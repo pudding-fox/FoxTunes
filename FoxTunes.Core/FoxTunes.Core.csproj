@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{62CD8F70-8415-4C15-B672-CB18475ABD7E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FoxTunes</RootNamespace>
+    <AssemblyName>FoxTunes.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyRegistry.cs" />
+    <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="BaseBehaviour.cs" />
+    <Compile Include="BaseComponent.cs" />
+    <Compile Include="BaseManager.cs" />
+    <Compile Include="ManagerLoader.cs" />
+    <Compile Include="BehaviourLoader.cs" />
+    <Compile Include="Behaviours\PlayNextItemBehaviour.cs" />
+    <Compile Include="Behaviours\PlaySelectedItemBehaviour.cs" />
+    <Compile Include="ComponentRegistry.cs" />
+    <Compile Include="ComponentScanner.cs" />
+    <Compile Include="Core.cs" />
+    <Compile Include="ComponentActivator.cs" />
+    <Compile Include="ComponentLoader.cs" />
+    <Compile Include="Managers\PlaybackManager.cs" />
+    <Compile Include="Managers\PlaylistManager.cs" />
+    <Compile Include="Playlist\Playlist.cs" />
+    <Compile Include="Playlist\PlaylistItem.cs" />
+    <Compile Include="Playlist\PlaylistItems.cs" />
+    <Compile Include="StandardBehaviour.cs" />
+    <Compile Include="StandardComponent.cs" />
+    <Compile Include="StandardComponents.cs" />
+    <Compile Include="Interfaces\IAssemblyRegistry.cs" />
+    <Compile Include="Interfaces\IAssemblyResolver.cs" />
+    <Compile Include="Interfaces\IBaseBehaviour.cs" />
+    <Compile Include="Interfaces\IBaseComponent.cs" />
+    <Compile Include="Interfaces\IBaseManager.cs" />
+    <Compile Include="Interfaces\IBehaviourLoader.cs" />
+    <Compile Include="Interfaces\IComponentRegistry.cs" />
+    <Compile Include="Interfaces\IComponentScanner.cs" />
+    <Compile Include="Interfaces\IConfiguration.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Interfaces\ICore.cs" />
+    <Compile Include="Interfaces\Database\IDatabase.cs" />
+    <Compile Include="Interfaces\IManagerLoader.cs" />
+    <Compile Include="Interfaces\IObservable.cs" />
+    <Compile Include="Interfaces\IStandardBehaviour.cs" />
+    <Compile Include="Interfaces\IStandardComponents.cs" />
+    <Compile Include="Interfaces\IStandardManager.cs" />
+    <Compile Include="Interfaces\IStandardManagers.cs" />
+    <Compile Include="Interfaces\Managers\IPlaybackManager.cs" />
+    <Compile Include="Interfaces\Managers\IPlaylistManager.cs" />
+    <Compile Include="Interfaces\Output\IOutput.cs" />
+    <Compile Include="Interfaces\IComponentActivator.cs" />
+    <Compile Include="Interfaces\IComponentLoader.cs" />
+    <Compile Include="Interfaces\Output\IOutputStream.cs" />
+    <Compile Include="Interfaces\Playlist\IPlaylist.cs" />
+    <Compile Include="Interfaces\Playlist\IPlaylistItem.cs" />
+    <Compile Include="Interfaces\Playlist\IPlaylistItems.cs" />
+    <Compile Include="Interfaces\IStandardComponent.cs" />
+    <Compile Include="Interfaces\UserInterface\IUserInterface.cs" />
+    <Compile Include="StandardManager.cs" />
+    <Compile Include="StandardManagers.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
