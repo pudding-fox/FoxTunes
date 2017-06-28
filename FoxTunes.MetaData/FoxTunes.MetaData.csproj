@@ -7,7 +7,7 @@
     <ProjectGuid>{395751A0-49B7-49DC-88A8-02B14A322E99}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FoxTunes.MetaData</RootNamespace>
+    <RootNamespace>FoxTunes</RootNamespace>
     <AssemblyName>FoxTunes.MetaData</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -39,7 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MetaDataItem.cs" />
+    <Compile Include="MetaDataItems.cs" />
+    <Compile Include="MetaDataSourceFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
+      <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
+      <Name>FoxTunes.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

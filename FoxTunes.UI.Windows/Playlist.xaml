@@ -8,15 +8,34 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <Grid>
-        <ListBox ItemsSource="{Binding Components.Playlist.Items}" SelectedValue="{Binding Components.Playlist.SelectedItem}" 
+        <ListView ItemsSource="{Binding Components.Playlist.Items}" SelectedValue="{Binding Components.Playlist.SelectedItem}" 
                 AllowDrop="True" 
                 DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" 
                 DragOver="ListBox_DragOver" Drop="ListBox_Drop">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Label Content="{Binding FileName}"></Label>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Artist / album">
+                            <GridViewColumn.DisplayMemberBinding>
+                                <MultiBinding StringFormat="{}{0} - {1}">
+                                    <Binding Path="MetaData.Items[FirstAlbumArtist].Value"></Binding>
+                                    <Binding Path="MetaData.Items[Album].Value"></Binding>
+                                </MultiBinding>
+                            </GridViewColumn.DisplayMemberBinding>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Track no" DisplayMemberBinding="{Binding MetaData.Items[Track].Value}"></GridViewColumn>
+                        <GridViewColumn Header="Title / track artist">
+                            <GridViewColumn.DisplayMemberBinding>
+                                <MultiBinding StringFormat="{}{0} - {1}">
+                                    <Binding Path="MetaData.Items[Title].Value"></Binding>
+                                    <Binding Path="MetaData.Items[Performers].Value"></Binding>
+                                </MultiBinding>
+                            </GridViewColumn.DisplayMemberBinding>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Duration"></GridViewColumn>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </UserControl>

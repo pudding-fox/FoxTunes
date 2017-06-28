@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxTunes.Factories;
+using FoxTunes.Interfaces;
 using System.IO;
 
 namespace FoxTunes.Managers
@@ -7,11 +8,14 @@ namespace FoxTunes.Managers
     {
         public IPlaylist Playlist { get; private set; }
 
+        public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
+
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Playlist = core.Components.Playlist;
+            this.PlaylistItemFactory = core.Factories.PlaylistItem;
             this.PlaybackManager = core.Managers.Playback;
             base.InitializeComponent(core);
         }
@@ -30,7 +34,7 @@ namespace FoxTunes.Managers
             {
                 return;
             }
-            this.Playlist.Items.Add(this.Playlist.Items.Create(fileName));
+            this.Playlist.Items.Add(this.PlaylistItemFactory.Create(fileName));
         }
 
         public void Next()

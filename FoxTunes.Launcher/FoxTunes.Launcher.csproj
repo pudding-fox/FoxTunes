@@ -76,6 +76,14 @@
       <Project>{64ed8f47-c8a1-4d23-943d-1c0f74d39d9d}</Project>
       <Name>FoxTunes.DB</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.MetaData.TagLib\FoxTunes.MetaData.TagLib.csproj">
+      <Project>{1bcb836b-688f-4183-8702-eff08440cc8a}</Project>
+      <Name>FoxTunes.MetaData.TagLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.MetaData\FoxTunes.MetaData.csproj">
+      <Project>{395751a0-49b7-49dc-88a8-02b14a322e99}</Project>
+      <Name>FoxTunes.MetaData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FoxTunes.Output.CSCore\FoxTunes.Output.CSCore.csproj">
       <Project>{30afd731-fd4c-426c-9566-38186fa6afa1}</Project>
       <Name>FoxTunes.Output.CSCore</Name>

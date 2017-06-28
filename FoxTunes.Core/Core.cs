@@ -20,22 +20,44 @@ namespace FoxTunes
             }
         }
 
-        public void LoadComponents()
+        public IStandardFactories Factories
+        {
+            get
+            {
+                return StandardFactories.Instance;
+            }
+        }
+
+        public void Load()
+        {
+            this.LoadComponents();
+            this.LoadManagers();
+            this.LoadFactories();
+            this.LoadBehaviours();
+            this.InitializeComponents();
+        }
+
+        protected virtual void LoadComponents()
         {
             ComponentRegistry.Instance.AddComponents(ComponentLoader.Instance.Load());
         }
 
-        public void LoadManagers()
+        protected virtual void LoadManagers()
         {
             ComponentRegistry.Instance.AddComponents(ManagerLoader.Instance.Load());
         }
 
-        public void LoadBehaviours()
+        protected virtual void LoadFactories()
+        {
+            ComponentRegistry.Instance.AddComponents(FactoryLoader.Instance.Load());
+        }
+
+        protected virtual void LoadBehaviours()
         {
             ComponentRegistry.Instance.AddComponents(BehaviourLoader.Instance.Load());
         }
 
-        public void InitializeComponents()
+        protected virtual void InitializeComponents()
         {
             ComponentRegistry.Instance.ForEach(component => component.InitializeComponent(this));
         }

@@ -15,6 +15,7 @@ namespace FoxTunes.Launcher
             typeof(Configuration),
             typeof(SqliteDatabase),
             typeof(CSCoreOutput),
+            typeof(TagLibMetaDataSource),
             typeof(WindowsUserInterface)
         };
 
@@ -22,10 +23,7 @@ namespace FoxTunes.Launcher
         public static void Main(string[] args)
         {
             var core = new Core();
-            core.LoadComponents();
-            core.LoadManagers();
-            core.LoadBehaviours();
-            core.InitializeComponents();
+            core.Load();
             core.Components.UserInterface.Show();
         }
     }
