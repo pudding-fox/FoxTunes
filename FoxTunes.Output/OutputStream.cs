@@ -22,9 +22,83 @@ namespace FoxTunes
 
         public abstract int BlockAlign { get; }
 
-        public abstract bool Paused { get; set; }
+        public abstract bool IsPlaying { get; }
+
+        protected virtual void OnIsPlayingChanged()
+        {
+            if (this.IsPlayingChanged != null)
+            {
+                this.IsPlayingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsPlaying");
+        }
+
+        public event EventHandler IsPlayingChanged = delegate { };
+
+        public abstract bool IsPaused { get; }
+
+        protected virtual void OnIsPausedChanged()
+        {
+            if (this.IsPausedChanged != null)
+            {
+                this.IsPausedChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsPaused");
+        }
+
+        public event EventHandler IsPausedChanged = delegate { };
+
+        public abstract bool IsStopped { get; }
+
+        protected virtual void OnIsStoppedChanged()
+        {
+            if (this.IsStoppedChanged != null)
+            {
+                this.IsStoppedChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsStopped");
+        }
+
+        public event EventHandler IsStoppedChanged = delegate { };
 
         public abstract void Play();
+
+        protected virtual void OnPlayed(bool manual)
+        {
+            if (this.Played == null)
+            {
+                return;
+            }
+            this.Played(this, new PlayedEventArgs(manual));
+        }
+
+        public event PlayedEventHandler Played = delegate { };
+
+        public abstract void Pause();
+
+        protected virtual void OnPaused()
+        {
+            if (this.Paused == null)
+            {
+                return;
+            }
+            this.Paused(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Paused = delegate { };
+
+        public abstract void Resume();
+
+        protected virtual void OnResumed()
+        {
+            if (this.Resumed == null)
+            {
+                return;
+            }
+            this.Resumed(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Resumed = delegate { };
 
         public abstract void Stop();
 

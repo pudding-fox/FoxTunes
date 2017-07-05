@@ -47,6 +47,9 @@
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Playback.xaml.cs">
+      <DependentUpon>Playback.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Playlist.xaml.cs">
       <DependentUpon>Playlist.xaml</DependentUpon>
     </Compile>
@@ -54,6 +57,9 @@
     <Compile Include="StreamPosition.xaml.cs">
       <DependentUpon>StreamPosition.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\Command.cs" />
+    <Compile Include="ViewModel\Playback.cs" />
+    <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="WindowsUserInterface.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +74,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Main.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Playback.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
