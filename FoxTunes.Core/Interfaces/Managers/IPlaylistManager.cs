@@ -1,4 +1,6 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System.Collections.Generic;
+
+namespace FoxTunes.Interfaces
 {
     public interface IPlaylistManager : IStandardManager
     {
@@ -9,5 +11,7 @@
         void Next();
 
         void Previous();
+
+        IEnumerable<IPlaylistItem> Items { get; }
     }
 }
