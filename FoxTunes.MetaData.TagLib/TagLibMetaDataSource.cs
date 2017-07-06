@@ -7,7 +7,7 @@ namespace FoxTunes
     {
         private TagLibMetaDataSource()
         {
-            this.Items = new TagLibMetaDataItems();
+            this.Items = new MetaDataItems();
         }
 
         public TagLibMetaDataSource(string fileName)
@@ -82,22 +82,22 @@ namespace FoxTunes
 
         private void Add(string name, IPicture[] value)
         {
-            this.Items.Add(new TagLibMetaDataItem(name, value));
+            this.Items.Add(new MetaDataItem(name, value));
         }
 
         private void Add(string name, uint value)
         {
-            this.Items.Add(new TagLibMetaDataItem(name, value));
+            this.Items.Add(new MetaDataItem(name, value));
         }
 
         private void Add(string name, string[] values)
         {
-            this.Items.Add(new TagLibMetaDataItem(name, values));
+            this.Items.Add(new MetaDataItem(name, values));
         }
 
         private void Add(string name, string value)
         {
-            this.Items.Add(new TagLibMetaDataItem(name, value));
+            this.Items.Add(new MetaDataItem(name, value));
         }
     }
 }

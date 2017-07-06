@@ -69,9 +69,13 @@
       <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
       <Name>FoxTunes.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.DB.Sqlite\FoxTunes.DB.Sqlite.csproj">
-      <Project>{a07d1c38-cf7b-4eb0-88ca-a87374b980fc}</Project>
-      <Name>FoxTunes.DB.Sqlite</Name>
+    <ProjectReference Include="..\FoxTunes.DB.EntityFramework.SQLite\FoxTunes.DB.EntityFramework.SQLite.csproj">
+      <Project>{aff37a81-f152-44e6-9686-95bf34c6487c}</Project>
+      <Name>FoxTunes.DB.EntityFramework.SQLite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.DB.EntityFramework\FoxTunes.DB.EntityFramework.csproj">
+      <Project>{e364d8b1-cfc6-4551-91f9-d5b7127cbe60}</Project>
+      <Name>FoxTunes.DB.EntityFramework</Name>
     </ProjectReference>
     <ProjectReference Include="..\FoxTunes.DB\FoxTunes.DB.csproj">
       <Project>{64ed8f47-c8a1-4d23-943d-1c0f74d39d9d}</Project>

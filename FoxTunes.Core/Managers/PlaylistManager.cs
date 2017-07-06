@@ -8,6 +8,8 @@ namespace FoxTunes.Managers
     {
         public IPlaylist Playlist { get; private set; }
 
+        public IDatabase Database { get; private set; }
+
         public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
@@ -15,6 +17,7 @@ namespace FoxTunes.Managers
         public override void InitializeComponent(ICore core)
         {
             this.Playlist = core.Components.Playlist;
+            this.Database = core.Components.Database;
             this.PlaylistItemFactory = core.Factories.PlaylistItem;
             this.PlaybackManager = core.Managers.Playback;
             base.InitializeComponent(core);
@@ -79,6 +82,16 @@ namespace FoxTunes.Managers
             {
                 return this.Playlist.Items;
             }
+        }
+
+        public void Save()
+        {
+            this.Database.Save(this.Playlist);
+        }
+
+        public void Load()
+        {
+            this.Database.Load(this.Playlist);
         }
     }
 }
