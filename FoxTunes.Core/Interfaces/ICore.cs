@@ -1,6 +1,8 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System;
+
+namespace FoxTunes.Interfaces
 {
-    public interface ICore
+    public interface ICore : IDisposable
     {
         IStandardComponents Components { get; }
 

@@ -22,9 +22,11 @@ namespace FoxTunes.Launcher
         [STAThread]
         public static void Main(string[] args)
         {
-            var core = new Core();
-            core.Load();
-            core.Components.UserInterface.Show();
+            using (var core = new Core())
+            {
+                core.Load();
+                core.Components.UserInterface.Show();
+            }
         }
     }
 }
