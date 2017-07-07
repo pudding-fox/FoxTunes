@@ -72,6 +72,14 @@ namespace FoxTunes
 
         new public DbSet<T> Set { get; private set; }
 
+        public bool IsLoaded { get; private set; }
+
+        public void Load()
+        {
+            this.Set.Load();
+            this.IsLoaded = true;
+        }
+
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             return ((IEnumerable<T>)this.Set).GetEnumerator();
@@ -108,6 +116,10 @@ namespace FoxTunes
 
         ObservableCollection<T> IPersistableSet<T>.AsObservable()
         {
+            if (!this.IsLoaded)
+            {
+                this.Load();
+            }
             return this.Set.Local;
         }
     }

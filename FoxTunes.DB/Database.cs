@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public abstract IPersistableSet<T> GetSet<T>() where T : class;
 
+        public abstract int SaveChanges();
+
         public override void InitializeComponent(ICore core)
         {
             this.Connection = this.CreateConnection();

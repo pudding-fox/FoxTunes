@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Database.dat" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

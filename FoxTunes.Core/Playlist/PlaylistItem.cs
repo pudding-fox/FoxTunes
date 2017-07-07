@@ -3,7 +3,7 @@ using System;
 
 namespace FoxTunes
 {
-    public class PlaylistItem : BaseComponent, IPlaylistItem
+    public class PlaylistItem : PersistableComponent
     {
         public PlaylistItem()
         {
@@ -15,8 +15,6 @@ namespace FoxTunes
             this.FileName = fileName;
             this.MetaData = metaData;
         }
-
-        public Guid Id { get; set; }
 
         public string FileName { get; set; }
 

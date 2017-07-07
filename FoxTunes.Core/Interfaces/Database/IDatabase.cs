@@ -7,5 +7,7 @@ namespace FoxTunes.Interfaces
         IPersistableSet GetSet(Type type);
 
         IPersistableSet<T> GetSet<T>() where T : class;
+
+        int SaveChanges();
     }
 }

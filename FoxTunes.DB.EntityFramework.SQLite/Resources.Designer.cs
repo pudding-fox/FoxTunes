@@ -63,6 +63,16 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Database {
+            get {
+                object obj = ResourceManager.GetObject("Database", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] SQLite_Interop_x64 {
             get {
                 object obj = ResourceManager.GetObject("SQLite_Interop_x64", resourceCulture);
