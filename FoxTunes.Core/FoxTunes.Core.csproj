@@ -54,8 +54,6 @@
     <Compile Include="Interfaces\IPersistableComponent.cs" />
     <Compile Include="Interfaces\IStandardFactories.cs" />
     <Compile Include="Interfaces\IStandardFactory.cs" />
-    <Compile Include="Interfaces\MetaData\IMetaDataItem.cs" />
-    <Compile Include="Interfaces\MetaData\IMetaDataItems.cs" />
     <Compile Include="Interfaces\MetaData\IMetaDataSource.cs" />
     <Compile Include="Interfaces\Factories\IPlaylistItemFactory.cs" />
     <Compile Include="ManagerLoader.cs" />
@@ -69,6 +67,7 @@
     <Compile Include="ComponentLoader.cs" />
     <Compile Include="Managers\PlaybackManager.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
+    <Compile Include="MetaData\MetaDataItem.cs" />
     <Compile Include="PersistableComponent.cs" />
     <Compile Include="Playlist\Playlist.cs" />
     <Compile Include="Playlist\PlaylistItem.cs" />
@@ -105,9 +104,7 @@
     <Compile Include="StandardManager.cs" />
     <Compile Include="StandardManagers.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MetaData\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

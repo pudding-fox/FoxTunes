@@ -18,7 +18,16 @@ namespace FoxTunes
         protected virtual DbModel CreateDbModel()
         {
             var builder = this.CreateModelBuilder();
-            builder.Entity<PlaylistItem>();
+            builder.Entity<PlaylistItem>()
+                .HasMany(item => item.MetaData)
+                .WithMany()
+                .Map(config =>
+                {
+                    config.MapLeftKey("PlaylistItem_Id");
+                    config.MapRightKey("MetaDataItem_Id");
+                    config.ToTable("PlaylistItem_MetaDataItem");
+                });
+            builder.Entity<MetaDataItem>();
             return builder.Build(this.Connection);
         }
 
@@ -35,7 +44,7 @@ namespace FoxTunes
             {
                 this.DbContext = this.CreateDbContext();
             }
-            return new WrappedDbSet(this.DbContext.Set(type));
+            return new WrappedDbSet(this.DbContext, this.DbContext.Set(type));
         }
 
         public override IPersistableSet<T> GetSet<T>()
@@ -44,7 +53,7 @@ namespace FoxTunes
             {
                 this.DbContext = this.CreateDbContext();
             }
-            return new WrappedDbSet<T>(this.DbContext.Set<T>());
+            return new WrappedDbSet<T>(this.DbContext, this.DbContext.Set<T>());
         }
 
         public override int SaveChanges()

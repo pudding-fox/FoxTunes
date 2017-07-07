@@ -18,17 +18,17 @@
                         <GridViewColumn Header="Artist / album">
                             <GridViewColumn.DisplayMemberBinding>
                                 <MultiBinding StringFormat="{}{0} - {1}">
-                                    <Binding Path="MetaData.Items[FirstAlbumArtist].Value"></Binding>
-                                    <Binding Path="MetaData.Items[Album].Value"></Binding>
+                                    <Binding Path="[FirstAlbumArtist].TextValue"></Binding>
+                                    <Binding Path="[Album].TextValue"></Binding>
                                 </MultiBinding>
                             </GridViewColumn.DisplayMemberBinding>
                         </GridViewColumn>
-                        <GridViewColumn Header="Track no" DisplayMemberBinding="{Binding MetaData.Items[Track].Value}"></GridViewColumn>
+                        <GridViewColumn Header="Track no" DisplayMemberBinding="{Binding [Track].NumericValue}"></GridViewColumn>
                         <GridViewColumn Header="Title / track artist">
                             <GridViewColumn.DisplayMemberBinding>
                                 <MultiBinding StringFormat="{}{0} - {1}">
-                                    <Binding Path="MetaData.Items[Title].Value"></Binding>
-                                    <Binding Path="MetaData.Items[Performers].Value"></Binding>
+                                    <Binding Path="[Title].TextValue"></Binding>
+                                    <Binding Path="[Performers].TextValue"></Binding>
                                 </MultiBinding>
                             </GridViewColumn.DisplayMemberBinding>
                         </GridViewColumn>

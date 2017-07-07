@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Collections.ObjectModel;
 using TagLib;
 
 namespace FoxTunes
@@ -7,7 +8,7 @@ namespace FoxTunes
     {
         private TagLibMetaDataSource()
         {
-            this.Items = new MetaDataItems();
+            this.Items = new ObservableCollection<MetaDataItem>();
         }
 
         public TagLibMetaDataSource(string fileName)
@@ -18,7 +19,7 @@ namespace FoxTunes
 
         public string FileName { get; private set; }
 
-        public IMetaDataItems Items { get; private set; }
+        public ObservableCollection<MetaDataItem> Items { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -82,22 +83,34 @@ namespace FoxTunes
 
         private void Add(string name, IPicture[] value)
         {
-            this.Items.Add(new MetaDataItem(name, value));
+            //Nothing to do.
         }
 
         private void Add(string name, uint value)
         {
-            this.Items.Add(new MetaDataItem(name, value));
+            if (value == 0)
+            {
+                return;
+            }
+            this.Items.Add(new MetaDataItem(name) { NumericValue = value });
+        }
+
+
+        private void Add(string name, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return;
+            }
+            this.Items.Add(new MetaDataItem(name) { TextValue = value });
         }
 
         private void Add(string name, string[] values)
         {
-            this.Items.Add(new MetaDataItem(name, values));
-        }
-
-        private void Add(string name, string value)
-        {
-            this.Items.Add(new MetaDataItem(name, value));
+            foreach (var value in values)
+            {
+                this.Add(name, value);
+            }
         }
     }
 }

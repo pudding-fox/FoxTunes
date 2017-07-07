@@ -13,7 +13,15 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
-        public ObservableCollection<PlaylistItem> Items { get; private set; }
+        public IPersistableSet<PlaylistItem> Set { get; private set; }
+
+        public ObservableCollection<PlaylistItem> Items
+        {
+            get
+            {
+                return this.Set.AsObservable();
+            }
+        }
 
         private PlaylistItem _SelectedItem { get; set; }
 
@@ -56,7 +64,8 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Components.Database;
-            this.Items = this.Database.GetSet<PlaylistItem>().AsObservable();
+            this.Set = this.Database.GetSet<PlaylistItem>();
+            this.Set.LoadCollection(item => item.MetaData);
             base.InitializeComponent(core);
         }
     }
