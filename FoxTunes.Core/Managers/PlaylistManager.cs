@@ -83,15 +83,5 @@ namespace FoxTunes.Managers
                 return this.Playlist.Items;
             }
         }
-
-        public void Save()
-        {
-            this.Database.Save(this.Playlist);
-        }
-
-        public void Load()
-        {
-            this.Database.Load(this.Playlist);
-        }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 namespace FoxTunes.Interfaces
 {
     public interface IPlaylist : IBaseComponent
     {
-        IPlaylistItems Items { get; }
+        ObservableCollection<IPlaylistItem> Items { get; }
 
         IPlaylistItem SelectedItem { get; set; }
 

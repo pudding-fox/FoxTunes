@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 
@@ -27,13 +28,22 @@ namespace FoxTunes
             return new InternalDbContext(this.Connection, compiled);
         }
 
-        protected virtual DbSet<T> GetSet<T>() where T : class
+        public override IPersistableSet GetSet(Type type)
         {
             if (this.DbContext == null)
             {
                 this.DbContext = this.CreateDbContext();
             }
-            return this.DbContext.Set<T>();
+            return new WrappedDbSet(this.DbContext.Set(type));
+        }
+
+        public override IPersistableSet<T> GetSet<T>()
+        {
+            if (this.DbContext == null)
+            {
+                this.DbContext = this.CreateDbContext();
+            }
+            return new WrappedDbSet<T>(this.DbContext.Set<T>());
         }
     }
 }

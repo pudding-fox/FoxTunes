@@ -1,7 +1,9 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System;
+
+namespace FoxTunes.Interfaces
 {
-    public interface IPersistableComponent<T> where T : IPersistableComponent<T>
+    public interface IPersistableComponent : IBaseComponent
     {
-        T ToPersistable();
+        Guid Id { get; set; }
     }
 }

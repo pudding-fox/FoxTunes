@@ -7,6 +7,12 @@ namespace FoxTunes
 {
     public class SQLiteDatabase : EntityFrameworkDatabase
     {
+        private static readonly Type[] References = new[]
+        {            
+            typeof(global::System.Data.SQLite.EF6.SQLiteProviderFactory),
+            typeof(global::System.Data.SQLite.Linq.SQLiteProviderFactory)
+        };
+
         private static readonly string DatabaseFileName = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "Database.dat"
@@ -67,16 +73,6 @@ namespace FoxTunes
                 SQLiteConnection.CreateFile(DatabaseFileName);
             }
             return new SQLiteConnection(this.ConnectionString);
-        }
-
-        public override void Save<T>(T value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Load<T>(T value)
-        {
-            throw new NotImplementedException();
         }
     }
 }

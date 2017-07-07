@@ -1,6 +1,6 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IPlaylistItem : IBaseComponent
+    public interface IPlaylistItem : IPersistableComponent
     {
         string FileName { get; }
 
