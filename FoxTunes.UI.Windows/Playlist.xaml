@@ -4,37 +4,29 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              x:Class="FoxTunes.Playlist" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}">
+            <ViewModel:Playlist.PlaylistColumns>
+                <ViewModel:PlaylistColumn Header="Playing"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Artist / album" Script="(function(){var parts=[];if(firstartist){parts.push(firstartist);}if(album){parts.push(album);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Track no" Script="track"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Title / track artist" Script="(function(){var parts=[];if(title){parts.push(title);}if(firstperformer &amp;&amp; firstperformer != firstartist){parts.push(firstperformer);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Duration"></ViewModel:PlaylistColumn>
+            </ViewModel:Playlist.PlaylistColumns>
+        </ViewModel:Playlist>
+    </UserControl.Resources>
     <Grid>
         <ListView ItemsSource="{Binding Components.Playlist.Items}" SelectedValue="{Binding Components.Playlist.SelectedItem}" 
                 AllowDrop="True" 
                 DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" 
                 DragOver="ListBox_DragOver" Drop="ListBox_Drop">
             <ListView.View>
-                <GridView>
-                    <GridView.Columns>
-                        <GridViewColumn Header="Artist / album">
-                            <GridViewColumn.DisplayMemberBinding>
-                                <MultiBinding StringFormat="{}{0} - {1}">
-                                    <Binding Path="[FirstAlbumArtist].TextValue"></Binding>
-                                    <Binding Path="[Album].TextValue"></Binding>
-                                </MultiBinding>
-                            </GridViewColumn.DisplayMemberBinding>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Track no" DisplayMemberBinding="{Binding [Track].NumericValue}"></GridViewColumn>
-                        <GridViewColumn Header="Title / track artist">
-                            <GridViewColumn.DisplayMemberBinding>
-                                <MultiBinding StringFormat="{}{0} - {1}">
-                                    <Binding Path="[Title].TextValue"></Binding>
-                                    <Binding Path="[Performers].TextValue"></Binding>
-                                </MultiBinding>
-                            </GridViewColumn.DisplayMemberBinding>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Duration"></GridViewColumn>
-                    </GridView.Columns>
-                </GridView>
+                <GridView Extensions:GridViewExtensions.ColumnsSource="{Binding Source={StaticResource ViewModel}, Path=GridColumns}" ></GridView>
             </ListView.View>
         </ListView>
     </Grid>

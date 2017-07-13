@@ -29,6 +29,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.EntityFramework
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.EntityFramework.SQLite", "FoxTunes.DB.EntityFramework.SQLite\FoxTunes.DB.EntityFramework.SQLite.csproj", "{AFF37A81-F152-44E6-9686-95BF34C6487C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Scripting", "FoxTunes.Scripting\FoxTunes.Scripting.csproj", "{50D995F1-CA54-42B6-BDA5-4047E720716D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Scripting.JS", "FoxTunes.Scripting.JS\FoxTunes.Scripting.JS.csproj", "{0F6183DB-5001-4D9A-BBD3-157356B62684}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +91,14 @@ Global
 		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Debug|Any CPU.Build.0 = Debug|x86
+		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
