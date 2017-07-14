@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -41,11 +42,31 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        private void EnsureScriptingContext()
+        {
+            if (this.ScriptingContext != null)
+            {
+                return;
+            }
+            this.ScriptingContext = this.Core.Components.ScriptingRuntime.CreateContext();
+        }
+
         protected override void OnCoreChanged()
         {
+            //TODO: This is a hack in order to make the playlist's "is playing" field update.
             this.Core.Managers.Playback.CurrentStreamChanged += (sender, e) => this.OnPropertyChanged("GridColumns");
             base.OnCoreChanged();
         }
+
+        public ICommand ClearCommand
+        {
+            get
+            {
+                return new Command(() => this.Core.Managers.Playlist.Clear());
+            }
+        }
+
+        #region IValueConverter
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -60,18 +81,9 @@ namespace FoxTunes.ViewModel
                 return null;
             }
             this.EnsureScriptingContext();
-            var runner = new PlaylistItemScriptRunner(this, playlistItem, script);
+            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, playlistItem, script);
             runner.Prepare();
             return runner.Run();
-        }
-
-        private void EnsureScriptingContext()
-        {
-            if (this.ScriptingContext != null)
-            {
-                return;
-            }
-            this.ScriptingContext = this.Core.Components.ScriptingRuntime.CreateContext();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -79,58 +91,11 @@ namespace FoxTunes.ViewModel
             throw new NotImplementedException();
         }
 
+        #endregion
+
         protected override Freezable CreateInstanceCore()
         {
             return new Playlist();
-        }
-
-        private class PlaylistItemScriptRunner
-        {
-            public PlaylistItemScriptRunner(Playlist playlist, PlaylistItem playlistItem, string script)
-            {
-                this.Playlist = playlist;
-                this.PlaylistItem = playlistItem;
-                this.Script = script;
-            }
-
-            public Playlist Playlist{ get; private set; }
-
-            public PlaylistItem PlaylistItem { get; private set; }
-
-            public string Script { get; private set; }
-
-            public void Prepare()
-            {
-                var metaData = new Dictionary<string, object>();
-                foreach (var item in this.PlaylistItem.MetaDatas)
-                {
-                    metaData.Add(item.Name.ToLower(), item.Value);
-                }
-
-                var properties = new Dictionary<string, object>();
-                foreach (var item in this.PlaylistItem.Properties)
-                {
-                    properties.Add(item.Name.ToLower(), item.Value);
-                }
-                this.Playlist.ScriptingContext.SetValue("item", this.PlaylistItem);
-                this.Playlist.ScriptingContext.SetValue("playing", this.Playlist.Core.Components.Playlist.SelectedItem);
-                this.Playlist.ScriptingContext.SetValue("tag", metaData);
-                this.Playlist.ScriptingContext.SetValue("stat", properties);
-            }
-
-            public object Run()
-            {
-                const string RESULT = "__result";
-                try
-                {
-                    this.Playlist.ScriptingContext.Run(string.Concat("var ", RESULT, " = ", this.Script, ";"));
-                }
-                catch (Exception e)
-                {
-                    return e;
-                }
-                return this.Playlist.ScriptingContext.GetValue(RESULT);
-            }
         }
     }
 }

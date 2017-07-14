@@ -76,6 +76,11 @@ namespace FoxTunes.Managers
             this.Playlist.SelectedItem = this.Playlist.Items[index];
         }
 
+        public void Clear()
+        {
+            this.Playlist.Items.Clear();
+        }
+
         public IEnumerable<PlaylistItem> Items
         {
             get

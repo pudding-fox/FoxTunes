@@ -58,6 +58,7 @@
     <Compile Include="StreamPosition.xaml.cs">
       <DependentUpon>StreamPosition.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\Playback.cs" />
     <Compile Include="ViewModel\Playlist.cs" />

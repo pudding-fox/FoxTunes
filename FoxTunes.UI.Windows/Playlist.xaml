@@ -25,6 +25,11 @@
                 AllowDrop="True" 
                 DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" 
                 DragOver="ListBox_DragOver" Drop="ListBox_Drop">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Clear" Command="{Binding Source={StaticResource ViewModel}, Path=ClearCommand}"></MenuItem>
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.View>
                 <GridView Extensions:GridViewExtensions.ColumnsSource="{Binding Source={StaticResource ViewModel}, Path=GridColumns}" ></GridView>
             </ListView.View>
