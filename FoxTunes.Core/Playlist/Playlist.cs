@@ -65,7 +65,8 @@ namespace FoxTunes
         {
             this.Database = core.Components.Database;
             this.Set = this.Database.GetSet<PlaylistItem>();
-            this.Set.LoadCollection(item => item.MetaData);
+            this.Set.LoadCollection(item => item.MetaDatas);
+            this.Set.LoadCollection(item => item.Properties);
             base.InitializeComponent(core);
         }
     }

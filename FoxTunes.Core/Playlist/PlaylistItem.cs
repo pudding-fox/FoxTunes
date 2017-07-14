@@ -15,19 +15,14 @@ namespace FoxTunes
         public PlaylistItem(string fileName, IMetaDataSource metaData)
         {
             this.FileName = fileName;
-            this.MetaData = metaData.Items;
+            this.MetaDatas = metaData.MetaDatas;
+            this.Properties = metaData.Properties;
         }
 
         public string FileName { get; set; }
 
-        public ObservableCollection<MetaDataItem> MetaData { get; private set; }
+        public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
 
-        public MetaDataItem this[string name]
-        {
-            get
-            {
-                return this.MetaData.FirstOrDefault(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
-            }
-        }
+        public ObservableCollection<PropertyItem> Properties { get; private set; }
     }
 }

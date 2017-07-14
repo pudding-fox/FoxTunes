@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,8 +43,8 @@ namespace FoxTunes.ViewModel
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var item = value as PlaylistItem;
-            if (item == null)
+            var playlistItem = value as PlaylistItem;
+            if (playlistItem == null)
             {
                 return null;
             }
@@ -54,24 +54,9 @@ namespace FoxTunes.ViewModel
                 return null;
             }
             this.EnsureScriptingContext();
-            this.ScriptingContext.SetValue("playing", value);
-            const string RESULT = "__result";
-            try
-            {
-                foreach (var metaData in item.MetaData)
-                {
-                    this.ScriptingContext.SetValue(metaData.Name.ToLower(), metaData.Value);
-                }
-                this.ScriptingContext.Run(string.Concat("var ", RESULT, " = ", script, ";"));
-            }
-            finally
-            {
-                foreach (var metaData in item.MetaData)
-                {
-                    this.ScriptingContext.SetValue(metaData.Name.ToLower(), null);
-                }
-            }
-            return this.ScriptingContext.GetValue(RESULT);
+            var runner = new PlaylistItemScriptRunner(this, playlistItem, script);
+            runner.Prepare();
+            return runner.Run();
         }
 
         private void EnsureScriptingContext()
@@ -91,6 +76,55 @@ namespace FoxTunes.ViewModel
         protected override Freezable CreateInstanceCore()
         {
             return new Playlist();
+        }
+
+        private class PlaylistItemScriptRunner
+        {
+            public PlaylistItemScriptRunner(Playlist playlist, PlaylistItem playlistItem, string script)
+            {
+                this.Playlist = playlist;
+                this.PlaylistItem = playlistItem;
+                this.Script = script;
+            }
+
+            public Playlist Playlist{ get; private set; }
+
+            public PlaylistItem PlaylistItem { get; private set; }
+
+            public string Script { get; private set; }
+
+            public void Prepare()
+            {
+                var metaData = new Dictionary<string, object>();
+                foreach (var item in this.PlaylistItem.MetaDatas)
+                {
+                    metaData.Add(item.Name.ToLower(), item.Value);
+                }
+
+                var properties = new Dictionary<string, object>();
+                foreach (var item in this.PlaylistItem.Properties)
+                {
+                    properties.Add(item.Name.ToLower(), item.Value);
+                }
+                this.Playlist.ScriptingContext.SetValue("item", this.PlaylistItem);
+                this.Playlist.ScriptingContext.SetValue("playing", this.Playlist.Core.Components.Playlist.SelectedItem);
+                this.Playlist.ScriptingContext.SetValue("tag", metaData);
+                this.Playlist.ScriptingContext.SetValue("stat", properties);
+            }
+
+            public object Run()
+            {
+                const string RESULT = "__result";
+                try
+                {
+                    this.Playlist.ScriptingContext.Run(string.Concat("var ", RESULT, " = ", this.Script, ";"));
+                }
+                catch (Exception e)
+                {
+                    return e;
+                }
+                return this.Playlist.ScriptingContext.GetValue(RESULT);
+            }
         }
     }
 }

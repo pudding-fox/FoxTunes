@@ -4,6 +4,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IMetaDataSource : IBaseComponent
     {
-        ObservableCollection<MetaDataItem> Items { get; }
+        ObservableCollection<MetaDataItem> MetaDatas { get; }
+
+        ObservableCollection<PropertyItem> Properties { get; }
     }
 }

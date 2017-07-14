@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.ObjectModel;
 using TagLib;
 
@@ -8,7 +9,8 @@ namespace FoxTunes
     {
         private TagLibMetaDataSource()
         {
-            this.Items = new ObservableCollection<MetaDataItem>();
+            this.MetaDatas = new ObservableCollection<MetaDataItem>();
+            this.Properties = new ObservableCollection<PropertyItem>();
         }
 
         public TagLibMetaDataSource(string fileName)
@@ -19,89 +21,152 @@ namespace FoxTunes
 
         public string FileName { get; private set; }
 
-        public ObservableCollection<MetaDataItem> Items { get; private set; }
+        public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
+
+        public ObservableCollection<PropertyItem> Properties { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             var file = File.Create(this.FileName);
-            this.Add("Album", file.Tag.Album);
-            this.Add("AlbumArtists", file.Tag.AlbumArtists);
-            this.Add("AlbumArtistsSort", file.Tag.AlbumArtistsSort);
-            this.Add("AlbumSort", file.Tag.AlbumSort);
-            this.Add("AmazonId", file.Tag.AmazonId);
-#pragma warning disable 612, 618
-            this.Add("Artists", file.Tag.Artists);
-#pragma warning restore 612, 618
-            this.Add("BeatsPerMinute", file.Tag.BeatsPerMinute);
-            this.Add("Comment", file.Tag.Comment);
-            this.Add("Composers", file.Tag.Composers);
-            this.Add("ComposersSort", file.Tag.ComposersSort);
-            this.Add("Conductor", file.Tag.Conductor);
-            this.Add("Copyright", file.Tag.Copyright);
-            this.Add("Disc", file.Tag.Disc);
-            this.Add("DiscCount", file.Tag.DiscCount);
-            this.Add("FirstAlbumArtist", file.Tag.FirstAlbumArtist);
-            this.Add("FirstAlbumArtistSort", file.Tag.FirstAlbumArtistSort);
-#pragma warning disable 612, 618
-            this.Add("FirstArtist", file.Tag.FirstArtist);
-#pragma warning restore 612, 618
-            this.Add("FirstComposer", file.Tag.FirstComposer);
-            this.Add("FirstComposerSort", file.Tag.FirstComposerSort);
-            this.Add("FirstGenre", file.Tag.FirstGenre);
-            this.Add("FirstPerformer", file.Tag.FirstPerformer);
-            this.Add("FirstPerformerSort", file.Tag.FirstPerformerSort);
-            this.Add("Genres", file.Tag.Genres);
-            this.Add("Grouping", file.Tag.Grouping);
-            this.Add("JoinedAlbumArtists", file.Tag.JoinedAlbumArtists);
-#pragma warning disable 612, 618
-            this.Add("JoinedArtists", file.Tag.JoinedArtists);
-#pragma warning restore 612, 618
-            this.Add("JoinedComposers", file.Tag.JoinedComposers);
-            this.Add("JoinedGenres", file.Tag.JoinedGenres);
-            this.Add("JoinedPerformers", file.Tag.JoinedPerformers);
-            this.Add("JoinedPerformersSort", file.Tag.JoinedPerformersSort);
-            this.Add("Lyrics", file.Tag.Lyrics);
-            this.Add("MusicBrainzArtistId", file.Tag.MusicBrainzArtistId);
-            this.Add("MusicBrainzDiscId", file.Tag.MusicBrainzDiscId);
-            this.Add("MusicBrainzReleaseArtistId", file.Tag.MusicBrainzReleaseArtistId);
-            this.Add("MusicBrainzReleaseCountry", file.Tag.MusicBrainzReleaseCountry);
-            this.Add("MusicBrainzReleaseId", file.Tag.MusicBrainzReleaseId);
-            this.Add("MusicBrainzReleaseStatus", file.Tag.MusicBrainzReleaseStatus);
-            this.Add("MusicBrainzReleaseType", file.Tag.MusicBrainzReleaseType);
-            this.Add("MusicBrainzTrackId", file.Tag.MusicBrainzTrackId);
-            this.Add("MusicIpId", file.Tag.MusicIpId);
-            this.Add("Performers", file.Tag.Performers);
-            this.Add("PerformersSort", file.Tag.PerformersSort);
-            this.Add("Pictures", file.Tag.Pictures);
-            this.Add("Title", file.Tag.Title);
-            this.Add("TitleSort", file.Tag.TitleSort);
-            this.Add("Track", file.Tag.Track);
-            this.Add("TrackCount", file.Tag.TrackCount);
-            this.Add("Year", file.Tag.Year);
-            base.InitializeComponent(core); ;
+            this.AddMetaDatas(file.Tag);
+            this.AddProperties(file.Properties);
+            base.InitializeComponent(core);
         }
 
-        private void Add(string name, IPicture[] value)
+        private void AddMetaDatas(Tag tag)
+        {
+            this.AddMetaData("Album", tag.Album);
+            this.AddMetaData("AlbumArtists", tag.AlbumArtists);
+            this.AddMetaData("AlbumArtistsSort", tag.AlbumArtistsSort);
+            this.AddMetaData("AlbumSort", tag.AlbumSort);
+            this.AddMetaData("AmazonId", tag.AmazonId);
+#pragma warning disable 612, 618
+            this.AddMetaData("Artists", tag.Artists);
+#pragma warning restore 612, 618
+            this.AddMetaData("BeatsPerMinute", tag.BeatsPerMinute);
+            this.AddMetaData("Comment", tag.Comment);
+            this.AddMetaData("Composers", tag.Composers);
+            this.AddMetaData("ComposersSort", tag.ComposersSort);
+            this.AddMetaData("Conductor", tag.Conductor);
+            this.AddMetaData("Copyright", tag.Copyright);
+            this.AddMetaData("Disc", tag.Disc);
+            this.AddMetaData("DiscCount", tag.DiscCount);
+            this.AddMetaData("FirstAlbumArtist", tag.FirstAlbumArtist);
+            this.AddMetaData("FirstAlbumArtistSort", tag.FirstAlbumArtistSort);
+#pragma warning disable 612, 618
+            this.AddMetaData("FirstArtist", tag.FirstArtist);
+#pragma warning restore 612, 618
+            this.AddMetaData("FirstComposer", tag.FirstComposer);
+            this.AddMetaData("FirstComposerSort", tag.FirstComposerSort);
+            this.AddMetaData("FirstGenre", tag.FirstGenre);
+            this.AddMetaData("FirstPerformer", tag.FirstPerformer);
+            this.AddMetaData("FirstPerformerSort", tag.FirstPerformerSort);
+            this.AddMetaData("Genres", tag.Genres);
+            this.AddMetaData("Grouping", tag.Grouping);
+            this.AddMetaData("JoinedAlbumArtists", tag.JoinedAlbumArtists);
+#pragma warning disable 612, 618
+            this.AddMetaData("JoinedArtists", tag.JoinedArtists);
+#pragma warning restore 612, 618
+            this.AddMetaData("JoinedComposers", tag.JoinedComposers);
+            this.AddMetaData("JoinedGenres", tag.JoinedGenres);
+            this.AddMetaData("JoinedPerformers", tag.JoinedPerformers);
+            this.AddMetaData("JoinedPerformersSort", tag.JoinedPerformersSort);
+            this.AddMetaData("Lyrics", tag.Lyrics);
+            this.AddMetaData("MusicBrainzArtistId", tag.MusicBrainzArtistId);
+            this.AddMetaData("MusicBrainzDiscId", tag.MusicBrainzDiscId);
+            this.AddMetaData("MusicBrainzReleaseArtistId", tag.MusicBrainzReleaseArtistId);
+            this.AddMetaData("MusicBrainzReleaseCountry", tag.MusicBrainzReleaseCountry);
+            this.AddMetaData("MusicBrainzReleaseId", tag.MusicBrainzReleaseId);
+            this.AddMetaData("MusicBrainzReleaseStatus", tag.MusicBrainzReleaseStatus);
+            this.AddMetaData("MusicBrainzReleaseType", tag.MusicBrainzReleaseType);
+            this.AddMetaData("MusicBrainzTrackId", tag.MusicBrainzTrackId);
+            this.AddMetaData("MusicIpId", tag.MusicIpId);
+            this.AddMetaData("Performers", tag.Performers);
+            this.AddMetaData("PerformersSort", tag.PerformersSort);
+            this.AddMetaData("Pictures", tag.Pictures);
+            this.AddMetaData("Title", tag.Title);
+            this.AddMetaData("TitleSort", tag.TitleSort);
+            this.AddMetaData("Track", tag.Track);
+            this.AddMetaData("TrackCount", tag.TrackCount);
+            this.AddMetaData("Year", tag.Year);
+        }
+
+        private void AddMetaData(string name, IPicture[] value)
         {
             //Nothing to do.
         }
 
-        private void Add(string name, uint value)
+        private void AddMetaData(string name, uint? value)
         {
-            this.Items.Add(new MetaDataItem(name) { NumericValue = value });
+            this.AddMetaData(name, (int?)value);
         }
 
-        private void Add(string name, string value)
+        private void AddMetaData(string name, int? value)
         {
-            this.Items.Add(new MetaDataItem(name) { TextValue = value });
+            if (!value.HasValue)
+            {
+                return;
+            }
+            this.MetaDatas.Add(new MetaDataItem(name) { NumericValue = value.Value });
         }
 
-        private void Add(string name, string[] values)
+        private void AddMetaData(string name, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return;
+            }
+            this.MetaDatas.Add(new MetaDataItem(name) { TextValue = value });
+        }
+
+        private void AddMetaData(string name, string[] values)
         {
             foreach (var value in values)
             {
-                this.Add(name, value);
+                this.AddMetaData(name, value);
             }
+        }
+
+        private void AddProperties(Properties properties)
+        {
+            this.AddProperty("AudioBitrate", properties.AudioBitrate);
+            this.AddProperty("AudioChannels", properties.AudioChannels);
+            this.AddProperty("AudioSampleRate", properties.AudioSampleRate);
+            this.AddProperty("BitsPerSample", properties.BitsPerSample);
+            this.AddProperty("Description", properties.Description);
+            this.AddProperty("Duration", properties.Duration);
+            this.AddProperty("PhotoHeight", properties.PhotoHeight);
+            this.AddProperty("PhotoQuality", properties.PhotoQuality);
+            this.AddProperty("PhotoWidth", properties.PhotoWidth);
+            this.AddProperty("VideoHeight", properties.VideoHeight);
+            this.AddProperty("VideoWidth", properties.VideoWidth);
+        }
+
+        private void AddProperty(string name, int? value)
+        {
+            if (!value.HasValue)
+            {
+                return;
+            }
+            this.Properties.Add(new PropertyItem(name) { NumericValue = value });
+        }
+
+        private void AddProperty(string name, TimeSpan? value)
+        {
+            if (!value.HasValue)
+            {
+                return;
+            }
+            this.Properties.Add(new PropertyItem(name) { NumericValue = Convert.ToInt32(value.Value.TotalMilliseconds) });
+        }
+
+        private void AddProperty(string name, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return;
+            }
+            this.Properties.Add(new PropertyItem(name) { TextValue = value });
         }
     }
 }

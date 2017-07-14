@@ -1,13 +1,13 @@
 ﻿namespace FoxTunes
 {
-    public class MetaDataItem : PersistableComponent
+    public class PropertyItem : PersistableComponent
     {
-        public MetaDataItem()
+        public PropertyItem()
         {
 
         }
 
-        public MetaDataItem(string name)
+        public PropertyItem(string name)
         {
             this.Name = name;
         }
@@ -17,8 +17,6 @@
         public int? NumericValue { get; set; }
 
         public string TextValue { get; set; }
-
-        public string FileValue { get; set; }
 
         public object Value
         {
@@ -31,10 +29,6 @@
                 if (this.TextValue != null)
                 {
                     return this.TextValue;
-                }
-                if (this.FileValue != null)
-                {
-                    return this.FileValue;
                 }
                 return null;
             }
