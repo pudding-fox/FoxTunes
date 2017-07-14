@@ -12,7 +12,7 @@
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}">
             <ViewModel:Playlist.PlaylistColumns>
-                <ViewModel:PlaylistColumn Header="Playing" Script="item == playing ? &quot;\u2022&quot; : &quot;&quot;"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.Id == playing.Id ? &quot;\u2022&quot; : &quot;&quot;"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Artist / album" Script="(function(){var parts=[];if(tag.firstartist){parts.push(tag.firstartist);}if(tag.album){parts.push(tag.album);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Track no" Script="tag.track"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Title / track artist" Script="(function(){var parts=[];if(tag.title){parts.push(tag.title);}if(tag.firstperformer &amp;&amp; tag.firstperformer != tag.firstartist){parts.push(tag.firstperformer);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>

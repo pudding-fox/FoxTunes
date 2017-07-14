@@ -41,6 +41,12 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        protected override void OnCoreChanged()
+        {
+            this.Core.Managers.Playback.CurrentStreamChanged += (sender, e) => this.OnPropertyChanged("GridColumns");
+            base.OnCoreChanged();
+        }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var playlistItem = value as PlaylistItem;
