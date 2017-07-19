@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public abstract class ViewModelBase : Freezable, INotifyPropertyChanging, INotifyPropertyChanged
+    public abstract class ViewModelBase : Freezable, INotifyPropertyChanged
     {
         public static readonly DependencyProperty CoreProperty = DependencyProperty.Register("Core", typeof(ICore), typeof(ViewModelBase), new PropertyMetadata(new PropertyChangedCallback(OnCoreChanged)));
 
@@ -37,17 +37,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler CoreChanged = delegate { };
-
-        protected virtual void OnPropertyChanging(string propertyName)
-        {
-            if (this.PropertyChanged == null)
-            {
-                return;
-            }
-            this.PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
-        }
-
-        public event PropertyChangingEventHandler PropertyChanging = delegate { };
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

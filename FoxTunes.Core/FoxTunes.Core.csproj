@@ -61,7 +61,6 @@
     <Compile Include="ManagerLoader.cs" />
     <Compile Include="BehaviourLoader.cs" />
     <Compile Include="Behaviours\PlayNextItemBehaviour.cs" />
-    <Compile Include="Behaviours\PlaySelectedItemBehaviour.cs" />
     <Compile Include="ComponentRegistry.cs" />
     <Compile Include="ComponentScanner.cs" />
     <Compile Include="Core.cs" />

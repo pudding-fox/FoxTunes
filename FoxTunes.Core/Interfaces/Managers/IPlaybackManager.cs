@@ -8,11 +8,9 @@ namespace FoxTunes.Interfaces
 
         IOutputStream CurrentStream { get; }
 
-        event EventHandler CurrentStreamChanging;
-
         event EventHandler CurrentStreamChanged;
 
-        void Load(string fileName);
+        IOutputStream Load(string fileName);
 
         void Unload();
     }

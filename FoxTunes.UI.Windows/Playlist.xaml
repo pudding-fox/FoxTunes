@@ -6,13 +6,14 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              x:Class="FoxTunes.Playlist" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}">
             <ViewModel:Playlist.PlaylistColumns>
-                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.Id == playing.Id ? &quot;\u2022&quot; : &quot;&quot;"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.FileName == playing.FileName ? &quot;\u2022&quot; : &quot;&quot;"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Artist / album" Script="(function(){var parts=[];if(tag.firstartist){parts.push(tag.firstartist);}if(tag.album){parts.push(tag.album);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Track no" Script="tag.track"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Title / track artist" Script="(function(){var parts=[];if(tag.title){parts.push(tag.title);}if(tag.firstperformer &amp;&amp; tag.firstperformer != tag.firstartist){parts.push(tag.firstperformer);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
@@ -21,10 +22,15 @@
         </ViewModel:Playlist>
     </UserControl.Resources>
     <Grid>
-        <ListView ItemsSource="{Binding Components.Playlist.Items}" SelectedValue="{Binding Components.Playlist.SelectedItem}" 
+        <ListView ItemsSource="{Binding Components.Playlist.Items}" Extensions:ListViewExtensions.SelectedItems="{Binding Source={StaticResource ViewModel}, Path=SelectedItems}"
                 AllowDrop="True" 
                 DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" 
                 DragOver="ListBox_DragOver" Drop="ListBox_Drop">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="MouseDoubleClick">
+                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=PlaySelectedItemCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Clear" Command="{Binding Source={StaticResource ViewModel}, Path=ClearCommand}"></MenuItem>

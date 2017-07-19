@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using FoxTunes.Utilities;
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
@@ -14,10 +15,13 @@ namespace FoxTunes.ViewModel
     {
         public Playlist()
         {
+            this.SelectedItems = new ObservableCollection<PlaylistItem>();
             this.PlaylistColumns = new ObservableCollection<PlaylistColumn>();
         }
 
         public IScriptingContext ScriptingContext { get; set; }
+
+        public IList SelectedItems { get; set; }
 
         public ObservableCollection<PlaylistColumn> PlaylistColumns { get; set; }
 
@@ -56,6 +60,19 @@ namespace FoxTunes.ViewModel
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
             this.Core.Managers.Playback.CurrentStreamChanged += (sender, e) => this.OnPropertyChanged("GridColumns");
             base.OnCoreChanged();
+        }
+
+        public ICommand PlaySelectedItemCommand
+        {
+            get
+            {
+                return new Command<IPlaybackManager>(playback =>
+                {
+                    var item = this.SelectedItems[0] as PlaylistItem;
+                    playback.Load(item.FileName).Play();
+                },
+                playback => playback != null && this.SelectedItems.Count > 0);
+            }
         }
 
         public ICommand ClearCommand

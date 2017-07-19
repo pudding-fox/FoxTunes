@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
 {
@@ -14,6 +15,8 @@ namespace FoxTunes.Interfaces
 
         void Clear();
 
-        IEnumerable<PlaylistItem> Items { get; }
+        PlaylistItem CurrentItem { get; }
+
+        ObservableCollection<PlaylistItem> Items { get; }
     }
 }

@@ -18,7 +18,7 @@ namespace FoxTunes.ViewModel
             {
                 return new Command<IPlaybackManager>(
                     playback => playback.CurrentStream.Play(),
-                    playback => playback != null && playback.CurrentStream != null && !playback.CurrentStream.IsPlaying
+                    playback => playback != null && playback.CurrentStream != null && playback.CurrentStream.IsStopped
                 );
             }
         }

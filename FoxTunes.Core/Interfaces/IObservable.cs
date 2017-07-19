@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IObservable : INotifyPropertyChanging, INotifyPropertyChanged
+    public interface IObservable : INotifyPropertyChanged
     {
     }
 }
