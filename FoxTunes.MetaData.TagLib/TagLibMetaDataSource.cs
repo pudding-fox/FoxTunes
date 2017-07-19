@@ -130,17 +130,17 @@ namespace FoxTunes
 
         private void AddProperties(Properties properties)
         {
-            this.AddProperty("AudioBitrate", properties.AudioBitrate);
-            this.AddProperty("AudioChannels", properties.AudioChannels);
-            this.AddProperty("AudioSampleRate", properties.AudioSampleRate);
-            this.AddProperty("BitsPerSample", properties.BitsPerSample);
-            this.AddProperty("Description", properties.Description);
-            this.AddProperty("Duration", properties.Duration);
-            this.AddProperty("PhotoHeight", properties.PhotoHeight);
-            this.AddProperty("PhotoQuality", properties.PhotoQuality);
-            this.AddProperty("PhotoWidth", properties.PhotoWidth);
-            this.AddProperty("VideoHeight", properties.VideoHeight);
-            this.AddProperty("VideoWidth", properties.VideoWidth);
+            this.AddProperty(CommonProperties.AudioBitrate, properties.AudioBitrate);
+            this.AddProperty(CommonProperties.AudioChannels, properties.AudioChannels);
+            this.AddProperty(CommonProperties.AudioSampleRate, properties.AudioSampleRate);
+            this.AddProperty(CommonProperties.BitsPerSample, properties.BitsPerSample);
+            this.AddProperty(CommonProperties.Description, properties.Description);
+            this.AddProperty(CommonProperties.Duration, properties.Duration);
+            this.AddProperty(CommonProperties.PhotoHeight, properties.PhotoHeight);
+            this.AddProperty(CommonProperties.PhotoQuality, properties.PhotoQuality);
+            this.AddProperty(CommonProperties.PhotoWidth, properties.PhotoWidth);
+            this.AddProperty(CommonProperties.VideoHeight, properties.VideoHeight);
+            this.AddProperty(CommonProperties.VideoWidth, properties.VideoWidth);
         }
 
         private void AddProperty(string name, int? value)
