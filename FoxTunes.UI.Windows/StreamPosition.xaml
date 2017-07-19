@@ -4,9 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <ViewModel:StreamPosition x:Key="ViewModel"></ViewModel:StreamPosition>
+    </UserControl.Resources>
     <Grid>
-        <Slider VerticalAlignment="Center" Value="{Binding Managers.Playback.CurrentStream.Position}" Maximum="{Binding Managers.Playback.CurrentStream.Length}"></Slider>
+        <Slider VerticalAlignment="Center" Value="{Binding Managers.Playback.CurrentStream.Position}" Maximum="{Binding Managers.Playback.CurrentStream.Length}">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="PreviewMouseDown">
+                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=PauseCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>
+                </Interactivity:EventTrigger>
+                <Interactivity:EventTrigger EventName="PreviewMouseUp">
+                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=ResumeCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
+        </Slider>
     </Grid>
 </UserControl>

@@ -65,6 +65,7 @@
     <Compile Include="ViewModel\Playback.cs" />
     <Compile Include="ViewModel\Playlist.cs" />
     <Compile Include="ViewModel\PlaylistColumn.cs" />
+    <Compile Include="ViewModel\StreamPosition.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="WindowsUserInterface.cs" />
   </ItemGroup>
