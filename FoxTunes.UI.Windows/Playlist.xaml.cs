@@ -58,7 +58,7 @@ namespace FoxTunes
                     }
                     else if (File.Exists(path))
                     {
-                        this.Core.Managers.Playlist.AddFile(path);
+                        this.Core.Managers.Playlist.AddFiles(path);
                     }
                 }
                 this.Core.Components.Database.SaveChanges();

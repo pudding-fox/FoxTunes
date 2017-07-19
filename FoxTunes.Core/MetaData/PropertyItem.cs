@@ -1,6 +1,8 @@
-﻿namespace FoxTunes
+﻿using FoxTunes.Interfaces;
+
+namespace FoxTunes
 {
-    public class PropertyItem : PersistableComponent
+    public class PropertyItem : PersistableComponent, INamedValue
     {
         public PropertyItem()
         {

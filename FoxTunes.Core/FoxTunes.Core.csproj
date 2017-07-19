@@ -46,11 +46,13 @@
     <Compile Include="BaseFactory.cs" />
     <Compile Include="BaseLoader.cs" />
     <Compile Include="BaseManager.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FactoryLoader.cs" />
     <Compile Include="Interfaces\Database\IPersistableSet.cs" />
     <Compile Include="Interfaces\Factories\IMetaDataSourceFactory.cs" />
     <Compile Include="Interfaces\IBaseFactory.cs" />
     <Compile Include="Interfaces\IBaseLoader.cs" />
+    <Compile Include="Interfaces\INamedValue.cs" />
     <Compile Include="Interfaces\IPersistableComponent.cs" />
     <Compile Include="Interfaces\IStandardFactories.cs" />
     <Compile Include="Interfaces\IStandardFactory.cs" />
@@ -68,6 +70,8 @@
     <Compile Include="ComponentLoader.cs" />
     <Compile Include="Managers\PlaybackManager.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
+    <Compile Include="MetaData\CommonMetaData.cs" />
+    <Compile Include="MetaData\CommonProperties.cs" />
     <Compile Include="MetaData\MetaDataItem.cs" />
     <Compile Include="MetaData\PropertyItem.cs" />
     <Compile Include="PersistableComponent.cs" />
