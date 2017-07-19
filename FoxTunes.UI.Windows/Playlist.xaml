@@ -33,6 +33,8 @@
             </Interactivity:Interaction.Triggers>
             <ListView.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Locate" Command="{Binding Source={StaticResource ViewModel}, Path=LocateCommand}"></MenuItem>
+                    <Separator></Separator>
                     <MenuItem Header="Clear" Command="{Binding Source={StaticResource ViewModel}, Path=ClearCommand}"></MenuItem>
                 </ContextMenu>
             </ListView.ContextMenu>

@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxTunes.Integration;
+using FoxTunes.Interfaces;
 using FoxTunes.Utilities;
 using System;
 using System.Collections;
@@ -72,6 +73,19 @@ namespace FoxTunes.ViewModel
                     playback.Load(item.FileName).Play();
                 },
                 playback => playback != null && this.SelectedItems.Count > 0);
+            }
+        }
+
+        public ICommand LocateCommand
+        {
+            get
+            {
+                return new Command(() =>
+                {
+                    var item = this.SelectedItems[0] as PlaylistItem;
+                    Explorer.Select(item.FileName);
+                },
+                () => this.SelectedItems.Count > 0);
             }
         }
 
