@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
+    [Component("F2F587A5-489B-429F-9C65-E60E7384D50B", ComponentSlots.Output)]
     public class CSCoreOutput : Output
     {
         public override bool IsSupported(string fileName)
@@ -23,7 +24,11 @@ namespace FoxTunes
 
         public override void Unload(IOutputStream stream)
         {
-            //Nothing to do.
+            if (!stream.IsStopped)
+            {
+                stream.Stop();
+            }
+            stream.Dispose();
         }
     }
 }

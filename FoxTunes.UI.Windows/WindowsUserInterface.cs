@@ -3,6 +3,7 @@ using System;
 
 namespace FoxTunes
 {
+    [Component("B889313D-4F21-4794-8D16-C2FAE6A7B305", ComponentSlots.UserInterface)]
     public class WindowsUserInterface : UserInterface
     {
         public static readonly Type[] References = new[]
