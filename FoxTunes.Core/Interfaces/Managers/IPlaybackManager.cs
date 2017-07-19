@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IPlaybackManager : IStandardManager
+    public interface IPlaybackManager : IStandardManager, IDisposable
     {
         bool IsSupported(string fileName);
 
