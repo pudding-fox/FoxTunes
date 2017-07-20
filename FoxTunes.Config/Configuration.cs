@@ -25,16 +25,11 @@ namespace FoxTunes
 
         public void RegisterSection(ConfigurationSection section)
         {
-            if (this.IsRegistered(section.Id))
+            if (this.GetSection(section.Id) != null)
             {
                 return;
             }
             this.Sections.Add(section);
-        }
-
-        private bool IsRegistered(string id)
-        {
-            return this.Sections.Any(section => string.Equals(section.Id, id, StringComparison.OrdinalIgnoreCase));
         }
 
         public void Load()
@@ -67,6 +62,21 @@ namespace FoxTunes
                 var formatter = new BinaryFormatter();
                 formatter.Serialize(stream, this.Sections.ToArray());
             }
+        }
+
+        public ConfigurationSection GetSection(string sectionId)
+        {
+            return this.Sections.FirstOrDefault(section => string.Equals(section.Id, sectionId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public T GetElement<T>(string sectionId, string elementId) where T : ConfigurationElement
+        {
+            var section = this.GetSection(sectionId);
+            if (section == null)
+            {
+                return default(T);
+            }
+            return section.Elements.FirstOrDefault(element => string.Equals(element.Id, elementId, StringComparison.OrdinalIgnoreCase)) as T;
         }
     }
 }

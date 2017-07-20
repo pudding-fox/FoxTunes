@@ -5,16 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
