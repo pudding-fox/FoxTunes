@@ -1,8 +1,10 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.ComponentModel;
 
 namespace FoxTunes
 {
+    [Serializable]
     public abstract class BaseComponent : IBaseComponent
     {
         public virtual void InitializeComponent(ICore core)
@@ -19,6 +21,7 @@ namespace FoxTunes
             this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
     }
 }

@@ -13,15 +13,40 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            
+
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock>Settings</TextBlock>
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Components.Configuration.Sections}">
-
+        <ItemsControl Grid.Row="1" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Components.Configuration.Sections}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <GroupBox Header="{Binding Name}">
+                        <ItemsControl ItemsSource="{Binding Elements}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                        <ContentControl Grid.Column="1" Content="{Binding}">
+                                            <ContentControl.ContentTemplate>
+                                                <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
+                                                    <ComboBox Width="250" ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
+                                                </DataTemplate>
+                                            </ContentControl.ContentTemplate>
+                                        </ContentControl>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </GroupBox>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
         </ItemsControl>
     </Grid>
 </UserControl>

@@ -1,5 +1,8 @@
-﻿namespace FoxTunes
+﻿using System;
+
+namespace FoxTunes
 {
+    [Serializable]
     public class ConfigurationElement
     {
         public ConfigurationElement(string id, string name = null, string description = null)

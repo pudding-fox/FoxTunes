@@ -8,6 +8,8 @@ namespace FoxTunes.Interfaces
 
         void RegisterSection(ConfigurationSection section);
 
+        void Load();
+
         void Save();
     }
 }

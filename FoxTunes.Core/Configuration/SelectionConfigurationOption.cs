@@ -1,5 +1,8 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System;
+
+namespace FoxTunes
 {
+    [Serializable]
     public class SelectionConfigurationOption
     {
         public SelectionConfigurationOption(string id, string name = null, string description = null)

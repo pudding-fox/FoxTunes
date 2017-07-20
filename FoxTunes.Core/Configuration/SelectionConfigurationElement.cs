@@ -1,26 +1,27 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 
-namespace FoxTunes.Interfaces
+namespace FoxTunes
 {
+    [Serializable]
     public class SelectionConfigurationElement : ConfigurationElement
     {
         public SelectionConfigurationElement(string id, string name = null, string description = null)
             : base(id, name, description)
         {
             this.Options = new ObservableCollection<SelectionConfigurationOption>();
-            this.SelectedOptions = new ObservableCollection<SelectionConfigurationOption>();
         }
 
-        public ObservableCollection<SelectionConfigurationOption> Options { get; private set; }
+        public ObservableCollection<SelectionConfigurationOption> Options { get; set; }
 
-        public ObservableCollection<SelectionConfigurationOption> SelectedOptions { get; private set; }
+        public SelectionConfigurationOption SelectedOption { get; set; }
 
         public SelectionConfigurationElement WithOption(SelectionConfigurationOption option, bool selected = false)
         {
             this.Options.Add(option);
             if (selected)
             {
-                this.SelectedOptions.Add(option);
+                this.SelectedOption = option;
             }
             return this;
         }
