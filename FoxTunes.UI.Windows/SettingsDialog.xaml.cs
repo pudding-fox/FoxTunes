@@ -3,11 +3,11 @@
 namespace FoxTunes
 {
     /// <summary>
-    /// Interaction logic for StreamPosition.xaml
+    /// Interaction logic for SettingsDialog.xaml
     /// </summary>
-    public partial class StreamPosition : UserControl
+    public partial class SettingsDialog : UserControl
     {
-        public StreamPosition()
+        public SettingsDialog()
         {
             InitializeComponent();
         }

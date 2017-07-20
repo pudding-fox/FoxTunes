@@ -50,6 +50,11 @@
     <Compile Include="ComponentSlots.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FactoryLoader.cs" />
+    <Compile Include="Interfaces\Configuration\IConfigurableComponent.cs" />
+    <Compile Include="Configuration\ConfigurationElement.cs" />
+    <Compile Include="Configuration\ConfigurationSection.cs" />
+    <Compile Include="Configuration\SelectionConfigurationElement.cs" />
+    <Compile Include="Configuration\SelectionConfigurationOption.cs" />
     <Compile Include="Interfaces\Database\IPersistableSet.cs" />
     <Compile Include="Interfaces\Factories\IMetaDataSourceFactory.cs" />
     <Compile Include="Interfaces\IBaseFactory.cs" />
@@ -90,7 +95,7 @@
     <Compile Include="Interfaces\IBaseManager.cs" />
     <Compile Include="Interfaces\IComponentRegistry.cs" />
     <Compile Include="Interfaces\IComponentScanner.cs" />
-    <Compile Include="Interfaces\IConfiguration.cs" />
+    <Compile Include="Interfaces\Configuration\IConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Interfaces\ICore.cs" />
     <Compile Include="Interfaces\Database\IDatabase.cs" />
