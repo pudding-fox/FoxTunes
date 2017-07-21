@@ -23,15 +23,10 @@ namespace FoxTunes.Theme
 
         private static IEnumerable<SelectionConfigurationOption> GetThemeOptions()
         {
-            var registry = ComponentRegistry.Instance.GetComponent<IThemeRegistry>();
-            foreach (var theme in registry.Themes)
+            var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
+            foreach (var theme in themes)
             {
-                var attribute = theme.GetType().GetCustomAttribute<ThemeAttribute>();
-                if (attribute == null)
-                {
-                    continue;
-                }
-                yield return new SelectionConfigurationOption(attribute.Id, attribute.Name, attribute.Description);
+                yield return new SelectionConfigurationOption(theme.Id, theme.Name, theme.Description);
             }
         }
     }

@@ -4,10 +4,10 @@ using System.Windows;
 
 namespace FoxTunes
 {
-    public class ExpressionLightTheme : ThemeBase
+    public class ShinyRedTheme : ThemeBase
     {
-        public ExpressionLightTheme()
-            : base("BF3790D0-033B-4526-8D06-1B3F66637EAF", "ExpressionLight")
+        public ShinyRedTheme()
+            : base("031597D5-EC7C-4339-9854-CA3851FB3460", "ShinyRed")
         {
 
         }
@@ -18,7 +18,7 @@ namespace FoxTunes
             application.Resources.MergedDictionaries.Add(
                 new ResourceDictionary()
                 {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionLight.xaml", UriKind.Relative)
+                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ShinyRed.xaml", UriKind.Relative)
                 }
             );
         }

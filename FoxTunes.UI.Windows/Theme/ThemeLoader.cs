@@ -9,8 +9,6 @@ namespace FoxTunes.Theme
     {
         public IConfiguration Configuration { get; private set; }
 
-        public IThemeRegistry ThemeRegistry { get; private set; }
-
         public SelectionConfigurationElement Element { get; private set; }
 
         private Application _Application { get; set; }
@@ -43,7 +41,6 @@ namespace FoxTunes.Theme
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.ThemeRegistry = ComponentRegistry.Instance.GetComponent<IThemeRegistry>();
             this.Element = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
                 WindowsUserInterfaceConfiguration.THEME_ELEMENT
@@ -62,11 +59,12 @@ namespace FoxTunes.Theme
         {
             get
             {
+                var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
                 if (this.Element.SelectedOption == null)
                 {
-                    return this.ThemeRegistry.Themes.FirstOrDefault();
+                    return themes.FirstOrDefault();
                 }
-                return this.ThemeRegistry.GetTheme(this.Element.SelectedOption.Id);
+                return themes.FirstOrDefault(theme => string.Equals(theme.Id, this.Element.SelectedOption.Id, StringComparison.OrdinalIgnoreCase));
             }
         }
 
