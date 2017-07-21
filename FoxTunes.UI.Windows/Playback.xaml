@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Playback x:Key="ViewModel" Core="{Binding}"></ViewModel:Playback>
-        <Style TargetType="{x:Type Button}">
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Width" Value="30"></Setter>
             <Setter Property="Height" Value="30"></Setter>
             <Setter Property="FontFamily" Value="Webdings"></Setter>

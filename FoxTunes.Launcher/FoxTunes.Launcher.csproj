@@ -33,6 +33,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -104,6 +105,10 @@
     <ProjectReference Include="..\FoxTunes.Scripting\FoxTunes.Scripting.csproj">
       <Project>{50d995f1-ca54-42b6-bda5-4047e720716d}</Project>
       <Name>FoxTunes.Scripting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.UI.Windows.Themes\FoxTunes.UI.Windows.Themes.csproj">
+      <Project>{80fabb9c-9fa7-4232-92eb-481be8ab8bfe}</Project>
+      <Name>FoxTunes.UI.Windows.Themes</Name>
     </ProjectReference>
     <ProjectReference Include="..\FoxTunes.UI.Windows\FoxTunes.UI.Windows.csproj">
       <Project>{610985f5-26ae-42b5-9733-61ebbab36e0a}</Project>
