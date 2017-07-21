@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FoxTunes
@@ -14,7 +15,32 @@ namespace FoxTunes
 
         public ObservableCollection<SelectionConfigurationOption> Options { get; set; }
 
-        public SelectionConfigurationOption SelectedOption { get; set; }
+        private SelectionConfigurationOption _SelectedOption { get; set; }
+
+        public SelectionConfigurationOption SelectedOption
+        {
+            get
+            {
+                return this._SelectedOption;
+            }
+            set
+            {
+                this._SelectedOption = value;
+                this.OnSelectedOptionChanged();
+            }
+        }
+
+        protected virtual void OnSelectedOptionChanged()
+        {
+            if (this.SelectedOptionChanged != null)
+            {
+                this.SelectedOptionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedOption");
+        }
+
+        [field: NonSerialized]
+        public event EventHandler SelectedOptionChanged = delegate { };
 
         public SelectionConfigurationElement WithOption(SelectionConfigurationOption option, bool selected = false)
         {
@@ -22,6 +48,15 @@ namespace FoxTunes
             if (selected)
             {
                 this.SelectedOption = option;
+            }
+            return this;
+        }
+
+        public SelectionConfigurationElement WithOptions(Func<IEnumerable<SelectionConfigurationOption>> options)
+        {
+            foreach (var option in options())
+            {
+                this.Options.Add(option);
             }
             return this;
         }

@@ -18,5 +18,15 @@ namespace FoxTunes
             }
             return (T)Convert.ChangeType(item.Value, typeof(T));
         }
+
+        public static T GetCustomAttribute<T>(this Type type, bool inherit = false) where T : Attribute
+        {
+            return type.GetCustomAttributes<T>(inherit).FirstOrDefault();
+        }
+
+        public static IEnumerable<T> GetCustomAttributes<T>(this Type type, bool inherit = false) where T : Attribute
+        {
+            return type.GetCustomAttributes(typeof(T), inherit).OfType<T>();
+        }
     }
 }

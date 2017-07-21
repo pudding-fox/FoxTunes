@@ -3,8 +3,8 @@ using System.Windows;
 
 namespace FoxTunes.Theme
 {
-    public interface IThemeLoader:IBaseComponent
+    public interface IThemeLoader : IStandardComponent
     {
-        void Apply(Application application);
+        Application Application { get; set; }
     }
 }

@@ -3,7 +3,7 @@
 namespace FoxTunes
 {
     [Serializable]
-    public class ConfigurationElement
+    public class ConfigurationElement : BaseComponent
     {
         public ConfigurationElement(string id, string name = null, string description = null)
         {
