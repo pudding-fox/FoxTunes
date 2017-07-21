@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -31,18 +32,33 @@ namespace FoxTunes.Managers
             this.UpdateCurrentItem();
         }
 
-        public void AddDirectory(string directoryName)
+        public void Add(IEnumerable<string> paths)
         {
-            this.AddFiles(Directory.GetFiles(directoryName));
+            var fileNames = new List<string>();
+            foreach (var path in paths)
+            {
+                if (Directory.Exists(path))
+                {
+                    fileNames.AddRange(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
+                }
+                else if (File.Exists(path))
+                {
+                    fileNames.Add(path);
+                }
+            }
+            this.AddFiles(fileNames);
         }
 
-        public void AddFiles(params string[] fileNames)
+        protected virtual void AddFiles(IEnumerable<string> fileNames)
         {
             var query =
                 from fileName in fileNames
                 where this.PlaybackManager.IsSupported(fileName)
                 select this.PlaylistItemFactory.Create(fileName) into playlistItem
-                orderby playlistItem.MetaDatas.Value<int>(CommonMetaData.Track), playlistItem.FileName
+                orderby
+                    Path.GetDirectoryName(playlistItem.FileName),
+                    playlistItem.MetaDatas.Value<int>(CommonMetaData.Track),
+                    playlistItem.FileName
                 select playlistItem;
             foreach (var playlistItem in query)
             {

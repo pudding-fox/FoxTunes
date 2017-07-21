@@ -1,12 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
 {
     public interface IPlaylistManager : IStandardManager
     {
-        void AddDirectory(string directoryName);
-
-        void AddFiles(params string[] fileName);
+        void Add(IEnumerable<string> paths);
 
         void Next();
 
