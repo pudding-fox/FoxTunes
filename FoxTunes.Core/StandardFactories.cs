@@ -12,6 +12,14 @@ namespace FoxTunes
             }
         }
 
+        public ILibraryItemFactory LibraryItem
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILibraryItemFactory>();
+            }
+        }
+
         public IMetaDataSourceFactory MetaDataSource
         {
             get

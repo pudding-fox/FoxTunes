@@ -17,7 +17,14 @@
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Windows:Playlist Grid.ColumnSpan="3"></Windows:Playlist>
+        <Grid Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Windows:Library></Windows:Library>
+            <Windows:Playlist Grid.Column="1"></Windows:Playlist>
+        </Grid>
         <Windows:Playback Grid.Row="1" ></Windows:Playback>
         <Windows:StreamPosition Grid.Column="1" Grid.Row="1"></Windows:StreamPosition>
         <Windows:Settings Grid.Column="2" Grid.Row="1"></Windows:Settings>

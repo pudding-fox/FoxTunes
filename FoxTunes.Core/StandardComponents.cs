@@ -41,6 +41,14 @@ namespace FoxTunes
             }
         }
 
+        public ILibrary Library
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILibrary>();
+            }
+        }
+
         public IOutput Output
         {
             get
