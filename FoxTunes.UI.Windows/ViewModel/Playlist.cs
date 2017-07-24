@@ -20,7 +20,9 @@ namespace FoxTunes.ViewModel
             this.PlaylistColumns = new ObservableCollection<PlaylistColumn>();
         }
 
-        public IScriptingContext ScriptingContext { get; set; }
+        public IScriptingRuntime ScriptingRuntime { get; private set; }
+
+        public IScriptingContext ScriptingContext { get; private set; }
 
         public IList SelectedItems { get; set; }
 
@@ -53,11 +55,12 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.ScriptingContext = this.Core.Components.ScriptingRuntime.CreateContext();
+            this.ScriptingContext = this.ScriptingRuntime.CreateContext();
         }
 
         protected override void OnCoreChanged()
         {
+            this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
             this.Core.Managers.Playback.CurrentStreamChanged += (sender, e) => this.OnPropertyChanged("GridColumns");
             base.OnCoreChanged();
@@ -111,10 +114,15 @@ namespace FoxTunes.ViewModel
             {
                 return null;
             }
+            return this.ExecuteScript(playlistItem, script);
+        }
+
+        private string ExecuteScript(PlaylistItem playlistItem, string script)
+        {
             this.EnsureScriptingContext();
             var runner = new PlaylistItemScriptRunner(this.ScriptingContext, playlistItem, script);
             runner.Prepare();
-            return runner.Run();
+            return global::System.Convert.ToString(runner.Run());
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

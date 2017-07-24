@@ -24,7 +24,7 @@ namespace FoxTunes
             }
         }
 
-        private void ListBox_DragEnter(object sender, DragEventArgs e)
+        protected override void OnDragEnter(DragEventArgs e)
         {
             var effects = DragDropEffects.None;
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -32,19 +32,10 @@ namespace FoxTunes
                 effects = DragDropEffects.Copy;
             }
             e.Effects = effects;
+            base.OnDragEnter(e);
         }
 
-        private void ListBox_DragLeave(object sender, DragEventArgs e)
-        {
-
-        }
-
-        private void ListBox_DragOver(object sender, DragEventArgs e)
-        {
-
-        }
-
-        private void ListBox_Drop(object sender, DragEventArgs e)
+        protected override void OnDrop(DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -52,6 +43,7 @@ namespace FoxTunes
                 this.Core.Managers.Playlist.Add(paths);
                 this.Core.Components.Database.SaveChanges();
             }
+            base.OnDrop(e);
         }
     }
 }
