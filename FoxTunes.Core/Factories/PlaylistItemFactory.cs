@@ -21,5 +21,12 @@ namespace FoxTunes.Factories
             item.InitializeComponent(this.Core);
             return item;
         }
+
+        public PlaylistItem Create(LibraryItem libraryItem)
+        {
+            var item = new PlaylistItem(libraryItem.FileName, libraryItem);
+            item.InitializeComponent(this.Core);
+            return item;
+        }
     }
 }

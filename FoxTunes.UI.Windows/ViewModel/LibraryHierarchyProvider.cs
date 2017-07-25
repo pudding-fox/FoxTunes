@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using FoxTunes.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -54,12 +53,12 @@ namespace FoxTunes.ViewModel
             }
             this.OnPropertyChanged("Hierarchy");
             //TODO: This is a hack in order to make the view refresh when the selected hierarchy is changed.
-            this.OnPropertyChanged("Items");
+            this.OnPropertyChanged("LibraryNodes");
         }
 
         public event EventHandler HierarchyChanged = delegate { };
 
-        public ObservableCollection<LibraryNode> Items
+        public ObservableCollection<LibraryNode> LibraryNodes
         {
             get
             {
@@ -80,7 +79,7 @@ namespace FoxTunes.ViewModel
             var query =
                 from libraryItem in libraryItems
                 group libraryItem by this.ExecuteScript(libraryItem, this.Hierarchy.Levels[level].Script) into hierarchy
-                select new LibraryNode(hierarchy.Key, this.BuildHierarchy(hierarchy, level + 1));
+                select new LibraryNode(hierarchy.Key, hierarchy, this.BuildHierarchy(hierarchy, level + 1));
             return query;
         }
 
@@ -106,7 +105,7 @@ namespace FoxTunes.ViewModel
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.Library = this.Core.Components.Library;
             //TODO: This is a hack in order to make the view refresh when the selected hierarchy is changed.
-            this.OnPropertyChanged("Items");
+            this.OnPropertyChanged("LibraryNodes");
             base.OnCoreChanged();
         }
 

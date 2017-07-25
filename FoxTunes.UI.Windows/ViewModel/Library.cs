@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -12,6 +13,8 @@ namespace FoxTunes.ViewModel
         }
 
         public ObservableCollection<LibraryHierarchy> Hierarchies { get; set; }
+
+        public IList SelectedItems { get; set; }
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 

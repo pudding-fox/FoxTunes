@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +32,10 @@ namespace FoxTunes
             {
                 effects = DragDropEffects.Copy;
             }
+            if (e.Data.GetDataPresent(typeof(ObservableCollection<LibraryItem>)))
+            {
+                effects = DragDropEffects.Copy;
+            }
             e.Effects = effects;
             base.OnDragEnter(e);
         }
@@ -41,6 +46,12 @@ namespace FoxTunes
             {
                 var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
                 this.Core.Managers.Playlist.Add(paths);
+                this.Core.Components.Database.SaveChanges();
+            }
+            if (e.Data.GetDataPresent(typeof(ObservableCollection<LibraryItem>)))
+            {
+                var items = e.Data.GetData(typeof(ObservableCollection<LibraryItem>)) as ObservableCollection<LibraryItem>;
+                this.Core.Managers.Playlist.Add(items);
                 this.Core.Components.Database.SaveChanges();
             }
             base.OnDrop(e);

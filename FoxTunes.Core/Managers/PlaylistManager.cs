@@ -54,16 +54,35 @@ namespace FoxTunes.Managers
             var query =
                 from fileName in fileNames
                 where this.PlaybackManager.IsSupported(fileName)
-                select this.PlaylistItemFactory.Create(fileName) into playlistItem
+                select this.PlaylistItemFactory.Create(fileName);
+            foreach (var playlistItem in this.OrderBy(query))
+            {
+                this.Items.Add(playlistItem);
+            }
+        }
+
+        public void Add(IEnumerable<LibraryItem> libraryItems)
+        {
+            var query =
+                from libraryItem in libraryItems
+                where this.PlaybackManager.IsSupported(libraryItem.FileName)
+                select this.PlaylistItemFactory.Create(libraryItem);
+            foreach (var playlistItem in this.OrderBy(query))
+            {
+                this.Items.Add(playlistItem);
+            }
+        }
+
+        private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)
+        {
+            var query =
+                from playlistItem in playlistItems
                 orderby
                     Path.GetDirectoryName(playlistItem.FileName),
                     playlistItem.MetaDatas.Value<int>(CommonMetaData.Track),
                     playlistItem.FileName
                 select playlistItem;
-            foreach (var playlistItem in query)
-            {
-                this.Items.Add(playlistItem);
-            }
+            return query;
         }
 
         public void Next()
