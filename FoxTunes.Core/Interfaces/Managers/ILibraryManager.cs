@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
@@ -7,8 +8,8 @@ namespace FoxTunes.Interfaces
     {
         void Add(IEnumerable<string> paths);
 
-        void Clear();
+        event EventHandler Updated;
 
-        ObservableCollection<LibraryItem> Items { get; }
+        void Clear();
     }
 }

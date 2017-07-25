@@ -47,6 +47,7 @@ namespace FoxTunes.Managers
                 }
             }
             this.AddFiles(fileNames);
+            this.OnUpdated();
         }
 
         protected virtual void AddFiles(IEnumerable<string> fileNames)
@@ -57,7 +58,7 @@ namespace FoxTunes.Managers
                 select this.PlaylistItemFactory.Create(fileName);
             foreach (var playlistItem in this.OrderBy(query))
             {
-                this.Items.Add(playlistItem);
+                this.Playlist.Set.Add(playlistItem);
             }
         }
 
@@ -69,9 +70,20 @@ namespace FoxTunes.Managers
                 select this.PlaylistItemFactory.Create(libraryItem);
             foreach (var playlistItem in this.OrderBy(query))
             {
-                this.Items.Add(playlistItem);
+                this.Playlist.Set.Add(playlistItem);
             }
         }
+
+        protected virtual void OnUpdated()
+        {
+            if (this.Updated == null)
+            {
+                return;
+            }
+            this.Updated(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Updated = delegate { };
 
         private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)
         {
@@ -94,13 +106,13 @@ namespace FoxTunes.Managers
             }
             else
             {
-                index = this.Playlist.Items.IndexOf(this.CurrentItem) + 1;
+                index = this.Playlist.Set.IndexOf(this.CurrentItem) + 1;
             }
-            if (index >= this.Playlist.Items.Count)
+            if (index >= this.Playlist.Set.Count)
             {
                 index = 0;
             }
-            this.PlaybackManager.Load(this.Playlist.Items[index].FileName).Play();
+            this.PlaybackManager.Load(this.Playlist.Set[index].FileName).Play();
         }
 
         public void Previous()
@@ -112,25 +124,25 @@ namespace FoxTunes.Managers
             }
             else
             {
-                index = this.Playlist.Items.IndexOf(this.CurrentItem) - 1;
+                index = this.Playlist.Set.IndexOf(this.CurrentItem) - 1;
             }
             if (index < 0)
             {
-                index = this.Playlist.Items.Count - 1;
+                index = this.Playlist.Set.Count - 1;
             }
-            this.PlaybackManager.Load(this.Playlist.Items[index].FileName).Play();
+            this.PlaybackManager.Load(this.Playlist.Set[index].FileName).Play();
         }
 
         public void Clear()
         {
-            this.Playlist.Items.Clear();
+            this.Playlist.Set.Clear();
         }
 
         protected virtual void UpdateCurrentItem()
         {
             if (this.PlaybackManager.CurrentStream != null)
             {
-                foreach (var item in this.Items)
+                foreach (var item in this.Playlist.Set)
                 {
                     if (!string.Equals(item.FileName, this.PlaybackManager.CurrentStream.FileName, StringComparison.OrdinalIgnoreCase))
                     {
@@ -168,13 +180,5 @@ namespace FoxTunes.Managers
         }
 
         public event EventHandler CurrentItemChanged = delegate { };
-
-        public ObservableCollection<PlaylistItem> Items
-        {
-            get
-            {
-                return this.Playlist.Items;
-            }
-        }
     }
 }

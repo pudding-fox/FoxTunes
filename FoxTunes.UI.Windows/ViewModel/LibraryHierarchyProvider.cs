@@ -12,6 +12,8 @@ namespace FoxTunes.ViewModel
     {
         public ILibrary Library { get; private set; }
 
+        public ILibraryManager LibraryManager { get; private set; }
+
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
         public IScriptingContext ScriptingContext { get; private set; }
@@ -53,7 +55,7 @@ namespace FoxTunes.ViewModel
             }
             this.OnPropertyChanged("Hierarchy");
             //TODO: This is a hack in order to make the view refresh when the selected hierarchy is changed.
-            this.OnPropertyChanged("LibraryNodes");
+            this.OnLibraryNodesChanged();
         }
 
         public event EventHandler HierarchyChanged = delegate { };
@@ -66,9 +68,20 @@ namespace FoxTunes.ViewModel
                 {
                     return new ObservableCollection<LibraryNode>();
                 }
-                return new ObservableCollection<LibraryNode>(this.BuildHierarchy(this.Library.Set, 0));
+                return new ObservableCollection<LibraryNode>(this.BuildHierarchy(this.Library.Query, 0));
             }
         }
+
+        protected virtual void OnLibraryNodesChanged()
+        {
+            if (this.LibraryNodesChanged != null)
+            {
+                this.LibraryNodesChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("LibraryNodes");
+        }
+
+        public event EventHandler LibraryNodesChanged = delegate { };
 
         private IEnumerable<LibraryNode> BuildHierarchy(IEnumerable<LibraryItem> libraryItems, int level)
         {
@@ -104,8 +117,10 @@ namespace FoxTunes.ViewModel
         {
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.Library = this.Core.Components.Library;
+            this.LibraryManager = this.Core.Managers.Library;
+            this.LibraryManager.Updated += (sender, e) => this.OnLibraryNodesChanged();
             //TODO: This is a hack in order to make the view refresh when the selected hierarchy is changed.
-            this.OnPropertyChanged("LibraryNodes");
+            this.OnLibraryNodesChanged();
             base.OnCoreChanged();
         }
 

@@ -4,38 +4,42 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace FoxTunes
 {
-    public class WrappedDbSet<T> : IDatabaseSet<T> where T : class
+    public class WrappedDbQuery<T> : IDatabaseQuery<T> where T : class
     {
-        public WrappedDbSet(DbContext dbContext, DbSet<T> set)
+        public WrappedDbQuery(DbContext dbContext, DbSet<T> set)
         {
             this.DbContext = dbContext;
             this.Set = set;
+            this.Query = set;
         }
 
         public DbContext DbContext { get; private set; }
 
         public DbSet<T> Set { get; private set; }
 
+        public DbQuery<T> Query { get; private set; }
+
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            return ((IEnumerable<T>)this.Set).GetEnumerator();
+            return ((IEnumerable<T>)this.Query).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)this.Set).GetEnumerator();
+            return ((IEnumerable)this.Query).GetEnumerator();
         }
 
         Type IQueryable.ElementType
         {
             get
             {
-                return ((IQueryable)this.Set).ElementType;
+                return ((IQueryable)this.Query).ElementType;
             }
         }
 
@@ -43,7 +47,7 @@ namespace FoxTunes
         {
             get
             {
-                return ((IQueryable)this.Set).Expression;
+                return ((IQueryable)this.Query).Expression;
             }
         }
 
@@ -51,13 +55,13 @@ namespace FoxTunes
         {
             get
             {
-                return ((IQueryable)this.Set).Provider;
+                return ((IQueryable)this.Query).Provider;
             }
         }
 
         public void Include(string path)
         {
-            throw new NotImplementedException();
+            this.Query = this.Query.Include(path);
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged
@@ -70,37 +74,6 @@ namespace FoxTunes
             {
                 this.Set.Local.CollectionChanged -= value;
             }
-        }
-
-        public T Add(T item)
-        {
-            return this.Set.Add(item);
-        }
-
-        public int IndexOf(T item)
-        {
-            return this.Set.Local.IndexOf(item);
-        }
-
-        public T this[int index]
-        {
-            get
-            {
-                return this.Set.Local[index];
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                return this.Set.Local.Count;
-            }
-        }
-
-        public void Clear()
-        {
-            this.Set.Local.Clear();
         }
     }
 }

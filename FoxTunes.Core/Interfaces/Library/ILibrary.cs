@@ -1,11 +1,9 @@
-﻿using System.Collections.ObjectModel;
-
-namespace FoxTunes.Interfaces
+﻿namespace FoxTunes.Interfaces
 {
     public interface ILibrary : IBaseComponent
     {
-        IPersistableSet<LibraryItem> Set { get; }
+        IDatabaseQuery<LibraryItem> Query { get; }
 
-        ObservableCollection<LibraryItem> Items { get; }
+        IDatabaseSet<LibraryItem> Set { get; }
     }
 }

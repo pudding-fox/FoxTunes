@@ -32,7 +32,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock><Run Text="View Mode:"/></TextBlock>
+        <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
         <ComboBox Grid.Column="1" ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
         <TreeView x:Name="TreeView" Grid.ColumnSpan="2" Grid.Row="1" ItemsSource="{Binding LibraryNodes, Source={StaticResource HierarchyProvider}}" TreeViewItem.Selected="TreeView_Selected">
             <TreeView.ItemTemplate>
@@ -41,7 +41,7 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <TextBlock Grid.Row="2"><Run Text="Filter:"/></TextBlock>
+        <TextBlock Grid.Row="2" VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="Filter:"/></TextBlock>
         <TextBox Grid.Column="1" Grid.Row="2"/>
     </Grid>
 </UserControl>

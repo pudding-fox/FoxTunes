@@ -7,10 +7,12 @@ namespace FoxTunes
     {
         public LibraryItem()
         {
-
+            this.MetaDatas = new ObservableCollection<MetaDataItem>();
+            this.Properties = new ObservableCollection<PropertyItem>();
+            this.Statistics = new ObservableCollection<StatisticItem>();
         }
 
-        public LibraryItem(string fileName, IMetaDataSource metaData)
+        public LibraryItem(string fileName, IMetaDataSource metaData) : this()
         {
             this.FileName = fileName;
             this.MetaDatas = metaData.MetaDatas;
