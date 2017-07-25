@@ -74,6 +74,7 @@
     <Compile Include="Interfaces\Factories\IPlaylistItemFactory.cs" />
     <Compile Include="Interfaces\Scripting\IScriptingContext.cs" />
     <Compile Include="Interfaces\Scripting\IScriptingRuntime.cs" />
+    <Compile Include="Library\LibraryMetaDataSource.cs" />
     <Compile Include="ManagerLoader.cs" />
     <Compile Include="BehaviourLoader.cs" />
     <Compile Include="Behaviours\PlayNextItemBehaviour.cs" />
