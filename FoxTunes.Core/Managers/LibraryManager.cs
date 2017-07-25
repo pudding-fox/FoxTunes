@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace FoxTunes.Managers
 {
@@ -26,36 +27,29 @@ namespace FoxTunes.Managers
 
         public void Add(IEnumerable<string> paths)
         {
+            var fileNames = new List<string>();
             foreach (var path in paths)
             {
                 if (Directory.Exists(path))
                 {
-                    this.AddDirectory(path);
+                    fileNames.AddRange(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
                 }
                 else if (File.Exists(path))
                 {
-                    this.AddFile(path);
+                    fileNames.Add(path);
                 }
             }
+            this.AddFiles(fileNames);
+        }
+
+        protected virtual void AddFiles(IEnumerable<string> fileNames)
+        {
+            var query =
+                from fileName in fileNames
+                where this.PlaybackManager.IsSupported(fileName)
+                select this.LibraryItemFactory.Create(fileName);
+            this.Library.Set.AddRange(query);
             this.OnUpdated();
-        }
-
-        protected virtual void AddDirectory(string directoryName)
-        {
-            var fileNames = Directory.GetFiles(directoryName, "*.*", SearchOption.AllDirectories);
-            foreach (var fileName in fileNames)
-            {
-                this.AddFile(fileName);
-            }
-        }
-
-        protected virtual void AddFile(string fileName)
-        {
-            if (!this.PlaybackManager.IsSupported(fileName))
-            {
-                return;
-            }
-            this.Library.Set.Add(this.LibraryItemFactory.Create(fileName));
         }
 
         protected virtual void OnUpdated()

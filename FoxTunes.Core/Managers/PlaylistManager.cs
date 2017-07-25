@@ -47,7 +47,6 @@ namespace FoxTunes.Managers
                 }
             }
             this.AddFiles(fileNames);
-            this.OnUpdated();
         }
 
         protected virtual void AddFiles(IEnumerable<string> fileNames)
@@ -56,10 +55,8 @@ namespace FoxTunes.Managers
                 from fileName in fileNames
                 where this.PlaybackManager.IsSupported(fileName)
                 select this.PlaylistItemFactory.Create(fileName);
-            foreach (var playlistItem in this.OrderBy(query))
-            {
-                this.Playlist.Set.Add(playlistItem);
-            }
+            this.Playlist.Set.AddRange(this.OrderBy(query));
+            this.OnUpdated();
         }
 
         public void Add(IEnumerable<LibraryItem> libraryItems)
@@ -68,10 +65,8 @@ namespace FoxTunes.Managers
                 from libraryItem in libraryItems
                 where this.PlaybackManager.IsSupported(libraryItem.FileName)
                 select this.PlaylistItemFactory.Create(libraryItem);
-            foreach (var playlistItem in this.OrderBy(query))
-            {
-                this.Playlist.Set.Add(playlistItem);
-            }
+            this.Playlist.Set.AddRange(this.OrderBy(query));
+            this.OnUpdated();
         }
 
         protected virtual void OnUpdated()
