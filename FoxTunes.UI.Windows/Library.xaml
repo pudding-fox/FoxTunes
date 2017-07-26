@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="FoxTunes.Library"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             x:Class="FoxTunes.Library"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
@@ -49,6 +50,6 @@
             </TreeView.ItemTemplate>
         </TreeView>
         <TextBlock Grid.Row="2" VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="Filter:"/></TextBlock>
-        <TextBox Grid.Column="1" Grid.Row="2"/>
+        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Filter, Source={StaticResource HierarchyProvider}, UpdateSourceTrigger=PropertyChanged}"></TextBox>
     </Grid>
 </UserControl>

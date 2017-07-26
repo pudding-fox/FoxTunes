@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
