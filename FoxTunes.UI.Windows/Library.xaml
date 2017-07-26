@@ -34,7 +34,14 @@
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
         <ComboBox Grid.Column="1" ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
-        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" Grid.Row="1" ItemsSource="{Binding LibraryNodes, Source={StaticResource HierarchyProvider}}" TreeViewItem.Selected="TreeView_Selected">
+        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" Grid.Row="1" ItemsSource="{Binding LibraryNodes, Source={StaticResource HierarchyProvider}}">
+            <TreeView.Resources>
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                    <EventSetter Event="Selected" Handler="TreeView_Selected"></EventSetter>
+                    <EventSetter Event="PreviewMouseDown" Handler="TreeViewItem_PreviewMouseDown"></EventSetter>
+                    <EventSetter Event="PreviewMouseMove" Handler="TreeViewItem_PreviewMouseMove"></EventSetter>
+                </Style>
+            </TreeView.Resources>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type ViewModel:LibraryNode}" ItemsSource="{Binding LibraryNodes}">
                     <TextBlock Text="{Binding Header}"/>

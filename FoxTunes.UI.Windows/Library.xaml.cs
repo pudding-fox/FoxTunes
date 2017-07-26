@@ -54,13 +54,32 @@ namespace FoxTunes
             base.OnDrop(e);
         }
 
-        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        private void DoDragDrop()
         {
-            this.DragStartPosition = e.GetPosition(null);
-            base.OnPreviewMouseLeftButtonDown(e);
+            this.DragInitialized = true;
+            DragDrop.DoDragDrop(
+                this,
+                this.SelectedNode.LibraryItems,
+                DragDropEffects.Copy
+            );
+            this.DragInitialized = false;
         }
 
-        protected override void OnPreviewMouseMove(MouseEventArgs e)
+        private void TreeView_Selected(object sender, RoutedEventArgs e)
+        {
+            this.SelectedNode = (e.OriginalSource as TreeViewItem).DataContext as LibraryNode;
+        }
+
+        private void TreeViewItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed)
+            {
+                return;
+            }
+            this.DragStartPosition = e.GetPosition(null);
+        }
+
+        private void TreeViewItem_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed || this.DragInitialized || this.SelectedNode == null)
             {
@@ -71,23 +90,6 @@ namespace FoxTunes
             {
                 this.DoDragDrop();
             }
-            base.OnPreviewMouseMove(e);
-        }
-
-        private void DoDragDrop()
-        {
-            this.DragInitialized = true;
-            DragDrop.DoDragDrop(
-                this, 
-                this.SelectedNode.LibraryItems, 
-                DragDropEffects.Copy
-            );
-            this.DragInitialized = false;
-        }
-
-        private void TreeView_Selected(object sender, RoutedEventArgs e)
-        {
-            this.SelectedNode = (e.OriginalSource as TreeViewItem).DataContext as LibraryNode;
         }
     }
 }
