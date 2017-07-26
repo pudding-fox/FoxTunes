@@ -50,7 +50,6 @@ namespace FoxTunes
             {
                 var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
                 this.Core.Managers.Library.Add(paths);
-                this.Core.Components.Database.SaveChanges();
             }
             base.OnDrop(e);
         }
