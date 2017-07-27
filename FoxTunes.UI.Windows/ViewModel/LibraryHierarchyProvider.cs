@@ -140,6 +140,7 @@ namespace FoxTunes.ViewModel
             var query =
                 from libraryItem in libraryItems
                 group libraryItem by this.ExecuteScript(libraryItem, this.Hierarchy.Levels[level].Script) into hierarchy
+                orderby hierarchy.Key
                 select new LibraryNode(hierarchy.Key, hierarchy, this.BuildHierarchy(hierarchy, level + 1));
             return query;
         }

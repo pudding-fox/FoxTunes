@@ -23,3 +23,8 @@
 
     return parts.join(":");
 }
+
+function zeropad(value, width) {
+    value = value + "";
+    return value.length >= width ? value : new Array(width - value.length + 1).join("0") + value;
+}

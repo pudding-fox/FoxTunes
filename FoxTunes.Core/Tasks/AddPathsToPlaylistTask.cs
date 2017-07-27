@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class AddPathsToPlaylistTask : PlaylistTask
+    public class AddPathsToPlaylistTask : BackgroundTask
     {
         public const string ID = "7B564369-A6A0-4BAF-8C99-08AF27908591";
 
@@ -26,11 +26,14 @@ namespace FoxTunes
 
         public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
 
+        public IDatabase Database { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Playlist = core.Components.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaylistItemFactory = core.Factories.PlaylistItem;
+            this.Database = core.Components.Database;
             base.InitializeComponent(core);
         }
 
@@ -87,6 +90,23 @@ namespace FoxTunes
                 position++;
             }
             this.SetPosition(this.Count);
+        }
+
+        private void SaveChanges()
+        {
+            this.ForegroundTaskRunner.Run(() => this.Database.SaveChanges());
+        }
+
+        private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)
+        {
+            var query =
+                from playlistItem in playlistItems
+                orderby
+                    Path.GetDirectoryName(playlistItem.FileName),
+                    playlistItem.MetaDatas.Value<int>(CommonMetaData.Track),
+                    playlistItem.FileName
+                select playlistItem;
+            return query;
         }
     }
 }

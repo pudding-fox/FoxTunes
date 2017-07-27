@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class AddLibraryItemsToPlaylistTask : PlaylistTask
+    public class AddLibraryItemsToPlaylistTask : BackgroundTask
     {
         public const string ID = "4E0DD392-1138-4DA8-84C2-69B27D1E34EA";
 
@@ -24,11 +24,14 @@ namespace FoxTunes
 
         public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
 
+        public IDatabase Database { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Playlist = core.Components.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaylistItemFactory = core.Factories.PlaylistItem;
+            this.Database = core.Components.Database;
             base.InitializeComponent(core);
         }
 
@@ -49,7 +52,7 @@ namespace FoxTunes
                 from libraryItem in this.LibraryItems
                 where this.PlaybackManager.IsSupported(libraryItem.FileName)
                 select this.PlaylistItemFactory.Create(libraryItem);
-            foreach(var playlistItem in this.OrderBy(query))
+            foreach (var playlistItem in query)
             {
                 this.ForegroundTaskRunner.Run(() => this.Playlist.Set.Add(playlistItem));
                 if (position % interval == 0)
@@ -60,6 +63,11 @@ namespace FoxTunes
                 position++;
             }
             this.SetPosition(this.Count);
+        }
+
+        private void SaveChanges()
+        {
+            this.ForegroundTaskRunner.Run(() => this.Database.SaveChanges());
         }
     }
 }
