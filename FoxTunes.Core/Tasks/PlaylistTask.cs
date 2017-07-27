@@ -35,7 +35,7 @@ namespace FoxTunes
 
         protected virtual void SaveChanges()
         {
-            this.Database.SaveChanges();
+            this.ForegroundTaskRunner.Run(() => this.Database.SaveChanges());
         }
     }
 }

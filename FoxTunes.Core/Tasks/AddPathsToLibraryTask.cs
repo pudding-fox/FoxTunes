@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -72,22 +73,28 @@ namespace FoxTunes
             this.SetName("Processing files");
             this.SetPosition(0);
             this.SetCount(this.FileNames.Count());
+            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
+            var position = 0;
             var query =
                 from fileName in this.FileNames
                 where this.PlaybackManager.IsSupported(fileName)
                 select this.LibraryItemFactory.Create(fileName);
             foreach (var libraryItem in query)
             {
-                this.SetDescription(Path.GetFileName(libraryItem.FileName));
                 this.ForegroundTaskRunner.Run(() => this.Library.Set.Add(libraryItem));
-                this.SetPosition(this.Position + 1);
+                if (position % interval == 0)
+                {
+                    this.SetDescription(Path.GetFileName(libraryItem.FileName));
+                    this.SetPosition(position);
+                }
+                position++;
             }
             this.SetPosition(this.Count);
         }
 
         private void SaveChanges()
         {
-            this.Database.SaveChanges();
+            this.ForegroundTaskRunner.Run(() => this.Database.SaveChanges());
         }
     }
 }
