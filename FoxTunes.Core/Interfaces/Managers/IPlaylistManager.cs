@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IPlaylistManager : IStandardManager
+    public interface IPlaylistManager : IStandardManager, IBackgroundTaskSource
     {
         void Add(IEnumerable<string> paths);
 

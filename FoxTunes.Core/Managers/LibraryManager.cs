@@ -1,13 +1,13 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace FoxTunes.Managers
 {
     public class LibraryManager : StandardManager, ILibraryManager
     {
+        public ICore Core { get; private set; }
+
         public ILibrary Library { get; private set; }
 
         public IDatabase Database { get; private set; }
@@ -18,6 +18,7 @@ namespace FoxTunes.Managers
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.Library = core.Components.Library;
             this.Database = core.Components.Database;
             this.LibraryItemFactory = core.Factories.LibraryItem;
@@ -27,30 +28,14 @@ namespace FoxTunes.Managers
 
         public void Add(IEnumerable<string> paths)
         {
-            var fileNames = new List<string>();
-            foreach (var path in paths)
+            var task = new AddPathsToLibraryTask(paths);
+            task.InitializeComponent(this.Core);
+            task.Completed += (sender, e) =>
             {
-                if (Directory.Exists(path))
-                {
-                    fileNames.AddRange(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
-                }
-                else if (File.Exists(path))
-                {
-                    fileNames.Add(path);
-                }
-            }
-            this.AddFiles(fileNames);
-        }
-
-        protected virtual void AddFiles(IEnumerable<string> fileNames)
-        {
-            var query =
-                from fileName in fileNames
-                where this.PlaybackManager.IsSupported(fileName)
-                select this.LibraryItemFactory.Create(fileName);
-            this.Library.Set.AddRange(query);
-            this.Database.SaveChanges();
-            this.OnUpdated();
+                this.OnUpdated();
+            };
+            this.OnBackgroundTask(task);
+            task.Run();
         }
 
         protected virtual void OnUpdated()
@@ -68,5 +53,16 @@ namespace FoxTunes.Managers
         {
             this.Library.Set.Clear();
         }
+
+        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
+        {
+            if (this.BackgroundTask == null)
+            {
+                return;
+            }
+            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
+        }
+
+        public event BackgroundTaskEventHandler BackgroundTask = delegate { };
     }
 }

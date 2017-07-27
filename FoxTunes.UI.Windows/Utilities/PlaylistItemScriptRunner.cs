@@ -24,7 +24,13 @@ namespace FoxTunes.Utilities
             var metaData = new Dictionary<string, object>();
             foreach (var item in this.LibraryItem.MetaDatas)
             {
-                metaData.Add(item.Name.ToLower(), item.Value);
+                var key = item.Name.ToLower();
+                if (metaData.ContainsKey(key))
+                {
+                    //Not sure what to do. Doesn't happen often.
+                    continue;
+                }
+                metaData.Add(key, item.Value);
             }
 
             var properties = new Dictionary<string, object>();

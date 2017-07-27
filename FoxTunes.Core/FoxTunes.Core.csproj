@@ -41,14 +41,20 @@
   <ItemGroup>
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
+    <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
+    <Compile Include="Tasks\AddPathsToLibraryTask.cs" />
+    <Compile Include="Tasks\BackgroundTask.cs" />
     <Compile Include="BaseBehaviour.cs" />
     <Compile Include="BaseComponent.cs" />
     <Compile Include="BaseFactory.cs" />
     <Compile Include="BaseLoader.cs" />
     <Compile Include="BaseManager.cs" />
     <Compile Include="Factories\LibraryItemFactory.cs" />
+    <Compile Include="Interfaces\IBackgroundTask.cs" />
     <Compile Include="Interfaces\Database\IDatabaseSet.cs" />
     <Compile Include="Interfaces\Factories\ILibraryItemFactory.cs" />
+    <Compile Include="Interfaces\IBackgroundTaskSource.cs" />
     <Compile Include="Interfaces\Library\ILibrary.cs" />
     <Compile Include="Interfaces\Managers\ILibraryManager.cs" />
     <Compile Include="Library\Library.cs" />
@@ -126,6 +132,11 @@
     <Compile Include="StandardManager.cs" />
     <Compile Include="StandardManagers.cs" />
     <Compile Include="Statistic\StatisticItem.cs" />
+    <Compile Include="Tasks\AddLibraryItemsToPlaylistTask.cs" />
+    <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
+    <Compile Include="Tasks\BackgroundTaskRunner.cs" />
+    <Compile Include="Tasks\IForegroundTaskRunner.cs" />
+    <Compile Include="Tasks\PlaylistTask.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

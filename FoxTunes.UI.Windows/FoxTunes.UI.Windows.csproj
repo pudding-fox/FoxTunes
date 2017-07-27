@@ -47,6 +47,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackgroundTasks.xaml.cs">
+      <DependentUpon>BackgroundTasks.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\GridView.cs" />
     <Compile Include="Extensions\ListView.cs" />
     <Compile Include="Integration\Explorer.cs" />
@@ -77,11 +80,13 @@
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
     <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
+    <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryHierarchy.cs" />
     <Compile Include="ViewModel\LibraryHierarchyLevel.cs" />
     <Compile Include="ViewModel\LibraryHierarchyProvider.cs" />
     <Compile Include="ViewModel\LibraryNode.cs" />
+    <Compile Include="WindowsForegroundTaskRunner.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="ViewModel\Command.cs" />
@@ -104,6 +109,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="BackgroundTasks.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Library.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

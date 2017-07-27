@@ -5,7 +5,7 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [Component("F9F07827-E4F6-49FE-A26D-E415E0211E56", ComponentSlots.Database)]
+    [Component("F9F07827-E4F6-49FE-A26D-E415E0211E56", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class SQLiteDatabase : EntityFrameworkDatabase
     {
         private static readonly Type[] References = new[]

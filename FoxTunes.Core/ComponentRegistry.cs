@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +12,7 @@ namespace FoxTunes
             this.Clear();
         }
 
-        private ConcurrentBag<IBaseComponent> Components { get; set; }
+        private List<IBaseComponent> Components { get; set; }
 
         public void AddComponents(params IBaseComponent[] components)
         {
@@ -44,9 +43,25 @@ namespace FoxTunes
             }
         }
 
+        public void ReplaceComponents<T>(params T[] components) where T : IBaseComponent
+        {
+            this.ReplaceComponents(components.AsEnumerable());
+        }
+
+        public void ReplaceComponents<T>(IEnumerable<T> components) where T : IBaseComponent
+        {
+            this.ForEach<T>(component => this.RemoveComponent(component));
+            this.AddComponents(components.OfType<IBaseComponent>());
+        }
+
+        private void RemoveComponent<T>(T component) where T : IBaseComponent
+        {
+            this.Components.Remove(component);
+        }
+
         public void ForEach(Action<IBaseComponent> action)
         {
-            foreach (var component in this.Components)
+            foreach (var component in this.Components.ToArray())
             {
                 action(component);
             }
@@ -54,7 +69,7 @@ namespace FoxTunes
 
         public void ForEach<T>(Action<T> action) where T : IBaseComponent
         {
-            foreach (var component in this.Components.OfType<T>())
+            foreach (var component in this.GetComponents<T>().ToArray())
             {
                 action(component);
             }
@@ -62,7 +77,7 @@ namespace FoxTunes
 
         public void Clear()
         {
-            this.Components = new ConcurrentBag<IBaseComponent>();
+            this.Components = new List<IBaseComponent>();
         }
 
         public static readonly IComponentRegistry Instance = new ComponentRegistry();
