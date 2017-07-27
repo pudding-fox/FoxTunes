@@ -14,7 +14,7 @@
             <ViewModel:Library.Hierarchies>
                 <ViewModel:LibraryHierarchy Name="Artist/Album/Title">
                     <ViewModel:LibraryHierarchy.Levels>
-                        <ViewModel:LibraryHierarchyLevel Script="tag.firstartist||&quot;No Artist&quot;"/>
+                        <ViewModel:LibraryHierarchyLevel Script="tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist||&quot;No Artist&quot;"/>
                         <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(&quot; - &quot;);}return &quot;No Album&quot;;})()"/>
                         <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.title){var parts=[];if(tag.track){parts.push(tag.track);}parts.push(tag.title);return parts.join(&quot; - &quot;);}return item.FileName;})()"/>
                     </ViewModel:LibraryHierarchy.Levels>
