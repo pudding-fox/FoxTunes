@@ -22,7 +22,18 @@
                         </Grid.RowDefinitions>
                         <TextBlock Text="{Binding Name}"></TextBlock>
                         <TextBlock Grid.Row="1" Text="{Binding Description}"></TextBlock>
-                        <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}"></ProgressBar>
+                        <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}">
+                            <ProgressBar.Style>
+                                <Style TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">
+                                    <Setter Property="IsIndeterminate" Value="False"></Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Count}" Value="0">
+                                            <Setter Property="IsIndeterminate" Value="True"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ProgressBar.Style>
+                        </ProgressBar>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
