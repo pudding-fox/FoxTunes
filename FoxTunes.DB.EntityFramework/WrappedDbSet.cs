@@ -60,6 +60,11 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
+        public void Include<TProperty>(Expression<Func<T, TProperty>> path)
+        {
+            throw new NotImplementedException();
+        }
+
         public event NotifyCollectionChangedEventHandler CollectionChanged
         {
             add
@@ -80,6 +85,31 @@ namespace FoxTunes
         public IEnumerable<T> AddRange(IEnumerable<T> items)
         {
             return this.Set.AddRange(items);
+        }
+
+        public T Update(T item)
+        {
+            this.DbContext.Entry(item).State = EntityState.Modified;
+            return item;
+        }
+
+        public IEnumerable<T> UpdateRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                this.Update(item);
+            }
+            return items;
+        }
+
+        public T Remove(T item)
+        {
+            return this.Set.Remove(item);
+        }
+
+        public IEnumerable<T> RemoveRange(IEnumerable<T> items)
+        {
+            return this.Set.RemoveRange(items);
         }
 
         public int IndexOf(T item)

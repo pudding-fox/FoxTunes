@@ -32,6 +32,18 @@ namespace FoxTunes.Managers
             task.InitializeComponent(this.Core);
             task.Completed += (sender, e) =>
             {
+                this.BuildHierarchies();
+            };
+            this.OnBackgroundTask(task);
+            task.Run();
+        }
+
+        public void BuildHierarchies()
+        {
+            var task = new BuildLibraryHierarchiesTask();
+            task.InitializeComponent(this.Core);
+            task.Completed += (sender, e) =>
+            {
                 this.OnUpdated();
             };
             this.OnBackgroundTask(task);
@@ -48,11 +60,6 @@ namespace FoxTunes.Managers
         }
 
         public event EventHandler Updated = delegate { };
-
-        public void Clear()
-        {
-            this.Library.Set.Clear();
-        }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
         {

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Source/FoxTunes/FoxTunes.DB.EntityFramework.SQLite/Database.dat"/><window><current_tab id="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1475"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="LibraryHierarchies"/><default_encoding codec=""/><browsetable_info data="AAAABAAAAEwATABpAGIAcgBhAHIAeQBIAGkAZQByAGEAcgBjAGgAeQBfAEwAaQBiAHIAYQByAHkASABpAGUAcgBhAHIAYwBoAHkATABlAHYAZQBsNIOSoAAAAgwAAAAAAAAAAgAAAAMAAAAAAAAAAgAAAAAAAAAAAP////8AAAAsAEwAaQBiAHIAYQByAHkASABpAGUAcgBhAHIAYwBoAHkATABlAHYAZQBsAHMAAAABAAAAAAAAAAAAAAACAAAAAwAAAAAAAAACAAAAAAAAAAAA/////wAAACoATABpAGIAcgBhAHIAeQBIAGkAZQByAGEAcgBjAGgAeQBJAHQAZQBtAHMzcuNgAAACDAAAAAAAAAAAAAAAAAD/////AAAAJABMAGkAYgByAGEAcgB5AEgAaQBlAHIAYQByAGMAaABpAGUAczNyXaAAAAIMAAAAAAAAAAEAAAABAAAAAAAAAAAA/////w=="/></tab_browse><tab_sql><sql name="SQL 1">SELECT 
+[UnionAll1].[Id] AS [C1], 
+[UnionAll1].[Id1] AS [C2], 
+[UnionAll1].[Name] AS [C3], 
+[UnionAll1].[C1] AS [C4], 
+[UnionAll1].[Id2] AS [C5], 
+[UnionAll1].[Id3] AS [C6], 
+[UnionAll1].[DisplayScript] AS [C7], 
+[UnionAll1].[SortScript] AS [C8], 
+[UnionAll1].[LibraryHierarchy_Id] AS [C9], 
+[UnionAll1].[C2] AS [C10], 
+[UnionAll1].[C3] AS [C11], 
+[UnionAll1].[C4] AS [C12], 
+[UnionAll1].[C5] AS [C13], 
+[UnionAll1].[C6] AS [C14], 
+[UnionAll1].[C7] AS [C15]
+FROM  (SELECT 
+	CASE WHEN ([Extent2].[Id] IS NULL) THEN NULL ELSE 1 END AS [C1], 
+	[Extent1].[Id] AS [Id], 
+	[Extent1].[Id] AS [Id1], 
+	[Extent1].[Name] AS [Name], 
+	[Extent2].[Id] AS [Id2], 
+	[Extent2].[Id] AS [Id3], 
+	[Extent2].[DisplayScript] AS [DisplayScript], 
+	[Extent2].[SortScript] AS [SortScript], 
+	[Extent2].[LibraryHierarchy_Id] AS [LibraryHierarchy_Id], 
+	NULL AS [C2], 
+	NULL AS [C3], 
+	NULL AS [C4], 
+	NULL AS [C5], 
+	NULL AS [C6], 
+	NULL AS [C7]
+	FROM  [LibraryHierarchies] AS [Extent1]
+	LEFT OUTER JOIN [LibraryHierarchyLevels] AS [Extent2] ON [Extent1].[Id] = [Extent2].[LibraryHierarchy_Id]
+UNION ALL
+	SELECT 
+	2 AS [C1], 
+	[Extent3].[Id] AS [Id], 
+	[Extent3].[Id] AS [Id1], 
+	[Extent3].[Name] AS [Name], 
+	NULL AS [C2], 
+	NULL AS [C3], 
+	NULL AS [C4], 
+	NULL AS [C5], 
+	NULL AS [C6], 
+	[Extent4].[Id] AS [Id2], 
+	[Extent4].[Id] AS [Id3], 
+	[Extent4].[DisplayValue] AS [DisplayValue], 
+	[Extent4].[SortValue] AS [SortValue], 
+	[Extent4].[Parent_Id] AS [Parent_Id], 
+	[Extent4].[LibraryHierarchy_Id] AS [LibraryHierarchy_Id]
+	FROM  [LibraryHierarchies] AS [Extent3]
+	INNER JOIN [LibraryHierarchyItems] AS [Extent4] ON [Extent3].[Id] = [Extent4].[LibraryHierarchy_Id]) AS [UnionAll1]
+ORDER BY [UnionAll1].[Id1] ASC, [UnionAll1].[C1] ASC</sql><current_tab id="0"/></tab_sql></sqlb_project>

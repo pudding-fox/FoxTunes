@@ -3,6 +3,7 @@ using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -23,6 +24,9 @@ namespace FoxTunes
             var builder = this.CreateModelBuilder();
             this.MapPlaylistItem(builder);
             this.MapLibraryItem(builder);
+            this.MapLibraryHierarchy(builder);
+            this.MapLibraryHierarchyLevel(builder);
+            this.MapLibraryHierarchyItem(builder);
             this.MapMetaDataItem(builder);
             this.MapPropertyItem(builder);
             this.MapStatisticItem(builder);
@@ -79,6 +83,49 @@ namespace FoxTunes
                     config.MapLeftKey("LibraryItem_Id");
                     config.MapRightKey("StatisticItem_Id");
                     config.ToTable("LibraryItem_StatisticItem");
+                });
+        }
+
+        protected virtual void MapLibraryHierarchy(DbModelBuilder builder)
+        {
+            builder.Entity<LibraryHierarchy>()
+                .HasMany(item => item.Levels)
+               .WithMany()
+               .Map(config =>
+               {
+                   config.MapLeftKey("LibraryHierarchy_Id");
+                   config.MapRightKey("LibraryHierarchyLevel_Id");
+                   config.ToTable("LibraryHierarchy_LibraryHierarchyLevel");
+               });
+            builder.Entity<LibraryHierarchy>()
+                .HasMany(item => item.Items)
+                .WithMany()
+                .Map(config =>
+                {
+                    config.MapLeftKey("LibraryHierarchy_Id");
+                    config.MapRightKey("LibraryHierarchyItem_Id");
+                    config.ToTable("LibraryHierarchy_LibraryHierarchyItem");
+                });
+        }
+
+        protected virtual void MapLibraryHierarchyLevel(DbModelBuilder builder)
+        {
+            builder.Entity<LibraryHierarchyLevel>();
+        }
+
+        protected virtual void MapLibraryHierarchyItem(DbModelBuilder builder)
+        {
+            //builder.Entity<LibraryHierarchyItem>()
+            //    .HasOptional(item => item.Parent)
+            //    .WithMany(item => item.Children);
+            builder.Entity<LibraryHierarchyItem>()
+                .HasMany(item => item.Items)
+                .WithMany()
+                .Map(config =>
+                {
+                    config.MapLeftKey("LibraryItem_Id");
+                    config.MapRightKey("LibraryHierarchyItem_Id");
+                    config.ToTable("LibraryItem_LibraryHierarchyItem");
                 });
         }
 

@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Integration;
 using FoxTunes.Interfaces;
-using FoxTunes.Utilities;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;

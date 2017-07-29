@@ -2,8 +2,12 @@
 {
     public interface ILibrary : IBaseComponent
     {
-        IDatabaseQuery<LibraryItem> Query { get; }
+        IDatabaseQuery<LibraryItem> LibraryItemQuery { get; }
 
-        IDatabaseSet<LibraryItem> Set { get; }
+        IDatabaseSet<LibraryItem> LibraryItemSet { get; }
+
+        IDatabaseQuery<LibraryHierarchy> LibraryHierarchyQuery { get; }
+
+        IDatabaseSet<LibraryHierarchy> LibraryHierarchySet { get; }
     }
 }

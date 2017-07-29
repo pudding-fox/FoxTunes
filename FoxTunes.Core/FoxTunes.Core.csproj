@@ -43,6 +43,9 @@
     <Compile Include="AssemblyResolver.cs" />
     <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
     <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
+    <Compile Include="Library\LibraryHierarchy.cs" />
+    <Compile Include="Library\LibraryHierarchyItem.cs" />
+    <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="Tasks\AddPathsToLibraryTask.cs" />
     <Compile Include="Tasks\BackgroundTask.cs" />
     <Compile Include="BaseBehaviour.cs" />
@@ -135,8 +138,11 @@
     <Compile Include="Tasks\AddLibraryItemsToPlaylistTask.cs" />
     <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
+    <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
+    <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
+    <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

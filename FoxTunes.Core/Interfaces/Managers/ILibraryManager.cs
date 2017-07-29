@@ -7,8 +7,8 @@ namespace FoxTunes.Interfaces
     {
         void Add(IEnumerable<string> paths);
 
-        event EventHandler Updated;
+        void BuildHierarchies();
 
-        void Clear();
+        event EventHandler Updated;
     }
 }
