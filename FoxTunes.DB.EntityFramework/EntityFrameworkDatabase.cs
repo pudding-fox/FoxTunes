@@ -221,6 +221,19 @@ namespace FoxTunes
             }
         }
 
+        public override void WithAutoDetectChanges(Action action)
+        {
+            this.DbContext.Configuration.AutoDetectChangesEnabled = true;
+            try
+            {
+                action();
+            }
+            finally
+            {
+                this.DbContext.Configuration.AutoDetectChangesEnabled = false;
+            }
+        }
+
         public override int SaveChanges()
         {
             if (this.DbContext == null)

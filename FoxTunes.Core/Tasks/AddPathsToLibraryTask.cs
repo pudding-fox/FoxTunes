@@ -112,7 +112,7 @@ namespace FoxTunes
                 select this.LibraryItemFactory.Create(fileName);
             foreach (var libraryItem in query)
             {
-                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Library.LibraryItemSet.Add(libraryItem)));
+                this.Database.Interlocked(() => this.Library.LibraryItemSet.Add(libraryItem));
                 if (position % interval == 0)
                 {
                     this.SetDescription(Path.GetFileName(libraryItem.FileName));

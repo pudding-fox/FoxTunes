@@ -26,6 +26,8 @@ namespace FoxTunes
 
         public abstract void Interlocked(Action action, TimeSpan timeout);
 
+        public abstract void WithAutoDetectChanges(Action action);
+
         public abstract int SaveChanges();
 
         public override void InitializeComponent(ICore core)
