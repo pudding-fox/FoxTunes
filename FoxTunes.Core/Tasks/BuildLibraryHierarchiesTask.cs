@@ -65,10 +65,7 @@ namespace FoxTunes
 
         private IEnumerable<LibraryHierarchyItem> BuildHierarchy(LibraryHierarchy libraryHierarchy, LibraryHierarchyItem parent, IEnumerable<LibraryItem> libraryItems, int level)
         {
-            if (level >= libraryHierarchy.Levels.Count)
-            {
-                return Enumerable.Empty<LibraryHierarchyItem>();
-            }
+            var isLeaf = level >= libraryHierarchy.Levels.Count - 1;
             var libraryHierarchyLevel = libraryHierarchy.Levels[level];
             var query =
                 from libraryItem in libraryItems
@@ -77,17 +74,20 @@ namespace FoxTunes
                     Display = this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript),
                     Sort = this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript),
                 } into hierarchy
-                select new LibraryHierarchyItem(hierarchy.Key.Display, hierarchy.Key.Sort)
+                select new LibraryHierarchyItem(hierarchy.Key.Display, hierarchy.Key.Sort, isLeaf)
                 {
                     Parent = parent,
                     Items = new ObservableCollection<LibraryItem>(hierarchy)
                 };
             var libraryHierarchyItems = query.ToList();
-            foreach (var libraryHierarchyItem in libraryHierarchyItems)
+            if (!isLeaf)
             {
-                libraryHierarchyItem.Children = new ObservableCollection<LibraryHierarchyItem>(
-                    this.BuildHierarchy(libraryHierarchy, libraryHierarchyItem, libraryHierarchyItem.Items, level + 1)
-                );
+                foreach (var libraryHierarchyItem in libraryHierarchyItems)
+                {
+                    libraryHierarchyItem.Children = new ObservableCollection<LibraryHierarchyItem>(
+                        this.BuildHierarchy(libraryHierarchy, libraryHierarchyItem, libraryHierarchyItem.Items, level + 1)
+                    );
+                }
             }
             return libraryHierarchyItems;
         }
