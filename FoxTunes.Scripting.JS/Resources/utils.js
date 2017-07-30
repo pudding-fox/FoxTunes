@@ -28,3 +28,14 @@ function zeropad(value, width) {
     value = value + "";
     return value.length >= width ? value : new Array(width - value.length + 1).join("0") + value;
 }
+
+function ucfirst(value) {
+    if (!value) {
+        return value;
+    }
+    var words = value.split(" ");
+    for (var a = 0; a < words.length; a++) {
+        words[a] = words[a].charAt(0).toUpperCase() + words[a].slice(1);
+    }
+    return words.join(" ");
+}

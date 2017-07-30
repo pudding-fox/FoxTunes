@@ -20,7 +20,11 @@ namespace FoxTunes.Interfaces
 
         void Interlocked(Action action);
 
+        T Interlocked<T>(Func<T> func);
+
         void Interlocked(Action action, TimeSpan timeout);
+
+        T Interlocked<T>(Func<T> func, TimeSpan timeout);
 
         void WithAutoDetectChanges(Action action);
 
