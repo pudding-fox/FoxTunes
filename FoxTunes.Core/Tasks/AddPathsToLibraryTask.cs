@@ -47,37 +47,37 @@ namespace FoxTunes
 
         private void EnumerateFiles()
         {
-            this.SetName("Getting file list");
-            this.SetPosition(0);
-            this.SetCount(this.Paths.Count());
+            this.Name = "Getting file list";
+            this.Position = 0;
+            this.Count = this.Paths.Count();
             var fileNames = new List<string>();
             foreach (var path in this.Paths)
             {
                 if (Directory.Exists(path))
                 {
-                    this.SetDescription(new DirectoryInfo(path).Name);
+                    this.Description = new DirectoryInfo(path).Name;
                     fileNames.AddRange(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
                 }
                 else if (File.Exists(path))
                 {
-                    this.SetDescription(new FileInfo(path).Name);
+                    this.Description = new FileInfo(path).Name;
                     fileNames.Add(path);
                 }
-                this.SetPosition(this.Position + 1);
+                this.Position = this.Position + 1;
             }
             this.FileNames = fileNames;
-            this.SetPosition(this.Count);
+            this.Position = this.Count;
         }
 
         private void SanitizeFiles()
         {
             var fileNames = this.FileNames.ToList();
-            this.SetName("Preparing file list");
-            this.SetPosition(0);
-            this.SetCount(fileNames.Count);
+            this.Name = "Preparing file list";
+            this.Position = 0;
+            this.Count = fileNames.Count;
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
-            for (var a = 0; a < fileNames.Count;)
+            for (var a = 0; a < fileNames.Count; )
             {
                 var fileName = fileNames[a];
                 if (this.Database.Interlocked(() => this.Library.LibraryItemSet.Any(libraryItem => libraryItem.FileName == fileName)))
@@ -90,20 +90,20 @@ namespace FoxTunes
                 }
                 if (position % interval == 0)
                 {
-                    this.SetDescription(new FileInfo(fileName).Name);
-                    this.SetPosition(position);
+                    this.Description = new FileInfo(fileName).Name;
+                    this.Position = position;
                 }
                 position++;
             }
             this.FileNames = fileNames;
-            this.SetPosition(this.Count);
+            this.Position = this.Count;
         }
 
         private void AddFiles()
         {
-            this.SetName("Processing files");
-            this.SetPosition(0);
-            this.SetCount(this.FileNames.Count());
+            this.Name = "Processing files";
+            this.Position = 0;
+            this.Count = this.FileNames.Count();
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
             var query =
@@ -115,18 +115,18 @@ namespace FoxTunes
                 this.Database.Interlocked(() => this.Library.LibraryItemSet.Add(libraryItem));
                 if (position % interval == 0)
                 {
-                    this.SetDescription(Path.GetFileName(libraryItem.FileName));
-                    this.SetPosition(position);
+                    this.Description = Path.GetFileName(libraryItem.FileName);
+                    this.Position = position;
                 }
                 position++;
             }
-            this.SetPosition(this.Count);
+            this.Position = this.Count;
         }
 
         private void SaveChanges()
         {
-            this.SetName("Saving changes");
-            this.SetPosition(this.Count);
+            this.Name = "Saving changes";
+            this.Position = this.Count;
             this.Database.Interlocked(() => this.Database.SaveChanges());
         }
     }

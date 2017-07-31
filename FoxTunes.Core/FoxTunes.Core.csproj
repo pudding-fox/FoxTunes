@@ -141,6 +141,7 @@
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
+    <Compile Include="Tasks\LoadOutputStreamTask.cs" />
     <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
   </ItemGroup>

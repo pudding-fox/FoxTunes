@@ -24,7 +24,7 @@ namespace FoxTunes
             {
                 return this._Name;
             }
-            private set
+            protected set
             {
                 this._Name = value;
                 this.OnNameChanged();
@@ -33,19 +33,17 @@ namespace FoxTunes
 
         protected virtual void OnNameChanged()
         {
-            if (this.NameChanged != null)
+            this.ForegroundTaskRunner.Run(() =>
             {
-                this.NameChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Name");
+                if (this.NameChanged != null)
+                {
+                    this.NameChanged(this, EventArgs.Empty);
+                }
+                this.OnPropertyChanged("Name");
+            });
         }
 
         public event EventHandler NameChanged = delegate { };
-
-        protected virtual void SetName(string name)
-        {
-            this.ForegroundTaskRunner.Run(() => this.Name = name);
-        }
 
         private string _Description { get; set; }
 
@@ -55,7 +53,7 @@ namespace FoxTunes
             {
                 return this._Description;
             }
-            private set
+            protected set
             {
                 this._Description = value;
                 this.OnDescriptionChanged();
@@ -64,19 +62,17 @@ namespace FoxTunes
 
         protected virtual void OnDescriptionChanged()
         {
-            if (this.DescriptionChanged != null)
+            this.ForegroundTaskRunner.Run(() =>
             {
-                this.DescriptionChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Description");
+                if (this.DescriptionChanged != null)
+                {
+                    this.DescriptionChanged(this, EventArgs.Empty);
+                }
+                this.OnPropertyChanged("Description");
+            });
         }
 
         public event EventHandler DescriptionChanged = delegate { };
-
-        protected virtual void SetDescription(string description)
-        {
-            this.ForegroundTaskRunner.Run(() => this.Description = description);
-        }
 
         private int _Position { get; set; }
 
@@ -86,7 +82,7 @@ namespace FoxTunes
             {
                 return this._Position;
             }
-            private set
+            protected set
             {
                 this._Position = value;
                 this.OnPositionChanged();
@@ -95,19 +91,17 @@ namespace FoxTunes
 
         protected virtual void OnPositionChanged()
         {
-            if (this.PositionChanged != null)
+            this.ForegroundTaskRunner.Run(() =>
             {
-                this.PositionChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Position");
+                if (this.PositionChanged != null)
+                {
+                    this.PositionChanged(this, EventArgs.Empty);
+                }
+                this.OnPropertyChanged("Position");
+            });
         }
 
         public event EventHandler PositionChanged = delegate { };
-
-        protected virtual void SetPosition(int position)
-        {
-            this.ForegroundTaskRunner.Run(() => this.Position = position);
-        }
 
         private int _Count { get; set; }
 
@@ -117,7 +111,7 @@ namespace FoxTunes
             {
                 return this._Count;
             }
-            private set
+            protected set
             {
                 this._Count = value;
                 this.OnCountChanged();
@@ -126,19 +120,17 @@ namespace FoxTunes
 
         protected virtual void OnCountChanged()
         {
-            if (this.CountChanged != null)
+            this.ForegroundTaskRunner.Run(() =>
             {
-                this.CountChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Count");
+                if (this.CountChanged != null)
+                {
+                    this.CountChanged(this, EventArgs.Empty);
+                }
+                this.OnPropertyChanged("Count");
+            });
         }
 
         public event EventHandler CountChanged = delegate { };
-
-        protected virtual void SetCount(int count)
-        {
-            this.ForegroundTaskRunner.Run(() => this.Count = count);
-        }
 
         public void Run()
         {

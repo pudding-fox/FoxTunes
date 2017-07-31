@@ -82,7 +82,7 @@ namespace FoxTunes.Managers
             {
                 index = 0;
             }
-            this.PlaybackManager.Load(this.Playlist.Set[index].FileName).Play();
+            this.PlaybackManager.Load(this.Playlist.Set[index].FileName, true);
         }
 
         public void Previous()
@@ -100,7 +100,7 @@ namespace FoxTunes.Managers
             {
                 index = this.Playlist.Set.Count - 1;
             }
-            this.PlaybackManager.Load(this.Playlist.Set[index].FileName).Play();
+            this.PlaybackManager.Load(this.Playlist.Set[index].FileName, true);
         }
 
         public void Clear()

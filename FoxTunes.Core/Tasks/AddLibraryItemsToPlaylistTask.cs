@@ -43,9 +43,9 @@ namespace FoxTunes
 
         private void AddItems()
         {
-            this.SetName("Processing files");
-            this.SetPosition(0);
-            this.SetCount(this.LibraryItems.Count());
+            this.Name = "Processing files";
+            this.Position = 0;
+            this.Count = this.LibraryItems.Count();
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
             var query =
@@ -57,18 +57,18 @@ namespace FoxTunes
                 this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Add(playlistItem)));
                 if (position % interval == 0)
                 {
-                    this.SetDescription(Path.GetFileName(playlistItem.FileName));
-                    this.SetPosition(position);
+                    this.Description = Path.GetFileName(playlistItem.FileName);
+                    this.Position = position;
                 }
                 position++;
             }
-            this.SetPosition(this.Count);
+            this.Position = this.Count;
         }
 
         private void SaveChanges()
         {
-            this.SetName("Saving changes");
-            this.SetPosition(this.Count);
+            this.Name = "Saving changes";
+            this.Position = this.Count;
             this.Database.Interlocked(() => this.Database.SaveChanges());
         }
     }
