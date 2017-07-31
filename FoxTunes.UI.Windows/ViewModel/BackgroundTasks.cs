@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -9,10 +10,13 @@ namespace FoxTunes.ViewModel
     {
         public BackgroundTasks()
         {
-            this.Items = new ObservableCollection<IBackgroundTask>();
+            this.RunningTasks = new ObservableCollection<IBackgroundTask>();
+            this.FaultedTasks = new ObservableCollection<IBackgroundTask>();
         }
 
-        public ObservableCollection<IBackgroundTask> Items { get; set; }
+        public ObservableCollection<IBackgroundTask> RunningTasks { get; set; }
+
+        public ObservableCollection<IBackgroundTask> FaultedTasks { get; set; }
 
         protected override void OnCoreChanged()
         {
@@ -24,16 +28,31 @@ namespace FoxTunes.ViewModel
         {
             e.BackgroundTask.Started += this.OnBackgroundTaskStarted;
             e.BackgroundTask.Completed += this.OnBackgroundTaskCompleted;
+            e.BackgroundTask.Faulted += this.OnBackgroundTaskFaulted;
         }
 
         protected virtual void OnBackgroundTaskStarted(object sender, EventArgs e)
         {
-            this.Items.Add(sender as IBackgroundTask);
+            this.RunningTasks.Add(sender as IBackgroundTask);
         }
 
         protected virtual void OnBackgroundTaskCompleted(object sender, EventArgs e)
         {
-            this.Items.Remove(sender as IBackgroundTask);
+            this.RunningTasks.Remove(sender as IBackgroundTask);
+        }
+
+        protected virtual void OnBackgroundTaskFaulted(object sender, EventArgs e)
+        {
+            this.RunningTasks.Remove(sender as IBackgroundTask);
+            this.FaultedTasks.Add(sender as IBackgroundTask);
+        }
+
+        public ICommand ClearFaultedTasksCommand
+        {
+            get
+            {
+                return new Command(() => this.FaultedTasks.Clear());
+            }
         }
 
         protected override Freezable CreateInstanceCore()
