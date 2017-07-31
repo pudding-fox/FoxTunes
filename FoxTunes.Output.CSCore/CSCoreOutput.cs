@@ -6,6 +6,8 @@ namespace FoxTunes
     [Component("F2F587A5-489B-429F-9C65-E60E7384D50B", ComponentSlots.Output)]
     public class CSCoreOutput : Output, IConfigurableComponent
     {
+        public ICore Core { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public ISoundOutFactory SoundOutFactory
@@ -50,6 +52,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.Configuration = core.Components.Configuration;
             base.InitializeComponent(core);
         }
@@ -63,7 +66,9 @@ namespace FoxTunes
         {
             var waveSource = this.WaveSourceFactory.CreateWaveSource(fileName);
             var soundOut = this.SoundOutFactory.CreateSoundOut();
-            return new CSCoreOutputStream(fileName, waveSource, soundOut);
+            var outputStream = new CSCoreOutputStream(fileName, waveSource, soundOut);
+            outputStream.InitializeComponent(this.Core);
+            return outputStream;
         }
 
         public override void Unload(IOutputStream stream)

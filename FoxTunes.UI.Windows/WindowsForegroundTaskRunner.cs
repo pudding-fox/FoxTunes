@@ -9,7 +9,14 @@ namespace FoxTunes
     {
         public Task Run(Action action)
         {
-            Application.Current.Dispatcher.Invoke(action);
+            if (Application.Current != null)
+            {
+                Application.Current.Dispatcher.Invoke(action);
+            }
+            else
+            {
+                action();
+            }
             return Task.CompletedTask;
         }
     }
