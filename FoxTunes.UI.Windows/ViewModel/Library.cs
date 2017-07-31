@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -10,6 +11,7 @@ namespace FoxTunes.ViewModel
     {
         public Library()
         {
+            this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<RenderableLibraryHierarchyItem>>();
         }
 
         public IDatabase Database { get; private set; }
@@ -43,6 +45,8 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedHierarchyChanged = delegate { };
 
+        private Dictionary<LibraryHierarchy, ObservableCollection<RenderableLibraryHierarchyItem>> _Items { get; set; }
+
         public ObservableCollection<RenderableLibraryHierarchyItem> Items
         {
             get
@@ -51,9 +55,13 @@ namespace FoxTunes.ViewModel
                 {
                     return null;
                 }
-                return new ObservableCollection<RenderableLibraryHierarchyItem>(
-                    this.SelectedHierarchy.Items.Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database))
-                );
+                if (!this._Items.ContainsKey(this.SelectedHierarchy))
+                {
+                    this._Items[this.SelectedHierarchy] = new ObservableCollection<RenderableLibraryHierarchyItem>(
+                        this.SelectedHierarchy.Items.Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database))
+                    );
+                }
+                return this._Items[this.SelectedHierarchy];
             }
         }
 
@@ -66,13 +74,19 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Items");
         }
 
+        public void Refresh()
+        {
+            this._Items.Clear();
+            this.OnItemsChanged();
+        }
+
         public event EventHandler ItemsChanged = delegate { };
 
         protected override void OnCoreChanged()
         {
             this.Database = this.Core.Components.Database;
-            this.Core.Managers.Library.Updated += (sender, e) => this.OnItemsChanged();
-            this.OnItemsChanged();
+            this.Core.Managers.Library.Updated += (sender, e) => this.Refresh();
+            this.Refresh();
             base.OnCoreChanged();
         }
 

@@ -117,7 +117,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name) { TextValue = value });
+            this.MetaDatas.Add(new MetaDataItem(name) { TextValue = value.Trim() });
         }
 
         private void AddMetaData(string name, string[] values)
@@ -167,7 +167,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Properties.Add(new PropertyItem(name) { TextValue = value });
+            this.Properties.Add(new PropertyItem(name) { TextValue = value.Trim() });
         }
     }
 }

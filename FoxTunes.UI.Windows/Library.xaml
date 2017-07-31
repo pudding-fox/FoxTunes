@@ -29,6 +29,8 @@
         <TreeView x:Name="TreeView" Grid.ColumnSpan="3" Grid.Row="1" ItemsSource="{Binding Items, Source={StaticResource ViewModel}}">
             <TreeView.Resources>
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
                     <EventSetter Event="Selected" Handler="TreeView_Selected"></EventSetter>
                     <EventSetter Event="PreviewMouseDown" Handler="TreeViewItem_PreviewMouseDown"></EventSetter>
                     <EventSetter Event="PreviewMouseMove" Handler="TreeViewItem_PreviewMouseMove"></EventSetter>
