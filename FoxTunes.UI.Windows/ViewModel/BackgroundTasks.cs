@@ -33,12 +33,22 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnBackgroundTaskStarted(object sender, EventArgs e)
         {
-            this.RunningTasks.Add(sender as IBackgroundTask);
+            var task = sender as IBackgroundTask;
+            if (!task.Visible)
+            {
+                return;
+            }
+            this.RunningTasks.Add(task);
         }
 
         protected virtual void OnBackgroundTaskCompleted(object sender, EventArgs e)
         {
-            this.RunningTasks.Remove(sender as IBackgroundTask);
+            var task = sender as IBackgroundTask;
+            if (!task.Visible)
+            {
+                return;
+            }
+            this.RunningTasks.Remove(task);
         }
 
         protected virtual void OnBackgroundTaskFaulted(object sender, EventArgs e)

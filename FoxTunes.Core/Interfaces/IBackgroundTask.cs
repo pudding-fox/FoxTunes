@@ -6,6 +6,8 @@ namespace FoxTunes.Interfaces
     {
         string Id { get; }
 
+        bool Visible { get; }
+
         string Name { get; }
 
         event EventHandler NameChanged;
