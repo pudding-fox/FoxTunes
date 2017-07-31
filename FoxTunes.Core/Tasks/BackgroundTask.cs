@@ -5,12 +5,15 @@ namespace FoxTunes
 {
     public abstract class BackgroundTask : BaseComponent, IBackgroundTask
     {
-        protected BackgroundTask(string id)
+        protected BackgroundTask(string id, bool visible = true)
         {
             this.Id = id;
+            this.Visible = visible;
         }
 
         public string Id { get; private set; }
+
+        public bool Visible { get; private set; }
 
         public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
 

@@ -75,7 +75,7 @@ namespace FoxTunes.ViewModel
                 return new Command(() =>
                 {
                     var item = this.SelectedItems[0] as PlaylistItem;
-                    this.PlaybackManager.Load(item.FileName, true);
+                    this.PlaybackManager.Load(item.FileName, () => this.PlaybackManager.CurrentStream.Play());
                 },
                 () => this.PlaybackManager != null && this.SelectedItems.Count > 0);
             }

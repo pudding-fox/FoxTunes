@@ -47,31 +47,39 @@ namespace FoxTunes.Managers
 
         public event EventHandler CurrentStreamChanged = delegate { };
 
-        public void Load(string fileName, bool play)
+        public void Load(string fileName, Action callBack = null)
         {
-            this.Unload();
-            var task = new LoadOutputStreamTask(fileName);
-            task.InitializeComponent(this.Core);
-            if (play)
+            this.Unload(() =>
             {
-                task.Completed += (sender, e) =>
+                var task = new LoadOutputStreamTask(fileName);
+                task.InitializeComponent(this.Core);
+                if (callBack != null)
                 {
-                    this.CurrentStream.Play();
-                };
-            }
-            this.OnBackgroundTask(task);
-            task.Run();
+                    task.Completed += (sender, e) => callBack();
+                }
+                this.OnBackgroundTask(task);
+                task.Run();
+            });
         }
 
-        public void Unload()
+        public void Unload(Action callBack = null)
         {
             if (this.CurrentStream == null)
             {
+                if (callBack != null)
+                {
+                    callBack();
+                }
                 return;
             }
-            this.CurrentStream.Stop();
-            this.CurrentStream.Dispose();
-            this.CurrentStream = null;
+            var task = new UnloadOutputStreamTask();
+            task.InitializeComponent(this.Core);
+            if (callBack != null)
+            {
+                task.Completed += (sender, e) => callBack();
+            }
+            this.OnBackgroundTask(task);
+            task.Run();
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
