@@ -31,6 +31,10 @@ namespace FoxTunes
             {
                 return false;
             }
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
             return this.Id == other.Id && string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -41,10 +45,7 @@ namespace FoxTunes
 
         public override int GetHashCode()
         {
-            var hashCode = 0;
-            hashCode += this.Id.GetHashCode();
-            hashCode += this.FileName.GetHashCode();
-            return hashCode;
+            return this.FileName.GetHashCode();
         }
 
         public static bool operator ==(PlaylistItem a, PlaylistItem b)
