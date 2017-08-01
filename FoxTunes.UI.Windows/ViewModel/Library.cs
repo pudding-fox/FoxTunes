@@ -40,7 +40,7 @@ namespace FoxTunes.ViewModel
                 this.SelectedHierarchyChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("SelectedHierarchy");
-            this.OnItemsChanged();
+            this.Refresh();
         }
 
         public event EventHandler SelectedHierarchyChanged = delegate { };
@@ -57,9 +57,9 @@ namespace FoxTunes.ViewModel
                 }
                 if (!this._Items.ContainsKey(this.SelectedHierarchy))
                 {
-                    this._Items[this.SelectedHierarchy] = new ObservableCollection<RenderableLibraryHierarchyItem>(
-                        this.SelectedHierarchy.Items.Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database))
-                    );
+                    var libraryHierarchyItems = this.SelectedHierarchy.Items
+                        .Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database));
+                    this._Items[this.SelectedHierarchy] = new ObservableCollection<RenderableLibraryHierarchyItem>(libraryHierarchyItems);
                 }
                 return this._Items[this.SelectedHierarchy];
             }
@@ -74,9 +74,14 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Items");
         }
 
-        public void Refresh()
+        public void Reload()
         {
             this._Items.Clear();
+            this.Refresh();
+        }
+
+        public void Refresh()
+        {
             this.OnItemsChanged();
         }
 
@@ -85,10 +90,37 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.Database = this.Core.Components.Database;
-            this.Core.Managers.Library.Updated += (sender, e) => this.Refresh();
+            this.Core.Managers.Library.Updated += (sender, e) => this.Reload();
             this.Refresh();
             base.OnCoreChanged();
         }
+
+        private string _Filter { get; set; }
+
+        public string Filter
+        {
+            get
+            {
+                return this._Filter;
+            }
+            set
+            {
+                this._Filter = value;
+                this.OnFilterChanged();
+            }
+        }
+
+        protected virtual void OnFilterChanged()
+        {
+            if (this.FilterChanged != null)
+            {
+                this.FilterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Filter");
+            this.Reload();
+        }
+
+        public event EventHandler FilterChanged = delegate { };
 
         protected override Freezable CreateInstanceCore()
         {
