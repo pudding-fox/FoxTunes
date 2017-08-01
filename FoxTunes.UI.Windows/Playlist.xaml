@@ -13,7 +13,7 @@
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}">
             <ViewModel:Playlist.PlaylistColumns>
-                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.FileName == playing.FileName ? &quot;\u2022&quot; : &quot;&quot;"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.Id == playing.Id ? &quot;\u2022&quot; : &quot;&quot;"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Artist / album" Script="(function(){var parts=[tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist];if(tag.album){parts.push(tag.album);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Track no" Script="(function(){var parts=[];if(tag.disccount != 1 &amp;&amp; tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
                 <ViewModel:PlaylistColumn Header="Title / track artist" Script="(function(){var parts=[];if(tag.title){parts.push(tag.title);}if(tag.firstperformer &amp;&amp; tag.firstperformer != (tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist)){parts.push(tag.firstperformer);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>

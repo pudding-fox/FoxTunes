@@ -63,11 +63,11 @@ namespace FoxTunes
             return this.WaveSourceFactory.IsSupported(fileName);
         }
 
-        public override Task<IOutputStream> Load(string fileName)
+        public override Task<IOutputStream> Load(PlaylistItem playlistItem)
         {
-            var waveSource = this.WaveSourceFactory.CreateWaveSource(fileName);
+            var waveSource = this.WaveSourceFactory.CreateWaveSource(playlistItem.FileName);
             var soundOut = this.SoundOutFactory.CreateSoundOut();
-            var outputStream = new CSCoreOutputStream(fileName, waveSource, soundOut);
+            var outputStream = new CSCoreOutputStream(playlistItem, waveSource, soundOut);
             outputStream.InitializeComponent(this.Core);
             return Task.FromResult<IOutputStream>(outputStream);
         }

@@ -6,12 +6,20 @@ namespace FoxTunes
 {
     public abstract class OutputStream : BaseComponent, IOutputStream
     {
-        protected OutputStream(string fileName)
+        protected OutputStream(PlaylistItem playlistItem)
         {
-            this.FileName = fileName;
+            this.PlaylistItem = playlistItem;
         }
 
-        public string FileName { get; private set; }
+        public int Id
+        {
+            get
+            {
+                return this.PlaylistItem.Id;
+            }
+        }
+
+        public PlaylistItem PlaylistItem { get; private set; }
 
         public abstract long Position { get; set; }
 

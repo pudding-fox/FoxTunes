@@ -7,7 +7,7 @@ namespace FoxTunes
     {
         public abstract bool IsSupported(string fileName);
 
-        public abstract Task<IOutputStream> Load(string fileName);
+        public abstract Task<IOutputStream> Load(PlaylistItem playlistItem);
 
         public abstract Task Unload(IOutputStream stream);
     }

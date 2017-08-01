@@ -67,9 +67,9 @@ namespace FoxTunes.Managers
 
         public event EventHandler CurrentStreamChanged = delegate { };
 
-        public Task Load(string fileName)
+        public Task Load(PlaylistItem playlistItem)
         {
-            var task = new LoadOutputStreamTask(fileName);
+            var task = new LoadOutputStreamTask(playlistItem);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run();

@@ -5,7 +5,9 @@ namespace FoxTunes.Interfaces
 {
     public interface IOutputStream : IBaseComponent, IDisposable
     {
-        string FileName { get; }
+        int Id { get; }
+
+        PlaylistItem PlaylistItem { get; }
 
         long Position { get; set; }
 

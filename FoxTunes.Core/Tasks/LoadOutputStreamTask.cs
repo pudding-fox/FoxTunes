@@ -8,13 +8,13 @@ namespace FoxTunes
     {
         public const string ID = "E3E23677-DE0A-4291-8416-BC4A91856037";
 
-        public LoadOutputStreamTask(string fileName)
+        public LoadOutputStreamTask(PlaylistItem playlistItem)
             : base(ID)
         {
-            this.FileName = fileName;
+            this.PlaylistItem = playlistItem;
         }
 
-        public string FileName { get; private set; }
+        public PlaylistItem PlaylistItem { get; private set; }
 
         public IOutput Output { get; private set; }
 
@@ -30,8 +30,8 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             this.Name = "Buffering";
-            this.Description = new FileInfo(this.FileName).Name;
-            this.OutputStreamQueue.Enqueue(await this.Output.Load(this.FileName));
+            this.Description = new FileInfo(this.PlaylistItem.FileName).Name;
+            this.OutputStreamQueue.Enqueue(await this.Output.Load(this.PlaylistItem));
         }
     }
 }

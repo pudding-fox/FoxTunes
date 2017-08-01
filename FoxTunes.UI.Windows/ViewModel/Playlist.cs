@@ -74,10 +74,17 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(() =>
                 {
-                    var item = this.SelectedItems[0] as PlaylistItem;
+                    var playlistItem = this.SelectedItems[0] as PlaylistItem;
                     return this.PlaybackManager
-                        .Load(item.FileName)
-                        .ContinueWith(_ => this.PlaybackManager.CurrentStream.Play());
+                        .Load(playlistItem)
+                        .ContinueWith(_ =>
+                        {
+                            if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
+                            {
+                                return;
+                            }
+                            this.PlaybackManager.CurrentStream.Play();
+                        });
                 },
                 () => this.PlaybackManager != null && this.SelectedItems.Count > 0);
             }
