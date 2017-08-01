@@ -57,6 +57,14 @@ namespace FoxTunes
             }
         }
 
+        public IOutputStreamQueue OutputStreamQueue
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IOutputStreamQueue>();
+            }
+        }
+
         public IScriptingRuntime ScriptingRuntime
         {
             get

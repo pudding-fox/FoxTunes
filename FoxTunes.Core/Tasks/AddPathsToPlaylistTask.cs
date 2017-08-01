@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -37,11 +38,11 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override void OnRun()
+        protected override Task OnRun()
         {
             this.EnumerateFiles();
             this.AddFiles();
-            this.SaveChanges();
+            return this.SaveChanges();
         }
 
         private void EnumerateFiles()
@@ -92,11 +93,11 @@ namespace FoxTunes
             this.Position = this.Count;
         }
 
-        private void SaveChanges()
+        private Task SaveChanges()
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
-            this.Database.Interlocked(() => this.Database.SaveChanges());
+            return this.Database.Interlocked(() => this.Database.SaveChangesAsync());
         }
 
         private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)

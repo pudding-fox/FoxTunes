@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Managers
 {
@@ -26,28 +27,20 @@ namespace FoxTunes.Managers
             base.InitializeComponent(core);
         }
 
-        public void Add(IEnumerable<string> paths)
+        public Task Add(IEnumerable<string> paths)
         {
             var task = new AddPathsToLibraryTask(paths);
             task.InitializeComponent(this.Core);
-            task.Completed += (sender, e) =>
-            {
-                this.BuildHierarchies();
-            };
             this.OnBackgroundTask(task);
-            task.Run();
+            return task.Run().ContinueWith(_ => this.BuildHierarchies());
         }
 
-        public void BuildHierarchies()
+        public Task BuildHierarchies()
         {
             var task = new BuildLibraryHierarchiesTask();
             task.InitializeComponent(this.Core);
-            task.Completed += (sender, e) =>
-            {
-                this.OnUpdated();
-            };
             this.OnBackgroundTask(task);
-            task.Run();
+            return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
         protected virtual void OnUpdated()

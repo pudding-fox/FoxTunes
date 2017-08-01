@@ -14,6 +14,8 @@
 
         IOutput Output { get; }
 
+        IOutputStreamQueue OutputStreamQueue { get; }
+
         IScriptingRuntime ScriptingRuntime { get; }
 
         IBackgroundTaskRunner BackgroundTaskRunner { get; }

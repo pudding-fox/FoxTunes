@@ -1,11 +1,14 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Managers
 {
     public class PlaylistManager : StandardManager, IPlaylistManager
     {
+        private volatile bool IsNavigating = false;
+
         public ICore Core { get; private set; }
 
         public IPlaylist Playlist { get; private set; }
@@ -32,28 +35,20 @@ namespace FoxTunes.Managers
             this.UpdateCurrentItem();
         }
 
-        public void Add(IEnumerable<string> paths)
+        public Task Add(IEnumerable<string> paths)
         {
             var task = new AddPathsToPlaylistTask(paths);
             task.InitializeComponent(this.Core);
-            task.Completed += (sender, e) =>
-            {
-                this.OnUpdated();
-            };
             this.OnBackgroundTask(task);
-            task.Run();
+            return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
-        public void Add(IEnumerable<LibraryItem> libraryItems)
+        public Task Add(IEnumerable<LibraryItem> libraryItems)
         {
             var task = new AddLibraryItemsToPlaylistTask(libraryItems);
             task.InitializeComponent(this.Core);
-            task.Completed += (sender, e) =>
-            {
-                this.OnUpdated();
-            };
             this.OnBackgroundTask(task);
-            task.Run();
+            return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
         protected virtual void OnUpdated()
@@ -67,52 +62,86 @@ namespace FoxTunes.Managers
 
         public event EventHandler Updated = delegate { };
 
-        public void Next()
+        public async Task Next()
         {
-            var index = default(int);
-            if (this.CurrentItem == null)
+            if (this.IsNavigating)
             {
-                index = 0;
+                return;
             }
-            else
+            try
             {
-                index = this.Playlist.Set.IndexOf(this.CurrentItem) + 1;
+                this.IsNavigating = true; ;
+                var index = default(int);
+                if (this.CurrentItem == null)
+                {
+                    index = 0;
+                }
+                else
+                {
+                    index = this.Playlist.Set.IndexOf(this.CurrentItem) + 1;
+                }
+                if (index >= this.Playlist.Set.Count)
+                {
+                    index = 0;
+                }
+                await this.Play(this.Playlist.Set[index].FileName);
             }
-            if (index >= this.Playlist.Set.Count)
+            finally
             {
-                index = 0;
+                this.IsNavigating = false;
             }
-            this.PlaybackManager.Load(this.Playlist.Set[index].FileName, () => this.PlaybackManager.CurrentStream.Play());
         }
 
-        public void Previous()
+        public async Task Previous()
         {
-            var index = default(int);
-            if (this.CurrentItem == null)
+            if (this.IsNavigating)
             {
-                index = 0;
+                return;
             }
-            else
+            try
             {
-                index = this.Playlist.Set.IndexOf(this.CurrentItem) - 1;
+                this.IsNavigating = true; ;
+                var index = default(int);
+                if (this.CurrentItem == null)
+                {
+                    index = 0;
+                }
+                else
+                {
+                    index = this.Playlist.Set.IndexOf(this.CurrentItem) - 1;
+                }
+                if (index < 0)
+                {
+                    index = this.Playlist.Set.Count - 1;
+                }
+                await this.Play(this.Playlist.Set[index].FileName);
             }
-            if (index < 0)
+            finally
             {
-                index = this.Playlist.Set.Count - 1;
+                this.IsNavigating = false;
             }
-            this.PlaybackManager.Load(this.Playlist.Set[index].FileName, () => this.PlaybackManager.CurrentStream.Play());
         }
 
-        public void Clear()
+        private Task Play(string fileName)
+        {
+            return this.PlaybackManager
+                .Load(fileName)
+                .ContinueWith(_ =>
+                {
+                    if (!string.Equals(fileName, this.PlaybackManager.CurrentStream.FileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return;
+                    }
+                    this.PlaybackManager.CurrentStream.Play();
+                });
+        }
+
+        public Task Clear()
         {
             var task = new ClearPlaylistTask();
             task.InitializeComponent(this.Core);
-            task.Completed += (sender, e) =>
-            {
-                this.OnUpdated();
-            };
             this.OnBackgroundTask(task);
-            task.Run();
+            return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
         protected virtual void UpdateCurrentItem()

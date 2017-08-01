@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -17,23 +18,20 @@ namespace FoxTunes
 
         public IOutput Output { get; private set; }
 
-        public IPlaybackManager PlaybackManager { get; private set; }
-
-        public IOutputStream OutputStream { get; private set; }
+        public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
-            this.PlaybackManager = core.Managers.Playback;
+            this.OutputStreamQueue = core.Components.OutputStreamQueue;
             base.InitializeComponent(core);
         }
 
-        protected override void OnRun()
+        protected override async Task OnRun()
         {
             this.Name = "Buffering";
             this.Description = new FileInfo(this.FileName).Name;
-            this.OutputStream = this.Output.Load(this.FileName);
-            this.ForegroundTaskRunner.Run(() => this.PlaybackManager.CurrentStream = this.OutputStream);
+            this.OutputStreamQueue.Enqueue(await this.Output.Load(this.FileName));
         }
     }
 }

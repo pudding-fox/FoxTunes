@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -38,7 +39,7 @@ namespace FoxTunes.Interfaces
 
         event EventHandler Resumed;
 
-        void Stop();
+        Task Stop();
 
         event StoppedEventHandler Stopped;
     }

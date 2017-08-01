@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -135,25 +136,30 @@ namespace FoxTunes
 
         public event EventHandler CountChanged = delegate { };
 
-        public void Run()
+        public Task Run()
         {
-            this.BackgroundTaskRunner.Run(() =>
+            this.OnStarted();
+            return this.BackgroundTaskRunner.Run(() => this.OnRun()).ContinueWith(_ =>
             {
-                this.OnStarted();
-                try
+                switch (_.Status)
                 {
-                    this.OnRun();
-                    this.OnCompleted();
-                }
-                catch (Exception e)
-                {
-                    this.Exception = e;
-                    this.OnFaulted();
+                    case TaskStatus.Faulted:
+                        this.Exception = _.Exception;
+                        this.OnFaulted();
+                        break;
+                    default:
+                        this.OnCompleted();
+                        break;
                 }
             });
         }
 
-        protected abstract void OnRun();
+        public void RunSynchronously()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected abstract Task OnRun();
 
         protected virtual void OnStarted()
         {

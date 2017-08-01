@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -33,5 +34,9 @@ namespace FoxTunes.Interfaces
         event EventHandler ExceptionChanged;
 
         event EventHandler Faulted;
+
+        Task Run();
+
+        void RunSynchronously();
     }
 }

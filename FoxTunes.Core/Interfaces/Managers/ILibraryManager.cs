@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
     public interface ILibraryManager : IStandardManager, IBackgroundTaskSource
     {
-        void Add(IEnumerable<string> paths);
+        Task Add(IEnumerable<string> paths);
 
-        void BuildHierarchies();
+        Task BuildHierarchies();
 
         event EventHandler Updated;
     }

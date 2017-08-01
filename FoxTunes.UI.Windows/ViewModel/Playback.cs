@@ -48,8 +48,8 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(
-                    () => this.PlaybackManager.CurrentStream.Stop(),
+                return new AsyncCommand(
+                    () => this.PlaybackManager.Stop(),
                     () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsPlaying
                 );
             }
@@ -59,7 +59,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(
+                return new AsyncCommand(
                     () => this.PlaylistManager.Previous(),
                     () => this.PlaylistManager != null && this.Playlist.Query.Any()
                 );
@@ -70,7 +70,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(
+                return new AsyncCommand(
                     () => this.PlaylistManager.Next(),
                     () => this.PlaylistManager != null && this.Playlist != null && this.Playlist.Query.Any()
                 );

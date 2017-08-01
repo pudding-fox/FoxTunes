@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -23,23 +24,23 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override void OnRun()
+        protected override async Task OnRun()
         {
-            this.Clear();
-            this.SaveChanges();
+            await this.Clear();
+            await this.SaveChanges();
         }
 
-        private void Clear()
+        private Task Clear()
         {
             this.Name = "Clearing playlist";
-            this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Clear()));
+            return this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Clear()));
         }
 
-        private void SaveChanges()
+        private Task SaveChanges()
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
-            this.Database.Interlocked(() => this.Database.SaveChanges());
+            return this.Database.Interlocked(() => this.Database.SaveChangesAsync());
         }
     }
 }

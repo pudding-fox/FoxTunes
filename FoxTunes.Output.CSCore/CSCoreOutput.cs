@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -62,20 +63,20 @@ namespace FoxTunes
             return this.WaveSourceFactory.IsSupported(fileName);
         }
 
-        public override IOutputStream Load(string fileName)
+        public override Task<IOutputStream> Load(string fileName)
         {
             var waveSource = this.WaveSourceFactory.CreateWaveSource(fileName);
             var soundOut = this.SoundOutFactory.CreateSoundOut();
             var outputStream = new CSCoreOutputStream(fileName, waveSource, soundOut);
             outputStream.InitializeComponent(this.Core);
-            return outputStream;
+            return Task.FromResult<IOutputStream>(outputStream);
         }
 
-        public override void Unload(IOutputStream stream)
+        public override async Task Unload(IOutputStream stream)
         {
             if (!stream.IsStopped)
             {
-                stream.Stop();
+                await stream.Stop();
             }
             stream.Dispose();
         }

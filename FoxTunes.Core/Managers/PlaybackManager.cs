@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Managers
 {
@@ -9,11 +10,30 @@ namespace FoxTunes.Managers
 
         public IOutput Output { get; private set; }
 
+        public IOutputStreamQueue OutputStreamQueue { get; private set; }
+
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Output = core.Components.Output;
+            this.OutputStreamQueue = core.Components.OutputStreamQueue;
+            this.OutputStreamQueue.Enqueued += this.OnOutputStreamQueueEnqueued;
+            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnOutputStreamQueueEnqueued(object sender, EventArgs e)
+        {
+            this.Interlocked(async () =>
+            {
+                if (this.CurrentStream != null)
+                {
+                    await this.Unload();
+                }
+                await this.ForegroundTaskRunner.Run(() => this.CurrentStream = this.OutputStreamQueue.Dequeue());
+            }).Wait();
         }
 
         public bool IsSupported(string fileName)
@@ -29,7 +49,7 @@ namespace FoxTunes.Managers
             {
                 return this._CurrentStream;
             }
-            set
+            private set
             {
                 this._CurrentStream = value;
                 this.OnCurrentStreamChanged();
@@ -47,39 +67,36 @@ namespace FoxTunes.Managers
 
         public event EventHandler CurrentStreamChanged = delegate { };
 
-        public void Load(string fileName, Action callBack = null)
+        public Task Load(string fileName)
         {
-            this.Unload(() =>
-            {
-                var task = new LoadOutputStreamTask(fileName);
-                task.InitializeComponent(this.Core);
-                if (callBack != null)
-                {
-                    task.Completed += (sender, e) => callBack();
-                }
-                this.OnBackgroundTask(task);
-                task.Run();
-            });
+            var task = new LoadOutputStreamTask(fileName);
+            task.InitializeComponent(this.Core);
+            this.OnBackgroundTask(task);
+            return task.Run();
         }
 
-        public void Unload(Action callBack = null)
+        public Task Unload()
         {
             if (this.CurrentStream == null)
             {
-                if (callBack != null)
-                {
-                    callBack();
-                }
-                return;
+                return Task.CompletedTask;
             }
             var task = new UnloadOutputStreamTask();
             task.InitializeComponent(this.Core);
-            if (callBack != null)
-            {
-                task.Completed += (sender, e) => callBack();
-            }
             this.OnBackgroundTask(task);
-            task.Run();
+            return task.Run();
+        }
+
+        public Task Stop()
+        {
+            if (this.CurrentStream == null)
+            {
+                return Task.CompletedTask;
+            }
+            var task = new StopOutputStreamTask();
+            task.InitializeComponent(this.Core);
+            this.OnBackgroundTask(task);
+            return task.Run();
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)

@@ -6,5 +6,7 @@ namespace FoxTunes.Interfaces
     public interface IForegroundTaskRunner : IBaseComponent
     {
         Task Run(Action action);
+
+        void RunAsync(Action action);
     }
 }
