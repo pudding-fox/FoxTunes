@@ -19,6 +19,14 @@ namespace FoxTunes
             }
         }
 
+        public string FileName
+        {
+            get
+            {
+                return this.PlaylistItem.FileName;
+            }
+        }
+
         public PlaylistItem PlaylistItem { get; private set; }
 
         public abstract long Position { get; set; }

@@ -138,16 +138,19 @@ namespace FoxTunes
 
         public Task Run()
         {
+            Logger.Write(this, LogLevel.Debug, "Running background task.");
             this.OnStarted();
             return this.BackgroundTaskRunner.Run(() => this.OnRun()).ContinueWith(_ =>
             {
                 switch (_.Status)
                 {
                     case TaskStatus.Faulted:
+                        Logger.Write(this, LogLevel.Error, "Background task failed: {0}", _.Exception.Message);
                         this.Exception = _.Exception;
                         this.OnFaulted();
                         break;
                     default:
+                        Logger.Write(this, LogLevel.Error, "Background task succeeded.");
                         this.OnCompleted();
                         break;
                 }

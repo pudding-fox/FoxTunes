@@ -32,13 +32,16 @@ namespace FoxTunes.Managers
 
         protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
         {
+            Logger.Write(this, LogLevel.Debug, "Playback manager output stream changed, updating current playlist item.");
             if (this.PlaybackManager.CurrentStream == null)
             {
                 this.CurrentItem = null;
+                Logger.Write(this, LogLevel.Debug, "Playback manager output stream is empty. Cleared current playlist item.");
             }
             else if (this.PlaybackManager.CurrentStream.PlaylistItem != this.CurrentItem)
             {
                 this.CurrentItem = this.PlaybackManager.CurrentStream.PlaylistItem;
+                Logger.Write(this, LogLevel.Debug, "Updated current playlist item: {0} => {1}", this.CurrentItem.Id, this.CurrentItem.FileName);
             }
         }
 
@@ -71,8 +74,10 @@ namespace FoxTunes.Managers
 
         public async Task Next()
         {
+            Logger.Write(this, LogLevel.Debug, "Navigating to next playlist item.");
             if (this.IsNavigating)
             {
+                Logger.Write(this, LogLevel.Debug, "Already navigating, ignoring request.");
                 return;
             }
             try
@@ -81,17 +86,22 @@ namespace FoxTunes.Managers
                 var index = default(int);
                 if (this.CurrentItem == null)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
                     index = 0;
                 }
                 else
                 {
                     index = this.Playlist.Set.IndexOf(this.CurrentItem) + 1;
+                    Logger.Write(this, LogLevel.Debug, "Next playlist item is index: {0}", index);
                 }
                 if (index >= this.Playlist.Set.Count)
                 {
                     index = 0;
+                    Logger.Write(this, LogLevel.Debug, "Index was too large, wrapping around to first item.");
                 }
-                await this.Play(this.Playlist.Set[index]);
+                var playlistItem = this.Playlist.Set[index];
+                Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+                await this.Play(playlistItem);
             }
             finally
             {
@@ -101,8 +111,10 @@ namespace FoxTunes.Managers
 
         public async Task Previous()
         {
+            Logger.Write(this, LogLevel.Debug, "Navigating to previous playlist item.");
             if (this.IsNavigating)
             {
+                Logger.Write(this, LogLevel.Debug, "Already navigating, ignoring request.");
                 return;
             }
             try
@@ -111,17 +123,22 @@ namespace FoxTunes.Managers
                 var index = default(int);
                 if (this.CurrentItem == null)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
                     index = 0;
                 }
                 else
                 {
                     index = this.Playlist.Set.IndexOf(this.CurrentItem) - 1;
+                    Logger.Write(this, LogLevel.Debug, "Previous playlist item is index: {0}", index);
                 }
                 if (index < 0)
                 {
                     index = this.Playlist.Set.Count - 1;
+                    Logger.Write(this, LogLevel.Debug, "Index was too small, wrapping around to last item.");
                 }
-                await this.Play(this.Playlist.Set[index]);
+                var playlistItem = this.Playlist.Set[index];
+                Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+                await this.Play(playlistItem);
             }
             finally
             {
