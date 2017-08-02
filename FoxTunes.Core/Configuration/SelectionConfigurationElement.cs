@@ -60,5 +60,18 @@ namespace FoxTunes
             }
             return this;
         }
+
+        public override void ConnectValue<T>(Action<T> action)
+        {
+            if (this.SelectedOption == null)
+            {
+                action(default(T));
+            }
+            else
+            {
+                action((T)Convert.ChangeType(this.SelectedOption.Id, typeof(T)));
+            }
+            this.SelectedOptionChanged += (sender, e) => this.ConnectValue(action);
+        }
     }
 }

@@ -11,50 +11,48 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public ISoundOutFactory SoundOutFactory
+        public ISoundOutFactory SoundOutFactory { get; private set; }
+
+        protected virtual ISoundOutFactory GetSoundOutFactory(string id)
         {
-            get
+            switch (id)
             {
-                var element = this.Configuration.GetElement<SelectionConfigurationElement>(
-                    CSCoreOutputConfiguration.OUTPUT_SECTION,
-                    CSCoreOutputConfiguration.BACKEND_ELEMENT
-                );
-                if (element != null && element.SelectedOption != null)
-                {
-                    switch (element.SelectedOption.Id)
-                    {
-                        case CSCoreOutputConfiguration.WASAPI_OPTION:
-                            return new WasapiSoundOutFactory();
-                    }
-                }
-                return new DirectSoundOutFactory();
+                case CSCoreOutputConfiguration.WASAPI_OPTION:
+                    return new WasapiSoundOutFactory();
             }
+            return new DirectSoundOutFactory();
         }
 
-        public IWaveSourceFactory WaveSourceFactory
+        public IWaveSourceFactory WaveSourceFactory { get; private set; }
+
+        protected virtual IWaveSourceFactory GetWaveSourceFactory(string id)
         {
-            get
+            switch (id)
             {
-                var element = this.Configuration.GetElement<SelectionConfigurationElement>(
-                    CSCoreOutputConfiguration.OUTPUT_SECTION,
-                    CSCoreOutputConfiguration.DECODER_ELEMENT
-                );
-                if (element != null && element.SelectedOption != null)
-                {
-                    switch (element.SelectedOption.Id)
-                    {
-                        case CSCoreOutputConfiguration.FFMPEG_OPTION:
-                            return new FfmpegWaveSourceFactory();
-                    }
-                }
-                return new NativeWaveSourceFactory();
+                case CSCoreOutputConfiguration.FFMPEG_OPTION:
+                    return new FfmpegWaveSourceFactory();
             }
+            return new NativeWaveSourceFactory();
         }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Configuration = core.Components.Configuration;
+            {
+                var element = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   CSCoreOutputConfiguration.OUTPUT_SECTION,
+                   CSCoreOutputConfiguration.BACKEND_ELEMENT
+                );
+                element.ConnectValue<string>(id => this.SoundOutFactory = this.GetSoundOutFactory(id));
+            }
+            {
+                var element = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   CSCoreOutputConfiguration.OUTPUT_SECTION,
+                   CSCoreOutputConfiguration.DECODER_ELEMENT
+                );
+                element.ConnectValue<string>(id => this.WaveSourceFactory = this.GetWaveSourceFactory(id));
+            }
             base.InitializeComponent(core);
         }
 
@@ -65,19 +63,26 @@ namespace FoxTunes
 
         public override Task<IOutputStream> Load(PlaylistItem playlistItem)
         {
+            Logger.Write(this, LogLevel.Debug, "Loading output stream from playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             var waveSource = this.WaveSourceFactory.CreateWaveSource(playlistItem.FileName);
+            Logger.Write(this, LogLevel.Debug, "Using wave source: {0}", waveSource.GetType().Name);
             var soundOut = this.SoundOutFactory.CreateSoundOut();
+            Logger.Write(this, LogLevel.Debug, "Using sound out: {0}", soundOut.GetType().Name);
             var outputStream = new CSCoreOutputStream(playlistItem, waveSource, soundOut);
             outputStream.InitializeComponent(this.Core);
+            Logger.Write(this, LogLevel.Debug, "Loaded output stream: {0}", outputStream.Description);
             return Task.FromResult<IOutputStream>(outputStream);
         }
 
         public override async Task Unload(IOutputStream stream)
         {
+            Logger.Write(this, LogLevel.Debug, "Unloading output stream for playlist item: {0} => {1}", stream.Id, stream.FileName);
             if (!stream.IsStopped)
             {
+                Logger.Write(this, LogLevel.Debug, "Stopping output stream for playlist item: {0} => {1}", stream.Id, stream.FileName);
                 await stream.Stop();
             }
+            Logger.Write(this, LogLevel.Debug, "Disposing output stream for playlist item: {0} => {1}", stream.Id, stream.FileName);
             stream.Dispose();
         }
 

@@ -17,7 +17,23 @@ namespace FoxTunes.Interfaces
 
         long Length { get; }
 
+        int BytesPerSample { get; }
+
+        int ExtraSize { get; }
+
+        int BitsPerSample { get; }
+
         int BlockAlign { get; }
+
+        int BytesPerSecond { get; }
+
+        int SampleRate { get; }
+
+        string Format { get; }
+
+        int BytesPerBlock { get; }
+
+        int Channels { get; }
 
         bool IsPlaying { get; }
 
@@ -46,6 +62,8 @@ namespace FoxTunes.Interfaces
         Task Stop();
 
         event StoppedEventHandler Stopped;
+
+        string Description { get; }
     }
 
     public delegate void PlayedEventHandler(object sender, PlayedEventArgs e);
