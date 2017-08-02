@@ -21,5 +21,9 @@
         IBackgroundTaskRunner BackgroundTaskRunner { get; }
 
         IForegroundTaskRunner ForegroundTaskRunner { get; }
+
+        ILogger Logger { get; }
+
+        ILogEmitter LogEmitter { get; }
     }
 }

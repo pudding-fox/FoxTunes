@@ -1,0 +1,34 @@
+﻿<Window x:Class="FoxTunes.Log"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+        mc:Ignorable="d" 
+        Title="Log" Height="300" Width="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico" ShowActivated="False" WindowStyle="ToolWindow" Closing="OnClosing">
+    <Window.Resources>
+        <ViewModel:Log x:Key="ViewModel" Core="{Binding}"></ViewModel:Log>
+    </Window.Resources>
+    <Window.Style>
+        <Style TargetType="{x:Type Window}" BasedOn="{StaticResource {x:Type Window}}">
+            <Setter Property="Visibility" Value="Hidden"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding LogVisible, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+    <ListBox ItemsSource="{Binding Messages, Source={StaticResource ViewModel}}" MinWidth="300" MinHeight="200" Margin="3,6,3,3">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock>
+                    <Run Text="{Binding Name, Mode=OneWay}"></Run>
+                    <Run Text="{Binding Level, Mode=OneWay}"></Run>
+                    <Run Text="{Binding Message, Mode=OneWay}"></Run>
+                </TextBlock>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</Window>

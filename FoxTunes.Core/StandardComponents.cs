@@ -89,6 +89,22 @@ namespace FoxTunes
             }
         }
 
+        public ILogger Logger
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILogger>();
+            }
+        }
+
+        public ILogEmitter LogEmitter
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILogEmitter>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }

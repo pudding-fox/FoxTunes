@@ -30,11 +30,14 @@
                                         </Grid.ColumnDefinitions>
                                         <Label VerticalAlignment="Center" Padding="0,0,7,0" Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
                                         <ContentControl Grid.Column="1" Content="{Binding}">
-                                            <ContentControl.ContentTemplate>
+                                            <ContentControl.Resources>
                                                 <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
                                                     <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
                                                 </DataTemplate>
-                                            </ContentControl.ContentTemplate>
+                                                <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
+                                                    <CheckBox IsChecked="{Binding Value}"></CheckBox>
+                                                </DataTemplate>
+                                            </ContentControl.Resources>
                                         </ContentControl>
                                     </Grid>
                                 </DataTemplate>

@@ -17,6 +17,7 @@ namespace FoxTunes
             }
         }
 
+        [NonSerialized]
         private volatile SemaphoreSlim Semaphore;
 
         private void EnsureSemaphore()

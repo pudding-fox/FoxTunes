@@ -42,6 +42,8 @@
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
+    <Compile Include="Configuration\BooleanConfigurationElement.cs" />
+    <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
     <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />

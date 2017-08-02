@@ -3,7 +3,7 @@ using System;
 
 namespace FoxTunes
 {
-    public class Core : ICore
+    public class Core : BaseComponent, ICore
     {
         public IStandardComponents Components
         {
