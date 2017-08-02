@@ -51,8 +51,12 @@ namespace FoxTunes
                 {
                     return;
                 }
+                Logger.Write(this, LogLevel.Debug, "Evicting output stream from the queue due to exceeded capacity: {0} => {1}", key.Id, key.FileName);
                 var value = default(OutputStreamQueueValue);
-                this.Queue.TryRemove(key, out value);
+                if (!this.Queue.TryRemove(key, out value))
+                {
+                    continue;
+                }
                 value.OutputStream.Dispose();
             }
         }

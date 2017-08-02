@@ -8,16 +8,12 @@ namespace FoxTunes
     {
         public Task Run(Action action)
         {
-            return Task.Factory.StartNew(action);
+            return Task.Run(action);
         }
 
-        public Task Run(Task task)
+        public Task Run(Func<Task> func)
         {
-            if (task.Status == TaskStatus.Created)
-            {
-                return this.Run(() => task.Start());
-            }
-            return task;
+            return Task.Run(func);
         }
     }
 }

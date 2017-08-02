@@ -12,6 +12,8 @@ namespace FoxTunes.Interfaces
 
         event EventHandler Updated;
 
+        Task Play(PlaylistItem playlistItem);
+
         Task Next();
 
         Task Previous();

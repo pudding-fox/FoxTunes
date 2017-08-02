@@ -25,6 +25,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public IPlaylistManager PlaylistManager { get; private set; }
+
         public IList SelectedItems { get; set; }
 
         public ObservableCollection<PlaylistColumn> PlaylistColumns { get; set; }
@@ -62,6 +64,7 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
+            this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
             this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.OnPropertyChanged("GridColumns");
@@ -75,16 +78,7 @@ namespace FoxTunes.ViewModel
                 return new AsyncCommand(() =>
                 {
                     var playlistItem = this.SelectedItems[0] as PlaylistItem;
-                    return this.PlaybackManager
-                        .Load(playlistItem, true)
-                        .ContinueWith(_ =>
-                        {
-                            if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
-                            {
-                                return;
-                            }
-                            this.PlaybackManager.CurrentStream.Play();
-                        });
+                    return this.PlaylistManager.Play(playlistItem);
                 },
                 () => this.PlaybackManager != null && this.SelectedItems.Count > 0);
             }
