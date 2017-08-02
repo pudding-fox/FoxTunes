@@ -76,7 +76,7 @@ namespace FoxTunes.ViewModel
                 {
                     var playlistItem = this.SelectedItems[0] as PlaylistItem;
                     return this.PlaybackManager
-                        .Load(playlistItem)
+                        .Load(playlistItem, true)
                         .ContinueWith(_ =>
                         {
                             if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)

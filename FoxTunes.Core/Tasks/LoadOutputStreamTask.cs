@@ -8,13 +8,15 @@ namespace FoxTunes
     {
         public const string ID = "E3E23677-DE0A-4291-8416-BC4A91856037";
 
-        public LoadOutputStreamTask(PlaylistItem playlistItem)
-            : base(ID)
+        public LoadOutputStreamTask(PlaylistItem playlistItem, bool immediate)
+            : base(ID, immediate)
         {
-            this.PlaylistItem = playlistItem;
+            this.PlaylistItem = playlistItem; this.Immediate = immediate;
         }
 
         public PlaylistItem PlaylistItem { get; private set; }
+
+        public bool Immediate { get; private set; }
 
         public IOutput Output { get; private set; }
 
@@ -27,11 +29,22 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
             this.Name = "Buffering";
             this.Description = new FileInfo(this.PlaylistItem.FileName).Name;
-            this.OutputStreamQueue.Enqueue(await this.Output.Load(this.PlaylistItem));
+            return this.OutputStreamQueue.Interlocked(async () =>
+            {
+                if (this.OutputStreamQueue.IsQueued(this.PlaylistItem))
+                {
+                    if (this.Immediate)
+                    {
+                        this.OutputStreamQueue.Dequeue(this.PlaylistItem);
+                    }
+                    return;
+                }
+                this.OutputStreamQueue.Enqueue(await this.Output.Load(this.PlaylistItem), this.Immediate);
+            });
         }
     }
 }

@@ -19,12 +19,12 @@ namespace FoxTunes.Managers
             this.Core = core;
             this.Output = core.Components.Output;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
-            this.OutputStreamQueue.Enqueued += this.OnOutputStreamQueueEnqueued;
+            this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnOutputStreamQueueEnqueued(object sender, EventArgs e)
+        protected virtual void OutputStreamQueueDequeued(object sender, OutputStreamQueueEventArgs e)
         {
             this.Interlocked(async () =>
             {
@@ -32,7 +32,7 @@ namespace FoxTunes.Managers
                 {
                     await this.Unload();
                 }
-                await this.ForegroundTaskRunner.Run(() => this.CurrentStream = this.OutputStreamQueue.Dequeue());
+                await this.ForegroundTaskRunner.Run(() => this.CurrentStream = e.OutputStream);
             }).Wait();
         }
 
@@ -67,9 +67,9 @@ namespace FoxTunes.Managers
 
         public event EventHandler CurrentStreamChanged = delegate { };
 
-        public Task Load(PlaylistItem playlistItem)
+        public Task Load(PlaylistItem playlistItem, bool immediate)
         {
-            var task = new LoadOutputStreamTask(playlistItem);
+            var task = new LoadOutputStreamTask(playlistItem, immediate);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run();
