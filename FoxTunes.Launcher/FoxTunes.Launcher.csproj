@@ -85,6 +85,10 @@
       <Project>{64ed8f47-c8a1-4d23-943d-1c0f74d39d9d}</Project>
       <Name>FoxTunes.DB</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Logging\FoxTunes.Logging.csproj">
+      <Project>{ab1362c8-0754-496d-85e1-3c258ff250bf}</Project>
+      <Name>FoxTunes.Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FoxTunes.MetaData.TagLib\FoxTunes.MetaData.TagLib.csproj">
       <Project>{1bcb836b-688f-4183-8702-eff08440cc8a}</Project>
       <Name>FoxTunes.MetaData.TagLib</Name>

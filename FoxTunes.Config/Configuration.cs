@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FoxTunes
 {
-    [Component("BA77B392-1900-4931-B720-16206B23DDA1", ComponentSlots.Configuration)]
+    [Component("BA77B392-1900-4931-B720-16206B23DDA1", ComponentSlots.Configuration, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class Configuration : StandardComponent, IConfiguration
     {
         private static readonly string ConfigurationFileName = Path.Combine(

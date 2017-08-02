@@ -42,12 +42,14 @@
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
+    <Compile Include="Interfaces\Logging\ILogger.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
     <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
     <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Library\LibraryHierarchy.cs" />
     <Compile Include="Library\LibraryHierarchyItem.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
+    <Compile Include="LogManager.cs" />
     <Compile Include="Tasks\AddPathsToLibraryTask.cs" />
     <Compile Include="Tasks\BackgroundTask.cs" />
     <Compile Include="BaseBehaviour.cs" />
