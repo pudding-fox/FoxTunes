@@ -35,6 +35,7 @@ namespace FoxTunes.Interfaces
         Error,
         Fatal,
         Info,
-        Warn
+        Warn,
+        Trace
     }
 }

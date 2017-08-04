@@ -69,7 +69,7 @@ namespace FoxTunes
 
         public void Interlocked(Action action, TimeSpan timeout)
         {
-            Logger.Write(this, LogLevel.Debug, "Entering critical section.");
+            Logger.Write(this, LogLevel.Trace, "Entering critical section.");
             this.EnsureSemaphore();
             if (!this.Semaphore.Wait(timeout))
             {
@@ -81,14 +81,14 @@ namespace FoxTunes
             }
             finally
             {
-                Logger.Write(this, LogLevel.Debug, "Exiting critical section.");
+                Logger.Write(this, LogLevel.Trace, "Exiting critical section.");
                 this.Semaphore.Release();
             }
         }
 
         public async Task Interlocked(Func<Task> func, TimeSpan timeout)
         {
-            Logger.Write(this, LogLevel.Debug, "Entering critical section.");
+            Logger.Write(this, LogLevel.Trace, "Entering critical section.");
             this.EnsureSemaphore();
             if (!await this.Semaphore.WaitAsync(timeout))
             {
@@ -100,14 +100,14 @@ namespace FoxTunes
             }
             finally
             {
-                Logger.Write(this, LogLevel.Debug, "Exiting critical section.");
+                Logger.Write(this, LogLevel.Trace, "Exiting critical section.");
                 this.Semaphore.Release();
             }
         }
 
         public T Interlocked<T>(Func<T> func, TimeSpan timeout)
         {
-            Logger.Write(this, LogLevel.Debug, "Entering critical section.");
+            Logger.Write(this, LogLevel.Trace, "Entering critical section.");
             this.EnsureSemaphore();
             if (!this.Semaphore.Wait(timeout))
             {
@@ -119,14 +119,14 @@ namespace FoxTunes
             }
             finally
             {
-                Logger.Write(this, LogLevel.Debug, "Exiting critical section.");
+                Logger.Write(this, LogLevel.Trace, "Exiting critical section.");
                 this.Semaphore.Release();
             }
         }
 
         public async Task<T> Interlocked<T>(Func<Task<T>> func, TimeSpan timeout)
         {
-            Logger.Write(this, LogLevel.Debug, "Entering critical section.");
+            Logger.Write(this, LogLevel.Trace, "Entering critical section.");
             this.EnsureSemaphore();
             if (!await this.Semaphore.WaitAsync(timeout))
             {
@@ -138,6 +138,7 @@ namespace FoxTunes
             }
             finally
             {
+                Logger.Write(this, LogLevel.Trace, "Exiting critical section.");
                 this.Semaphore.Release();
             }
         }

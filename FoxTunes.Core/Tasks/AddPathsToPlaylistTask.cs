@@ -53,6 +53,7 @@ namespace FoxTunes
             var fileNames = new List<string>();
             foreach (var path in this.Paths)
             {
+                Logger.Write(this, LogLevel.Debug, "Enumerating files in path: {0}", path);
                 if (Directory.Exists(path))
                 {
                     this.Description = new DirectoryInfo(path).Name;
@@ -65,6 +66,7 @@ namespace FoxTunes
                 }
                 this.Position = this.Position + 1;
             }
+            Logger.Write(this, LogLevel.Debug, "Enumerated {0} files.", fileNames.Count);
             this.FileNames = fileNames;
             this.Position = this.Count;
         }
@@ -76,12 +78,14 @@ namespace FoxTunes
             this.Count = this.FileNames.Count();
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
+            Logger.Write(this, LogLevel.Debug, "Converting file names to playlist items.");
             var query =
                 from fileName in this.FileNames
                 where this.PlaybackManager.IsSupported(fileName)
                 select this.PlaylistItemFactory.Create(fileName);
             foreach (var playlistItem in this.OrderBy(query))
             {
+                Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Add(playlistItem)));
                 if (position % interval == 0)
                 {
@@ -97,6 +101,7 @@ namespace FoxTunes
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
+            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
             return this.Database.Interlocked(() => this.Database.SaveChangesAsync());
         }
 

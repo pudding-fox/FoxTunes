@@ -24,9 +24,11 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            await this.Output.Unload(this.PlaybackManager.CurrentStream);
+            var outputStream = this.PlaybackManager.CurrentStream;
+            Logger.Write(this, LogLevel.Debug, "Unloading output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
+            return this.Output.Unload(outputStream);
         }
     }
 }

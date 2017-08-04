@@ -33,6 +33,7 @@ namespace FoxTunes
         private Task Clear()
         {
             this.Name = "Clearing playlist";
+            Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
             return this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Clear()));
         }
 
@@ -40,6 +41,7 @@ namespace FoxTunes
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
+            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
             return this.Database.Interlocked(() => this.Database.SaveChangesAsync());
         }
     }

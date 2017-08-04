@@ -38,6 +38,7 @@ namespace FoxTunes
             this.Count = this.Library.LibraryItemQuery.Count() * this.Library.LibraryHierarchyQuery.Count();
             foreach (var libraryHierarchy in this.Library.LibraryHierarchyQuery)
             {
+                Logger.Write(this, LogLevel.Debug, "Building library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);
                 this.Description = libraryHierarchy.Name;
                 this.ClearHierarchy(libraryHierarchy);
                 var libraryHierarchyItems = this.BuildHierarchy(libraryHierarchy);
@@ -52,6 +53,7 @@ namespace FoxTunes
 
         private void ClearHierarchy(LibraryHierarchy libraryHierarchy)
         {
+            Logger.Write(this, LogLevel.Debug, "Clearing existing library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);
             this.Database.Interlocked(() => libraryHierarchy.Items.Clear());
         }
 
@@ -64,18 +66,37 @@ namespace FoxTunes
         {
             var isLeaf = level >= libraryHierarchy.Levels.Count - 1;
             var libraryHierarchyLevel = libraryHierarchy.Levels[level];
-            var query =
-                from libraryItem in libraryItems
-                group libraryItem by new
-                {
-                    Display = this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript),
-                    Sort = this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript),
-                } into hierarchy
-                select new LibraryHierarchyItem(hierarchy.Key.Display, hierarchy.Key.Sort, isLeaf)
-                {
-                    Parent = parent,
-                    Items = new ObservableCollection<LibraryItem>(hierarchy)
-                };
+            Logger.Write(this, LogLevel.Trace, "Building library hierarchy level: {0} => {1}", libraryHierarchyLevel.Id, libraryHierarchyLevel.DisplayScript);
+            var query = default(IEnumerable<LibraryHierarchyItem>);
+            if (!isLeaf)
+            {
+                query =
+                    from libraryItem in libraryItems
+                    group libraryItem by new
+                    {
+                        Display = this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript),
+                        Sort = this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript),
+                    } into hierarchy
+                    select new LibraryHierarchyItem(hierarchy.Key.Display, hierarchy.Key.Sort, isLeaf)
+                    {
+                        Parent = parent,
+                        Items = new ObservableCollection<LibraryItem>(hierarchy)
+                    };
+            }
+            else
+            {
+                query =
+                    from libraryItem in libraryItems
+                    select new LibraryHierarchyItem(
+                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript), 
+                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript), 
+                        isLeaf
+                    )
+                    {
+                        Parent = parent,
+                        Items = new ObservableCollection<LibraryItem>(libraryItems)
+                    };
+            }
             var libraryHierarchyItems = query.ToList();
             if (!isLeaf)
             {
@@ -97,6 +118,7 @@ namespace FoxTunes
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
+            Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
             return this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(() => this.Database.SaveChangesAsync()));
         }
 
