@@ -43,6 +43,18 @@ namespace FoxTunes.Managers
             return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
+        public Task AddHierarchy(LibraryHierarchy libraryHierarchy)
+        {
+            this.Library.LibraryHierarchySet.Add(libraryHierarchy);
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteHierarchy(LibraryHierarchy libraryHierarchy)
+        {
+            this.Library.LibraryHierarchySet.Remove(libraryHierarchy);
+            return Task.CompletedTask;
+        }
+
         protected virtual void OnUpdated()
         {
             if (this.Updated == null)

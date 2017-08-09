@@ -94,7 +94,7 @@ namespace FoxTunes
                     )
                     {
                         Parent = parent,
-                        Items = new ObservableCollection<LibraryItem>(libraryItems)
+                        Items = new ObservableCollection<LibraryItem>(new[] { libraryItem })
                     };
             }
             var libraryHierarchyItems = query.ToList();

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
@@ -10,12 +11,31 @@ namespace FoxTunes
             this.Items = new ObservableCollection<LibraryHierarchyItem>();
         }
 
-        public LibraryHierarchy(string name) : this()
+        private string _Name { get; set; }
+
+        public string Name
         {
-            this.Name = name;
+            get
+            {
+                return this._Name;
+            }
+            set
+            {
+                this._Name = value;
+                this.OnNameChanged();
+            }
         }
 
-        public string Name { get; set; }
+        protected virtual void OnNameChanged()
+        {
+            if (this.NameChanged != null)
+            {
+                this.NameChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Name");
+        }
+
+        public event EventHandler NameChanged = delegate { };
 
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
 

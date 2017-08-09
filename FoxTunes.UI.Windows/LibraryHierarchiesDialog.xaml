@@ -14,13 +14,43 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock>Settings</TextBlock>
-        <TextBlock Grid.Row="1" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform Angle="45"/>
-                </TransformGroup>
-            </TextBlock.RenderTransform>Not yet editable.</TextBlock>
+        <TextBlock>Library View Modes</TextBlock>
+        <TabControl Grid.Row="1" ItemsSource="{Binding Components.Library.LibraryHierarchyQuery}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name" Margin="0,7,0,0">
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <Grid Margin="7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Label>Name</Label>
+                        <TextBox Grid.Column="1" Text="{Binding Name}" Padding="0,0,7,0"></TextBox>
+                        <DataGrid Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding Levels}" MinHeight="300" AutoGenerateColumns="False" Margin="0,7,0,0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Script" Binding="{Binding DisplayScript}"></DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Width" Value="60"></Setter>
+                    <Setter Property="Height" Value="30"></Setter>
+                    <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                </Style>
+            </StackPanel.Resources>
+            <Button Command="{Binding NewCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+            <Button Command="{Binding DeleteCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+            <Button Command="{Binding RebuildCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Rebuild</Button>
+        </StackPanel>
     </Grid>
 </UserControl>
