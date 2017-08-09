@@ -38,7 +38,14 @@ namespace FoxTunes
             {
                 return;
             }
-            this.ForegroundTaskRunner.RunAsync(() => this.LogMessage(this, new LogMessageEventArgs(new LogMessage(name, level, message))));
+            if (this.ForegroundTaskRunner == null)
+            {
+                this.LogMessage(this, new LogMessageEventArgs(new LogMessage(name, level, message)));
+            }
+            else
+            {
+                this.ForegroundTaskRunner.RunAsync(() => this.LogMessage(this, new LogMessageEventArgs(new LogMessage(name, level, message))));
+            }
         }
 
         public event LogMessageEventHandler LogMessage = delegate { };

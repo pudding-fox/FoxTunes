@@ -42,6 +42,18 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
+        <TextBlock Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to collection by dropping files here." IsHitTestVisible="False">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Items.Count, Mode=OneWay, Source={StaticResource ViewModel}}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
         <TextBlock Grid.Row="2" VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="Filter:"/></TextBlock>
         <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}"></TextBox>
     </Grid>
