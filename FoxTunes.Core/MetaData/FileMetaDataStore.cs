@@ -15,8 +15,7 @@ namespace FoxTunes
 
         public static Task Write(string id, byte[] data)
         {
-            var segments = GetSegments(id);
-            var fileName = GetFileName(segments);
+            var fileName = GetFileName(id);
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             File.WriteAllBytes(fileName, data);
             return Task.CompletedTask;
@@ -24,8 +23,7 @@ namespace FoxTunes
 
         public static async Task Write(string id, Stream stream)
         {
-            var segments = GetSegments(id);
-            var fileName = GetFileName(segments);
+            var fileName = GetFileName(id);
             using (var file = File.OpenWrite(fileName))
             {
                 await stream.CopyToAsync(file);
@@ -34,8 +32,7 @@ namespace FoxTunes
 
         public static Task<Stream> Read(string id)
         {
-            var segments = GetSegments(id);
-            var fileName = GetFileName(segments);
+            var fileName = GetFileName(id);
             if (!File.Exists(fileName))
             {
                 return Task.FromResult(Stream.Null);
@@ -49,9 +46,9 @@ namespace FoxTunes
             return BitConverter.GetBytes(id.GetHashCode()).Select(value => Convert.ToString(value));
         }
 
-        private static string GetFileName(IEnumerable<string> segments)
+        public static string GetFileName(string id)
         {
-            return Path.Combine(DataStoreDirectoryName, string.Concat(Path.Combine(segments.ToArray()), ".bin"));
+            return Path.Combine(DataStoreDirectoryName, string.Concat(Path.Combine(GetSegments(id).ToArray()), ".bin"));
         }
     }
 }

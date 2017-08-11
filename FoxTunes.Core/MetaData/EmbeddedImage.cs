@@ -12,7 +12,7 @@ namespace FoxTunes
 
         public EmbeddedImage(string fileName, string mimeType, string imageType, string description)
         {
-            this.FileName = FileName;
+            this.FileName = fileName;
             this.MimeType = mimeType;
             this.ImageType = imageType;
             this.Description = description;
@@ -36,9 +36,9 @@ namespace FoxTunes
             }
         }
 
-        public static Task<EmbeddedImage> Decode(string values)
+        public static Task<EmbeddedImage> Decode(string embeddedImage)
         {
-            using (var stream = new MemoryStream(Convert.FromBase64String(values)))
+            using (var stream = new MemoryStream(Convert.FromBase64String(embeddedImage)))
             {
                 return Task.FromResult((EmbeddedImage)Formatter.Deserialize(stream));
             }
