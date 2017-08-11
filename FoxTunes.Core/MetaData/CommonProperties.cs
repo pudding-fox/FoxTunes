@@ -1,4 +1,4 @@
-﻿namespace FoxTunes.MetaData
+﻿namespace FoxTunes
 {
     public static class CommonProperties
     {
