@@ -31,7 +31,15 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", this.FileName);
             var file = File.Create(this.FileName);
+            if (file.PossiblyCorrupt)
+            {
+                foreach (var reason in file.CorruptionReasons)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Meta data corruption detected: {0} => {1}", this.FileName, reason);
+                }
+            }
             this.AddMetaDatas(file.Tag);
             this.AddProperties(file.Properties);
             this.AddImages(file.Tag);
@@ -185,7 +193,12 @@ namespace FoxTunes
                 var fileName = default(string);
                 if (!FileMetaDataStore.Exists(id, out fileName))
                 {
+                    Logger.Write(this, LogLevel.Trace, "Extracted image from meta data: {0} => {1}", this.FileName, fileName);
                     fileName = await FileMetaDataStore.Write(id, value.Data.Data);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Trace, "Re-using image from store: {0} => {1}", this.FileName, fileName);
                 }
                 this.AddImage(fileName, value);
             }

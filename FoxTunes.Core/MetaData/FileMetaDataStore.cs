@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace FoxTunes
         public static Task<string> Write(string id, byte[] data)
         {
             var fileName = GetFileName(id);
+            LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             File.WriteAllBytes(fileName, data);
             return Task.FromResult(fileName);
@@ -30,6 +32,7 @@ namespace FoxTunes
         public static async Task<string> Write(string id, Stream stream)
         {
             var fileName = GetFileName(id);
+            LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
             using (var file = File.OpenWrite(fileName))
             {
                 await stream.CopyToAsync(file);
