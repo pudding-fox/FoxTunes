@@ -52,9 +52,9 @@
     <Compile Include="Library\LibraryHierarchyItem.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="LogManager.cs" />
-    <Compile Include="MetaData\EmbeddedImage.cs" />
-    <Compile Include="MetaData\Extensions.cs" />
+    <Compile Include="MetaData\CommonImageMetaData.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
+    <Compile Include="MetaData\ImageItem.cs" />
     <Compile Include="Tasks\AddPathsToLibraryTask.cs" />
     <Compile Include="Tasks\BackgroundTask.cs" />
     <Compile Include="BaseBehaviour.cs" />

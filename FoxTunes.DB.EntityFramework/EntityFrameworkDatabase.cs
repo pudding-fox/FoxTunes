@@ -40,6 +40,7 @@ namespace FoxTunes
             this.MapLibraryHierarchyItem(builder);
             this.MapMetaDataItem(builder);
             this.MapPropertyItem(builder);
+            this.MapImageItem(builder);
             this.MapStatisticItem(builder);
             return builder.Build(this.Connection);
         }
@@ -65,6 +66,15 @@ namespace FoxTunes
                     config.MapRightKey("PropertyItem_Id");
                     config.ToTable("PlaylistItem_PropertyItem");
                 });
+            builder.Entity<PlaylistItem>()
+                .HasMany(item => item.Images)
+                .WithMany()
+                .Map(config =>
+                {
+                    config.MapLeftKey("PlaylistItem_Id");
+                    config.MapRightKey("ImageItem_Id");
+                    config.ToTable("PlaylistItem_ImageItem");
+                });
         }
 
         protected virtual void MapLibraryItem(DbModelBuilder builder)
@@ -87,6 +97,15 @@ namespace FoxTunes
                     config.MapLeftKey("LibraryItem_Id");
                     config.MapRightKey("PropertyItem_Id");
                     config.ToTable("LibraryItem_PropertyItem");
+                });
+            builder.Entity<LibraryItem>()
+                .HasMany(item => item.Images)
+                .WithMany()
+                .Map(config =>
+                {
+                    config.MapLeftKey("LibraryItem_Id");
+                    config.MapRightKey("ImageItem_Id");
+                    config.ToTable("LibraryItem_ImageItem");
                 });
             builder.Entity<LibraryItem>()
                 .HasMany(item => item.Statistics)
@@ -155,6 +174,20 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(PropertyItem).Name);
             builder.Entity<PropertyItem>();
+        }
+
+        public virtual void MapImageItem(DbModelBuilder builder)
+        {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(ImageItem).Name);
+            builder.Entity<ImageItem>()
+                .HasMany(item => item.MetaDatas)
+                .WithMany()
+                .Map(config =>
+                {
+                    config.MapLeftKey("ImageItem_Id");
+                    config.MapRightKey("MetaDataItem_Id");
+                    config.ToTable("ImageItem_MetaDataItem");
+                });
         }
 
         protected virtual void MapStatisticItem(DbModelBuilder builder)

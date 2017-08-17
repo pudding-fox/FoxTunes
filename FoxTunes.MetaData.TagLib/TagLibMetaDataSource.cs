@@ -12,6 +12,7 @@ namespace FoxTunes
         {
             this.MetaDatas = new ObservableCollection<MetaDataItem>();
             this.Properties = new ObservableCollection<PropertyItem>();
+            this.Images = new ObservableCollection<ImageItem>();
         }
 
         public TagLibMetaDataSource(string fileName)
@@ -26,11 +27,14 @@ namespace FoxTunes
 
         public ObservableCollection<PropertyItem> Properties { get; private set; }
 
+        public ObservableCollection<ImageItem> Images { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             var file = File.Create(this.FileName);
             this.AddMetaDatas(file.Tag);
             this.AddProperties(file.Properties);
+            this.AddImages(file.Tag);
             base.InitializeComponent(core);
         }
 
@@ -84,32 +88,11 @@ namespace FoxTunes
             this.AddMetaData(CommonMetaData.MusicIpId, tag.MusicIpId);
             this.AddMetaData(CommonMetaData.Performers, tag.Performers);
             this.AddMetaData(CommonMetaData.PerformersSort, tag.PerformersSort);
-            this.AddMetaData(CommonMetaData.Pictures, tag.Pictures).Wait();
             this.AddMetaData(CommonMetaData.Title, tag.Title);
             this.AddMetaData(CommonMetaData.TitleSort, tag.TitleSort);
             this.AddMetaData(CommonMetaData.Track, tag.Track);
             this.AddMetaData(CommonMetaData.TrackCount, tag.TrackCount);
             this.AddMetaData(CommonMetaData.Year, tag.Year);
-        }
-
-        private async Task AddMetaData(string name, IPicture[] values)
-        {
-            if (values == null)
-            {
-                return;
-            }
-            foreach (var value in values)
-            {
-                var embeddedImage = new EmbeddedImage(
-                    this.FileName,
-                    value.MimeType,
-                    Enum.GetName(typeof(PictureType), value.Type),
-                    value.Description
-                );
-                var id = await embeddedImage.Encode();
-                await FileMetaDataStore.Write(id, value.Data.Data);
-                this.MetaDatas.Add(new MetaDataItem(name) { FileValue = id });
-            }
         }
 
         private void AddMetaData(string name, uint? value)
@@ -183,6 +166,38 @@ namespace FoxTunes
                 return;
             }
             this.Properties.Add(new PropertyItem(name) { TextValue = value.Trim() });
+        }
+
+        private void AddImages(Tag tag)
+        {
+            this.AddImage(CommonMetaData.Pictures, tag.Pictures).Wait();
+        }
+
+        private async Task AddImage(string name, IPicture[] values)
+        {
+            if (values == null)
+            {
+                return;
+            }
+            foreach (var value in values)
+            {
+                var id = global::System.IO.Path.GetDirectoryName(this.FileName);
+                var fileName = default(string);
+                if (!FileMetaDataStore.Exists(id, out fileName))
+                {
+                    fileName = await FileMetaDataStore.Write(id, value.Data.Data);
+                }
+                this.AddImage(fileName, value);
+            }
+        }
+
+        private void AddImage(string fileName, IPicture value)
+        {
+            var imageItem = new ImageItem(fileName);
+            imageItem.MetaDatas.Add(new MetaDataItem(CommonImageMetaData.Type) { TextValue = Enum.GetName(typeof(PictureType), value.Type) });
+            imageItem.MetaDatas.Add(new MetaDataItem(CommonImageMetaData.MimeType) { TextValue = value.MimeType });
+            imageItem.MetaDatas.Add(new MetaDataItem(CommonImageMetaData.Description) { TextValue = value.Description });
+            this.Images.Add(imageItem);
         }
     }
 }
