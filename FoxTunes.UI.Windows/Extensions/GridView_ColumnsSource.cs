@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace FoxTunes.Extensions
 {
-    public static class GridViewExtensions
+    public static partial class GridViewExtensions
     {
         public static readonly DependencyProperty ColumnsSourceProperty = DependencyProperty.RegisterAttached(
             "ColumnsSource",

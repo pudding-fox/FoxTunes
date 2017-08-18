@@ -6,9 +6,9 @@ namespace FoxTunes.Interfaces
 {
     public interface IPlaylistManager : IStandardManager, IBackgroundTaskSource
     {
-        Task Add(IEnumerable<string> paths);
+        Task Add(int sequence, IEnumerable<string> paths);
 
-        Task Add(IEnumerable<LibraryItem> libraryItems);
+        Task Add(int sequence, IEnumerable<LibraryItem> libraryItems);
 
         event EventHandler Updated;
 

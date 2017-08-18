@@ -29,6 +29,85 @@ namespace FoxTunes.ViewModel
 
         public IList SelectedItems { get; set; }
 
+        private bool _InsertActive { get; set; }
+
+        public bool InsertActive
+        {
+            get
+            {
+                return this._InsertActive;
+            }
+            set
+            {
+                this._InsertActive = value;
+                this.OnInsertActiveChanged();
+            }
+        }
+
+        protected virtual void OnInsertActiveChanged()
+        {
+            if (this.InsertActiveChanged != null)
+            {
+                this.InsertActiveChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("InsertActive");
+        }
+
+        public event EventHandler InsertActiveChanged = delegate { };
+
+
+        private int _InsertIndex { get; set; }
+
+        public int InsertIndex
+        {
+            get
+            {
+                return this._InsertIndex;
+            }
+            set
+            {
+                this._InsertIndex = value;
+                this.OnInsertIndexChanged();
+            }
+        }
+
+        protected virtual void OnInsertIndexChanged()
+        {
+            if (this.InsertIndexChanged != null)
+            {
+                this.InsertIndexChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("InsertIndex");
+        }
+
+        public event EventHandler InsertIndexChanged = delegate { };
+
+        private int _InsertOffset { get; set; }
+
+        public int InsertOffset
+        {
+            get
+            {
+                return this._InsertOffset;
+            }
+            set
+            {
+                this._InsertOffset = value;
+                this.OnInsertOffsetChanged();
+            }
+        }
+
+        protected virtual void OnInsertOffsetChanged()
+        {
+            if (this.InsertOffsetChanged != null)
+            {
+                this.InsertOffsetChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("InsertOffset");
+        }
+
+        public event EventHandler InsertOffsetChanged = delegate { };
+
         public ObservableCollection<PlaylistColumn> PlaylistColumns { get; set; }
 
         public ObservableCollection<GridViewColumn> GridColumns

@@ -15,8 +15,9 @@ CREATE TABLE "PropertyItems" (
 );
 CREATE TABLE [PlaylistItems] ( 
   [Id] INTEGER NOT NULL 
-, [FileName] TEXT NOT NULL 
-, CONSTRAINT [PK_PlaylistItems] PRIMARY KEY ([Id]) 
+, [Sequence] INTEGER NOT NULL  
+, [FileName] text NOT NULL 
+, CONSTRAINT [sqlite_master_PK_PlaylistItems] PRIMARY KEY ([Id]) 
 );
 CREATE TABLE [PlaylistItem_PropertyItem] ( 
   [Id] INTEGER NOT NULL 

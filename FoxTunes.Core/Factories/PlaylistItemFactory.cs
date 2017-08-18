@@ -15,16 +15,16 @@ namespace FoxTunes.Factories
             base.InitializeComponent(core);
         }
 
-        public PlaylistItem Create(string fileName)
+        public PlaylistItem Create(int sequence, string fileName)
         {
-            var item = new PlaylistItem(fileName, this.MetaDataSourceFactory.Create(fileName));
+            var item = new PlaylistItem(sequence, fileName, this.MetaDataSourceFactory.Create(fileName));
             item.InitializeComponent(this.Core);
             return item;
         }
 
-        public PlaylistItem Create(LibraryItem libraryItem)
+        public PlaylistItem Create(int sequence, LibraryItem libraryItem)
         {
-            var item = new PlaylistItem(libraryItem.FileName, new LibraryMetaDataSource(libraryItem));
+            var item = new PlaylistItem(sequence, libraryItem.FileName, new LibraryMetaDataSource(libraryItem));
             item.InitializeComponent(this.Core);
             return item;
         }

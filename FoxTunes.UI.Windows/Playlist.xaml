@@ -7,45 +7,63 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" 
+             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              x:Class="FoxTunes.Playlist" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" AllowDrop="True">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}">
             <ViewModel:Playlist.PlaylistColumns>
-                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.Id == playing.Id ? &quot;\u2022&quot; : &quot;&quot;"></ViewModel:PlaylistColumn>
-                <ViewModel:PlaylistColumn Header="Artist / album" Script="(function(){var parts=[tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist];if(tag.album){parts.push(tag.album);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
-                <ViewModel:PlaylistColumn Header="Track no" Script="(function(){var parts=[];if(tag.disccount != 1 &amp;&amp; tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
-                <ViewModel:PlaylistColumn Header="Title / track artist" Script="(function(){var parts=[];if(tag.title){parts.push(tag.title);}if(tag.firstperformer &amp;&amp; tag.firstperformer != (tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist)){parts.push(tag.firstperformer);}return parts.join(&quot; - &quot;);})()"></ViewModel:PlaylistColumn>
-                <ViewModel:PlaylistColumn Header="Duration" Script="timestamp(stat.duration)"></ViewModel:PlaylistColumn>
+                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.Id == playing.Id ? &quot;\u2022&quot; : &quot;&quot;"/>
+                <ViewModel:PlaylistColumn Header="Artist / album" Script="(function(){var parts=[tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist];if(tag.album){parts.push(tag.album);}return parts.join(&quot; - &quot;);})()"/>
+                <ViewModel:PlaylistColumn Header="Track no" Script="(function(){var parts=[];if(tag.disccount != 1 &amp;&amp; tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}return parts.join(&quot; - &quot;);})()"/>
+                <ViewModel:PlaylistColumn Header="Title / track artist" Script="(function(){var parts=[];if(tag.title){parts.push(tag.title);}if(tag.firstperformer &amp;&amp; tag.firstperformer != (tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist)){parts.push(tag.firstperformer);}return parts.join(&quot; - &quot;);})()"/>
+                <ViewModel:PlaylistColumn Header="Duration" Script="timestamp(stat.duration)"/>
             </ViewModel:Playlist.PlaylistColumns>
         </ViewModel:Playlist>
+        <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Components.Playlist.Query}" IsLiveSortingRequested="True">
+            <CollectionViewSource.LiveGroupingProperties>
+                <System:String>Sequence</System:String>
+            </CollectionViewSource.LiveGroupingProperties>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription PropertyName="Sequence"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
-        <ListView ItemsSource="{Binding Components.Playlist.Query}" Extensions:ListViewExtensions.SelectedItems="{Binding Source={StaticResource ViewModel}, Path=SelectedItems}">
+        <ListView ItemsSource="{Binding Mode=OneWay, Source={StaticResource PlaylistItems}}" 
+                  Extensions:ListViewExtensions.SelectedItems="{Binding SelectedItems, Source={StaticResource ViewModel}}"
+                  Extensions:ListViewExtensions.DropInsert="True"
+                  Extensions:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"
+                  Extensions:ListViewExtensions.DropInsertIndex="{Binding InsertIndex, Source={StaticResource ViewModel}}"
+                  Extensions:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}">
+            <Extensions:ListViewExtensions.DropInsertPen>
+                <Pen Brush="{DynamicResource TextBrush}" Thickness="3"/>
+            </Extensions:ListViewExtensions.DropInsertPen>
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseDoubleClick">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=PlaySelectedItemCommand}"></Interactivity:InvokeCommandAction>
+                    <Interactivity:InvokeCommandAction Command="{Binding PlaySelectedItemCommand, Source={StaticResource ViewModel}}"/>
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Locate" Command="{Binding Source={StaticResource ViewModel}, Path=LocateCommand}"></MenuItem>
-                    <Separator></Separator>
-                    <MenuItem Header="Clear" Command="{Binding Source={StaticResource ViewModel}, Path=ClearCommand}"></MenuItem>
+                    <MenuItem Header="Locate" Command="{Binding LocateCommand, Source={StaticResource ViewModel}}"/>
+                    <Separator/>
+                    <MenuItem Header="Clear" Command="{Binding ClearCommand, Source={StaticResource ViewModel}}"/>
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.View>
-                <GridView Extensions:GridViewExtensions.ColumnsSource="{Binding Source={StaticResource ViewModel}, Path=GridColumns}" ></GridView>
+                <GridView Extensions:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}" />
             </ListView.View>
         </ListView>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                    <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Components.Playlist.Query.Count, Mode=OneWay}" Value="0">
-                            <Setter Property="Visibility" Value="Visible"></Setter>
+                            <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

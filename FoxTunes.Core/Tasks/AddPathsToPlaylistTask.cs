@@ -7,40 +7,38 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class AddPathsToPlaylistTask : BackgroundTask
+    public class AddPathsToPlaylistTask : PlaylistTaskBase
     {
         public const string ID = "7B564369-A6A0-4BAF-8C99-08AF27908591";
 
-        public AddPathsToPlaylistTask(IEnumerable<string> paths)
+        public AddPathsToPlaylistTask(int sequence, IEnumerable<string> paths)
             : base(ID)
         {
+            this.Sequence = sequence;
             this.Paths = paths;
         }
+
+        public int Sequence { get; private set; }
 
         public IEnumerable<string> Paths { get; private set; }
 
         public IEnumerable<string> FileNames { get; private set; }
 
-        public IPlaylist Playlist { get; private set; }
-
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
 
-        public IDatabase Database { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            this.Playlist = core.Components.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaylistItemFactory = core.Factories.PlaylistItem;
-            this.Database = core.Components.Database;
             base.InitializeComponent(core);
         }
 
         protected override Task OnRun()
         {
             this.EnumerateFiles();
+            this.ShiftItems(this.Sequence,this.FileNames.Count());
             this.AddFiles();
             return this.SaveChanges();
         }
@@ -82,7 +80,7 @@ namespace FoxTunes
             var query =
                 from fileName in this.FileNames
                 where this.PlaybackManager.IsSupported(fileName)
-                select this.PlaylistItemFactory.Create(fileName);
+                select this.PlaylistItemFactory.Create(this.Sequence++, fileName);
             foreach (var playlistItem in this.OrderBy(query))
             {
                 Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);

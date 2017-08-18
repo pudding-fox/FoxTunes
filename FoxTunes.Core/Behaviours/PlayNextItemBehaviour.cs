@@ -35,6 +35,7 @@ namespace FoxTunes.Behaviours
             {
                 return;
             }
+            Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
             this.PlaylistManager.Next();
         }
     }

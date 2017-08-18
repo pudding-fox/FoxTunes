@@ -13,13 +13,40 @@ namespace FoxTunes
             this.Images = new ObservableCollection<ImageItem>();
         }
 
-        public PlaylistItem(string fileName, IMetaDataSource metaData) : this()
+        public PlaylistItem(int sequence, string fileName, IMetaDataSource metaData) : this()
         {
+            this.Sequence = sequence;
             this.FileName = fileName;
             this.MetaDatas = metaData.MetaDatas;
             this.Properties = metaData.Properties;
             this.Images = metaData.Images;
         }
+
+        private int _Sequence { get; set; }
+
+        public int Sequence
+        {
+            get
+            {
+                return this._Sequence;
+            }
+            set
+            {
+                this._Sequence = value;
+                this.OnSequenceChanged();
+            }
+        }
+
+        protected virtual void OnSequenceChanged()
+        {
+            if (this.SequenceChanged != null)
+            {
+                this.SequenceChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Sequence");
+        }
+
+        public event EventHandler SequenceChanged = delegate { };
 
         public string FileName { get; set; }
 
