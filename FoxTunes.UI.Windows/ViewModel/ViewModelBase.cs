@@ -14,6 +14,16 @@ namespace FoxTunes.ViewModel
             new PropertyMetadata(new PropertyChangedCallback(OnCoreChanged))
         );
 
+        public static ICore GetCore(ViewModelBase source)
+        {
+            return (ICore)source.GetValue(CoreProperty);
+        }
+
+        public static void SetCore(ViewModelBase source, ICore value)
+        {
+            source.SetValue(CoreProperty, value);
+        }
+
         public static void OnCoreChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var viewModel = sender as ViewModelBase;

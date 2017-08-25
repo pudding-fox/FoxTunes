@@ -12,6 +12,7 @@ namespace FoxTunes.ViewModel
         public Library()
         {
             this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<RenderableLibraryHierarchyItem>>();
+            this._SelectedItem = new RenderableLibraryHierarchyItem();
         }
 
         public IDatabase Database { get; private set; }

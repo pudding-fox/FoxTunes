@@ -58,7 +58,6 @@
     <Compile Include="Extensions\ListView_DropInsert.cs" />
     <Compile Include="Extensions\ListView_SelectedItems.cs" />
     <Compile Include="Extensions\TreeView_SelectedItem.cs" />
-    <Compile Include="Extensions\Visual_ImageStack.cs" />
     <Compile Include="Integration\Explorer.cs" />
     <Compile Include="Library.xaml.cs">
       <DependentUpon>Library.xaml</DependentUpon>
@@ -95,6 +94,8 @@
     <Compile Include="Theme\IThemeLoader.cs" />
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
+    <Compile Include="Utilities\DiagonalStackPanel.cs" />
+    <Compile Include="Utilities\MouseCursorAdorner.cs" />
     <Compile Include="ViewModel\Artwork.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
@@ -187,9 +188,7 @@
     <Resource Include="Images\Fox.ico" />
     <None Include="Images\Fox.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utilities\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

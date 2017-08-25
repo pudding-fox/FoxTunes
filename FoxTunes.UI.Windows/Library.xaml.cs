@@ -1,4 +1,6 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Utilities;
+using FoxTunes.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -55,12 +57,21 @@ namespace FoxTunes
         private void DoDragDrop()
         {
             this.DragInitialized = true;
-            DragDrop.DoDragDrop(
-                this,
-                this.SelectedNode.Items,
-                DragDropEffects.Copy
-            );
-            this.DragInitialized = false;
+            this.MouseCursorAdorner.Show();
+            try
+            {
+
+                DragDrop.DoDragDrop(
+                    this,
+                    this.SelectedNode.Items,
+                    DragDropEffects.Copy
+                );
+            }
+            finally
+            {
+                this.DragInitialized = false;
+                this.MouseCursorAdorner.Hide();
+            }
         }
 
         private void TreeView_Selected(object sender, RoutedEventArgs e)
