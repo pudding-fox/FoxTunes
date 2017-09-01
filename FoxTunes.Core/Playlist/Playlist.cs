@@ -12,17 +12,24 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
-        public IDatabaseSet<PlaylistItem> Set { get; private set; }
+        public IDatabaseSet<PlaylistItem> PlaylistItemSet { get; private set; }
 
-        public IDatabaseQuery<PlaylistItem> Query { get; private set; }
+        public IDatabaseQuery<PlaylistItem> PlaylistItemQuery { get; private set; }
+
+        public IDatabaseSet<PlaylistColumn> PlaylistColumnSet { get; private set; }
+
+        public IDatabaseQuery<PlaylistColumn> PlaylistColumnQuery { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Components.Database;
-            this.Set = this.Database.GetSet<PlaylistItem>();
-            this.Query = this.Database.GetQuery<PlaylistItem>();
-            this.Query.Include("MetaDatas");
-            this.Query.Include("Properties");
+            this.PlaylistItemSet = this.Database.GetSet<PlaylistItem>();
+            this.PlaylistItemQuery = this.Database.GetQuery<PlaylistItem>();
+            this.PlaylistItemQuery.Include("MetaDatas");
+            this.PlaylistItemQuery.Include("Properties");
+            this.PlaylistItemQuery.Include("Images");
+            this.PlaylistColumnSet = this.Database.GetSet<PlaylistColumn>();
+            this.PlaylistColumnQuery = this.Database.GetQuery<PlaylistColumn>();
             base.InitializeComponent(core);
         }
     }

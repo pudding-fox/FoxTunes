@@ -63,11 +63,11 @@ namespace FoxTunes
             var viewModel = this.FindResource("ViewModel") as global::FoxTunes.ViewModel.Playlist;
             if (!viewModel.InsertActive)
             {
-                if (!this.Core.Components.Playlist.Query.Any())
+                if (!this.Core.Components.Playlist.PlaylistItemQuery.Any())
                 {
                     return 0;
                 }
-                return this.Core.Components.Playlist.Query.Max(playlistItem => playlistItem.Sequence) + 1;
+                return this.Core.Components.Playlist.PlaylistItemQuery.Max(playlistItem => playlistItem.Sequence) + 1;
             }
             return viewModel.InsertIndex + viewModel.InsertOffset;
         }

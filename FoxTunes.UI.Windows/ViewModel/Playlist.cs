@@ -16,7 +16,6 @@ namespace FoxTunes.ViewModel
         public Playlist()
         {
             this.SelectedItems = new ObservableCollection<PlaylistItem>();
-            this.PlaylistColumns = new ObservableCollection<PlaylistColumn>();
         }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
@@ -26,6 +25,8 @@ namespace FoxTunes.ViewModel
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
+
+        public ISignalEmitter SignalEmitter { get; private set; }
 
         public IList SelectedItems { get; set; }
 
@@ -108,28 +109,41 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler InsertOffsetChanged = delegate { };
 
-        public ObservableCollection<PlaylistColumn> PlaylistColumns { get; set; }
-
         public ObservableCollection<GridViewColumn> GridColumns
         {
             get
             {
                 var columns = new ObservableCollection<GridViewColumn>();
-                foreach (var column in this.PlaylistColumns)
+                if (this.Core != null)
                 {
-                    columns.Add(new GridViewColumn()
+                    foreach (var column in this.Core.Components.Playlist.PlaylistColumnQuery)
                     {
-                        Header = column.Header,
-                        DisplayMemberBinding = new Binding()
+                        columns.Add(new GridViewColumn()
                         {
-                            Converter = this,
-                            ConverterParameter = column.Script
-                        }
-                    });
+                            Header = column.Name,
+                            DisplayMemberBinding = new Binding()
+                            {
+                                Converter = this,
+                                ConverterParameter = column.DisplayScript
+                            },
+                            Width = column.Width.HasValue ? column.Width.Value : double.NaN
+                        });
+                    }
                 }
                 return columns;
             }
         }
+
+        protected virtual void OnGridColumnsChanged()
+        {
+            if (this.GridColumnsChanged != null)
+            {
+                this.GridColumnsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("GridColumns");
+        }
+
+        public event EventHandler GridColumnsChanged = delegate { };
 
         private void EnsureScriptingContext()
         {
@@ -142,12 +156,23 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
+            this.OnGridColumnsChanged();
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
-            this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.OnPropertyChanged("GridColumns");
+            this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.OnGridColumnsChanged();
+            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnSignal(object sender, ISignal signal)
+        {
+            if (string.Equals(signal.Name, CommonSignals.PlaylistColumnsUpdated))
+            {
+                this.OnGridColumnsChanged();
+            }
         }
 
         public ICommand PlaySelectedItemCommand
@@ -184,6 +209,14 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public ICommand SettingsCommand
+        {
+            get
+            {
+                return new Command(() => this.SettingsVisible = true);
+            }
+        }
+
         #region IValueConverter
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -215,6 +248,32 @@ namespace FoxTunes.ViewModel
         }
 
         #endregion
+
+        private bool _SettingsVisible { get; set; }
+
+        public bool SettingsVisible
+        {
+            get
+            {
+                return this._SettingsVisible;
+            }
+            set
+            {
+                this._SettingsVisible = value;
+                this.OnSettingsVisibleChanged();
+            }
+        }
+
+        protected virtual void OnSettingsVisibleChanged()
+        {
+            if (this.SettingsVisibleChanged != null)
+            {
+                this.SettingsVisibleChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SettingsVisible");
+        }
+
+        public event EventHandler SettingsVisibleChanged = delegate { };
 
         protected override Freezable CreateInstanceCore()
         {

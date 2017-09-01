@@ -150,7 +150,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetFirstPlaylistItem()
         {
             var query =
-                from playlistItem in this.Playlist.Query
+                from playlistItem in this.Playlist.PlaylistItemQuery
                 orderby playlistItem.Sequence
                 select playlistItem;
             return query.FirstOrDefault();
@@ -159,7 +159,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetLastPlaylistItem()
         {
             var query =
-                from playlistItem in this.Playlist.Query
+                from playlistItem in this.Playlist.PlaylistItemQuery
                 orderby playlistItem.Sequence descending
                 select playlistItem;
             return query.FirstOrDefault();
@@ -168,7 +168,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetNextPlaylistItem(int sequence)
         {
             var query =
-                from playlistItem in this.Playlist.Query
+                from playlistItem in this.Playlist.PlaylistItemQuery
                 orderby playlistItem.Sequence
                 where playlistItem.Sequence > sequence
                 select playlistItem;
@@ -178,7 +178,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetPreviousPlaylistItem(int sequence)
         {
             var query =
-                from playlistItem in this.Playlist.Query
+                from playlistItem in this.Playlist.PlaylistItemQuery
                 orderby playlistItem.Sequence descending
                 where playlistItem.Sequence < sequence
                 select playlistItem;

@@ -37,16 +37,17 @@ namespace FoxTunes.Behaviours
 
         private void EnqueueItems()
         {
+            var sequence = this.PlaybackManager.CurrentStream.PlaylistItem.Sequence;
+            var query =
+                from playlistItem in this.Playlist.PlaylistItemQuery
+                orderby playlistItem.Sequence
+                where playlistItem.Sequence > sequence
+                select playlistItem;
+            var playlistItems = query.Take(ENQUEUE_COUNT).ToArray();
             this.BackgroundTaskRunner.Run(async () =>
             {
-                var sequence = this.PlaybackManager.CurrentStream.PlaylistItem.Sequence;
-                var query =
-                    from playlistItem in this.Playlist.Query
-                    orderby playlistItem.Sequence
-                    where playlistItem.Sequence > sequence
-                    select playlistItem;
                 Logger.Write(this, LogLevel.Debug, "Preemptively buffering {0} items.", ENQUEUE_COUNT);
-                foreach (var playlistItem in query.Take(ENQUEUE_COUNT))
+                foreach (var playlistItem in playlistItems)
                 {
                     if (this.OutputStreamQueue.IsQueued(playlistItem))
                     {

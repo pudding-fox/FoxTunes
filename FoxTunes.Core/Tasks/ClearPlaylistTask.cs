@@ -34,7 +34,7 @@ namespace FoxTunes
         {
             this.Name = "Clearing playlist";
             Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
-            return this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Clear()));
+            return this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.PlaylistItemSet.Clear()));
         }
 
         private Task SaveChanges()

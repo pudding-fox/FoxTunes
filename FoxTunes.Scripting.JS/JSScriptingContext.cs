@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using Noesis.Javascript;
+using System.Diagnostics;
 
 namespace FoxTunes
 {
@@ -28,9 +29,17 @@ namespace FoxTunes
             return this.Context.GetParameter(name);
         }
 
+        [DebuggerNonUserCode]
         public override object Run(string script)
         {
-            return this.Context.Run(script);
+            try
+            {
+                return this.Context.Run(script);
+            }
+            catch (JavascriptException e)
+            {
+                throw new ScriptingException(e.Line, e.StartColumn, e.EndColumn, e.Message);
+            }
         }
 
         protected override void OnDisposing()

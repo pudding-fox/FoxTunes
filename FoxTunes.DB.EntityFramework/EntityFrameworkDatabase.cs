@@ -1,12 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Threading;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Infrastructure;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -34,6 +32,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Creating database model.");
             var builder = this.CreateModelBuilder();
             this.MapPlaylistItem(builder);
+            this.MapPlaylistColumn(builder);
             this.MapLibraryItem(builder);
             this.MapLibraryHierarchy(builder);
             this.MapLibraryHierarchyLevel(builder);
@@ -75,6 +74,11 @@ namespace FoxTunes
                     config.MapRightKey("ImageItem_Id");
                     config.ToTable("PlaylistItem_ImageItem");
                 });
+        }
+
+        protected virtual void MapPlaylistColumn(DbModelBuilder builder)
+        {
+            builder.Entity<PlaylistColumn>();
         }
 
         protected virtual void MapLibraryItem(DbModelBuilder builder)
@@ -297,7 +301,7 @@ namespace FoxTunes
             {
                 return 0;
             }
-            var count= this.DbContext.SaveChanges();
+            var count = this.DbContext.SaveChanges();
             Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
             return count;
         }

@@ -55,7 +55,7 @@ namespace FoxTunes
             foreach (var playlistItem in query)
             {
                 Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Add(playlistItem)));
+                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.PlaylistItemSet.Add(playlistItem)));
                 if (position % interval == 0)
                 {
                     this.Description = Path.GetFileName(playlistItem.FileName);

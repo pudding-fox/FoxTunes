@@ -3,11 +3,11 @@
 namespace FoxTunes
 {
     /// <summary>
-    /// Interaction logic for LibraryHierarchiesDialog.xaml
+    /// Interaction logic for PlaylistSettingsDialog.xaml
     /// </summary>
-    public partial class LibraryHierarchiesDialog : UserControl
+    public partial class PlaylistSettingsDialog : UserControl
     {
-        public LibraryHierarchiesDialog()
+        public PlaylistSettingsDialog()
         {
             InitializeComponent();
         }

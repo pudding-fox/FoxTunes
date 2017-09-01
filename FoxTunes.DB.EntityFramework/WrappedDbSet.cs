@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Linq;
@@ -136,6 +137,14 @@ namespace FoxTunes
         public void Clear()
         {
             this.Set.Local.Clear();
+        }
+
+        public ObservableCollection<T> Local
+        {
+            get
+            {
+                return this.Set.Local;
+            }
         }
     }
 }

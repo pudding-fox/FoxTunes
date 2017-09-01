@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
 {
@@ -26,5 +27,7 @@ namespace FoxTunes.Interfaces
         T this[int index] { get; }
 
         int IndexOf(T item);
+
+        ObservableCollection<T> Local { get; }
     }
 }
