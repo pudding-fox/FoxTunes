@@ -100,7 +100,7 @@ namespace FoxTunes
             this.Name = "Saving changes";
             this.Position = this.Count;
             Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
-            return this.Database.Interlocked(() => this.Database.SaveChangesAsync());
+            return this.Database.Interlocked(async () => await this.Database.SaveChangesAsync());
         }
 
         private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)

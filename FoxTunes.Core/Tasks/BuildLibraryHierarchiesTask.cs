@@ -128,7 +128,7 @@ namespace FoxTunes
             this.Name = "Saving changes";
             this.Position = this.Count;
             Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
-            return this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(() => this.Database.SaveChangesAsync()));
+            return this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(async () => await this.Database.SaveChangesAsync()));
         }
 
         private string ExecuteScript(LibraryItem libraryItem, string script)

@@ -82,7 +82,7 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var playlistItem = this.PlaylistManager.CurrentItem;
-            if (playlistItem == null)
+            if (playlistItem == null || !this.Database.CanQuery(playlistItem))
             {
                 this.Image = null;
                 return;

@@ -1763,7 +1763,40 @@
         </Setter>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
     </Style>
-
+    <Style TargetType="{x:Type ContextMenu}">
+        <Setter Property="Background" Value="{DynamicResource ShadeBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ShadeBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContextMenu}">
+                    <Border>
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="Tag" Value="{DynamicResource {x:Static SystemParameters.DropShadowKey}}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Padding" Value="0,0,5,5"/>
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect BlurRadius="4" Opacity="0.8" ShadowDepth="1"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                            <ScrollViewer CanContentScroll="True" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </ScrollViewer>
+                        </Border>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <Style TargetType="{x:Type Menu}">
         <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
@@ -2687,12 +2720,10 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListView}">
                     <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0,0,0,0" BorderBrush="{DynamicResource DefaultedBorderBrush}" Background="{DynamicResource ControlBackgroundBrush}">
-
                         <ScrollViewer Padding="{TemplateBinding Padding}" Style="{DynamicResource {x:Static GridView.GridViewScrollViewerStyleKey}}">
                             <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         </ScrollViewer>
                     </Border>
-
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsGrouping" Value="true">
                             <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
