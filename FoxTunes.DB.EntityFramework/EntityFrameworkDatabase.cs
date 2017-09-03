@@ -6,6 +6,7 @@ using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace FoxTunes
 {
@@ -301,19 +302,34 @@ namespace FoxTunes
             {
                 return 0;
             }
-            var count = this.DbContext.SaveChanges();
-            Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
-            return count;
+            using (var transaction = this.BeginTransaction())
+            {
+                var count = this.DbContext.SaveChanges();
+                transaction.Complete();
+                Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
+                return count;
+            }
         }
 
-        public override Task<int> SaveChangesAsync()
+        public override async Task<int> SaveChangesAsync()
         {
-            //if (this.DbContext == null)
-            //{
-            //    return Task.FromResult(0);
-            //}
-            //return this.DbContext.SaveChangesAsync();
-            return Task.FromResult(this.SaveChanges());
+            if (this.DbContext == null)
+            {
+                return 0;
+            }
+            using (var transaction = this.BeginTransaction())
+            {
+                var count = await this.DbContext.SaveChangesAsync();
+                transaction.Complete();
+                Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
+                return count;
+            }
+        }
+
+        private TransactionScope BeginTransaction()
+        {
+            var options = new TransactionOptions();
+            return new TransactionScope(TransactionScopeOption.Required, options);
         }
     }
 }

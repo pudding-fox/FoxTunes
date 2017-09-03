@@ -11,7 +11,8 @@ namespace FoxTunes
         public LoadOutputStreamTask(PlaylistItem playlistItem, bool immediate)
             : base(ID, immediate)
         {
-            this.PlaylistItem = playlistItem; this.Immediate = immediate;
+            this.PlaylistItem = playlistItem;
+            this.Immediate = immediate;
         }
 
         public PlaylistItem PlaylistItem { get; private set; }
@@ -33,6 +34,7 @@ namespace FoxTunes
         {
             this.Name = "Buffering";
             this.Description = new FileInfo(this.PlaylistItem.FileName).Name;
+            this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Loading play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             await this.OutputStreamQueue.Interlocked(async () =>
             {

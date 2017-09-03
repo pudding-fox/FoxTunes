@@ -26,6 +26,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
+            this.IsIndeterminate = true;
             await this.Clear();
             await this.SaveChanges();
         }
@@ -40,7 +41,6 @@ namespace FoxTunes
         private Task SaveChanges()
         {
             this.Name = "Saving changes";
-            this.Position = this.Count;
             Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
             return this.Database.Interlocked(async () => await this.Database.SaveChangesAsync());
         }
