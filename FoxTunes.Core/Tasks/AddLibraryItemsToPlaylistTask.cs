@@ -26,18 +26,22 @@ namespace FoxTunes
 
         public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = core.Managers.Playback;
             this.PlaylistItemFactory = core.Factories.PlaylistItem;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             this.ShiftItems(this.Sequence, this.LibraryItems.Count());
             this.AddItems();
-            return this.SaveChanges();
+            await this.SaveChanges();
+            this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
         private void AddItems()

@@ -17,10 +17,13 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Playlist = core.Components.Playlist;
             this.Database = core.Components.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
@@ -29,6 +32,7 @@ namespace FoxTunes
             this.IsIndeterminate = true;
             await this.Clear();
             await this.SaveChanges();
+            this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
         private Task Clear()
