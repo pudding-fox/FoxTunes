@@ -41,10 +41,12 @@
   <ItemGroup>
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
     <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
+    <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
     <Compile Include="Interfaces\Signal\ISignal.cs" />
     <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
@@ -53,6 +55,7 @@
     <Compile Include="Library\LibraryHierarchyItem.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="LogManager.cs" />
+    <Compile Include="Managers\HierarchyManager.cs" />
     <Compile Include="MetaData\CommonImageMetaData.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="MetaData\ImageItem.cs" />

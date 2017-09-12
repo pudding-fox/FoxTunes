@@ -7,9 +7,7 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryHierarchies : ViewModelBase
     {
-        public ILibrary Library { get; private set; }
-
-        public ILibraryManager LibraryManager { get; private set; }
+        public IHierarchyManager HierarchyManager { get; private set; }
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 
@@ -76,8 +74,8 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new AsyncCommand(
-                    () => this.LibraryManager.AddHierarchy(new LibraryHierarchy()),
-                    () => this.LibraryManager != null
+                    () => this.HierarchyManager.AddHierarchy(new LibraryHierarchy()),
+                    () => this.HierarchyManager != null
                 );
             }
         }
@@ -87,8 +85,8 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new AsyncCommand(
-                    () => this.LibraryManager.DeleteHierarchy(this.SelectedHierarchy),
-                    () => this.LibraryManager != null && this.SelectedHierarchy != null
+                    () => this.HierarchyManager.DeleteHierarchy(this.SelectedHierarchy),
+                    () => this.HierarchyManager != null && this.SelectedHierarchy != null
                 );
             }
         }
@@ -98,16 +96,15 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new AsyncCommand(
-                    () => this.LibraryManager.BuildHierarchies(),
-                    () => this.LibraryManager != null
+                    () => this.HierarchyManager.BuildHierarchies(),
+                    () => this.HierarchyManager != null
                 );
             }
         }
 
         protected override void OnCoreChanged()
         {
-            this.Library = this.Core.Components.Library;
-            this.LibraryManager = this.Core.Managers.Library;
+            this.HierarchyManager = this.Core.Managers.Hierarchy;
             base.OnCoreChanged();
         }
 

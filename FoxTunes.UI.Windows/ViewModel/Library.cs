@@ -17,6 +17,8 @@ namespace FoxTunes.ViewModel
 
         public IDatabase Database { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public IDatabaseQuery<LibraryHierarchyItem> LibraryHierarchyItemQuery { get; private set; }
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
@@ -117,9 +119,20 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.Database = this.Core.Components.Database;
-            this.Core.Managers.Library.Updated += (sender, e) => this.Reload();
+            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Refresh();
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.HierarchiesUpdated:
+                    this.Reload();
+                    break;
+            }
         }
 
         private string _Filter { get; set; }

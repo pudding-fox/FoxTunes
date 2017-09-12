@@ -7,5 +7,7 @@
         IPlaylistManager Playlist { get; }
 
         ILibraryManager Library { get; }
+
+        IHierarchyManager Hierarchy { get; }
     }
 }

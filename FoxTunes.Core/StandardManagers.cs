@@ -33,6 +33,14 @@ namespace FoxTunes
             }
         }
 
+        public IHierarchyManager Hierarchy
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IHierarchyManager>();
+            }
+        }
+
         public static readonly IStandardManagers Instance = new StandardManagers();
     }
 }
