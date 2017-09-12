@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
-    public class LibraryItem : PersistableComponent, IMetaDataSource
+    public class LibraryItem : PersistableComponent, IMetaDataSource, IEquatable<LibraryItem>
     {
         public LibraryItem()
         {
@@ -14,13 +14,17 @@ namespace FoxTunes
             this.Statistics = new ObservableCollection<StatisticItem>();
         }
 
-        public LibraryItem(string fileName, IMetaDataSource metaData) : this()
+        public LibraryItem(string directoryName, string fileName, IMetaDataSource metaData)
+            : this()
         {
+            this.DirectoryName = directoryName;
             this.FileName = fileName;
             this.MetaDatas = metaData.MetaDatas;
             this.Properties = metaData.Properties;
             this.Images = metaData.Images;
         }
+
+        public string DirectoryName { get; set; }
 
         public string FileName { get; set; }
 

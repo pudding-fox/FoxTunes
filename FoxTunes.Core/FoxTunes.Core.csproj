@@ -41,11 +41,21 @@
   <ItemGroup>
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="Behaviours\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
+    <Compile Include="Interfaces\Database\IDatabaseContext.cs" />
+    <Compile Include="Interfaces\IRootDataQueries.cs" />
+    <Compile Include="Interfaces\IRootDataSets.cs" />
     <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
+    <Compile Include="Interfaces\Managers\IDataManager.cs" />
     <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
     <Compile Include="Interfaces\Signal\ISignal.cs" />
@@ -55,12 +65,16 @@
     <Compile Include="Library\LibraryHierarchyItem.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="LogManager.cs" />
+    <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\HierarchyManager.cs" />
     <Compile Include="MetaData\CommonImageMetaData.cs" />
+    <Compile Include="MetaData\CustomMetaData.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="MetaData\ImageItem.cs" />
     <Compile Include="Playlist\PlaylistColumn.cs" />
     <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
+    <Compile Include="RootDataQueries.cs" />
+    <Compile Include="RootDataSets.cs" />
     <Compile Include="Scripting\ScriptingException.cs" />
     <Compile Include="Signal\CommonSignals.cs" />
     <Compile Include="Signal\Signal.cs" />
@@ -77,9 +91,7 @@
     <Compile Include="Interfaces\Database\IDatabaseSet.cs" />
     <Compile Include="Interfaces\Factories\ILibraryItemFactory.cs" />
     <Compile Include="Interfaces\IBackgroundTaskSource.cs" />
-    <Compile Include="Interfaces\Library\ILibrary.cs" />
     <Compile Include="Interfaces\Managers\ILibraryManager.cs" />
-    <Compile Include="Library\Library.cs" />
     <Compile Include="Library\LibraryItem.cs" />
     <Compile Include="ComponentAttribute.cs" />
     <Compile Include="ComponentSlots.cs" />
@@ -119,7 +131,6 @@
     <Compile Include="MetaData\MetaDataItem.cs" />
     <Compile Include="MetaData\PropertyItem.cs" />
     <Compile Include="PersistableComponent.cs" />
-    <Compile Include="Playlist\Playlist.cs" />
     <Compile Include="Playlist\PlaylistItem.cs" />
     <Compile Include="Factories\PlaylistItemFactory.cs" />
     <Compile Include="StandardBehaviour.cs" />
@@ -146,7 +157,6 @@
     <Compile Include="Interfaces\Output\IOutput.cs" />
     <Compile Include="Interfaces\IComponentActivator.cs" />
     <Compile Include="Interfaces\Output\IOutputStream.cs" />
-    <Compile Include="Interfaces\Playlist\IPlaylist.cs" />
     <Compile Include="Interfaces\IStandardComponent.cs" />
     <Compile Include="Interfaces\UserInterface\IUserInterface.cs" />
     <Compile Include="StandardFactories.cs" />
@@ -159,15 +169,36 @@
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
+    <Compile Include="Tasks\LibraryTaskBase.cs" />
     <Compile Include="Tasks\PlaylistTaskBase.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
+    <Compile Include="Tasks\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Tasks\StopOutputStreamTask.cs" />
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Behaviours\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tasks\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Behaviours\Resources\VariousArtists.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Tasks\Resources\ClearPlaylist.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

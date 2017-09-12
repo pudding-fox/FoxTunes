@@ -1,8 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Managers
 {
@@ -12,20 +12,14 @@ namespace FoxTunes.Managers
 
         public ICore Core { get; private set; }
 
-        public IPlaylist Playlist { get; private set; }
-
-        public IDatabase Database { get; private set; }
-
-        public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
+        public IDataManager DataManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Playlist = core.Components.Playlist;
-            this.Database = core.Components.Database;
-            this.PlaylistItemFactory = core.Factories.PlaylistItem;
+            this.DataManager = core.Managers.Data;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             base.InitializeComponent(core);
@@ -46,20 +40,41 @@ namespace FoxTunes.Managers
             }
         }
 
-        public Task Add(int sequence, IEnumerable<string> paths)
+        public Task Add(IEnumerable<string> paths)
         {
-            var task = new AddPathsToPlaylistTask(sequence, paths);
+            var index = this.GetInsertIndex();
+            return this.Insert(index, paths);
+        }
+
+        public Task Insert(int index, IEnumerable<string> paths)
+        {
+            var task = new AddPathsToPlaylistTask(index, paths);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
-        public Task Add(int sequence, IEnumerable<LibraryItem> libraryItems)
+        public Task Add(IEnumerable<LibraryItem> libraryItems)
         {
-            var task = new AddLibraryItemsToPlaylistTask(sequence, libraryItems);
+            var index = this.GetInsertIndex();
+            return this.Insert(index, libraryItems);
+        }
+
+        public Task Insert(int index, IEnumerable<LibraryItem> libraryItems)
+        {
+            var task = new AddLibraryItemsToPlaylistTask(index, libraryItems);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run().ContinueWith(_ => this.OnUpdated());
+        }
+
+        private int GetInsertIndex()
+        {
+            if (!this.DataManager.ReadContext.Queries.PlaylistItem.Any())
+            {
+                return 0;
+            }
+            return this.DataManager.ReadContext.Queries.PlaylistItem.Max(playlistItem => playlistItem.Sequence) + 1;
         }
 
         protected virtual void OnUpdated()
@@ -72,6 +87,14 @@ namespace FoxTunes.Managers
         }
 
         public event EventHandler Updated = delegate { };
+
+        public bool CanNavigate
+        {
+            get
+            {
+                return this.DataManager.ReadContext.Queries.PlaylistItem.Any();
+            }
+        }
 
         public async Task Next()
         {
@@ -99,6 +122,11 @@ namespace FoxTunes.Managers
                 if (playlistItem == null)
                 {
                     playlistItem = this.GetFirstPlaylistItem();
+                    if (playlistItem == null)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
+                        return;
+                    }
                     Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
                 }
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
@@ -120,7 +148,7 @@ namespace FoxTunes.Managers
             }
             try
             {
-                this.IsNavigating = true; ;
+                this.IsNavigating = true;
                 var sequence = default(int);
                 if (this.CurrentItem == null)
                 {
@@ -136,6 +164,11 @@ namespace FoxTunes.Managers
                 if (playlistItem == null)
                 {
                     playlistItem = this.GetLastPlaylistItem();
+                    if (playlistItem == null)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
+                        return;
+                    }
                     Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
                 }
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
@@ -150,7 +183,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetFirstPlaylistItem()
         {
             var query =
-                from playlistItem in this.Playlist.PlaylistItemQuery
+                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
                 orderby playlistItem.Sequence
                 select playlistItem;
             return query.FirstOrDefault();
@@ -159,7 +192,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetLastPlaylistItem()
         {
             var query =
-                from playlistItem in this.Playlist.PlaylistItemQuery
+                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
                 orderby playlistItem.Sequence descending
                 select playlistItem;
             return query.FirstOrDefault();
@@ -168,7 +201,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetNextPlaylistItem(int sequence)
         {
             var query =
-                from playlistItem in this.Playlist.PlaylistItemQuery
+                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
                 orderby playlistItem.Sequence
                 where playlistItem.Sequence > sequence
                 select playlistItem;
@@ -178,7 +211,7 @@ namespace FoxTunes.Managers
         protected virtual PlaylistItem GetPreviousPlaylistItem(int sequence)
         {
             var query =
-                from playlistItem in this.Playlist.PlaylistItemQuery
+                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
                 orderby playlistItem.Sequence descending
                 where playlistItem.Sequence < sequence
                 select playlistItem;

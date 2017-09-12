@@ -26,7 +26,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Components.Library.LibraryHierarchyQuery}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Managers.Data.ReadContext.Queries.LibraryHierarchy}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
         <Windows:LibraryHierarchies Grid.Column="2"></Windows:LibraryHierarchies>
         <TreeView x:Name="TreeView" Grid.ColumnSpan="3" Grid.Row="1" 
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"

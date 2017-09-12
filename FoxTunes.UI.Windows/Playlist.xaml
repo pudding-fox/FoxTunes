@@ -15,7 +15,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}"></ViewModel:Playlist>
-        <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Components.Playlist.PlaylistItemQuery}" IsLiveSortingRequested="True">
+        <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Managers.Data.ReadContext.Queries.PlaylistItem}" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Sequence</System:String>
             </CollectionViewSource.LiveGroupingProperties>
@@ -67,7 +67,7 @@
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Components.Playlist.PlaylistItemQuery.Count, Mode=OneWay}" Value="0">
+                        <DataTrigger Binding="{Binding Managers.Data.ReadContext.Queries.PlaylistItem.Count, Mode=OneWay}" Value="0">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>

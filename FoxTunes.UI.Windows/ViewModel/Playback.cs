@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -8,8 +7,6 @@ namespace FoxTunes.ViewModel
     public class Playback : ViewModelBase
     {
         public IDatabase Database { get; private set; }
-
-        public IPlaylist Playlist { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -63,7 +60,7 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     () => this.PlaylistManager.Previous(),
-                    () => this.PlaylistManager != null && this.Database.Interlocked(() => this.Playlist.PlaylistItemQuery.Any())
+                    () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
                 );
             }
         }
@@ -74,7 +71,7 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     () => this.PlaylistManager.Next(),
-                    () => this.PlaylistManager != null && this.Playlist != null && this.Database.Interlocked(() => this.Playlist.PlaylistItemQuery.Any())
+                    () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
                 );
             }
         }
@@ -82,7 +79,6 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.Database = this.Core.Components.Database;
-            this.Playlist = this.Core.Components.Playlist;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             base.OnCoreChanged();

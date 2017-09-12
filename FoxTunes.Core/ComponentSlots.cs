@@ -2,6 +2,8 @@
 {
     public static class ComponentSlots
     {
+        public const string None = "00000000-0000-0000-0000-000000000000";
+
         public const string Configuration = "C6A34BDB-FFDB-46DC-B7F3-D04CCD319C4E";
 
         public const string Database = "D5A705D6-4553-4FA8-8642-56176F0BCFF4";

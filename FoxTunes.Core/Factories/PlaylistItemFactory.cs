@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.IO;
 
 namespace FoxTunes.Factories
 {
@@ -17,14 +18,14 @@ namespace FoxTunes.Factories
 
         public PlaylistItem Create(int sequence, string fileName)
         {
-            var item = new PlaylistItem(sequence, fileName, this.MetaDataSourceFactory.Create(fileName));
+            var item = new PlaylistItem(sequence, Path.GetDirectoryName(fileName), fileName, this.MetaDataSourceFactory.Create(fileName));
             item.InitializeComponent(this.Core);
             return item;
         }
 
         public PlaylistItem Create(int sequence, LibraryItem libraryItem)
         {
-            var item = new PlaylistItem(sequence, libraryItem.FileName, new LibraryMetaDataSource(libraryItem));
+            var item = new PlaylistItem(sequence, libraryItem.DirectoryName, libraryItem.FileName, new LibraryMetaDataSource(libraryItem));
             item.InitializeComponent(this.Core);
             return item;
         }

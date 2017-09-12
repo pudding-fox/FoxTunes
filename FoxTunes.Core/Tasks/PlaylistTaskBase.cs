@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -9,22 +10,19 @@ namespace FoxTunes
         {
         }
 
-        public IPlaylist Playlist { get; private set; }
-
-        public IDatabase Database { get; private set; }
+        public IDataManager DataManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Playlist = core.Components.Playlist;
-            this.Database = core.Components.Database;
+            this.DataManager = core.Managers.Data;
             base.InitializeComponent(core);
         }
 
-        protected virtual void ShiftItems(int sequence, int offset)
+        protected virtual void ShiftItems(IDatabaseContext context, int sequence, int offset)
         {
             Logger.Write(this, LogLevel.Debug, "Shifting playlist items from {0}", sequence);
             var query =
-                from playlistItem in this.Playlist.PlaylistItemQuery
+                from playlistItem in context.Queries.PlaylistItem
                 where playlistItem.Sequence >= sequence
                 orderby playlistItem.Sequence
                 select playlistItem;
@@ -32,8 +30,20 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Shifting playlist item: {0} => {1} => {2} => {3}", playlistItem.Id, playlistItem.FileName, playlistItem.Sequence, playlistItem.Sequence + offset);
                 playlistItem.Sequence = playlistItem.Sequence + offset;
-                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.PlaylistItemSet.Update(playlistItem)));
+                context.Sets.PlaylistItem.Update(playlistItem);
+                this.ForegroundTaskRunner.Run(() =>
+                {
+                    this.DataManager.ReadContext.Sets.PlaylistItem.SetCurrentValues(playlistItem, playlistItem.Id);
+                });
             }
+        }
+
+        protected virtual Task SaveChanges(IDatabaseContext context)
+        {
+            this.Name = "Saving changes";
+            this.IsIndeterminate = true;
+            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
+            return context.SaveChangesAsync();
         }
     }
 }

@@ -7,7 +7,33 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryHierarchies : ViewModelBase
     {
-        public IHierarchyManager HierarchyManager { get; private set; }
+        public ISignalEmitter SignalEmitter { get; private set; }
+
+        private IDatabaseContext _DatabaseContext { get; set; }
+
+        public IDatabaseContext DatabaseContext
+        {
+            get
+            {
+                return this._DatabaseContext;
+            }
+            set
+            {
+                this._DatabaseContext = value;
+                this.OnDatabaseContextChanged();
+            }
+        }
+
+        protected virtual void OnDatabaseContextChanged()
+        {
+            if (this.DatabaseContextChanged != null)
+            {
+                this.DatabaseContextChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("DatabaseContext");
+        }
+
+        public event EventHandler DatabaseContextChanged = delegate { };
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 
@@ -61,21 +87,13 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SettingsVisibleChanged = delegate { };
 
-        public ICommand SaveCommand
-        {
-            get
-            {
-                return null;
-            }
-        }
-
         public ICommand NewCommand
         {
             get
             {
-                return new AsyncCommand(
-                    () => this.HierarchyManager.AddHierarchy(new LibraryHierarchy()),
-                    () => this.HierarchyManager != null
+                return new Command(
+                    () => this.DatabaseContext.Sets.LibraryHierarchy.Add(new LibraryHierarchy()),
+                    () => this.DatabaseContext != null
                 );
             }
         }
@@ -84,27 +102,40 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    () => this.HierarchyManager.DeleteHierarchy(this.SelectedHierarchy),
-                    () => this.HierarchyManager != null && this.SelectedHierarchy != null
+                return new Command(
+                    () => this.DatabaseContext.Sets.LibraryHierarchy.Remove(this.SelectedHierarchy),
+                    () => this.DatabaseContext != null && this.SelectedHierarchy != null
                 );
             }
         }
 
-        public ICommand RebuildCommand
+        public ICommand SaveCommand
         {
             get
             {
-                return new AsyncCommand(
-                    () => this.HierarchyManager.BuildHierarchies(),
-                    () => this.HierarchyManager != null
-                );
+                return new Command(this.Save);
             }
+        }
+
+        public void Save()
+        {
+            this.DatabaseContext.SaveChanges();
+            this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+        }
+
+        public void Reload()
+        {
+            if (this.DatabaseContext != null)
+            {
+                this.DatabaseContext.Dispose();
+            }
+            
         }
 
         protected override void OnCoreChanged()
         {
-            this.HierarchyManager = this.Core.Managers.Hierarchy;
+            this.DatabaseContext = this.Core.Managers.Data.CreateWriteContext();
+            this.SignalEmitter = this.Core.Components.SignalEmitter;
             base.OnCoreChanged();
         }
 

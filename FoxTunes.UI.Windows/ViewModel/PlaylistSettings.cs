@@ -8,9 +8,7 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistSettings : ViewModelBase
     {
-        public IPlaylist Playlist { get; private set; }
-
-        public IDatabase Database { get; private set; }
+        public IDatabaseContext DatabaseContext { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -44,11 +42,11 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Playlist == null)
+                if (this.DatabaseContext == null)
                 {
                     return null;
                 }
-                return this.Playlist.PlaylistColumnSet.Local;
+                return this.DatabaseContext.Sets.PlaylistColumn.Local;
             }
         }
 
@@ -77,7 +75,7 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.Playlist.PlaylistColumnSet.Update(this.SelectedPlaylistColumn);
+            this.DatabaseContext.Sets.PlaylistColumn.Update(this.SelectedPlaylistColumn);
         }
 
         public ICommand SaveCommand
@@ -90,14 +88,14 @@ namespace FoxTunes.ViewModel
 
         public void Save()
         {
-            this.Database.SaveChanges();
+            this.DatabaseContext.SaveChanges();
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
         }
 
         protected override void OnCoreChanged()
         {
-            this.Playlist = this.Core.Components.Playlist;
-            this.Database = this.Core.Components.Database;
+            this.DatabaseContext = this.Core.Managers.Data.CreateWriteContext();
+            this.DatabaseContext.Sets.PlaylistColumn.Load();
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.OnColumnsChanged();
             base.OnCoreChanged();

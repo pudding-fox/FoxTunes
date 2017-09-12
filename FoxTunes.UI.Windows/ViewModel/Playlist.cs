@@ -18,9 +18,13 @@ namespace FoxTunes.ViewModel
             this.SelectedItems = new ObservableCollection<PlaylistItem>();
         }
 
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
         public IScriptingContext ScriptingContext { get; private set; }
+
+        public IDataManager DataManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -55,7 +59,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler InsertActiveChanged = delegate { };
-
 
         private int _InsertIndex { get; set; }
 
@@ -114,9 +117,9 @@ namespace FoxTunes.ViewModel
             get
             {
                 var columns = new ObservableCollection<GridViewColumn>();
-                if (this.Core != null)
+                if (this.DataManager != null)
                 {
-                    foreach (var column in this.Core.Components.Playlist.PlaylistColumnQuery)
+                    foreach (var column in this.DataManager.ReadContext.Sets.PlaylistColumn)
                     {
                         columns.Add(new GridViewColumn()
                         {
@@ -145,6 +148,11 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler GridColumnsChanged = delegate { };
 
+        public void Reload()
+        {
+            this.OnGridColumnsChanged();
+        }
+
         private void EnsureScriptingContext()
         {
             if (this.ScriptingContext != null)
@@ -156,22 +164,26 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
-            this.OnGridColumnsChanged();
+            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
+            this.DataManager = this.Core.Managers.Data;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
             this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.OnGridColumnsChanged();
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.OnGridColumnsChanged();
             base.OnCoreChanged();
         }
 
         protected virtual void OnSignal(object sender, ISignal signal)
         {
-            if (string.Equals(signal.Name, CommonSignals.PlaylistColumnsUpdated))
+            switch (signal.Name)
             {
-                this.OnGridColumnsChanged();
+                case CommonSignals.PlaylistColumnsUpdated:
+                    this.ForegroundTaskRunner.Run(this.Reload);
+                    break;
             }
         }
 

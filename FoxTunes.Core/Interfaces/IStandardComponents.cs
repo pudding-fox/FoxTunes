@@ -8,10 +8,6 @@
 
         IUserInterface UserInterface { get; }
 
-        IPlaylist Playlist { get; }
-
-        ILibrary Library { get; }
-
         IOutput Output { get; }
 
         IOutputStreamQueue OutputStreamQueue { get; }

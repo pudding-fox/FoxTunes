@@ -1,9 +1,10 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Tasks;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class ClearPlaylistTask : BackgroundTask
+    public class ClearPlaylistTask : PlaylistTaskBase
     {
         public const string ID = "D2F22C47-386F-4333-AD4F-693951C0E5A1";
 
@@ -13,40 +14,26 @@ namespace FoxTunes
 
         }
 
-        public IPlaylist Playlist { get; private set; }
-
-        public IDatabase Database { get; private set; }
+        public IDataManager DataManager { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Playlist = core.Components.Playlist;
-            this.Database = core.Components.Database;
+            this.DataManager = core.Managers.Data;
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
             this.IsIndeterminate = true;
-            await this.Clear();
-            await this.SaveChanges();
+            using (var context = this.DataManager.CreateWriteContext())
+            {
+                context.Execute(Resources.ClearPlaylist);
+            }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
-        }
-
-        private Task Clear()
-        {
-            this.Name = "Clearing playlist";
-            Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
-            return this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.PlaylistItemSet.Clear()));
-        }
-
-        private Task SaveChanges()
-        {
-            this.Name = "Saving changes";
-            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
-            return this.Database.Interlocked(async () => await this.Database.SaveChangesAsync());
+            return Task.CompletedTask;
         }
     }
 }
