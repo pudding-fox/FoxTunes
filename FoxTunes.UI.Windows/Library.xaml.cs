@@ -1,6 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.Utilities;
-using FoxTunes.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -49,7 +47,7 @@ namespace FoxTunes
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                this.Core.Managers.Library.Add(paths);
+                this.AddToLibrary(paths);
             }
             base.OnDrop(e);
         }
@@ -72,6 +70,11 @@ namespace FoxTunes
                 this.DragInitialized = false;
                 this.MouseCursorAdorner.Hide();
             }
+        }
+
+        private void AddToLibrary(IEnumerable<string> paths)
+        {
+            this.Core.Managers.Library.Add(paths);
         }
 
         private void TreeView_Selected(object sender, RoutedEventArgs e)

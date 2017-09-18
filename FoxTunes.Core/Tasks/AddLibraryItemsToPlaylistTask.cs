@@ -18,6 +18,14 @@ namespace FoxTunes
             this.LibraryItems = libraryItems;
         }
 
+        public override bool Visible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public int Sequence { get; private set; }
 
         public IEnumerable<LibraryItem> LibraryItems { get; private set; }

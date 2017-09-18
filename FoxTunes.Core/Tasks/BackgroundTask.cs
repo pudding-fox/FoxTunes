@@ -1,20 +1,51 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public abstract class BackgroundTask : BaseComponent, IBackgroundTask
     {
-        protected BackgroundTask(string id, bool visible = true)
+        static BackgroundTask()
+        {
+            Semaphores = new ConcurrentDictionary<Type, SemaphoreSlim>();
+        }
+
+        private static ConcurrentDictionary<Type, SemaphoreSlim> Semaphores { get; set; }
+
+        protected BackgroundTask(string id)
         {
             this.Id = id;
-            this.Visible = visible;
         }
 
         public string Id { get; private set; }
 
-        public bool Visible { get; private set; }
+        public virtual bool Visible
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public virtual int Concurrency
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        public SemaphoreSlim Semaphore
+        {
+            get
+            {
+                return Semaphores.GetOrAdd(this.GetType(), type => new SemaphoreSlim(this.Concurrency, this.Concurrency));
+            }
+        }
 
         public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
 
@@ -159,21 +190,26 @@ namespace FoxTunes
         public Task Run()
         {
             Logger.Write(this, LogLevel.Debug, "Running background task.");
-            this.OnStarted();
-            return this.BackgroundTaskRunner.Run(() => this.OnRun()).ContinueWith(_ =>
+            return this.BackgroundTaskRunner.Run(async () =>
             {
-                switch (_.Status)
+                await Semaphore.WaitAsync();
+                this.OnStarted();
+                await this.OnRun().ContinueWith(task =>
                 {
-                    case TaskStatus.Faulted:
-                        Logger.Write(this, LogLevel.Error, "Background task failed: {0}", _.Exception.Message);
-                        this.Exception = _.Exception;
-                        this.OnFaulted();
-                        break;
-                    default:
-                        Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
-                        this.OnCompleted();
-                        break;
-                }
+                    switch (task.Status)
+                    {
+                        case TaskStatus.Faulted:
+                            Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
+                            this.Exception = task.Exception;
+                            this.OnFaulted();
+                            break;
+                        default:
+                            Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
+                            this.OnCompleted();
+                            break;
+                    }
+                    Semaphore.Release();
+                });
             });
         }
 
