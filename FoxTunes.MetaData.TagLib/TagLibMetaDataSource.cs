@@ -206,10 +206,7 @@ namespace FoxTunes
 
         private void AddImage(string fileName, IPicture value)
         {
-            var imageItem = new ImageItem(fileName);
-            imageItem.MetaDatas.Add(new MetaDataItem(CommonImageMetaData.Type) { TextValue = Enum.GetName(typeof(PictureType), value.Type) });
-            imageItem.MetaDatas.Add(new MetaDataItem(CommonImageMetaData.MimeType) { TextValue = value.MimeType });
-            imageItem.MetaDatas.Add(new MetaDataItem(CommonImageMetaData.Description) { TextValue = value.Description });
+            var imageItem = new ImageItem(fileName, Enum.GetName(typeof(PictureType), value.Type));
             this.Images.Add(imageItem);
         }
     }

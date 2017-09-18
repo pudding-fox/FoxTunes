@@ -87,7 +87,8 @@ namespace FoxTunes.ViewModel
                 if (this.Items != null)
                 {
                     var query =
-                        from imageItem in this.Items.SelectMany(_ => _.Images)
+                        from imageItem in this.Items.SelectMany(libraryItem => libraryItem.Images)
+                        where imageItem.ImageType == CommonImageTypes.FrontCover
                         group imageItem by imageItem.FileName into imageItems
                         select imageItems.FirstOrDefault();
                     //Return a maximum of 5 images.

@@ -67,7 +67,7 @@
     <Compile Include="LogManager.cs" />
     <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\HierarchyManager.cs" />
-    <Compile Include="MetaData\CommonImageMetaData.cs" />
+    <Compile Include="MetaData\CommonImageTypes.cs" />
     <Compile Include="MetaData\CustomMetaData.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="MetaData\ImageItem.cs" />

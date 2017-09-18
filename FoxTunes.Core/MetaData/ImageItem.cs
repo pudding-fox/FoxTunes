@@ -1,21 +1,20 @@
-﻿using System.Collections.ObjectModel;
-
-namespace FoxTunes
+﻿namespace FoxTunes
 {
     public class ImageItem : PersistableComponent
     {
         public ImageItem()
         {
-            this.MetaDatas = new ObservableCollection<MetaDataItem>();
+
         }
 
-        public ImageItem(string fileName) : this()
+        public ImageItem(string fileName, string imageType)
         {
             this.FileName = fileName;
+            this.ImageType = imageType;
         }
 
         public string FileName { get; set; }
 
-        public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
+        public string ImageType { get; set; }
     }
 }

@@ -193,15 +193,7 @@ namespace FoxTunes
         public virtual void MapImageItem(DbModelBuilder builder)
         {
             Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(ImageItem).Name);
-            builder.Entity<ImageItem>()
-                .HasMany(item => item.MetaDatas)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("ImageItem_Id");
-                    config.MapRightKey("MetaDataItem_Id");
-                    config.ToTable("ImageItem_MetaDataItem");
-                });
+            builder.Entity<ImageItem>();
         }
 
         protected virtual void MapStatisticItem(DbModelBuilder builder)

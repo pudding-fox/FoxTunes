@@ -39,7 +39,7 @@ CREATE TABLE [PlaylistColumns] (
 , [Width] numeric(53,0) NULL 
 , CONSTRAINT [sqlite_master_PK_PlaylistColumns] PRIMARY KEY ([Id]) 
 );
-INSERT INTO `PlaylistColumns` VALUES (1,'Playing','playing != null && item.Id == playing.Id ? "\u2022" : ""',NULL);
+INSERT INTO `PlaylistColumns` VALUES (1,'Playing','playing != null && item.FileName == playing.FileName ? "\u2022" : ""',NULL);
 INSERT INTO `PlaylistColumns` VALUES (2,'Artist / album','(function(){ var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist]; if(tag.album) { parts.push(tag.album); } return parts.join(" - "); })()',NULL);
 INSERT INTO `PlaylistColumns` VALUES (3,'Track no','(function(){ var parts = []; if (tag.disccount != 1 && tag.disc) { parts.push(tag.disc); } if (tag.track) { parts.push(zeropad(tag.track, 2)); } return parts.join(" - "); })()',NULL);
 INSERT INTO `PlaylistColumns` VALUES (4,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) { parts.push(tag.firstperformer); } return parts.join(" - "); })()',NULL);
@@ -121,13 +121,12 @@ CREATE TABLE [LibraryHierarchies] (
 );
 INSERT INTO `LibraryHierarchies` VALUES (1,'Artist/Album/Title');
 INSERT INTO `LibraryHierarchies` VALUES (2,'Genre/Album/Title');
-CREATE TABLE [ImageItems](
-    [Id] INTEGER CONSTRAINT [PK_ImageItems] PRIMARY KEY NOT NULL, 
-    [FileName] TEXT NOT NULL);
-CREATE TABLE [ImageItem_MetaDataItem](
-    [Id] INTEGER CONSTRAINT [sqlite_master_PK_ImageItem_MetaDataItem] PRIMARY KEY NOT NULL, 
-    [ImageItem_Id] bigint NOT NULL REFERENCES ImageItems([Id]) ON DELETE CASCADE, 
-    [MetaDataItem_Id] bigint NOT NULL REFERENCES MetaDataItems([Id]) ON DELETE CASCADE);
+CREATE TABLE "ImageItems" (
+	`Id`	INTEGER NOT NULL,
+	`FileName`	TEXT NOT NULL,
+	`ImageType`	TEXT,
+	PRIMARY KEY(`Id`)
+);
 CREATE UNIQUE INDEX [IDX_PlaylistItem_PropertyItem]
 ON [PlaylistItem_PropertyItem](
     [PlaylistItem_Id], 
@@ -164,8 +163,4 @@ CREATE UNIQUE INDEX [IDX_LibraryHierarchy_LibraryHierarchyItem]
 ON [LibraryHierarchy_LibraryHierarchyItem](
     [LibraryHierarchy_Id], 
     [LibraryHierarchyItem_Id]);
-CREATE UNIQUE INDEX [IDX_ImageItem_MetaDataItem]
-ON [ImageItem_MetaDataItem](
-    [ImageItem_Id], 
-    [MetaDataItem_Id]);
 COMMIT;

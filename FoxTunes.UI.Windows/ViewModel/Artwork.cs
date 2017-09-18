@@ -7,40 +7,9 @@ namespace FoxTunes.ViewModel
 {
     public class Artwork : ViewModelBase
     {
-        public Artwork()
-        {
-        }
-
         public IDataManager DataManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
-
-        private string _ImageType { get; set; }
-
-        public string ImageType
-        {
-            get
-            {
-                return this._ImageType;
-            }
-            set
-            {
-                this._ImageType = value;
-                this.OnImageTypeChanged();
-            }
-        }
-
-        protected virtual void OnImageTypeChanged()
-        {
-            if (this.ImageTypeChanged != null)
-            {
-                this.ImageTypeChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ImageType");
-            this.Refresh();
-        }
-
-        public event EventHandler ImageTypeChanged = delegate { };
 
         private ImageItem _Image { get; set; }
 
@@ -82,9 +51,7 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.Image = playlistItem.Images.FirstOrDefault(
-                imageItem => imageItem.MetaDatas.Any(
-                    metaDataItem => metaDataItem.Name == "Type" && metaDataItem.TextValue == this.ImageType
-                )
+                imageItem => imageItem.ImageType == CommonImageTypes.FrontCover
             );
         }
 
