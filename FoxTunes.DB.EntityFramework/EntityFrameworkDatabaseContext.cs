@@ -129,13 +129,9 @@ namespace FoxTunes
             {
                 return 0;
             }
-            using (var transaction = this.BeginTransaction())
-            {
-                var count = this.DbContext.SaveChanges();
-                transaction.Complete();
-                Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
-                return count;
-            }
+            var count = this.DbContext.SaveChanges();
+            Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
+            return count;
         }
 
         public override async Task<int> SaveChangesAsync()
@@ -144,19 +140,9 @@ namespace FoxTunes
             {
                 return 0;
             }
-            using (var transaction = this.BeginTransaction())
-            {
-                var count = await this.DbContext.SaveChangesAsync();
-                transaction.Complete();
-                Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
-                return count;
-            }
-        }
-
-        private TransactionScope BeginTransaction()
-        {
-            var options = new TransactionOptions();
-            return new TransactionScope(TransactionScopeOption.Required, options);
+            var count = await this.DbContext.SaveChangesAsync();
+            Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
+            return count;
         }
 
         protected override void OnDisposing()

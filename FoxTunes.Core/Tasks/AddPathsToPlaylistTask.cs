@@ -2,6 +2,7 @@
 using FoxTunes.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,10 +54,10 @@ namespace FoxTunes
             {
                 using (var transaction = databaseContext.Connection.BeginTransaction())
                 {
-                    this.AddPlaylistItems(databaseContext);
-                    this.ShiftItems(databaseContext, this.Sequence, this.Offset);
-                    this.AddOrUpdateMetaData(databaseContext);
-                    this.SetPlaylistItemsStatus(databaseContext);
+                    this.AddPlaylistItems(databaseContext, transaction);
+                    this.ShiftItems(databaseContext, transaction, this.Sequence, this.Offset);
+                    this.AddOrUpdateMetaData(databaseContext, transaction);
+                    this.SetPlaylistItemsStatus(databaseContext, transaction);
                     transaction.Commit();
                 }
             }
@@ -64,13 +65,14 @@ namespace FoxTunes
             return Task.CompletedTask;
         }
 
-        private void AddPlaylistItems(IDatabaseContext databaseContext)
+        private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
+                command.Transaction = transaction;
                 var sequence = 1;
                 var addPlaylistItem = new Action<string>(fileName =>
                 {
@@ -102,9 +104,9 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(IDatabaseContext databaseContext)
+        private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(databaseContext, "Playlist"))
+            using (var metaDataPopulator = new MetaDataPopulator(databaseContext, transaction, "Playlist"))
             {
                 var query = databaseContext.GetQuery<PlaylistItem>().Detach().Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
                 metaDataPopulator.InitializeComponent(this.Core);

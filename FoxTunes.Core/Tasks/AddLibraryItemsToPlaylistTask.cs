@@ -2,6 +2,7 @@
 using FoxTunes.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -41,10 +42,10 @@ namespace FoxTunes
             {
                 using (var transaction = databaseContext.Connection.BeginTransaction())
                 {
-                    this.AddPlaylistItems(databaseContext);
-                    this.ShiftItems(databaseContext, this.Sequence, this.Offset);
-                    this.AddOrUpdateMetaData(databaseContext);
-                    this.SetPlaylistItemsStatus(databaseContext);
+                    this.AddPlaylistItems(databaseContext, transaction);
+                    this.ShiftItems(databaseContext, transaction, this.Sequence, this.Offset);
+                    this.AddOrUpdateMetaData(databaseContext, transaction);
+                    this.SetPlaylistItemsStatus(databaseContext, transaction);
                     transaction.Commit();
                 }
             }
@@ -52,11 +53,12 @@ namespace FoxTunes
             return Task.CompletedTask;
         }
 
-        private void AddPlaylistItems(IDatabaseContext databaseContext)
+        private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
+                command.Transaction = transaction;
                 var sequence = 0;
                 var addPlaylistItem = new Action<string>(fileName =>
                 {
@@ -78,11 +80,12 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(IDatabaseContext databaseContext)
+        private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.CopyMetaDataItems, new[] { "status" }, out parameters))
             {
+                command.Transaction = transaction;
                 parameters["status"] = PlaylistItemStatus.Import;
                 command.ExecuteNonQuery();
             }
