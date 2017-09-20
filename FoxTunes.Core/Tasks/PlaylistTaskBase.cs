@@ -1,49 +1,46 @@
 ﻿using FoxTunes.Interfaces;
-using System.Linq;
-using System.Threading.Tasks;
+using FoxTunes.Tasks;
 
 namespace FoxTunes
 {
     public abstract class PlaylistTaskBase : BackgroundTask
     {
-        protected PlaylistTaskBase(string id) : base(id)
+        protected PlaylistTaskBase(string id)
+            : base(id)
         {
         }
 
         public IDataManager DataManager { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.DataManager = core.Managers.Data;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
         protected virtual void ShiftItems(IDatabaseContext context, int sequence, int offset)
         {
-            Logger.Write(this, LogLevel.Debug, "Shifting playlist items from {0}", sequence);
-            var query =
-                from playlistItem in context.Queries.PlaylistItem
-                where playlistItem.Sequence >= sequence
-                orderby playlistItem.Sequence
-                select playlistItem;
-            foreach (var playlistItem in query)
+            var parameters = default(IDbParameterCollection);
+            using (var command = context.Connection.CreateCommand(Resources.ShiftPlaylistItems, new[] { "status", "sequence", "offset" }, out parameters))
             {
-                Logger.Write(this, LogLevel.Debug, "Shifting playlist item: {0} => {1} => {2} => {3}", playlistItem.Id, playlistItem.FileName, playlistItem.Sequence, playlistItem.Sequence + offset);
-                playlistItem.Sequence = playlistItem.Sequence + offset;
-                context.Sets.PlaylistItem.Update(playlistItem);
-                this.ForegroundTaskRunner.Run(() =>
-                {
-                    this.DataManager.ReadContext.Sets.PlaylistItem.SetCurrentValues(playlistItem, playlistItem.Id);
-                });
+                parameters["status"] = PlaylistItemStatus.None;
+                parameters["sequence"] = sequence;
+                parameters["offset"] = offset;
+                command.ExecuteNonQuery();
             }
         }
 
-        protected virtual Task SaveChanges(IDatabaseContext context)
+        protected virtual void SetPlaylistItemsStatus(IDatabaseContext databaseContext)
         {
-            this.Name = "Saving changes";
-            this.IsIndeterminate = true;
-            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
-            return context.SaveChangesAsync();
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(Resources.SetPlaylistItemStatus, new[] { "status" }, out parameters))
+            {
+                parameters["status"] = LibraryItemStatus.None;
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

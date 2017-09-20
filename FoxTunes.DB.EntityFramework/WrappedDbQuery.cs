@@ -66,19 +66,22 @@ namespace FoxTunes
             }
         }
 
-        public void Detach()
+        public IDatabaseQuery<T> Detach()
         {
             this.Query = this.Query.AsNoTracking();
+            return this;
         }
 
-        public void Include(string path)
+        public IDatabaseQuery<T> Include(string path)
         {
             this.Query = this.Query.Include(path);
+            return this;
         }
 
-        public void Include<TProperty>(Expression<Func<T, TProperty>> path)
+        public IDatabaseQuery<T> Include<TProperty>(Expression<Func<T, TProperty>> path)
         {
             this.Query = this.Query.Include(path) as DbQuery<T>;
+            return this;
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged

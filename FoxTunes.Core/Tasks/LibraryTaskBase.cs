@@ -20,16 +20,5 @@ namespace FoxTunes
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
-
-        protected virtual Task SaveChanges(IDatabaseContext context, bool showProgress)
-        {
-            if (showProgress)
-            {
-                this.Name = "Saving changes";
-                this.IsIndeterminate = true;
-            }
-            Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
-            return context.SaveChangesAsync();
-        }
     }
 }

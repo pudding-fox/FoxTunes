@@ -6,20 +6,17 @@ CREATE TABLE "StatisticItems" (
 	`TextValue`	text,
 	PRIMARY KEY(`Id`)
 );
-CREATE TABLE "PropertyItems" (
-	`Id`	INTEGER NOT NULL,
-	`Name`	text NOT NULL,
-	`NumericValue`	INTEGER,
-	`TextValue`	text,
-	PRIMARY KEY(`Id`)
-);
-CREATE TABLE [PlaylistItems] ( 
-  [Id] INTEGER NOT NULL 
-, [Sequence] bigint NOT NULL 
-,[DirectoryName] text NOT NULL 
-, [FileName] text NOT NULL 
-, CONSTRAINT [sqlite_master_PK_PlaylistItems] PRIMARY KEY ([Id]) 
-);
+CREATE TABLE [PropertyItems](
+    [Id] INTEGER PRIMARY KEY NOT NULL, 
+    [Name] text NOT NULL, 
+    [NumericValue] INTEGER, 
+    [TextValue] text);
+CREATE TABLE [PlaylistItems](
+    [Id] INTEGER CONSTRAINT [sqlite_master_PK_PlaylistItems] PRIMARY KEY NOT NULL, 
+    [Sequence] bigint NOT NULL, 
+    [DirectoryName] text NOT NULL, 
+    [FileName] text NOT NULL, 
+    [Status] bigint NOT NULL);
 CREATE TABLE [PlaylistItem_PropertyItem](
     [Id] INTEGER CONSTRAINT [PK_PlaylistItem_PropertyItem] PRIMARY KEY NOT NULL, 
     [PlaylistItem_Id] INTEGER NOT NULL REFERENCES PlaylistItems([Id]) ON DELETE CASCADE, 
@@ -39,25 +36,18 @@ CREATE TABLE [PlaylistColumns] (
 , [Width] numeric(53,0) NULL 
 , CONSTRAINT [sqlite_master_PK_PlaylistColumns] PRIMARY KEY ([Id]) 
 );
-INSERT INTO `PlaylistColumns` VALUES (1,'Playing','playing != null && item.FileName == playing.FileName ? "\u2022" : ""',NULL);
+INSERT INTO `PlaylistColumns` VALUES (1,'Playing','playing != null && item.Id == playing.Id ? "\u2022" : ""',NULL);
 INSERT INTO `PlaylistColumns` VALUES (2,'Artist / album','(function(){ var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist]; if(tag.album) { parts.push(tag.album); } return parts.join(" - "); })()',NULL);
 INSERT INTO `PlaylistColumns` VALUES (3,'Track no','(function(){ var parts = []; if (tag.disccount != 1 && tag.disc) { parts.push(tag.disc); } if (tag.track) { parts.push(zeropad(tag.track, 2)); } return parts.join(" - "); })()',NULL);
 INSERT INTO `PlaylistColumns` VALUES (4,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) { parts.push(tag.firstperformer); } return parts.join(" - "); })()',NULL);
 INSERT INTO `PlaylistColumns` VALUES (5,'Duration','timestamp(stat.duration)',NULL);
-CREATE TABLE "MetaDataItems" (
-	`Id`	INTEGER NOT NULL,
-	`Name`	text NOT NULL,
-	`NumericValue`	INTEGER,
-	`TextValue`	text,
-	`FileValue`	text,
-	PRIMARY KEY(`Id`)
-);
-CREATE TABLE [LibraryItems] ( 
-  [Id] INTEGER NOT NULL 
-, [DirectoryName] text  NOT NULL 
-, [FileName] text NOT NULL 
-, CONSTRAINT [sqlite_master_PK_LibraryItems] PRIMARY KEY ([Id]) 
-);
+CREATE TABLE [MetaDataItems](
+    [Id] INTEGER PRIMARY KEY NOT NULL, 
+    [Name] text NOT NULL, 
+    [NumericValue] INTEGER, 
+    [TextValue] text, 
+    [FileValue] text);
+CREATE TABLE LibraryItems (Id INTEGER NOT NULL, DirectoryName text NOT NULL, FileName text NOT NULL, Status INTEGER NOT NULL, CONSTRAINT sqlite_master_PK_LibraryItems PRIMARY KEY (Id));
 CREATE TABLE [LibraryItem_StatisticItem](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
     [LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE, 
@@ -74,12 +64,10 @@ CREATE TABLE [LibraryItem_LibraryHierarchyItem](
     [Id] INTEGER CONSTRAINT [PK_LibraryItem_LibraryHierarchyItem] PRIMARY KEY NOT NULL, 
     [LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE, 
     [LibraryHierarchyItem_Id] INTEGER NOT NULL REFERENCES LibraryHierarchyItems([Id]) ON DELETE CASCADE);
-CREATE TABLE [LibraryItem_ImageItem] ( 
-  [Id] INTEGER NOT NULL 
-, [LibraryItem_Id] bigint NOT NULL 
-, [ImageItem_Id] bigint NOT NULL 
-, CONSTRAINT [sqlite_master_PK_LibraryItem_ImageItem] PRIMARY KEY ([Id]) 
-);
+CREATE TABLE [LibraryItem_ImageItem](
+    [Id] INTEGER CONSTRAINT [sqlite_master_PK_LibraryItem_ImageItem] PRIMARY KEY NOT NULL, 
+    [LibraryItem_Id] bigint NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE, 
+    [ImageItem_Id] bigint NOT NULL REFERENCES ImageItems([Id]) ON DELETE CASCADE);
 CREATE TABLE [LibraryHierarchy_LibraryHierarchyLevel](
     [Id] INTEGER PRIMARY KEY, 
     [LibraryHierarchy_Id] INTEGER REFERENCES LibraryHierarchies([Id]) ON DELETE CASCADE, 
@@ -127,6 +115,18 @@ CREATE TABLE "ImageItems" (
 	`ImageType`	TEXT,
 	PRIMARY KEY(`Id`)
 );
+CREATE UNIQUE INDEX [IDX_PropertyValues_TextValue]
+ON [PropertyItems](
+    [Name], 
+    [TextValue])
+WHERE
+    [TextValue] IS NOT NULL;
+CREATE UNIQUE INDEX [IDX_PropertyItems_NumericValue]
+ON [PropertyItems](
+    [Name], 
+    [NumericValue])
+WHERE
+    [NumericValue] IS NOT NULL;
 CREATE UNIQUE INDEX [IDX_PlaylistItem_PropertyItem]
 ON [PlaylistItem_PropertyItem](
     [PlaylistItem_Id], 
@@ -139,6 +139,25 @@ CREATE UNIQUE INDEX [IDX_PlaylistItem_ImageItem]
 ON [PlaylistItem_ImageItem](
     [PlaylistItem_Id], 
     [ImageItem_Id]);
+CREATE UNIQUE INDEX [IDX_MetaDataItems_TextValue]
+ON [MetaDataItems](
+    [Name], 
+    [TextValue])
+WHERE
+    [TextValue] IS NOT NULL;
+CREATE UNIQUE INDEX [IDX_MetaDataItems_NumericValue]
+ON [MetaDataItems](
+    [Name], 
+    [NumericValue])
+WHERE
+    [NumericValue] IS NOT NULL;
+CREATE UNIQUE INDEX [IDX_MetaDataItems_FileValue]
+ON [MetaDataItems](
+    [Name], 
+    [FileValue])
+WHERE
+    [FileValue] IS NOT NULL;
+CREATE UNIQUE INDEX IDX_LibraryItems_Location ON LibraryItems (DirectoryName, FileName);
 CREATE UNIQUE INDEX [IDX_LibraryItem_StatisticItem]
 ON [LibraryItem_StatisticItem](
     [LibraryItem_Id], 
@@ -155,6 +174,10 @@ CREATE UNIQUE INDEX [IDX_LibraryItem_LibraryHierarchyItem]
 ON [LibraryItem_LibraryHierarchyItem](
     [LibraryItem_Id], 
     [LibraryHierarchyItem_Id]);
+CREATE UNIQUE INDEX [IDX_LibraryItem_ImageItem]
+ON [LibraryItem_ImageItem](
+    [LibraryItem_Id], 
+    [ImageItem_Id]);
 CREATE UNIQUE INDEX [IDX_LibraryHierarchy_LibraryHierarchyLevel]
 ON [LibraryHierarchy_LibraryHierarchyLevel](
     [LibraryHierarchy_Id], 

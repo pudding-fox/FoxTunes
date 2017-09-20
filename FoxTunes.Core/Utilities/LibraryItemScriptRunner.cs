@@ -1,29 +1,28 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace FoxTunes
 {
-    public class PlaylistItemScriptRunner
+    public class LibraryItemScriptRunner
     {
-        public PlaylistItemScriptRunner(IScriptingContext scriptingContext, PlaylistItem playlistItem, string script)
+        public LibraryItemScriptRunner(IScriptingContext scriptingContext, LibraryItem libraryItem, string script)
         {
             this.ScriptingContext = scriptingContext;
-            this.PlaylistItem = playlistItem;
+            this.LibraryItem = libraryItem;
             this.Script = script;
         }
 
         public IScriptingContext ScriptingContext { get; private set; }
 
-        public PlaylistItem PlaylistItem { get; private set; }
+        public LibraryItem LibraryItem { get; private set; }
 
         public string Script { get; private set; }
 
         public void Prepare()
         {
             var metaData = new Dictionary<string, object>();
-            foreach (var item in this.PlaylistItem.MetaDatas)
+            foreach (var item in this.LibraryItem.MetaDatas)
             {
                 var key = item.Name.ToLower();
                 if (metaData.ContainsKey(key))
@@ -35,15 +34,21 @@ namespace FoxTunes
             }
 
             var properties = new Dictionary<string, object>();
-            foreach (var item in this.PlaylistItem.Properties)
+            foreach (var item in this.LibraryItem.Properties)
             {
                 properties.Add(item.Name.ToLower(), item.Value);
             }
 
-            this.ScriptingContext.SetValue("playing", StandardManagers.Instance.Playback.CurrentStream);
-            this.ScriptingContext.SetValue("item", this.PlaylistItem);
+            var statistics = new Dictionary<string, object>();
+            foreach (var item in this.LibraryItem.Statistics)
+            {
+                statistics.Add(item.Name.ToLower(), item.Value);
+            }
+
+            this.ScriptingContext.SetValue("item", this.LibraryItem);
             this.ScriptingContext.SetValue("tag", metaData);
-            this.ScriptingContext.SetValue("stat", properties);
+            this.ScriptingContext.SetValue("prop", properties);
+            this.ScriptingContext.SetValue("stat", statistics);
         }
 
         [DebuggerNonUserCode]

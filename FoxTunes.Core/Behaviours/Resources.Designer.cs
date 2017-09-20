@@ -61,28 +61,21 @@ namespace FoxTunes.Behaviours {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH &quot;MetaDataLookup&quot;
+        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;NumericValue&quot;)
+        ///SELECT &apos;__FT_VariousArtists&apos;, 1
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = &apos;__FT_VariousArtists&apos; AND &quot;NumericValue&quot; = 1)
+        ///
+        ///WITH &quot;MetaData&quot;
         ///AS
         ///(
         ///	SELECT 
         ///		&quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot; AS &quot;Id&quot;,
         ///		&quot;MetaDataItems&quot;.&quot;Name&quot;,
-        ///		&quot;MetaDataItems&quot;.&quot;TextValue&quot; AS &quot;Value&quot;
+        ///		&quot;MetaDataItems&quot;.&quot;NumericValue&quot;,
+        ///		&quot;MetaDataItems&quot;.&quot;TextValue&quot;
         ///	FROM &quot;LibraryItem_MetaDataItem&quot; 
         ///		JOIN &quot;MetaDataItems&quot; 
-        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
-        ///)
-        ///
-        ///
-        ///SELECT 
-        ///	&quot;LibraryItems&quot;.*, 
-        ///	(
-        ///		SELECT &quot;Value&quot;
-        ///		FROM &quot;MetaDataLookup&quot;
-        ///		WHERE &quot;MetaDataLookup&quot;.&quot;Id&quot; = &quot;LibraryItems&quot;.&quot;Id&quot; AND &quot;MetaDataLookup&quot;.&quot;Name&quot; = &apos;Album&apos;
-        ///	) AS &quot;Album&quot;
-        ///FROM &quot;LibraryItems&quot;
-        ///	 [rest of string was truncated]&quot;;.
+        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_I [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string VariousArtists {
             get {

@@ -39,30 +39,27 @@ namespace FoxTunes
             this.Description = new FileInfo(this.PlaylistItem.FileName).Name;
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Loading play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-            await this.OutputStreamQueue.Interlocked(async () =>
+            if (this.OutputStreamQueue.IsQueued(this.PlaylistItem))
             {
-                if (this.OutputStreamQueue.IsQueued(this.PlaylistItem))
-                {
-                    Logger.Write(this, LogLevel.Debug, "Play list item already exists in the queue:  {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-                    if (this.Immediate)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Immediate load was requested, de-queuing: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-                        this.OutputStreamQueue.Dequeue(this.PlaylistItem);
-                    }
-                    return;
-                }
-                var outputStream = await this.Output.Load(this.PlaylistItem);
-                Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-                this.OutputStreamQueue.Enqueue(outputStream, this.Immediate);
+                Logger.Write(this, LogLevel.Debug, "Play list item already exists in the queue:  {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
                 if (this.Immediate)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Immediate load was requested, output stream was automatically de-queued: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                    Logger.Write(this, LogLevel.Debug, "Immediate load was requested, de-queuing: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                    this.OutputStreamQueue.Dequeue(this.PlaylistItem);
                 }
-                else
-                {
-                    Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-                }
-            });
+                return;
+            }
+            var outputStream = await this.Output.Load(this.PlaylistItem);
+            Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+            this.OutputStreamQueue.Enqueue(outputStream, this.Immediate);
+            if (this.Immediate)
+            {
+                Logger.Write(this, LogLevel.Debug, "Immediate load was requested, output stream was automatically de-queued: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+            }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
         }
     }

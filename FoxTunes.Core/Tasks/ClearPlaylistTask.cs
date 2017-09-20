@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using FoxTunes.Tasks;
+﻿using FoxTunes.Tasks;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -14,20 +13,15 @@ namespace FoxTunes
 
         }
 
-        public ISignalEmitter SignalEmitter { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.SignalEmitter = core.Components.SignalEmitter;
-            base.InitializeComponent(core);
-        }
-
         protected override Task OnRun()
         {
             this.IsIndeterminate = true;
             using (var context = this.DataManager.CreateWriteContext())
             {
-                context.Execute(Resources.ClearPlaylist);
+                using (var command = context.Connection.CreateCommand(Resources.ClearPlaylist))
+                {
+                    command.ExecuteNonQuery();
+                }
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
             return Task.CompletedTask;

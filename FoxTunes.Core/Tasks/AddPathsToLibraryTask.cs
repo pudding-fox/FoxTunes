@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,116 +32,93 @@ namespace FoxTunes
 
         public IEnumerable<string> FileNames { get; private set; }
 
+        public ICore Core { get; private set; }
+
         public IPlaybackManager PlaybackManager { get; private set; }
 
-        public ILibraryItemFactory LibraryItemFactory { get; private set; }
+        public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.PlaybackManager = core.Managers.Playback;
-            this.LibraryItemFactory = core.Factories.LibraryItem;
+            this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            this.EnumerateFiles();
-            using (var context = this.DataManager.CreateWriteContext())
+            using (var databaseContext = this.DataManager.CreateWriteContext())
             {
-                this.SanitizeFiles(context);
-                await this.AddFiles(context);
-                await this.SaveChanges(context, true);
+                using (var transaction = databaseContext.Connection.BeginTransaction())
+                {
+                    this.AddLibraryItems(databaseContext);
+                    this.AddOrUpdateMetaData(databaseContext);
+                    this.SetLibraryItemsStatus(databaseContext);
+                    transaction.Commit();
+                }
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+            return Task.CompletedTask;
         }
 
-        private void EnumerateFiles()
+        private void AddLibraryItems(IDatabaseContext databaseContext)
         {
             this.Name = "Getting file list";
-            this.Position = 0;
-            this.Count = this.Paths.Count();
-            var fileNames = new List<string>();
-            foreach (var path in this.Paths)
+            this.IsIndeterminate = true;
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(Resources.AddLibraryItem, new[] { "directoryName", "fileName", "status" }, out parameters))
             {
-                Logger.Write(this, LogLevel.Debug, "Enumerating files in path: {0}", path);
-                if (Directory.Exists(path))
+                var addLibraryItem = new Action<string>(fileName =>
                 {
-                    this.Description = new DirectoryInfo(path).Name;
-                    fileNames.AddRange(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
-                }
-                else if (File.Exists(path))
+                    if (!this.PlaybackManager.IsSupported(fileName))
+                    {
+                        return;
+                    }
+                    parameters["directoryName"] = Path.GetDirectoryName(fileName);
+                    parameters["fileName"] = fileName;
+                    parameters["status"] = LibraryItemStatus.Import;
+                    command.ExecuteNonQuery();
+                });
+                foreach (var path in this.Paths)
                 {
-                    this.Description = new FileInfo(path).Name;
-                    fileNames.Add(path);
+                    if (Directory.Exists(path))
+                    {
+                        foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
+                        {
+                            addLibraryItem(fileName);
+                        }
+                    }
+                    else if (File.Exists(path))
+                    {
+                        addLibraryItem(path);
+                    }
                 }
-                this.Position = this.Position + 1;
             }
-            Logger.Write(this, LogLevel.Debug, "Enumerated {0} files.", fileNames.Count);
-            this.FileNames = fileNames;
-            this.Position = this.Count;
         }
 
-        private void SanitizeFiles(IDatabaseContext context)
+        private void AddOrUpdateMetaData(IDatabaseContext databaseContext)
         {
-            var fileNames = this.FileNames.ToList();
-            this.Name = "Preparing file list";
-            this.Position = 0;
-            this.Count = fileNames.Count;
-            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
-            var position = 0;
-            Logger.Write(this, LogLevel.Debug, "Sanitizing files.");
-            for (var a = 0; a < fileNames.Count;)
+            using (var metaDataPopulator = new MetaDataPopulator(databaseContext, "Library"))
             {
-                var fileName = fileNames[a];
-                if (context.Queries.LibraryItem.Any(libraryItem => libraryItem.FileName == fileName))
-                {
-                    Logger.Write(this, LogLevel.Debug, "File already exists in library: {0}", fileName);
-                    fileNames.RemoveAt(a);
-                }
-                else
-                {
-                    a++;
-                }
-                if (position % interval == 0)
-                {
-                    this.Description = new FileInfo(fileName).Name;
-                    this.Position = position;
-                }
-                position++;
+                var query = databaseContext.GetQuery<LibraryItem>().Detach().Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import);
+                metaDataPopulator.InitializeComponent(this.Core);
+                metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
+                metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
+                metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
+                metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
+                metaDataPopulator.Populate(query);
             }
-            Logger.Write(this, LogLevel.Debug, "Sanitized {0} files.", fileNames.Count);
-            this.FileNames = fileNames;
-            this.Position = this.Count;
         }
 
-        private async Task AddFiles(IDatabaseContext context)
+        private void SetLibraryItemsStatus(IDatabaseContext databaseContext)
         {
-            this.Name = "Processing files";
-            this.Position = 0;
-            this.Count = this.FileNames.Count();
-            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
-            var position = 0;
-            Logger.Write(this, LogLevel.Debug, "Converting file names to library items.");
-            var query =
-                from fileName in this.FileNames
-                where this.PlaybackManager.IsSupported(fileName)
-                select this.LibraryItemFactory.Create(fileName);
-            foreach (var libraryItem in query)
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(Resources.SetLibraryItemStatus, new[] { "status" }, out parameters))
             {
-                Logger.Write(this, LogLevel.Debug, "Adding item to library: {0} => {1}", libraryItem.Id, libraryItem.FileName);
-                context.Sets.LibraryItem.Add(libraryItem);
-                if (position % interval == 0)
-                {
-                    this.Description = Path.GetFileName(libraryItem.FileName);
-                    this.Position = position;
-                }
-                if (position > 0 && position % SAVE_INTERVAL == 0)
-                {
-                    await this.SaveChanges(context, false);
-                }
-                position++;
+                parameters["status"] = LibraryItemStatus.None;
+                command.ExecuteNonQuery();
             }
-            this.Position = this.Count;
         }
     }
 }
