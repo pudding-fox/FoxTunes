@@ -17,10 +17,10 @@
         </Style>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal">
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=StopCommand}">&lt;</Button>
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PlayCommand}">4</Button>
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PauseCommand}">;</Button>
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PreviousCommand}">9</Button>
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=NextCommand}">:</Button>
+        <Button Command="{Binding StopCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}">&lt;</Button>
+        <Button Command="{Binding PlayCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}">4</Button>
+        <Button Command="{Binding PauseCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}">;</Button>
+        <Button Command="{Binding PreviousCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}">9</Button>
+        <Button Command="{Binding NextCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}">:</Button>
     </StackPanel>
 </UserControl>

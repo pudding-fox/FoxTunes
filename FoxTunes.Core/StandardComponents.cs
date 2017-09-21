@@ -97,6 +97,14 @@ namespace FoxTunes
             }
         }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILibraryHierarchyBrowser>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }

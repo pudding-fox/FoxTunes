@@ -107,7 +107,6 @@
     <Compile Include="ViewModel\LibraryHierarchies.cs" />
     <Compile Include="ViewModel\Log.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
-    <Compile Include="ViewModel\RenderableLibraryHierarchyItem.cs" />
     <Compile Include="WindowsForegroundTaskRunner.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="ViewModel\Command.cs" />

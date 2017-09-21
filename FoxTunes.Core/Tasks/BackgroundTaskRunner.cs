@@ -15,5 +15,15 @@ namespace FoxTunes
         {
             return Task.Run(func);
         }
+
+        public Task<T> Run<T>(Func<T> func)
+        {
+            return Task.Run(func);
+        }
+
+        public Task<T> Run<T>(Func<Task<T>> func)
+        {
+            return Task.Run(func);
+        }
     }
 }

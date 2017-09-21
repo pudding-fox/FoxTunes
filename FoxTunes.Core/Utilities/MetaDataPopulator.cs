@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace FoxTunes.Tasks
+namespace FoxTunes
 {
     public class MetaDataPopulator : BaseComponent, IReportsProgress, IDisposable
     {

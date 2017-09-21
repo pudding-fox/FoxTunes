@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
@@ -11,13 +10,15 @@ namespace FoxTunes.ViewModel
     {
         public Library()
         {
-            this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<RenderableLibraryHierarchyItem>>();
-            this._SelectedItem = new RenderableLibraryHierarchyItem();
+            this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>>();
+            this._SelectedItem = LibraryHierarchyNode.Empty;
         }
 
         public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         public IDataManager DataManager { get; private set; }
+
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -48,9 +49,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedHierarchyChanged = delegate { };
 
-        private Dictionary<LibraryHierarchy, ObservableCollection<RenderableLibraryHierarchyItem>> _Items { get; set; }
+        private Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>> _Items { get; set; }
 
-        public ObservableCollection<RenderableLibraryHierarchyItem> Items
+        public ObservableCollection<LibraryHierarchyNode> Items
         {
             get
             {
@@ -60,9 +61,9 @@ namespace FoxTunes.ViewModel
                 }
                 if (!this._Items.ContainsKey(this.SelectedHierarchy))
                 {
-                    var libraryHierarchyItems = this.SelectedHierarchy.Items
-                        .Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.DataManager.ReadContext));
-                    this._Items[this.SelectedHierarchy] = new ObservableCollection<RenderableLibraryHierarchyItem>(libraryHierarchyItems);
+                    this._Items[this.SelectedHierarchy] = new ObservableCollection<LibraryHierarchyNode>(
+                        this.LibraryHierarchyBrowser.GetRootNodes(this.SelectedHierarchy)
+                    );
                 }
                 return this._Items[this.SelectedHierarchy];
             }
@@ -79,9 +80,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged = delegate { };
 
-        private RenderableLibraryHierarchyItem _SelectedItem { get; set; }
+        private LibraryHierarchyNode _SelectedItem { get; set; }
 
-        public RenderableLibraryHierarchyItem SelectedItem
+        public LibraryHierarchyNode SelectedItem
         {
             get
             {
@@ -124,6 +125,7 @@ namespace FoxTunes.ViewModel
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.DataManager = this.Core.Managers.Data;
+            this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Refresh(false);

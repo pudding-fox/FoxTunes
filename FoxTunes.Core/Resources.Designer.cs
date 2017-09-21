@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FoxTunes.Tasks {
+namespace FoxTunes {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace FoxTunes.Tasks {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Tasks.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -90,6 +90,26 @@ namespace FoxTunes.Tasks {
         internal static string AddImageItems {
             get {
                 return ResourceManager.GetString("AddImageItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
+        ///SELECT @sequence, &quot;LibraryItems&quot;.&quot;DirectoryName&quot;, &quot;LibraryItems&quot;.&quot;FileName&quot;, @status
+        ///FROM &quot;LibraryHierarchyItems&quot;
+        ///JOIN &quot;LibraryItems&quot; ON &quot;LibraryHierarchyItems&quot;.&quot;LibraryItem_Id&quot; = &quot;LibraryItems&quot;.&quot;Id&quot;
+        ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId 
+        ///	AND &quot;LibraryHierarchyLevel_Id&quot; = @libraryHierarchyLevelId 
+        ///	AND &quot;DisplayValue&quot; = @displayValue;
+        ///
+        ///UPDATE &quot;PlaylistItems&quot;
+        ///SET &quot;Sequence&quot; = &quot;Sequence&quot; +
+        ///(
+        ///	SELECT COUNT(*) [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AddLibraryHierarchyNodeToPlaylist {
+            get {
+                return ResourceManager.GetString("AddLibraryHierarchyNodeToPlaylist", resourceCulture);
             }
         }
         
@@ -195,6 +215,45 @@ namespace FoxTunes.Tasks {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SELECT &quot;LibraryItem_Id&quot;
+        ///FROM &quot;LibraryHierarchyItems&quot;
+        ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId 
+        ///	AND &quot;LibraryHierarchyLevel_Id&quot; = @libraryHierarchyLevelId 
+        ///	AND &quot;DisplayValue&quot; = @displayValue.
+        /// </summary>
+        internal static string GetLibraryHierarchyLibraryItems {
+            get {
+                return ResourceManager.GetString("GetLibraryHierarchyLibraryItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchyLevel_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;,&quot;LibraryHierarchyItems&quot;.&quot;IsLeaf&quot;
+        ///FROM &quot;LibraryHierarchyItems&quot;
+        ///JOIN  &quot;LibraryHierarchyItems&quot; AS &quot;LibraryHierarchyItems_Copy&quot; ON &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = &quot;LibraryHierarchyItems_Copy&quot;.&quot;Id&quot;
+        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId 
+        ///	AND &quot;LibraryHierarchyItems_Copy&quot;.&quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId 
+        ///	AND &quot;Lib [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GetLibraryHierarchyNodes {
+            get {
+                return ResourceManager.GetString("GetLibraryHierarchyNodes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
+        ///FROM &quot;LibraryHierarchyItems&quot;
+        ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId AND &quot;Parent_Id&quot; IS NULL
+        ///GROUP BY &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;.
+        /// </summary>
+        internal static string GetLibraryHierarchyRootNodes {
+            get {
+                return ResourceManager.GetString("GetLibraryHierarchyRootNodes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UPDATE &quot;LibraryItems&quot;
         ///SET &quot;Status&quot; = @status.
         /// </summary>
@@ -222,6 +281,29 @@ namespace FoxTunes.Tasks {
         internal static string ShiftPlaylistItems {
             get {
                 return ResourceManager.GetString("ShiftPlaylistItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;NumericValue&quot;)
+        ///SELECT &apos;__FT_VariousArtists&apos;, 1
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = &apos;__FT_VariousArtists&apos; AND &quot;NumericValue&quot; = 1);
+        ///
+        ///WITH &quot;MetaData&quot;
+        ///AS
+        ///(
+        ///	SELECT 
+        ///		&quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot; AS &quot;Id&quot;,
+        ///		&quot;MetaDataItems&quot;.&quot;Name&quot;,
+        ///		&quot;MetaDataItems&quot;.&quot;NumericValue&quot;,
+        ///		&quot;MetaDataItems&quot;.&quot;TextValue&quot;
+        ///	FROM &quot;LibraryItem_MetaDataItem&quot; 
+        ///		JOIN &quot;MetaDataItems&quot; 
+        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string VariousArtists {
+            get {
+                return ResourceManager.GetString("VariousArtists", resourceCulture);
             }
         }
     }

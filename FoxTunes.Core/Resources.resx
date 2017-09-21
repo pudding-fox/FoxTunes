@@ -121,6 +121,9 @@
   <data name="AddImageItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addimageitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="AddLibraryHierarchyNodeToPlaylist" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addlibraryhierarchynodetoplaylist.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="AddLibraryItem" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addlibraryitem.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -139,6 +142,15 @@
   <data name="CopyMetaDataItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\copymetadataitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="GetLibraryHierarchyLibraryItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\getlibraryhierarchylibraryitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="GetLibraryHierarchyNodes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\getlibraryhierarchynodes.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="GetLibraryHierarchyRootNodes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\getlibraryhierarchyrootnodes.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="SetLibraryItemStatus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\setlibraryitemstatus.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -147,5 +159,8 @@
   </data>
   <data name="ShiftPlaylistItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\shiftplaylistitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="VariousArtists" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\variousartists.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

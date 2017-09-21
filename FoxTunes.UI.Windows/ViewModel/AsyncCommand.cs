@@ -8,28 +8,58 @@ namespace FoxTunes.ViewModel
     public class AsyncCommand : ICommand
     {
         public AsyncCommand(Func<Task> func)
-            : this(func, null)
-        {
-        }
-
-        public AsyncCommand(Func<Task> func, Func<bool> predicate)
         {
             this.Func = func;
-            this.Predicate = predicate;
+        }
 
+        public AsyncCommand(Func<Task> func, Func<bool> predicate) : this(func)
+        {
+            this.Predicate = predicate;
+        }
+
+        public AsyncCommand(Func<Task> func, Func<Task<bool>> predicate) : this(func)
+        {
+            this.AsyncPredicate = predicate;
         }
 
         public Func<Task> Func { get; private set; }
 
         public Func<bool> Predicate { get; private set; }
 
-        public bool CanExecute(object parameter)
+        public Func<Task<bool>> AsyncPredicate { get; private set; }
+
+        public bool? CanExecute { get; private set; }
+
+        bool ICommand.CanExecute(object parameter)
         {
-            if (this.Predicate == null)
+            if (this.Predicate != null)
+            {
+                return this.Predicate();
+            }
+            else if (this.AsyncPredicate != null)
+            {
+                this.AsyncPredicate().ContinueWith(_ =>
+                {
+                    if (this.CanExecute.HasValue && this.CanExecute.Value == _.Result)
+                    {
+                        return;
+                    }
+                    this.CanExecute = _.Result;
+                    this.InvalidateRequerySuggested();
+                });
+                if (this.CanExecute.HasValue)
+                {
+                    return this.CanExecute.Value;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
             {
                 return true;
             }
-            return this.Predicate();
         }
 
         protected virtual void OnCanExecuteChanged()
@@ -60,18 +90,19 @@ namespace FoxTunes.ViewModel
 
         public void Execute(object parameter)
         {
-            if (!this.CanExecute(parameter))
-            {
-                throw new InvalidOperationException("Execution is not valid at this time.");
-            }
             if (this.Func == null)
             {
                 return;
             }
             this.Func().ContinueWith(_ =>
             {
-                ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().Run(() => CommandManager.InvalidateRequerySuggested());
+                this.InvalidateRequerySuggested();
             });
+        }
+
+        public void InvalidateRequerySuggested()
+        {
+            ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().Run(() => CommandManager.InvalidateRequerySuggested());
         }
 
         public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);

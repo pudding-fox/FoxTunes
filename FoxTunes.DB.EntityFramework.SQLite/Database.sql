@@ -94,14 +94,15 @@ INSERT INTO `LibraryHierarchyLevels` VALUES (3,'(function(){if(tag.title){var pa
 INSERT INTO `LibraryHierarchyLevels` VALUES (4,'ucfirst(tag.firstgenre)||"No Genre"',NULL);
 INSERT INTO `LibraryHierarchyLevels` VALUES (5,'(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
 INSERT INTO `LibraryHierarchyLevels` VALUES (6,'(function(){if(tag.title){var parts=[];if(tag.disccount != 1 && tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return item.FileName;})()',NULL);
-CREATE TABLE [LibraryHierarchyItems] ( 
-  [Id] INTEGER NOT NULL 
-, [Parent_Id] bigint NULL 
-, [DisplayValue] text NOT NULL 
-, [SortValue] text NULL 
-, [IsLeaf] bit NOT NULL 
-, CONSTRAINT [sqlite_master_PK_LibraryHierarchyItems] PRIMARY KEY ([Id]) 
-);
+CREATE TABLE [LibraryHierarchyItems](
+    [Id] INTEGER CONSTRAINT [sqlite_master_PK_LibraryHierarchyItems] PRIMARY KEY NOT NULL, 
+    [Parent_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]) ON DELETE CASCADE, 
+    [LibraryHierarchy_Id] bigint NOT NULL REFERENCES LibraryHierarchies([Id]) ON DELETE CASCADE, 
+    [LibraryHierarchyLevel_Id] bigint NOT NULL REFERENCES LibraryHierarchyLevels([Id]) ON DELETE CASCADE, 
+    [LibraryItem_Id] bigint NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE, 
+    [DisplayValue] text NOT NULL, 
+    [SortValue] text, 
+    [IsLeaf] bit NOT NULL);
 CREATE TABLE [LibraryHierarchies] ( 
   [Id] INTEGER NOT NULL 
 , [Name] TEXT NOT NULL 
@@ -186,4 +187,14 @@ CREATE UNIQUE INDEX [IDX_LibraryHierarchy_LibraryHierarchyItem]
 ON [LibraryHierarchy_LibraryHierarchyItem](
     [LibraryHierarchy_Id], 
     [LibraryHierarchyItem_Id]);
+CREATE INDEX [IDX_LibraryHierarchyItem_Values]
+ON [LibraryHierarchyItems](
+    [DisplayValue], 
+    [SortValue]);
+CREATE INDEX [IDX_LibraryHierarchyItem]
+ON [LibraryHierarchyItems](
+    [LibraryHierarchy_Id], 
+    [LibraryHierarchyLevel_Id], 
+    [DisplayValue], 
+    [SortValue]);
 COMMIT;

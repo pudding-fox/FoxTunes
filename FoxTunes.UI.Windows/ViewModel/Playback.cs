@@ -6,6 +6,8 @@ namespace FoxTunes.ViewModel
 {
     public class Playback : ViewModelBase
     {
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
+
         public IDatabase Database { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -60,7 +62,7 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     () => this.PlaylistManager.Previous(),
-                    () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
+                    () => this.BackgroundTaskRunner.Run(() => this.PlaylistManager != null && this.PlaylistManager.CanNavigate)
                 );
             }
         }
@@ -71,13 +73,14 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     () => this.PlaylistManager.Next(),
-                    () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
+                    () => this.BackgroundTaskRunner.Run(() => this.PlaylistManager != null && this.PlaylistManager.CanNavigate)
                 );
             }
         }
 
         protected override void OnCoreChanged()
         {
+            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.Database = this.Core.Components.Database;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;

@@ -10,9 +10,9 @@ namespace FoxTunes.Interfaces
 
         Task Insert(int index, IEnumerable<string> paths);
 
-        Task Add(IEnumerable<LibraryItem> libraryItems);
+        Task Add(LibraryHierarchyNode libraryHierarchyNode);
 
-        Task Insert(int index, IEnumerable<LibraryItem> libraryItems);
+        Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode);
 
         event EventHandler Updated;
 
