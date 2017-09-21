@@ -24,6 +24,7 @@ namespace FoxTunes
 
         protected virtual void ShiftItems(IDatabaseContext context, IDbTransaction transaction, int sequence, int offset)
         {
+            this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
             using (var command = context.Connection.CreateCommand(Resources.ShiftPlaylistItems, new[] { "status", "sequence", "offset" }, out parameters))
             {
@@ -37,6 +38,7 @@ namespace FoxTunes
 
         protected virtual void SetPlaylistItemsStatus(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
+            this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.SetPlaylistItemStatus, new[] { "status" }, out parameters))
             {

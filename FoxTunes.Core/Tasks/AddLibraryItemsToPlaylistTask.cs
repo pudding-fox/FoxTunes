@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -17,6 +18,14 @@ namespace FoxTunes
         {
             this.Sequence = sequence;
             this.LibraryItems = libraryItems;
+        }
+
+        public override bool Visible
+        {
+            get
+            {
+                return true;
+            }
         }
 
         public int Sequence { get; private set; }
@@ -55,18 +64,23 @@ namespace FoxTunes
 
         private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
+            this.Name = "Processing library items";
+            this.Position = 0;
+            this.Count = this.LibraryItems.Count();
+            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
+            Logger.Write(this, LogLevel.Debug, "Converting library items to playlist items.");
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
                 command.Transaction = transaction;
-                var sequence = 0;
+                var position = 0;
                 var addPlaylistItem = new Action<string>(fileName =>
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
                     {
                         return;
                     }
-                    parameters["sequence"] = this.Sequence + sequence++;
+                    parameters["sequence"] = this.Sequence + position++;
                     parameters["directoryName"] = Path.GetDirectoryName(fileName);
                     parameters["fileName"] = fileName;
                     parameters["status"] = PlaylistItemStatus.Import;
@@ -74,14 +88,21 @@ namespace FoxTunes
                 });
                 foreach (var libraryItem in this.LibraryItems)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                     addPlaylistItem(libraryItem.FileName);
+                    if (position % interval == 0)
+                    {
+                        this.Description = Path.GetFileName(libraryItem.FileName);
+                        this.Position = position;
+                    }
                 }
-                this.Offset = sequence;
+                this.Offset = position;
             }
         }
 
         private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
+            this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.CopyMetaDataItems, new[] { "status" }, out parameters))
             {
