@@ -80,6 +80,20 @@ namespace FoxTunes
             return command;
         }
 
+        public static T GetValue<T>(this IDataRecord dataRecord, int index)
+        {
+            var value = dataRecord.GetValue(index);
+            if (DBNull.Value.Equals(value))
+            {
+                return default(T);
+            }
+            if (typeof(T).IsEnum)
+            {
+                return (T)Enum.ToObject(typeof(T), value);
+            }
+            return (T)Convert.ChangeType(value, typeof(T));
+        }
+
         private class DbParameterCollection : IDbParameterCollection
         {
             public DbParameterCollection(IDataParameterCollection parameters)

@@ -11,9 +11,9 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
-        private ImageItem _Image { get; set; }
+        private MetaDataItem _Image { get; set; }
 
-        public ImageItem Image
+        public MetaDataItem Image
         {
             get
             {
@@ -50,8 +50,8 @@ namespace FoxTunes.ViewModel
                 this.Image = null;
                 return;
             }
-            this.Image = playlistItem.Images.FirstOrDefault(
-                imageItem => imageItem.ImageType == CommonImageTypes.FrontCover
+            this.Image = playlistItem.MetaDatas.FirstOrDefault(
+                metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == CommonImageTypes.FrontCover
             );
         }
 

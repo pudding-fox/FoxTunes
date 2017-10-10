@@ -24,28 +24,31 @@ namespace FoxTunes
 
         public void Prepare()
         {
-            var metaData = new Dictionary<string, object>();
+            var collections = new Dictionary<MetaDataItemType, Dictionary<string, object>>()
+            {
+                { MetaDataItemType.Tag, new Dictionary<string, object>() },
+                { MetaDataItemType.Property, new Dictionary<string, object>() }
+            };
+
             foreach (var item in this.PlaylistItem.MetaDatas)
             {
+                if (!collections.ContainsKey(item.Type))
+                {
+                    continue;
+                }
                 var key = item.Name.ToLower();
-                if (metaData.ContainsKey(key))
+                if (collections[item.Type].ContainsKey(key))
                 {
                     //Not sure what to do. Doesn't happen often.
                     continue;
                 }
-                metaData.Add(key, item.Value);
-            }
-
-            var properties = new Dictionary<string, object>();
-            foreach (var item in this.PlaylistItem.Properties)
-            {
-                properties.Add(item.Name.ToLower(), item.Value);
+                collections[item.Type].Add(key, item.Value);
             }
 
             this.ScriptingContext.SetValue("playing", this.PlaybackManager.CurrentStream);
             this.ScriptingContext.SetValue("item", this.PlaylistItem);
-            this.ScriptingContext.SetValue("tag", metaData);
-            this.ScriptingContext.SetValue("stat", properties);
+            this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
+            this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
         }
 
         [DebuggerNonUserCode]

@@ -17,7 +17,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Trace, "Creating meta data source: {0}", fileName);
             var source = new TagLibMetaDataSource(fileName);
             source.InitializeComponent(this.Core);
-            Logger.Write(this, LogLevel.Trace, "Created meta data source: {0}, {1} tags, {2} properties", fileName, source.MetaDatas.Count, source.Properties.Count);
+            Logger.Write(this, LogLevel.Trace, "Created meta data source: {0}, {1} items", fileName, source.MetaDatas.Count);
             return source;
         }
     }

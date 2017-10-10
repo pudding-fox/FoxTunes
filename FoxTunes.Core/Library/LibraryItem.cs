@@ -9,9 +9,6 @@ namespace FoxTunes
         public LibraryItem()
         {
             this.MetaDatas = new ObservableCollection<MetaDataItem>();
-            this.Properties = new ObservableCollection<PropertyItem>();
-            this.Images = new ObservableCollection<ImageItem>();
-            this.Statistics = new ObservableCollection<StatisticItem>();
         }
 
         public LibraryItem(string directoryName, string fileName, LibraryItemStatus status, IMetaDataSource metaData)
@@ -21,8 +18,6 @@ namespace FoxTunes
             this.FileName = fileName;
             this.Status = status;
             this.MetaDatas = metaData.MetaDatas;
-            this.Properties = metaData.Properties;
-            this.Images = metaData.Images;
         }
 
         public string DirectoryName { get; set; }
@@ -32,12 +27,6 @@ namespace FoxTunes
         public LibraryItemStatus Status { get; set; }
 
         public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
-
-        public ObservableCollection<PropertyItem> Properties { get; private set; }
-
-        public ObservableCollection<ImageItem> Images { get; private set; }
-
-        public ObservableCollection<StatisticItem> Statistics { get; private set; }
 
         public bool Equals(LibraryItem other)
         {

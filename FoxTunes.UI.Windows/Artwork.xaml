@@ -11,6 +11,6 @@
         <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}"/>
     </UserControl.Resources>
     <Grid>
-        <Image Source="{Binding Image.FileName, Source={StaticResource ViewModel}}"></Image>
+        <Image Source="{Binding Image.FileValue, Source={StaticResource ViewModel}}"></Image>
     </Grid>
 </UserControl>

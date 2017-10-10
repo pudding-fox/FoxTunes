@@ -13,8 +13,6 @@ namespace FoxTunes
         private TagLibMetaDataSource()
         {
             this.MetaDatas = new ObservableCollection<MetaDataItem>();
-            this.Properties = new ObservableCollection<PropertyItem>();
-            this.Images = new ObservableCollection<ImageItem>();
         }
 
         public TagLibMetaDataSource(string fileName)
@@ -26,10 +24,6 @@ namespace FoxTunes
         public string FileName { get; private set; }
 
         public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
-
-        public ObservableCollection<PropertyItem> Properties { get; private set; }
-
-        public ObservableCollection<ImageItem> Images { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -142,7 +136,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name) { NumericValue = value.Value });
+            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Tag) { NumericValue = value.Value });
         }
 
         private void AddMetaData(string name, string value)
@@ -151,7 +145,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name) { TextValue = value.Trim() });
+            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Tag) { TextValue = value.Trim() });
         }
 
         private void AddMetaData(string name, string[] values)
@@ -189,7 +183,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Properties.Add(new PropertyItem(name) { NumericValue = value });
+            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Property) { NumericValue = value });
         }
 
         private void AddProperty(string name, TimeSpan? value)
@@ -198,7 +192,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Properties.Add(new PropertyItem(name) { NumericValue = Convert.ToInt32(value.Value.TotalMilliseconds) });
+            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Property) { NumericValue = Convert.ToInt32(value.Value.TotalMilliseconds) });
         }
 
         private void AddProperty(string name, string value)
@@ -207,7 +201,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Properties.Add(new PropertyItem(name) { TextValue = value.Trim() });
+            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Property) { TextValue = value.Trim() });
         }
 
         private void AddImages(Tag tag)
@@ -240,8 +234,7 @@ namespace FoxTunes
 
         private void AddImage(string fileName, IPicture value)
         {
-            var imageItem = new ImageItem(fileName, Enum.GetName(typeof(PictureType), value.Type));
-            this.Images.Add(imageItem);
+            this.MetaDatas.Add(new MetaDataItem(Enum.GetName(typeof(PictureType), value.Type), MetaDataItemType.Image) { FileValue = fileName });
         }
     }
 

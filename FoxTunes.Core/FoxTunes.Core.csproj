@@ -71,7 +71,6 @@
     <Compile Include="MetaData\CommonImageTypes.cs" />
     <Compile Include="MetaData\CustomMetaData.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
-    <Compile Include="MetaData\ImageItem.cs" />
     <Compile Include="Playlist\PlaylistColumn.cs" />
     <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
     <Compile Include="RootDataQueries.cs" />
@@ -127,7 +126,6 @@
     <Compile Include="MetaData\CommonMetaData.cs" />
     <Compile Include="MetaData\CommonProperties.cs" />
     <Compile Include="MetaData\MetaDataItem.cs" />
-    <Compile Include="MetaData\PropertyItem.cs" />
     <Compile Include="PersistableComponent.cs" />
     <Compile Include="Playlist\PlaylistItem.cs" />
     <Compile Include="StandardBehaviour.cs" />
@@ -160,7 +158,6 @@
     <Compile Include="StandardFactory.cs" />
     <Compile Include="StandardManager.cs" />
     <Compile Include="StandardManagers.cs" />
-    <Compile Include="Statistic\StatisticItem.cs" />
     <Compile Include="Tasks\AddLibraryHierarchyNodeToPlaylistTask.cs" />
     <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
@@ -191,7 +188,6 @@
     </Compile>
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
-    <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
     <Compile Include="Utilities\Templates\PivotViewBuilder_Logic.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -228,10 +224,10 @@
     <None Include="Resources\SetPlaylistItemStatus.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\GetLibraryHierarchyLibraryItems.sql" />
     <None Include="Resources\GetLibraryHierarchyNodes.sql" />
     <None Include="Resources\GetLibraryHierarchyRootNodes.sql" />
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
+    <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
     <Content Include="Utilities\Templates\LibraryHierarchyViewBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>LibraryHierarchyViewBuilder.cs</LastGenOutput>

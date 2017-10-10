@@ -1,6 +1,6 @@
-﻿INSERT INTO "MetaDataItems" ("Name", "NumericValue")
-SELECT '__FT_VariousArtists', 1
-WHERE NOT EXISTS(SELECT * FROM "MetaDataItems" WHERE "Name" = '__FT_VariousArtists' AND "NumericValue" = 1);
+﻿INSERT INTO "MetaDataItems" ("Name", "Type", "NumericValue")
+SELECT @name, @type, @numericValue
+WHERE NOT EXISTS(SELECT * FROM "MetaDataItems" WHERE "Name" = @name AND "Type" = @type AND "NumericValue" = @numericValue);
 
 WITH "MetaData"
 AS
@@ -45,7 +45,7 @@ AS
 (
 	SELECT "Id" 
 	FROM "MetaDataItems" 
-	WHERE "Name" = '__FT_VariousArtists' AND "NumericValue" = 1
+	WHERE "Name" = @name AND "Type" = @type AND "NumericValue" = @numericValue
 )
 	
 INSERT INTO "LibraryItem_MetaDataItem" ("LibraryItem_Id", "MetaDataItem_Id")

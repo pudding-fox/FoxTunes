@@ -9,8 +9,6 @@ namespace FoxTunes
         public PlaylistItem()
         {
             this.MetaDatas = new ObservableCollection<MetaDataItem>();
-            this.Properties = new ObservableCollection<PropertyItem>();
-            this.Images = new ObservableCollection<ImageItem>();
         }
 
         public PlaylistItem(int sequence, string directoryName, string fileName, PlaylistItemStatus status, IMetaDataSource metaData)
@@ -20,8 +18,6 @@ namespace FoxTunes
             this.DirectoryName = directoryName;
             this.FileName = fileName;
             this.MetaDatas = metaData.MetaDatas;
-            this.Properties = metaData.Properties;
-            this.Images = metaData.Images;
         }
 
         private int _Sequence { get; set; }
@@ -57,10 +53,6 @@ namespace FoxTunes
         public PlaylistItemStatus Status { get; set; }
 
         public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
-
-        public ObservableCollection<PropertyItem> Properties { get; private set; }
-
-        public ObservableCollection<ImageItem> Images { get; private set; }
 
         public bool Equals(PlaylistItem other)
         {

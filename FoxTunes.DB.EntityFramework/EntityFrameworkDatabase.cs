@@ -41,9 +41,6 @@ namespace FoxTunes
             this.MapLibraryHierarchyLevel(builder);
             this.MapLibraryHierarchyItem(builder);
             this.MapMetaDataItem(builder);
-            this.MapPropertyItem(builder);
-            this.MapImageItem(builder);
-            this.MapStatisticItem(builder);
             return builder.Build(connection);
         }
 
@@ -64,24 +61,6 @@ namespace FoxTunes
                     config.MapRightKey("MetaDataItem_Id");
                     config.ToTable("PlaylistItem_MetaDataItem");
                 });
-            builder.Entity<PlaylistItem>()
-                .HasMany(item => item.Properties)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("PlaylistItem_Id");
-                    config.MapRightKey("PropertyItem_Id");
-                    config.ToTable("PlaylistItem_PropertyItem");
-                });
-            builder.Entity<PlaylistItem>()
-                .HasMany(item => item.Images)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("PlaylistItem_Id");
-                    config.MapRightKey("ImageItem_Id");
-                    config.ToTable("PlaylistItem_ImageItem");
-                });
         }
 
         protected virtual void MapPlaylistColumn(DbModelBuilder builder)
@@ -100,33 +79,6 @@ namespace FoxTunes
                     config.MapLeftKey("LibraryItem_Id");
                     config.MapRightKey("MetaDataItem_Id");
                     config.ToTable("LibraryItem_MetaDataItem");
-                });
-            builder.Entity<LibraryItem>()
-                .HasMany(item => item.Properties)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("LibraryItem_Id");
-                    config.MapRightKey("PropertyItem_Id");
-                    config.ToTable("LibraryItem_PropertyItem");
-                });
-            builder.Entity<LibraryItem>()
-                .HasMany(item => item.Images)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("LibraryItem_Id");
-                    config.MapRightKey("ImageItem_Id");
-                    config.ToTable("LibraryItem_ImageItem");
-                });
-            builder.Entity<LibraryItem>()
-                .HasMany(item => item.Statistics)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("LibraryItem_Id");
-                    config.MapRightKey("StatisticItem_Id");
-                    config.ToTable("LibraryItem_StatisticItem");
                 });
         }
 
@@ -174,24 +126,6 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(MetaDataItem).Name);
             builder.Entity<MetaDataItem>();
-        }
-
-        protected virtual void MapPropertyItem(DbModelBuilder builder)
-        {
-            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(PropertyItem).Name);
-            builder.Entity<PropertyItem>();
-        }
-
-        public virtual void MapImageItem(DbModelBuilder builder)
-        {
-            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(ImageItem).Name);
-            builder.Entity<ImageItem>();
-        }
-
-        protected virtual void MapStatisticItem(DbModelBuilder builder)
-        {
-            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(StatisticItem).Name);
-            builder.Entity<StatisticItem>();
         }
     }
 }
