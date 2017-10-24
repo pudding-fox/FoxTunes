@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System;
+using System.Text;
 
 namespace FoxTunes
 {
@@ -11,6 +12,32 @@ namespace FoxTunes
         public ICore Core { get; private set; }
 
         public IDataManager DataManager { get; private set; }
+
+        private string _Filter { get; set; }
+
+        public string Filter
+        {
+            get
+            {
+                return this._Filter;
+            }
+            set
+            {
+                this._Filter = value;
+                this.OnFilterChanged();
+            }
+        }
+
+        protected virtual void OnFilterChanged()
+        {
+            if (this.FilterChanged != null)
+            {
+                this.FilterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Filter");
+        }
+
+        public event EventHandler FilterChanged = delegate { };
 
         public override void InitializeComponent(ICore core)
         {
@@ -22,9 +49,10 @@ namespace FoxTunes
         public IEnumerable<LibraryHierarchyNode> GetRootNodes(LibraryHierarchy libraryHierarchy)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyRootNodes, new[] { "libraryHierarchyId" }, out parameters))
+            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyRootNodes, new[] { "libraryHierarchyId", "filter" }, out parameters))
             {
                 parameters["libraryHierarchyId"] = libraryHierarchy.Id;
+                parameters["filter"] = this.GetFilter();
                 return this.GetNodes(command).ToArray();
             }
         }
@@ -32,11 +60,12 @@ namespace FoxTunes
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "displayValue" }, out parameters))
+            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "displayValue", "filter" }, out parameters))
             {
                 parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
                 parameters["libraryHierarchyLevelId"] = libraryHierarchyNode.LibraryHierarchyLevelId;
                 parameters["displayValue"] = libraryHierarchyNode.Value;
+                parameters["filter"] = this.GetFilter();
                 return this.GetNodes(command).ToArray();
             }
         }
@@ -92,6 +121,19 @@ namespace FoxTunes
                     yield return metaDataItem;
                 }
             }
+        }
+
+        private string GetFilter()
+        {
+            if (string.IsNullOrEmpty(this.Filter))
+            {
+                return null;
+            }
+            var builder = new StringBuilder();
+            builder.Append('%');
+            builder.Append(this.Filter.Replace(' ', '%'));
+            builder.Append('%');
+            return builder.ToString();
         }
     }
 }

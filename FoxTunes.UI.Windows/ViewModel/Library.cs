@@ -126,10 +126,16 @@ namespace FoxTunes.ViewModel
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.DataManager = this.Core.Managers.Data;
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
+            this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Refresh(false);
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnFilterChanged(object sender, EventArgs e)
+        {
+            this.Reload();
         }
 
         protected virtual void OnSignal(object sender, ISignal signal)
@@ -141,34 +147,7 @@ namespace FoxTunes.ViewModel
                     break;
             }
         }
-
-        private string _Filter { get; set; }
-
-        public string Filter
-        {
-            get
-            {
-                return this._Filter;
-            }
-            set
-            {
-                this._Filter = value;
-                this.OnFilterChanged();
-            }
-        }
-
-        protected virtual void OnFilterChanged()
-        {
-            if (this.FilterChanged != null)
-            {
-                this.FilterChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Filter");
-            this.Reload();
-        }
-
-        public event EventHandler FilterChanged = delegate { };
-
+        
         protected override Freezable CreateInstanceCore()
         {
             return new Library();

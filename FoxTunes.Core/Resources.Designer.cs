@@ -223,12 +223,12 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchyLevel_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;,&quot;LibraryHierarchyItems&quot;.&quot;IsLeaf&quot;
-        ///FROM &quot;LibraryHierarchyItems&quot;
-        ///JOIN  &quot;LibraryHierarchyItems&quot; AS &quot;LibraryHierarchyItems_Copy&quot; ON &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = &quot;LibraryHierarchyItems_Copy&quot;.&quot;Id&quot;
-        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId 
-        ///	AND &quot;LibraryHierarchyItems_Copy&quot;.&quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId 
-        ///	AND &quot;Lib [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to WITH RECURSIVE LibraryHierarchy(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;)
+        ///AS
+        ///(
+        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchyLevel_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;,&quot;LibraryHierarchyItems&quot;.&quot;IsLeaf&quot;
+        ///	FROM &quot;LibraryHierarchyItems&quot;
+        ///		JOIN  &quot;LibraryHierarchyItems&quot; AS &quot;LibraryHierarchyItems_Co [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyNodes {
             get {
@@ -237,10 +237,13 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
-        ///FROM &quot;LibraryHierarchyItems&quot;
-        ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId AND &quot;Parent_Id&quot; IS NULL
-        ///GROUP BY &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;.
+        ///   Looks up a localized string similar to WITH RECURSIVE LibraryHierarchy(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;)
+        ///AS
+        ///(
+        ///	SELECT &quot;Id&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
+        ///	FROM &quot;LibraryHierarchyItems&quot;
+        ///	UNION ALL 
+        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchyLevel_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Display [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyRootNodes {
             get {
