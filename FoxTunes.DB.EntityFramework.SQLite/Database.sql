@@ -33,10 +33,6 @@ CREATE TABLE [LibraryItem_MetaDataItem](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
     [LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE, 
     [MetaDataItem_Id] INTEGER NOT NULL REFERENCES MetaDataItems([Id]) ON DELETE CASCADE);
-CREATE TABLE [LibraryItem_LibraryHierarchyItem](
-    [Id] INTEGER CONSTRAINT [PK_LibraryItem_LibraryHierarchyItem] PRIMARY KEY NOT NULL, 
-    [LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE, 
-    [LibraryHierarchyItem_Id] INTEGER NOT NULL REFERENCES LibraryHierarchyItems([Id]) ON DELETE CASCADE);
 CREATE TABLE [LibraryHierarchy_LibraryHierarchyLevel](
     [Id] INTEGER PRIMARY KEY, 
     [LibraryHierarchy_Id] INTEGER REFERENCES LibraryHierarchies([Id]) ON DELETE CASCADE, 
@@ -68,10 +64,14 @@ CREATE TABLE [LibraryHierarchyItems](
     [Parent_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]) ON DELETE CASCADE, 
     [LibraryHierarchy_Id] bigint NOT NULL REFERENCES LibraryHierarchies([Id]) ON DELETE CASCADE, 
     [LibraryHierarchyLevel_Id] bigint NOT NULL REFERENCES LibraryHierarchyLevels([Id]) ON DELETE CASCADE, 
-    [LibraryItem_Id] bigint NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE, 
     [DisplayValue] text NOT NULL, 
     [SortValue] text, 
     [IsLeaf] bit NOT NULL);
+CREATE TABLE `LibraryHierarchyItem_LibraryItem` (
+	`Id`	INTEGER CONSTRAINT [sqlite_master_PK_LibraryHierarchyItem_LibraryItem] PRIMARY KEY NOT NULL,
+	`LibraryHierarchyItem_Id`INTEGER NOT NULL REFERENCES LibraryHierarchyItems([Id]) ON DELETE CASCADE,
+	`LibraryItem_Id`	INTEGER NOT NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE
+);
 CREATE TABLE [LibraryHierarchies] ( 
   [Id] INTEGER NOT NULL 
 , [Name] TEXT NOT NULL 
@@ -106,10 +106,6 @@ CREATE UNIQUE INDEX [IDX_LibraryItem_MetaDataItem]
 ON [LibraryItem_MetaDataItem](
     [LibraryItem_Id], 
     [MetaDataItem_Id]);
-CREATE UNIQUE INDEX [IDX_LibraryItem_LibraryHierarchyItem]
-ON [LibraryItem_LibraryHierarchyItem](
-    [LibraryItem_Id], 
-    [LibraryHierarchyItem_Id]);
 CREATE UNIQUE INDEX [IDX_LibraryHierarchy_LibraryHierarchyLevel]
 ON [LibraryHierarchy_LibraryHierarchyLevel](
     [LibraryHierarchy_Id], 
@@ -122,6 +118,7 @@ CREATE INDEX [IDX_LibraryHierarchyItem_Values]
 ON [LibraryHierarchyItems](
     [DisplayValue], 
     [SortValue]);
+CREATE UNIQUE INDEX `IDX_LibraryHierarchyItem_LibraryItem` ON `LibraryHierarchyItem_LibraryItem` (`LibraryHierarchyItem_Id` ,`LibraryItem_Id` );
 CREATE INDEX [IDX_LibraryHierarchyItem]
 ON [LibraryHierarchyItems](
     [LibraryHierarchy_Id], 

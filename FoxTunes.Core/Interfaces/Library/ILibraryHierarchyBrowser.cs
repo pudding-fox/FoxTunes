@@ -9,7 +9,7 @@ namespace FoxTunes.Interfaces
 
         event EventHandler FilterChanged;
 
-        IEnumerable<LibraryHierarchyNode> GetRootNodes(LibraryHierarchy libraryHierarchy);
+        IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy);
 
         IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode);
 

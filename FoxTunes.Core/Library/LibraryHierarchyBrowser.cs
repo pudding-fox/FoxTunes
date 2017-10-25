@@ -46,12 +46,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public IEnumerable<LibraryHierarchyNode> GetRootNodes(LibraryHierarchy libraryHierarchy)
+        public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyRootNodes, new[] { "libraryHierarchyId", "filter" }, out parameters))
+            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters))
             {
                 parameters["libraryHierarchyId"] = libraryHierarchy.Id;
+                parameters["libraryHierarchyItemId"] = DBNull.Value;
                 parameters["filter"] = this.GetFilter();
                 return this.GetNodes(command).ToArray();
             }
@@ -60,11 +61,10 @@ namespace FoxTunes
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "displayValue", "filter" }, out parameters))
+            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters))
             {
-                parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
-                parameters["libraryHierarchyLevelId"] = libraryHierarchyNode.LibraryHierarchyLevelId;
-                parameters["displayValue"] = libraryHierarchyNode.Value;
+                parameters["libraryHierarchyId"] = DBNull.Value;
+                parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
                 parameters["filter"] = this.GetFilter();
                 return this.GetNodes(command).ToArray();
             }
@@ -76,11 +76,10 @@ namespace FoxTunes
             {
                 while (reader.Read())
                 {
-                    var libraryHierarchyId = reader.GetInt32(0);
-                    var libraryHierarchyLevelId = reader.GetInt32(1);
-                    var value = reader.GetString(2);
-                    var isLeaf = reader.GetBoolean(3);
-                    var libraryHierarchyNode = new LibraryHierarchyNode(libraryHierarchyId, libraryHierarchyLevelId, value, isLeaf);
+                    var id = reader.GetInt32(0);
+                    var value = reader.GetString(1);
+                    var isLeaf = reader.GetBoolean(2);
+                    var libraryHierarchyNode = new LibraryHierarchyNode(id, value, isLeaf);
                     libraryHierarchyNode.InitializeComponent(this.Core);
                     yield return libraryHierarchyNode;
                 }
@@ -90,11 +89,9 @@ namespace FoxTunes
         public IEnumerable<MetaDataItem> GetMetaData(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyMetaDataItems, new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "displayValue", "type" }, out parameters))
+            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyMetaDataItems, new[] { "libraryHierarchyItemId", "type" }, out parameters))
             {
-                parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
-                parameters["libraryHierarchyLevelId"] = libraryHierarchyNode.LibraryHierarchyLevelId;
-                parameters["displayValue"] = libraryHierarchyNode.Value;
+                parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
                 parameters["type"] = metaDataItemType;
                 return this.GetMetaData(command).ToArray();
             }

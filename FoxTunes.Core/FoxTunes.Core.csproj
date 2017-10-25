@@ -73,6 +73,11 @@
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="Playlist\PlaylistColumn.cs" />
     <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="RootDataQueries.cs" />
     <Compile Include="RootDataSets.cs" />
     <Compile Include="Scripting\ScriptingException.cs" />
@@ -168,11 +173,6 @@
     <Compile Include="Tasks\PlaylistTaskBase.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Utilities\SQL.cs" />
     <Compile Include="Utilities\Templates\LibraryHierarchyViewBuilder.cs">
       <AutoGen>True</AutoGen>
@@ -189,12 +189,6 @@
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="Utilities\Templates\PivotViewBuilder_Logic.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\VariousArtists.sql" />
@@ -225,7 +219,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\GetLibraryHierarchyNodes.sql" />
-    <None Include="Resources\GetLibraryHierarchyRootNodes.sql" />
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
     <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
     <Content Include="Utilities\Templates\LibraryHierarchyViewBuilder.tt">
@@ -240,7 +233,12 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
