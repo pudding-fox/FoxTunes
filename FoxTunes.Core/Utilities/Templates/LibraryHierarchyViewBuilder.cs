@@ -34,7 +34,7 @@ AS
 	WITH ""VerticalMetaData""
 	AS
 	(
-		SELECT ""LibraryItems"".""Id"", ""MetaDataItems"".""Name"", 
+		SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", 
 			CASE 
 				WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN 'Numeric' 
 				WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN 'Text' 
@@ -59,7 +59,7 @@ AS
             #line 32 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 			"VerticalMetaData", 
-			new[] { "Id" }, 
+			new[] { "Id", "FileName" }, 
 			new[] { "Name" }, 
 			new[] { "ValueType", "Value" }, 
 			this.MetaDataNames
@@ -73,10 +73,11 @@ AS
 	SELECT ""LibraryHierarchy_LibraryHierarchyLevel"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_Id"", ""LibraryHierarchyLevels"".""Id"" AS ""LibraryHierarchyLevel_Id"", ""HorizontalMetaData"".""Id"" AS ""LibraryItem_Id"",
 		EXECUTE_SCRIPT
 		(
+			""HorizontalMetaData"".""FileName"",
 			""LibraryHierarchyLevels"".""DisplayScript""
 	");
             
-            #line 47 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 48 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		for(var index = 0; index < this.MetaDataNames.Length; index++)
 		{
@@ -86,31 +87,31 @@ AS
             #line hidden
             this.Write(",\"Key_");
             
-            #line 50 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 51 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 50 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 51 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 50 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 51 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		}
 	
             
             #line default
             #line hidden
-            this.Write("\t\t) AS DisplayValue,\r\n\t\tEXECUTE_SCRIPT\r\n\t\t(\r\n\t\t\t\"LibraryHierarchyLevels\".\"SortScr" +
-                    "ipt\"\r\n\t");
+            this.Write("\t\t) AS DisplayValue,\r\n\t\tEXECUTE_SCRIPT\r\n\t\t(\r\n\t\t\t\"HorizontalMetaData\".\"FileName\",\r" +
+                    "\n\t\t\t\"LibraryHierarchyLevels\".\"SortScript\"\r\n\t");
             
-            #line 57 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 59 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		for(var index = 0; index < this.MetaDataNames.Length; index++)
 		{
@@ -120,21 +121,21 @@ AS
             #line hidden
             this.Write(",\"Key_");
             
-            #line 60 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 62 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 60 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 62 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 60 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 62 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		}
 	

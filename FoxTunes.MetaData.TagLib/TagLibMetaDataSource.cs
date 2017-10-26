@@ -28,17 +28,24 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", this.FileName);
-            var file = File.Create(this.FileName);
-            if (file.PossiblyCorrupt)
+            try
             {
-                foreach (var reason in file.CorruptionReasons)
+                var file = File.Create(this.FileName);
+                if (file.PossiblyCorrupt)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Meta data corruption detected: {0} => {1}", this.FileName, reason);
+                    foreach (var reason in file.CorruptionReasons)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Meta data corruption detected: {0} => {1}", this.FileName, reason);
+                    }
                 }
+                this.AddMetaDatas(file.Tag);
+                this.AddProperties(file.Properties);
+                this.AddImages(file.Tag);
             }
-            this.AddMetaDatas(file.Tag);
-            this.AddProperties(file.Properties);
-            this.AddImages(file.Tag);
+            catch (UnsupportedFormatException)
+            {
+                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", this.FileName);
+            }
             base.InitializeComponent(core);
         }
 

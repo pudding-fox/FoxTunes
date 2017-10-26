@@ -97,14 +97,10 @@ namespace FoxTunes {
         ///   Looks up a localized string similar to WITH &quot;OrderedLibraryItems&quot;
         ///AS
         ///(
-        ///	SELECT  &quot;LibraryItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;SortValue&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;
+        ///	SELECT  &quot;LibraryItems&quot;.&quot;Id&quot;, &quot;LibraryItems&quot;.&quot;DirectoryName&quot;, &quot;LibraryItems&quot;.&quot;FileName&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;SortValue&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;
         ///	FROM  &quot;LibraryItems&quot;
         ///		JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; ON &quot;LibraryItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot;
-        ///		JOIN &quot;LibraryHierarchyItems&quot; ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot; = &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;
-        ///)
-        ///
-        ///INSERT INTO &quot;PlaylistItems&quot; (&quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
-        ///SELECT @seque [rest of string was truncated]&quot;;.
+        ///		JOIN &quot;LibraryHierarchyItems&quot; ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot; = &quot;LibraryHierarchyItems&quot;. [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddLibraryHierarchyNodeToPlaylist {
             get {
@@ -221,7 +217,23 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH RECURSIVE LibraryHierarchy(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;DisplayValue&quot;)
+        ///   Looks up a localized string similar to SELECT &quot;Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
+        ///FROM &quot;LibraryHierarchyItems&quot;
+        ///JOIN LibraryHierarchyParents ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = LibraryHierarchyParents.&quot;Root&quot;
+        ///WHERE (@libraryHierarchyId IS NULL OR &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId)
+        ///	AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
+        ///ORDER BY &quot;SortValue&quot;, &quot;DisplayValue&quot;.
+        /// </summary>
+        internal static string GetLibraryHierarchyNodes {
+            get {
+                return ResourceManager.GetString("GetLibraryHierarchyNodes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WITH RECURSIVE 
+        ///
+        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;DisplayValue&quot;)
         ///AS
         ///(
         ///	SELECT &quot;Id&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;DisplayValue&quot;
@@ -229,16 +241,14 @@ namespace FoxTunes {
         ///	UNION ALL 
         ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;
         ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///		JOIN LibraryHierarchy ON &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = LibraryHierarchy.&quot;Id&quot;
-        ///)
+        ///		JOIN LibraryHierarchyParents ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = LibraryHierarchyParents.&quot;Parent_Id&quot;
+        ///),
         ///
-        ///SELECT &quot;Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
-        ///FROM &quot;LibraryHierarchyItems&quot;
-        ///WHERE (@libraryHiera [rest of string was truncated]&quot;;.
+        ///LibraryHierarchyChildren(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;DisplayVal [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string GetLibraryHierarchyNodes {
+        internal static string GetLibraryHierarchyNodesWithFilter {
             get {
-                return ResourceManager.GetString("GetLibraryHierarchyNodes", resourceCulture);
+                return ResourceManager.GetString("GetLibraryHierarchyNodesWithFilter", resourceCulture);
             }
         }
         

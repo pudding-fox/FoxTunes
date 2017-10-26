@@ -12,9 +12,10 @@ namespace FoxTunes
             this.MetaDatas = new ObservableCollection<MetaDataItem>();
         }
 
-        public LibraryHierarchyNode(int id, string value, bool isLeaf)
+        public LibraryHierarchyNode(int id, int libraryHierarchyId, string value, bool isLeaf)
         {
             this.Id = id;
+            this.LibraryHierarchyId = libraryHierarchyId;
             this.Value = value;
             if (this.IsLeaf = isLeaf)
             {
@@ -29,6 +30,8 @@ namespace FoxTunes
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public int Id { get; private set; }
+
+        public int LibraryHierarchyId { get; private set; }
 
         public string Value { get; private set; }
 
