@@ -98,9 +98,10 @@ SET "Parent_Id" =
 	JOIN "LibraryHierarchy" AS "LibraryHierarchy_Copy" ON "LibraryHierarchy_Copy"."LibraryHierarchy_Id" = "LibraryHierarchyItems_Copy"."LibraryHierarchy_Id"
 		AND "LibraryHierarchy_Copy"."LibraryHierarchyLevel_Id" = 
 		(
-			SELECT MAX("Id") 
+			SELECT MAX("LibraryHierarchyLevels"."Id") 
 			FROM "LibraryHierarchyLevels" 
-			WHERE "Id" < "LibraryHierarchy"."LibraryHierarchyLevel_Id"
+				JOIN "LibraryHierarchy_LibraryHierarchyLevel" ON "LibraryHierarchyLevels"."Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id"
+			WHERE "LibraryHierarchyLevels"."Id" < "LibraryHierarchy"."LibraryHierarchyLevel_Id" AND "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" = "LibraryHierarchy"."LibraryHierarchy_Id" 
 		)
 		AND "LibraryHierarchy_Copy"."LibraryItem_Id" = "LibraryHierarchy"."LibraryItem_Id"
 		AND "LibraryHierarchy_Copy"."DisplayValue" = "LibraryHierarchyItems_Copy"."DisplayValue"
