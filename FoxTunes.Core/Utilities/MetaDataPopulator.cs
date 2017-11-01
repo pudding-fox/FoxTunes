@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -51,7 +52,7 @@ namespace FoxTunes
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
 
-            fileDatas.AsParallel().ForAll(fileData =>
+            Parallel.ForEach(fileDatas, this.ParallelOptions, fileData =>
             {
                 Logger.Write(this, LogLevel.Debug, "Populating meta data for file data: {0} => {1}", fileData.Id, fileData.FileName);
 
@@ -91,7 +92,7 @@ namespace FoxTunes
             }
             return this.Command.Value = new MetaDataPopulatorCommand(this.DatabaseContext, this.Transaction, this.Prefix);
         }
-        
+
         protected override void OnDisposing()
         {
             foreach (var command in this.Command.Values)
