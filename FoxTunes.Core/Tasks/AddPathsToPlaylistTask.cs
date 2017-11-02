@@ -69,7 +69,7 @@ namespace FoxTunes
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(Resources.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
+            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
                 command.Transaction = transaction;
                 var sequence = 1;
@@ -107,7 +107,7 @@ namespace FoxTunes
 
         private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(databaseContext, transaction, "Playlist"))
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Playlist"))
             {
                 var query = databaseContext.GetQuery<PlaylistItem>().Detach().Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
                 metaDataPopulator.InitializeComponent(this.Core);

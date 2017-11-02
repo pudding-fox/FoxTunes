@@ -45,6 +45,7 @@
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
+    <Compile Include="Interfaces\Database\ICoreSQL.cs" />
     <Compile Include="Interfaces\Database\IDatabaseContext.cs" />
     <Compile Include="Interfaces\IDbParameterCollection.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
@@ -73,11 +74,6 @@
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="Playlist\PlaylistColumn.cs" />
     <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
     <Compile Include="RootDataQueries.cs" />
     <Compile Include="RootDataSets.cs" />
     <Compile Include="Scripting\ScriptingException.cs" />
@@ -194,38 +190,6 @@
     <Compile Include="Utilities\Templates\PivotViewBuilder_Logic.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\VariousArtists.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AddLibraryItem.sql" />
-    <None Include="Resources\ClearPlaylist.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AddMetaDataItems.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AddImageItems.sql" />
-    <None Include="Resources\AddPropertyItems.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\CopyMetaDataItems.sql" />
-    <None Include="Resources\SetLibraryItemStatus.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ShiftPlaylistItems.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AddPlaylistItem.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SetPlaylistItemStatus.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GetLibraryHierarchyNodes.sql" />
-    <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
-    <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
-    <None Include="Resources\GetLibraryHierarchyNodesWithFilter.sql" />
-    <None Include="Resources\AddLibraryHierarchyRecord.sql" />
     <Content Include="Utilities\Templates\LibraryHierarchyBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
@@ -237,12 +201,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

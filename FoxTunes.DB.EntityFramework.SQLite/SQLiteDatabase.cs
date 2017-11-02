@@ -86,6 +86,14 @@ namespace FoxTunes
             }
         }
 
+        public override ICoreSQL CoreSQL
+        {
+            get
+            {
+                return SQLiteCoreSQL.Instance;
+            }
+        }
+
         private static DbConnection Connection { get; set; }
 
         public override DbConnection CreateConnection()

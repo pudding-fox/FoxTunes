@@ -1,8 +1,8 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System;
 using System.Text;
 
 namespace FoxTunes
@@ -10,6 +10,8 @@ namespace FoxTunes
     public class LibraryHierarchyBrowser : StandardComponent, ILibraryHierarchyBrowser
     {
         public ICore Core { get; private set; }
+
+        public IDatabase Database { get; private set; }
 
         public IDataManager DataManager { get; private set; }
 
@@ -42,6 +44,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.Database = core.Components.Database;
             this.DataManager = core.Managers.Data;
             base.InitializeComponent(core);
         }
@@ -68,11 +71,11 @@ namespace FoxTunes
             var parameters = default(IDbParameterCollection);
             if (string.IsNullOrEmpty(this.Filter))
             {
-                command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId" }, out parameters);
+                command = this.DataManager.ReadContext.Connection.CreateCommand(this.Database.CoreSQL.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId" }, out parameters);
             }
             else
             {
-                command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodesWithFilter, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters);
+                command = this.DataManager.ReadContext.Connection.CreateCommand(this.Database.CoreSQL.GetLibraryHierarchyNodesWithFilter, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters);
                 parameters["filter"] = this.GetFilter();
             }
             parameters["libraryHierarchyId"] = libraryHierarchyId;
@@ -100,7 +103,7 @@ namespace FoxTunes
         public IEnumerable<MetaDataItem> GetMetaData(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyMetaDataItems, new[] { "libraryHierarchyItemId", "type" }, out parameters))
+            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(this.Database.CoreSQL.GetLibraryHierarchyMetaDataItems, new[] { "libraryHierarchyItemId", "type" }, out parameters))
             {
                 parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
                 parameters["type"] = metaDataItemType;

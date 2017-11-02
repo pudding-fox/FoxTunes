@@ -64,6 +64,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SQLiteCoreSQL.cs" />
     <Compile Include="SQLiteDatabase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -98,7 +99,55 @@
     <None Include="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\x86\SQLite.Interop.dll">
       <Link>lib\x86\SQLite.Interop.dll</Link>
     </None>
-    <None Include="Database.sql" />
+    <None Include="Resources\Database.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddImageItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddLibraryHierarchyRecord.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddLibraryItem.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddMetaDataItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddPlaylistItem.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddPropertyItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ClearPlaylist.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CopyMetaDataItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GetLibraryHierarchyNodes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GetLibraryHierarchyNodesWithFilter.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SetLibraryItemStatus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SetPlaylistItemStatus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ShiftPlaylistItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VariousArtists.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets')" />

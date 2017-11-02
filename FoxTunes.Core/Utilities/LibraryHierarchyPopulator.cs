@@ -1,10 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Data;
-using System.Threading;
-using System.Linq;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -18,12 +18,15 @@ namespace FoxTunes
             this.Command = new ThreadLocal<LibraryHierarchyPopulatorCommand>(true);
         }
 
-        public LibraryHierarchyPopulator(IDatabaseContext databaseContext, IDbTransaction transaction)
+        public LibraryHierarchyPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction)
             : this()
         {
+            this.Database = database;
             this.DatabaseContext = databaseContext;
             this.Transaction = transaction;
         }
+
+        public IDatabase Database { get; private set; }
 
         public IDatabaseContext DatabaseContext { get; private set; }
 
@@ -113,7 +116,7 @@ namespace FoxTunes
             {
                 return this.Command.Value;
             }
-            return this.Command.Value = new LibraryHierarchyPopulatorCommand(this.ScriptingRuntime, this.DatabaseContext, this.Transaction);
+            return this.Command.Value = new LibraryHierarchyPopulatorCommand(this.ScriptingRuntime, this.Database, this.DatabaseContext, this.Transaction);
         }
 
         protected override void OnDisposing()
@@ -128,12 +131,12 @@ namespace FoxTunes
 
         private class LibraryHierarchyPopulatorCommand : BaseComponent
         {
-            public LibraryHierarchyPopulatorCommand(IScriptingRuntime scriptingRuntime, IDatabaseContext databaseContext, IDbTransaction transaction)
+            public LibraryHierarchyPopulatorCommand(IScriptingRuntime scriptingRuntime, IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction)
             {
                 this.ScriptingContext = scriptingRuntime.CreateContext();
                 var parameters = default(IDbParameterCollection);
                 this.Command = databaseContext.Connection.CreateCommand(
-                    Resources.AddLibraryHierarchyRecord,
+                    database.CoreSQL.AddLibraryHierarchyRecord,
                     new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "libraryItemId", "displayValue", "sortValue", "isLeaf" },
                     out parameters
                 );
