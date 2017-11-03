@@ -8,25 +8,17 @@ namespace FoxTunes
     {
         public const string ID = "4E0DD392-1138-4DA8-84C2-69B27D1E34EA";
 
-        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode) : base(ID)
+        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode) : base(ID, sequence)
         {
-            this.Sequence = sequence;
             this.LibraryHierarchyNode = libraryHierarchyNode;
         }
 
-        public int Sequence { get; private set; }
-
-        public int Offset { get; private set; }
-
         public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
-
-        public ICore Core { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Core = core;
             this.PlaybackManager = core.Managers.Playback;
             base.InitializeComponent(core);
         }
@@ -38,7 +30,7 @@ namespace FoxTunes
                 using (var transaction = databaseContext.Connection.BeginTransaction())
                 {
                     this.AddPlaylistItems(databaseContext, transaction);
-                    this.ShiftItems(databaseContext, transaction, this.Sequence, this.Offset);
+                    this.ShiftItems(databaseContext, transaction);
                     this.AddOrUpdateMetaData(databaseContext, transaction);
                     this.SetPlaylistItemsStatus(databaseContext, transaction);
                     transaction.Commit();

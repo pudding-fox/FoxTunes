@@ -61,6 +61,31 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///  var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist];
+        ///
+        ///  if (tag.album) {
+        ///    parts.push(tag.album);
+        ///  }
+        ///
+        ///  if (tag.disccount != 1 &amp;&amp; tag.disc) {
+        ///    parts.push(tag.disc);
+        ///  }
+        ///
+        ///  if (tag.track) {
+        ///    parts.push(zeropad(tag.track, 2));
+        ///  }
+        ///
+        ///  return parts.join(&quot; - &quot;);
+        ///})();.
+        /// </summary>
+        internal static string PlaylistSortValues {
+            get {
+                return ResourceManager.GetString("PlaylistSortValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to function timestamp(value) {
         ///    var s = parseInt((value / 1000) % 60);
         ///    var m = parseInt((value / (1000 * 60)) % 60);
@@ -74,17 +99,20 @@ namespace FoxTunes {
         ///        }
         ///        parts.push(h);
         ///    }
-        ///    if (m &gt; 0) {
-        ///        if (m &lt; 10) {
-        ///            m = &quot;0&quot; + m;
-        ///        }
-        ///        parts.push(m);
+        ///
+        ///    if (m &lt; 10) {
+        ///        m = &quot;0&quot; + m;
         ///    }
-        ///    if (s &gt; 0) {
-        ///        if (s &lt; 10) {
-        ///            s = &quot;0&quot; + s;
-        ///        }
-        ///        par [rest of string was truncated]&quot;;.
+        ///    parts.push(m);
+        ///    if (s &lt; 10) {
+        ///        s = &quot;0&quot; + s;
+        ///    }
+        ///    parts.push(s);
+        ///
+        ///    return parts.join(&quot;:&quot;);
+        ///}
+        ///
+        ///function zeropad(value,  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string utils {
             get {

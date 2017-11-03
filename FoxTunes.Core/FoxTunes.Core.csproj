@@ -58,6 +58,7 @@
     <Compile Include="Interfaces\Managers\IDataManager.cs" />
     <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
+    <Compile Include="Interfaces\Scripting\ICoreScripts.cs" />
     <Compile Include="Interfaces\Signal\ISignal.cs" />
     <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
     <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
@@ -171,6 +172,7 @@
     <Compile Include="Tasks\PlaylistTaskBase.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
+    <Compile Include="Utilities\PlaylistSequencePopulator.cs" />
     <Compile Include="Utilities\PopulatorBase.cs" />
     <Compile Include="Utilities\SQL.cs" />
     <Compile Include="Utilities\Templates\LibraryHierarchyBuilder.cs">
@@ -188,6 +190,12 @@
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="Utilities\Templates\PivotViewBuilder_Logic.cs" />
+    <Compile Include="Utilities\Templates\PlaylistSequenceBuilder.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PlaylistSequenceBuilder.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\Templates\PlaylistSequenceBuilder_Logic.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Utilities\Templates\LibraryHierarchyBuilder.tt">
@@ -197,6 +205,10 @@
     <Content Include="Utilities\Templates\PivotViewBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>PivotViewBuilder.cs</LastGenOutput>
+    </Content>
+    <Content Include="Utilities\Templates\PlaylistSequenceBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PlaylistSequenceBuilder.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

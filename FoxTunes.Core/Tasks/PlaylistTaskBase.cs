@@ -5,10 +5,17 @@ namespace FoxTunes
 {
     public abstract class PlaylistTaskBase : BackgroundTask
     {
-        protected PlaylistTaskBase(string id)
+        protected PlaylistTaskBase(string id, int sequence = 0)
             : base(id)
         {
+            this.Sequence = sequence;
         }
+
+        public int Sequence { get; private set; }
+
+        public int Offset { get; protected set; }
+
+        public ICore Core { get; private set; }
 
         public IDataManager DataManager { get; private set; }
 
@@ -16,15 +23,19 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IScriptingRuntime ScriptingRuntime { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.DataManager = core.Managers.Data;
             this.Database = core.Components.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
+            this.ScriptingRuntime = core.Components.ScriptingRuntime;
             base.InitializeComponent(core);
         }
 
-        protected virtual void ShiftItems(IDatabaseContext context, IDbTransaction transaction, int sequence, int offset)
+        protected virtual void ShiftItems(IDatabaseContext context, IDbTransaction transaction)
         {
             this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
@@ -32,8 +43,8 @@ namespace FoxTunes
             {
                 command.Transaction = transaction;
                 parameters["status"] = PlaylistItemStatus.None;
-                parameters["sequence"] = sequence;
-                parameters["offset"] = offset;
+                parameters["sequence"] = this.Sequence;
+                parameters["offset"] = this.Offset;
                 command.ExecuteNonQuery();
             }
         }

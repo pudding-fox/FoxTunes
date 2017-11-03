@@ -24,7 +24,8 @@ SET "Sequence" = "Sequence" +
 	FROM "PlaylistItems" AS "PlaylistItems_Copy"
 	WHERE "PlaylistItems_Copy"."Id" < "PlaylistItems"."Id" 
 		AND "Status" = @status
-);
+)
+WHERE "Status" = @status;
 
 SELECT COUNT(*)
 FROM "PlaylistItems"

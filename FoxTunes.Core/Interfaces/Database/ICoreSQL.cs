@@ -8,6 +8,8 @@
 
         string AddLibraryHierarchyRecord { get; }
 
+        string AddPlaylistSequenceRecord { get; }
+
         string AddLibraryItem { get; }
 
         string AddMetaDataItems { get; }

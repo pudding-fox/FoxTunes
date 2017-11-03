@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JSCoreScripts.cs" />
     <Compile Include="JSScriptingContext.cs" />
     <Compile Include="JSScriptingRuntime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -111,6 +112,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\utils.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\PlaylistSortValues.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

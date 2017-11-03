@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Utilities.Templates;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,9 +14,8 @@ namespace FoxTunes
         public const string ID = "7B564369-A6A0-4BAF-8C99-08AF27908591";
 
         public AddPathsToPlaylistTask(int sequence, IEnumerable<string> paths)
-            : base(ID)
+            : base(ID, sequence)
         {
-            this.Sequence = sequence;
             this.Paths = paths;
         }
 
@@ -27,13 +27,7 @@ namespace FoxTunes
             }
         }
 
-        public int Sequence { get; private set; }
-
-        public int Offset { get; private set; }
-
         public IEnumerable<string> Paths { get; private set; }
-
-        public ICore Core { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -41,7 +35,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Core = core;
             this.PlaybackManager = core.Managers.Playback;
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             base.InitializeComponent(core);
@@ -54,8 +47,9 @@ namespace FoxTunes
                 using (var transaction = databaseContext.Connection.BeginTransaction())
                 {
                     this.AddPlaylistItems(databaseContext, transaction);
-                    this.ShiftItems(databaseContext, transaction, this.Sequence, this.Offset);
+                    this.ShiftItems(databaseContext, transaction);
                     this.AddOrUpdateMetaData(databaseContext, transaction);
+                    this.SequenceItems(databaseContext, transaction);
                     this.SetPlaylistItemsStatus(databaseContext, transaction);
                     transaction.Commit();
                 }
@@ -72,18 +66,19 @@ namespace FoxTunes
             using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
                 command.Transaction = transaction;
-                var sequence = 1;
+                var count = 1;
                 var addPlaylistItem = new Action<string>(fileName =>
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
                     {
                         return;
                     }
-                    parameters["sequence"] = this.Sequence + sequence++;
                     parameters["directoryName"] = Path.GetDirectoryName(fileName);
                     parameters["fileName"] = fileName;
+                    parameters["sequence"] = this.Sequence;
                     parameters["status"] = PlaylistItemStatus.Import;
                     command.ExecuteNonQuery();
+                    count++;
                 });
                 foreach (var path in this.Paths)
                 {
@@ -101,7 +96,7 @@ namespace FoxTunes
                         addPlaylistItem(path);
                     }
                 }
-                this.Offset = sequence;
+                this.Offset = count;
             }
         }
 
@@ -116,6 +111,38 @@ namespace FoxTunes
                 metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
                 metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
                 metaDataPopulator.Populate(query);
+            }
+        }
+
+        protected virtual void SequenceItems(IDatabaseContext databaseContext, IDbTransaction transaction)
+        {
+            var metaDataNames =
+                from metaDataItem in databaseContext.GetQuery<MetaDataItem>().Detach()
+                group metaDataItem by metaDataItem.Name into name
+                select name.Key;
+            var libraryHierarchyBuilder = new PlaylistSequenceBuilder(metaDataNames);
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(libraryHierarchyBuilder.TransformText(), new[] { "status" }, out parameters))
+            {
+                command.Transaction = transaction;
+                parameters["status"] = PlaylistItemStatus.Import;
+                using (var reader = EnumerableDataReader.Create(command.ExecuteReader()))
+                {
+                    this.SequenceItems(databaseContext, transaction, reader);
+                }
+            }
+        }
+
+        protected virtual void SequenceItems(IDatabaseContext databaseContext, IDbTransaction transaction, EnumerableDataReader reader)
+        {
+            using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, databaseContext, transaction))
+            {
+                playlistSequencePopulator.InitializeComponent(this.Core);
+                playlistSequencePopulator.NameChanged += (sender, e) => this.Name = playlistSequencePopulator.Name;
+                playlistSequencePopulator.DescriptionChanged += (sender, e) => this.Description = playlistSequencePopulator.Description;
+                playlistSequencePopulator.PositionChanged += (sender, e) => this.Position = playlistSequencePopulator.Position;
+                playlistSequencePopulator.CountChanged += (sender, e) => this.Count = playlistSequencePopulator.Count;
+                playlistSequencePopulator.Populate(reader);
             }
         }
     }
