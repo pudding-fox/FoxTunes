@@ -106,6 +106,7 @@
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
+    <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryHierarchies.cs" />
     <Compile Include="ViewModel\Log.cs" />

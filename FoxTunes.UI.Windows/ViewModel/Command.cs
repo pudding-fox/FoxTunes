@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -67,6 +68,11 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.Action();
+        }
+
+        public static void InvalidateRequerySuggested()
+        {
+            ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().Run(() => CommandManager.InvalidateRequerySuggested());
         }
 
         public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);
