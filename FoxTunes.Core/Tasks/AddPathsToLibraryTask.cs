@@ -30,8 +30,6 @@ namespace FoxTunes
 
         public IEnumerable<string> Paths { get; private set; }
 
-        public IEnumerable<string> FileNames { get; private set; }
-
         public ICore Core { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
