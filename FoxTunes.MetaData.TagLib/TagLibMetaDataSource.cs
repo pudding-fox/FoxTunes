@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using TagLib;
 
@@ -8,6 +9,8 @@ namespace FoxTunes
 {
     public class TagLibMetaDataSource : BaseComponent, IMetaDataSource
     {
+        private static readonly TimeSpan FILE_STORE_LOCK_TIMEOUT = TimeSpan.FromSeconds(10);
+
         public static MetaDataCategory Categories = MetaDataCategory.Standard | MetaDataCategory.First;
 
         private TagLibMetaDataSource()
@@ -225,18 +228,34 @@ namespace FoxTunes
             foreach (var value in values)
             {
                 var id = global::System.IO.Path.GetDirectoryName(this.FileName);
-                var fileName = default(string);
-                if (!FileMetaDataStore.Exists(id, out fileName))
-                {
-                    Logger.Write(this, LogLevel.Trace, "Extracted image from meta data: {0} => {1}", this.FileName, fileName);
-                    fileName = await FileMetaDataStore.Write(id, value.Data.Data);
-                }
-                else
-                {
-                    Logger.Write(this, LogLevel.Trace, "Re-using image from store: {0} => {1}", this.FileName, fileName);
-                }
-                this.AddImage(fileName, value);
+                this.AddImage(await this.AddImage(value, id), value);
             }
+        }
+
+        private async Task<string> AddImage(IPicture value, string id)
+        {
+            var fileName = default(string);
+            if (!FileMetaDataStore.Exists(id, out fileName))
+            {
+                if (!Monitor.TryEnter(FileMetaDataStore.SyncRoot, FILE_STORE_LOCK_TIMEOUT))
+                {
+                    throw new TimeoutException("Timed out while attempting to synchronize file store.");
+                }
+                try
+                {
+                    if (!FileMetaDataStore.Exists(id, out fileName))
+                    {
+                        Logger.Write(this, LogLevel.Trace, "Extracted image from meta data: {0} => {1}", this.FileName, fileName);
+                        return await FileMetaDataStore.Write(id, value.Data.Data);
+                    }
+                }
+                finally
+                {
+                    Monitor.Exit(FileMetaDataStore.SyncRoot);
+                }
+            }
+            Logger.Write(this, LogLevel.Trace, "Re-using image from store: {0} => {1}", this.FileName, fileName);
+            return fileName;
         }
 
         private void AddImage(string fileName, IPicture value)
