@@ -1,6 +1,10 @@
 ﻿(function () {
   var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist];
 
+  if (tag.year) {
+      parts.push(tag.year);
+  }
+
   if (tag.album) {
     parts.push(tag.album);
   }

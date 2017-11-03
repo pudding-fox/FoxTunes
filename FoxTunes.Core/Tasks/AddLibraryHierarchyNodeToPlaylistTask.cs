@@ -32,6 +32,7 @@ namespace FoxTunes
                     this.AddPlaylistItems(databaseContext, transaction);
                     this.ShiftItems(databaseContext, transaction);
                     this.AddOrUpdateMetaData(databaseContext, transaction);
+                    this.SequenceItems(databaseContext, transaction);
                     this.SetPlaylistItemsStatus(databaseContext, transaction);
                     transaction.Commit();
                 }

@@ -13,12 +13,14 @@ namespace FoxTunes
     {
         public readonly object SyncRoot = new object();
 
-        private MetaDataPopulator()
+        private MetaDataPopulator(bool reportProgress)
+            : base(reportProgress)
         {
             this.Command = new ThreadLocal<MetaDataPopulatorCommand>(true);
         }
 
-        public MetaDataPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, string prefix) : this()
+        public MetaDataPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, string prefix, bool reportProgress)
+            : this(reportProgress)
         {
             this.Database = database;
             this.DatabaseContext = databaseContext;
@@ -48,9 +50,12 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Begin populating meta data.");
 
-            this.Name = "Populating meta data";
-            this.Position = 0;
-            this.Count = fileDatas.Count();
+            if (this.ReportProgress)
+            {
+                this.Name = "Populating meta data";
+                this.Position = 0;
+                this.Count = fileDatas.Count();
+            }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
@@ -74,16 +79,18 @@ namespace FoxTunes
                     command.Command.ExecuteNonQuery();
                 }
 
-                if (position % interval == 0)
+                if (this.ReportProgress)
                 {
-                    lock (this.SyncRoot)
+                    if (position % interval == 0)
                     {
-                        this.Description = new FileInfo(fileData.FileName).Name;
-                        this.Position = position;
+                        lock (this.SyncRoot)
+                        {
+                            this.Description = new FileInfo(fileData.FileName).Name;
+                            this.Position = position;
+                        }
                     }
+                    Interlocked.Increment(ref position);
                 }
-
-                Interlocked.Increment(ref position);
             });
         }
 

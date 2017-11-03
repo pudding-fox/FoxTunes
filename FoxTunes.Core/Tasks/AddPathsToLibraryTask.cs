@@ -102,7 +102,7 @@ namespace FoxTunes
 
         private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Library"))
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Library", true))
             {
                 var query = databaseContext.GetQuery<LibraryItem>().Detach().Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import);
                 metaDataPopulator.InitializeComponent(this.Core);

@@ -13,13 +13,14 @@ namespace FoxTunes
     {
         public readonly object SyncRoot = new object();
 
-        private LibraryHierarchyPopulator()
+        private LibraryHierarchyPopulator(bool reportProgress)
+            : base(reportProgress)
         {
             this.Command = new ThreadLocal<LibraryHierarchyPopulatorCommand>(true);
         }
 
-        public LibraryHierarchyPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction)
-            : this()
+        public LibraryHierarchyPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, bool reportProgress)
+            : this(reportProgress)
         {
             this.Database = database;
             this.DatabaseContext = databaseContext;
@@ -44,14 +45,18 @@ namespace FoxTunes
 
         public void Populate(EnumerableDataReader reader)
         {
-            this.Name = "Populating library hierarchies";
-            this.Position = 0;
-            this.Count = (
-                this.DatabaseContext.GetQuery<LibraryHierarchyLevel>().Detach().Count() * this.DatabaseContext.GetQuery<LibraryItem>().Detach().Count()
-            );
+            if (this.ReportProgress)
+            {
+                this.Name = "Populating library hierarchies";
+                this.Position = 0;
+                this.Count = (
+                    this.DatabaseContext.GetQuery<LibraryHierarchyLevel>().Detach().Count() * this.DatabaseContext.GetQuery<LibraryItem>().Detach().Count()
+                );
+            }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
+
             Parallel.ForEach(reader, this.ParallelOptions, record =>
             {
                 var command = this.GetOrAddCommand();
@@ -63,17 +68,19 @@ namespace FoxTunes
                 command.Parameters["isLeaf"] = record["IsLeaf"];
                 command.Command.ExecuteNonQuery();
 
-                if (position % interval == 0)
+                if (this.ReportProgress)
                 {
-                    lock (this.SyncRoot)
+                    if (position % interval == 0)
                     {
-                        var fileName = record["FileName"] as string;
-                        this.Description = new FileInfo(fileName).Name;
-                        this.Position = position;
+                        lock (this.SyncRoot)
+                        {
+                            var fileName = record["FileName"] as string;
+                            this.Description = new FileInfo(fileName).Name;
+                            this.Position = position;
+                        }
                     }
+                    Interlocked.Increment(ref position);
                 }
-
-                Interlocked.Increment(ref position);
             });
         }
 

@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.Utilities.Templates;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -102,7 +101,7 @@ namespace FoxTunes
 
         private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Playlist"))
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Playlist", true))
             {
                 var query = databaseContext.GetQuery<PlaylistItem>().Detach().Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
                 metaDataPopulator.InitializeComponent(this.Core);
@@ -111,38 +110,6 @@ namespace FoxTunes
                 metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
                 metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
                 metaDataPopulator.Populate(query);
-            }
-        }
-
-        protected virtual void SequenceItems(IDatabaseContext databaseContext, IDbTransaction transaction)
-        {
-            var metaDataNames =
-                from metaDataItem in databaseContext.GetQuery<MetaDataItem>().Detach()
-                group metaDataItem by metaDataItem.Name into name
-                select name.Key;
-            var libraryHierarchyBuilder = new PlaylistSequenceBuilder(metaDataNames);
-            var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(libraryHierarchyBuilder.TransformText(), new[] { "status" }, out parameters))
-            {
-                command.Transaction = transaction;
-                parameters["status"] = PlaylistItemStatus.Import;
-                using (var reader = EnumerableDataReader.Create(command.ExecuteReader()))
-                {
-                    this.SequenceItems(databaseContext, transaction, reader);
-                }
-            }
-        }
-
-        protected virtual void SequenceItems(IDatabaseContext databaseContext, IDbTransaction transaction, EnumerableDataReader reader)
-        {
-            using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, databaseContext, transaction))
-            {
-                playlistSequencePopulator.InitializeComponent(this.Core);
-                playlistSequencePopulator.NameChanged += (sender, e) => this.Name = playlistSequencePopulator.Name;
-                playlistSequencePopulator.DescriptionChanged += (sender, e) => this.Description = playlistSequencePopulator.Description;
-                playlistSequencePopulator.PositionChanged += (sender, e) => this.Position = playlistSequencePopulator.Position;
-                playlistSequencePopulator.CountChanged += (sender, e) => this.Count = playlistSequencePopulator.Count;
-                playlistSequencePopulator.Populate(reader);
             }
         }
     }

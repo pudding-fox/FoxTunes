@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Utilities.Templates;
 using System.Data;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -46,6 +48,34 @@ namespace FoxTunes
                 parameters["sequence"] = this.Sequence;
                 parameters["offset"] = this.Offset;
                 command.ExecuteNonQuery();
+            }
+        }
+
+        protected virtual void SequenceItems(IDatabaseContext databaseContext, IDbTransaction transaction)
+        {
+            var metaDataNames =
+                from metaDataItem in databaseContext.GetQuery<MetaDataItem>().Detach()
+                group metaDataItem by metaDataItem.Name into name
+                select name.Key;
+            var libraryHierarchyBuilder = new PlaylistSequenceBuilder(metaDataNames);
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(libraryHierarchyBuilder.TransformText(), new[] { "status" }, out parameters))
+            {
+                command.Transaction = transaction;
+                parameters["status"] = PlaylistItemStatus.Import;
+                using (var reader = EnumerableDataReader.Create(command.ExecuteReader()))
+                {
+                    this.SequenceItems(databaseContext, transaction, reader);
+                }
+            }
+        }
+
+        protected virtual void SequenceItems(IDatabaseContext databaseContext, IDbTransaction transaction, EnumerableDataReader reader)
+        {
+            using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, databaseContext, transaction, false))
+            {
+                playlistSequencePopulator.InitializeComponent(this.Core);
+                playlistSequencePopulator.Populate(reader);
             }
         }
 
