@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -173,6 +175,42 @@ namespace FoxTunes.ViewModel
                     this.ForegroundTaskRunner.Run(this.Reload);
                     break;
             }
+        }
+
+        public ICommand DragEnterCommand
+        {
+            get
+            {
+                return new Command<DragEventArgs>(this.OnDragEnter);
+            }
+        }
+
+        protected virtual void OnDragEnter(DragEventArgs e)
+        {
+            var effects = DragDropEffects.None;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                effects = DragDropEffects.Copy;
+            }
+            e.Effects = effects;
+        }
+
+        public ICommand DropCommand
+        {
+            get
+            {
+                return new AsyncCommand<DragEventArgs>(this.OnDrop);
+            }
+        }
+
+        protected virtual Task OnDrop(DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
+                return this.Core.Managers.Library.Add(paths);
+            }
+            return Task.CompletedTask;
         }
 
         protected override Freezable CreateInstanceCore()
