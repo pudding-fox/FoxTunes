@@ -1,7 +1,0 @@
-﻿{
-    "components": {
-        "database": "SqliteDatabase",
-        "userInterface": "WindowsUserInterface",
-        "output": "GStreamerOutput"
-    }
-}
