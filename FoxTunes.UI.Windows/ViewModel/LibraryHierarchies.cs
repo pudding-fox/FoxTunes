@@ -145,11 +145,23 @@ namespace FoxTunes.ViewModel
 
         public void Update()
         {
-            if (this.SelectedHierarchy.Id == 0 && this.SelectedHierarchyLevel != null)
+            this.AddOrUpdateLibraryHierarchy();
+        }
+
+        private void AddOrUpdateLibraryHierarchy()
+        {
+            if (this.SelectedHierarchy == null)
             {
                 return;
             }
-            this.DatabaseContext.GetSet<LibraryHierarchyLevel>().Update(this.SelectedHierarchyLevel);
+            if (this.SelectedHierarchy.Id == 0)
+            {
+                this.DatabaseContext.Sets.LibraryHierarchy.Add(this.SelectedHierarchy);
+            }
+            else
+            {
+                this.DatabaseContext.Sets.LibraryHierarchy.Update(this.SelectedHierarchy);
+            }
         }
 
         public ICommand SaveCommand
@@ -162,7 +174,7 @@ namespace FoxTunes.ViewModel
 
         public void Save()
         {
-            this.DatabaseContext.SaveChanges();
+            this.DatabaseContext.WithAutoDetectChanges(() => this.DatabaseContext.SaveChanges());
             this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
