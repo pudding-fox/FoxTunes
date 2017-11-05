@@ -11,6 +11,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         private MetaDataItem _Image { get; set; }
 
         public MetaDataItem Image

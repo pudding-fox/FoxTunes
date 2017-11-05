@@ -1,14 +1,32 @@
-﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-        xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
-        xmlns:Windows="clr-namespace:FoxTunes" 
-        x:Class="FoxTunes.Main"
-        mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="Fox Tunes" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico" 
-        Loaded="OnLoaded" Closed="OnClosed">
+﻿<UserControl x:Class="FoxTunes.Main"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
+        <Style x:Key="LibraryStyle" TargetType="{x:Type Windows:Library}">
+            <Setter Property="Visibility" Value="Visible"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ArtworkStyle" TargetType="{x:Type Windows:Artwork}">
+            <Setter Property="Visibility" Value="Visible"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ShowArtwork.Value, Source={StaticResource ViewModel}}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -21,20 +39,37 @@
         </Grid.RowDefinitions>
         <Grid Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".35*"></ColumnDefinition>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="{x:Type ColumnDefinition}">
+                            <Setter Property="Width" Value=".35*"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
+                                    <Setter Property="Width" Value="0"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
-            <Windows:Library></Windows:Library>
-            <Windows:Artwork Grid.Row="1"></Windows:Artwork>
-            <Windows:BackgroundTasks Grid.RowSpan="2" VerticalAlignment="Bottom"></Windows:BackgroundTasks>
+            <Windows:Library Style="{StaticResource LibraryStyle}"></Windows:Library>
+            <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}"></Windows:Artwork>
             <Windows:Playlist Grid.Column="1" Grid.RowSpan="2"></Windows:Playlist>
+            <Grid Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalAlignment="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".35*"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Windows:BackgroundTasks ></Windows:BackgroundTasks>
+            </Grid>
         </Grid>
         <Windows:Playback Grid.Row="1" ></Windows:Playback>
         <Windows:StreamPosition Grid.Column="1" Grid.Row="1"></Windows:StreamPosition>
         <Windows:Settings Grid.Column="2" Grid.Row="1"></Windows:Settings>
     </Grid>
-</Window>
+</UserControl>

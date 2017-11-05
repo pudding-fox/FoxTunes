@@ -62,7 +62,7 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     () => this.PlaylistManager.Previous(),
-                    () => this.BackgroundTaskRunner.Run(() => this.PlaylistManager != null && this.PlaylistManager.CanNavigate)
+                    async () => this.BackgroundTaskRunner != null && this.PlaylistManager != null && await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.CanNavigate)
                 );
             }
         }
@@ -73,7 +73,7 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     () => this.PlaylistManager.Next(),
-                    () => this.BackgroundTaskRunner.Run(() => this.PlaylistManager != null && this.PlaylistManager.CanNavigate)
+                    async () => this.BackgroundTaskRunner != null && this.PlaylistManager != null && await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.CanNavigate)
                 );
             }
         }
