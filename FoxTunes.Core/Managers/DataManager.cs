@@ -8,7 +8,14 @@ namespace FoxTunes.Managers
     {
         public Task Reload()
         {
-            return this.ForegroundTaskRunner.Run(() => this.ReadContext = this.Database.CreateContext());
+            return this.ForegroundTaskRunner.Run(() =>
+            {
+                if (this.ReadContext != null)
+                {
+                    this.ReadContext.Dispose();
+                }
+                this.ReadContext = this.Database.CreateContext();
+            });
         }
 
         public IDatabase Database { get; private set; }
@@ -23,7 +30,7 @@ namespace FoxTunes.Managers
             {
                 return this._ReadContext;
             }
-            set
+            private set
             {
                 this._ReadContext = value;
                 this.OnReadContextChanged();

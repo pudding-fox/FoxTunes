@@ -108,12 +108,18 @@ namespace FoxTunes
                 }
                 Logger.Write(this, LogLevel.Debug, "Connecting to database: {0}", this.ConnectionString);
                 Connection = new SQLiteConnection(this.ConnectionString);
+                Connection.Disposed += this.OnConnectionDisposed;
                 if (create)
                 {
                     this.CreateDatabase();
                 }
             }
             return Connection;
+        }
+
+        private void OnConnectionDisposed(object sender, EventArgs e)
+        {
+            Connection = null;
         }
 
         private void CreateDatabase()
