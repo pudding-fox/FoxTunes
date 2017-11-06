@@ -211,22 +211,32 @@ namespace FoxTunes
             {
                 await Semaphore.WaitAsync();
                 this.OnStarted();
-                await this.OnRun().ContinueWith(task =>
+                try
                 {
-                    switch (task.Status)
+                    await this.OnRun().ContinueWith(task =>
                     {
-                        case TaskStatus.Faulted:
-                            Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
-                            this.Exception = task.Exception;
-                            this.OnFaulted();
-                            break;
-                        default:
-                            Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
-                            this.OnCompleted();
-                            break;
-                    }
+                        switch (task.Status)
+                        {
+                            case TaskStatus.Faulted:
+                                Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
+                                this.Exception = task.Exception;
+                                this.OnFaulted();
+                                break;
+                            default:
+                                Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
+                                this.OnCompleted();
+                                break;
+                        }
+                        Semaphore.Release();
+                    });
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
+                    this.Exception = e;
+                    this.OnFaulted();
                     Semaphore.Release();
-                });
+                }
             });
         }
 

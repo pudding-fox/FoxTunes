@@ -236,7 +236,7 @@ namespace FoxTunes
             this.OnIsStoppedChanged();
         }
 
-        public override void Dispose()
+        protected override void OnDisposing()
         {
             this.SoundOut.Dispose();
             this.WaveSource.Dispose();

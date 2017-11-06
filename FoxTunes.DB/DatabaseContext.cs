@@ -62,5 +62,11 @@ namespace FoxTunes
         protected abstract void OnDisposing();
 
         public event EventHandler Disposed = delegate { };
+
+        ~DatabaseContext()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
+        }
     }
 }
