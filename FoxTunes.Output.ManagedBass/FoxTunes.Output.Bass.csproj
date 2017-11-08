@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{676F7DD1-BF13-4317-819F-9B5D85DF18B5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FoxTunes</RootNamespace>
+    <AssemblyName>FoxTunes.Output.Bass</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>c605b928</NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\distribution\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ManagedBass, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.2.0.4\lib\net45\ManagedBass.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BassMasterChannel.cs" />
+    <Compile Include="BassNotificationSource.cs" />
+    <Compile Include="BassOutput.cs" />
+    <Compile Include="BassOutputStream.cs" />
+    <Compile Include="BassPluginLoader.cs" />
+    <Compile Include="BassUtils.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
+      <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
+      <Name>FoxTunes.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output\FoxTunes.Output.csproj">
+      <Project>{c031b8f2-b799-4881-8140-de1d11a23fd8}</Project>
+      <Name>FoxTunes.Output</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\Addon\bassalac.dll">
+      <Link>lib\x64\plugins\bassalac.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\Addon\bassdsd.dll">
+      <Link>lib\x64\plugins\bassdsd.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\Addon\bassflac.dll">
+      <Link>lib\x64\plugins\bassflac.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\Addon\basswma.dll">
+      <Link>lib\x64\plugins\basswma.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\Addon\bass_aac.dll">
+      <Link>lib\x64\plugins\bass_aac.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\Addon\bass_ac3.dll">
+      <Link>lib\x64\plugins\bass_ac3.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\Addon\bass_ape.dll">
+      <Link>lib\x64\plugins\bass_ape.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\bass.dll">
+      <Link>lib\x64\bass.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\bassmix.dll">
+      <Link>lib\x64\bassmix.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\basswasapi.dll">
+      <Link>lib\x64\basswasapi.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\bass_fx.dll">
+      <Link>lib\x64\bass_fx.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x64\bass_vst.dll">
+      <Link>lib\x64\bass_vst.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\Addon\bassalac.dll">
+      <Link>lib\x86\plugins\bassalac.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\Addon\bassdsd.dll">
+      <Link>lib\x86\plugins\bassdsd.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\Addon\bassflac.dll">
+      <Link>lib\x86\plugins\bassflac.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\Addon\basswma.dll">
+      <Link>lib\x86\plugins\basswma.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\Addon\bass_aac.dll">
+      <Link>lib\x86\plugins\bass_aac.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\Addon\bass_ac3.dll">
+      <Link>lib\x86\plugins\bass_ac3.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\Addon\bass_ape.dll">
+      <Link>lib\x86\plugins\bass_ape.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\bass.dll">
+      <Link>lib\x86\bass.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\bassmix.dll">
+      <Link>lib\x86\bassmix.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\basswasapi.dll">
+      <Link>lib\x86\basswasapi.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\bass_fx.dll">
+      <Link>lib\x86\bass_fx.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\bass_vst.dll">
+      <Link>lib\x86\bass_vst.dll</Link>
+    </Content>
+    <Content Include="..\packages\BASS.Native.2.4.12.2\build\native\x86\bass_wadsp.dll">
+      <Link>lib\x86\bass_wadsp.dll</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets" Condition="Exists('..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

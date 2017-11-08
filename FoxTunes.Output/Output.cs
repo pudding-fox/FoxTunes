@@ -9,6 +9,8 @@ namespace FoxTunes
 
         public abstract Task<IOutputStream> Load(PlaylistItem playlistItem);
 
+        public abstract Task Preempt(IOutputStream stream);
+
         public abstract Task Unload(IOutputStream stream);
     }
 }

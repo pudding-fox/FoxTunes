@@ -86,10 +86,6 @@
       <Project>{395751a0-49b7-49dc-88a8-02b14a322e99}</Project>
       <Name>FoxTunes.MetaData</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.CSCore\FoxTunes.Output.CSCore.csproj">
-      <Project>{30afd731-fd4c-426c-9566-38186fa6afa1}</Project>
-      <Name>FoxTunes.Output.CSCore</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FoxTunes.Output\FoxTunes.Output.csproj">
       <Project>{c031b8f2-b799-4881-8140-de1d11a23fd8}</Project>
       <Name>FoxTunes.Output</Name>

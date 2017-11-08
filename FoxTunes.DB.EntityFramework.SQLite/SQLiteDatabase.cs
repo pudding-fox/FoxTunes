@@ -31,46 +31,6 @@ namespace FoxTunes
             "Database.dat"
         );
 
-        static SQLiteDatabase()
-        {
-            StageInteropAssemblies();
-        }
-
-        private static void StageInteropAssemblies()
-        {
-            var assemblies = new[]{
-                new
-                {
-                    DirectoryName = "x86",
-                    FileName = "SQLite.Interop.dll",
-                    Content = Resources.SQLite_Interop_x86
-                },
-                new
-                {
-                    DirectoryName = "x64",
-                    FileName = "SQLite.Interop.dll",
-                    Content = Resources.SQLite_Interop_x64
-                }
-            };
-            var location = typeof(SQLiteDatabase).Assembly.Location;
-            var baseDirectoryName = Path.GetDirectoryName(location);
-            foreach (var assembly in assemblies)
-            {
-                var directoryName = Path.Combine(baseDirectoryName, assembly.DirectoryName);
-                if (!Directory.Exists(directoryName))
-                {
-                    Logger.Write(typeof(SQLiteDatabase), LogLevel.Debug, "Creating interop directory: {0}", directoryName);
-                    Directory.CreateDirectory(directoryName);
-                }
-                var fileName = Path.Combine(directoryName, assembly.FileName);
-                if (!File.Exists(fileName))
-                {
-                    Logger.Write(typeof(SQLiteDatabase), LogLevel.Debug, "Writing interop assembly: {0}", fileName);
-                    File.WriteAllBytes(fileName, assembly.Content);
-                }
-            }
-        }
-
         protected virtual string ConnectionString
         {
             get

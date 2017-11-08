@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -44,21 +43,7 @@ namespace FoxTunes
 
         public abstract long Length { get; }
 
-        public abstract int BytesPerSample { get; }
-
-        public abstract int ExtraSize { get; }
-
-        public abstract int BitsPerSample { get; }
-
-        public abstract int BlockAlign { get; }
-
-        public abstract int BytesPerSecond { get; }
-
         public abstract int SampleRate { get; }
-
-        public abstract string Format { get; }
-
-        public abstract int BytesPerBlock { get; }
 
         public abstract int Channels { get; }
 
@@ -140,7 +125,18 @@ namespace FoxTunes
 
         public event EventHandler Resumed = delegate { };
 
-        public abstract Task Stop();
+        public abstract void Stop();
+
+        protected virtual void OnStopping()
+        {
+            if (this.Stopping == null)
+            {
+                return;
+            }
+            this.Stopping(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Stopping = delegate { };
 
         protected virtual void OnStopped(bool manual)
         {
@@ -153,11 +149,18 @@ namespace FoxTunes
 
         public event StoppedEventHandler Stopped = delegate { };
 
+        protected virtual void EmitState()
+        {
+            this.OnIsPlayingChanged();
+            this.OnIsPausedChanged();
+            this.OnIsStoppedChanged();
+        }
+
         public string Description
         {
             get
             {
-                return string.Format("Length = {0},  BytesPerSample = {1},  ExtraSize = {2}, BitsPerSample = {3}, BlockAlign = {4}, BytesPerSecond = {5}, SampleRate = {6}, Format = {7}, BytesPerBlock = {8}, Channels = {9}", this.Length, this.BytesPerSample, this.ExtraSize, this.BitsPerSample, this.BlockAlign, this.BytesPerSecond, this.SampleRate, this.Format, this.BytesPerBlock, this.Channels);
+                return string.Format("Length = {0},  SampleRate = {1}, Channels = {2}", this.Length, this.SampleRate, this.Channels);
             }
         }
 

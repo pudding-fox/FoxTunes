@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
     <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />

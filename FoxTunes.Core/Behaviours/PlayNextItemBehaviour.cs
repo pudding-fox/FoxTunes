@@ -9,6 +9,8 @@ namespace FoxTunes.Behaviours
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public PlaylistItem NextPlaylistItem { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = core.Managers.Playback;
@@ -23,17 +25,18 @@ namespace FoxTunes.Behaviours
             {
                 return;
             }
+            this.NextPlaylistItem = this.PlaylistManager.GetNext();
             this.PlaybackManager.CurrentStream.Stopped += this.CurrentStream_Stopped;
         }
 
         protected virtual void CurrentStream_Stopped(object sender, StoppedEventArgs e)
         {
-            if (e.Manual)
+            if (e.Manual || this.NextPlaylistItem == null)
             {
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
-            this.PlaylistManager.Next();
+            this.PlaylistManager.Play(this.NextPlaylistItem);
         }
     }
 }

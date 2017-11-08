@@ -1,8 +1,12 @@
 ﻿(function () {
-  var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist];
+  var parts = [];
+
+  if (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist) {
+    parts.push(tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist);
+  }
 
   if (tag.year) {
-      parts.push(tag.year);
+    parts.push(tag.year);
   }
 
   if (tag.album) {

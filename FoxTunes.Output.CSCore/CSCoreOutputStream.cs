@@ -16,11 +16,6 @@ namespace FoxTunes
         {
             this.WaveSource = waveSource;
             this.SoundOut = soundOut;
-            this.SampleSource = this.WaveSource.ToSampleSource();
-            this.NotificationSource = new NotificationSource(this.SampleSource);
-            this.NotificationSource.Interval = UPDATE_INTERVAL;
-            this.NotificationSource.BlockRead += this.NotificationSource_BlockRead;
-            this.SoundOut.Stopped += this.SoundOut_Stopped;
         }
 
         public IWaveSource WaveSource { get; private set; }
@@ -77,67 +72,11 @@ namespace FoxTunes
             }
         }
 
-        public override int BytesPerSample
-        {
-            get
-            {
-                return this.WaveFormat.BytesPerSample;
-            }
-        }
-
-        public override int ExtraSize
-        {
-            get
-            {
-                return this.WaveFormat.ExtraSize;
-            }
-        }
-
-        public override int BitsPerSample
-        {
-            get
-            {
-                return this.WaveFormat.BitsPerSample;
-            }
-        }
-
-        public override int BlockAlign
-        {
-            get
-            {
-                return this.WaveFormat.BlockAlign;
-            }
-        }
-
-        public override int BytesPerSecond
-        {
-            get
-            {
-                return this.WaveFormat.BytesPerSecond;
-            }
-        }
-
         public override int SampleRate
         {
             get
             {
                 return this.WaveFormat.SampleRate;
-            }
-        }
-
-        public override string Format
-        {
-            get
-            {
-                return Enum.GetName(typeof(AudioEncoding), this.WaveFormat.WaveFormatTag);
-            }
-        }
-
-        public override int BytesPerBlock
-        {
-            get
-            {
-                return this.WaveFormat.BytesPerBlock;
             }
         }
 
@@ -178,6 +117,11 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
+            this.SampleSource = this.WaveSource.ToSampleSource();
+            this.NotificationSource = new NotificationSource(this.SampleSource);
+            this.NotificationSource.Interval = UPDATE_INTERVAL;
+            this.NotificationSource.BlockRead += this.NotificationSource_BlockRead;
+            this.SoundOut.Stopped += this.SoundOut_Stopped;
             base.InitializeComponent(core);
         }
 
@@ -220,24 +164,17 @@ namespace FoxTunes
             this.OnResumed();
         }
 
-        public override Task Stop()
+        public override void Stop()
         {
             Logger.Write(this, LogLevel.Debug, "Stopping sound out.");
             this.StopRequested = true;
             this.SoundOut.Stop();
             this.EmitState();
-            return Task.CompletedTask;
-        }
-
-        private void EmitState()
-        {
-            this.OnIsPlayingChanged();
-            this.OnIsPausedChanged();
-            this.OnIsStoppedChanged();
         }
 
         protected override void OnDisposing()
         {
+            this.NotificationSource.Dispose();
             this.SoundOut.Dispose();
             this.WaveSource.Dispose();
         }
