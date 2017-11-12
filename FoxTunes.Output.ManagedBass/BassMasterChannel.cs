@@ -11,27 +11,31 @@ namespace FoxTunes
 
         const int CHANNELS = 2;
 
-        public BassMasterChannel()
+        public BassMasterChannel(BassOutput output)
         {
-
+            this.Output = output;
         }
+
+        public BassOutput Output { get; private set; }
 
         public int ChannelHandle { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.ChannelHandle = BASS_StreamCreateGaplessMaster(RATE, CHANNELS, BassFlags.Default, IntPtr.Zero);
-            BassUtils.OK(Bass.ChannelPlay(this.ChannelHandle));
+            Logger.Write(this, LogLevel.Debug, "Created master stream: {0}.", this.ChannelHandle);
             base.InitializeComponent(core);
         }
 
-        public void SetPrimaryChannel(int channelhandle)
+        public void SetPrimaryChannel(int channelHandle)
         {
-            BASS_ChannelSetGaplessPrimary(channelhandle);
+            Logger.Write(this, LogLevel.Debug, "Setting primary playback channel: {0}", channelHandle);
+            BASS_ChannelSetGaplessPrimary(channelHandle);
         }
 
-        public void SetStandbyChannelHandle(int channelHandle)
+        public void SetSecondaryChannelHandle(int channelHandle)
         {
+            Logger.Write(this, LogLevel.Debug, "Setting secondary playback channel: {0}", channelHandle);
             BASS_ChannelSetGaplessSecondary(channelHandle);
         }
 
@@ -61,22 +65,54 @@ namespace FoxTunes
 
         public void Play()
         {
-            BassUtils.OK(Bass.ChannelPlay(this.ChannelHandle));
+            Logger.Write(this, LogLevel.Debug, "Starting master stream: {0}", this.ChannelHandle);
+            try
+            {
+                BassUtils.OK(Bass.ChannelPlay(this.ChannelHandle));
+            }
+            catch (Exception e)
+            {
+                this.OnError(e);
+            }
         }
 
         public void Pause()
         {
-            BassUtils.OK(Bass.ChannelPause(this.ChannelHandle));
+            Logger.Write(this, LogLevel.Debug, "Pausing master stream: {0}", this.ChannelHandle);
+            try
+            {
+                BassUtils.OK(Bass.ChannelPause(this.ChannelHandle));
+            }
+            catch (Exception e)
+            {
+                this.OnError(e);
+            }
         }
 
         public void Resume()
         {
-            BassUtils.OK(Bass.ChannelPlay(this.ChannelHandle));
+            Logger.Write(this, LogLevel.Debug, "Resuming master stream: {0}", this.ChannelHandle);
+            try
+            {
+                BassUtils.OK(Bass.ChannelPlay(this.ChannelHandle));
+            }
+            catch (Exception e)
+            {
+                this.OnError(e);
+            }
         }
 
         public void Stop()
         {
-            BassUtils.OK(Bass.ChannelStop(this.ChannelHandle));
+            Logger.Write(this, LogLevel.Debug, "Stopping master stream: {0}", this.ChannelHandle);
+            try
+            {
+                BassUtils.OK(Bass.ChannelStop(this.ChannelHandle));
+            }
+            catch (Exception e)
+            {
+                this.OnError(e);
+            }
         }
 
         public bool IsDisposed { get; private set; }

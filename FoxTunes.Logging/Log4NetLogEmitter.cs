@@ -97,16 +97,9 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (this.PropertyChanged == null)
-            {
-                return;
-            }
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public event ComponentOutputErrorEventHandler Error = delegate { };
 
         #endregion
     }

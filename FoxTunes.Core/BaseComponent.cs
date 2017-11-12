@@ -31,5 +31,28 @@ namespace FoxTunes
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        protected virtual void OnError(string message)
+        {
+            this.OnError(new Exception(message));
+        }
+
+        protected virtual void OnError(Exception exception)
+        {
+            this.OnError(exception.Message, exception);
+        }
+
+        protected virtual void OnError(string message, Exception exception)
+        {
+            Logger.Write(this, LogLevel.Error, message, exception);
+            if (this.Error == null)
+            {
+                return;
+            }
+            this.Error(this, new ComponentOutputErrorEventArgs(message, exception));
+        }
+
+        [field: NonSerialized]
+        public event ComponentOutputErrorEventHandler Error = delegate { };
     }
 }

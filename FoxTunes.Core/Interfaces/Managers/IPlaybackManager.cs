@@ -13,8 +13,6 @@ namespace FoxTunes.Interfaces
 
         Task Load(PlaylistItem playlistItem, bool immediate);
 
-        Task Unload();
-
         Task Stop();
     }
 }

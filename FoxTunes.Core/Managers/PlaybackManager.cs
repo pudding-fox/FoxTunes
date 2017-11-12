@@ -18,14 +18,23 @@ namespace FoxTunes.Managers
         {
             this.Core = core;
             this.Output = core.Components.Output;
+            this.Output.Error += this.OutputError;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
         }
 
+        protected virtual void OutputError(object sender, ComponentOutputErrorEventArgs e)
+        {
+            this.CurrentStream.Dispose();
+            this.CurrentStream = null;
+        }
+
         protected virtual void OutputStreamQueueDequeued(object sender, OutputStreamQueueEventArgs e)
         {
+            Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+            this.Output.Preempt(e.OutputStream);
             Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
             if (this.CurrentStream != null)
             {

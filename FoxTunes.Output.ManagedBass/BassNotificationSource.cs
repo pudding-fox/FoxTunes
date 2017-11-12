@@ -26,12 +26,14 @@ namespace FoxTunes
             this.Timer.Interval = this.Interval;
             this.Timer.Elapsed += this.Timer_Elapsed;
             this.Timer.Start();
+            Logger.Write(this, LogLevel.Debug, "Creating \"Ending\" channel sync {0} seconds from the end.", STOPPING_THRESHOLD);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.Position,
                 this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, STOPPING_THRESHOLD),
                 this.ChannelSync_Ending
             ));
+            Logger.Write(this, LogLevel.Debug, "Creating \"End\" channel sync.", STOPPING_THRESHOLD);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.End,
@@ -48,13 +50,13 @@ namespace FoxTunes
 
         protected virtual void ChannelSync_Ending(int Handle, int Channel, int Data, IntPtr User)
         {
-            Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: Ending.", this.OutputStream.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ending\".", this.OutputStream.ChannelHandle);
             this.OnStopping();
         }
 
         protected virtual void ChannelSync_Ended(int Handle, int Channel, int Data, IntPtr User)
         {
-            Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: Ended.", this.OutputStream.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ended\".", this.OutputStream.ChannelHandle);
             this.OnStopped();
         }
 
