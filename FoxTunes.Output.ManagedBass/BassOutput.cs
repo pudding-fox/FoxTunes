@@ -22,7 +22,6 @@ namespace FoxTunes
             try
             {
                 BassUtils.OK(Bass.Init());
-                BassPluginLoader.Instance.Load();
                 this.MasterChannel = new BassMasterChannel(this);
                 this.MasterChannel.InitializeComponent(core);
                 this.MasterChannel.Error += this.MasterChannel_Error;
@@ -43,7 +42,6 @@ namespace FoxTunes
                 this.MasterChannel.Dispose();
                 this.MasterChannel = null;
                 BassUtils.OK(Bass.Free());
-                BassUtils.OK(Bass.PluginFree(0));
                 Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
             }
             catch (Exception e)
@@ -65,6 +63,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            BassPluginLoader.Instance.Load();
             base.InitializeComponent(core);
         }
 
