@@ -10,15 +10,9 @@ namespace FoxTunes
     [Component("F9F07827-E4F6-49FE-A26D-E415E0211E56", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class SQLiteDatabase : EntityFrameworkDatabase
     {
-        const SynchronizationModes SYNC_MODE = SynchronizationModes.Normal;
-
-        const SQLiteJournalModeEnum JOURNAL_MODE = SQLiteJournalModeEnum.Default;
-
         const int BUSY_TIMEOUT = 60;
 
         const int DEFAULT_TIMEOUT = 60;
-
-        const IsolationLevel DEFAULT_ISOLATION_LEVEL = IsolationLevel.ReadCommitted;
 
         private static readonly Type[] References = new[]
         {
@@ -37,11 +31,8 @@ namespace FoxTunes
             {
                 var builder = new SQLiteConnectionStringBuilder();
                 builder.DataSource = DatabaseFileName;
-                builder.SyncMode = SYNC_MODE;
-                builder.JournalMode = JOURNAL_MODE;
                 builder.BusyTimeout = BUSY_TIMEOUT;
                 builder.DefaultTimeout = DEFAULT_TIMEOUT;
-                builder.DefaultIsolationLevel = DEFAULT_ISOLATION_LEVEL;
                 return builder.ToString();
             }
         }

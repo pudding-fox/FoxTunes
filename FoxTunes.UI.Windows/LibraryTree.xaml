@@ -9,11 +9,11 @@
              xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:Utilities="clr-namespace:FoxTunes.Utilities"
-             x:Class="FoxTunes.Library"
+             x:Class="FoxTunes.LibraryTree"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:Library x:Key="ViewModel" Core="{Binding}"></ViewModel:Library>
+        <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryTree>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -24,20 +24,13 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Managers.Data.ReadContext.Queries.LibraryHierarchy}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
-        <Windows:LibraryHierarchies Grid.Column="2"></Windows:LibraryHierarchies>
-        <TreeView x:Name="TreeView" Grid.ColumnSpan="3" Grid.Row="1" 
+        <Windows:LibraryViewMode SelectedLibraryHierarchy="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"></Windows:LibraryViewMode>
+        <TreeView x:Name="TreeView" Grid.Row="1" 
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
                   Extensions:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}">
             <TreeView.Resources>
@@ -55,7 +48,7 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <TextBlock Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to collection by dropping files here." IsHitTestVisible="False">
+        <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to collection by dropping files here." IsHitTestVisible="False">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"></Setter>
@@ -67,8 +60,7 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBlock Grid.Row="2" VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="Filter:"/></TextBlock>
-        <Windows:SearchBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
+        <Windows:SearchBox Grid.Row="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
         <Utilities:MouseCursorAdorner x:Name="MouseCursorAdorner">
             <Utilities:MouseCursorAdorner.Template>
                 <DataTemplate>

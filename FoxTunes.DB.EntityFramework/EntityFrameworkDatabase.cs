@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Data;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -46,7 +47,14 @@ namespace FoxTunes
 
         protected virtual DbContext CreateDbContext()
         {
-            return new InternalDbContext(this.CreateConnection(), this.DbCompiledModel);
+            var connection = this.CreateConnection();
+            switch (connection.State)
+            {
+                case ConnectionState.Closed:
+                    connection.Open();
+                    break;
+            }
+            return new InternalDbContext(connection, this.DbCompiledModel);
         }
 
         protected virtual void MapPlaylistItem(DbModelBuilder builder)

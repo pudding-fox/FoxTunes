@@ -8,10 +8,8 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class Library : ViewModelBase
+    public abstract class Library : ViewModelBase
     {
-        const int EXPAND_ALL_LIMIT = 5;
-
         public Library()
         {
             this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>>();
@@ -51,8 +49,6 @@ namespace FoxTunes.ViewModel
             this.Refresh(false);
         }
 
-        public event EventHandler SelectedHierarchyChanged = delegate { };
-
         private Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>> _Items { get; set; }
 
         public ObservableCollection<LibraryHierarchyNode> Items
@@ -70,6 +66,11 @@ namespace FoxTunes.ViewModel
                     );
                 }
                 return this._Items[this.SelectedHierarchy];
+            }
+            protected set
+            {
+                this._Items[this.SelectedHierarchy] = value;
+                this.OnItemsChanged();
             }
         }
 
@@ -110,13 +111,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedItemChanged = delegate { };
 
-        public void Reload()
-        {
-            this._Items.Clear();
-            this.Refresh(true);
-        }
-
-        public void Refresh(bool deep)
+        public virtual void Refresh(bool deep)
         {
             if (this.DataManager != null && this.SelectedHierarchy != null && deep)
             {
@@ -125,25 +120,9 @@ namespace FoxTunes.ViewModel
             this.OnItemsChanged();
         }
 
-        public void ExpandAll()
+        public virtual void Reload()
         {
-            var stack = new Stack<LibraryHierarchyNode>(this.Items);
-            while (stack.Count > 0)
-            {
-                var node = stack.Pop();
-                if (!node.IsExpanded)
-                {
-                    node.IsExpanded = true;
-                }
-                foreach (var child in node.Children)
-                {
-                    if (child.IsLeaf)
-                    {
-                        continue;
-                    }
-                    stack.Push(child);
-                }
-            }
+            this.Refresh(true);
         }
 
         protected override void OnCoreChanged()
@@ -160,11 +139,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFilterChanged(object sender, EventArgs e)
         {
-            this.Reload();
-            if (!string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter) && this.Items.Count <= EXPAND_ALL_LIMIT)
-            {
-                this.ExpandAll();
-            }
+            //Nothing to do.
         }
 
         protected virtual void OnSignal(object sender, ISignal signal)
@@ -213,9 +188,6 @@ namespace FoxTunes.ViewModel
             return Task.CompletedTask;
         }
 
-        protected override Freezable CreateInstanceCore()
-        {
-            return new Library();
-        }
+        public event EventHandler SelectedHierarchyChanged = delegate { };
     }
 }

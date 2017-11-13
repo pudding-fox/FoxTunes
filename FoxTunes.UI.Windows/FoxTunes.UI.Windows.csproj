@@ -59,14 +59,20 @@
     <Compile Include="Extensions\ListView_SelectedItems.cs" />
     <Compile Include="Extensions\TreeView_SelectedItem.cs" />
     <Compile Include="Integration\Explorer.cs" />
-    <Compile Include="Library.xaml.cs">
-      <DependentUpon>Library.xaml</DependentUpon>
+    <Compile Include="LibraryBrowser.xaml.cs">
+      <DependentUpon>LibraryBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LibraryTree.xaml.cs">
+      <DependentUpon>LibraryTree.xaml</DependentUpon>
     </Compile>
     <Compile Include="LibraryHierarchies.xaml.cs">
       <DependentUpon>LibraryHierarchies.xaml</DependentUpon>
     </Compile>
     <Compile Include="LibraryHierarchiesDialog.xaml.cs">
       <DependentUpon>LibraryHierarchiesDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LibraryViewMode.xaml.cs">
+      <DependentUpon>LibraryViewMode.xaml</DependentUpon>
     </Compile>
     <Compile Include="Log.xaml.cs">
       <DependentUpon>Log.xaml</DependentUpon>
@@ -111,6 +117,8 @@
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />
+    <Compile Include="ViewModel\LibraryBrowser.cs" />
+    <Compile Include="ViewModel\LibraryTree.cs" />
     <Compile Include="ViewModel\LibraryHierarchies.cs" />
     <Compile Include="ViewModel\Log.cs" />
     <Compile Include="ViewModel\Main.cs" />
@@ -148,7 +156,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </None>
-    <Page Include="Library.xaml">
+    <Page Include="LibraryBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibraryTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,6 +169,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LibraryHierarchiesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibraryViewMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

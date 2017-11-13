@@ -10,7 +10,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
-        <Style x:Key="LibraryStyle" TargetType="{x:Type Windows:Library}">
+        <Style x:Key="LibraryTreeStyle" TargetType="{x:Type Windows:LibraryTree}">
             <Setter Property="Visibility" Value="Visible"></Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
@@ -18,6 +18,14 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <!--<Style x:Key="LibraryBrowserStyle" TargetType="{x:Type Windows:LibraryBrowser}">
+            <Setter Property="Visibility" Value="Visible"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>-->
         <Style x:Key="ArtworkStyle" TargetType="{x:Type Windows:Artwork}">
             <Setter Property="Visibility" Value="Visible"></Setter>
             <Style.Triggers>
@@ -57,7 +65,8 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
-            <Windows:Library Style="{StaticResource LibraryStyle}"></Windows:Library>
+            <Windows:LibraryTree Style="{StaticResource LibraryTreeStyle}"></Windows:LibraryTree>
+            <!--<Windows:LibraryBrowser Style="{StaticResource LibraryBrowserStyle}"></Windows:LibraryBrowser>-->
             <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}"></Windows:Artwork>
             <Windows:Playlist Grid.Column="1" Grid.RowSpan="2"></Windows:Playlist>
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalAlignment="Bottom">
