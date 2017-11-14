@@ -2,9 +2,9 @@
 
 namespace FoxTunes
 {
-    public class OutputStreamException : Exception
+    public class OutputException : Exception
     {
-        public OutputStreamException(string message)
+        public OutputException(string message)
             : base(message)
         {
 

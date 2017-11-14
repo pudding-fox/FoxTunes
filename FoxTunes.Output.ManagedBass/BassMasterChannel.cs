@@ -7,8 +7,6 @@ namespace FoxTunes
 {
     public class BassMasterChannel : BaseComponent, IDisposable
     {
-        const int RATE = 44100;
-
         const int CHANNELS = 2;
 
         public BassMasterChannel(BassOutput output)
@@ -20,23 +18,83 @@ namespace FoxTunes
 
         public int ChannelHandle { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        public bool IsStarted { get; private set; }
+
+        public BassFlags Flags
         {
-            this.ChannelHandle = BASS_StreamCreateGaplessMaster(RATE, CHANNELS, BassFlags.Default, IntPtr.Zero);
-            Logger.Write(this, LogLevel.Debug, "Created master stream: {0}.", this.ChannelHandle);
-            base.InitializeComponent(core);
+            get
+            {
+                var flags = BassFlags.Default;
+                if (this.Output.Float)
+                {
+                    flags |= BassFlags.Float;
+                }
+                return flags;
+            }
+        }
+
+        public void StartStream(int rate)
+        {
+            if (this.ChannelHandle != 0)
+            {
+                this.FreeStream();
+            }
+            this.ChannelHandle = BASS_StreamCreateGaplessMaster(rate, CHANNELS, this.Flags, IntPtr.Zero);
+            if (this.ChannelHandle != 0)
+            {
+                Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", this.Output.Rate, this.Output.Float ? "32F" : "16", this.ChannelHandle);
+                this.IsStarted = true;
+            }
+            else
+            {
+                BassUtils.Throw();
+            }
+        }
+
+        public void FreeStream()
+        {
+            Logger.Write(this, LogLevel.Debug, "Stopping master stream: {0}", this.ChannelHandle);
+            Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
+            this.ChannelHandle = 0;
+            this.IsStarted = false;
         }
 
         public void SetPrimaryChannel(int channelHandle)
         {
+            var channelRate = BassUtils.GetChannelRate(channelHandle);
+            if (!this.IsStarted)
+            {
+                this.StartStream(channelRate);
+            }
+            else
+            {
+                var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
+                if (currentRate != channelRate)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, restarting.", channelRate, currentRate);
+                    this.StartStream(channelRate);
+                }
+            }
             Logger.Write(this, LogLevel.Debug, "Setting primary playback channel: {0}", channelHandle);
-            BASS_ChannelSetGaplessPrimary(channelHandle);
+            BassUtils.OK(BASS_ChannelSetGaplessPrimary(channelHandle));
         }
 
         public void SetSecondaryChannelHandle(int channelHandle)
         {
+            if (!this.IsStarted)
+            {
+                Logger.Write(this, LogLevel.Warn, "Not yet started, cannot set secondary playback channel: {0}", channelHandle);
+                return;
+            }
+            var channelRate = BassUtils.GetChannelRate(channelHandle);
+            var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
+            if (currentRate != channelRate)
+            {
+                Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, cannot set secondary playback channel: {2}", channelRate, currentRate, channelHandle);
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Setting secondary playback channel: {0}", channelHandle);
-            BASS_ChannelSetGaplessSecondary(channelHandle);
+            BassUtils.OK(BASS_ChannelSetGaplessSecondary(channelHandle));
         }
 
         public bool IsPlaying
@@ -135,8 +193,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
-            this.ChannelHandle = 0;
+            this.FreeStream();
         }
 
         ~BassMasterChannel()

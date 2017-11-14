@@ -35,7 +35,7 @@ namespace FoxTunes
             {
                 if (Bass.LastError != Errors.OK)
                 {
-                    throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
+                    Throw();
                 }
             }
             return result;
@@ -47,10 +47,20 @@ namespace FoxTunes
             {
                 if (Bass.LastError != Errors.OK)
                 {
-                    throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
+                    Throw();
                 }
             }
             return result;
+        }
+
+        public static void Throw()
+        {
+            throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
+        }
+
+        public static int GetChannelRate(int channelHandle)
+        {
+            return (int)Convert.ChangeType(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.Frequency), typeof(int));
         }
     }
 }
