@@ -58,6 +58,10 @@
       <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
       <Name>FoxTunes.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Logging\FoxTunes.Logging.csproj">
+      <Project>{ab1362c8-0754-496d-85e1-3c258ff250bf}</Project>
+      <Name>FoxTunes.Logging</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
