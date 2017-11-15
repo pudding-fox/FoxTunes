@@ -39,6 +39,14 @@ namespace FoxTunes
             }
         }
 
+        public virtual BackgroundTaskPriority Priority
+        {
+            get
+            {
+                return BackgroundTaskPriority.None;
+            }
+        }
+
         public SemaphoreSlim Semaphore
         {
             get
@@ -237,7 +245,7 @@ namespace FoxTunes
                     this.OnFaulted();
                     Semaphore.Release();
                 }
-            });
+            }, this.Priority);
         }
 
         public void RunSynchronously()

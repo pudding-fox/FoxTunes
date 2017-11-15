@@ -167,6 +167,7 @@
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\LibraryTaskBase.cs" />
+    <Compile Include="Tasks\PriorityScheduler.cs" />
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\EnumerableDataReader.cs" />
     <Compile Include="Utilities\LibraryHierarchyPopulator.cs" />

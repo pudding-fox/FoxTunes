@@ -20,6 +20,10 @@ namespace FoxTunes
         {
             core.Components.Output.IsStartedChanged += (sender, e) =>
             {
+                if (this.Queue.Count == 0)
+                {
+                    return;
+                }
                 Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
                 this.Clear();
             };
