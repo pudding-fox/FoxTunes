@@ -122,6 +122,7 @@ namespace FoxTunes.ViewModel
 
         public virtual void Reload()
         {
+            this._Items.Clear();
             this.Refresh(true);
         }
 
