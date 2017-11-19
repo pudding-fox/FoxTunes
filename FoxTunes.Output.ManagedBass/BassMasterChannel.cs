@@ -40,12 +40,12 @@ namespace FoxTunes
                 this.FreeStream();
             }
             this.Config = config;
-            this.ChannelHandle = BASS_StreamCreateGaplessMaster(config.GetActualRate(), config.Channels, this.Flags, IntPtr.Zero);
+            this.ChannelHandle = BASS_StreamCreateGaplessMaster(config.EffectiveRate, config.Channels, this.Flags, IntPtr.Zero);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
             }
-            Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", config.GetActualRate(), this.Output.Float ? "32F" : "16", this.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", config.EffectiveRate, this.Output.Float ? "Float" : "16", this.ChannelHandle);
             this.OnStartedStream();
             this.IsStarted = true;
         }
@@ -87,7 +87,7 @@ namespace FoxTunes
                 {
                     if (this.Config != config)
                     {
-                        Logger.Write(this, LogLevel.Warn, "Channel config differs from current config, restarting.");
+                        Logger.Write(this, LogLevel.Warn, "Channel config \"{0}\" differs from current config \"{1}\", restarting.", config, this.Config);
                         this.StartStream(config);
                     }
                 }
@@ -113,7 +113,7 @@ namespace FoxTunes
                 var config = new BassMasterChannelConfig(this.Output, channelHandle);
                 if (this.Config != config)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Channel config differs from current config, cannot set secondary playback channel: {0}", channelHandle);
+                    Logger.Write(this, LogLevel.Warn, "Channel config \"{0}\" differs from current config \"{1}\", cannot set secondary playback channel: {2}", config, this.Config, channelHandle);
                     return;
                 }
             }
@@ -247,34 +247,34 @@ namespace FoxTunes
         public BassMasterChannelConfig(BassOutput output, int channelHandle)
         {
             this.DsdDirect = output.DsdDirect;
-            this.Rate = BassUtils.GetChannelRate(channelHandle);
+            this.PcmRate = BassUtils.GetChannelPcmRate(channelHandle);
             this.DsdRate = BassUtils.GetChannelDsdRate(channelHandle);
             this.Channels = BassUtils.GetChannelCount(channelHandle);
         }
 
-        public BassMasterChannelConfig(bool dsdDirect, int rate, int dsdRate, int channels)
-        {
-            this.DsdDirect = dsdDirect;
-            this.Rate = rate;
-            this.DsdRate = dsdRate;
-            this.Channels = channels;
-        }
-
         public bool DsdDirect { get; private set; }
 
-        public int Rate { get; private set; }
+        public int PcmRate { get; private set; }
 
         public int DsdRate { get; private set; }
 
         public int Channels { get; private set; }
 
-        public int GetActualRate()
+        public int EffectiveRate
         {
-            if (this.DsdDirect && this.DsdRate > 0)
+            get
             {
-                return this.DsdRate;
+                if (this.DsdDirect && this.DsdRate > 0)
+                {
+                    return this.DsdRate;
+                }
+                return this.PcmRate;
             }
-            return this.Rate;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("DSD Direct {0}, PCM Rate {1}, DSD Rate {2}, Channels {3}", this.DsdDirect, this.PcmRate, this.DsdRate, this.Channels);
         }
 
         public bool Equals(BassMasterChannelConfig other)
@@ -299,7 +299,7 @@ namespace FoxTunes
         {
             var hashCode = default(int);
             hashCode += this.DsdDirect.GetHashCode();
-            hashCode += this.Rate.GetHashCode();
+            hashCode += this.PcmRate.GetHashCode();
             hashCode += this.DsdRate.GetHashCode();
             hashCode += this.Channels.GetHashCode();
             return hashCode;

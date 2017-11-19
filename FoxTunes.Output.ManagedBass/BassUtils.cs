@@ -73,7 +73,7 @@ namespace FoxTunes
             return channelInfo.Channels;
         }
 
-        public static int GetChannelRate(int channelHandle)
+        public static int GetChannelPcmRate(int channelHandle)
         {
             return (int)Convert.ChangeType(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.Frequency), typeof(int));
         }
