@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using ManagedBass.Asio;
+using ManagedBass.Dsd;
+using System.Globalization;
 
 namespace FoxTunes
 {
@@ -94,18 +96,18 @@ namespace FoxTunes
             }
         }
 
-        private bool _DSDDirect { get; set; }
+        private bool _DsdDirect { get; set; }
 
-        public bool DSDDirect
+        public bool DsdDirect
         {
             get
             {
-                return this._DSDDirect;
+                return this._DsdDirect;
             }
             private set
             {
-                this._DSDDirect = value;
-                Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DSDDirect);
+                this._DsdDirect = value;
+                Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DsdDirect);
                 this.Shutdown();
             }
         }
@@ -165,8 +167,6 @@ namespace FoxTunes
         private void StartASIO()
         {
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice, this.Rate));
-            BassUtils.OK(BassAsio.Init(this.AsioDevice, AsioInitFlags.Thread));
-            BassAsio.Rate = this.Rate;
             Logger.Write(this, LogLevel.Debug, "BASS ASIO Initialized.");
         }
 
@@ -184,15 +184,7 @@ namespace FoxTunes
                     this.MasterChannel.Dispose();
                     this.MasterChannel = null;
                 }
-                switch (this.Mode)
-                {
-                    case BassOutputMode.DirectSound:
-                        this.StopDirectSound();
-                        break;
-                    case BassOutputMode.ASIO:
-                        this.StopASIO();
-                        break;
-                }
+                Bass.Free();
                 Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
             }
             catch (Exception e)
@@ -203,19 +195,6 @@ namespace FoxTunes
             {
                 this.IsStarted = false;
             }
-        }
-
-        private void StopDirectSound()
-        {
-            //Not checking result code as shutdown may be forced regardless of state.
-            Bass.Free();
-        }
-
-        private void StopASIO()
-        {
-            //Not checking result code as shutdown may be forced regardless of state.
-            Bass.Free();
-            BassAsio.Free();
         }
 
         protected virtual void MasterChannel_Error(object sender, ComponentOutputErrorEventArgs e)
@@ -243,7 +222,7 @@ namespace FoxTunes
             this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.DSD_RAW_ELEMENT
-            ).ConnectValue<bool>(value => this.DSDDirect = value);
+            ).ConnectValue<bool>(value => this.DsdDirect = value);
             this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.RATE_ELEMENT
@@ -274,16 +253,42 @@ namespace FoxTunes
             {
                 this.Start();
             }
+            var channelHandle = this.CreateStream(playlistItem);
+            var outputStream = new BassOutputStream(this, playlistItem, channelHandle);
+            outputStream.InitializeComponent(this.Core);
+            return Task.FromResult<IOutputStream>(outputStream);
+        }
+
+        private int CreateStream(PlaylistItem playlistItem)
+        {
             Logger.Write(this, LogLevel.Debug, "Creating stream from file {0}", playlistItem.FileName);
-            var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, this.Flags);
+            var channelHandle = default(int);
+            if (this.IsDsd(playlistItem) && this.Mode == BassOutputMode.ASIO && this.DsdDirect)
+            {
+                Logger.Write(this, LogLevel.Debug, "Creating DSD RAW stream from file {0}", playlistItem.FileName);
+                channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
+            }
+            else
+            {
+                channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, this.Flags);
+            }
             if (channelHandle == 0)
             {
                 BassUtils.Throw();
             }
             Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
-            var outputStream = new BassOutputStream(this, playlistItem, channelHandle);
-            outputStream.InitializeComponent(this.Core);
-            return Task.FromResult<IOutputStream>(outputStream);
+            return channelHandle;
+        }
+
+        private bool IsDsd(PlaylistItem playlistItem)
+        {
+            var extension = Path.GetExtension(playlistItem.FileName);
+            if (string.IsNullOrEmpty(extension))
+            {
+                return false;
+            }
+            extension = extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
+            return new[] { "dsd", "dsf" }.Contains(extension, StringComparer.OrdinalIgnoreCase);
         }
 
         public override Task Preempt(IOutputStream stream)

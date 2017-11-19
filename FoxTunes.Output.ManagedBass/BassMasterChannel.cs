@@ -7,8 +7,6 @@ namespace FoxTunes
 {
     public class BassMasterChannel : BaseComponent, IDisposable
     {
-        public const int CHANNELS = 2;
-
         public BassMasterChannel(BassOutput output)
         {
             this.Output = output;
@@ -17,6 +15,8 @@ namespace FoxTunes
         public BassOutput Output { get; private set; }
 
         public int ChannelHandle { get; private set; }
+
+        public BassMasterChannelConfig Config { get; private set; }
 
         public bool IsStarted { get; private set; }
 
@@ -33,23 +33,24 @@ namespace FoxTunes
             }
         }
 
-        public void StartStream(int rate)
+        public void StartStream(BassMasterChannelConfig config)
         {
             if (this.ChannelHandle != 0)
             {
                 this.FreeStream();
             }
-            this.ChannelHandle = BASS_StreamCreateGaplessMaster(rate, CHANNELS, this.Flags, IntPtr.Zero);
+            this.Config = config;
+            this.ChannelHandle = BASS_StreamCreateGaplessMaster(config.GetActualRate(), config.Channels, this.Flags, IntPtr.Zero);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
             }
-            Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", rate, this.Output.Float ? "32F" : "16", this.ChannelHandle);
-            this.OnStartedStream(rate);
+            Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", config.GetActualRate(), this.Output.Float ? "32F" : "16", this.ChannelHandle);
+            this.OnStartedStream();
             this.IsStarted = true;
         }
 
-        protected virtual void OnStartedStream(int rate)
+        protected virtual void OnStartedStream()
         {
             //Nothing to do;
         }
@@ -77,18 +78,17 @@ namespace FoxTunes
         {
             if (channelHandle != 0)
             {
-                var channelRate = BassUtils.GetChannelRate(channelHandle);
+                var config = new BassMasterChannelConfig(this.Output, channelHandle);
                 if (!this.IsStarted)
                 {
-                    this.StartStream(channelRate);
+                    this.StartStream(config);
                 }
                 else
                 {
-                    var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
-                    if (currentRate != channelRate)
+                    if (this.Config != config)
                     {
-                        Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, restarting.", channelRate, currentRate);
-                        this.StartStream(channelRate);
+                        Logger.Write(this, LogLevel.Warn, "Channel config differs from current config, restarting.");
+                        this.StartStream(config);
                     }
                 }
             }
@@ -110,11 +110,10 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Not yet started, cannot set secondary playback channel: {0}", channelHandle);
                     return;
                 }
-                var channelRate = BassUtils.GetChannelRate(channelHandle);
-                var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
-                if (currentRate != channelRate)
+                var config = new BassMasterChannelConfig(this.Output, channelHandle);
+                if (this.Config != config)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, cannot set secondary playback channel: {2}", channelRate, currentRate, channelHandle);
+                    Logger.Write(this, LogLevel.Warn, "Channel config differs from current config, cannot set secondary playback channel: {0}", channelHandle);
                     return;
                 }
             }
@@ -241,5 +240,91 @@ namespace FoxTunes
 
         [DllImport("bass_foxtunes.dll", EntryPoint = "BASS_ChannelSetGaplessSecondary")]
         static extern int BASS_ChannelSetGaplessSecondary(int Channel);
+    }
+
+    public class BassMasterChannelConfig : IEquatable<BassMasterChannelConfig>
+    {
+        public BassMasterChannelConfig(BassOutput output, int channelHandle)
+        {
+            this.DsdDirect = output.DsdDirect;
+            this.Rate = BassUtils.GetChannelRate(channelHandle);
+            this.DsdRate = BassUtils.GetChannelDsdRate(channelHandle);
+            this.Channels = BassUtils.GetChannelCount(channelHandle);
+        }
+
+        public BassMasterChannelConfig(bool dsdDirect, int rate, int dsdRate, int channels)
+        {
+            this.DsdDirect = dsdDirect;
+            this.Rate = rate;
+            this.DsdRate = dsdRate;
+            this.Channels = channels;
+        }
+
+        public bool DsdDirect { get; private set; }
+
+        public int Rate { get; private set; }
+
+        public int DsdRate { get; private set; }
+
+        public int Channels { get; private set; }
+
+        public int GetActualRate()
+        {
+            if (this.DsdDirect && this.DsdRate > 0)
+            {
+                return this.DsdRate;
+            }
+            return this.Rate;
+        }
+
+        public bool Equals(BassMasterChannelConfig other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return this.GetHashCode() == other.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as BassMasterChannelConfig);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = default(int);
+            hashCode += this.DsdDirect.GetHashCode();
+            hashCode += this.Rate.GetHashCode();
+            hashCode += this.DsdRate.GetHashCode();
+            hashCode += this.Channels.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator ==(BassMasterChannelConfig a, BassMasterChannelConfig b)
+        {
+            if ((object)a == null && (object)b == null)
+            {
+                return true;
+            }
+            if ((object)a == null || (object)b == null)
+            {
+                return false;
+            }
+            if (object.ReferenceEquals((object)a, (object)b))
+            {
+                return true;
+            }
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(BassMasterChannelConfig a, BassMasterChannelConfig b)
+        {
+            return !(a == b);
+        }
     }
 }

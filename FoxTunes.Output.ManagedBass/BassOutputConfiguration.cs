@@ -103,10 +103,12 @@ namespace FoxTunes
                 case MODE_DS_OPTION:
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_DS_DEVICE).Show();
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(OUTPUT_SECTION, DSD_RAW_ELEMENT).Hide();
                     break;
                 case MODE_ASIO_OPTION:
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_DS_DEVICE).Hide();
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Show();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(OUTPUT_SECTION, DSD_RAW_ELEMENT).Show();
                     break;
             }
         }
