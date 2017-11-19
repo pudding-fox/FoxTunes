@@ -20,6 +20,14 @@ namespace FoxTunes
 
         private Timer Timer { get; set; }
 
+        public long EndingPosition
+        {
+            get
+            {
+                return this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, STOPPING_THRESHOLD);
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Timer = new Timer();
@@ -30,15 +38,15 @@ namespace FoxTunes
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.Position,
-                this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, STOPPING_THRESHOLD),
-                this.ChannelSync_Ending
+                this.EndingPosition,
+                this.OnEnding
             ));
             Logger.Write(this, LogLevel.Debug, "Creating \"End\" channel sync for channel: {0}", this.OutputStream.ChannelHandle);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.End,
                 0,
-                this.ChannelSync_Ended
+                this.OnEnded
             ));
             base.InitializeComponent(core);
         }
@@ -48,13 +56,23 @@ namespace FoxTunes
             this.OnUpdated();
         }
 
-        protected virtual void ChannelSync_Ending(int Handle, int Channel, int Data, IntPtr User)
+        protected virtual void OnEnding(int Handle, int Channel, int Data, IntPtr User)
+        {
+            this.Ending();
+        }
+
+        public virtual void Ending()
         {
             Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ending\".", this.OutputStream.ChannelHandle);
             this.OnStopping();
         }
 
-        protected virtual void ChannelSync_Ended(int Handle, int Channel, int Data, IntPtr User)
+        protected virtual void OnEnded(int Handle, int Channel, int Data, IntPtr User)
+        {
+            this.Ended();
+        }
+
+        public virtual void Ended()
         {
             Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ended\".", this.OutputStream.ChannelHandle);
             this.OnStopped();

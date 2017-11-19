@@ -20,8 +20,29 @@ DWORD CALLBACK GaplessProc(HSTREAM handle, void *buffer, DWORD length, void *use
 	return result;
 }
 
+DWORD CALLBACK AsioGaplessProc(BOOL input, DWORD channel, void *buffer, DWORD length, void *user)
+{
+	DWORD result;
+	if (channelPrimary && BASS_ChannelIsActive(channelPrimary)) {
+		result = BASS_ChannelGetData(channelPrimary, buffer, length);
+	}
+	else if (channelSecondary && BASS_ChannelIsActive(channelSecondary)) {
+		result = BASS_ChannelGetData(channelSecondary, buffer, length);
+		channelPrimary = channelSecondary;
+		channelSecondary = 0;
+	}
+	else {
+		result = 0;
+	}
+	return result;
+}
+
 HSTREAM BASSDEF(BASS_StreamCreateGaplessMaster)(DWORD freq, DWORD chans, DWORD flags, void *user) {
 	return channelMaster = BASS_StreamCreate(freq, chans, flags, &GaplessProc, user);
+}
+
+BOOL BASSASIODEF(BASS_ASIO_ChannelEnableGaplessMaster)(BOOL input, DWORD channel, void *user) {
+	return BASS_ASIO_ChannelEnable(input, channel, &AsioGaplessProc, user);
 }
 
 DWORD BASSDEF(BASS_ChannelGetGaplessPrimary)() {

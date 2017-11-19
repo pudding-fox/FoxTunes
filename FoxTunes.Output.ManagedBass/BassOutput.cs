@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using ManagedBass.Asio;
 
 namespace FoxTunes
 {
@@ -45,6 +46,70 @@ namespace FoxTunes
             }
         }
 
+        private BassOutputMode _Mode { get; set; }
+
+        public BassOutputMode Mode
+        {
+            get
+            {
+                return this._Mode;
+            }
+            private set
+            {
+                this._Mode = value;
+                Logger.Write(this, LogLevel.Debug, "Mode = {0}", Enum.GetName(typeof(BassOutputMode), this.Mode));
+                this.Shutdown();
+            }
+        }
+
+        private int _DirectSoundDevice { get; set; }
+
+        public int DirectSoundDevice
+        {
+            get
+            {
+                return this._DirectSoundDevice;
+            }
+            private set
+            {
+                this._DirectSoundDevice = value;
+                Logger.Write(this, LogLevel.Debug, "Direct Sound Device = {0}", this.DirectSoundDevice);
+                this.Shutdown();
+            }
+        }
+
+        private int _AsioDevice { get; set; }
+
+        public int AsioDevice
+        {
+            get
+            {
+                return this._AsioDevice;
+            }
+            private set
+            {
+                this._AsioDevice = value;
+                Logger.Write(this, LogLevel.Debug, "ASIO Device = {0}", this.AsioDevice);
+                this.Shutdown();
+            }
+        }
+
+        private bool _DSDDirect { get; set; }
+
+        public bool DSDDirect
+        {
+            get
+            {
+                return this._DSDDirect;
+            }
+            private set
+            {
+                this._DSDDirect = value;
+                Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DSDDirect);
+                this.Shutdown();
+            }
+        }
+
         public BassFlags Flags
         {
             get
@@ -69,8 +134,16 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Starting BASS.");
             try
             {
-                BassUtils.OK(Bass.Init(Bass.DefaultDevice, this.Rate));
-                this.MasterChannel = new BassMasterChannel(this);
+                switch (this.Mode)
+                {
+                    case BassOutputMode.DirectSound:
+                        this.StartDirectSound();
+                        break;
+                    case BassOutputMode.ASIO:
+                        this.StartASIO();
+                        break;
+                }
+                this.MasterChannel = BassMasterChannelFactory.Instance.Create(this);
                 this.MasterChannel.InitializeComponent(this.Core);
                 this.MasterChannel.Error += this.MasterChannel_Error;
                 this.IsStarted = true;
@@ -78,22 +151,48 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
+                this.Shutdown(true);
                 this.OnError(e);
             }
         }
 
-        public void Shutdown()
+        private void StartDirectSound()
         {
-            if (!this.IsStarted)
+            BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Rate));
+            Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
+        }
+
+        private void StartASIO()
+        {
+            BassUtils.OK(Bass.Init(Bass.NoSoundDevice, this.Rate));
+            BassUtils.OK(BassAsio.Init(this.AsioDevice, AsioInitFlags.Thread));
+            BassAsio.Rate = this.Rate;
+            Logger.Write(this, LogLevel.Debug, "BASS ASIO Initialized.");
+        }
+
+        public void Shutdown(bool force = false)
+        {
+            if (!force && !this.IsStarted)
             {
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
             try
             {
-                this.MasterChannel.Dispose();
-                this.MasterChannel = null;
-                BassUtils.OK(Bass.Free());
+                if (this.MasterChannel != null)
+                {
+                    this.MasterChannel.Dispose();
+                    this.MasterChannel = null;
+                }
+                switch (this.Mode)
+                {
+                    case BassOutputMode.DirectSound:
+                        this.StopDirectSound();
+                        break;
+                    case BassOutputMode.ASIO:
+                        this.StopASIO();
+                        break;
+                }
                 Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
             }
             catch (Exception e)
@@ -106,6 +205,19 @@ namespace FoxTunes
             }
         }
 
+        private void StopDirectSound()
+        {
+            //Not checking result code as shutdown may be forced regardless of state.
+            Bass.Free();
+        }
+
+        private void StopASIO()
+        {
+            //Not checking result code as shutdown may be forced regardless of state.
+            Bass.Free();
+            BassAsio.Free();
+        }
+
         protected virtual void MasterChannel_Error(object sender, ComponentOutputErrorEventArgs e)
         {
             this.Shutdown();
@@ -116,6 +228,22 @@ namespace FoxTunes
         {
             BassPluginLoader.Instance.Load();
             this.Core = core;
+            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.MODE_ELEMENT
+            ).ConnectValue<string>(value => this.Mode = BassOutputConfiguration.GetMode(value));
+            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.ELEMENT_DS_DEVICE
+            ).ConnectValue<string>(value => this.DirectSoundDevice = BassOutputConfiguration.GetDsDevice(value));
+            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.ELEMENT_ASIO_DEVICE
+            ).ConnectValue<string>(value => this.AsioDevice = BassOutputConfiguration.GetAsioDevice(value));
+            this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.DSD_RAW_ELEMENT
+            ).ConnectValue<bool>(value => this.DSDDirect = value);
             this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.RATE_ELEMENT
@@ -161,8 +289,15 @@ namespace FoxTunes
         public override Task Preempt(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
-            Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
-            this.MasterChannel.SetSecondaryChannelHandle(outputStream.ChannelHandle);
+            if (this.IsStarted)
+            {
+                Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                this.MasterChannel.SetSecondaryChannel(outputStream.ChannelHandle);
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Not yet started, cannot pre-emp playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+            }
             return Task.CompletedTask;
         }
 
@@ -208,5 +343,12 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             this.Dispose(true);
         }
+    }
+
+    public enum BassOutputMode : byte
+    {
+        None,
+        DirectSound,
+        ASIO
     }
 }

@@ -11,7 +11,8 @@
     <AssemblyName>FoxTunes.Output.Bass</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>c605b928</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +37,9 @@
       <HintPath>..\packages\ManagedBass.2.0.4\lib\net45\ManagedBass.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ManagedBass.Asio, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.Asio.2.0.0\lib\netstandard1.4\ManagedBass.Asio.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,7 +49,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BassAsioMasterChannel.cs" />
     <Compile Include="BassMasterChannel.cs" />
+    <Compile Include="BassMasterChannelFactory.cs" />
     <Compile Include="BassNotificationSource.cs" />
     <Compile Include="BassOutput.cs" />
     <Compile Include="BassOutputConfiguration.cs" />
@@ -152,7 +158,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets'))" />
+    <Error Condition="!Exists('..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets'))" />
   </Target>
+  <Import Project="..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets" Condition="Exists('..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
