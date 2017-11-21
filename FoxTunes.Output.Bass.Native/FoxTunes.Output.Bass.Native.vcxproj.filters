@@ -24,6 +24,9 @@
     <ClInclude Include="bass\bassasio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="bass\basswasapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -34,5 +37,6 @@
     <Library Include="lib\bass.lib" />
     <Library Include="lib\msvcrt.lib" />
     <Library Include="lib\bassasio.lib" />
+    <Library Include="lib\basswasapi.lib" />
   </ItemGroup>
 </Project>

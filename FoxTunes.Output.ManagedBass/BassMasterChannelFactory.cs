@@ -12,6 +12,8 @@ namespace FoxTunes
                     return new BassMasterChannel(output);
                 case BassOutputMode.ASIO:
                     return new BassAsioMasterChannel(output);
+                case BassOutputMode.WASAPI:
+                    return new BassWasapiMasterChannel(output);
             }
             throw new NotImplementedException();
         }
