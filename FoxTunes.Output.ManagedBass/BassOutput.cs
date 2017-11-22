@@ -31,6 +31,22 @@ namespace FoxTunes
             }
         }
 
+        private bool _EnforceRate { get; set; }
+
+        public bool EnforceRate
+        {
+            get
+            {
+                return this._EnforceRate;
+            }
+            private set
+            {
+                this._EnforceRate = value;
+                Logger.Write(this, LogLevel.Debug, "Enforce Rate = {0}", this.EnforceRate);
+                this.Shutdown();
+            }
+        }
+
         private bool _Float { get; set; }
 
         public bool Float
@@ -186,14 +202,14 @@ namespace FoxTunes
         private void StartASIO()
         {
             BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 0));
-            BassUtils.OK(Bass.Init(Bass.NoSoundDevice, this.Rate));
+            BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
         private void StartWASAPI()
         {
             BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 0));
-            BassUtils.OK(Bass.Init(Bass.NoSoundDevice, this.Rate));
+            BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
@@ -258,6 +274,10 @@ namespace FoxTunes
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.RATE_ELEMENT
             ).ConnectValue<string>(value => this.Rate = BassOutputConfiguration.GetRate(value));
+            this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.ENFORCE_RATE_ELEMENT
+            ).ConnectValue<bool>(value => this.EnforceRate = value);
             this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.DEPTH_ELEMENT
@@ -328,7 +348,10 @@ namespace FoxTunes
             if (this.IsStarted)
             {
                 Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
-                this.MasterChannel.SetSecondaryChannel(outputStream.ChannelHandle);
+                if (this.MasterChannel.GetSecondaryChannel() != outputStream.ChannelHandle)
+                {
+                    this.MasterChannel.SetSecondaryChannel(outputStream.ChannelHandle);
+                }
             }
             else
             {

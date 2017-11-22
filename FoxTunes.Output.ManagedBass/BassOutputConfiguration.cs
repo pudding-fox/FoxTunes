@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public const string RATE_192000_OPTION = "3F00BE95-307B-4B80-B8DA-40798889945B";
 
+        public const string ENFORCE_RATE_ELEMENT = "1C5E5B16-1B49-4C50-A8CF-BE3A6CCD4A87";
+
         public const string DEPTH_ELEMENT = "F535A2A6-DCA0-4E27-9812-498BB2A2C4BC";
 
         public const string DEPTH_16_OPTION = "768B8466-7582-4B1C-8687-7AB75D636CD8";
@@ -74,7 +76,8 @@ namespace FoxTunes
                     .WithOption(new SelectionConfigurationOption(MODE_DS_OPTION, "Direct Sound"), true)
                     .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO"))
                     .WithOption(new SelectionConfigurationOption(MODE_WASAPI_OPTION, "WASAPI")))
-                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct").WithValue(false)
+                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate").WithValue(false)
             );
             StandardComponents.Instance.Configuration.GetElement(OUTPUT_SECTION, MODE_ELEMENT).ConnectValue<string>(mode => UpdateDevices(mode));
         }
