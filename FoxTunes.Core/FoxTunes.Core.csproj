@@ -198,6 +198,7 @@
       <DependentUpon>PlaylistSequenceBuilder.tt</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Templates\PlaylistSequenceBuilder_Logic.cs" />
+    <Compile Include="Utilities\TwoWayConcurrentDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Utilities\Templates\LibraryHierarchyBuilder.tt">
