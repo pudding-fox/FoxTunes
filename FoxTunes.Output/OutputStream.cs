@@ -43,7 +43,9 @@ namespace FoxTunes
 
         public abstract long Length { get; }
 
-        public abstract int SampleRate { get; }
+        public abstract int PCMRate { get; }
+
+        public abstract int DSDRate { get; }
 
         public abstract int Channels { get; }
 
@@ -160,7 +162,7 @@ namespace FoxTunes
         {
             get
             {
-                return string.Format("Length = {0},  SampleRate = {1}, Channels = {2}", this.Length, this.SampleRate, this.Channels);
+                return string.Format("Length = {0},  Rate (PCM) = {1}, Rate (DSD) = {2}, Channels = {3}", this.Length, this.PCMRate, this.DSDRate, this.Channels);
             }
         }
 

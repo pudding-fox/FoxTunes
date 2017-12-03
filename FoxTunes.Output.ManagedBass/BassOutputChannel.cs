@@ -16,7 +16,30 @@ namespace FoxTunes
 
         public BassOutput Output { get; private set; }
 
-        public int Rate { get; private set; }
+        public virtual bool CanPlayPCM
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public virtual bool CanPlayDSD
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public virtual bool CheckFormat(int rate, int channels)
+        {
+            return true;
+        }
+
+        public int PCMRate { get; private set; }
+
+        public int DSDRate { get; private set; }
 
         public int Channels { get; private set; }
 
@@ -63,8 +86,10 @@ namespace FoxTunes
 
         protected virtual void StartChannel(BassOutputStream outputStream)
         {
-            this.Rate = outputStream.SampleRate;
-            this.Channels = outputStream.Channels;
+            this.PCMRate = BassUtils.GetChannelPcmRate(outputStream.ChannelHandle);
+            this.DSDRate = BassUtils.GetChannelDsdRate(outputStream.ChannelHandle);
+            this.Channels = BassUtils.GetChannelCount(outputStream.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Initializing BASS GAPLESS.");
             BassUtils.OK(BassGapless.Init());
             try
             {
@@ -80,7 +105,8 @@ namespace FoxTunes
 
         protected virtual void CreateChannel()
         {
-            this.ChannelHandle = BassGapless.StreamCreate(this.Rate, this.Channels, this.Flags);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", this.PCMRate, this.Channels);
+            this.ChannelHandle = BassGapless.StreamCreate(this.PCMRate, this.Channels, this.Flags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
@@ -95,15 +121,18 @@ namespace FoxTunes
         protected virtual void StopChannel()
         {
             this.FreeChannel();
-            //Ignore errors.
+            Logger.Write(this, LogLevel.Debug, "Releasing BASS GAPLESS.");
             BassGapless.Free();
             this.OnChannelStopped();
         }
 
         protected virtual void FreeChannel()
         {
-            //Ignore errors.
-            Bass.StreamFree(this.ChannelHandle);
+            if (this.ChannelHandle != 0)
+            {
+                this.Output.FreeStream(this.ChannelHandle);
+                this.ChannelHandle = 0;
+            }
         }
 
         protected virtual void OnChannelStopped()
@@ -115,6 +144,10 @@ namespace FoxTunes
         {
             get
             {
+                if (!this.IsStarted)
+                {
+                    return Enumerable.Empty<int>();
+                }
                 var count = default(int);
                 return BassGapless.GetChannels(out count);
             }
@@ -134,16 +167,19 @@ namespace FoxTunes
 
         public void Enqueue(BassOutputStream outputStream)
         {
+            Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", outputStream.ChannelHandle);
             BassUtils.OK(BassGapless.ChannelEnqueue(outputStream.ChannelHandle));
         }
 
         public void Remove(BassOutputStream outputStream)
         {
+            Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", outputStream.ChannelHandle);
             BassUtils.OK(BassGapless.ChannelRemove(outputStream.ChannelHandle));
         }
 
         public void Clear()
         {
+            Logger.Write(this, LogLevel.Debug, "Clearing the queue.");
             foreach (var channelHandle in this.Queue)
             {
                 BassUtils.OK(BassGapless.ChannelRemove(channelHandle));
@@ -157,11 +193,12 @@ namespace FoxTunes
 
         public virtual bool CanPlay(BassOutputStream outputStream)
         {
-            return outputStream.SampleRate == this.Rate && outputStream.Channels == this.Channels;
+            return outputStream.PCMRate == this.PCMRate && outputStream.Channels == this.Channels;
         }
 
         public virtual void Play(BassOutputStream outputStream, bool reconfigure)
         {
+            Logger.Write(this, LogLevel.Debug, "Playing stream: {0}", outputStream.ChannelHandle);
             if (!this.IsStarted)
             {
                 this.StartChannel(outputStream);
@@ -170,12 +207,13 @@ namespace FoxTunes
             {
                 if (reconfigure)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Cannot play stream {0} with current configuration, restarting.", outputStream.ChannelHandle);
                     this.StopChannel();
                     this.StartChannel(outputStream);
                 }
                 else
                 {
-                    throw new ApplicationException("Cannot play with current configuration.");
+                    throw new InvalidOperationException("Cannot play with current configuration, set the reconfigure argument to true.");
                 }
             }
             else if (this.Position(outputStream) == 0)
@@ -185,6 +223,7 @@ namespace FoxTunes
             }
             else
             {
+                Logger.Write(this, LogLevel.Debug, "Resetting the queue after reconfiguration.");
                 this.Stop();
                 this.Clear();
             }

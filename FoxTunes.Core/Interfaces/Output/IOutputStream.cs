@@ -16,7 +16,9 @@ namespace FoxTunes.Interfaces
 
         long Length { get; }
 
-        int SampleRate { get; }
+        int PCMRate { get; }
+
+        int DSDRate { get; }
 
         int Channels { get; }
 

@@ -49,11 +49,33 @@ namespace FoxTunes
             }
         }
 
-        public override int SampleRate
+        public override int PCMRate
         {
             get
             {
-                return Bass.ChannelGetInfo(this.ChannelHandle).Frequency;
+                var rate = default(float);
+                if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.Frequency, out rate))
+                {
+                    return 0;
+                }
+                return Convert.ToInt32(rate);
+            }
+        }
+
+        public override int DSDRate
+        {
+            get
+            {
+                if (!Bass.ChannelHasFlag(this.ChannelHandle, BassFlags.DSDRaw))
+                {
+                    return 0;
+                }
+                var rate = default(float);
+                if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.DSDRate, out rate))
+                {
+                    return 0;
+                }
+                return Convert.ToInt32(rate);
             }
         }
 
@@ -192,7 +214,7 @@ namespace FoxTunes
             {
                 this.Output.OutputChannel.Remove(this);
             }
-            Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
+            this.Output.FreeStream(this.ChannelHandle);
             this.ChannelHandle = 0;
         }
     }
