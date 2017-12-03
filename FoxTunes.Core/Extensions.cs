@@ -112,6 +112,21 @@ namespace FoxTunes
             return alternative;
         }
 
+        public static int IndexOf<T>(this IEnumerable<T> sequence, T element)
+        {
+            var index = 0;
+            var enumerator = sequence.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                if (enumerator.Current != null && enumerator.Current.Equals(element))
+                {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        }
+
         private class DbParameterCollection : IDbParameterCollection
         {
             public DbParameterCollection(IDataParameterCollection parameters)
