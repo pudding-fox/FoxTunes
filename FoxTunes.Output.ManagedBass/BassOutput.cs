@@ -208,6 +208,7 @@ namespace FoxTunes
             {
                 this.Shutdown(true);
                 this.OnError(e);
+                throw;
             }
         }
 

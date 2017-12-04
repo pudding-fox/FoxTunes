@@ -91,7 +91,7 @@ namespace FoxTunes
                 BassUtils.OK(BassAsio.ChannelJoin(false, channel, PRIMARY_CHANNEL));
             }
             this.DsdDirect = false;
-            if (this.Output.DsdDirect && this.DSDRate > 0)
+            if (this.Output.DsdDirect && this.InputFlags.HasFlag(BassFlags.DSDRaw))
             {
                 if (this.ConfigureDSD())
                 {
@@ -129,20 +129,28 @@ namespace FoxTunes
 
         private bool ConfigureDSD()
         {
-            Logger.Write(this, LogLevel.Debug, "Configuring DSD RAW.");
-            BassUtils.OK(BassAsio.SetDSD(true));
-            if (!this.CheckRate(this.DSDRate))
+            try
             {
-                Logger.Write(this, LogLevel.Warn, "DSD rate {0} is unsupported.", this.DSDRate);
+                Logger.Write(this, LogLevel.Debug, "Configuring DSD RAW.");
+                BassUtils.OK(BassAsio.SetDSD(true));
+                if (!this.CheckRate(this.DSDRate))
+                {
+                    Logger.Write(this, LogLevel.Warn, "DSD rate {0} is unsupported.", this.DSDRate);
+                    return false;
+                }
+                else
+                {
+                    BassAsio.Rate = this.DSDRate;
+                }
+                Logger.Write(this, LogLevel.Debug, "DSD: Rate = {0}, Format = {1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), this.DSDFormat));
+                BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.DSDFormat));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to configure DSD RAW: {0}", e.Message);
                 return false;
             }
-            else
-            {
-                BassAsio.Rate = this.DSDRate;
-            }
-            Logger.Write(this, LogLevel.Debug, "DSD: Rate = {0}, Format = {1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), this.DSDFormat));
-            BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.DSDFormat));
-            return true;
         }
 
         protected override void FreeChannel()
@@ -213,7 +221,7 @@ namespace FoxTunes
 
         public override bool CanPlay(BassOutputStream outputStream)
         {
-            if (this.DsdDirect && outputStream.DSDRate != this.DSDRate)
+            if (this.DsdDirect && !BassUtils.GetChannelFlags(outputStream.ChannelHandle).HasFlag(BassFlags.DSDRaw))
             {
                 return false;
             }

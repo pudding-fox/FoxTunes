@@ -43,7 +43,15 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var types = assembly.GetExportedTypes();
+                var types = default(IEnumerable<Type>);
+                try
+                {
+                    types = assembly.GetExportedTypes();
+                }
+                catch
+                {
+                    continue;
+                }
                 foreach (var type in types)
                 {
                     if (!type.IsClass || type.IsAbstract)

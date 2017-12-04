@@ -45,7 +45,9 @@ namespace FoxTunes
 
         public int ChannelHandle { get; private set; }
 
-        public BassFlags Flags
+        public BassFlags InputFlags { get; private set; }
+
+        public virtual BassFlags OutputFlags
         {
             get
             {
@@ -89,6 +91,7 @@ namespace FoxTunes
             this.PCMRate = BassUtils.GetChannelPcmRate(outputStream.ChannelHandle);
             this.DSDRate = BassUtils.GetChannelDsdRate(outputStream.ChannelHandle);
             this.Channels = BassUtils.GetChannelCount(outputStream.ChannelHandle);
+            this.InputFlags = BassUtils.GetChannelFlags(outputStream.ChannelHandle);
             Logger.Write(this, LogLevel.Debug, "Initializing BASS GAPLESS.");
             BassUtils.OK(BassGapless.Init());
             try
@@ -96,9 +99,10 @@ namespace FoxTunes
                 this.CreateChannel();
                 this.OnChannelStarted();
             }
-            catch
+            catch(Exception e)
             {
                 this.StopChannel();
+                this.OnError(e);
                 throw;
             }
         }
@@ -106,7 +110,7 @@ namespace FoxTunes
         protected virtual void CreateChannel()
         {
             Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", this.PCMRate, this.Channels);
-            this.ChannelHandle = BassGapless.StreamCreate(this.PCMRate, this.Channels, this.Flags);
+            this.ChannelHandle = BassGapless.StreamCreate(this.PCMRate, this.Channels, this.OutputFlags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
