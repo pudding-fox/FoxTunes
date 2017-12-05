@@ -6,7 +6,7 @@ namespace FoxTunes.ViewModel
 {
     public class StreamPosition : ViewModelBase
     {
-        public ICommand PauseCommand
+        public ICommand StopCommand
         {
             get
             {
@@ -14,7 +14,7 @@ namespace FoxTunes.ViewModel
                     {
                         if (playback.CurrentStream.IsPlaying)
                         {
-                            playback.CurrentStream.Pause();
+                            playback.CurrentStream.Stop();
                         }
                     },
                     playback => playback != null && playback.CurrentStream != null
@@ -22,15 +22,15 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public ICommand ResumeCommand
+        public ICommand PlayCommand
         {
             get
             {
                 return new Command<IPlaybackManager>(playback =>
                     {
-                        if (playback.CurrentStream.IsPaused)
+                        if (playback.CurrentStream.IsStopped)
                         {
-                            playback.CurrentStream.Resume();
+                            playback.CurrentStream.Play();
                         }
                     },
                     playback => playback != null && playback.CurrentStream != null

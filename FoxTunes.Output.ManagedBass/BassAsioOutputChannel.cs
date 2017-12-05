@@ -1,9 +1,12 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using ManagedBass.Asio;
 using ManagedBass.Gapless.Asio;
+using ManagedBass.Sox;
+using ManagedBass.Sox.Asio;
+using System;
+using System.Linq;
 using System.Threading;
-using FoxTunes.Interfaces;
-using ManagedBass;
 
 namespace FoxTunes
 {
@@ -14,6 +17,10 @@ namespace FoxTunes
         const int START_ATTEMPT_INTERVAL = 400;
 
         const int PRIMARY_CHANNEL = 0;
+
+        const int SOX_BUFFER_LENGTH = 3;
+
+        const bool SOX_BACKGROUND = true;
 
         public BassAsioOutputChannel(BassOutput output) : base(output)
         {
@@ -50,11 +57,39 @@ namespace FoxTunes
             }
         }
 
+        public override BassFlags OutputFlags
+        {
+            get
+            {
+                return base.OutputFlags | BassFlags.Decode;
+            }
+        }
+
         public override bool CanPlayDSD
         {
             get
             {
                 return true;
+            }
+        }
+
+        public override bool IsResampling
+        {
+            get
+            {
+                return base.IsResampling && (!this.CheckRate(this.PCMRate) || this.Output.EnforceRate);
+            }
+        }
+
+        public override int BufferLength
+        {
+            get
+            {
+                if (this.IsResampling)
+                {
+                    return SOX_BUFFER_LENGTH;
+                }
+                return base.BufferLength;
             }
         }
 
@@ -82,10 +117,21 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Error, "Cannot play stream with more channels than device outputs.");
                 throw new NotImplementedException(string.Format("The stream contains {0} channels which is greater than {1} output channels provided by the device.", this.Channels, BassAsio.Info.Outputs));
             }
-            Logger.Write(this, LogLevel.Debug, "Initializing BASS GAPLESS ASIO.");
-            BassUtils.OK(BassGaplessAsio.Init());
             Logger.Write(this, LogLevel.Debug, "Configuring BASS ASIO.");
-            BassUtils.OK(BassGaplessAsio.ChannelEnable(false, PRIMARY_CHANNEL));
+            if (this.IsResampling)
+            {
+                base.CreateChannel();
+                Logger.Write(this, LogLevel.Debug, "Initializing BASS SOX ASIO.");
+                BassUtils.OK(BassSoxAsio.Init());
+                BassUtils.OK(BassSoxAsio.StreamSet(this.ResamplerChannelHandle));
+                BassUtils.OK(BassSoxAsio.ChannelEnable(false, PRIMARY_CHANNEL));
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Initializing BASS GAPLESS ASIO.");
+                BassUtils.OK(BassGaplessAsio.Init());
+                BassUtils.OK(BassGaplessAsio.ChannelEnable(false, PRIMARY_CHANNEL));
+            }
             for (var channel = 1; channel < this.Channels; channel++)
             {
                 BassUtils.OK(BassAsio.ChannelJoin(false, channel, PRIMARY_CHANNEL));
@@ -112,7 +158,7 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Configuring PCM.");
             BassUtils.OK(BassAsio.SetDSD(false));
-            if (!this.CheckRate(this.PCMRate) || this.Output.EnforceRate)
+            if (this.IsResampling)
             {
                 Logger.Write(this, LogLevel.Warn, "PCM rate {0} is either unsupported or another rate is enforced.", this.PCMRate);
                 BassAsio.Rate = this.Output.Rate;
@@ -123,7 +169,7 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "PCM: Rate = {0}, Format = {1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), this.PCMFormat));
             BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.PCMFormat));
-            BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, this.PCMRate));
+            BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, BassAsio.Rate));
             return true;
         }
 
@@ -164,6 +210,14 @@ namespace FoxTunes
             }
         }
 
+        protected override void CreateResamplingChannel()
+        {
+            base.CreateResamplingChannel();
+            Logger.Write(this, LogLevel.Debug, "Configuring BASS SOX: Buffer Length = {0}, Background = {1}", SOX_BUFFER_LENGTH, SOX_BACKGROUND);
+            BassUtils.OK(BassSox.ChannelSetAttribute(this.ResamplerChannelHandle, SoxChannelAttribute.BufferLength, this.BufferLength));
+            BassUtils.OK(BassSox.ChannelSetAttribute(this.ResamplerChannelHandle, SoxChannelAttribute.Background, SOX_BACKGROUND));
+        }
+
         protected override void FreeChannel()
         {
             if (BassAsio.IsStarted)
@@ -189,8 +243,17 @@ namespace FoxTunes
                 //Nothing can be done.
                 Logger.Write(this, LogLevel.Warn, "Failed to reset channel attributes: {0}", e.Message);
             }
-            Logger.Write(this, LogLevel.Debug, "Releasing BASS GAPLESS ASIO.");
-            BassGaplessAsio.Free();
+            if (this.IsResampling)
+            {
+                base.FreeChannel();
+                Logger.Write(this, LogLevel.Debug, "Releasing BASS SOX ASIO.");
+                BassSoxAsio.Free();
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Releasing BASS GAPLESS ASIO.");
+                BassGaplessAsio.Free();
+            }
             Logger.Write(this, LogLevel.Debug, "Releasing BASS ASIO.");
             BassAsio.Free();
         }
