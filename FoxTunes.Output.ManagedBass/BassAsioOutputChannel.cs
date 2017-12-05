@@ -86,7 +86,7 @@ namespace FoxTunes
             BassUtils.OK(BassGaplessAsio.Init());
             Logger.Write(this, LogLevel.Debug, "Configuring BASS ASIO.");
             BassUtils.OK(BassGaplessAsio.ChannelEnable(false, PRIMARY_CHANNEL));
-            for (var channel = 1; channel < BassAsio.Info.Outputs; channel++)
+            for (var channel = 1; channel < this.Channels; channel++)
             {
                 BassUtils.OK(BassAsio.ChannelJoin(false, channel, PRIMARY_CHANNEL));
             }
@@ -132,7 +132,18 @@ namespace FoxTunes
             try
             {
                 Logger.Write(this, LogLevel.Debug, "Configuring DSD RAW.");
-                BassUtils.OK(BassAsio.SetDSD(true));
+                try
+                {
+                    BassUtils.OK(BassAsio.SetDSD(true));
+                }
+                catch
+                {
+                    //If we get here some drivers (at least Creative) will crash when BassAsio.Start is called.
+                    //I can't find a way to prevent it but it seems to be related to the allocated buffer size
+                    //not being what the driver *thinks* it is and over-flowing.
+                    Logger.Write(this, LogLevel.Error, "Failed to enable DSD RAW on the device. Creative ASIO driver becomes unstable and usually crashes soon...");
+                    return false;
+                }
                 if (!this.CheckRate(this.DSDRate))
                 {
                     Logger.Write(this, LogLevel.Warn, "DSD rate {0} is unsupported.", this.DSDRate);

@@ -83,7 +83,7 @@ namespace FoxTunes
             return Convert.ToInt32(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.DSDRate));
         }
 
-        public static BassFlags GetChannelFlags(int channelHandle)
+        public static Enum GetChannelFlags(int channelHandle)
         {
             var channelInfo = default(ChannelInfo);
             OK(Bass.ChannelGetInfo(channelHandle, out channelInfo));
