@@ -13,7 +13,8 @@ namespace FoxTunes
         public BassOutputChannel(BassOutput output)
         {
             this.Output = output;
-            this.ResamplerEnabled = output.SoxResampler;
+            this.EnforceRate = output.EnforceRate;
+            this.SoxResampler = output.SoxResampler;
         }
 
         public BassOutput Output { get; private set; }
@@ -39,7 +40,9 @@ namespace FoxTunes
             return true;
         }
 
-        public bool ResamplerEnabled { get; private set; }
+        public bool EnforceRate { get; private set; }
+
+        public bool SoxResampler { get; private set; }
 
         public int PCMRate { get; private set; }
 
@@ -47,12 +50,29 @@ namespace FoxTunes
 
         public int Channels { get; private set; }
 
-        public virtual bool IsResampling
+        public virtual bool ShouldResample
         {
             get
             {
-                return this.ResamplerEnabled && this.PCMRate != this.Output.Rate;
+                return this.SoxResampler && (this.ShouldEnforceRate || !this.CheckRate(this.PCMRate));
             }
+        }
+
+        public bool IsResampling { get; protected set; }
+
+        public virtual bool ShouldEnforceRate
+        {
+            get
+            {
+                return this.EnforceRate && this.Output.Rate != this.PCMRate;
+            }
+        }
+
+        public bool IsEnforcingRate { get; protected set; }
+
+        protected virtual bool CheckRate(int rate)
+        {
+            return true;
         }
 
         public int GaplessChannelHandle { get; private set; }
@@ -149,7 +169,7 @@ namespace FoxTunes
         protected virtual void CreateChannel()
         {
             this.CreateGaplessChannel();
-            if (this.IsResampling)
+            if (this.ShouldResample)
             {
                 this.CreateResamplingChannel();
             }
@@ -178,6 +198,7 @@ namespace FoxTunes
             {
                 BassUtils.Throw();
             }
+            this.IsResampling = true;
         }
 
         protected virtual void OnChannelStarted()
@@ -229,7 +250,7 @@ namespace FoxTunes
         {
             if (this.GaplessChannelHandle != 0)
             {
-                //if (Bass.ChannelIsActive(this.GaplessChannelHandle) == PlaybackState.Stopped)
+                if (Bass.ChannelIsActive(this.GaplessChannelHandle) == PlaybackState.Stopped)
                 {
                     Logger.Write(this, LogLevel.Debug, "Resetting BASS GAPLESS stream position: {0}", this.GaplessChannelHandle);
                     Bass.ChannelSetPosition(this.GaplessChannelHandle, 0);
@@ -241,7 +262,7 @@ namespace FoxTunes
         {
             if (this.ResamplerChannelHandle != 0)
             {
-                //if (Bass.ChannelIsActive(this.ResamplerChannelHandle) == PlaybackState.Stopped)
+                if (Bass.ChannelIsActive(this.ResamplerChannelHandle) == PlaybackState.Stopped)
                 {
                     Logger.Write(this, LogLevel.Debug, "Resetting BASS SOX stream position: {0}", this.ResamplerChannelHandle);
                     Bass.ChannelSetPosition(this.ResamplerChannelHandle, 0);
@@ -425,24 +446,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-
                 this.OnError(e);
-            }
-        }
-
-        public long Position
-        {
-            get
-            {
-                if (this.GaplessChannelHandle != 0)
-                {
-                    return Bass.ChannelGetPosition(this.GaplessChannelHandle) - Bass.ChannelSeconds2Bytes(this.GaplessChannelHandle, this.BufferLength);
-                }
-                if (this.CurrentChannelHandle != 0)
-                {
-                    return Bass.ChannelGetPosition(this.CurrentChannelHandle);
-                }
-                return 0;
             }
         }
 

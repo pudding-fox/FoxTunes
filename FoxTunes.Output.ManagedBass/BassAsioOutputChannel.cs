@@ -18,6 +18,8 @@ namespace FoxTunes
 
         const int PRIMARY_CHANNEL = 0;
 
+        const int SECONDARY_CHANNEL = 1;
+
         const int SOX_BUFFER_LENGTH = 3;
 
         const bool SOX_BACKGROUND = true;
@@ -73,12 +75,9 @@ namespace FoxTunes
             }
         }
 
-        public override bool IsResampling
+        protected override bool CheckRate(int rate)
         {
-            get
-            {
-                return base.IsResampling && (!this.CheckRate(this.PCMRate) || this.Output.EnforceRate);
-            }
+            return BassAsio.CheckRate(rate);
         }
 
         public override int BufferLength
@@ -102,11 +101,6 @@ namespace FoxTunes
             return base.CheckFormat(rate, channels);
         }
 
-        protected virtual bool CheckRate(int rate)
-        {
-            return BassAsio.CheckRate(rate);
-        }
-
         protected override void CreateChannel()
         {
             Logger.Write(this, LogLevel.Debug, "Initializing BASS ASIO.");
@@ -118,7 +112,7 @@ namespace FoxTunes
                 throw new NotImplementedException(string.Format("The stream contains {0} channels which is greater than {1} output channels provided by the device.", this.Channels, BassAsio.Info.Outputs));
             }
             Logger.Write(this, LogLevel.Debug, "Configuring BASS ASIO.");
-            if (this.IsResampling)
+            if (this.ShouldResample)
             {
                 base.CreateChannel();
                 Logger.Write(this, LogLevel.Debug, "Initializing BASS SOX ASIO.");
@@ -132,9 +126,18 @@ namespace FoxTunes
                 BassUtils.OK(BassGaplessAsio.Init());
                 BassUtils.OK(BassGaplessAsio.ChannelEnable(false, PRIMARY_CHANNEL));
             }
-            for (var channel = 1; channel < this.Channels; channel++)
+            if (this.Channels == 1)
             {
-                BassUtils.OK(BassAsio.ChannelJoin(false, channel, PRIMARY_CHANNEL));
+                //Upmix mono to stereo.
+                BassUtils.OK(BassAsio.ChannelEnableMirror(SECONDARY_CHANNEL, false, PRIMARY_CHANNEL));
+            }
+            else
+            {
+                //Deinterleave multi channel.
+                for (var channel = 1; channel < this.Channels; channel++)
+                {
+                    BassUtils.OK(BassAsio.ChannelJoin(false, channel, PRIMARY_CHANNEL));
+                }
             }
             this.DsdDirect = false;
             if (this.Output.DsdDirect && this.InputFlags.HasFlag(BassFlags.DSDRaw))
@@ -160,16 +163,22 @@ namespace FoxTunes
             BassUtils.OK(BassAsio.SetDSD(false));
             if (this.IsResampling)
             {
-                Logger.Write(this, LogLevel.Warn, "PCM rate {0} is either unsupported or another rate is enforced.", this.PCMRate);
                 BassAsio.Rate = this.Output.Rate;
+                BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, this.Output.Rate));
+            }
+            else if (this.ShouldEnforceRate)
+            {
+                BassAsio.Rate = this.Output.Rate;
+                BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, this.PCMRate));
+                this.IsEnforcingRate = true;
             }
             else
             {
                 BassAsio.Rate = this.PCMRate;
+                BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, this.PCMRate));
             }
             Logger.Write(this, LogLevel.Debug, "PCM: Rate = {0}, Format = {1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), this.PCMFormat));
             BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.PCMFormat));
-            BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, BassAsio.Rate));
             return true;
         }
 

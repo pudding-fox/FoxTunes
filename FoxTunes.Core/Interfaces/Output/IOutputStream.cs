@@ -53,6 +53,10 @@ namespace FoxTunes.Interfaces
         event StoppedEventHandler Stopped;
 
         string Description { get; }
+
+        void BeginSeek();
+
+        void EndSeek();
     }
 
     public delegate void PlayedEventHandler(object sender, PlayedEventArgs e);
