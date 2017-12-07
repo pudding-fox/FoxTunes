@@ -29,6 +29,10 @@ namespace FoxTunes
 
         public const string RATE_192000_OPTION = "3F00BE95-307B-4B80-B8DA-40798889945B";
 
+        public const string RATE_352800_OPTION = "3CF9FC05-A7A3-4B5B-A3BD-CA27625DF3D5";
+
+        public const string RATE_384000_OPTION = "61A9BAC3-FFF3-43D7-A126-F5E2049FE97C";
+
         public const string ENFORCE_RATE_ELEMENT = "1C5E5B16-1B49-4C50-A8CF-BE3A6CCD4A87";
 
         public const string DEPTH_ELEMENT = "F535A2A6-DCA0-4E27-9812-498BB2A2C4BC";
@@ -64,7 +68,9 @@ namespace FoxTunes
                     .WithOption(new SelectionConfigurationOption(RATE_088200_OPTION, "88200"))
                     .WithOption(new SelectionConfigurationOption(RATE_096000_OPTION, "96000"))
                     .WithOption(new SelectionConfigurationOption(RATE_176400_OPTION, "176400"))
-                    .WithOption(new SelectionConfigurationOption(RATE_192000_OPTION, "192000")))
+                    .WithOption(new SelectionConfigurationOption(RATE_192000_OPTION, "192000"))
+                    .WithOption(new SelectionConfigurationOption(RATE_352800_OPTION, "352800"))
+                    .WithOption(new SelectionConfigurationOption(RATE_384000_OPTION, "384000")))
                 .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth")
                     .WithOption(new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit"), true)
                     .WithOption(new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point")))
@@ -174,6 +180,10 @@ namespace FoxTunes
                     return 176400;
                 case RATE_192000_OPTION:
                     return 192000;
+                case RATE_352800_OPTION:
+                    return 352800;
+                case RATE_384000_OPTION:
+                    return 384000;
             }
         }
 
