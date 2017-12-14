@@ -21,12 +21,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>..\distribution\Release\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Noesis.Javascript" Condition="'$(PlatformTarget)' == 'x86'">
-      <HintPath>..\packages\Noesis.Javascript.0.7.1.0\lib\net40\x86\Noesis.Javascript.dll</HintPath>
-    </Reference>
     <Reference Include="Noesis.Javascript" Condition="'$(PlatformTarget)' == 'x64'">
       <HintPath>..\packages\Noesis.Javascript.0.7.1.0\lib\net40\amd64\Noesis.Javascript.dll</HintPath>
+    </Reference>
+    <Reference Include="Noesis.Javascript">
+      <HintPath>..\packages\Noesis.Javascript.0.7.1.0\lib\net40\x86\Noesis.Javascript.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -99,15 +99,19 @@ namespace FoxTunes
 
         public override ConfigurationElement ConnectValue<T>(Action<T> action)
         {
-            if (this.SelectedOption == null)
+            var payload = new Action(() =>
             {
-                action(default(T));
-            }
-            else
-            {
-                action((T)Convert.ChangeType(this.SelectedOption.Id, typeof(T)));
-            }
-            this.SelectedOptionChanged += (sender, e) => this.ConnectValue(action);
+                if (this.SelectedOption == null)
+                {
+                    action(default(T));
+                }
+                else
+                {
+                    action((T)Convert.ChangeType(this.SelectedOption.Id, typeof(T)));
+                }
+            });
+            payload();
+            this.SelectedOptionChanged += (sender, e) => payload();
             return this;
         }
 

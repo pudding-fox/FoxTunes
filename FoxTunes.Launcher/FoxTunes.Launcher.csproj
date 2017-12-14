@@ -28,6 +28,9 @@
   <PropertyGroup>
     <ApplicationIcon>Images\Fox.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>..\distribution\Release\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
