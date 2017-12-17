@@ -115,22 +115,6 @@ namespace FoxTunes
             }
         }
 
-        private int _WasapiDevice { get; set; }
-
-        public int WasapiDevice
-        {
-            get
-            {
-                return this._WasapiDevice;
-            }
-            private set
-            {
-                this._WasapiDevice = value;
-                Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
-                this.Shutdown();
-            }
-        }
-
         private bool _DsdDirect { get; set; }
 
         public bool DsdDirect
@@ -194,9 +178,6 @@ namespace FoxTunes
                     case BassOutputMode.ASIO:
                         this.StartASIO();
                         break;
-                    case BassOutputMode.WASAPI:
-                        this.StartWASAPI();
-                        break;
                 }
                 this.OutputChannel = BassOutputChannelFactory.Instance.Create(this);
                 this.OutputChannel.InitializeComponent(this.Core);
@@ -220,13 +201,6 @@ namespace FoxTunes
         }
 
         private void StartASIO()
-        {
-            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
-            BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
-            Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
-        }
-
-        private void StartWASAPI()
         {
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
@@ -283,10 +257,6 @@ namespace FoxTunes
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.ELEMENT_ASIO_DEVICE
             ).ConnectValue<string>(value => this.AsioDevice = BassOutputConfiguration.GetAsioDevice(value));
-            this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
-                BassOutputConfiguration.ELEMENT_WASAPI_DEVICE
-            ).ConnectValue<string>(value => this.WasapiDevice = BassOutputConfiguration.GetWasapiDevice(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.DSD_RAW_ELEMENT
@@ -457,7 +427,6 @@ namespace FoxTunes
     {
         None,
         DirectSound,
-        ASIO,
-        WASAPI
+        ASIO
     }
 }
