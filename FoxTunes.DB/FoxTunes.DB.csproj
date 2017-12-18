@@ -35,7 +35,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database.cs" />
-    <Compile Include="DatabaseContext.cs" />
+    <Compile Include="DatabaseQuery.cs" />
+    <Compile Include="DatabaseSet.cs" />
+    <Compile Include="DatabaseSets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

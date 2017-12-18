@@ -46,26 +46,23 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            using (var databaseContext = this.DataManager.CreateWriteContext())
+            using (var transaction = this.Database.BeginTransaction())
             {
-                using (var transaction = databaseContext.Connection.BeginTransaction())
-                {
-                    this.AddLibraryItems(databaseContext, transaction);
-                    this.AddOrUpdateMetaData(databaseContext, transaction);
-                    this.SetLibraryItemsStatus(databaseContext, transaction);
-                    transaction.Commit();
-                }
+                this.AddLibraryItems(transaction);
+                this.AddOrUpdateMetaData(transaction);
+                this.SetLibraryItemsStatus(transaction);
+                transaction.Commit();
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
             return Task.CompletedTask;
         }
 
-        private void AddLibraryItems(IDatabaseContext databaseContext, IDbTransaction transaction)
+        private void AddLibraryItems(IDbTransaction transaction)
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.AddLibraryItem, new[] { "directoryName", "fileName", "status" }, out parameters))
+            using (var command = this.Database.CreateCommand(this.Database.Queries.AddLibraryItem, out parameters))
             {
                 command.Transaction = transaction;
                 var addLibraryItem = new Action<string>(fileName =>
@@ -98,11 +95,11 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
+        private void AddOrUpdateMetaData(IDbTransaction transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Library", true))
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddLibraryMetaDataItems, true))
             {
-                var query = databaseContext.GetQuery<LibraryItem>().Detach().Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import);
+                var query = this.Database.Sets.LibraryItem.Query(this.Database.Queries.GetLibraryItems, parameters => parameters["status"] = LibraryItemStatus.Import);
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
@@ -112,11 +109,11 @@ namespace FoxTunes
             }
         }
 
-        private void SetLibraryItemsStatus(IDatabaseContext databaseContext, IDbTransaction transaction)
+        private void SetLibraryItemsStatus(IDbTransaction transaction)
         {
             this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.SetLibraryItemStatus, new[] { "status" }, out parameters))
+            using (var command = this.Database.CreateCommand(this.Database.Queries.SetLibraryItemStatus, out parameters))
             {
                 command.Transaction = transaction;
                 parameters["status"] = LibraryItemStatus.None;

@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -8,7 +9,7 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistSettings : ViewModelBase
     {
-        public IDatabaseContext DatabaseContext { get; private set; }
+        public IDatabase Database { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -38,45 +39,31 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedPlaylistColumnChanged = delegate { };
 
-        public ObservableCollection<PlaylistColumn> Columns
+        private ObservableCollection<PlaylistColumn> _PlaylistColumns { get; set; }
+
+        public ObservableCollection<PlaylistColumn> PlaylistColumns
         {
             get
             {
-                if (this.DatabaseContext == null)
-                {
-                    return null;
-                }
-                return this.DatabaseContext.Sets.PlaylistColumn.Local;
+                return this._PlaylistColumns;
             }
-        }
-
-        protected virtual void OnColumnsChanged()
-        {
-            if (this.ColumnsChanged != null)
+            set
             {
-                this.ColumnsChanged(this, EventArgs.Empty);
+                this._PlaylistColumns = value;
+                this.OnPlaylistColumnsChanged();
             }
-            this.OnPropertyChanged("Columns");
         }
 
-        public event EventHandler ColumnsChanged = delegate { };
-
-        public ICommand UpdateCommand
+        protected virtual void OnPlaylistColumnsChanged()
         {
-            get
+            if (this.PlaylistColumnsChanged != null)
             {
-                return new Command(this.Update);
+                this.PlaylistColumnsChanged(this, EventArgs.Empty);
             }
+            this.OnPropertyChanged("PlaylistColumns");
         }
 
-        public void Update()
-        {
-            if (this.SelectedPlaylistColumn.Id == 0)
-            {
-                return;
-            }
-            this.DatabaseContext.Sets.PlaylistColumn.Update(this.SelectedPlaylistColumn);
-        }
+        public event EventHandler PlaylistColumnsChanged = delegate { };
 
         public ICommand SaveCommand
         {
@@ -88,19 +75,28 @@ namespace FoxTunes.ViewModel
 
         public void Save()
         {
-            this.DatabaseContext.SaveChanges();
-            this.DatabaseContext.Dispose();
-            this.DatabaseContext = this.Core.Managers.Data.CreateWriteContext();
+            using (var transaction = this.Database.BeginTransaction())
+            {
+                var playlistColumns = this.Database.GetSet<PlaylistColumn>(transaction);
+                playlistColumns.Delete(playlistColumns.Except(this.PlaylistColumns));
+                playlistColumns.AddOrUpdate(this.PlaylistColumns);
+                transaction.Commit();
+            }
+            this.Refresh();
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
         }
 
         protected override void OnCoreChanged()
         {
-            this.DatabaseContext = this.Core.Managers.Data.CreateWriteContext();
-            this.DatabaseContext.Sets.PlaylistColumn.Load();
+            this.Database = this.Core.Components.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
-            this.OnColumnsChanged();
+            this.Refresh();
             base.OnCoreChanged();
+        }
+
+        protected virtual void Refresh()
+        {
+            this.PlaylistColumns = new ObservableCollection<PlaylistColumn>(this.Database.Sets.PlaylistColumn);
         }
 
         protected override Freezable CreateInstanceCore()

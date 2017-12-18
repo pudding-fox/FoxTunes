@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IDatabaseQuery : IOrderedQueryable, IQueryable, IEnumerable, INotifyCollectionChanged
+    public interface IDatabaseQuery
     {
+        string CommandText { get; }
 
-    }
-
-    public interface IDatabaseQuery<T> : IDatabaseQuery, IOrderedQueryable<T>, IQueryable<T>, IEnumerable<T> where T : class
-    {
-        IDatabaseQuery<T> Detach();
-
-        IDatabaseQuery<T> Include(string path);
-
-        IDatabaseQuery<T> Include<TProperty>(Expression<Func<T, TProperty>> path);
+        IEnumerable<string> ParameterNames { get; }
     }
 }

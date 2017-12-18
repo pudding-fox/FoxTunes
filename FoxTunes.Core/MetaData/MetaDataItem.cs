@@ -51,9 +51,10 @@ namespace FoxTunes
     public enum MetaDataItemType : byte
     {
         None = 0,
-        Tag,
-        Property,
-        Image,
-        Statistic
+        Tag = 1,
+        Property = 2,
+        Image = 4,
+        Statistic = 8,
+        All = Tag | Property | Image | Statistic
     }
 }

@@ -9,7 +9,5 @@
         ILibraryManager Library { get; }
 
         IHierarchyManager Hierarchy { get; }
-
-        IDataManager Data { get; }
     }
 }

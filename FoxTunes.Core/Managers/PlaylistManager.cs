@@ -12,7 +12,7 @@ namespace FoxTunes.Managers
 
         public ICore Core { get; private set; }
 
-        public IDataManager DataManager { get; private set; }
+        public IDatabase Database { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -21,7 +21,7 @@ namespace FoxTunes.Managers
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.DataManager = core.Managers.Data;
+            this.Database = core.Components.Database;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -46,7 +46,7 @@ namespace FoxTunes.Managers
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Playlist was updated, refreshing current item.");
-            if ((this.CurrentItem = this.DataManager.ReadContext.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
+            if ((this.CurrentItem = this.Database.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
             }
@@ -69,12 +69,14 @@ namespace FoxTunes.Managers
 
         public Task Add(IEnumerable<string> paths)
         {
+            Logger.Write(this, LogLevel.Debug, "Adding paths to playlist.");
             var index = this.GetInsertIndex();
             return this.Insert(index, paths);
         }
 
         public Task Insert(int index, IEnumerable<string> paths)
         {
+            Logger.Write(this, LogLevel.Debug, "Inserting paths into playlist at index: {0}", index);
             var task = new AddPathsToPlaylistTask(index, paths);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
@@ -83,12 +85,14 @@ namespace FoxTunes.Managers
 
         public Task Add(LibraryHierarchyNode libraryHierarchyNode)
         {
+            Logger.Write(this, LogLevel.Debug, "Adding library node to playlist.");
             var index = this.GetInsertIndex();
             return this.Insert(index, libraryHierarchyNode);
         }
 
         public Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode)
         {
+            Logger.Write(this, LogLevel.Debug, "Inserting library node into playlist at index: {0}", index);
             var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
@@ -97,15 +101,20 @@ namespace FoxTunes.Managers
 
         private int GetInsertIndex()
         {
-            if (!this.DataManager.ReadContext.Queries.PlaylistItem.Any())
+            var playlistItem = this.GetLastPlaylistItem();
+            if (playlistItem == null)
             {
                 return 0;
             }
-            return this.DataManager.ReadContext.Queries.PlaylistItem.Max(playlistItem => playlistItem.Sequence) + 1;
+            else
+            {
+                return playlistItem.Sequence + 1;
+            }
         }
 
         protected virtual void OnUpdated()
         {
+            Logger.Write(this, LogLevel.Debug, "Playlist was updated.");
             if (this.Updated == null)
             {
                 return;
@@ -119,7 +128,7 @@ namespace FoxTunes.Managers
         {
             get
             {
-                return this.DataManager.ReadContext.Queries.PlaylistItem.Any();
+                return this.Database.Sets.PlaylistItem.Count > 0;
             }
         }
 
@@ -225,40 +234,28 @@ namespace FoxTunes.Managers
 
         protected virtual PlaylistItem GetFirstPlaylistItem()
         {
-            var query =
-                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
-                orderby playlistItem.Sequence
-                select playlistItem;
-            return query.FirstOrDefault();
+            return this.Database.Sets.PlaylistItem.Query(this.Database.Queries.GetFirstPlaylistItem).FirstOrDefault();
         }
 
         protected virtual PlaylistItem GetLastPlaylistItem()
         {
-            var query =
-                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
-                orderby playlistItem.Sequence descending
-                select playlistItem;
-            return query.FirstOrDefault();
+            return this.Database.Sets.PlaylistItem.Query(this.Database.Queries.GetLastPlaylistItem).FirstOrDefault();
         }
 
         protected virtual PlaylistItem GetNextPlaylistItem(int sequence)
         {
-            var query =
-                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
-                orderby playlistItem.Sequence
-                where playlistItem.Sequence > sequence
-                select playlistItem;
-            return query.FirstOrDefault();
+            return this.Database.Sets.PlaylistItem.Query(
+                this.Database.Queries.GetNextPlaylistItem,
+                parameters => parameters["sequence"] = sequence
+            ).FirstOrDefault();
         }
 
         protected virtual PlaylistItem GetPreviousPlaylistItem(int sequence)
         {
-            var query =
-                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
-                orderby playlistItem.Sequence descending
-                where playlistItem.Sequence < sequence
-                select playlistItem;
-            return query.FirstOrDefault();
+            return this.Database.Sets.PlaylistItem.Query(
+                this.Database.Queries.GetPreviousPlaylistItem,
+                parameters => parameters["sequence"] = sequence
+            ).FirstOrDefault();
         }
 
         public async Task Play(PlaylistItem playlistItem)

@@ -8,43 +8,14 @@ namespace FoxTunes
     {
         public PlaylistItem()
         {
-            this.MetaDatas = new ObservableCollection<MetaDataItem>();
+
         }
 
-        public PlaylistItem(int sequence, string directoryName, string fileName, PlaylistItemStatus status, IMetaDataSource metaData)
-            : this()
-        {
-            this.Sequence = sequence;
-            this.DirectoryName = directoryName;
-            this.FileName = fileName;
-            this.MetaDatas = metaData.MetaDatas;
-        }
+        public ICore Core { get; private set; }
 
-        private int _Sequence { get; set; }
+        public IDatabase Database { get; private set; }
 
-        public int Sequence
-        {
-            get
-            {
-                return this._Sequence;
-            }
-            set
-            {
-                this._Sequence = value;
-                this.OnSequenceChanged();
-            }
-        }
-
-        protected virtual void OnSequenceChanged()
-        {
-            if (this.SequenceChanged != null)
-            {
-                this.SequenceChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Sequence");
-        }
-
-        public event EventHandler SequenceChanged = delegate { };
+        public int Sequence { get; set; }
 
         public string DirectoryName { get; set; }
 
@@ -52,52 +23,57 @@ namespace FoxTunes
 
         public PlaylistItemStatus Status { get; set; }
 
-        public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
+        private ObservableCollection<MetaDataItem> _MetaDatas { get; set; }
 
-        public bool Equals(PlaylistItem other)
+        public ObservableCollection<MetaDataItem> MetaDatas
         {
-            if (other == null)
+            get
             {
-                return false;
+                if (this._MetaDatas == null)
+                {
+                    this.LoadMetaDatas();
+                }
+                return this._MetaDatas;
             }
-            if (object.ReferenceEquals(this, other))
+            set
             {
-                return true;
+                this._MetaDatas = value;
+                this.OnMetaDatasChanged();
             }
-            return this.Id == other.Id && string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase);
         }
 
-        public override bool Equals(object obj)
+        protected virtual void OnMetaDatasChanged()
         {
-            return this.Equals(obj as PlaylistItem);
+            if (this.MetaDatasChanged != null)
+            {
+                this.MetaDatasChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MetaDatas");
         }
 
-        public override int GetHashCode()
+        public event EventHandler MetaDatasChanged = delegate { };
+
+        public override void InitializeComponent(ICore core)
         {
-            return this.FileName.GetHashCode();
+            this.Core = core;
+            this.Database = core.Components.Database;
+            base.InitializeComponent(core);
         }
 
-        public static bool operator ==(PlaylistItem a, PlaylistItem b)
+        public void LoadMetaDatas()
         {
-            if ((object)a == null && (object)b == null)
-            {
-                return true;
-            }
-            if ((object)a == null || (object)b == null)
-            {
-                return false;
-            }
-            if (object.ReferenceEquals((object)a, (object)b))
-            {
-                return true;
-            }
-            return a.Equals(b);
+            this.MetaDatas = new ObservableCollection<MetaDataItem>(MetaDataInfo.GetMetaData(this.Core, this.Database, this, MetaDataItemType.All));
         }
 
-        public static bool operator !=(PlaylistItem a, PlaylistItem b)
+        public override bool Equals(IPersistableComponent other)
         {
-            return !(a == b);
+            if (other is PlaylistItem)
+            {
+                return base.Equals(other) && string.Equals(this.FileName, (other as PlaylistItem).FileName, StringComparison.OrdinalIgnoreCase);
+            }
+            return base.Equals(other);
         }
+
     }
 
     public enum PlaylistItemStatus : byte

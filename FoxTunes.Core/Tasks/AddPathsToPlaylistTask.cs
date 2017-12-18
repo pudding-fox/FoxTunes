@@ -41,29 +41,26 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            using (var databaseContext = this.DataManager.CreateWriteContext())
+            using (IDbTransaction transaction = this.Database.BeginTransaction())
             {
-                using (var transaction = databaseContext.Connection.BeginTransaction())
-                {
-                    this.AddPlaylistItems(databaseContext, transaction);
-                    this.ShiftItems(databaseContext, transaction);
-                    this.AddOrUpdateMetaDataFromLibrary(databaseContext, transaction);
-                    this.AddOrUpdateMetaData(databaseContext, transaction);
-                    this.SequenceItems(databaseContext, transaction);
-                    this.SetPlaylistItemsStatus(databaseContext, transaction);
-                    transaction.Commit();
-                }
+                this.AddPlaylistItems(transaction);
+                this.ShiftItems(transaction);
+                this.AddOrUpdateMetaDataFromLibrary(transaction);
+                this.AddOrUpdateMetaData(transaction);
+                this.SequenceItems(transaction);
+                this.SetPlaylistItemsStatus(transaction);
+                transaction.Commit();
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
             return Task.CompletedTask;
         }
 
-        private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
+        private void AddPlaylistItems(IDbTransaction transaction)
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
+            using (var command = this.Database.CreateCommand(this.Database.Queries.AddPlaylistItem, out parameters))
             {
                 command.Transaction = transaction;
                 var count = 0;
@@ -71,6 +68,7 @@ namespace FoxTunes
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
                     {
+                        Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
                         return;
                     }
                     parameters["directoryName"] = Path.GetDirectoryName(fileName);
@@ -100,14 +98,15 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
+        private void AddOrUpdateMetaData(IDbTransaction transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Playlist", true))
+            Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddPlaylistMetaDataItems, true))
             {
-                var query =
-                    from playlistItem in databaseContext.GetQuery<PlaylistItem>().Detach()
-                    where playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any()
-                    select playlistItem;
+                var query = this.Database.GetSet<PlaylistItem>(transaction).Query(
+                    this.Database.Queries.GetPlaylistItemsWithoutMetaData,
+                    parameters => parameters["status"] = PlaylistItemStatus.Import
+                );
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,17 +18,14 @@ namespace FoxTunes
             this.Command = new ThreadLocal<LibraryHierarchyPopulatorCommand>(true);
         }
 
-        public LibraryHierarchyPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, bool reportProgress)
+        public LibraryHierarchyPopulator(IDatabase database, IDbTransaction transaction, bool reportProgress)
             : this(reportProgress)
         {
             this.Database = database;
-            this.DatabaseContext = databaseContext;
             this.Transaction = transaction;
         }
 
         public IDatabase Database { get; private set; }
-
-        public IDatabaseContext DatabaseContext { get; private set; }
 
         public IDbTransaction Transaction { get; private set; }
 
@@ -50,7 +46,7 @@ namespace FoxTunes
                 this.Name = "Populating library hierarchies";
                 this.Position = 0;
                 this.Count = (
-                    this.DatabaseContext.GetQuery<LibraryHierarchyLevel>().Detach().Count() * this.DatabaseContext.GetQuery<LibraryItem>().Detach().Count()
+                    this.Database.GetSet<LibraryHierarchyLevel>().Count * this.Database.GetSet<LibraryItem>().Count
                 );
             }
 
@@ -123,7 +119,7 @@ namespace FoxTunes
             {
                 return this.Command.Value;
             }
-            return this.Command.Value = new LibraryHierarchyPopulatorCommand(this.ScriptingRuntime, this.Database, this.DatabaseContext, this.Transaction);
+            return this.Command.Value = new LibraryHierarchyPopulatorCommand(this.ScriptingRuntime, this.Database, this.Transaction);
         }
 
         protected override void OnDisposing()
@@ -138,13 +134,12 @@ namespace FoxTunes
 
         private class LibraryHierarchyPopulatorCommand : BaseComponent
         {
-            public LibraryHierarchyPopulatorCommand(IScriptingRuntime scriptingRuntime, IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction)
+            public LibraryHierarchyPopulatorCommand(IScriptingRuntime scriptingRuntime, IDatabase database, IDbTransaction transaction)
             {
                 this.ScriptingContext = scriptingRuntime.CreateContext();
                 var parameters = default(IDbParameterCollection);
-                this.Command = databaseContext.Connection.CreateCommand(
-                    database.CoreSQL.AddLibraryHierarchyRecord,
-                    new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "libraryItemId", "displayValue", "sortValue", "isLeaf" },
+                this.Command = database.CreateCommand(
+                    database.Queries.AddLibraryHierarchyRecord,
                     out parameters
                 );
                 this.Command.Transaction = transaction;

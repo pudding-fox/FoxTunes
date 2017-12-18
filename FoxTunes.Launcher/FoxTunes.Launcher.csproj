@@ -46,9 +46,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
       <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
       <Name>FoxTunes.Core</Name>

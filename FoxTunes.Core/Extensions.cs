@@ -48,6 +48,11 @@ namespace FoxTunes
             }
         }
 
+        public static void Enumerate<T>(this IEnumerable<T> sequence)
+        {
+            foreach (var element in sequence) ;
+        }
+
         public static bool Contains(this IEnumerable<string> sequence, string value, bool ignoreCase)
         {
             if (!ignoreCase)
@@ -74,6 +79,10 @@ namespace FoxTunes
 
         public static IDbCommand CreateCommand(this IDbConnection connection, string commandText, IEnumerable<string> parameterNames, out IDbParameterCollection parameters)
         {
+            if (string.IsNullOrEmpty(commandText))
+            {
+                throw new ArgumentException("Command text is required.");
+            }
             var command = connection.CreateCommand();
             command.CommandText = commandText;
             if (parameterNames != null)
@@ -127,6 +136,20 @@ namespace FoxTunes
             return -1;
         }
 
+        public static bool IsNullable(this Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
+        public static Type NullableType(this Type type)
+        {
+            if (!type.IsNullable())
+            {
+                throw new ArgumentException("Type \"{0}\" is not Nullable.", type.Name);
+            }
+            return type.GetGenericArguments().First();
+        }
+
         private class DbParameterCollection : IDbParameterCollection
         {
             public DbParameterCollection(IDataParameterCollection parameters)
@@ -136,15 +159,28 @@ namespace FoxTunes
 
             public IDataParameterCollection Parameters { get; private set; }
 
-            public object this[string parameterName]
+            public int Count
             {
                 get
                 {
-                    return (this.Parameters[parameterName] as IDataParameter).Value;
+                    return this.Parameters.Count;
+                }
+            }
+
+            public bool Contains(string name)
+            {
+                return this.Parameters.Contains(name);
+            }
+
+            public object this[string name]
+            {
+                get
+                {
+                    return (this.Parameters[name] as IDataParameter).Value;
                 }
                 set
                 {
-                    (this.Parameters[parameterName] as IDataParameter).Value = value;
+                    (this.Parameters[name] as IDataParameter).Value = value;
                 }
             }
         }

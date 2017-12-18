@@ -26,7 +26,7 @@ namespace FoxTunes.ViewModel
 
         public IScriptingContext ScriptingContext { get; private set; }
 
-        public IDataManager DataManager { get; private set; }
+        public IDatabase Database { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -119,9 +119,9 @@ namespace FoxTunes.ViewModel
             get
             {
                 var columns = new ObservableCollection<GridViewColumn>();
-                if (this.DataManager != null)
+                if (this.Database != null)
                 {
-                    foreach (var column in this.DataManager.ReadContext.Sets.PlaylistColumn)
+                    foreach (var column in this.Database.Sets.PlaylistColumn)
                     {
                         columns.Add(new GridViewColumn()
                         {
@@ -168,7 +168,7 @@ namespace FoxTunes.ViewModel
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
-            this.DataManager = this.Core.Managers.Data;
+            this.Database = this.Core.Components.Database;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.

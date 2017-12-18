@@ -6,26 +6,14 @@ namespace FoxTunes
 {
     public class LibraryHierarchyNode : BaseComponent
     {
-        private LibraryHierarchyNode()
+        public LibraryHierarchyNode()
         {
-            this.Children = new ObservableCollection<LibraryHierarchyNode>();
-            this.MetaDatas = new ObservableCollection<MetaDataItem>();
+
         }
 
-        public LibraryHierarchyNode(int id, int libraryHierarchyId, string value, bool isLeaf)
-        {
-            this.Id = id;
-            this.LibraryHierarchyId = libraryHierarchyId;
-            this.Value = value;
-            if (this.IsLeaf = isLeaf)
-            {
-                this.Children = new ObservableCollection<LibraryHierarchyNode>();
-            }
-            else
-            {
-                this.Children = new ObservableCollection<LibraryHierarchyNode>(new[] { Empty });
-            }
-        }
+        public ICore Core { get; private set; }
+
+        public IDatabase Database { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
@@ -33,7 +21,9 @@ namespace FoxTunes
 
         public int LibraryHierarchyId { get; private set; }
 
-        public string Value { get; private set; }
+        public string DisplayValue { get; private set; }
+
+        public string SortValue { get; private set; }
 
         public bool IsLeaf { get; private set; }
 
@@ -177,22 +167,37 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
+            this.Database = core.Components.Database;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            if (this.IsLeaf)
+            {
+                this.Children = new ObservableCollection<LibraryHierarchyNode>();
+            }
+            else
+            {
+                this.Children = new ObservableCollection<LibraryHierarchyNode>(new[] { Empty });
+            }
             base.InitializeComponent(core);
         }
 
         public void LoadChildren()
         {
-            if (this.LibraryHierarchyBrowser != null)
+            if (this.LibraryHierarchyBrowser == null)
             {
-                this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
+                return;
             }
+            this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
             this.IsLoaded = true;
         }
 
         public void LoadMetaDatas()
         {
-            this.MetaDatas = new ObservableCollection<MetaDataItem>(this.LibraryHierarchyBrowser.GetMetaData(this, MetaDataItemType.Image));
+            if (this.Database == null)
+            {
+                return;
+            }
+            this.MetaDatas = new ObservableCollection<MetaDataItem>(MetaDataInfo.GetMetaData(this.Core, this.Database, this, MetaDataItemType.Image));
         }
 
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();

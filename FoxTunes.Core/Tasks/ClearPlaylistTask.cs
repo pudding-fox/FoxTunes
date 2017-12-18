@@ -17,12 +17,9 @@ namespace FoxTunes
         {
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
-            using (var context = this.DataManager.CreateWriteContext())
+            using (var command = this.Database.CreateCommand(this.Database.Queries.ClearPlaylist))
             {
-                using (var command = context.Connection.CreateCommand(this.Database.CoreSQL.ClearPlaylist))
-                {
-                    command.ExecuteNonQuery();
-                }
+                command.ExecuteNonQuery();
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
             return Task.CompletedTask;

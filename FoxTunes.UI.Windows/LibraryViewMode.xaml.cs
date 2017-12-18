@@ -59,7 +59,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.SelectedLibraryHierarchy = this.Core.Managers.Data.ReadContext.Queries.LibraryHierarchy.FirstOrDefault();
+            this.SelectedLibraryHierarchy = this.Core.Components.Database.Sets.LibraryHierarchy.FirstOrDefault();
         }
     }
 }

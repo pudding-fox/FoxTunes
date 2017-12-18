@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.0
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core", "FoxTunes.Core\FoxTunes.Core.csproj", "{62CD8F70-8415-4C15-B672-CB18475ABD7E}"
 EndProject
@@ -23,10 +23,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.MetaData", "FoxTun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.MetaData.TagLib", "FoxTunes.MetaData.TagLib\FoxTunes.MetaData.TagLib.csproj", "{1BCB836B-688F-4183-8702-EFF08440CC8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.EntityFramework", "FoxTunes.DB.EntityFramework\FoxTunes.DB.EntityFramework.csproj", "{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.EntityFramework.SQLite", "FoxTunes.DB.EntityFramework.SQLite\FoxTunes.DB.EntityFramework.SQLite.csproj", "{AFF37A81-F152-44E6-9686-95BF34C6487C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Scripting", "FoxTunes.Scripting\FoxTunes.Scripting.csproj", "{50D995F1-CA54-42B6-BDA5-4047E720716D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Scripting.JS", "FoxTunes.Scripting.JS\FoxTunes.Scripting.JS.csproj", "{0F6183DB-5001-4D9A-BBD3-157356B62684}"
@@ -36,6 +32,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Logging", "FoxTunes.Logging\FoxTunes.Logging.csproj", "{AB1362C8-0754-496D-85E1-3C258FF250BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass", "FoxTunes.Output.ManagedBass\FoxTunes.Output.Bass.csproj", "{676F7DD1-BF13-4317-819F-9B5D85DF18B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.SQLite", "FoxTunes.DB.SQLite\FoxTunes.DB.SQLite.csproj", "{1599399A-2873-46F5-96CD-56768AFC967E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,14 +81,6 @@ Global
 		{1BCB836B-688F-4183-8702-EFF08440CC8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BCB836B-688F-4183-8702-EFF08440CC8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BCB836B-688F-4183-8702-EFF08440CC8A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.Build.0 = Debug|x86
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.ActiveCfg = Release|x86
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.Build.0 = Release|x86
 		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -111,6 +101,9 @@ Global
 		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Debug|Any CPU.Build.0 = Debug|x86
 		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Release|Any CPU.ActiveCfg = Release|x86
 		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Release|Any CPU.Build.0 = Release|x86
+		{1599399A-2873-46F5-96CD-56768AFC967E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{1599399A-2873-46F5-96CD-56768AFC967E}.Debug|Any CPU.Build.0 = Debug|x86
+		{1599399A-2873-46F5-96CD-56768AFC967E}.Release|Any CPU.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
