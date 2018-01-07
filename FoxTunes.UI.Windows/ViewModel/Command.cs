@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -70,9 +71,9 @@ namespace FoxTunes.ViewModel
             this.Action();
         }
 
-        public static void InvalidateRequerySuggested()
+        public static Task InvalidateRequerySuggested()
         {
-            ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().Run(() => CommandManager.InvalidateRequerySuggested());
+            return ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().RunAsync(() => CommandManager.InvalidateRequerySuggested());
         }
 
         public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);

@@ -1,4 +1,6 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,6 +12,8 @@ namespace FoxTunes
 {
     public class PlaylistSequencePopulator : PopulatorBase
     {
+        //public const int SAVE_INTERVAL = 1000;
+
         public readonly object SyncRoot = new object();
 
         private PlaylistSequencePopulator(bool reportProgress)
@@ -18,16 +22,16 @@ namespace FoxTunes
             this.Command = new ThreadLocal<PlaylistSequencePopulatorCommand>(true);
         }
 
-        public PlaylistSequencePopulator(IDatabase database, IDbTransaction transaction, bool reportProgress)
+        public PlaylistSequencePopulator(IDatabaseComponent database, ITransactionSource transaction, bool reportProgress)
             : this(reportProgress)
         {
             this.Database = database;
             this.Transaction = transaction;
         }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
-        public IDbTransaction Transaction { get; private set; }
+        public ITransactionSource Transaction { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
@@ -39,14 +43,14 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void Populate(EnumerableDataReader reader)
+        public void Populate(IDatabaseReader reader)
         {
             if (this.ReportProgress)
             {
                 this.Name = "Populating playlist sequencies";
                 this.Position = 0;
                 this.Count = (
-                    this.Database.GetSet<LibraryHierarchyLevel>().Count * this.Database.GetSet<LibraryItem>().Count
+                    this.Database.Set<LibraryHierarchyLevel>().Count * this.Database.Set<LibraryItem>().Count
                 );
             }
 
@@ -75,6 +79,7 @@ namespace FoxTunes
                 }
 
                 command.Command.ExecuteNonQuery();
+                //command.Increment();
 
                 if (this.ReportProgress)
                 {
@@ -92,14 +97,14 @@ namespace FoxTunes
             });
         }
 
-        private object[] ExecuteScript(IScriptingContext scriptingContext, EnumerableDataReader.EnumerableDataReaderRow record)
+        private object[] ExecuteScript(IScriptingContext scriptingContext, IDatabaseReaderRecord record)
         {
             var fileName = record["FileName"] as string;
             var metaData = new Dictionary<string, object>();
             for (var a = 0; true; a++)
             {
                 var keyName = string.Format("Key_{0}", a);
-                if (!record.ContainsKey(keyName))
+                if (!record.Contains(keyName))
                 {
                     break;
                 }
@@ -126,7 +131,7 @@ namespace FoxTunes
             {
                 return this.Command.Value;
             }
-            return this.Command.Value = new PlaylistSequencePopulatorCommand(this.ScriptingRuntime, this.Database, this.Transaction);
+            return this.Command.Value = new PlaylistSequencePopulatorCommand(this.Database, this.Transaction, this.ScriptingRuntime);
         }
 
         protected override void OnDisposing()
@@ -141,23 +146,46 @@ namespace FoxTunes
 
         private class PlaylistSequencePopulatorCommand : BaseComponent
         {
-            public PlaylistSequencePopulatorCommand(IScriptingRuntime scriptingRuntime, IDatabase database, IDbTransaction transaction)
+            public PlaylistSequencePopulatorCommand(IDatabaseComponent database, ITransactionSource transaction, IScriptingRuntime scriptingRuntime)
             {
+                this.Database = database;
+                this.Transaction = transaction;
                 this.ScriptingContext = scriptingRuntime.CreateContext();
-                var parameters = default(IDbParameterCollection);
-                this.Command = database.CreateCommand(
-                    database.Queries.AddPlaylistSequenceRecord,
-                    out parameters
-                );
-                this.Command.Transaction = transaction;
-                this.Parameters = parameters;
+                this.CreateCommand();
             }
+
+            public IDatabaseComponent Database { get; private set; }
+
+            public ITransactionSource Transaction { get; private set; }
 
             public IScriptingContext ScriptingContext { get; private set; }
 
             public IDbCommand Command { get; private set; }
 
-            public IDbParameterCollection Parameters { get; private set; }
+            public IDatabaseParameters Parameters { get; private set; }
+
+            //public int Batch { get; private set; }
+
+            public void CreateCommand()
+            {
+                var parameters = default(IDatabaseParameters);
+                this.Command = this.Database.Connection.CreateCommand(
+                    this.Database.Queries.AddPlaylistSequenceRecord,
+                    out parameters,
+                    this.Transaction
+                );
+                this.Parameters = parameters;
+            }
+
+            //public void Increment()
+            //{
+            //    if (this.Batch++ >= SAVE_INTERVAL)
+            //    {
+            //        this.Transaction.Commit();
+            //        this.Transaction.Bind(this.Command);
+            //        this.Batch = 0;
+            //    }
+            //}
 
             public bool IsDisposed { get; private set; }
 

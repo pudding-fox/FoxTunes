@@ -33,6 +33,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FoxDb.Core">
+      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FoxDb.SQLite">
+      <HintPath>..\lib\FoxDb.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
@@ -52,46 +58,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SQLiteSchema.cs" />
-    <Compile Include="SQLiteSyntax.cs" />
     <Compile Include="SQLiteDatabase.cs" />
     <Compile Include="SQLiteDatabaseQueries.cs" />
-    <Compile Include="Templates\Update.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Update.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Templates\Insert_Logic.cs" />
-    <Compile Include="Templates\Update_Logic.cs" />
-    <Compile Include="Templates\Count.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Count.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Templates\Delete.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Delete.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Templates\Delete_Logic.cs" />
-    <Compile Include="Templates\Find_Logic.cs" />
-    <Compile Include="Templates\Count_Logic.cs" />
-    <Compile Include="Templates\Find.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Find.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Templates\GetTableInfo.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>GetTableInfo.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Templates\GetTableInfo_Logic.cs" />
-    <Compile Include="Templates\Insert.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Insert.tt</DependentUpon>
-    </Compile>
     <Compile Include="Templates\LibraryHierarchyBuilder.cs">
       <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -110,12 +78,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Templates\PlaylistSequenceBuilder_Logic.cs" />
-    <Compile Include="Templates\Select.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Select.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Templates\Select_Logic.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
@@ -153,39 +115,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\GetLibraryItems.sql" />
-    <None Include="Resources\GetPreviousPlaylistItem.sql" />
-    <None Include="Resources\GetNextPlaylistItem.sql" />
     <None Include="Resources\GetPlaylistMetaDataItems.sql" />
-    <Content Include="Templates\Update.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>Update.cs</LastGenOutput>
-    </Content>
-    <Content Include="Templates\Delete.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>Delete.cs</LastGenOutput>
-    </Content>
-    <Content Include="Templates\Find.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>Find.cs</LastGenOutput>
-    </Content>
     <None Include="Resources\GetMetaDataNames.sql" />
     <None Include="Resources\AddLibraryMetaDataItems.sql" />
     <None Include="Resources\GetPlaylistItemsWithoutMetaData.sql" />
     <None Include="Resources\AddPlaylistMetaDataItems.sql" />
-    <None Include="Resources\GetFirstPlaylistItem.sql" />
-    <None Include="Resources\GetLastPlaylistItem.sql" />
-    <Content Include="Templates\Count.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>Count.cs</LastGenOutput>
-    </Content>
-    <Content Include="Templates\GetTableInfo.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>GetTableInfo.cs</LastGenOutput>
-    </Content>
-    <Content Include="Templates\Insert.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>Insert.cs</LastGenOutput>
-    </Content>
+    <None Include="Resources\ClearLibrary.sql" />
     <Content Include="Templates\LibraryHierarchyBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
@@ -197,10 +132,6 @@
     <Content Include="Templates\PlaylistSequenceBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>PlaylistSequenceBuilder.cs</LastGenOutput>
-    </Content>
-    <Content Include="Templates\Select.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>Select.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

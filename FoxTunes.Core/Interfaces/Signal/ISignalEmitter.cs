@@ -1,11 +1,13 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace FoxTunes.Interfaces
 {
     public interface ISignalEmitter : IStandardComponent
     {
-        void Send(ISignal signal);
+        Task Send(ISignal signal);
 
         event SignalEventHandler Signal;
     }
 
-    public delegate void SignalEventHandler(object sender, ISignal signal);
+    public delegate Task SignalEventHandler(object sender, ISignal signal);
 }

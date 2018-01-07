@@ -26,6 +26,9 @@
     <OutputPath>..\distribution\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FoxDb.Core">
+      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />

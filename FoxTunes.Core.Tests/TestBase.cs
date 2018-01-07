@@ -19,5 +19,12 @@ namespace FoxTunes
             this.Core = new Core();
             this.Core.Load();
         }
+
+        [TearDown]
+        public void TearDown()
+        {
+            this.Core.Dispose();
+            this.Core = null;
+        }
     }
 }

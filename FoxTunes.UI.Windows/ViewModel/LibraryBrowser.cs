@@ -94,9 +94,9 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void Refresh(bool deep)
+        public override void Refresh()
         {
-            base.Refresh(deep);
+            base.Refresh();
             this.SelectedItems.Clear();
             this.Update();
         }

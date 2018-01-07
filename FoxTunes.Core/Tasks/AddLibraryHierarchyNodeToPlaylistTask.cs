@@ -1,5 +1,5 @@
-﻿using FoxTunes.Interfaces;
-using System.Data;
+﻿using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -38,17 +38,14 @@ namespace FoxTunes
             return Task.CompletedTask;
         }
 
-        private void AddPlaylistItems(IDbTransaction transaction)
+        private void AddPlaylistItems(ITransactionSource transaction)
         {
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, out parameters))
+            this.Offset = this.Database.ExecuteScalar<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, parameters =>
             {
-                command.Transaction = transaction;
                 parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
                 parameters["sequence"] = this.Sequence;
                 parameters["status"] = PlaylistItemStatus.Import;
-                this.Offset = command.ExecuteNonQuery();
-            }
+            }, transaction);
         }
     }
 }

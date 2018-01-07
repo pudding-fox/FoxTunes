@@ -48,6 +48,10 @@ namespace FoxTunes
                         this.Output.OutputChannel.ClearBuffer();
                     }
                 }
+                if (value >= this.Length)
+                {
+                    value = this.Length - 1;
+                }
                 BassUtils.OK(Bass.ChannelSetPosition(this.ChannelHandle, value));
                 if (value > this.NotificationSource.EndingPosition)
                 {

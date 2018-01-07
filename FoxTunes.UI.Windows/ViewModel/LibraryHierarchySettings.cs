@@ -1,15 +1,16 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using System.Linq;
 
 namespace FoxTunes.ViewModel
 {
     public class LibraryHierarchySettings : ViewModelBase
     {
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -122,7 +123,7 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new Command(
-                    () => this.LibraryHierarchies.Add(new LibraryHierarchy()),
+                    () => this.LibraryHierarchies.Add(this.Database.Sets.LibraryHierarchy.Create().With(libraryHierarchy => libraryHierarchy.Name = "New")),
                     () => this.LibraryHierarchies != null
                 );
             }
@@ -151,16 +152,9 @@ namespace FoxTunes.ViewModel
         {
             using (var transaction = this.Database.BeginTransaction())
             {
-                var libraryHierarchies = this.Database.GetSet<LibraryHierarchy>(transaction);
-                var libraryHierarchyLevels = this.Database.GetSet<LibraryHierarchyLevel>(transaction);
+                var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction);
                 libraryHierarchies.Delete(libraryHierarchies.Except(this.LibraryHierarchies));
                 libraryHierarchies.AddOrUpdate(this.LibraryHierarchies);
-                foreach (var libraryHierarchy in this.LibraryHierarchies)
-                {
-                    libraryHierarchy.Levels.Do(libraryHierarchyLevel => libraryHierarchyLevel.LibraryHierarchyId = libraryHierarchy.Id).Enumerate();
-                    libraryHierarchyLevels.Delete(libraryHierarchies.Find(libraryHierarchy.Id).Levels.Except(libraryHierarchy.Levels));
-                    libraryHierarchyLevels.AddOrUpdate(libraryHierarchy.Levels);
-                }
                 transaction.Commit();
             }
             this.Refresh();

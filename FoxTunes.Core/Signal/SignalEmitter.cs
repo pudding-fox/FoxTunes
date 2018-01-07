@@ -1,23 +1,24 @@
 ﻿using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class SignalEmitter : StandardComponent, ISignalEmitter
     {
-        public void Send(ISignal signal)
+        public Task Send(ISignal signal)
         {
-            this.OnSignal(signal);
+            return this.OnSignal(signal);
         }
 
-        protected virtual void OnSignal(ISignal signal)
+        protected virtual Task OnSignal(ISignal signal)
         {
             if (this.Signal == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Signal(this, signal);
+            return this.Signal(this, signal);
         }
 
-        public event SignalEventHandler Signal = delegate { };
+        public event SignalEventHandler Signal;
     }
 }

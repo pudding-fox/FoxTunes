@@ -25,21 +25,6 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        public override BackgroundTaskPriority Priority
-        {
-            get
-            {
-                if (this.Immediate)
-                {
-                    return BackgroundTaskPriority.High;
-                }
-                else
-                {
-                    return BackgroundTaskPriority.Low;
-                }
-            }
-        }
-
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
@@ -75,7 +60,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             }
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
         }
     }
 }

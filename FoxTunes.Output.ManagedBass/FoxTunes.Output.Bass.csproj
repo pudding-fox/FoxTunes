@@ -39,18 +39,19 @@
     </Reference>
     <Reference Include="ManagedBass.Gapless, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\ManagedBass.Gapless.dll</HintPath>
+      <HintPath>..\lib\ManagedBass.Gapless.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Gapless.Asio, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\ManagedBass.Gapless.Asio.dll</HintPath>
+      <HintPath>..\lib\ManagedBass.Gapless.Asio.dll</HintPath>
     </Reference>
-    <Reference Include="ManagedBass.Sox">
-      <HintPath>lib\ManagedBass.Sox.dll</HintPath>
-    </Reference>
-    <Reference Include="ManagedBass.Sox.Asio, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ManagedBass.Sox, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\ManagedBass.Sox.Asio.dll</HintPath>
+      <HintPath>..\lib\ManagedBass.Sox.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass.Sox.Asio, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\ManagedBass.Sox.Asio.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -86,26 +87,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bass_sox.dll">
+    <None Include="..\lib\bass_gapless.dll">
+      <Link>bass_gapless.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="ManagedBass.Sox.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bass_gapless.dll">
+    <None Include="..\lib\bass_gapless_asio.dll">
+      <Link>bass_gapless_asio.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="bass_gapless_asio.dll">
+    <None Include="..\lib\bass_sox.dll">
+      <Link>bass_sox.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="ManagedBass.Gapless.Asio.dll" />
-    <None Include="ManagedBass.Gapless.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bass_sox_asio.dll">
+    <None Include="..\lib\bass_sox_asio.dll">
+      <Link>bass_sox_asio.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="ManagedBass.Sox.Asio.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets" Condition="Exists('..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets')" />

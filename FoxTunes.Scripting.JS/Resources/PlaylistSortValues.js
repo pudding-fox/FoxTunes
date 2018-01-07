@@ -1,8 +1,13 @@
 ﻿(function () {
   var parts = [];
 
-  if (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist) {
-    parts.push(tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist);
+  if (tag.__ft_variousartists) {
+    parts.push("Various Artists");
+  }
+  else {
+    if (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist) {
+      parts.push(tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist);
+    }
   }
 
   if (tag.year) {

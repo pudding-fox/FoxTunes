@@ -4,33 +4,44 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 
-DROP TABLE IF EXISTS "LibraryHierarchyLevelLeaf";
-CREATE TEMPORARY TABLE "LibraryHierarchyLevelLeaf"
-AS
-	SELECT LibraryHierarchy_Id, MAX("Id") AS "LibraryHierarchyLevel_Id"
-	FROM "LibraryHierarchyLevels"
-	GROUP BY "LibraryHierarchy_Id";
-CREATE UNIQUE INDEX "IDX_LibraryHierarchyLevelLeaf" ON "LibraryHierarchyLevelLeaf"
+CREATE TEMPORARY TABLE IF NOT EXISTS "LibraryHierarchyLevelLeaf"
+(
+	"LibraryHierarchy_Id" INTEGER NOT NULL, 
+	"LibraryHierarchyLevel_Id" INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "IDX_LibraryHierarchyLevelLeaf" ON "LibraryHierarchyLevelLeaf"
 (
 	"LibraryHierarchy_Id"
 );
 
-DROP TABLE IF EXISTS "LibraryHierarchyLevelParent";
-CREATE TEMPORARY TABLE "LibraryHierarchyLevelParent"
-AS
-	SELECT "LibraryHierarchyLevels"."Id" AS "Id", MAX("LibraryHierarchyLevels_Copy"."Id") AS "Parent_Id"
-	FROM "LibraryHierarchyLevels"
-	JOIN "LibraryHierarchyLevels" AS "LibraryHierarchyLevels_Copy"
-		ON "LibraryHierarchyLevels"."LibraryHierarchy_Id"  = "LibraryHierarchyLevels_Copy"."LibraryHierarchy_Id"
-			AND "LibraryHierarchyLevels_Copy"."Id" < "LibraryHierarchyLevels"."Id"
-	GROUP BY "LibraryHierarchyLevels"."Id";
-CREATE UNIQUE INDEX "IDX_LibraryHierarchyLevelParent" ON "LibraryHierarchyLevelParent"
+DELETE FROM "LibraryHierarchyLevelLeaf";
+
+INSERT INTO "LibraryHierarchyLevelLeaf"
+SELECT LibraryHierarchy_Id, MAX("Id")
+FROM "LibraryHierarchyLevels"
+GROUP BY "LibraryHierarchy_Id";
+
+CREATE TEMPORARY TABLE IF NOT EXISTS "LibraryHierarchyLevelParent"
+(
+	"Id" INTEGER NOT NULL, 
+	"Parent_Id" INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "IDX_LibraryHierarchyLevelParent" ON "LibraryHierarchyLevelParent"
 (
 	"Id"
 );
 
-DROP TABLE IF EXISTS "LibraryHierarchy";
-CREATE TEMPORARY TABLE "LibraryHierarchy"
+DELETE FROM "LibraryHierarchyLevelParent";
+
+INSERT INTO "LibraryHierarchyLevelParent"
+SELECT "LibraryHierarchyLevels"."Id" AS "Id", MAX("LibraryHierarchyLevels_Copy"."Id") AS "Parent_Id"
+FROM "LibraryHierarchyLevels"
+JOIN "LibraryHierarchyLevels" AS "LibraryHierarchyLevels_Copy"
+	ON "LibraryHierarchyLevels"."LibraryHierarchy_Id"  = "LibraryHierarchyLevels_Copy"."LibraryHierarchy_Id"
+		AND "LibraryHierarchyLevels_Copy"."Id" < "LibraryHierarchyLevels"."Id"
+GROUP BY "LibraryHierarchyLevels"."Id";
+
+CREATE TEMPORARY TABLE IF NOT EXISTS "LibraryHierarchy"
 (
 	"LibraryHierarchy_Id" INTEGER NOT NULL, 
 	"LibraryHierarchyLevel_Id" INTEGER NOT NULL, 
@@ -39,6 +50,21 @@ CREATE TEMPORARY TABLE "LibraryHierarchy"
 	"SortValue" text NOT NULL,
 	"IsLeaf" bit NOT NULL
 );
+CREATE UNIQUE INDEX IF NOT EXISTS "IDX_LibraryHierarchy" ON "LibraryHierarchy"
+(
+	"LibraryHierarchy_Id",
+	"LibraryHierarchyLevel_Id",
+	"LibraryItem_Id",
+	"DisplayValue",
+	"SortValue",
+	"IsLeaf"
+);
+CREATE INDEX IF NOT EXISTS "IDX_LibraryHierarchy_LibraryItem" ON "LibraryHierarchy"
+(
+	"LibraryItem_Id"
+);
+
+DELETE FROM "LibraryHierarchy";
 
 WITH "VerticalMetaData"
 AS
@@ -87,20 +113,6 @@ FROM "LibraryHierarchyLevels"
 		ON "LibraryHierarchyLevelLeaf"."LibraryHierarchy_Id" = "LibraryHierarchyLevels"."LibraryHierarchy_Id" 
 	JOIN "HorizontalMetaData";
 
-CREATE UNIQUE INDEX "IDX_LibraryHierarchy" ON "LibraryHierarchy"
-(
-	"LibraryHierarchy_Id",
-	"LibraryHierarchyLevel_Id",
-	"LibraryItem_Id",
-	"DisplayValue",
-	"SortValue",
-	"IsLeaf"
-);
-CREATE INDEX "IDX_LibraryHierarchy_LibraryItem" ON "LibraryHierarchy"
-(
-	"LibraryItem_Id"
-);
-
 DELETE FROM "LibraryHierarchyItems";
 
 INSERT INTO "LibraryHierarchyItems" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf")
@@ -141,7 +153,3 @@ FROM "LibraryHierarchyItems"
 		AND "LibraryHierarchy"."DisplayValue" = "LibraryHierarchyItems"."DisplayValue"
 		AND "LibraryHierarchy"."SortValue" = "LibraryHierarchyItems"."SortValue"
 		AND "LibraryHierarchy"."IsLeaf" = "LibraryHierarchyItems"."IsLeaf";
-
-DROP TABLE "LibraryHierarchyLevelLeaf";
-DROP TABLE "LibraryHierarchyLevelParent";
-DROP TABLE "LibraryHierarchy";

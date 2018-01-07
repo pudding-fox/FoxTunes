@@ -4,8 +4,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 
-DROP TABLE IF EXISTS "PlaylistSort";
-CREATE TEMPORARY TABLE "PlaylistSort"
+CREATE TEMPORARY TABLE IF NOT EXISTS "PlaylistSort"
 (
 	"PlaylistItem_Id" INTEGER NOT NULL, 
 	"Value1" text NULL,
@@ -19,6 +18,15 @@ CREATE TEMPORARY TABLE "PlaylistSort"
 	"Value9" text NULL,
 	"Value10" text NULL
 );
+
+CREATE TEMPORARY TABLE IF NOT EXISTS "PlaylistSequence"
+(
+	"Id" INTEGER PRIMARY KEY NOT NULL,
+	"PlaylistItem_Id" INTEGER NOT NULL
+);
+
+DELETE FROM "PlaylistSort";
+DELETE FROM "PlaylistSequence";
 
 WITH "VerticalMetaData"
 AS
@@ -66,13 +74,6 @@ SELECT "HorizontalMetaData"."Id" AS "PlaylistItem_Id", "HorizontalMetaData"."Fil
 #>
 FROM "HorizontalMetaData";
 
-DROP TABLE IF EXISTS "PlaylistSequence";
-CREATE TEMPORARY TABLE "PlaylistSequence"
-(
-	"Id" INTEGER PRIMARY KEY NOT NULL,
-	"PlaylistItem_Id" INTEGER NOT NULL
-);
-
 INSERT INTO "PlaylistSequence" ("PlaylistItem_Id")
 SELECT "PlaylistItem_Id"
 FROM "PlaylistSort"
@@ -86,6 +87,3 @@ SET "Sequence" = "Sequence" +
 	WHERE "PlaylistSequence"."PlaylistItem_Id" = "PlaylistItems"."Id"
 )
 WHERE "Status" = @status;
-
-DROP TABLE "PlaylistSort";
-DROP TABLE "PlaylistSequence";

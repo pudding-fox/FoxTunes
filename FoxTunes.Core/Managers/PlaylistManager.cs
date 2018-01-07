@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace FoxTunes.Managers
 
         public ICore Core { get; private set; }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -29,27 +30,27 @@ namespace FoxTunes.Managers
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnSignal(object sender, ISignal signal)
+        protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    this.Refresh();
-                    break;
+                    return this.Refresh();
             }
+            return Task.CompletedTask;
         }
 
-        public void Refresh()
+        public Task Refresh()
         {
-            if (this.CurrentItem == null)
+            if (this.CurrentItem != null)
             {
-                return;
+                Logger.Write(this, LogLevel.Debug, "Playlist was updated, refreshing current item.");
+                if ((this.CurrentItem = this.Database.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                }
             }
-            Logger.Write(this, LogLevel.Debug, "Playlist was updated, refreshing current item.");
-            if ((this.CurrentItem = this.Database.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
-            }
+            return Task.CompletedTask;
         }
 
         protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
@@ -234,28 +235,32 @@ namespace FoxTunes.Managers
 
         protected virtual PlaylistItem GetFirstPlaylistItem()
         {
-            return this.Database.Sets.PlaylistItem.Query(this.Database.Queries.GetFirstPlaylistItem).FirstOrDefault();
+            return this.Database.AsQueryable<PlaylistItem>()
+                .OrderBy(playlistItem => playlistItem.Sequence)
+                .FirstOrDefault();
         }
 
         protected virtual PlaylistItem GetLastPlaylistItem()
         {
-            return this.Database.Sets.PlaylistItem.Query(this.Database.Queries.GetLastPlaylistItem).FirstOrDefault();
+            return this.Database.AsQueryable<PlaylistItem>()
+                .OrderByDescending(playlistItem => playlistItem.Sequence)
+                .FirstOrDefault();
         }
 
         protected virtual PlaylistItem GetNextPlaylistItem(int sequence)
         {
-            return this.Database.Sets.PlaylistItem.Query(
-                this.Database.Queries.GetNextPlaylistItem,
-                parameters => parameters["sequence"] = sequence
-            ).FirstOrDefault();
+            return this.Database.AsQueryable<PlaylistItem>()
+                .Where(playlistItem => playlistItem.Sequence > sequence)
+                .OrderBy(playlistItem => playlistItem.Sequence)
+                .FirstOrDefault();
         }
 
         protected virtual PlaylistItem GetPreviousPlaylistItem(int sequence)
         {
-            return this.Database.Sets.PlaylistItem.Query(
-                this.Database.Queries.GetPreviousPlaylistItem,
-                parameters => parameters["sequence"] = sequence
-            ).FirstOrDefault();
+            return this.Database.AsQueryable<PlaylistItem>()
+                .Where(playlistItem => playlistItem.Sequence < sequence)
+                .OrderByDescending(playlistItem => playlistItem.Sequence)
+                .FirstOrDefault();
         }
 
         public async Task Play(PlaylistItem playlistItem)

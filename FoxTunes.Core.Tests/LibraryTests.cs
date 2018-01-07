@@ -1,52 +1,54 @@
 ﻿using NUnit.Framework;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [TestFixture]
-    public class PlaylistTests : TestBase
+    public class LibraryTests : TestBase
     {
         [Test]
-        public async Task CanInsertFilesIntoPlaylist()
+        public async Task CanAddFilesToLibrary()
         {
-            await this.Core.Managers.Playlist.Clear();
-            await this.Core.Managers.Playlist.Add(new[]
+            await this.Core.Managers.Library.Clear();
+            await this.Core.Managers.Library.Add(new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             });
-            this.AssertPlaylistItems(
+            this.AssertLibraryItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Playlist.Insert(1, new[]
-            {
-                TestInfo.AudioFileNames[1]
-            });
-            this.AssertPlaylistItems(
+            this.AssertLibraryHierarchy(
                 TestInfo.AudioFileNames[0],
-                TestInfo.AudioFileNames[1],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Library.Clear();
         }
 
-        protected virtual void AssertPlaylistItems(params string[] fileNames)
+        protected virtual void AssertLibraryItems(params string[] fileNames)
         {
-            var sequence = this.Core.Components.Database.Sets.PlaylistItem;
+            var sequence = this.Core.Components.Database.Sets.LibraryItem;
             var query = (
                 from element in sequence
-                orderby element.Sequence
                 select element
             ).ToArray();
             Assert.AreEqual(fileNames.Length, query.Length);
             for (var a = 0; a < fileNames.Length; a++)
             {
                 Assert.AreEqual(fileNames[a], query[a].FileName);
+            }
+        }
+
+        protected virtual void AssertLibraryHierarchy(params string[] fileNames)
+        {
+            foreach (var hierarchy in this.Core.Components.Database.Sets.LibraryHierarchy)
+            {
+                var nodes = this.Core.Components.LibraryHierarchyBrowser.GetNodes(hierarchy);
             }
         }
     }

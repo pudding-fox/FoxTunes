@@ -1,5 +1,6 @@
 ﻿<#@ template language="C#" #>
 <#@ assembly name="System.Core" #>
+<#@ import namespace="FoxDb" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
@@ -9,7 +10,7 @@ SELECT
 foreach (var keyColumn in this.KeyColumns) 
 { 
 #>
-<#= SQLiteSyntax.Column(this.Table, keyColumn) #>,
+<#= SQLiteSyntax.Identifier(this.Table, keyColumn) #>,
 <# 
 } 
 #>
@@ -27,8 +28,8 @@ foreach (var keyColumn in this.KeyColumns)
             { 
 #>, GROUP_CONCAT
 (
-    CASE WHEN <#= SQLiteSyntax.Column(this.Table, nameColumn) #> = <#= SQLiteSyntax.String(value) #> 
-        THEN <#= SQLiteSyntax.Column(this.Table, valueColumn) #> 
+    CASE WHEN <#= SQLiteSyntax.Identifier(this.Table, nameColumn) #> = <#= SQLiteSyntax.String(value) #> 
+        THEN <#= SQLiteSyntax.Identifier(this.Table, valueColumn) #> 
     END
 ) AS "Value_<#= index #>_<#= valueColumn #>"
 <#
@@ -46,7 +47,7 @@ GROUP BY
     foreach (var keyColumn in this.KeyColumns)
     {
         if (index > 0) { #>,<# }#>
-<#= SQLiteSyntax.Column(this.Table, keyColumn) #>
+<#= SQLiteSyntax.Identifier(this.Table, keyColumn) #>
 <#
         index++;
     }

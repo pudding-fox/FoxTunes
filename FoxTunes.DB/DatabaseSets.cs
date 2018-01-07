@@ -1,5 +1,6 @@
-﻿using System;
+﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -15,65 +16,65 @@ namespace FoxTunes
         {
             get
             {
-                return this.Database.GetSet<PlaylistItem>();
+                return this.Database.Set<PlaylistItem>();
             }
         }
 
-        protected virtual void OnPlaylistItemChanged()
+        protected virtual Task OnPlaylistItemChanged()
         {
-            this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("PlaylistItem"));
+            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("PlaylistItem"));
         }
 
         public IDatabaseSet<PlaylistColumn> PlaylistColumn
         {
             get
             {
-                return this.Database.GetSet<PlaylistColumn>();
+                return this.Database.Set<PlaylistColumn>();
             }
         }
 
-        protected virtual void OnPlaylistColumnChanged()
+        protected virtual Task OnPlaylistColumnChanged()
         {
-            this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("PlaylistColumn"));
+            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("PlaylistColumn"));
         }
 
         public IDatabaseSet<LibraryItem> LibraryItem
         {
             get
             {
-                return this.Database.GetSet<LibraryItem>();
+                return this.Database.Set<LibraryItem>();
             }
         }
 
-        protected virtual void OnLibraryItemChanged()
+        protected virtual Task OnLibraryItemChanged()
         {
-            this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("LibraryItem"));
+            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("LibraryItem"));
         }
 
         public IDatabaseSet<LibraryHierarchy> LibraryHierarchy
         {
             get
             {
-                return this.Database.GetSet<LibraryHierarchy>();
+                return this.Database.Set<LibraryHierarchy>();
             }
         }
 
-        protected virtual void OnLibraryHierarchyChanged()
+        protected virtual Task OnLibraryHierarchyChanged()
         {
-            this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("LibraryHierarchy"));
+            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("LibraryHierarchy"));
         }
 
         public IDatabaseSet<LibraryHierarchyLevel> LibraryHierarchyLevel
         {
             get
             {
-                return this.Database.GetSet<LibraryHierarchyLevel>();
+                return this.Database.Set<LibraryHierarchyLevel>();
             }
         }
 
-        protected virtual void OnLibraryHierarchyLevelChanged()
+        protected virtual Task OnLibraryHierarchyLevelChanged()
         {
-            this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("LibraryHierarchyLevel"));
+            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("LibraryHierarchyLevel"));
         }
 
         public override void InitializeComponent(ICore core)
@@ -85,17 +86,16 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnSignal(object sender, ISignal signal)
+        protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    this.OnPlaylistItemChanged();
-                    break;
+                    return this.OnPlaylistItemChanged();
                 case CommonSignals.HierarchiesUpdated:
-                    this.OnLibraryHierarchyChanged();
-                    break;
+                    return this.OnLibraryHierarchyChanged();
             }
+            return Task.CompletedTask;
         }
     }
 }

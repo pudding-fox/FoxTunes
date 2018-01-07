@@ -4,7 +4,7 @@
     {
         IConfiguration Configuration { get; }
 
-        IDatabase Database { get; }
+        IDatabaseComponent Database { get; }
 
         IUserInterface UserInterface { get; }
 

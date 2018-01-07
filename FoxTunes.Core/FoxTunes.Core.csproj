@@ -25,6 +25,13 @@
     <OutputPath>..\distribution\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FoxDb.Core">
+      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FoxDb.Linq, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,15 +47,12 @@
     <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
-    <Compile Include="DB\RecordEnumerator.cs" />
-    <Compile Include="DB\RecordPersister.cs" />
+    <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseQueries.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseQuery.cs" />
+    <Compile Include="Interfaces\Database\IDatabaseSets.cs" />
     <Compile Include="Interfaces\ICountable.cs" />
-    <Compile Include="Interfaces\IDbParameterCollection.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseSets.cs" />
     <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
     <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
@@ -60,7 +64,6 @@
     <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Library\LibraryHierarchy.cs" />
     <Compile Include="Library\LibraryHierarchyBrowser.cs" />
-    <Compile Include="Library\LibraryHierarchyInfo.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="Library\LibraryHierarchyNode.cs" />
     <Compile Include="LogManager.cs" />
@@ -83,7 +86,6 @@
     <Compile Include="BaseLoader.cs" />
     <Compile Include="BaseManager.cs" />
     <Compile Include="Interfaces\IBackgroundTask.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseSet.cs" />
     <Compile Include="Interfaces\IBackgroundTaskSource.cs" />
     <Compile Include="Interfaces\Managers\ILibraryManager.cs" />
     <Compile Include="Library\LibraryItem.cs" />
@@ -135,7 +137,6 @@
     <Compile Include="Interfaces\Configuration\IConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Interfaces\ICore.cs" />
-    <Compile Include="Interfaces\Database\IDatabase.cs" />
     <Compile Include="Interfaces\IObservable.cs" />
     <Compile Include="Interfaces\IStandardBehaviour.cs" />
     <Compile Include="Interfaces\IStandardComponents.cs" />
@@ -156,15 +157,13 @@
     <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
+    <Compile Include="Tasks\ClearLibraryTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\LibraryTaskBase.cs" />
-    <Compile Include="Tasks\PriorityScheduler.cs" />
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
-    <Compile Include="Utilities\EnumerableDataReader.cs" />
     <Compile Include="Utilities\LibraryHierarchyPopulator.cs" />
     <Compile Include="Utilities\MetaDataPopulator.cs" />
     <Compile Include="Tasks\PlaylistTaskBase.cs" />
-    <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistSequencePopulator.cs" />
     <Compile Include="Utilities\PopulatorBase.cs" />

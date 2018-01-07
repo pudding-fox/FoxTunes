@@ -9,7 +9,7 @@ namespace FoxTunes
         {
         }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 

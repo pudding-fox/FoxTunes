@@ -1,4 +1,6 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using FoxTunes.Templates;
 using System;
 using System.Collections.Generic;
@@ -23,44 +25,6 @@ namespace FoxTunes
         }
 
         public IDatabase Database { get; private set; }
-
-        public IDatabaseQuery Count<T>()
-        {
-            var count = new Count(Tables[typeof(T)]);
-            return new DatabaseQuery(count.TransformText());
-        }
-
-        public IDatabaseQuery Find<T>()
-        {
-            var find = new Find(Tables[typeof(T)]);
-            return new DatabaseQuery(find.TransformText(), "id");
-        }
-
-        public IDatabaseQuery Select<T>(params string[] filters)
-        {
-            var select = new Select(Tables[typeof(T)], filters);
-            return new DatabaseQuery(select.TransformText(), filters);
-        }
-
-        public IDatabaseQuery Insert<T>()
-        {
-            var fieldNames = SQLiteSchema.GetFieldNames(this.Database, Tables[typeof(T)]);
-            var insert = new Insert(Tables[typeof(T)], fieldNames);
-            return new DatabaseQuery(insert.TransformText(), fieldNames.ToArray());
-        }
-
-        public IDatabaseQuery Update<T>()
-        {
-            var fieldNames = SQLiteSchema.GetFieldNames(this.Database, Tables[typeof(T)]);
-            var update = new Update(Tables[typeof(T)], fieldNames);
-            return new DatabaseQuery(update.TransformText(), fieldNames.ToArray());
-        }
-
-        public IDatabaseQuery Delete<T>()
-        {
-            var delete = new Delete(Tables[typeof(T)]);
-            return new DatabaseQuery(delete.TransformText(), "id");
-        }
 
         public IDatabaseQuery AddLibraryHierarchyNodeToPlaylist
         {
@@ -123,6 +87,14 @@ namespace FoxTunes
             get
             {
                 return new DatabaseQuery(Resources.ClearPlaylist);
+            }
+        }
+
+        public IDatabaseQuery ClearLibrary
+        {
+            get
+            {
+                return new DatabaseQuery(Resources.CLearLibrary);
             }
         }
 
@@ -213,39 +185,7 @@ namespace FoxTunes
                 return new DatabaseQuery(Resources.VariousArtists, "name", "type", "numericValue");
             }
         }
-
-        public IDatabaseQuery GetFirstPlaylistItem
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.GetFirstPlaylistItem);
-            }
-        }
-
-        public IDatabaseQuery GetLastPlaylistItem
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.GetLastPlaylistItem);
-            }
-        }
-
-        public IDatabaseQuery GetNextPlaylistItem
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.GetNextPlaylistItem, "sequence");
-            }
-        }
-
-        public IDatabaseQuery GetPreviousPlaylistItem
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.GetPreviousPlaylistItem, "sequence");
-            }
-        }
-
+        
         public IDatabaseQuery PlaylistSequenceBuilder(IEnumerable<string> metaDataNames)
         {
             var playlistSequenceBuilder = new PlaylistSequenceBuilder(metaDataNames);

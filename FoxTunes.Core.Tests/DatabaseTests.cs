@@ -11,7 +11,7 @@ namespace FoxTunes
         {
             using (var transaction = this.Core.Components.Database.BeginTransaction())
             {
-                var set = this.Core.Components.Database.GetSet<PlaylistColumn>(transaction);
+                var set = this.Core.Components.Database.Set<PlaylistColumn>(transaction);
                 set.Delete(set);
                 Assert.AreEqual(0, set.Count);
                 set.AddOrUpdate(new[] {

@@ -25,6 +25,9 @@
     <OutputPath>..\distribution\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FoxDb.Core">
+      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -34,9 +37,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database.cs" />
-    <Compile Include="DatabaseQuery.cs" />
-    <Compile Include="DatabaseSet.cs" />
     <Compile Include="DatabaseSets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -22,6 +22,14 @@ namespace FoxTunes.Managers
             return task.Run();
         }
 
+        public Task Clear()
+        {
+            var task = new ClearLibraryTask();
+            task.InitializeComponent(this.Core);
+            this.OnBackgroundTask(task);
+            return task.Run();
+        }
+
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)

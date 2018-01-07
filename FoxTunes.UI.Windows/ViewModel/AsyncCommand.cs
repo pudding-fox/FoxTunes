@@ -38,15 +38,15 @@ namespace FoxTunes.ViewModel
             }
             else if (this.AsyncPredicate != null)
             {
-                this.AsyncPredicate().ContinueWith(_ =>
+                ComponentRegistry.Instance.GetComponent<IBackgroundTaskRunner>().Run(() => this.AsyncPredicate().ContinueWith(async task =>
                 {
-                    if (this.CanExecute.HasValue && this.CanExecute.Value == _.Result)
+                    if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
                     {
                         return;
                     }
-                    this.CanExecute = _.Result;
-                    InvalidateRequerySuggested();
-                });
+                    this.CanExecute = task.Result;
+                    await InvalidateRequerySuggested();
+                })).Wait();
                 if (this.CanExecute.HasValue)
                 {
                     return this.CanExecute.Value;
@@ -94,15 +94,12 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.Func().ContinueWith(_ =>
-            {
-                InvalidateRequerySuggested();
-            });
+            this.Func().ContinueWith(async task => await InvalidateRequerySuggested());
         }
 
-        public static void InvalidateRequerySuggested()
+        public static Task InvalidateRequerySuggested()
         {
-            ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().Run(() => CommandManager.InvalidateRequerySuggested());
+            return ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().RunAsync(() => CommandManager.InvalidateRequerySuggested());
         }
 
         public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);
@@ -141,15 +138,15 @@ namespace FoxTunes.ViewModel
             }
             else if (this.AsyncPredicate != null)
             {
-                this.AsyncPredicate((T)parameter).ContinueWith(_ =>
+                ComponentRegistry.Instance.GetComponent<IBackgroundTaskRunner>().Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
                 {
-                    if (this.CanExecute.HasValue && this.CanExecute.Value == _.Result)
+                    if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
                     {
                         return;
                     }
-                    this.CanExecute = _.Result;
-                    Command.InvalidateRequerySuggested();
-                });
+                    this.CanExecute = task.Result;
+                    await Command.InvalidateRequerySuggested();
+                })).Wait();
                 if (this.CanExecute.HasValue)
                 {
                     return this.CanExecute.Value;
@@ -197,10 +194,7 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.Func((T)parameter).ContinueWith(_ =>
-            {
-                Command.InvalidateRequerySuggested();
-            });
+            this.Func((T)parameter).ContinueWith(async task => await Command.InvalidateRequerySuggested());
         }
     }
 }

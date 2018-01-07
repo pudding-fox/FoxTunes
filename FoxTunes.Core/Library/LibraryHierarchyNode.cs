@@ -1,11 +1,18 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace FoxTunes
 {
+    [Table(Name = "LibraryHierarchyItems")]
     public class LibraryHierarchyNode : BaseComponent
     {
+        const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Image;
+
+        const int META_DATA_COUNT = 5;
+
         public LibraryHierarchyNode()
         {
 
@@ -13,19 +20,20 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
-        public int Id { get; private set; }
+        public int Id { get; set; }
 
-        public int LibraryHierarchyId { get; private set; }
+        [Column(Name = "LibraryHierarchy_Id")]
+        public int LibraryHierarchyId { get; set; }
 
-        public string DisplayValue { get; private set; }
+        public string DisplayValue { get; set; }
 
-        public string SortValue { get; private set; }
+        public string SortValue { get; set; }
 
-        public bool IsLeaf { get; private set; }
+        public bool IsLeaf { get; set; }
 
         private ObservableCollection<LibraryHierarchyNode> _Children { get; set; }
 
@@ -197,7 +205,14 @@ namespace FoxTunes
             {
                 return;
             }
-            this.MetaDatas = new ObservableCollection<MetaDataItem>(MetaDataInfo.GetMetaData(this.Core, this.Database, this, MetaDataItemType.Image));
+            this.MetaDatas = new ObservableCollection<MetaDataItem>(
+                MetaDataInfo.GetMetaData(
+                    this.Core,
+                    this.Database,
+                    this,
+                    META_DATA_TYPE
+                ).Take(META_DATA_COUNT)
+            );
         }
 
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();

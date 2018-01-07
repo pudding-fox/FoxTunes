@@ -1,21 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using FoxDb.Interfaces;
+using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
     public interface IDatabaseQueries : IBaseComponent
     {
-        IDatabaseQuery Select<T>(params string[] filters);
-
-        IDatabaseQuery Find<T>();
-
-        IDatabaseQuery Count<T>();
-
-        IDatabaseQuery Insert<T>();
-
-        IDatabaseQuery Update<T>();
-
-        IDatabaseQuery Delete<T>();
-
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }
 
         IDatabaseQuery AddLibraryHierarchyRecord { get; }
@@ -31,6 +20,8 @@ namespace FoxTunes.Interfaces
         IDatabaseQuery AddPlaylistMetaDataItems { get; }
 
         IDatabaseQuery ClearPlaylist { get; }
+
+        IDatabaseQuery ClearLibrary { get; }
 
         IDatabaseQuery CopyMetaDataItems { get; }
 
@@ -53,14 +44,6 @@ namespace FoxTunes.Interfaces
         IDatabaseQuery ShiftPlaylistItems { get; }
 
         IDatabaseQuery VariousArtists { get; }
-
-        IDatabaseQuery GetFirstPlaylistItem { get; }
-
-        IDatabaseQuery GetLastPlaylistItem { get; }
-
-        IDatabaseQuery GetNextPlaylistItem { get; }
-
-        IDatabaseQuery GetPreviousPlaylistItem { get; }
 
         IDatabaseQuery PlaylistSequenceBuilder(IEnumerable<string> metaDataNames);
 

@@ -1,4 +1,6 @@
-﻿namespace FoxTunes.Interfaces
+﻿using FoxDb.Interfaces;
+
+namespace FoxTunes.Interfaces
 {
     public interface IDatabaseSets : IBaseComponent
     {

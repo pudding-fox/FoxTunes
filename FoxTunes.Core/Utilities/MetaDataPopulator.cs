@@ -1,4 +1,6 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +13,8 @@ namespace FoxTunes
 {
     public class MetaDataPopulator : PopulatorBase
     {
+        //public const int SAVE_INTERVAL = 1000;
+
         public readonly object SyncRoot = new object();
 
         private MetaDataPopulator(bool reportProgress)
@@ -19,7 +23,7 @@ namespace FoxTunes
             this.Command = new ThreadLocal<MetaDataPopulatorCommand>(true);
         }
 
-        public MetaDataPopulator(IDatabase database, IDbTransaction transaction, IDatabaseQuery query, bool reportProgress)
+        public MetaDataPopulator(IDatabase database, ITransactionSource transaction, IDatabaseQuery query, bool reportProgress)
             : this(reportProgress)
         {
             this.Database = database;
@@ -29,7 +33,7 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
-        public IDbTransaction Transaction { get; private set; }
+        public ITransactionSource Transaction { get; private set; }
 
         public IDatabaseQuery Query { get; private set; }
 
@@ -81,6 +85,7 @@ namespace FoxTunes
                     command.Parameters["textValue"] = metaDataItem.TextValue;
                     command.Parameters["fileValue"] = metaDataItem.FileValue;
                     command.Command.ExecuteNonQuery();
+                    //command.Increment();
                 }
 
                 if (this.ReportProgress)
@@ -119,16 +124,42 @@ namespace FoxTunes
 
         private class MetaDataPopulatorCommand : BaseComponent
         {
-            public MetaDataPopulatorCommand(IDatabase database, IDbTransaction transaction, IDatabaseQuery query)
+            public MetaDataPopulatorCommand(IDatabase database, ITransactionSource transaction, IDatabaseQuery query)
             {
-                var parameters = default(IDbParameterCollection);
-                this.Command = database.CreateCommand(query, out parameters, transaction);
-                this.Parameters = parameters;
+                this.Database = database;
+                this.Transaction = transaction;
+                this.Query = query;
+                this.CreateCommand();
             }
+
+            public IDatabase Database { get; private set; }
+
+            public ITransactionSource Transaction { get; private set; }
+
+            public IDatabaseQuery Query { get; private set; }
 
             public IDbCommand Command { get; private set; }
 
-            public IDbParameterCollection Parameters { get; private set; }
+            public IDatabaseParameters Parameters { get; private set; }
+
+            //public int Batch { get; private set; }
+
+            public void CreateCommand()
+            {
+                var parameters = default(IDatabaseParameters);
+                this.Command = this.Database.Connection.CreateCommand(this.Query, out parameters, this.Transaction);
+                this.Parameters = parameters;
+            }
+
+            //public void Increment()
+            //{
+            //    if (this.Batch++ >= SAVE_INTERVAL)
+            //    {
+            //        this.Transaction.Commit();
+            //        this.Transaction.Bind(this.Command);
+            //        this.Batch = 0;
+            //    }
+            //}
 
             public bool IsDisposed { get; private set; }
 

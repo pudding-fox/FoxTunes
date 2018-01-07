@@ -44,7 +44,7 @@ namespace FoxTunes.ViewModel
                 this.SelectedHierarchyChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("SelectedHierarchy");
-            this.Refresh(false);
+            this.Refresh();
         }
 
         private Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>> _Items { get; set; }
@@ -109,19 +109,15 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedItemChanged = delegate { };
 
-        public virtual void Refresh(bool deep)
+        public virtual void Refresh()
         {
-            //if (this.DataManager != null && this.SelectedHierarchy != null && deep)
-            //{
-            //    this.SelectedHierarchy = this.DataManager.ReadContext.Sets.LibraryHierarchy.Find(this.SelectedHierarchy.Id);
-            //}
             this.OnItemsChanged();
         }
 
         public virtual void Reload()
         {
             this._Items.Clear();
-            this.Refresh(true);
+            this.Refresh();
         }
 
         protected override void OnCoreChanged()
@@ -131,7 +127,7 @@ namespace FoxTunes.ViewModel
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Refresh(false);
+            this.Refresh();
             base.OnCoreChanged();
         }
 
@@ -140,14 +136,14 @@ namespace FoxTunes.ViewModel
             //Nothing to do.
         }
 
-        protected virtual void OnSignal(object sender, ISignal signal)
+        protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    this.ForegroundTaskRunner.Run(this.Reload);
-                    break;
+                    return this.ForegroundTaskRunner.RunAsync(() => this.Reload());
             }
+            return Task.CompletedTask;
         }
 
         public ICommand DragEnterCommand
