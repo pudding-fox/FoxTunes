@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 
 namespace FoxTunes
@@ -18,7 +19,7 @@ namespace FoxTunes
             }
             if (type.GetConstructor(new Type[] { }) != null)
             {
-                return (T)Activator.CreateInstance(type);
+                return (T)FastActivator.Instance.Activate(type);
             }
             throw new ComponentActivatorException(string.Format("Failed to locate constructor for component {0}.", type.Name));
         }
