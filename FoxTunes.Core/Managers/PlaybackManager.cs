@@ -99,7 +99,7 @@ namespace FoxTunes.Managers
             return task.Run();
         }
 
-        public Task Stop()
+        public Task StopStream()
         {
             if (this.CurrentStream == null)
             {
@@ -109,6 +109,11 @@ namespace FoxTunes.Managers
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run();
+        }
+
+        public Task StopOutput()
+        {
+            return this.StopStream().ContinueWith(task => this.Output.Shutdown());
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)

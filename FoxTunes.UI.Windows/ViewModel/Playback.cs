@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,6 +12,8 @@ namespace FoxTunes.ViewModel
 
         public IDatabase Database { get; private set; }
 
+        public IOutput Output { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
@@ -19,9 +22,25 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(
-                    () => this.PlaybackManager.CurrentStream.Play(),
-                    () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsStopped
+                return new AsyncCommand(
+                    this.BackgroundTaskRunner,
+                    () =>
+                    {
+                        if (this.PlaybackManager.CurrentStream == null)
+                        {
+                            return this.PlaylistManager.Next();
+                        }
+                        else if (this.PlaybackManager.CurrentStream.IsPaused)
+                        {
+                            this.PlaybackManager.CurrentStream.Resume();
+                        }
+                        else if (this.PlaybackManager.CurrentStream.IsStopped)
+                        {
+                            this.PlaybackManager.CurrentStream.Play();
+                        }
+                        return Task.CompletedTask;
+                    },
+                    () => this.PlaybackManager != null && this.PlaylistManager != null && (this.PlaybackManager.CurrentStream == null || (this.PlaybackManager.CurrentStream.IsPaused || this.PlaybackManager.CurrentStream.IsStopped))
                 );
             }
         }
@@ -30,7 +49,8 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() =>
+                return new Command(
+                    () =>
                     {
                         if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
@@ -46,13 +66,26 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public ICommand StopCommand
+        public ICommand StopStreamCommand
         {
             get
             {
                 return new AsyncCommand(
-                    () => this.PlaybackManager.Stop(),
+                    this.BackgroundTaskRunner,
+                    () => this.PlaybackManager.StopStream(),
                     () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsPlaying
+                );
+            }
+        }
+
+        public ICommand StopOutputCommand
+        {
+            get
+            {
+                return new AsyncCommand(
+                    this.BackgroundTaskRunner,
+                    () => this.PlaybackManager.StopOutput(),
+                    () => this.PlaybackManager != null && this.Output != null && this.Output.IsStarted
                 );
             }
         }
@@ -62,6 +95,7 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new AsyncCommand(
+                    this.BackgroundTaskRunner,
                     () => this.PlaylistManager.Previous(),
                     async () => this.BackgroundTaskRunner != null && this.PlaylistManager != null && await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.CanNavigate)
                 );
@@ -73,6 +107,7 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new AsyncCommand(
+                    this.BackgroundTaskRunner,
                     () => this.PlaylistManager.Next(),
                     async () => this.BackgroundTaskRunner != null && this.PlaylistManager != null && await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.CanNavigate)
                 );
@@ -83,10 +118,22 @@ namespace FoxTunes.ViewModel
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.Database = this.Core.Components.Database;
+            this.Output = this.Core.Components.Output;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             this.Core.Components.Output.IsStartedChanged += (sender, e) => Command.InvalidateRequerySuggested();
+            this.OnCommandsChanged();
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnCommandsChanged()
+        {
+            this.OnPropertyChanged("PlayCommand");
+            this.OnPropertyChanged("PauseCommand");
+            this.OnPropertyChanged("StopStreamCommand");
+            this.OnPropertyChanged("StopOutputCommand");
+            this.OnPropertyChanged("PreviousCommand");
+            this.OnPropertyChanged("NextCommand");
         }
 
         protected override Freezable CreateInstanceCore()

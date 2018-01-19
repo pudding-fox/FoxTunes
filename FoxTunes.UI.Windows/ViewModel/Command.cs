@@ -69,11 +69,21 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.Action();
+            InvalidateRequerySuggested();
         }
 
         public static Task InvalidateRequerySuggested()
         {
-            return ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().RunAsync(() => CommandManager.InvalidateRequerySuggested());
+            var foregroundTaskRunner = ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>();
+            if (foregroundTaskRunner != null)
+            {
+                return foregroundTaskRunner.RunAsync(() => CommandManager.InvalidateRequerySuggested());
+            }
+            else
+            {
+                CommandManager.InvalidateRequerySuggested();
+                return Task.CompletedTask;
+            }
         }
 
         public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);
@@ -143,6 +153,7 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.Action((T)parameter);
+            Command.InvalidateRequerySuggested();
         }
     }
 }

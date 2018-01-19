@@ -207,31 +207,36 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
-        public void Shutdown(bool force = false)
+        public override Task Shutdown()
         {
-            if (!force && !this.IsStarted)
+            return this.Shutdown(false);
+        }
+
+        protected virtual Task Shutdown(bool force)
+        {
+            if (force || this.IsStarted)
             {
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
-            try
-            {
-                if (this.OutputChannel != null)
+                Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
+                try
                 {
-                    this.OutputChannel.Dispose();
-                    this.OutputChannel = null;
+                    if (this.OutputChannel != null)
+                    {
+                        this.OutputChannel.Dispose();
+                        this.OutputChannel = null;
+                    }
+                    Bass.Free();
+                    Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
                 }
-                Bass.Free();
-                Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
+                catch (Exception e)
+                {
+                    this.OnError(e);
+                }
+                finally
+                {
+                    this.IsStarted = false;
+                }
             }
-            catch (Exception e)
-            {
-                this.OnError(e);
-            }
-            finally
-            {
-                this.IsStarted = false;
-            }
+            return Task.CompletedTask;
         }
 
         protected virtual void OutputChannel_Error(object sender, ComponentOutputErrorEventArgs e)

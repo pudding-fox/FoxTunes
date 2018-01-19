@@ -135,27 +135,25 @@ namespace FoxTunes.Managers
 
         public PlaylistItem GetNext()
         {
-            var sequence = default(int);
+            var playlistItem = default(PlaylistItem);
             if (this.CurrentItem == null)
             {
                 Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                sequence = 0;
+                playlistItem = this.GetFirstPlaylistItem();
             }
             else
             {
-                sequence = this.CurrentItem.Sequence;
-                Logger.Write(this, LogLevel.Debug, "Current playlist item is sequence: {0}", sequence);
-            }
-            var playlistItem = this.GetNextPlaylistItem(sequence);
-            if (playlistItem == null)
-            {
-                playlistItem = this.GetFirstPlaylistItem();
+                Logger.Write(this, LogLevel.Debug, "Current playlist item is sequence: {0}", this.CurrentItem.Sequence);
+                playlistItem = this.GetNextPlaylistItem(this.CurrentItem.Sequence);
                 if (playlistItem == null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
-                    return default(PlaylistItem);
+                    Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
+                    playlistItem = this.GetFirstPlaylistItem();
                 }
-                Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
+            }
+            if (playlistItem == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
             }
             return playlistItem;
         }
@@ -170,7 +168,7 @@ namespace FoxTunes.Managers
             }
             try
             {
-                this.IsNavigating = true; ;
+                this.IsNavigating = true;
                 var playlistItem = this.GetNext();
                 if (playlistItem == null)
                 {
@@ -187,27 +185,25 @@ namespace FoxTunes.Managers
 
         public PlaylistItem GetPrevious()
         {
-            var sequence = default(int);
+            var playlistItem = default(PlaylistItem);
             if (this.CurrentItem == null)
             {
-                Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                sequence = 0;
+                Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming last item.");
+                playlistItem = this.GetLastPlaylistItem();
             }
             else
             {
-                sequence = this.CurrentItem.Sequence;
-                Logger.Write(this, LogLevel.Debug, "Previous playlist item is sequence: {0}", sequence);
-            }
-            var playlistItem = this.GetPreviousPlaylistItem(sequence);
-            if (playlistItem == null)
-            {
-                playlistItem = this.GetLastPlaylistItem();
+                Logger.Write(this, LogLevel.Debug, "Previous playlist item is sequence: {0}", this.CurrentItem.Sequence);
+                playlistItem = this.GetPreviousPlaylistItem(this.CurrentItem.Sequence);
                 if (playlistItem == null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
-                    return default(PlaylistItem);
+                    Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
+                    playlistItem = this.GetLastPlaylistItem();
                 }
-                Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
+            }
+            if (playlistItem == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
             }
             return playlistItem;
         }

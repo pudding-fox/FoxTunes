@@ -39,5 +39,7 @@ namespace FoxTunes
         public abstract Task Preempt(IOutputStream stream);
 
         public abstract Task Unload(IOutputStream stream);
+
+        public abstract Task Shutdown();
     }
 }
