@@ -7,7 +7,7 @@ using System.Windows.Threading;
 
 namespace FoxTunes
 {
-    [Component("B889313D-4F21-4794-8D16-C2FAE6A7B305", ComponentSlots.UserInterface)]
+    [Component("B889313D-4F21-4794-8D16-C2FAE6A7B305", ComponentSlots.UserInterface, priority: ComponentAttribute.PRIORITY_LOW)]
     public class WindowsUserInterface : UserInterface, IConfigurableComponent
     {
         public static readonly Type[] References = new[]
