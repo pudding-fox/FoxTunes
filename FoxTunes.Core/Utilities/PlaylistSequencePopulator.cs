@@ -61,6 +61,7 @@ namespace FoxTunes
             {
                 var command = this.GetOrAddCommand();
                 var values = this.ExecuteScript(command.ScriptingContext, record);
+                Logger.Write(this, LogLevel.Debug, "Using the following values for item {0}: {1}", record["PlaylistItem_Id"], string.Join(", ", values));
 
                 command.Parameters["playlistItemId"] = record["PlaylistItem_Id"];
 

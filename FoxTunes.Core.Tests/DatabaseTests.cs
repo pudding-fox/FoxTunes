@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FoxDb;
+using NUnit.Framework;
 using System.Linq;
 
 namespace FoxTunes

@@ -14,7 +14,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}"></ViewModel:Playlist>
+        <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}" AutoSizeGridColumns="True"></ViewModel:Playlist>
         <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Components.Database.Sets.PlaylistItem}" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Sequence</System:String>

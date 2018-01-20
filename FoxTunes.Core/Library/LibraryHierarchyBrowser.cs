@@ -1,4 +1,5 @@
-﻿using FoxDb.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;

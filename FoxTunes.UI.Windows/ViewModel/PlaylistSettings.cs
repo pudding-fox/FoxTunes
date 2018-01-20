@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
