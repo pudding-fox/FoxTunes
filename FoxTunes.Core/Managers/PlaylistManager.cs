@@ -1,4 +1,5 @@
 ﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace FoxTunes.Managers
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.Refresh();
             base.InitializeComponent(core);
         }
 
@@ -42,13 +44,30 @@ namespace FoxTunes.Managers
 
         public Task Refresh()
         {
-            if (this.CurrentItem != null)
+            Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
+            this.CanNavigate = this.Database.ExecuteScalar<bool>(this.Database.QueryFactory.Build().With(query1 =>
             {
-                Logger.Write(this, LogLevel.Debug, "Playlist was updated, refreshing current item.");
-                if ((this.CurrentItem = this.Database.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
+                query1.Output.AddFunction(QueryFunction.Exists, query1.Output.CreateSubQuery(this.Database.QueryFactory.Build().With(query2 =>
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                    query2.Output.AddOperator(QueryOperator.Star);
+                    query2.Source.AddTable(this.Database.Config.Table<PlaylistItem>());
+                })));
+            }));
+            if (this.CanNavigate)
+            {
+                Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
+                if (this.CurrentItem != null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Refreshing current item.");
+                    if ((this.CurrentItem = this.Database.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                    }
                 }
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Navigation is not possible, playlist is empty.");
             }
             return Task.CompletedTask;
         }
@@ -125,13 +144,7 @@ namespace FoxTunes.Managers
 
         public event EventHandler Updated = delegate { };
 
-        public bool CanNavigate
-        {
-            get
-            {
-                return this.Database.Sets.PlaylistItem.Count > 0;
-            }
-        }
+        public bool CanNavigate { get; private set; }
 
         public PlaylistItem GetNext()
         {

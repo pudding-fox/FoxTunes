@@ -61,30 +61,18 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
-        ///SELECT @sequence, &quot;LibraryItems&quot;.&quot;DirectoryName&quot;, &quot;LibraryItems&quot;.&quot;FileName&quot;, @status
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;LibraryItem_Id&quot;, &quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
+        ///SELECT &quot;LibraryItems&quot;.&quot;Id&quot;, @sequence, &quot;LibraryItems&quot;.&quot;DirectoryName&quot;, &quot;LibraryItems&quot;.&quot;FileName&quot;, @status
         ///FROM &quot;LibraryHierarchyItems&quot;
         ///	JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; 
         ///		ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot;
         ///	JOIN &quot;LibraryItems&quot;
         ///		ON &quot;LibraryItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot;
-        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId;
-        ///
-        ///SELECT [rest of string was truncated]&quot;;.
+        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;I [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddLibraryHierarchyNodeToPlaylist {
             get {
                 return ResourceManager.GetString("AddLibraryHierarchyNodeToPlaylist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryHierarchy&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;LibraryItem_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;)
-        ///VALUES (@libraryHierarchyId, @libraryHierarchyLevelId, @libraryItemId, @displayValue, @sortValue, @isLeaf).
-        /// </summary>
-        internal static string AddLibraryHierarchyRecord {
-            get {
-                return ResourceManager.GetString("AddLibraryHierarchyRecord", resourceCulture);
             }
         }
         
@@ -121,8 +109,8 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
-        ///SELECT @sequence, @directoryName, @fileName, @status.
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;LibraryItem_Id&quot;, &quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
+        ///SELECT (SELECT &quot;Id&quot; FROM &quot;LibraryItems&quot; WHERE &quot;FileName&quot; = @fileName), @sequence, @directoryName, @fileName, @status.
         /// </summary>
         internal static string AddPlaylistItem {
             get {
@@ -185,33 +173,20 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItem_MetaDataItem&quot; (&quot;PlaylistItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
-        ///SELECT &quot;PlaylistItems&quot;.&quot;Id&quot;, &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
-        ///FROM &quot;PlaylistItems&quot;
-        ///	JOIN &quot;LibraryItems&quot; 
-        ///		ON &quot;PlaylistItems&quot;.&quot;FileName&quot; = &quot;LibraryItems&quot;.&quot;FileName&quot;
-        ///	JOIN &quot;LibraryItem_MetaDataItem&quot; 
-        ///		ON &quot;LibraryItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot;
-        ///WHERE &quot;PlaylistItems&quot;.&quot;Status&quot; = @status;.
-        /// </summary>
-        internal static string CopyMetaDataItems {
-            get {
-                return ResourceManager.GetString("CopyMetaDataItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to BEGIN TRANSACTION;
         ///CREATE TABLE [PlaylistItems](
         ///    [Id] INTEGER CONSTRAINT [sqlite_master_PK_PlaylistItems] PRIMARY KEY NOT NULL, 
+        ///	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE,
         ///    [Sequence] bigint NOT NULL, 
         ///    [DirectoryName] text NOT NULL, 
         ///    [FileName] text NOT NULL, 
         ///    [Status] bigint NOT NULL);
+        ///CREATE INDEX [IDX_PlaylistItems]
+        ///ON [PlaylistItems](
+        ///    [Status]);
         ///CREATE TABLE [PlaylistItem_MetaDataItem](
         ///    [Id] INTEGER PRIMARY KEY NOT NULL, 
-        ///    [PlaylistItem_Id] INTEGER NOT NULL REFERENCES PlaylistItems([Id]) ON DELETE CASCADE, 
-        ///    [MetaDataItem_Id] INTEGER NOT NULL REFERENCES MetaDataItems([Id]) ON DEL [rest of string was truncated]&quot;;.
+        ///    [PlaylistItem_ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
@@ -313,37 +288,6 @@ namespace FoxTunes {
         internal static string GetPlaylistMetaDataItems {
             get {
                 return ResourceManager.GetString("GetPlaylistMetaDataItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to UPDATE &quot;LibraryItems&quot;
-        ///SET &quot;Status&quot; = @status.
-        /// </summary>
-        internal static string SetLibraryItemStatus {
-            get {
-                return ResourceManager.GetString("SetLibraryItemStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to UPDATE &quot;PlaylistItems&quot;
-        ///SET &quot;Status&quot; = @status.
-        /// </summary>
-        internal static string SetPlaylistItemStatus {
-            get {
-                return ResourceManager.GetString("SetPlaylistItemStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to UPDATE &quot;PlaylistItems&quot;
-        ///SET &quot;Sequence&quot; = &quot;Sequence&quot; + @offset
-        ///WHERE &quot;Status&quot; = @status AND &quot;Sequence&quot; &gt;= @sequence.
-        /// </summary>
-        internal static string ShiftPlaylistItems {
-            get {
-                return ResourceManager.GetString("ShiftPlaylistItems", resourceCulture);
             }
         }
         

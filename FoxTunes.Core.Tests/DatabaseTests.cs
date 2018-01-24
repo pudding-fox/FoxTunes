@@ -13,7 +13,7 @@ namespace FoxTunes
             using (var transaction = this.Core.Components.Database.BeginTransaction())
             {
                 var set = this.Core.Components.Database.Set<PlaylistColumn>(transaction);
-                set.Delete(set);
+                set.Remove(set);
                 Assert.AreEqual(0, set.Count);
                 set.AddOrUpdate(new[] {
                     new PlaylistColumn() { Name = "Test1", DisplayScript = "N/A" },
@@ -30,7 +30,7 @@ namespace FoxTunes
                     var items = set.ToArray();
                     this.AssertRecords(items, "Test1", "Test_Updated_2", "Test3");
                 }
-                set.Delete(set);
+                set.Remove(set);
                 Assert.AreEqual(0, set.Count);
                 transaction.Rollback();
             }

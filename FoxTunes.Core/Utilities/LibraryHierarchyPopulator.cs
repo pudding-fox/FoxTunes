@@ -162,8 +162,19 @@ namespace FoxTunes
             public void CreateCommand()
             {
                 var parameters = default(IDatabaseParameters);
-                this.Command = this.Database.Connection.CreateCommand(
-                    this.Database.Queries.AddLibraryHierarchyRecord,
+                var table = this.Database.Config.Table("LibraryHierarchy", TableFlags.None);
+                table.Column("LibraryHierarchy_Id");
+                table.Column("LibraryHierarchyLevel_Id");
+                table.Column("LibraryItem_Id");
+                table.Column("DisplayValue");
+                table.Column("SortValue");
+                table.Column("IsLeaf");
+                var query = this.Database.QueryFactory.Build();
+                query.Add.SetTable(table);
+                query.Add.AddColumns(table.Columns);
+                query.Output.AddParameters(table.Columns);
+                this.Command = this.Database.CreateCommand(
+                    query.Build(),
                     out parameters,
                     this.Transaction
                 );

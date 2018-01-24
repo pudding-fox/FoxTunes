@@ -170,7 +170,7 @@ namespace FoxTunes
             public void CreateCommand()
             {
                 var parameters = default(IDatabaseParameters);
-                this.Command = this.Database.Connection.CreateCommand(
+                this.Command = this.Database.CreateCommand(
                     this.Database.Queries.AddPlaylistSequenceRecord,
                     out parameters,
                     this.Transaction

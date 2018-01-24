@@ -10,7 +10,7 @@ SELECT
 foreach (var keyColumn in this.KeyColumns) 
 { 
 #>
-<#= SQLiteSyntax.Identifier(this.Table, keyColumn) #>,
+<#= this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn) #>,
 <# 
 } 
 #>
@@ -20,7 +20,7 @@ foreach (var keyColumn in this.KeyColumns)
     foreach (var value in this.Values) 
     {
         if (index > 0) { #>,<# }#>
-<#= SQLiteSyntax.String(value) #> AS "Key_<#= index #>"
+<#= this.Database.QueryFactory.Dialect.String(value) #> AS "Key_<#= index #>"
 <# 
         foreach (var nameColumn in this.NameColumns) 
         {
@@ -28,8 +28,8 @@ foreach (var keyColumn in this.KeyColumns)
             { 
 #>, GROUP_CONCAT
 (
-    CASE WHEN <#= SQLiteSyntax.Identifier(this.Table, nameColumn) #> = <#= SQLiteSyntax.String(value) #> 
-        THEN <#= SQLiteSyntax.Identifier(this.Table, valueColumn) #> 
+    CASE WHEN <#= this.Database.QueryFactory.Dialect.Identifier(this.Table, nameColumn) #> = <#= this.Database.QueryFactory.Dialect.String(value) #> 
+        THEN <#= this.Database.QueryFactory.Dialect.Identifier(this.Table, valueColumn) #> 
     END
 ) AS "Value_<#= index #>_<#= valueColumn #>"
 <#
@@ -41,13 +41,13 @@ foreach (var keyColumn in this.KeyColumns)
 {
     var index = 0;
 #> 
-FROM <#= SQLiteSyntax.Identifier(this.Table) #> 
+FROM <#= this.Database.QueryFactory.Dialect.Identifier(this.Table) #> 
 GROUP BY
 <#
     foreach (var keyColumn in this.KeyColumns)
     {
         if (index > 0) { #>,<# }#>
-<#= SQLiteSyntax.Identifier(this.Table, keyColumn) #>
+<#= this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn) #>
 <#
         index++;
     }

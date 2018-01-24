@@ -44,7 +44,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             using (var transaction = this.Database.BeginTransaction())
             {
@@ -53,8 +53,7 @@ namespace FoxTunes
                 this.SetLibraryItemsStatus(transaction);
                 transaction.Commit();
             }
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
-            return Task.CompletedTask;
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
         private void AddLibraryItems(ITransactionSource transaction)
@@ -63,7 +62,7 @@ namespace FoxTunes
             this.IsIndeterminate = true;
             //var batch = 0;
             var parameters = default(IDatabaseParameters);
-            using (var command = this.Database.Connection.CreateCommand(this.Database.Queries.AddLibraryItem, out parameters))
+            using (var command = this.Database.CreateCommand(this.Database.Queries.AddLibraryItem, out parameters))
             {
                 transaction.Bind(command);
                 var addLibraryItem = new Action<string>(fileName =>
@@ -119,7 +118,11 @@ namespace FoxTunes
         private void SetLibraryItemsStatus(ITransactionSource transaction)
         {
             this.IsIndeterminate = true;
-            this.Database.Execute(this.Database.Queries.SetLibraryItemStatus, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
+            var table = this.Database.Config.Table<LibraryItem>();
+            var query = this.Database.QueryFactory.Build();
+            query.Update.SetTable(table);
+            query.Update.AddColumn(table.Column("Status"));
+            this.Database.Execute(query, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
         }
     }
 }

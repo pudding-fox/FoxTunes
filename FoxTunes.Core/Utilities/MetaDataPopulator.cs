@@ -147,7 +147,7 @@ namespace FoxTunes
             public void CreateCommand()
             {
                 var parameters = default(IDatabaseParameters);
-                this.Command = this.Database.Connection.CreateCommand(this.Query, out parameters, this.Transaction);
+                this.Command = this.Database.CreateCommand(this.Query, out parameters, this.Transaction);
                 this.Parameters = parameters;
             }
 

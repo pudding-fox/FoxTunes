@@ -91,6 +91,7 @@ AS
 (
 <#= 
 	new PivotViewBuilder(
+		this.Database,
 		"VerticalMetaData", 
 		new[] { "Id", "FileName" }, 
 		new[] { "Name" }, 

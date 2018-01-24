@@ -1,6 +1,7 @@
 BEGIN TRANSACTION;
 CREATE TABLE [PlaylistItems](
     [Id] INTEGER CONSTRAINT [sqlite_master_PK_PlaylistItems] PRIMARY KEY NOT NULL, 
+	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE,
     [Sequence] bigint NOT NULL, 
     [DirectoryName] text NOT NULL, 
     [FileName] text NOT NULL, 
@@ -77,7 +78,10 @@ CREATE TABLE [LibraryHierarchies] (
 );
 INSERT INTO `LibraryHierarchies` VALUES (1,'Artist/Album/Title');
 INSERT INTO `LibraryHierarchies` VALUES (2,'Genre/Album/Title');
-CREATE UNIQUE INDEX [IDX_PlaylistItem_MetaDataItem]
+CREATE INDEX [IDX_PlaylistItem_MetaDataItem_1]
+ON [PlaylistItem_MetaDataItem](
+    [PlaylistItem_Id]);
+CREATE UNIQUE INDEX [IDX_PlaylistItem_MetaDataItem_2]
 ON [PlaylistItem_MetaDataItem](
     [PlaylistItem_Id], 
     [MetaDataItem_Id]);

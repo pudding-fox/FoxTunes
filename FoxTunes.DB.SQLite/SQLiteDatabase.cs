@@ -30,6 +30,7 @@ namespace FoxTunes
             {
                 this.CreateDatabase();
             }
+            this.Configure();
         }
 
         public IDatabaseSets Sets { get; private set; }
@@ -45,7 +46,31 @@ namespace FoxTunes
 
         protected virtual void CreateDatabase()
         {
-            this.Execute(new DatabaseQuery(Resources.Database));
+            this.Execute(this.QueryFactory.Create(Resources.Database));
+        }
+
+        protected virtual void Configure()
+        {
+            this.Config.Table<PlaylistItem>().With(table =>
+            {
+                table.Relation(item => item.MetaDatas).With(relation =>
+                {
+                    relation.Expression.Left = relation.Expression.Clone();
+                    relation.Expression.Operator = relation.Expression.CreateOperator(QueryOperator.OrElse);
+                    relation.Expression.Right = relation.CreateConstraint().With(constraint =>
+                    {
+                        constraint.Left = relation.CreateConstraint(
+                            this.Config.Table<PlaylistItem>().Column("LibraryItem_Id"),
+                            this.Config.Table<LibraryItem, MetaDataItem>().Column("LibraryItem_Id")
+                        );
+                        constraint.Operator = constraint.CreateOperator(QueryOperator.AndAlso);
+                        constraint.Right = relation.CreateConstraint(
+                            this.Config.Table<LibraryItem, MetaDataItem>().Column("MetaDataItem_Id"),
+                            this.Config.Table<MetaDataItem>().Column("Id")
+                        );
+                    });
+                });
+            });
         }
 
         protected virtual void OnPropertyChanged(string propertyName)
@@ -87,7 +112,8 @@ namespace FoxTunes
         {
             var builder = new SQLiteConnectionStringBuilder();
             builder.DataSource = DatabaseFileName;
-            builder.JournalMode = SQLiteJournalModeEnum.Wal;
+            //builder.JournalMode = SQLiteJournalModeEnum.Memory;
+            //builder.SyncMode = SynchronizationModes.Off;
             return new SQLiteProvider(DatabaseFileName);
         }
     }

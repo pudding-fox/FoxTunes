@@ -1,6 +1,7 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
+using FoxDb;
 
 namespace FoxTunes
 {
@@ -37,7 +38,24 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Shifting playlist items at position {0} by offset {1}.", this.Sequence, this.Offset);
             this.IsIndeterminate = true;
-            this.Database.Execute(this.Database.Queries.ShiftPlaylistItems, parameters =>
+            var query = this.Database.QueryFactory.Build();
+            var table = this.Database.Config.Table<PlaylistItem>();
+            var sequence = table.Column("Sequence");
+            var status = table.Column("Status");
+            query.Update.SetTable(table);
+            query.Update.AddColumn(sequence).Right = query.Update.Fragment<IBinaryExpressionBuilder>().With(expression =>
+            {
+                expression.Left = expression.CreateColumn(sequence);
+                expression.Operator = expression.CreateOperator(QueryOperator.Add);
+                expression.Right = expression.CreateParameter("offset");
+            });
+            query.Filter.AddColumn(status);
+            query.Filter.AddColumn(sequence).With(expression =>
+            {
+                expression.Operator = expression.CreateOperator(QueryOperator.GreaterOrEqual);
+                expression.Right = expression.CreateParameter("sequence");
+            });
+            this.Database.Execute(query, parameters =>
             {
                 parameters["status"] = PlaylistItemStatus.None;
                 parameters["sequence"] = this.Sequence;
@@ -70,13 +88,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             this.IsIndeterminate = true;
-            this.Database.Execute(this.Database.Queries.SetPlaylistItemStatus, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
-        }
-
-        protected virtual void AddOrUpdateMetaDataFromLibrary(ITransactionSource transaction)
-        {
-            Logger.Write(this, LogLevel.Debug, "Updating playlist items with meta data from library.");
-            this.Database.Execute(this.Database.Queries.CopyMetaDataItems, parameters => parameters["status"] = LibraryItemStatus.Import, transaction);
+            var table = this.Database.Config.Table<PlaylistItem>();
+            var query = this.Database.QueryFactory.Build();
+            query.Update.SetTable(table);
+            query.Update.AddColumn(table.Column("Status"));
+            this.Database.Execute(query, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
         }
     }
 }

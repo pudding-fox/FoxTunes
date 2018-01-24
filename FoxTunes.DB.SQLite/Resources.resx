@@ -121,9 +121,6 @@
   <data name="AddLibraryHierarchyNodeToPlaylist" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addlibraryhierarchynodetoplaylist.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="AddLibraryHierarchyRecord" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\addlibraryhierarchyrecord.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="AddLibraryItem" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addlibraryitem.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -144,9 +141,6 @@
   </data>
   <data name="ClearPlaylist" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\clearplaylist.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="CopyMetaDataItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\copymetadataitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="Database" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\database.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
@@ -171,15 +165,6 @@
   </data>
   <data name="GetPlaylistMetaDataItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\getplaylistmetadataitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="SetLibraryItemStatus" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\setlibraryitemstatus.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="SetPlaylistItemStatus" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\setplaylistitemstatus.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="ShiftPlaylistItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\shiftplaylistitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="VariousArtists" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\variousartists.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

@@ -29,7 +29,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             this.Name = "Building hierarchies";
             this.Description = "Preparing";
@@ -45,8 +45,7 @@ namespace FoxTunes
                 }
                 transaction.Commit();
             }
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
-            return Task.CompletedTask;
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
 
         private void AddHiearchies(ITransactionSource transaction, IDatabaseReader reader)

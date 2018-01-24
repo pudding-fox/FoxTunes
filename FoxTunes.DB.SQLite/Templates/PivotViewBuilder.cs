@@ -41,7 +41,7 @@ foreach (var keyColumn in this.KeyColumns)
             #line hidden
             
             #line 13 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SQLiteSyntax.Identifier(this.Table, keyColumn)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn)));
             
             #line default
             #line hidden
@@ -74,7 +74,7 @@ foreach (var keyColumn in this.KeyColumns)
             #line hidden
             
             #line 23 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SQLiteSyntax.String(value)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(value)));
             
             #line default
             #line hidden
@@ -100,21 +100,21 @@ foreach (var keyColumn in this.KeyColumns)
             this.Write(", GROUP_CONCAT\r\n(\r\n    CASE WHEN ");
             
             #line 31 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SQLiteSyntax.Identifier(this.Table, nameColumn)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, nameColumn)));
             
             #line default
             #line hidden
             this.Write(" = ");
             
             #line 31 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SQLiteSyntax.String(value)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(value)));
             
             #line default
             #line hidden
             this.Write(" \r\n        THEN ");
             
             #line 32 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SQLiteSyntax.Identifier(this.Table, valueColumn)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, valueColumn)));
             
             #line default
             #line hidden
@@ -150,7 +150,7 @@ foreach (var keyColumn in this.KeyColumns)
             this.Write(" \r\nFROM ");
             
             #line 44 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SQLiteSyntax.Identifier(this.Table)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table)));
             
             #line default
             #line hidden
@@ -173,7 +173,7 @@ foreach (var keyColumn in this.KeyColumns)
             #line hidden
             
             #line 50 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SQLiteSyntax.Identifier(this.Table, keyColumn)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn)));
             
             #line default
             #line hidden

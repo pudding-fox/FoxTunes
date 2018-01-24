@@ -1,5 +1,5 @@
-﻿INSERT INTO "PlaylistItems" ("Sequence", "DirectoryName", "FileName", "Status") 
-SELECT @sequence, "LibraryItems"."DirectoryName", "LibraryItems"."FileName", @status
+﻿INSERT INTO "PlaylistItems" ("LibraryItem_Id", "Sequence", "DirectoryName", "FileName", "Status") 
+SELECT "LibraryItems"."Id", @sequence, "LibraryItems"."DirectoryName", "LibraryItems"."FileName", @status
 FROM "LibraryHierarchyItems"
 	JOIN "LibraryHierarchyItem_LibraryItem" 
 		ON "LibraryHierarchyItems"."Id" = "LibraryHierarchyItem_LibraryItem"."LibraryHierarchyItem_Id"

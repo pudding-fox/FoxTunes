@@ -153,7 +153,7 @@ namespace FoxTunes.ViewModel
             using (var transaction = this.Database.BeginTransaction())
             {
                 var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction);
-                libraryHierarchies.Delete(libraryHierarchies.Except(this.LibraryHierarchies));
+                libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies));
                 libraryHierarchies.AddOrUpdate(this.LibraryHierarchies);
                 transaction.Commit();
             }

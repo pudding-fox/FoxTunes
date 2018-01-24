@@ -79,7 +79,7 @@ namespace FoxTunes.ViewModel
             using (var transaction = this.Database.BeginTransaction())
             {
                 var playlistColumns = this.Database.Set<PlaylistColumn>(transaction);
-                playlistColumns.Delete(playlistColumns.Except(this.PlaylistColumns));
+                playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns));
                 playlistColumns.AddOrUpdate(this.PlaylistColumns);
                 transaction.Commit();
             }
