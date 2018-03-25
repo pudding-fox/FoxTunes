@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="SQLiteDatabase.cs" />
     <Compile Include="SQLiteDatabaseQueries.cs" />
+    <Compile Include="SQLiteDatabaseTables.cs" />
     <Compile Include="Templates\LibraryHierarchyBuilder.cs">
       <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -99,8 +100,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
-    <None Include="Resources\AddLibraryItem.sql" />
-    <None Include="Resources\AddPlaylistItem.sql" />
     <None Include="Resources\AddPlaylistSequenceRecord.sql" />
     <None Include="Resources\ClearPlaylist.sql" />
     <None Include="Resources\Database.sql" />
@@ -110,11 +109,8 @@
     <None Include="Resources\VariousArtists.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\GetLibraryItems.sql" />
-    <None Include="Resources\GetPlaylistMetaDataItems.sql" />
     <None Include="Resources\GetMetaDataNames.sql" />
     <None Include="Resources\AddLibraryMetaDataItems.sql" />
-    <None Include="Resources\GetPlaylistItemsWithoutMetaData.sql" />
     <None Include="Resources\AddPlaylistMetaDataItems.sql" />
     <None Include="Resources\ClearLibrary.sql" />
     <Content Include="Templates\LibraryHierarchyBuilder.tt">

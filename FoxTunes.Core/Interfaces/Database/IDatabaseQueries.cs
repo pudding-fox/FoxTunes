@@ -9,11 +9,7 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery AddPlaylistSequenceRecord { get; }
 
-        IDatabaseQuery AddLibraryItem { get; }
-
         IDatabaseQuery AddLibraryMetaDataItems { get; }
-
-        IDatabaseQuery AddPlaylistItem { get; }
 
         IDatabaseQuery AddPlaylistMetaDataItems { get; }
 
@@ -21,13 +17,7 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery ClearLibrary { get; }
 
-        IDatabaseQuery GetPlaylistItemsWithoutMetaData { get; }
-
-        IDatabaseQuery GetLibraryItems { get; }
-
         IDatabaseQuery GetLibraryHierarchyMetaDataItems { get; }
-
-        IDatabaseQuery GetPlaylistMetaDataItems { get; }
 
         IDatabaseQuery GetLibraryHierarchyNodes { get; }
 

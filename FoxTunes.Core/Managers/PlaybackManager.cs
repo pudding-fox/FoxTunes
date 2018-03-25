@@ -26,7 +26,7 @@ namespace FoxTunes.Managers
                 }
                 Logger.Write(this, LogLevel.Warn, "Output state changed, disposing current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
                 this.CurrentStream.Dispose();
-                this.CurrentStream = null;
+                this.ForegroundTaskRunner.RunAsync(() => this.CurrentStream = null);
             };
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;

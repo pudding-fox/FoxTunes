@@ -62,7 +62,34 @@ namespace FoxTunes
             this.IsIndeterminate = true;
             //var batch = 0;
             var parameters = default(IDatabaseParameters);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.AddLibraryItem, out parameters))
+            var query = this.Database.QueryFactory.Build();
+            query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("DirectoryName"));
+            query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
+            query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
+            query.Add.SetTable(this.Database.Tables.LibraryItem);
+            query.Output.AddParameters(new[]
+            {
+                "DirectoryName",
+                "FileName",
+                "Status"
+            });
+            query.Filter.Expressions.Add(
+                query.Filter.CreateUnary(
+                    QueryOperator.Not,
+                    query.Filter.CreateFunction(
+                        QueryFunction.Exists,
+                        query.Filter.CreateSubQuery(
+                            this.Database.QueryFactory.Build().With(subQuery =>
+                            {
+                                subQuery.Output.AddOperator(QueryOperator.Star);
+                                subQuery.Source.AddTable(this.Database.Tables.LibraryItem);
+                                subQuery.Filter.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
+                            })
+                        )
+                    )
+                )
+            );
+            using (var command = this.Database.CreateCommand(query.Build(), out parameters))
             {
                 transaction.Bind(command);
                 var addLibraryItem = new Action<string>(fileName =>
@@ -105,7 +132,11 @@ namespace FoxTunes
         {
             using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddLibraryMetaDataItems, true))
             {
-                var enumerable = this.Database.ExecuteEnumerator<LibraryItem>(this.Database.Queries.GetLibraryItems, parameters => parameters["status"] = LibraryItemStatus.Import, transaction);
+                var query = this.Database.QueryFactory.Build();
+                query.Output.AddOperator(QueryOperator.Star);
+                query.Source.AddTable(this.Database.Tables.LibraryItem);
+                query.Filter.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
+                var enumerable = this.Database.ExecuteEnumerator<LibraryItem>(query, parameters => parameters["status"] = LibraryItemStatus.Import, transaction);
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
@@ -118,10 +149,9 @@ namespace FoxTunes
         private void SetLibraryItemsStatus(ITransactionSource transaction)
         {
             this.IsIndeterminate = true;
-            var table = this.Database.Config.Table<LibraryItem>();
             var query = this.Database.QueryFactory.Build();
-            query.Update.SetTable(table);
-            query.Update.AddColumn(table.Column("Status"));
+            query.Update.SetTable(this.Database.Tables.LibraryItem);
+            query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
             this.Database.Execute(query, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
         }
     }

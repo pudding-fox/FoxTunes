@@ -77,17 +77,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryItems&quot; (&quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
-        ///SELECT @directoryName, @fileName, @status
-        ///WHERE NOT EXISTS(SELECT * FROM &quot;LibraryItems&quot; WHERE &quot;FileName&quot; = @fileName).
-        /// </summary>
-        internal static string AddLibraryItem {
-            get {
-                return ResourceManager.GetString("AddLibraryItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to WITH 
         ///&quot;MetaDataItems_Lookup&quot; AS
         ///(
@@ -105,16 +94,6 @@ namespace FoxTunes {
         internal static string AddLibraryMetaDataItems {
             get {
                 return ResourceManager.GetString("AddLibraryMetaDataItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;LibraryItem_Id&quot;, &quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
-        ///SELECT (SELECT &quot;Id&quot; FROM &quot;LibraryItems&quot; WHERE &quot;FileName&quot; = @fileName), @sequence, @directoryName, @fileName, @status.
-        /// </summary>
-        internal static string AddPlaylistItem {
-            get {
-                return ResourceManager.GetString("AddPlaylistItem", resourceCulture);
             }
         }
         
@@ -240,17 +219,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT *
-        ///FROM &quot;LibraryItems&quot;
-        ///WHERE &quot;Status&quot; = @status.
-        /// </summary>
-        internal static string GetLibraryItems {
-            get {
-                return ResourceManager.GetString("GetLibraryItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SELECT &quot;Name&quot;
         ///FROM &quot;MetaDataItems&quot;
         ///GROUP BY &quot;Name&quot;.
@@ -258,36 +226,6 @@ namespace FoxTunes {
         internal static string GetMetaDataNames {
             get {
                 return ResourceManager.GetString("GetMetaDataNames", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT *
-        ///FROM &quot;PlaylistItems&quot;
-        ///WHERE &quot;Status&quot; = @status
-        ///    AND NOT EXISTS
-        ///    (
-        ///        SELECT *
-        ///        FROM &quot;PlaylistItem_MetaDataItem&quot;
-        ///        WHERE &quot;PlaylistItem_MetaDataItem&quot;.&quot;PlaylistItem_Id&quot; = &quot;PlaylistItems&quot;.&quot;Id&quot;
-        ///    ).
-        /// </summary>
-        internal static string GetPlaylistItemsWithoutMetaData {
-            get {
-                return ResourceManager.GetString("GetPlaylistItemsWithoutMetaData", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;MetaDataItems&quot;.*
-        ///FROM &quot;MetaDataItems&quot;
-        ///	JOIN &quot;PlaylistItem_MetaDataItem&quot; ON  &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;PlaylistItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
-        ///WHERE &quot;PlaylistItem_MetaDataItem&quot;.&quot;PlaylistItem_Id&quot; = @playlistItemId
-        ///	AND (@type &amp; &quot;MetaDataItems&quot;.&quot;Type&quot;) =  &quot;MetaDataItems&quot;.&quot;Type&quot;.
-        /// </summary>
-        internal static string GetPlaylistMetaDataItems {
-            get {
-                return ResourceManager.GetString("GetPlaylistMetaDataItems", resourceCulture);
             }
         }
         

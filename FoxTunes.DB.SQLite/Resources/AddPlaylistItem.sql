@@ -1,2 +1,0 @@
-﻿INSERT INTO "PlaylistItems" ("LibraryItem_Id", "Sequence", "DirectoryName", "FileName", "Status") 
-SELECT (SELECT "Id" FROM "LibraryItems" WHERE "FileName" = @fileName), @sequence, @directoryName, @fileName, @status

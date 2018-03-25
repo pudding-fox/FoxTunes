@@ -39,10 +39,9 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Shifting playlist items at position {0} by offset {1}.", this.Sequence, this.Offset);
             this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
-            var table = this.Database.Config.Table<PlaylistItem>();
-            var sequence = table.Column("Sequence");
-            var status = table.Column("Status");
-            query.Update.SetTable(table);
+            var sequence = this.Database.Tables.PlaylistItem.Column("Sequence");
+            var status = this.Database.Tables.PlaylistItem.Column("Status");
+            query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(sequence).Right = query.Update.Fragment<IBinaryExpressionBuilder>().With(expression =>
             {
                 expression.Left = expression.CreateColumn(sequence);
@@ -88,10 +87,9 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             this.IsIndeterminate = true;
-            var table = this.Database.Config.Table<PlaylistItem>();
             var query = this.Database.QueryFactory.Build();
-            query.Update.SetTable(table);
-            query.Update.AddColumn(table.Column("Status"));
+            query.Update.SetTable(this.Database.Tables.PlaylistItem);
+            query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
             this.Database.Execute(query, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
         }
     }
