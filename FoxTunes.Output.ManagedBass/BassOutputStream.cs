@@ -1,6 +1,6 @@
-﻿using System;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using System;
 
 namespace FoxTunes
 {
@@ -27,37 +27,47 @@ namespace FoxTunes
         {
             get
             {
-                var position = Bass.ChannelGetPosition(this.ChannelHandle);
-                if (this.Output != null && this.Output.OutputChannel != null)
-                {
-                    var buffer = this.Output.OutputChannel.BufferLength;
-                    if (buffer > 0)
-                    {
-                        position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, buffer);
-                    }
-                }
-                return position;
+                return this.GetPosition();
             }
             set
             {
-                if (this.Output != null && this.Output.OutputChannel != null)
+                this.SetPosition(value);
+            }
+        }
+
+        protected virtual long GetPosition()
+        {
+            var position = Bass.ChannelGetPosition(this.ChannelHandle);
+            if (this.Output != null && this.Output.Pipeline != null)
+            {
+                var buffer = this.Output.Pipeline.BufferLength;
+                if (buffer > 0)
                 {
-                    var buffer = this.Output.OutputChannel.BufferLength;
-                    if (buffer > 0)
-                    {
-                        this.Output.OutputChannel.ClearBuffer();
-                    }
+                    position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, buffer);
                 }
-                if (value >= this.Length)
+            }
+            return position;
+        }
+
+        protected virtual void SetPosition(long position)
+        {
+            if (this.Output != null && this.Output.Pipeline != null)
+            {
+                var buffer = this.Output.Pipeline.BufferLength;
+                if (buffer > 0)
                 {
-                    value = this.Length - 1;
+                    this.Output.Pipeline.ClearBuffer();
                 }
-                BassUtils.OK(Bass.ChannelSetPosition(this.ChannelHandle, value));
-                if (value > this.NotificationSource.EndingPosition)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Channel {0} was manually seeked past the \"Ending\" sync, raising it manually.", this.ChannelHandle);
-                    this.NotificationSource.Ending();
-                }
+            }
+            if (position >= this.Length)
+            {
+                position = this.Length - 1;
+            }
+            BassUtils.OK(Bass.ChannelSetPosition(this.ChannelHandle, position));
+            if (position > this.NotificationSource.EndingPosition)
+            {
+                Logger.Write(this, LogLevel.Debug, "Channel {0} was manually seeked past the \"Ending\" sync, raising it manually.", this.ChannelHandle);
+                this.NotificationSource.Ending();
             }
         }
 
@@ -69,29 +79,19 @@ namespace FoxTunes
             }
         }
 
-        public override int PCMRate
+        public override int Rate
         {
             get
             {
                 var rate = default(float);
+                if (Bass.ChannelHasFlag(this.ChannelHandle, BassFlags.DSDRaw))
+                {
+                    if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.DSDRate, out rate))
+                    {
+                        return 0;
+                    }
+                }
                 if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.Frequency, out rate))
-                {
-                    return 0;
-                }
-                return Convert.ToInt32(rate);
-            }
-        }
-
-        public override int DSDRate
-        {
-            get
-            {
-                if (!Bass.ChannelHasFlag(this.ChannelHandle, BassFlags.DSDRaw))
-                {
-                    return 0;
-                }
-                var rate = default(float);
-                if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.DSDRate, out rate))
                 {
                     return 0;
                 }
@@ -104,42 +104,6 @@ namespace FoxTunes
             get
             {
                 return Bass.ChannelGetInfo(this.ChannelHandle).Channels;
-            }
-        }
-
-        public override bool IsPlaying
-        {
-            get
-            {
-                if (!this.Output.IsStarted)
-                {
-                    return false;
-                }
-                return this.Output.OutputChannel.IsPlaying;
-            }
-        }
-
-        public override bool IsPaused
-        {
-            get
-            {
-                if (!this.Output.IsStarted)
-                {
-                    return false;
-                }
-                return this.Output.OutputChannel.IsPaused;
-            }
-        }
-
-        public override bool IsStopped
-        {
-            get
-            {
-                if (!this.Output.IsStarted)
-                {
-                    return true;
-                }
-                return this.Output.OutputChannel.IsStopped;
             }
         }
 
@@ -178,13 +142,49 @@ namespace FoxTunes
             });
         }
 
+        public override bool IsPlaying
+        {
+            get
+            {
+                if (!this.Output.IsStarted || this.Output.Pipeline == null)
+                {
+                    return false;
+                }
+                return this.Output.Pipeline.Output.IsPlaying;
+            }
+        }
+
+        public override bool IsPaused
+        {
+            get
+            {
+                if (!this.Output.IsStarted || this.Output.Pipeline == null)
+                {
+                    return false;
+                }
+                return this.Output.Pipeline.Output.IsPaused;
+            }
+        }
+
+        public override bool IsStopped
+        {
+            get
+            {
+                if (!this.Output.IsStarted || this.Output.Pipeline == null)
+                {
+                    return false;
+                }
+                return this.Output.Pipeline.Output.IsStopped;
+            }
+        }
+
         public override void Play()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.OutputChannel.Play(this, true);
+            this.Output.GetOrCreatePipeline(this).Play();
             this.EmitState();
             this.OnPlayed(true);
         }
@@ -195,7 +195,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.OutputChannel.Pause();
+            this.Output.GetOrCreatePipeline(this).Pause();
             this.EmitState();
             this.OnPaused();
         }
@@ -206,7 +206,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.OutputChannel.Resume();
+            this.Output.GetOrCreatePipeline(this).Resume();
             this.EmitState();
             this.OnResumed();
         }
@@ -217,7 +217,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.OutputChannel.Stop();
+            this.Output.GetOrCreatePipeline(this).Stop();
             this.EmitState();
             this.OnStopped(true);
         }
@@ -230,10 +230,6 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.Output.IsStarted && this.Output.OutputChannel.QueueContains(this))
-            {
-                this.Output.OutputChannel.Remove(this);
-            }
             this.Output.FreeStream(this.ChannelHandle);
             this.ChannelHandle = 0;
         }
@@ -241,7 +237,8 @@ namespace FoxTunes
 
     public class BassOutputStreamException : OutputStreamException
     {
-        private BassOutputStreamException(string message) : base(message)
+        private BassOutputStreamException(string message)
+            : base(message)
         {
 
         }

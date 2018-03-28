@@ -41,17 +41,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\ManagedBass.Gapless.dll</HintPath>
     </Reference>
-    <Reference Include="ManagedBass.Gapless.Asio, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ManagedBass.Gapless.Asio.dll</HintPath>
+    <Reference Include="ManagedBass.Mix, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.Mix.2.1.0\lib\netstandard1.4\ManagedBass.Mix.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="ManagedBass.Sox, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\ManagedBass.Sox.dll</HintPath>
-    </Reference>
-    <Reference Include="ManagedBass.Sox.Asio, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ManagedBass.Sox.Asio.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -62,16 +58,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BassAsioOutputChannel.cs" />
     <Compile Include="BassNotificationSource.cs" />
     <Compile Include="BassOutput.cs" />
-    <Compile Include="BassOutputChannel.cs" />
-    <Compile Include="BassOutputChannelFactory.cs" />
     <Compile Include="BassOutputConfiguration.cs" />
     <Compile Include="BassOutputStream.cs" />
     <Compile Include="BassPluginLoader.cs" />
+    <Compile Include="BassStreamFactory.cs" />
+    <Compile Include="BassStreamPipeline.cs" />
+    <Compile Include="BassStreamPipelineFactory.cs" />
     <Compile Include="BassUtils.cs" />
+    <Compile Include="Components\BassResamplerStreamComponent.cs" />
+    <Compile Include="Components\BassStreamComponent.cs" />
+    <Compile Include="Inputs\BassGaplessStreamInput.cs" />
+    <Compile Include="Inputs\BassStreamInput.cs" />
+    <Compile Include="Interfaces\IBassStreamControllable.cs" />
+    <Compile Include="Interfaces\IBassStreamOutput.cs" />
+    <Compile Include="Interfaces\IBassOutput.cs" />
+    <Compile Include="Interfaces\IBassStreamComponent.cs" />
+    <Compile Include="Interfaces\IBassStreamFactory.cs" />
+    <Compile Include="Interfaces\IBassStreamInput.cs" />
+    <Compile Include="Interfaces\IBassStreamPipeline.cs" />
+    <Compile Include="Interfaces\IBassStreamPipelineFactory.cs" />
+    <Compile Include="Interfaces\IBassStreamProvider.cs" />
+    <Compile Include="Outputs\BassAsioStreamOutput.cs" />
+    <Compile Include="Outputs\BassDefaultStreamOutput.cs" />
+    <Compile Include="Outputs\BassStreamOutput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\BassDefaultStreamProvider.cs" />
+    <Compile Include="Providers\BassDsdStreamProvider.cs" />
+    <Compile Include="Providers\BassStreamProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
@@ -91,26 +106,22 @@
       <Link>bass_gapless.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\bass_gapless_asio.dll">
-      <Link>bass_gapless_asio.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="..\lib\bass_sox.dll">
       <Link>bass_sox.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\bass_sox_asio.dll">
-      <Link>bass_sox_asio.dll</Link>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\lib\bass_asio_handler.dll">
+      <Link>bass_asio_handler.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets" Condition="Exists('..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BASS.Native.2.4.12.2\build\BASS.Native.targets'))" />
     <Error Condition="!Exists('..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets'))" />
   </Target>
   <Import Project="..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets" Condition="Exists('..\packages\BASS.ASIO.1.3.1.2\build\BASS.ASIO.targets')" />

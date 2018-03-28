@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -23,6 +24,14 @@ namespace FoxTunes
                     Path.Combine(CurrentDirectory, "Audio", "C.mp3"),
                     Path.Combine(CurrentDirectory, "Audio", "D.mp3")
                 };
+            }
+        }
+
+        public static PlaylistItem[] PlaylistItems
+        {
+            get
+            {
+                return AudioFileNames.Select(fileName => new PlaylistItem() { FileName = fileName }).ToArray();
             }
         }
     }

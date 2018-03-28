@@ -7,12 +7,14 @@ namespace FoxTunes
     {
         public Metric(int capacity, long? @default = null)
         {
-            this.Measures = new long?[capacity];
-            for (var a = 0; a < this.Measures.Length; a++)
-            {
-                this.Measures[a] = @default;
-            }
+            this.Capacity = capacity;
+            this.Default = @default;
+            this.Reset();
         }
+
+        public int Capacity { get; private set; }
+
+        public long? Default { get; private set; }
 
         private long?[] Measures { get; set; }
 
@@ -31,6 +33,15 @@ namespace FoxTunes
         private long Average()
         {
             return Convert.ToInt64(Math.Ceiling(this.Measures.Where(measure => measure.HasValue).Average(measure => measure.Value)));
+        }
+
+        public void Reset()
+        {
+            this.Measures = new long?[this.Capacity];
+            for (var a = 0; a < this.Measures.Length; a++)
+            {
+                this.Measures[a] = this.Default;
+            }
         }
     }
 }

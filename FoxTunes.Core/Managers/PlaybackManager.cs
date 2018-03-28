@@ -37,7 +37,11 @@ namespace FoxTunes.Managers
         protected virtual void OutputStreamQueueDequeued(object sender, OutputStreamQueueEventArgs e)
         {
             Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
-            this.Output.Preempt(e.OutputStream);
+            //TODO: Bad .Result
+            if (!this.Output.Preempt(e.OutputStream).Result)
+            {
+                Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+            }
             Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
             if (this.CurrentStream != null)
             {

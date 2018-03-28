@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace FoxTunes
@@ -40,6 +41,20 @@ namespace FoxTunes
                     continue;
                 }
                 return fileName;
+            }
+            //I'm not sure why but some platforms end up here for framework assemblies
+            //like System.Runtime. I'm not sure how else to get the location.
+            try
+            {
+                var assembly = Assembly.Load(name);
+                if (File.Exists(assembly.Location))
+                {
+                    return assembly.Location;
+                }
+            }
+            catch
+            {
+                //Nothing to do.
             }
             throw new AssemblyResolverException(string.Format("Failed to resolve assembly {0}.", name));
         }

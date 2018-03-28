@@ -66,6 +66,11 @@ namespace FoxTunes
             }
         }
 
+        public static bool GetChannelDsdRaw(int channelHandle)
+        {
+            return GetChannelFlags(channelHandle).HasFlag(BassFlags.DSDRaw);
+        }
+
         public static int GetChannelCount(int channelHandle)
         {
             var channelInfo = default(ChannelInfo);

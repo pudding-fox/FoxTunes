@@ -50,7 +50,7 @@ namespace FoxTunes
 
         public const string DSD_RAW_ELEMENT = "9044043A-8A30-42A0-B2CB-3DE379636DD6";
 
-        public const string SOX_RESAMPLER_ELEMENT = "91D65C85-178C-470D-A977-C54350875AB3";
+        public const string RESAMPLER_ELEMENT = "91D65C85-178C-470D-A977-C54350875AB3";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -76,7 +76,7 @@ namespace FoxTunes
                     .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO")))
                 .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(SOX_RESAMPLER_ELEMENT, "High Quality Resampler").WithValue(false)
+                .WithElement(new BooleanConfigurationElement(RESAMPLER_ELEMENT, "High Quality Resampler").WithValue(false)
             );
             StandardComponents.Instance.Configuration.GetElement(OUTPUT_SECTION, MODE_ELEMENT).ConnectValue<string>(mode => UpdateDevices(mode));
         }
