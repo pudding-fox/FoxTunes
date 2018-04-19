@@ -80,5 +80,6 @@
         <Windows:Playback Grid.Row="1" ></Windows:Playback>
         <Windows:StreamPosition Grid.Column="1" Grid.Row="1"></Windows:StreamPosition>
         <Windows:Settings Grid.Column="2" Grid.Row="1"></Windows:Settings>
+        <Windows:Components></Windows:Components>
     </Grid>
 </UserControl>

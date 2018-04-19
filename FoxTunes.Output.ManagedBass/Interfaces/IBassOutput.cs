@@ -1,5 +1,5 @@
-﻿using ManagedBass;
-using System;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -11,18 +11,12 @@ namespace FoxTunes.Interfaces
 
         bool Float { get; }
 
-        BassOutputMode Mode { get; }
-
-        int DirectSoundDevice { get; }
-
-        int AsioDevice { get; }
-
-        bool DsdDirect { get; }
-
-        bool Resampler { get; }
-
-        BassFlags Flags { get; }
-
         void FreeStream(int channelHandle);
+
+        Task Shutdown();
+
+        event EventHandler Init;
+
+        event EventHandler Free;
     }
 }

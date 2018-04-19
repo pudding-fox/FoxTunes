@@ -13,16 +13,28 @@ namespace FoxTunes
 
         public static int BUFFER_LENGTH = 3;
 
-        public BassResamplerStreamComponent(int rate, int channels, BassFlags flags)
+        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, BassOutputStream stream)
         {
-            Logger.Write(this, LogLevel.Debug, "Initializing BASS SOX.");
-            BassUtils.OK(BassSox.Init());
-            this.Rate = rate;
-            this.Channels = channels;
-            this.Flags = flags;
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
+            {
+                throw new InvalidOperationException("Cannot resample DSD streams.");
+            }
+            this.Behaviour = behaviour;
+            this.Rate = behaviour.Output.Rate;
+            this.Depth = stream.Depth;
+            this.Channels = stream.Channels;
+            this.Flags = BassFlags.Decode;
+            if (this.Behaviour.Output.Float)
+            {
+                this.Flags |= BassFlags.Float;
+            }
         }
 
+        public BassResamplerStreamComponentBehaviour Behaviour { get; private set; }
+
         public override int Rate { get; protected set; }
+
+        public override int Depth { get; protected set; }
 
         public override int Channels { get; protected set; }
 
@@ -105,8 +117,6 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS SOX stream: {0}", this.ChannelHandle);
                 BassUtils.OK(BassSox.StreamFree(this.ChannelHandle));
             }
-            Logger.Write(this, LogLevel.Debug, "Releasing BASS SOX.");
-            BassUtils.OK(BassSox.Free());
         }
     }
 }

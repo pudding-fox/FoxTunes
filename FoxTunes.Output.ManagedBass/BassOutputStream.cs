@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -83,19 +84,15 @@ namespace FoxTunes
         {
             get
             {
-                var rate = default(float);
-                if (Bass.ChannelHasFlag(this.ChannelHandle, BassFlags.DSDRaw))
-                {
-                    if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.DSDRate, out rate))
-                    {
-                        return 0;
-                    }
-                }
-                if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.Frequency, out rate))
-                {
-                    return 0;
-                }
-                return Convert.ToInt32(rate);
+                return BassUtils.GetChannelPcmRate(this.ChannelHandle);
+            }
+        }
+
+        public override int Depth
+        {
+            get
+            {
+                return this.PlaylistItem.MetaDatas.GetMetaDataValue<int>(MetaDataItemType.Property, CommonProperties.BitsPerSample);
             }
         }
 
@@ -103,7 +100,7 @@ namespace FoxTunes
         {
             get
             {
-                return Bass.ChannelGetInfo(this.ChannelHandle).Channels;
+                return BassUtils.GetChannelCount(this.ChannelHandle);
             }
         }
 

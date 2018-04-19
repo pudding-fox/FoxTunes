@@ -32,7 +32,7 @@ namespace FoxTunes
 
         public IEnumerable<Type> GetComponents(Type interfaceType)
         {
-            Logger.Write(this, LogLevel.Debug, "Scanning for components of type: {0}", interfaceType.FullName);
+            Logger.Write(this, LogLevel.Debug, "Scanning for components of type: {0}", interfaceType.Name);
             foreach (var fileName in this.FileNames)
             {
                 var assemblyName = default(AssemblyName);
@@ -76,7 +76,7 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    Logger.Write(this, LogLevel.Debug, "Scanning component of type {0} in assembly {1}: {2}", interfaceType.FullName, fileName, type.FullName);
+                    Logger.Write(this, LogLevel.Debug, "Scanning component of type {0} in assembly {1}: {2}", interfaceType.Name, fileName, type.Name);
                     yield return type;
                 }
             }

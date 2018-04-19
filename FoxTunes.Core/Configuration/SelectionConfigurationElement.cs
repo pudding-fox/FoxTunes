@@ -141,20 +141,27 @@ namespace FoxTunes
                     this.SelectedOption.Update(option);
                 }
             }
-            foreach (var option in this.Options.ToArray())
-            {
-                if (!element.Contains(option.Id))
-                {
-                    this.Remove(option);
-                    if (this.SelectedOption != null && string.Equals(this.SelectedOption.Id, option.Id, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.SelectedOption = null;
-                    }
-                }
-            }
+            //foreach (var option in this.Options.ToArray())
+            //{
+            //    if (!element.Contains(option.Id))
+            //    {
+            //        this.Remove(option);
+            //        if (this.SelectedOption != null && string.Equals(this.SelectedOption.Id, option.Id, StringComparison.OrdinalIgnoreCase))
+            //        {
+            //            this.SelectedOption = null;
+            //        }
+            //    }
+            //}
             if (this.SelectedOption == null)
             {
-                this.SelectedOption = this.Options.FirstOrDefault(option => option.IsDefault);
+                if (element.SelectedOption != null)
+                {
+                    this.SelectedOption = element.SelectedOption;
+                }
+                else
+                {
+                    this.SelectedOption = this.Options.FirstOrDefault(option => option.IsDefault);
+                }
             }
         }
     }

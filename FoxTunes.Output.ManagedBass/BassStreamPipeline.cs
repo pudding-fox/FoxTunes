@@ -54,17 +54,21 @@ namespace FoxTunes
         public void Connect()
         {
             var previous = (IBassStreamComponent)this.Input;
+            Logger.Write(this, LogLevel.Debug, "Connecting pipeline input: \"{0}\"", this.Input.GetType().Name);
             this.Input.Connect(previous);
             foreach (var component in this.Components)
             {
+                Logger.Write(this, LogLevel.Debug, "Connecting pipeline component: \"{0}\"", component.GetType().Name);
                 component.Connect(previous);
                 previous = component;
             }
+            Logger.Write(this, LogLevel.Debug, "Connecting pipeline output: \"{0}\"", this.Output.GetType().Name);
             this.Output.Connect(previous);
         }
 
         public void ClearBuffer()
         {
+            Logger.Write(this, LogLevel.Debug, "Clearing pipeline buffer.");
             this.All.ForEach(component => component.ClearBuffer());
         }
 
@@ -110,7 +114,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Error, "Component \"{0}\" could not be disposed: {1}", component.GetType().Name, e.Message);
+                    Logger.Write(this, LogLevel.Error, "Pipeline component \"{0}\" could not be disposed: {1}", component.GetType().Name, e.Message);
                 }
             });
             this.IsDisposed = true;

@@ -12,15 +12,6 @@ namespace FoxTunes.Interfaces
 
         int Latency { get; }
 
-        BassStreamOutputCapability Capabilities { get; }
-
         bool CheckFormat(int rate, int channels);
-    }
-
-    [Flags]
-    public enum BassStreamOutputCapability : byte
-    {
-        None = 0,
-        DSD = 1
     }
 }

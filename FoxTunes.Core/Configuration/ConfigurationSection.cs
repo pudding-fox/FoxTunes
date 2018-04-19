@@ -50,13 +50,13 @@ namespace FoxTunes
                     this.Add(element);
                 }
             }
-            foreach (var element in this.Elements.ToArray())
-            {
-                if (!section.Contains(element.Id))
-                {
-                    this.Hide(element);
-                }
-            }
+            //foreach (var element in this.Elements.ToArray())
+            //{
+            //    if (!section.Contains(element.Id))
+            //    {
+            //        this.Hide(element);
+            //    }
+            //}
         }
 
         private bool Contains(string id)

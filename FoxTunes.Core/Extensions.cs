@@ -31,6 +31,12 @@ namespace FoxTunes
             return type.GetCustomAttributes(typeof(T), inherit).OfType<T>();
         }
 
+        public static T Do<T>(this T value, Action<T> action)
+        {
+            action(value);
+            return value;
+        }
+
         public static IEnumerable<T> Do<T>(this IEnumerable<T> sequence, Action action)
         {
             foreach (var element in sequence)

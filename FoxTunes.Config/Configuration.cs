@@ -85,6 +85,16 @@ namespace FoxTunes
             }
         }
 
+        public void Reset()
+        {
+            if (!File.Exists(ConfigurationFileName))
+            {
+                return;
+            }
+            File.Delete(ConfigurationFileName);
+            this.Sections.Clear();
+        }
+
         public ConfigurationSection GetSection(string sectionId)
         {
             return this.Sections.FirstOrDefault(section => string.Equals(section.Id, sectionId, StringComparison.OrdinalIgnoreCase));

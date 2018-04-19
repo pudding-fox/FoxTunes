@@ -28,11 +28,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BassOutputTests.cs" />
@@ -47,6 +43,18 @@
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
       <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
       <Name>FoxTunes.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Asio\FoxTunes.Output.Bass.Asio.csproj">
+      <Project>{3e8a3809-3fba-4024-9343-2a54dae013ca}</Project>
+      <Name>FoxTunes.Output.Bass.Asio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.DirectSound\FoxTunes.Output.Bass.DirectSound.csproj">
+      <Project>{4eaf00da-fe41-46ed-afb5-3a543bcf0bf9}</Project>
+      <Name>FoxTunes.Output.Bass.DirectSound</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Resampler\FoxTunes.Output.Bass.Resampler.csproj">
+      <Project>{a638a91c-bd8e-4475-a5fb-e4fcff7ba61d}</Project>
+      <Name>FoxTunes.Output.Bass.Resampler</Name>
     </ProjectReference>
     <ProjectReference Include="..\FoxTunes.Output.ManagedBass\FoxTunes.Output.Bass.csproj">
       <Project>{676f7dd1-bf13-4317-819f-9b5d85df18b5}</Project>

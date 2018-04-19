@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Data.SQLite;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -98,18 +99,18 @@ namespace FoxTunes
             this.OnError(exception.Message, exception);
         }
 
-        protected virtual void OnError(string message, Exception exception)
+        protected virtual Task OnError(string message, Exception exception)
         {
             Logger.Write(this, LogLevel.Error, message, exception);
             if (this.Error == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Error(this, new ComponentOutputErrorEventArgs(message, exception));
+            return this.Error(this, new ComponentOutputErrorEventArgs(message, exception));
         }
 
         [field: NonSerialized]
-        public event ComponentOutputErrorEventHandler Error = delegate { };
+        public event ComponentOutputErrorEventHandler Error;
 
         private static IProvider GetProvider()
         {
