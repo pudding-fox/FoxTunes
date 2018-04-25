@@ -77,18 +77,18 @@ namespace FoxTunes
 
         public override bool CheckFormat(int rate, int channels)
         {
-            return BassAsio.CheckRate(rate) && channels <= BassAsio.Info.Outputs;
+            return BassAsioDevice.Info.SupportedRates.Contains(rate) && channels <= BassAsioDevice.Info.Outputs;
         }
 
         public override void Connect(IBassStreamComponent previous)
         {
-            if (previous.Channels > BassAsio.Info.Outputs)
+            if (previous.Channels > BassAsioDevice.Info.Outputs)
             {
                 //TODO: We should down mix.
                 Logger.Write(this, LogLevel.Error, "Cannot play stream with more channels than device outputs.");
-                throw new NotImplementedException(string.Format("The stream contains {0} channels which is greater than {1} output channels provided by the device.", this.Channels, BassAsio.Info.Outputs));
+                throw new NotImplementedException(string.Format("The stream contains {0} channels which is greater than {1} output channels provided by the device.", previous.Channels, BassAsioDevice.Info.Outputs));
             }
-            if (!BassAsio.CheckRate(this.Rate))
+            if (!this.CheckFormat(this.Rate, previous.Channels))
             {
                 Logger.Write(this, LogLevel.Error, "Cannot play stream with unsupported rate.");
                 throw new NotImplementedException(string.Format("The stream has a rate of {0} which is not supported by the device.", this.Rate));

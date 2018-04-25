@@ -52,7 +52,7 @@ BOOL BASSASIOHANDLERDEF(BASS_ASIO_HANDLER_StreamSet)(DWORD handle) {
 }
 
 BOOL BASSASIOHANDLERDEF(BASS_ASIO_HANDLER_ChannelEnable)(BOOL input, DWORD channel, void *user) {
-	BOOL success = BASS_ASIO_ChannelEnable(input, channel, &asio_handler_stream_proc, user);
+	BOOL success = BASS_ASIO_ChannelEnable(input, channel, &BASS_ASIO_HANDLER_StreamProc, user);
 	if (!success) {
 #if _DEBUG
 		printf("BASS ASIO HANDLER enabled.\n");
@@ -61,7 +61,7 @@ BOOL BASSASIOHANDLERDEF(BASS_ASIO_HANDLER_ChannelEnable)(BOOL input, DWORD chann
 	return success;
 }
 
-DWORD CALLBACK asio_handler_stream_proc(BOOL input, DWORD channel, void *buffer, DWORD length, void *user) {
+DWORD CALLBACK BASS_ASIO_HANDLER_StreamProc(BOOL input, DWORD channel, void *buffer, DWORD length, void *user) {
 	DWORD result;
 	if (!channel_handle) {
 		result = 0;

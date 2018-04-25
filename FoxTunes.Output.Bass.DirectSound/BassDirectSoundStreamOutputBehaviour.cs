@@ -96,7 +96,7 @@ namespace FoxTunes
             }
             this.OnFreeDevice();
             LogManager.Logger.Write(this, LogLevel.Debug, "Releasing BASS.");
-            BassUtils.OK(Bass.Free());
+            Bass.Free();
             this.IsInitialized = false;
         }
 

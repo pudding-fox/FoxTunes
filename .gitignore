@@ -120,3 +120,7 @@ source/stash/Logs
 #runtime folder
 runtime_env/
 source/.vs/
+
+#libs
+lib/bass_asio_handler.*
+lib/bass_wasapi_handler.*

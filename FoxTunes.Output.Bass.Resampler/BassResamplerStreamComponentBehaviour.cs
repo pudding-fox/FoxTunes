@@ -62,7 +62,7 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Releasing BASS SOX.");
-            BassUtils.OK(BassSox.Free());
+            BassSox.Free();
             this.IsInitialized = false;
         }
 

@@ -19,4 +19,4 @@ BOOL BASSASIOHANDLERDEF(BASS_ASIO_HANDLER_StreamSet)(DWORD handle);
 __declspec(dllexport)
 BOOL BASSASIOHANDLERDEF(BASS_ASIO_HANDLER_ChannelEnable)(BOOL input, DWORD channel, void *user);
 
-DWORD CALLBACK asio_handler_stream_proc(BOOL input, DWORD channel, void *buffer, DWORD length, void *user);
+DWORD CALLBACK BASS_ASIO_HANDLER_StreamProc(BOOL input, DWORD channel, void *buffer, DWORD length, void *user);

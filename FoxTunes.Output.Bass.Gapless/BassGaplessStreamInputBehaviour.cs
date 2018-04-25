@@ -29,7 +29,7 @@ namespace FoxTunes
         protected virtual void OnFree(object sender, EventArgs e)
         {
             Logger.Write(this, LogLevel.Debug, "Releasing BASS GAPLESS.");
-            BassUtils.OK(BassGapless.Free());
+            BassGapless.Free();
             this.IsInitialized = false;
         }
 

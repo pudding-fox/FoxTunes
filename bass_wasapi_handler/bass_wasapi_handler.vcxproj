@@ -12,8 +12,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{1DFDA520-5749-4ED7-AEE2-432C38AA9406}</ProjectGuid>
-    <RootNamespace>bassasiohandler</RootNamespace>
+    <ProjectGuid>{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}</ProjectGuid>
+    <RootNamespace>basswasapihandler</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -54,7 +54,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BASS_ASIO_HANDLER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BASS_WASAPI_HANDLER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
@@ -84,16 +84,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Library Include="..\lib\bass.lib" />
-    <Library Include="..\lib\bassasio.lib" />
+    <Library Include="..\lib\basswasapi.lib" />
     <Library Include="..\lib\msvcrt.lib" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bass_asio_handler.c" />
+    <ClCompile Include="bass_wasapi_handler.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bass\bass.h" />
-    <ClInclude Include="bass\bassasio.h" />
-    <ClInclude Include="bass_asio_handler.h" />
+    <ClInclude Include="bass\basswasapi.h" />
+    <ClInclude Include="bass_wasapi_handler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
