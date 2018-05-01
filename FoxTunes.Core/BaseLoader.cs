@@ -5,14 +5,25 @@ using System;
 
 namespace FoxTunes
 {
-    public abstract class BaseLoader<T> : IBaseLoader<T> where T : IBaseComponent
+    public abstract class BaseLoader<T> : BaseComponent, IBaseLoader<T> where T : IBaseComponent
     {
         public virtual IEnumerable<T> Load()
         {
             var components = new List<T>();
             foreach (var type in ComponentScanner.Instance.GetComponents(typeof(T)))
             {
-                components.Add(ComponentActivator.Instance.Activate<T>(type));
+                var component = default(T);
+                try
+                {
+                    component = ComponentActivator.Instance.Activate<T>(type);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to activate component: {0} => {1}: {2}", type.Name, typeof(T).Name, e.Message);
+                    continue;
+                }
+                Logger.Write(this, LogLevel.Debug, "Activated component: {0} => {1}", type.Name, typeof(T).Name);
+                components.Add(component);
             }
             return components.OrderBy(this.ComponentPriority);
         }
