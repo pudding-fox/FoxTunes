@@ -27,6 +27,22 @@ namespace FoxTunes
             }
         }
 
+        public IBaseComponent GetComponent(Type type)
+        {
+            return this.GetComponents(type).FirstOrDefault();
+        }
+
+        public IEnumerable<IBaseComponent> GetComponents(Type type)
+        {
+            foreach (var component in this.Components)
+            {
+                if (type.IsAssignableFrom(component.GetType()))
+                {
+                    yield return component;
+                }
+            }
+        }
+
         public T GetComponent<T>() where T : IBaseComponent
         {
             return this.GetComponents<T>().FirstOrDefault();

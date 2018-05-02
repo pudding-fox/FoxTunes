@@ -81,7 +81,10 @@ INSERT INTO `LibraryHierarchies` VALUES (2,'Genre/Album/Title');
 CREATE INDEX [IDX_PlaylistItem_MetaDataItem_1]
 ON [PlaylistItem_MetaDataItem](
     [PlaylistItem_Id]);
-CREATE UNIQUE INDEX [IDX_PlaylistItem_MetaDataItem_2]
+CREATE INDEX [IDX_PlaylistItem_MetaDataItem_2]
+ON [PlaylistItem_MetaDataItem](
+    [MetaDataItem_Id]);
+CREATE UNIQUE INDEX [IDX_PlaylistItem_MetaDataItem_3]
 ON [PlaylistItem_MetaDataItem](
     [PlaylistItem_Id], 
     [MetaDataItem_Id]);
@@ -104,7 +107,13 @@ ON [MetaDataItems](
 WHERE
     [FileValue] IS NOT NULL;
 CREATE UNIQUE INDEX IDX_LibraryItems_Location ON LibraryItems (DirectoryName, FileName);
-CREATE UNIQUE INDEX [IDX_LibraryItem_MetaDataItem]
+CREATE INDEX [IDX_LibraryItem_MetaDataItem_1]
+ON [LibraryItem_MetaDataItem](
+    [LibraryItem_Id]);
+CREATE INDEX [IDX_LibraryItem_MetaDataItem_2]
+ON [LibraryItem_MetaDataItem](
+    [MetaDataItem_Id]);
+CREATE UNIQUE INDEX [IDX_LibraryItem_MetaDataItem_3]
 ON [LibraryItem_MetaDataItem](
     [LibraryItem_Id], 
     [MetaDataItem_Id]);

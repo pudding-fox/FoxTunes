@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Linq;
 
 namespace FoxTunes
 {

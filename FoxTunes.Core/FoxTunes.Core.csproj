@@ -45,10 +45,12 @@
     <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
+    <Compile Include="CoreValidator.cs" />
     <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseQueries.cs" />
     <Compile Include="Interfaces\Database\IDatabaseSets.cs" />
     <Compile Include="Interfaces\Database\IDatabaseTables.cs" />
+    <Compile Include="Interfaces\ICoreValidator.cs" />
     <Compile Include="Interfaces\ICountable.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />

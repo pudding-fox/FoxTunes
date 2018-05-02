@@ -9,6 +9,10 @@ namespace FoxTunes.Interfaces
 
         void AddComponents(IEnumerable<IBaseComponent> components);
 
+        IBaseComponent GetComponent(Type type);
+
+        IEnumerable<IBaseComponent> GetComponents(Type type);
+
         T GetComponent<T>() where T : IBaseComponent;
 
         IEnumerable<T> GetComponents<T>() where T : IBaseComponent;
