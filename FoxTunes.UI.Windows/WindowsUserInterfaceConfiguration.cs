@@ -14,10 +14,6 @@ namespace FoxTunes
 
         public const string SHOW_LIBRARY = "E21CDA77-129F-4988-99EC-6A21EB9096D8";
 
-        public const string SYSTEM_SECTION = "FE07ADAE-393F-48E8-90E3-260F28B1189E";
-
-        public const string LOGGING_ELEMENT = "6FFC8459-F9D9-44CF-A3AB-42832DB04C17";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var themeOptions = GetThemeOptions().ToArray();
@@ -31,11 +27,6 @@ namespace FoxTunes
                     new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_LIBRARY, "Show Library").WithValue(true)
-            );
-            yield return new ConfigurationSection(SYSTEM_SECTION, "System")
-                .WithElement(
-                    new BooleanConfigurationElement(LOGGING_ELEMENT, "Logging")
-                        .WithValue(false)
             );
         }
 
