@@ -7,17 +7,24 @@ namespace FoxTunes.Output.Bass.Tests
     [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER)]
     [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.ASIO)]
     [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.ASIO)]
+    [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.WASAPI)]
     public class BassOutputTests : TestBase
     {
         public const long RESAMPLER = 128;
 
         public const long ASIO = 256;
 
-        public static int RATE = 48000;
+        public const long WASAPI = 512;
+
+        public static int RATE = 44100;
+
+        public static bool FLOAT = true;
 
         public static int DS_DEVICE = -1;
 
-        public static int ASIO_DEVICE = 2;
+        public static int ASIO_DEVICE = 0;
+
+        public static int WASAPI_DEVICE = -1;
 
         public BassOutputTests(long configuration)
             : base(configuration)
@@ -36,6 +43,7 @@ namespace FoxTunes.Output.Bass.Tests
             var resampler = ComponentRegistry.Instance.GetComponent<BassResamplerStreamComponentBehaviour>();
             var ds = ComponentRegistry.Instance.GetComponent<BassDirectSoundStreamOutputBehaviour>();
             var asio = ComponentRegistry.Instance.GetComponent<BassAsioStreamOutputBehaviour>();
+            var wasapi = ComponentRegistry.Instance.GetComponent<BassWasapiStreamOutputBehaviour>();
             if ((this.Configuration & RESAMPLER) != 0)
             {
                 resampler.Enabled = true;
@@ -49,14 +57,24 @@ namespace FoxTunes.Output.Bass.Tests
                 asio.Enabled = true;
                 asio.AsioDevice = ASIO_DEVICE;
                 ds.Enabled = false;
+                wasapi.Enabled = false;
+            }
+            else if ((this.Configuration & WASAPI) != 0)
+            {
+                wasapi.Enabled = true;
+                wasapi.WasapiDevice = WASAPI_DEVICE;
+                ds.Enabled = false;
+                asio.Enabled = false;
             }
             else
             {
                 ds.Enabled = true;
                 ds.DirectSoundDevice = DS_DEVICE;
                 asio.Enabled = false;
+                wasapi.Enabled = false;
             }
             output.Rate = RATE;
+            output.Float = FLOAT;
         }
 
         [Test]

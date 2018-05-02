@@ -48,22 +48,6 @@ namespace FoxTunes
             }
         }
 
-        private bool _DsdDirect { get; set; }
-
-        public bool DsdDirect
-        {
-            get
-            {
-                return this._DsdDirect;
-            }
-            private set
-            {
-                this._DsdDirect = value;
-                Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DsdDirect);
-                this.Output.Shutdown();
-            }
-        }
-
         private bool _Exclusive { get; set; }
 
         public bool Exclusive
@@ -110,10 +94,6 @@ namespace FoxTunes
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_DEVICE
             ).ConnectValue<string>(value => this.WasapiDevice = BassWasapiStreamOutputConfiguration.GetWasapiDevice(value));
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
-                BassWasapiStreamOutputConfiguration.DSD_RAW_ELEMENT
-            ).ConnectValue<bool>(value => this.DsdDirect = value);
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_EXCLUSIVE
@@ -182,10 +162,6 @@ namespace FoxTunes
                 return;
             }
             this.OnInitDevice();
-            if (this.DsdDirect)
-            {
-                e.OutputCapabilities |= BassCapability.DSD_RAW;
-            }
             e.OutputRates = BassWasapiDevice.Info.SupportedRates;
             e.OutputChannels = BassWasapiDevice.Info.Outputs;
         }

@@ -7,8 +7,6 @@ namespace FoxTunes.Interfaces
     {
         int Rate { get; }
 
-        int Depth { get; }
-
         int Channels { get; }
 
         BassFlags Flags { get; }

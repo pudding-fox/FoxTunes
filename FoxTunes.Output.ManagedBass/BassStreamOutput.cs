@@ -8,8 +8,6 @@ namespace FoxTunes
     {
         public abstract int Rate { get; protected set; }
 
-        public abstract int Depth { get; protected set; }
-
         public abstract int Channels { get; protected set; }
 
         public abstract BassFlags Flags { get; protected set; }
@@ -44,11 +42,11 @@ namespace FoxTunes
 
         public event EventHandler Invalidate = delegate { };
 
-        public abstract bool IsPlaying { get; }
+        public abstract bool IsPlaying { get; protected set; }
 
-        public abstract bool IsPaused { get; }
+        public abstract bool IsPaused { get; protected set; }
 
-        public abstract bool IsStopped { get; }
+        public abstract bool IsStopped { get; protected set; }
 
         public abstract int Latency { get; }
 

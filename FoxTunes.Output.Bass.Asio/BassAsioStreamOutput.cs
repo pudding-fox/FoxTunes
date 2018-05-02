@@ -51,7 +51,6 @@ namespace FoxTunes
                     this.Flags |= BassFlags.Float;
                 }
             }
-            this.Depth = stream.Depth;
             this.Channels = stream.Channels;
         }
 
@@ -66,8 +65,6 @@ namespace FoxTunes
         }
 
         public override int Rate { get; protected set; }
-
-        public override int Depth { get; protected set; }
 
         public override int Channels { get; protected set; }
 
@@ -270,7 +267,7 @@ namespace FoxTunes
                 //    default:
                 //        throw new NotImplementedException();
                 //}
-                Logger.Write(this, LogLevel.Debug, "DSD: Rate = {0}, Depth = {1}, Format = {2}", BassAsio.Rate, this.Depth, Enum.GetName(typeof(AsioSampleFormat), AsioSampleFormat.DSD_MSB));
+                Logger.Write(this, LogLevel.Debug, "DSD: Rate = {0}, Format = {1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), AsioSampleFormat.DSD_MSB));
                 BassAsioUtils.OK(BassAsio.ChannelSetFormat(false, BassAsioDevice.PRIMARY_CHANNEL, AsioSampleFormat.DSD_MSB));
                 return true;
             }
@@ -310,6 +307,10 @@ namespace FoxTunes
             {
                 return BassAsio.IsStarted;
             }
+            protected set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public override bool IsPaused
@@ -318,6 +319,10 @@ namespace FoxTunes
             {
                 return BassAsio.ChannelIsActive(false, BassAsioDevice.PRIMARY_CHANNEL) == AsioChannelActive.Paused;
             }
+            protected set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public override bool IsStopped
@@ -325,6 +330,10 @@ namespace FoxTunes
             get
             {
                 return !BassAsio.IsStarted;
+            }
+            protected set
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -372,7 +381,7 @@ namespace FoxTunes
 
         public override void Resume()
         {
-            if (this.IsPlaying)
+            if (!this.IsPaused)
             {
                 return;
             }
