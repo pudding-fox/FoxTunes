@@ -1,4 +1,9 @@
 ﻿function timestamp(value) {
+
+    if (!value) {
+        return value;
+    }
+
     var s = parseInt((value / 1000) % 60);
     var m = parseInt((value / (1000 * 60)) % 60);
     var h = parseInt((value / (1000 * 60 * 60)) % 24);
@@ -38,4 +43,12 @@ function ucfirst(value) {
         words[a] = words[a].charAt(0).toUpperCase() + words[a].slice(1);
     }
     return words.join(" ");
+}
+
+function filename(value) {
+    if (!value) {
+       return value; 
+    }
+    var parts = value.split('\\');
+    return parts[parts.length - 1].replace(/\.[^/.]+$/, '');
 }

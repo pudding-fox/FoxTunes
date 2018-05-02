@@ -2,8 +2,6 @@
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,14 +10,12 @@ namespace FoxTunes
 {
     public class LibraryHierarchyPopulator : PopulatorBase
     {
-        //public const int SAVE_INTERVAL = 1000;
-
         public readonly object SyncRoot = new object();
 
         private LibraryHierarchyPopulator(bool reportProgress)
             : base(reportProgress)
         {
-            this.Command = new ThreadLocal<LibraryHierarchyPopulatorCommand>(true);
+            this.Writers = new ThreadLocal<LibraryHierarchyWriter>(true);
         }
 
         public LibraryHierarchyPopulator(IDatabaseComponent database, ITransactionSource transaction, bool reportProgress)
@@ -35,7 +31,7 @@ namespace FoxTunes
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
-        private ThreadLocal<LibraryHierarchyPopulatorCommand> Command { get; set; }
+        private ThreadLocal<LibraryHierarchyWriter> Writers { get; set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -59,15 +55,8 @@ namespace FoxTunes
 
             Parallel.ForEach(reader, this.ParallelOptions, record =>
             {
-                var command = this.GetOrAddCommand();
-                command.Parameters["libraryHierarchyId"] = record["LibraryHierarchy_Id"];
-                command.Parameters["libraryHierarchyLevelId"] = record["LibraryHierarchyLevel_Id"];
-                command.Parameters["libraryItemId"] = record["LibraryItem_Id"];
-                command.Parameters["displayValue"] = this.ExecuteScript(command.ScriptingContext, record, "DisplayScript");
-                command.Parameters["sortValue"] = this.ExecuteScript(command.ScriptingContext, record, "SortScript");
-                command.Parameters["isLeaf"] = record["IsLeaf"];
-                command.Command.ExecuteNonQuery();
-                //command.Increment();
+                var writer = this.GetOrAddWriter();
+                writer.Write(record);
 
                 if (this.ReportProgress)
                 {
@@ -85,141 +74,23 @@ namespace FoxTunes
             });
         }
 
-        private object ExecuteScript(IScriptingContext scriptingContext, IDatabaseReaderRecord record, string name)
+        private LibraryHierarchyWriter GetOrAddWriter()
         {
-            var script = record[name] as string;
-            if (string.IsNullOrEmpty(script))
+            if (this.Writers.IsValueCreated)
             {
-                return string.Empty;
+                return this.Writers.Value;
             }
-            var fileName = record["FileName"] as string;
-            var metaData = new Dictionary<string, object>();
-            for (var a = 0; true; a++)
-            {
-                var keyName = string.Format("Key_{0}", a);
-                if (!record.Contains(keyName))
-                {
-                    break;
-                }
-                var key = (record[keyName] as string).ToLower();
-                var valueName = string.Format("Value_{0}_Value", a);
-                var value = record[valueName] == DBNull.Value ? null : record[valueName];
-                metaData.Add(key, value);
-            }
-            scriptingContext.SetValue("fileName", fileName);
-            scriptingContext.SetValue("tag", metaData);
-            try
-            {
-                return scriptingContext.Run(script);
-            }
-            catch (ScriptingException e)
-            {
-                return e.Message;
-            }
-        }
-
-        private LibraryHierarchyPopulatorCommand GetOrAddCommand()
-        {
-            if (this.Command.IsValueCreated)
-            {
-                return this.Command.Value;
-            }
-            return this.Command.Value = new LibraryHierarchyPopulatorCommand(this.Database, this.Transaction, this.ScriptingRuntime);
+            return this.Writers.Value = new LibraryHierarchyWriter(this.Database, this.Transaction, this.ScriptingRuntime);
         }
 
         protected override void OnDisposing()
         {
-            foreach (var command in this.Command.Values)
+            foreach (var writer in this.Writers.Values)
             {
-                command.Dispose();
+                writer.Dispose();
             }
-            this.Command.Dispose();
+            this.Writers.Dispose();
             base.OnDisposing();
-        }
-
-        private class LibraryHierarchyPopulatorCommand : BaseComponent
-        {
-            public LibraryHierarchyPopulatorCommand(IDatabaseComponent database, ITransactionSource transaction, IScriptingRuntime scriptingRuntime)
-            {
-                this.Database = database;
-                this.Transaction = transaction;
-                this.ScriptingContext = scriptingRuntime.CreateContext();
-                this.CreateCommand();
-            }
-
-            public IDatabaseComponent Database { get; private set; }
-
-            public ITransactionSource Transaction { get; private set; }
-
-            public IScriptingContext ScriptingContext { get; private set; }
-
-            public IDbCommand Command { get; private set; }
-
-            public IDatabaseParameters Parameters { get; private set; }
-
-            //public int Batch { get; private set; }
-
-            public void CreateCommand()
-            {
-                var parameters = default(IDatabaseParameters);
-                var table = this.Database.Config.Table("LibraryHierarchy", TableFlags.None);
-                table.Column("LibraryHierarchy_Id");
-                table.Column("LibraryHierarchyLevel_Id");
-                table.Column("LibraryItem_Id");
-                table.Column("DisplayValue");
-                table.Column("SortValue");
-                table.Column("IsLeaf");
-                var query = this.Database.QueryFactory.Build();
-                query.Add.SetTable(table);
-                query.Add.AddColumns(table.Columns);
-                query.Output.AddParameters(table.Columns);
-                this.Command = this.Database.CreateCommand(
-                    query.Build(),
-                    out parameters,
-                    this.Transaction
-                );
-                this.Parameters = parameters;
-            }
-
-            //public void Increment()
-            //{
-            //    if (this.Batch++ >= SAVE_INTERVAL)
-            //    {
-            //        this.Transaction.Commit();
-            //        this.Transaction.Bind(this.Command);
-            //        this.Batch = 0;
-            //    }
-            //}
-
-            public bool IsDisposed { get; private set; }
-
-            public void Dispose()
-            {
-                this.Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (this.IsDisposed || !disposing)
-                {
-                    return;
-                }
-                this.OnDisposing();
-                this.IsDisposed = true;
-            }
-
-            protected virtual void OnDisposing()
-            {
-                this.ScriptingContext.Dispose();
-                this.Command.Dispose();
-            }
-
-            ~LibraryHierarchyPopulatorCommand()
-            {
-                Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-                this.Dispose(true);
-            }
         }
     }
 }

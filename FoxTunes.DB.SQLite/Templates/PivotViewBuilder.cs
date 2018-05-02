@@ -19,7 +19,7 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+    #line 1 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
     public partial class PivotViewBuilder : PivotViewBuilderBase
     {
@@ -31,63 +31,69 @@ namespace FoxTunes.Templates
         {
             this.Write("\r\nSELECT\r\n");
             
-            #line 9 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
- 
-foreach (var keyColumn in this.KeyColumns) 
-{ 
-
-            
-            #line default
-            #line hidden
-            
-            #line 13 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn)));
-            
-            #line default
-            #line hidden
-            this.Write(",\r\n");
-            
-            #line 14 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
- 
-} 
-
-            
-            #line default
-            #line hidden
-            
-            #line 17 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 9 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
  
 {
-    var index = 0;
-    foreach (var value in this.Values) 
-    {
-        if (index > 0) { 
+	var index = 0;
+	foreach (var keyColumn in this.KeyColumns) 
+	{ 
+		if (index > 0) { 
             
             #line default
             #line hidden
             this.Write(",");
             
-            #line 22 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 14 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
  }
             
             #line default
             #line hidden
+            this.Write("\t\t");
             
-            #line 23 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 15 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn)));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\t");
+            
+            #line 16 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+ 
+		index++;
+	}
+}
+
+            
+            #line default
+            #line hidden
+            
+            #line 21 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+ 
+{
+    var index = 0;
+    foreach (var value in this.Values) 
+    {
+
+            
+            #line default
+            #line hidden
+            this.Write(",");
+            
+            #line 26 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(value)));
             
             #line default
             #line hidden
             this.Write(" AS \"Key_");
             
-            #line 23 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 26 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\"\r\n");
             
-            #line 24 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 27 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
  
         foreach (var nameColumn in this.NameColumns) 
         {
@@ -99,42 +105,42 @@ foreach (var keyColumn in this.KeyColumns)
             #line hidden
             this.Write(", GROUP_CONCAT\r\n(\r\n    CASE WHEN ");
             
-            #line 31 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 34 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, nameColumn)));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 31 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 34 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(value)));
             
             #line default
             #line hidden
             this.Write(" \r\n        THEN ");
             
-            #line 32 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 35 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, valueColumn)));
             
             #line default
             #line hidden
             this.Write(" \r\n    END\r\n) AS \"Value_");
             
-            #line 34 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 37 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_");
             
-            #line 34 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 37 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(valueColumn));
             
             #line default
             #line hidden
             this.Write("\"\r\n");
             
-            #line 35 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 38 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
 
             }
         }
@@ -149,14 +155,14 @@ foreach (var keyColumn in this.KeyColumns)
             #line hidden
             this.Write(" \r\nFROM ");
             
-            #line 44 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table)));
             
             #line default
             #line hidden
             this.Write(" \r\nGROUP BY\r\n");
             
-            #line 46 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 49 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
 
     foreach (var keyColumn in this.KeyColumns)
     {
@@ -166,20 +172,20 @@ foreach (var keyColumn in this.KeyColumns)
             #line hidden
             this.Write(",");
             
-            #line 49 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 52 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
  }
             
             #line default
             #line hidden
             
-            #line 50 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 53 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn)));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 51 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
+            #line 54 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PivotViewBuilder.tt"
 
         index++;
     }

@@ -201,6 +201,18 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.PlaylistColumnsUpdated:
                     return this.ForegroundTaskRunner.RunAsync(() => this.Reload());
+                case CommonSignals.PluginInvocation:
+                    switch (Convert.ToString(signal.State))
+                    {
+                        case PlaylistActionsBehaviour.LOCATE_PLAYLIST_ITEM:
+                            if (this.SelectedItems.Count > 0)
+                            {
+                                var item = this.SelectedItems[0] as PlaylistItem;
+                                Explorer.Select(item.FileName);
+                            }
+                            break;
+                    }
+                    break;
             }
             return Task.CompletedTask;
         }
@@ -218,27 +230,6 @@ namespace FoxTunes.ViewModel
                     },
                     () => this.PlaybackManager != null && this.SelectedItems.Count > 0
                 );
-            }
-        }
-
-        public ICommand LocateCommand
-        {
-            get
-            {
-                return new Command(() =>
-                {
-                    var item = this.SelectedItems[0] as PlaylistItem;
-                    Explorer.Select(item.FileName);
-                },
-                () => this.SelectedItems.Count > 0);
-            }
-        }
-
-        public ICommand ClearCommand
-        {
-            get
-            {
-                return new AsyncCommand(this.BackgroundTaskRunner, () => this.Core.Managers.Playlist.Clear());
             }
         }
 

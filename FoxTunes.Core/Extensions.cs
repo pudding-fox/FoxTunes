@@ -103,6 +103,12 @@ namespace FoxTunes
             return -1;
         }
 
+        public static string GetName(this string fileName)
+        {
+            var name = Path.GetFileName(fileName);
+            return name;
+        }
+
         public static string GetExtension(this string fileName)
         {
             var extension = Path.GetExtension(fileName);
@@ -111,6 +117,18 @@ namespace FoxTunes
                 return string.Empty;
             }
             return extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
+        }
+
+        public static IEnumerable<string> GetLines(this string sequence)
+        {
+            if (string.IsNullOrEmpty(sequence))
+            {
+                yield break;
+            }
+            foreach (var element in sequence.Split('\n'))
+            {
+                yield return element.TrimEnd('\r');
+            }
         }
 
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
@@ -137,6 +155,15 @@ namespace FoxTunes
                 }
             }
             return value;
+        }
+
+        public static IEnumerable<T> AddRange<T>(this IList<T> list, IEnumerable<T> sequence)
+        {
+            foreach (var element in sequence)
+            {
+                list.Add(element);
+            }
+            return sequence;
         }
     }
 }

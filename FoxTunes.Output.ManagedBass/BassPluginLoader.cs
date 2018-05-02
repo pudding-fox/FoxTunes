@@ -12,7 +12,6 @@ namespace FoxTunes
 
         public static readonly string[] Blacklist = new[]
         {
-            "basscd.dll",
             "bassenc.dll",
             "bassenc_ogg.dll",
             "bassenc_opus.dll",

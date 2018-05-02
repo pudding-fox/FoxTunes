@@ -1,7 +1,5 @@
-﻿using System;
-using System.ComponentModel;
-using System.Threading.Tasks;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {

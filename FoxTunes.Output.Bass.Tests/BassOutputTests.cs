@@ -80,7 +80,7 @@ namespace FoxTunes.Output.Bass.Tests
         [Test]
         public async Task CanPlayStream()
         {
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0]);
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
             outputStream.Play();
             for (var a = 0; a <= 15; a++)
             {
@@ -99,7 +99,7 @@ namespace FoxTunes.Output.Bass.Tests
         [Test]
         public async Task CanPauseAndResumeStream()
         {
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0]);
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
             outputStream.Play();
             await Task.Delay(1000);
             Assert.IsTrue(outputStream.Position > 0);
@@ -115,7 +115,7 @@ namespace FoxTunes.Output.Bass.Tests
         [Test]
         public async Task CanSeekStream()
         {
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0]);
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
             var quarter = outputStream.Length / 4;
             var half = outputStream.Length / 2;
             outputStream.Position = quarter;
@@ -132,8 +132,8 @@ namespace FoxTunes.Output.Bass.Tests
         {
             var outputStreams = new[]
             {
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[2]),
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[3])
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[2], false),
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[3], false)
             };
             outputStreams[0].Play();
             await this.Core.Components.Output.Preempt(outputStreams[1]);

@@ -1,0 +1,25 @@
+﻿using FoxTunes.Interfaces;
+
+namespace FoxTunes
+{
+    public class InvocationComponent : IInvocationComponent
+    {
+        public const string CATEGORY_PLAYLIST = "42BC8F63-202C-4F77-8383-04A54FFFDCD5";
+
+        public InvocationComponent(string category, string id, string name = null, string description = null)
+        {
+            this.Category = category;
+            this.Id = id;
+            this.Name = name;
+            this.Description = description;
+        }
+
+        public string Category { get; private set; }
+
+        public string Id { get; private set; }
+
+        public string Name { get; private set; }
+
+        public string Description { get; private set; }
+    }
+}

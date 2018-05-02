@@ -58,21 +58,8 @@ namespace FoxTunes
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
-            var parameters = default(IDatabaseParameters);
-            var query = this.Database.QueryFactory.Build();
-            query.Add.SetTable(this.Database.Tables.PlaylistItem);
-            query.Add.AddColumns(this.Database.Tables.PlaylistItem.Columns.Except(this.Database.Tables.PlaylistItem.PrimaryKeys));
-            query.Output.AddSubQuery(this.Database.QueryFactory.Build().With(subQuery =>
+            using (var writer = new PlaylistWriter(this.Database, transaction))
             {
-                subQuery.Output.AddColumn(this.Database.Tables.LibraryItem.Column("Id"));
-                subQuery.Source.AddTable(this.Database.Tables.LibraryItem);
-                subQuery.Filter.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
-            }));
-            query.Output.AddParameters(this.Database.Tables.PlaylistItem.Columns.Except(this.Database.Tables.PlaylistItem.PrimaryKeys.Concat(this.Database.Tables.PlaylistItem.Column("LibraryItem_Id"))));
-            using (var command = this.Database.CreateCommand(query.Build(), out parameters))
-            {
-                transaction.Bind(command);
-                var count = 0;
                 var addPlaylistItem = new Action<string>(fileName =>
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
@@ -80,12 +67,14 @@ namespace FoxTunes
                         Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
                         return;
                     }
-                    parameters["directoryName"] = Path.GetDirectoryName(fileName);
-                    parameters["fileName"] = fileName;
-                    parameters["sequence"] = this.Sequence;
-                    parameters["status"] = PlaylistItemStatus.Import;
-                    command.ExecuteNonQuery();
-                    count++;
+                    var playlistItem = new PlaylistItem()
+                    {
+                        DirectoryName = Path.GetDirectoryName(fileName),
+                        FileName = fileName,
+                        Sequence = this.Sequence
+                    };
+                    writer.Write(playlistItem);
+                    this.Offset++;
                 });
                 foreach (var path in this.Paths)
                 {
@@ -103,7 +92,6 @@ namespace FoxTunes
                         addPlaylistItem(path);
                     }
                 }
-                this.Offset = count;
             }
         }
 

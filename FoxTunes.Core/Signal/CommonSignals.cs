@@ -11,5 +11,9 @@
         public const string PlaylistColumnsUpdated = "PlaylistColumnsUpdated";
 
         public const string StreamLoaded = "StreamLoaded";
+
+        public const string StreamFault = "StreamFault";
+
+        public const string PluginInvocation = "PluginInvocation";
     }
 }

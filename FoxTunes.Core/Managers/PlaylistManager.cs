@@ -10,6 +10,8 @@ namespace FoxTunes.Managers
 {
     public class PlaylistManager : StandardManager, IPlaylistManager
     {
+        public const string CLEAR_PLAYLIST = "F452E482-2DF8-42F3-8D7D-4B3C7F40A708";
+
         private volatile bool IsNavigating = false;
 
         public ICore Core { get; private set; }
@@ -100,7 +102,7 @@ namespace FoxTunes.Managers
             var task = new AddPathsToPlaylistTask(index, paths);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
-            return task.Run().ContinueWith(_ => this.OnUpdated());
+            return task.Run();
         }
 
         public Task Add(LibraryHierarchyNode libraryHierarchyNode)
@@ -116,10 +118,10 @@ namespace FoxTunes.Managers
             var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
-            return task.Run().ContinueWith(_ => this.OnUpdated());
+            return task.Run();
         }
 
-        private int GetInsertIndex()
+        public int GetInsertIndex()
         {
             var playlistItem = this.GetLastPlaylistItem();
             if (playlistItem == null)
@@ -131,18 +133,6 @@ namespace FoxTunes.Managers
                 return playlistItem.Sequence + 1;
             }
         }
-
-        protected virtual void OnUpdated()
-        {
-            Logger.Write(this, LogLevel.Debug, "Playlist was updated.");
-            if (this.Updated == null)
-            {
-                return;
-            }
-            this.Updated(this, EventArgs.Empty);
-        }
-
-        public event EventHandler Updated = delegate { };
 
         public bool CanNavigate { get; private set; }
 
@@ -309,7 +299,7 @@ namespace FoxTunes.Managers
             var task = new ClearPlaylistTask();
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
-            return task.Run().ContinueWith(_ => this.OnUpdated());
+            return task.Run();
         }
 
         private PlaylistItem _CurrentItem { get; set; }
@@ -348,5 +338,23 @@ namespace FoxTunes.Managers
         }
 
         public event BackgroundTaskEventHandler BackgroundTask = delegate { };
+
+        public IEnumerable<IInvocationComponent> Invocations
+        {
+            get
+            {
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Clear");
+            }
+        }
+
+        public Task InvokeAsync(IInvocationComponent component)
+        {
+            switch (component.Id)
+            {
+                case CLEAR_PLAYLIST:
+                    return this.Clear();
+            }
+            return Task.CompletedTask;
+        }
     }
 }

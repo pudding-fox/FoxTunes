@@ -47,6 +47,7 @@
     <Compile Include="BackgroundTasks.xaml.cs">
       <DependentUpon>BackgroundTasks.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviours\PlaylistActionsBehaviour.cs" />
     <Compile Include="Components.xaml.cs">
       <DependentUpon>Components.xaml</DependentUpon>
     </Compile>
@@ -119,6 +120,7 @@
     <Compile Include="ViewModel\LibraryHierarchySettings.cs" />
     <Compile Include="ViewModel\Main.cs" />
     <Compile Include="Utilities\PlaylistScriptBinding.cs" />
+    <Compile Include="ViewModel\Menu.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
     <Compile Include="Utilities\ScriptBinding.cs" />
     <Compile Include="WindowsForegroundTaskRunner.cs" />

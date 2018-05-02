@@ -7,20 +7,23 @@
 
 SELECT
 <# 
-foreach (var keyColumn in this.KeyColumns) 
-{ 
-#>
-<#= this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn) #>,
-<# 
-} 
+{
+	var index = 0;
+	foreach (var keyColumn in this.KeyColumns) 
+	{ 
+		if (index > 0) { #>,<# }#>
+		<#= this.Database.QueryFactory.Dialect.Identifier(this.Table, keyColumn) #>
+		<# 
+		index++;
+	}
+}
 #>
 <# 
 {
     var index = 0;
     foreach (var value in this.Values) 
     {
-        if (index > 0) { #>,<# }#>
-<#= this.Database.QueryFactory.Dialect.String(value) #> AS "Key_<#= index #>"
+#>,<#= this.Database.QueryFactory.Dialect.String(value) #> AS "Key_<#= index #>"
 <# 
         foreach (var nameColumn in this.NameColumns) 
         {

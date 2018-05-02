@@ -13,7 +13,7 @@ namespace FoxTunes
             this.Sequence = sequence;
         }
 
-        public int Sequence { get; private set; }
+        public int Sequence { get; protected set; }
 
         public int Offset { get; protected set; }
 
@@ -76,7 +76,7 @@ namespace FoxTunes
 
         protected virtual void SequenceItems(ITransactionSource transaction, IDatabaseReader reader)
         {
-            using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, transaction, false))
+            using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, transaction))
             {
                 playlistSequencePopulator.InitializeComponent(this.Core);
                 playlistSequencePopulator.Populate(reader);

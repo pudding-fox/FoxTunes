@@ -31,6 +31,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BassCdTests.cs" />
     <Compile Include="BassOutputTests.cs" />
     <Compile Include="BassPipelineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -48,9 +49,21 @@
       <Project>{3e8a3809-3fba-4024-9343-2a54dae013ca}</Project>
       <Name>FoxTunes.Output.Bass.Asio</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Cd\FoxTunes.Output.Bass.Cd.csproj">
+      <Project>{23d4420f-18ba-4a72-bc63-8acb7fa2b09a}</Project>
+      <Name>FoxTunes.Output.Bass.Cd</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FoxTunes.Output.Bass.DirectSound\FoxTunes.Output.Bass.DirectSound.csproj">
       <Project>{4eaf00da-fe41-46ed-afb5-3a543bcf0bf9}</Project>
       <Name>FoxTunes.Output.Bass.DirectSound</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Dsd\FoxTunes.Output.Bass.Dsd.csproj">
+      <Project>{2e2722f2-8c19-4022-8e5e-36b9a9983cb3}</Project>
+      <Name>FoxTunes.Output.Bass.Dsd</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Gapless\FoxTunes.Output.Bass.Gapless.csproj">
+      <Project>{526df089-aa89-45c8-8c8a-a5e6780075dc}</Project>
+      <Name>FoxTunes.Output.Bass.Gapless</Name>
     </ProjectReference>
     <ProjectReference Include="..\FoxTunes.Output.Bass.Resampler\FoxTunes.Output.Bass.Resampler.csproj">
       <Project>{a638a91c-bd8e-4475-a5fb-e4fcff7ba61d}</Project>
