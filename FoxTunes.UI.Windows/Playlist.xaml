@@ -52,6 +52,17 @@
                 <ContextMenu ItemsSource="{Binding Items, Source={StaticResource Menu}}">
                     <ContextMenu.Resources>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Separator></Separator>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
                             <Setter Property="Header" Value="{Binding Invocation.Name}"></Setter>
                             <Setter Property="Command" Value="{Binding Command}"></Setter>
                         </Style>

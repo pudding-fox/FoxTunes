@@ -9,5 +9,7 @@
         string Name { get; }
 
         string Description { get; }
+
+        byte Attributes { get; }
     }
 }

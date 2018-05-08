@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Linq;
 
 namespace FoxTunes.ViewModel
 {
@@ -35,7 +36,14 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.InvocableComponents.AddRange(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
-            this.Items.AddRange(this.GetItems());
+            foreach (var item in this.GetItems().OrderBy(item => item.Invocation.Category).ThenBy(item => item.Invocation.Id))
+            {
+                if (item.Separator)
+                {
+                    this.Items.Add(null);
+                }
+                this.Items.Add(item);
+            }
             base.OnCoreChanged();
         }
         protected override Freezable CreateInstanceCore()
@@ -68,6 +76,14 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new AsyncCommand(this.BackgroundTaskRunner, this.OnInvoke);
+            }
+        }
+
+        public bool Separator
+        {
+            get
+            {
+                return (this.Invocation.Attributes & InvocationComponent.ATTRIBUTE_SEPARATOR) == InvocationComponent.ATTRIBUTE_SEPARATOR;
             }
         }
 
