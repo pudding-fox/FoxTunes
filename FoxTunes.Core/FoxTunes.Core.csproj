@@ -169,6 +169,7 @@
     <Compile Include="Tasks\ClearLibraryTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\LibraryTaskBase.cs" />
+    <Compile Include="Tasks\RemoveItemsFromPlaylistTask.cs" />
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\LibraryHierarchyPopulator.cs" />
     <Compile Include="Utilities\MetaDataPopulator.cs" />
