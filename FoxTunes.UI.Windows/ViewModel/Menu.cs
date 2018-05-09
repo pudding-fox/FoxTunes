@@ -1,10 +1,11 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Linq;
 
 namespace FoxTunes.ViewModel
 {
@@ -16,6 +17,56 @@ namespace FoxTunes.ViewModel
             this.Items = new ObservableCollection<MenuItem>();
         }
 
+        public static readonly DependencyProperty CategoryProperty = DependencyProperty.Register(
+            "Category",
+            typeof(string),
+            typeof(Menu),
+            new PropertyMetadata(new PropertyChangedCallback(OnCategoryChanged))
+        );
+
+        public static string GetCategory(Menu source)
+        {
+            return (string)source.GetValue(CategoryProperty);
+        }
+
+        public static void SetCategory(Menu source, string value)
+        {
+            source.SetValue(CategoryProperty, value);
+        }
+
+        public static void OnCategoryChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var menu = sender as Menu;
+            if (menu == null)
+            {
+                return;
+            }
+            menu.OnCategoryChanged();
+        }
+
+        public string Category
+        {
+            get
+            {
+                return this.GetValue(CategoryProperty) as string;
+            }
+            set
+            {
+                this.SetValue(CategoryProperty, value);
+            }
+        }
+
+        protected virtual void OnCategoryChanged()
+        {
+            if (this.CategoryChanged != null)
+            {
+                this.CategoryChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Category");
+        }
+
+        public event EventHandler CategoryChanged = delegate { };
+
         public ObservableCollection<IInvocableComponent> InvocableComponents { get; set; }
 
         public ObservableCollection<MenuItem> Items { get; set; }
@@ -26,6 +77,10 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var invocation in component.Invocations)
                 {
+                    if (!string.IsNullOrEmpty(this.Category) && !string.Equals(this.Category, invocation.Category, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
                     var item = new MenuItem(component, invocation);
                     item.Core = this.Core;
                     yield return item;
@@ -59,7 +114,8 @@ namespace FoxTunes.ViewModel
 
         }
 
-        public MenuItem(IInvocableComponent component, IInvocationComponent invocation) : this()
+        public MenuItem(IInvocableComponent component, IInvocationComponent invocation)
+            : this()
         {
             this.Component = component;
             this.Invocation = invocation;
