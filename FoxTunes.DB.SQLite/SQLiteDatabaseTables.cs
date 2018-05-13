@@ -8,12 +8,15 @@ namespace FoxTunes
     {
         public SQLiteDatabaseTables(IDatabase database)
         {
+            this.MetaDataItem = database.Config.GetTable(TableConfig.By(typeof(MetaDataItem), TableFlags.None));
             this.PlaylistItem = database.Config.GetTable(TableConfig.By(typeof(PlaylistItem), TableFlags.None));
             this.PlaylistColumn = database.Config.GetTable(TableConfig.By(typeof(PlaylistColumn), TableFlags.None));
             this.LibraryItem = database.Config.GetTable(TableConfig.By(typeof(LibraryItem), TableFlags.None));
             this.LibraryHierarchy = database.Config.GetTable(TableConfig.By(typeof(LibraryHierarchy), TableFlags.None));
             this.LibraryHierarchyLevel = database.Config.GetTable(TableConfig.By(typeof(LibraryHierarchyLevel), TableFlags.None));
         }
+
+        public ITableConfig MetaDataItem { get; private set; }
 
         public ITableConfig PlaylistItem { get; private set; }
 

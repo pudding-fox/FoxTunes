@@ -28,7 +28,5 @@ namespace FoxTunes.Interfaces
         IDatabaseQuery PlaylistSequenceBuilder(IEnumerable<string> metaDataNames);
 
         IDatabaseQuery LibraryHierarchyBuilder(IEnumerable<string> metaDataNames);
-
-        IDatabaseQuery GetMetaDataNames { get; }
     }
 }
