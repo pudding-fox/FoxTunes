@@ -1,5 +1,7 @@
 ﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -14,11 +16,33 @@ namespace FoxTunes
 
         }
 
+        protected virtual IEnumerable<ITableConfig> Tables
+        {
+            get
+            {
+                yield return this.Database.Config.Table("LibraryHierarchy_LibraryHierarchyItem", TableFlags.None);
+                yield return this.Database.Config.Table("LibraryHierarchyItem_LibraryItem", TableFlags.None);
+                yield return this.Database.Config.Table("LibraryHierarchyItems", TableFlags.None);
+                yield return this.Database.Config.Table("LibraryItems", TableFlags.None);
+                yield return this.Database.Config.Table("LibraryItem_MetaDataItem", TableFlags.None);
+            }
+        }
+
         protected override async Task OnRun()
         {
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Clearing library.");
-            this.Database.Execute(this.Database.Queries.ClearLibrary);
+            using (var transaction = this.Database.BeginTransaction())
+            {
+                foreach (var table in this.Tables)
+                {
+                    var query = this.Database.QueryFactory.Build();
+                    query.Delete.Touch();
+                    query.Source.AddTable(table);
+                    this.Database.Execute(query, transaction);
+                }
+                transaction.Commit();
+            }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
     }

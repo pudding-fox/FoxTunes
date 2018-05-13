@@ -47,22 +47,6 @@ namespace FoxTunes
             }
         }
 
-        public IDatabaseQuery ClearPlaylist
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(Resources.ClearPlaylist);
-            }
-        }
-
-        public IDatabaseQuery ClearLibrary
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(Resources.CLearLibrary);
-            }
-        }
-
         public IDatabaseQuery GetLibraryHierarchyMetaDataItems
         {
             get
