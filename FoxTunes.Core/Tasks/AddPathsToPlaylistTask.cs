@@ -13,10 +13,11 @@ namespace FoxTunes
     {
         public const string ID = "7B564369-A6A0-4BAF-8C99-08AF27908591";
 
-        public AddPathsToPlaylistTask(int sequence, IEnumerable<string> paths)
+        public AddPathsToPlaylistTask(int sequence, IEnumerable<string> paths, bool clear)
             : base(ID, sequence)
         {
             this.Paths = paths;
+            this.Clear = clear;
         }
 
         public override bool Visible
@@ -28,6 +29,8 @@ namespace FoxTunes
         }
 
         public IEnumerable<string> Paths { get; private set; }
+
+        public bool Clear { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -44,6 +47,10 @@ namespace FoxTunes
         {
             using (ITransactionSource transaction = this.Database.BeginTransaction())
             {
+                if (this.Clear)
+                {
+                    this.ClearItems(transaction);
+                }
                 this.AddPlaylistItems(transaction);
                 this.ShiftItems(transaction);
                 this.AddOrUpdateMetaData(transaction);

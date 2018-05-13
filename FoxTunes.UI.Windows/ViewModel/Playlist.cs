@@ -203,39 +203,46 @@ namespace FoxTunes.ViewModel
                 case CommonSignals.PlaylistColumnsUpdated:
                     return this.ForegroundTaskRunner.RunAsync(() => this.Reload());
                 case CommonSignals.PluginInvocation:
-                    switch (Convert.ToString(signal.State))
+                    var invocation = signal.State as IInvocationComponent;
+                    if (invocation != null)
                     {
-                        case PlaylistActionsBehaviour.REMOVE_PLAYLIST_ITEMS:
-                            this.RemovePlaylistItems();
-                            break;
-                        case PlaylistActionsBehaviour.CROP_PLAYLIST_ITEMS:
-                            this.CropPlaylistItems();
-                            break;
-                        case PlaylistActionsBehaviour.LOCATE_PLAYLIST_ITEMS:
-                            this.LocatePlaylistItems();
-                            break;
+                        switch (invocation.Category)
+                        {
+                            case InvocationComponent.CATEGORY_PLAYLIST:
+                                switch (invocation.Id)
+                                {
+                                    case PlaylistActionsBehaviour.REMOVE_PLAYLIST_ITEMS:
+                                        return this.RemovePlaylistItems();
+                                    case PlaylistActionsBehaviour.CROP_PLAYLIST_ITEMS:
+                                        return this.CropPlaylistItems();
+                                    case PlaylistActionsBehaviour.LOCATE_PLAYLIST_ITEMS:
+                                        return this.LocatePlaylistItems();
+                                }
+                                break;
+                        }
                     }
                     break;
             }
             return Task.CompletedTask;
         }
 
-        protected virtual void RemovePlaylistItems()
+        protected virtual Task RemovePlaylistItems()
         {
-            this.PlaylistManager.Remove(this.SelectedItems.OfType<PlaylistItem>());
+            return this.PlaylistManager.Remove(this.SelectedItems.OfType<PlaylistItem>());
         }
 
-        protected virtual void CropPlaylistItems()
+        protected virtual Task CropPlaylistItems()
         {
-            this.PlaylistManager.Crop(this.SelectedItems.OfType<PlaylistItem>());
+            return this.PlaylistManager.Crop(this.SelectedItems.OfType<PlaylistItem>());
         }
 
-        protected virtual void LocatePlaylistItems()
+        protected virtual Task LocatePlaylistItems()
         {
             foreach (var item in this.SelectedItems.OfType<PlaylistItem>())
             {
                 Explorer.Select(item.FileName);
             }
+            return Task.CompletedTask;
         }
 
         public ICommand PlaySelectedItemCommand
@@ -312,11 +319,11 @@ namespace FoxTunes.ViewModel
             var sequence = default(int);
             if (this.TryGetInsertSequence(out sequence))
             {
-                return this.Core.Managers.Playlist.Insert(sequence, paths);
+                return this.PlaylistManager.Insert(sequence, paths, false);
             }
             else
             {
-                return this.Core.Managers.Playlist.Add(paths);
+                return this.PlaylistManager.Add(paths, false);
             }
         }
 
@@ -325,11 +332,11 @@ namespace FoxTunes.ViewModel
             var sequence = default(int);
             if (this.TryGetInsertSequence(out sequence))
             {
-                return this.Core.Managers.Playlist.Insert(sequence, libraryHierarchyNode);
+                return this.PlaylistManager.Insert(sequence, libraryHierarchyNode, false);
             }
             else
             {
-                return this.Core.Managers.Playlist.Add(libraryHierarchyNode);
+                return this.PlaylistManager.Add(libraryHierarchyNode, false);
             }
         }
 

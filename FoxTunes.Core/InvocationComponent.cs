@@ -6,6 +6,8 @@ namespace FoxTunes
     {
         public const string CATEGORY_PLAYLIST = "42BC8F63-202C-4F77-8383-04A54FFFDCD5";
 
+        public const string CATEGORY_LIBRARY = "CE91AB2A-3442-4019-B585-C4DCFEF1DB65";
+
         public const byte ATTRIBUTE_SEPARATOR = 1;
 
         public InvocationComponent(string category, string id, string name = null, string description = null, byte attributes = 0)

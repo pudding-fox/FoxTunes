@@ -8,12 +8,23 @@ namespace FoxTunes
     {
         public const string ID = "4E0DD392-1138-4DA8-84C2-69B27D1E34EA";
 
-        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode) : base(ID, sequence)
+        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode, bool clear) : base(ID, sequence)
         {
             this.LibraryHierarchyNode = libraryHierarchyNode;
+            this.Clear = clear;
+        }
+
+        public override bool Visible
+        {
+            get
+            {
+                return true;
+            }
         }
 
         public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
+
+        public bool Clear { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -27,6 +38,10 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction())
             {
+                if (this.Clear)
+                {
+                    this.ClearItems(transaction);
+                }
                 this.AddPlaylistItems(transaction);
                 this.ShiftItems(transaction);
                 this.SequenceItems(transaction);
@@ -38,6 +53,8 @@ namespace FoxTunes
 
         private void AddPlaylistItems(ITransactionSource transaction)
         {
+            this.Name = "Getting file list";
+            this.IsIndeterminate = true;
             this.Offset = this.Database.ExecuteScalar<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, parameters =>
             {
                 parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
