@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +11,7 @@ namespace FoxTunes.Extensions
 {
     public static partial class ListViewExtensions
     {
-        private static readonly Dictionary<ListView, DropInsertBehaviour> DropInsertBehaviours = new Dictionary<ListView, DropInsertBehaviour>();
+        private static readonly ConcurrentDictionary<ListView, DropInsertBehaviour> DropInsertBehaviours = new ConcurrentDictionary<ListView, DropInsertBehaviour>();
 
         public static readonly DependencyProperty DropInsertProperty = DependencyProperty.RegisterAttached(
             "DropInsert",
@@ -36,14 +37,13 @@ namespace FoxTunes.Extensions
             {
                 return;
             }
-            var value = GetDropInsert(listView);
-            if (value && !DropInsertBehaviours.ContainsKey(listView))
+            if (GetDropInsert(listView))
             {
-                DropInsertBehaviours.Add(listView, new DropInsertBehaviour(listView));
+                DropInsertBehaviours.TryAdd(listView, new DropInsertBehaviour(listView));
             }
-            else if (!value && DropInsertBehaviours.ContainsKey(listView))
+            else
             {
-                DropInsertBehaviours.Remove(listView);
+                DropInsertBehaviours.TryRemove(listView);
             }
         }
 
