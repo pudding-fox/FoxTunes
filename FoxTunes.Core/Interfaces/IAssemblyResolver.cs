@@ -6,6 +6,6 @@
 
         void Disable();
 
-        string Resolve(string name);
+        string Resolve(string directoryName, string name);
     }
 }
