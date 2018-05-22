@@ -6,7 +6,6 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
@@ -34,14 +33,14 @@
     </Interactivity:Interaction.Triggers>
     <Grid>
         <ListView ItemsSource="{Binding Mode=OneWay, Source={StaticResource PlaylistItems}}" 
-                  Extensions:ListViewExtensions.SelectedItems="{Binding SelectedItems, Source={StaticResource ViewModel}}"
-                  Extensions:ListViewExtensions.DropInsert="True"
-                  Extensions:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"
-                  Extensions:ListViewExtensions.DropInsertIndex="{Binding InsertIndex, Source={StaticResource ViewModel}}"
-                  Extensions:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}">
-            <Extensions:ListViewExtensions.DropInsertPen>
+                  Windows:ListViewExtensions.SelectedItems="{Binding SelectedItems, Source={StaticResource ViewModel}}"
+                  Windows:ListViewExtensions.DropInsert="True"
+                  Windows:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"
+                  Windows:ListViewExtensions.DropInsertIndex="{Binding InsertIndex, Source={StaticResource ViewModel}}"
+                  Windows:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}">
+            <Windows:ListViewExtensions.DropInsertPen>
                 <Pen Brush="{DynamicResource TextBrush}" Thickness="3"/>
-            </Extensions:ListViewExtensions.DropInsertPen>
+            </Windows:ListViewExtensions.DropInsertPen>
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseDoubleClick">
                     <Interactivity:InvokeCommandAction Command="{Binding PlaySelectedItemCommand, Source={StaticResource ViewModel}}"/>
@@ -51,7 +50,7 @@
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLIST}}"></Windows:Menu>
             </ListView.ContextMenu>
             <ListView.View>
-                <GridView Extensions:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}">
+                <GridView Windows:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}">
                     <GridView.ColumnHeaderContainerStyle>
                         <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
                             <Setter Property="ContextMenu">

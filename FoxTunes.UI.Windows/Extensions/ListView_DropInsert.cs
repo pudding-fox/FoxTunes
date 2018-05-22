@@ -7,7 +7,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace FoxTunes.Extensions
+namespace FoxTunes
 {
     public static partial class ListViewExtensions
     {

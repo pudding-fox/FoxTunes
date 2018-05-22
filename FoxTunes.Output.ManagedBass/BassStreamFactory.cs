@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,6 +18,14 @@ namespace FoxTunes
         }
 
         private SortedList<byte, IBassStreamProvider> Providers { get; set; }
+
+        IEnumerable<IBassStreamProvider> IBassStreamFactory.Providers
+        {
+            get
+            {
+                return this.Providers.Values;
+            }
+        }
 
         public IBassOutput Output { get; private set; }
 

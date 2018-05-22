@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System.Threading.Tasks;
 
-namespace FoxTunes.Behaviours
+namespace FoxTunes
 {
     [Component("D3B587B2-C1AE-4E06-A6C9-592DD7FF157D", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class VariousArtistsBehaviour : StandardBehaviour

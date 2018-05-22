@@ -6,7 +6,6 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:Utilities="clr-namespace:FoxTunes.Utilities"
              mc:Ignorable="d" 

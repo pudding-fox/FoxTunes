@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2043
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core", "FoxTunes.Core\FoxTunes.Core.csproj", "{62CD8F70-8415-4C15-B672-CB18475ABD7E}"
 EndProject
@@ -131,10 +131,10 @@ Global
 		{1599399A-2873-46F5-96CD-56768AFC967E}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{1599399A-2873-46F5-96CD-56768AFC967E}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{1599399A-2873-46F5-96CD-56768AFC967E}.Release|Mixed Platforms.Build.0 = Release|x86
-		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Release|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Release|Mixed Platforms.ActiveCfg = Debug|x86
+		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Release|Mixed Platforms.Build.0 = Debug|x86
 		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Debug|Mixed Platforms.ActiveCfg = Release|Win32
 		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Release|Mixed Platforms.Build.0 = Release|Win32

@@ -1,7 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
-namespace FoxTunes.Behaviours
+namespace FoxTunes
 {
     public class PreemptNextItemBehaviour : StandardBehaviour
     {
@@ -37,22 +38,27 @@ namespace FoxTunes.Behaviours
 
         protected virtual void PlaybackManager_CurrentStream_Stopping(object sender, EventArgs e)
         {
+            this.Preempt();
+        }
+
+        public Task Preempt()
+        {
             var playlistItem = this.PlaylistManager.GetNext();
             if (playlistItem == null)
             {
-                return;
+                return Task.CompletedTask;
             }
             var outputStream = this.OutputStreamQueue.Peek(playlistItem);
             if (outputStream == null)
             {
-                return;
+                return Task.CompletedTask;
             }
             Logger.Write(this, LogLevel.Debug, "Current stream is about to end, pre-empting the next stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-            this.BackgroundTaskRunner.Run(async () =>
+            return this.BackgroundTaskRunner.Run(async () =>
             {
                 if (!await this.Output.Preempt(outputStream))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", outputStream.Id, outputStream.FileName);
+                    Logger.Write(this, LogLevel.Debug, "Pre-empt failed for stream: {0} => {1}", outputStream.Id, outputStream.FileName);
                 }
             });
         }

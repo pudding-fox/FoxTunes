@@ -6,7 +6,6 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:Utilities="clr-namespace:FoxTunes.Utilities"
              x:Class="FoxTunes.LibraryTree"
@@ -32,8 +31,8 @@
         <Windows:LibraryViewMode SelectedLibraryHierarchy="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"></Windows:LibraryViewMode>
         <TreeView x:Name="TreeView" Grid.Row="1" 
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
-                  Extensions:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
-                  Extensions:TreeViewExtensions.RightButtonSelect="True">
+                  Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
+                  Windows:TreeViewExtensions.RightButtonSelect="True">
             <TreeView.Resources>
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
