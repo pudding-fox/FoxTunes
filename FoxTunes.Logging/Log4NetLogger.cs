@@ -7,7 +7,7 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [Component("3DC2C04A-CE99-4416-BC27-068E8AC02F56", ComponentSlots.Logger, priority: ComponentAttribute.PRIORITY_HIGHEST)]
+    [Component("3DC2C04A-CE99-4416-BC27-068E8AC02F56", ComponentSlots.Logger, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class Log4NetLogger : StandardComponent, ILogger
     {
         public bool IsDebugEnabled(IBaseComponent component)

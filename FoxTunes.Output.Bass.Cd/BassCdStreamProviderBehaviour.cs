@@ -1,7 +1,9 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using ManagedBass;
 using ManagedBass.Cd;
+using ManagedBass.Gapless.Cd;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [Component("C051C82C-3391-4DDC-B856-C4BDEA86ADDC", null, priority: ComponentAttribute.PRIORITY_LOW)]
     public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent
     {
         public const string OPEN_CD = "FFFF";
@@ -89,13 +92,21 @@ namespace FoxTunes
 
         protected virtual void OnInit(object sender, EventArgs e)
         {
+            var flags = BassFlags.Decode;
+            if (this.Output.Float)
+            {
+                flags |= BassFlags.Float;
+            }
+            BassUtils.OK(BassGaplessCd.Init());
+            BassUtils.OK(BassGaplessCd.Enable(this.CdDrive, flags));
             BassCd.FreeOld = false;
             Logger.Write(this, LogLevel.Debug, "BASS CD Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
         {
-            //Nothing to do.
+            BassGaplessCd.Disable();
+            BassGaplessCd.Free();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

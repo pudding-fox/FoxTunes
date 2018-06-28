@@ -5,9 +5,9 @@ namespace FoxTunes
 {
     public class BassStreamProvider : BaseComponent, IBassStreamProvider
     {
-        public const byte PRIORITY_HIGHEST = 0;
+        public const byte PRIORITY_HIGH = 0;
 
-        public const byte PRIORITY_HIGH = 100;
+        public const byte PRIORITY_NORMAL = 100;
 
         public const byte PRIORITY_LOW = 255;
 
@@ -15,7 +15,7 @@ namespace FoxTunes
         {
             get
             {
-                return PRIORITY_LOW;
+                return PRIORITY_NORMAL;
             }
         }
 

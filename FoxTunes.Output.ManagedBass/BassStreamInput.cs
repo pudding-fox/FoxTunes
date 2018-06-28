@@ -1,11 +1,14 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public abstract class BassStreamInput : BaseComponent, IBassStreamInput
     {
+        public abstract IEnumerable<int> Queue { get; }
+
         public abstract int Rate { get; protected set; }
 
         public abstract int Channels { get; protected set; }

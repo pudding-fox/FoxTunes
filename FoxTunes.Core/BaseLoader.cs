@@ -37,7 +37,7 @@ namespace FoxTunes
                     var attribute = component.GetType().GetCustomAttribute<ComponentAttribute>();
                     if (attribute == null)
                     {
-                        return ComponentAttribute.PRIORITY_LOW;
+                        return ComponentAttribute.PRIORITY_NORMAL;
                     }
                     return attribute.Priority;
                 };
