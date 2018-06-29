@@ -6,6 +6,10 @@ namespace FoxTunes
 {
     public abstract class BassStreamOutput : BaseComponent, IBassStreamOutput
     {
+        public abstract string Name { get; }
+
+        public abstract string Description { get; }
+
         public abstract int Rate { get; protected set; }
 
         public abstract int Channels { get; protected set; }

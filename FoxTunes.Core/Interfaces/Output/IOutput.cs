@@ -5,6 +5,10 @@ namespace FoxTunes.Interfaces
 {
     public interface IOutput : IStandardComponent
     {
+        string Name { get; }
+
+        string Description { get; }
+
         bool IsStarted { get; }
 
         event EventHandler IsStartedChanged;

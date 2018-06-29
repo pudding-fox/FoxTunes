@@ -48,15 +48,9 @@ namespace FoxTunes
             return this.GetComponents<T>().FirstOrDefault();
         }
 
-        public IEnumerable<T> GetComponents<T>() where T : IBaseComponent
+        public IEnumerable<T> GetComponents<T>()
         {
-            foreach (var component in this.Components)
-            {
-                if (component is T)
-                {
-                    yield return (T)component;
-                }
-            }
+            return this.Components.OfType<T>();
         }
 
         public void ReplaceComponents<T>(params T[] components) where T : IBaseComponent
@@ -83,7 +77,7 @@ namespace FoxTunes
             }
         }
 
-        public void ForEach<T>(Action<T> action) where T : IBaseComponent
+        public void ForEach<T>(Action<T> action)
         {
             foreach (var component in this.GetComponents<T>().ToArray())
             {

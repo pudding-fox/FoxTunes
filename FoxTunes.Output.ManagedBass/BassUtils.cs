@@ -29,6 +29,54 @@ namespace FoxTunes
             }
         }
 
+        public static string DepthDescription(BassFlags flags)
+        {
+            if (flags.HasFlag(BassFlags.DSDRaw))
+            {
+                return "DSD";
+            }
+            if (flags.HasFlag(BassFlags.Float))
+            {
+                return "32";
+            }
+            return "16";
+        }
+
+        public static string RateDescription(int rate)
+        {
+            var a = default(float);
+            var suffix = default(string);
+            if (rate < 1000000)
+            {
+                a = rate / 1000f;
+                suffix = "k";
+            }
+            else
+            {
+                a = rate / 1000000f;
+                suffix = "m";
+            }
+            return string.Format("{0:0.#}{1}Hz", a, suffix);
+        }
+
+        public static string ChannelDescription(int channels)
+        {
+            switch (channels)
+            {
+                case 1:
+                    return "mono";
+                case 2:
+                    return "stereo";
+                case 4:
+                    return "quad";
+                case 6:
+                    return "5.1";
+                case 8:
+                    return "7.1";
+            }
+            return string.Format("{0} channels", channels);
+        }
+
         public static bool OK(bool result)
         {
             if (!result)

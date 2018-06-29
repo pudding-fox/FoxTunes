@@ -7,6 +7,10 @@ namespace FoxTunes
 {
     public abstract class BassStreamInput : BaseComponent, IBassStreamInput
     {
+        public abstract string Name { get; }
+
+        public abstract string Description { get; }
+
         public abstract IEnumerable<int> Queue { get; }
 
         public abstract int Rate { get; protected set; }

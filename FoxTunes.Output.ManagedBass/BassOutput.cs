@@ -2,6 +2,7 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +19,35 @@ namespace FoxTunes
         const int START_ATTEMPTS = 5;
 
         const int START_ATTEMPT_INTERVAL = 400;
+
+        public override string Name
+        {
+            get
+            {
+                return "BASS";
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                var builder = new StringBuilder();
+                builder.Append(this.Name);
+                builder.Append(string.Format(" v{0}", Bass.Version));
+                if (this.Pipeline != null)
+                {
+                    builder.AppendLine();
+                    builder.AppendLine(string.Format("Input = {0}", this.Pipeline.Input.Description));
+                    foreach (var component in this.Pipeline.Components)
+                    {
+                        builder.AppendLine(string.Format("Component = {0}", component.Description));
+                    }
+                    builder.Append(string.Format("Output = {0}", this.Pipeline.Output.Description));
+                }
+                return builder.ToString();
+            }
+        }
 
         public ICore Core { get; private set; }
 

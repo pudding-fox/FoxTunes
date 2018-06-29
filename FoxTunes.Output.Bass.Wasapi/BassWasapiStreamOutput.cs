@@ -33,6 +33,28 @@ namespace FoxTunes
             this.Flags = BassFlags.Decode | BassFlags.Float;
         }
 
+        public override string Name
+        {
+            get
+            {
+                return "WASAPI";
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                return string.Format(
+                    "{0} ({1}/{2} {3})",
+                    this.Name,
+                    BassUtils.DepthDescription(this.Flags),
+                    BassUtils.RateDescription(this.Rate),
+                    BassUtils.ChannelDescription(this.Channels)
+                );
+            }
+        }
+
         public BassWasapiStreamOutputBehaviour Behaviour { get; private set; }
 
         public int Device

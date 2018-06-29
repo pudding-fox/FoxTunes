@@ -69,12 +69,8 @@ namespace FoxTunes
 
         protected virtual void LoadConfiguration()
         {
-            ComponentRegistry.Instance.ForEach(component =>
+            ComponentRegistry.Instance.ForEach<IConfigurableComponent>(component =>
             {
-                if (!(component is IConfigurableComponent))
-                {
-                    return;
-                }
                 var sections = (component as IConfigurableComponent).GetConfigurationSections();
                 foreach (var section in sections)
                 {
@@ -108,14 +104,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            ComponentRegistry.Instance.ForEach(component =>
-            {
-                if (!(component is IDisposable))
-                {
-                    return;
-                }
-                (component as IDisposable).Dispose();
-            });
+            ComponentRegistry.Instance.ForEach<IDisposable>(component => component.Dispose());
             ComponentRegistry.Instance.Clear();
         }
 

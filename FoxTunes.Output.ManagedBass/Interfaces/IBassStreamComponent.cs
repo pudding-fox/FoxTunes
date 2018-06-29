@@ -5,6 +5,10 @@ namespace FoxTunes.Interfaces
 {
     public interface IBassStreamComponent : IDisposable
     {
+        string Name { get; }
+
+        string Description { get; }
+
         int Rate { get; }
 
         int Channels { get; }
