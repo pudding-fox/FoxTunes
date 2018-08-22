@@ -50,10 +50,10 @@ namespace FoxTunes
             {
                 return Task.CompletedTask;
             }
-            return this.Error(this, new ComponentOutputErrorEventArgs(message, exception));
+            return this.Error(this, new ComponentErrorEventArgs(message, exception));
         }
 
         [field: NonSerialized]
-        public event ComponentOutputErrorEventHandler Error;
+        public event ComponentErrorEventHandler Error;
     }
 }

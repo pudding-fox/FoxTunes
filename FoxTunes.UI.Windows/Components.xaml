@@ -27,7 +27,8 @@
                     BorderBrush="{DynamicResource NormalBorderBrush}" 
                     BorderThickness="1" 
                     CornerRadius="8,8,3,3" 
-                    Padding="10">
+                    Padding="10"
+                    MinWidth="300">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
