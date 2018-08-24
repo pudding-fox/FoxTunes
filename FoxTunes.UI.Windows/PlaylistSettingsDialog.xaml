@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
@@ -18,18 +17,58 @@
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock>Playlist Settings</TextBlock>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding PlaylistColumns, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPlaylistColumn, Converter={StaticResource DataGridSelectedItemConverter}, Source={StaticResource ViewModel}}" MinHeight="300" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Margin="0,7,0,0">
-            <!--<Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="CellEditEnding">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=UpdateCommand}"></Interactivity:InvokeCommandAction>
-                </Interactivity:EventTrigger>
-            </Interactivity:Interaction.Triggers>-->
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Script" Binding="{Binding DisplayScript}"></DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <TextBlock Grid.Row="0">Playlist Settings</TextBlock>
+        <GroupBox Grid.Row="1" Header="Columns" Padding="0,7,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="175"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <ListBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding PlaylistColumns, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPlaylistColumn, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
+                <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Width" Value="60"></Setter>
+                            <Setter Property="Height" Value="30"></Setter>
+                            <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Command="{Binding NewCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                    <Button Command="{Binding DeleteCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                </StackPanel>
+                <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding SelectedPlaylistColumn, Source={StaticResource ViewModel}}">
+                    <Grid.Style>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="IsEnabled" Value="True"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                    <Setter Property="IsEnabled" Value="False"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="300"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Column="0" Grid.Row="0">Name</Label>
+                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}"></TextBox>
+                    <Label Grid.Column="0" Grid.Row="1">Dynamic</Label>
+                    <CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="{Binding IsDynamic}"></CheckBox>
+                    <Label Grid.Column="0" Grid.Row="2">Script</Label>
+                    <TextBox Grid.Column="1" Grid.Row="2" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" TextWrapping="Wrap" Text="{Binding DisplayScript}"></TextBox>
+                </Grid>
+            </Grid>
+        </GroupBox>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">

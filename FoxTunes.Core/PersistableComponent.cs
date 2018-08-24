@@ -16,6 +16,11 @@ namespace FoxTunes
             {
                 return true;
             }
+            if (this.Id == 0)
+            {
+                //Un-persisted data is never equal.
+                return false;
+            }
             return this.Id == other.Id;
         }
 
@@ -26,6 +31,11 @@ namespace FoxTunes
 
         public override int GetHashCode()
         {
+            if (this.Id == 0)
+            {
+                //Un-persisted data uses default hash code implementation. 
+                return base.GetHashCode();
+            }
             return this.Id.GetHashCode();
         }
 
