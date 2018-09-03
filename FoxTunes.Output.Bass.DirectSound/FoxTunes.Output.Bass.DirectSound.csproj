@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedBass, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ManagedBass.2.0.4\lib\net45\ManagedBass.dll</HintPath>
+      <HintPath>..\packages\ManagedBass.2.0.0\lib\net45\ManagedBass.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Mix, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedBass.Mix.2.1.0\lib\netstandard1.4\ManagedBass.Mix.dll</HintPath>
@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BassDirectSoundDevice.cs" />
+    <Compile Include="BassDirectSoundMonitorBehaviour.cs" />
     <Compile Include="BassDirectSoundStreamOutput.cs" />
     <Compile Include="BassDirectSoundStreamOutputBehaviour.cs" />
     <Compile Include="BassDirectSoundStreamOutputConfiguration.cs" />

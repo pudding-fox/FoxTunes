@@ -61,10 +61,6 @@ namespace FoxTunes
 
         public static void Init(int device, bool exclusive, bool eventDriven, int frequency = 0, int channels = 0)
         {
-            if (IsInitialized)
-            {
-                Free();
-            }
             LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initializing BASS WASAPI.");
             var flags = WasapiInitFlags.Shared;
             if (exclusive)

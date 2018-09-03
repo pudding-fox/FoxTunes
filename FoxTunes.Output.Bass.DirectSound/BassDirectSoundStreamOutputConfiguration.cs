@@ -25,7 +25,7 @@ namespace FoxTunes
         {
             if (!string.Equals(value, Bass.DefaultDevice.ToString()))
             {
-                for (var a = 0; a < Bass.DeviceCount; a++)
+                for (int a = 0, b = Bass.DeviceCount; a < b; a++)
                 {
                     var deviceInfo = default(DeviceInfo);
                     BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
@@ -41,7 +41,7 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetDSDevices()
         {
             yield return new SelectionConfigurationOption(Bass.DefaultDevice.ToString(), "Default Device").Default();
-            for (var a = 0; a < Bass.DeviceCount; a++)
+            for (int a = 0, b = Bass.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(DeviceInfo);
                 BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
