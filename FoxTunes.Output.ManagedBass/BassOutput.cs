@@ -335,7 +335,18 @@ namespace FoxTunes
         protected virtual IBassStreamPipeline CreatePipeline(BassOutputStream stream)
         {
             Logger.Write(this, LogLevel.Debug, "Creating pipeline for stream: {0}", stream.ChannelHandle);
-            var pipeline = this.PipelineFactory.CreatePipeline(stream);
+            var pipeline = default(IBassStreamPipeline);
+            try
+            {
+                pipeline = this.PipelineFactory.CreatePipeline(stream);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Failed to create pipeline: {0}", e.Message);
+                //TODO: Bad .Wait()
+                this.Shutdown().Wait();
+                throw;
+            }
             pipeline.Input.Add(stream.ChannelHandle);
             pipeline.Error += this.OnPipelineError;
             return pipeline;

@@ -47,6 +47,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BassWasapiMonitorBehaviour.cs" />
     <Compile Include="BassWasapiDevice.cs" />
     <Compile Include="BassWasapiHandler.cs" />
     <Compile Include="BassWasapiStreamOutput.cs" />

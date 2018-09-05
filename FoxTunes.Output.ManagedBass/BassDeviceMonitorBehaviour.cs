@@ -35,7 +35,7 @@ namespace FoxTunes
             }
         }
 
-        public override void InitializeComponent(Interfaces.ICore core)
+        public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
