@@ -52,6 +52,7 @@
     <Compile Include="Components.xaml.cs">
       <DependentUpon>Components.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\Command_Decorator.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\GridView_ColumnsSource.cs" />
     <Compile Include="Extensions\ListView_DropInsert.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="ViewModel\Artwork.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
+    <Compile Include="ViewModel\CommandBase.cs" />
     <Compile Include="ViewModel\Components.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />

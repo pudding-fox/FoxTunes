@@ -1,11 +1,8 @@
-﻿using FoxTunes.Interfaces;
-using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System;
 
 namespace FoxTunes.ViewModel
 {
-    public class Command : ICommand
+    public class Command : CommandBase
     {
         public Command(Action action)
             : this(action, null)
@@ -23,7 +20,7 @@ namespace FoxTunes.ViewModel
 
         public Func<bool> Predicate { get; private set; }
 
-        public bool CanExecute(object parameter)
+        public override bool CanExecute(object parameter)
         {
             if (this.Predicate == null)
             {
@@ -32,33 +29,7 @@ namespace FoxTunes.ViewModel
             return this.Predicate();
         }
 
-        protected virtual void OnCanExecuteChanged()
-        {
-            if (this._CanExecuteChanged == null)
-            {
-                return;
-            }
-            this._CanExecuteChanged(this, EventArgs.Empty);
-        }
-
-        public event EventHandler _CanExecuteChanged = delegate { };
-
-        public event EventHandler CanExecuteChanged
-        {
-            add
-            {
-                CommandManager.RequerySuggested += value;
-                this._CanExecuteChanged += value;
-            }
-
-            remove
-            {
-                CommandManager.RequerySuggested -= value;
-                this._CanExecuteChanged -= value;
-            }
-        }
-
-        public void Execute(object parameter)
+        public override void Execute(object parameter)
         {
             if (!this.CanExecute(parameter))
             {
@@ -68,28 +39,21 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.Action();
+            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
+            try
+            {
+                this.Action();
+                this.OnPhase(CommandPhase.After, this.Tag, parameter);
+            }
+            catch
+            {
+                //TODO: Logging.
+            }
             InvalidateRequerySuggested();
         }
-
-        public static Task InvalidateRequerySuggested()
-        {
-            var foregroundTaskRunner = ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>();
-            if (foregroundTaskRunner != null)
-            {
-                return foregroundTaskRunner.RunAsync(() => CommandManager.InvalidateRequerySuggested());
-            }
-            else
-            {
-                CommandManager.InvalidateRequerySuggested();
-                return Task.CompletedTask;
-            }
-        }
-
-        public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);
     }
 
-    public class Command<T> : ICommand
+    public class Command<T> : CommandBase
     {
         public Command(Action<T> action)
             : this(action, null)
@@ -107,7 +71,7 @@ namespace FoxTunes.ViewModel
 
         public Func<T, bool> Predicate { get; private set; }
 
-        public bool CanExecute(object parameter)
+        public override bool CanExecute(object parameter)
         {
             if (this.Predicate == null)
             {
@@ -116,33 +80,7 @@ namespace FoxTunes.ViewModel
             return this.Predicate((T)parameter);
         }
 
-        protected virtual void OnCanExecuteChanged()
-        {
-            if (this._CanExecuteChanged == null)
-            {
-                return;
-            }
-            this._CanExecuteChanged(this, EventArgs.Empty);
-        }
-
-        public event EventHandler _CanExecuteChanged = delegate { };
-
-        public event EventHandler CanExecuteChanged
-        {
-            add
-            {
-                CommandManager.RequerySuggested += value;
-                this._CanExecuteChanged += value;
-            }
-
-            remove
-            {
-                CommandManager.RequerySuggested -= value;
-                this._CanExecuteChanged -= value;
-            }
-        }
-
-        public void Execute(object parameter)
+        public override void Execute(object parameter)
         {
             if (!this.CanExecute(parameter))
             {
@@ -152,8 +90,22 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.Action((T)parameter);
-            Command.InvalidateRequerySuggested();
+            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
+            try
+            {
+                this.Action((T)parameter);
+                this.OnPhase(CommandPhase.After, this.Tag, parameter);
+            }
+            catch
+            {
+                //TODO: Logging.
+            }
+            InvalidateRequerySuggested();
         }
+    }
+
+    public static class CommandHints
+    {
+        public const string DISMISS = "CommandHints.Dismiss";
     }
 }

@@ -10,6 +10,18 @@ namespace FoxTunes.Utilities
 {
     public class MouseCursorAdorner : UIElement
     {
+        public static readonly DependencyProperty FlowDirectionProperty = Block.FlowDirectionProperty.AddOwner(typeof(MouseCursorAdorner));
+
+        public static FlowDirection GetFlowDirection(MouseCursorAdorner source)
+        {
+            return (FlowDirection)source.GetValue(FlowDirectionProperty);
+        }
+
+        public static void SetFlowDirection(MouseCursorAdorner source, FlowDirection value)
+        {
+            source.SetValue(FlowDirectionProperty, value);
+        }
+
         public static readonly DependencyProperty TemplateProperty = DependencyProperty.Register(
             "Template",
             typeof(DataTemplate),

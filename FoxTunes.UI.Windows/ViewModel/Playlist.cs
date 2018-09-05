@@ -261,14 +261,6 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public ICommand SettingsCommand
-        {
-            get
-            {
-                return new Command(() => this.SettingsVisible = true);
-            }
-        }
-
         public ICommand DragEnterCommand
         {
             get
@@ -389,32 +381,6 @@ namespace FoxTunes.ViewModel
         {
             this.GridColumns = new ObservableCollection<GridViewColumn>(this.GetGridColumns());
         }
-
-        private bool _SettingsVisible { get; set; }
-
-        public bool SettingsVisible
-        {
-            get
-            {
-                return this._SettingsVisible;
-            }
-            set
-            {
-                this._SettingsVisible = value;
-                this.OnSettingsVisibleChanged();
-            }
-        }
-
-        protected virtual void OnSettingsVisibleChanged()
-        {
-            if (this.SettingsVisibleChanged != null)
-            {
-                this.SettingsVisibleChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SettingsVisible");
-        }
-
-        public event EventHandler SettingsVisibleChanged = delegate { };
 
         protected override Freezable CreateInstanceCore()
         {

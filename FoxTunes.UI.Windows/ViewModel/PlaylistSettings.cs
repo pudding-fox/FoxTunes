@@ -104,7 +104,10 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Save);
+                return new Command(this.Save)
+                {
+                    Tag = CommandHints.DISMISS
+                };
             }
         }
 
@@ -124,7 +127,24 @@ namespace FoxTunes.ViewModel
             catch (Exception e)
             {
                 this.OnError("Save", e);
+                throw;
             }
+        }
+
+        public ICommand CancelCommand
+        {
+            get
+            {
+                return new Command(this.Cancel)
+                {
+                    Tag = CommandHints.DISMISS
+                };
+            }
+        }
+
+        public void Cancel()
+        {
+            this.Refresh();
         }
 
         protected override void OnCoreChanged()

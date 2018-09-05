@@ -1,11 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class AsyncCommand : ICommand
+    public class AsyncCommand : CommandBase
     {
         public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func)
         {
@@ -31,9 +30,9 @@ namespace FoxTunes.ViewModel
 
         public Func<Task<bool>> AsyncPredicate { get; private set; }
 
-        public bool? CanExecute { get; private set; }
+        public bool? _CanExecute { get; private set; }
 
-        bool ICommand.CanExecute(object parameter)
+        public override bool CanExecute(object parameter)
         {
             if (this.Predicate != null)
             {
@@ -46,17 +45,17 @@ namespace FoxTunes.ViewModel
                     //TODO: Bad .Wait()
                     this.BackgroundTaskRunner.Run(() => this.AsyncPredicate().ContinueWith(async task =>
                     {
-                        if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
+                        if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
                         {
                             return;
                         }
-                        this.CanExecute = task.Result;
+                        this._CanExecute = task.Result;
                         await InvalidateRequerySuggested();
                     })).Wait();
                 }
-                if (this.CanExecute.HasValue)
+                if (this._CanExecute.HasValue)
                 {
-                    return this.CanExecute.Value;
+                    return this._CanExecute.Value;
                 }
                 else
                 {
@@ -69,59 +68,27 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void OnCanExecuteChanged()
-        {
-            if (this._CanExecuteChanged == null)
-            {
-                return;
-            }
-            this._CanExecuteChanged(this, EventArgs.Empty);
-        }
-
-        public event EventHandler _CanExecuteChanged = delegate { };
-
-        public event EventHandler CanExecuteChanged
-        {
-            add
-            {
-                CommandManager.RequerySuggested += value;
-                this._CanExecuteChanged += value;
-            }
-
-            remove
-            {
-                CommandManager.RequerySuggested -= value;
-                this._CanExecuteChanged -= value;
-            }
-        }
-
-        public void Execute(object parameter)
+        public override void Execute(object parameter)
         {
             if (this.Func == null)
             {
                 return;
             }
-            this.Func().ContinueWith(async task => await InvalidateRequerySuggested());
-        }
-
-        public static Task InvalidateRequerySuggested()
-        {
-            var foregroundTaskRunner = ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>();
-            if (foregroundTaskRunner != null)
+            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
+            this.Func().ContinueWith(async task =>
             {
-                return foregroundTaskRunner.RunAsync(() => CommandManager.InvalidateRequerySuggested());
-            }
-            else
-            {
-                CommandManager.InvalidateRequerySuggested();
-                return Task.CompletedTask;
-            }
+                if (task.IsFaulted)
+                {
+                    //TODO: Logging.
+                    return;
+                }
+                this.OnPhase(CommandPhase.After, this.Tag, parameter);
+                await InvalidateRequerySuggested();
+            });
         }
-
-        public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);
     }
 
-    public class AsyncCommand<T> : ICommand
+    public class AsyncCommand<T> : CommandBase
     {
         public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func)
         {
@@ -147,10 +114,11 @@ namespace FoxTunes.ViewModel
 
         public Func<T, Task<bool>> AsyncPredicate { get; private set; }
 
-        public bool? CanExecute { get; private set; }
+        public bool? _CanExecute { get; private set; }
 
-        bool ICommand.CanExecute(object parameter)
+        public override bool CanExecute(object parameter)
         {
+
             if (this.Predicate != null)
             {
                 return this.Predicate((T)parameter);
@@ -162,17 +130,17 @@ namespace FoxTunes.ViewModel
                     //TODO: Bad .Wait()
                     this.BackgroundTaskRunner.Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
                     {
-                        if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
+                        if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
                         {
                             return;
                         }
-                        this.CanExecute = task.Result;
-                        await Command.InvalidateRequerySuggested();
+                        this._CanExecute = task.Result;
+                        await InvalidateRequerySuggested();
                     })).Wait();
                 }
-                if (this.CanExecute.HasValue)
+                if (this._CanExecute.HasValue)
                 {
-                    return this.CanExecute.Value;
+                    return this._CanExecute.Value;
                 }
                 else
                 {
@@ -185,39 +153,23 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void OnCanExecuteChanged()
-        {
-            if (this._CanExecuteChanged == null)
-            {
-                return;
-            }
-            this._CanExecuteChanged(this, EventArgs.Empty);
-        }
-
-        public event EventHandler _CanExecuteChanged = delegate { };
-
-        public event EventHandler CanExecuteChanged
-        {
-            add
-            {
-                CommandManager.RequerySuggested += value;
-                this._CanExecuteChanged += value;
-            }
-
-            remove
-            {
-                CommandManager.RequerySuggested -= value;
-                this._CanExecuteChanged -= value;
-            }
-        }
-
-        public void Execute(object parameter)
+        public override void Execute(object parameter)
         {
             if (this.Func == null)
             {
                 return;
             }
-            this.Func((T)parameter).ContinueWith(async task => await Command.InvalidateRequerySuggested());
+            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
+            this.Func((T)parameter).ContinueWith(async task =>
+            {
+                if (task.IsFaulted)
+                {
+                    //TODO: Logging.
+                    return;
+                }
+                this.OnPhase(CommandPhase.After, this.Tag, parameter);
+                await InvalidateRequerySuggested();
+            });
         }
     }
 }

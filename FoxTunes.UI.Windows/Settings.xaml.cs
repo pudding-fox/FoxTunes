@@ -1,5 +1,4 @@
 ﻿using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 
 namespace FoxTunes
 {
@@ -10,7 +9,7 @@ namespace FoxTunes
     {
         public Settings()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

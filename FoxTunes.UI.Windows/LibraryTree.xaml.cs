@@ -1,7 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using FoxTunes.ViewModel;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
