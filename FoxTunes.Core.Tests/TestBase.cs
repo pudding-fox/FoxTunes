@@ -14,6 +14,14 @@ namespace FoxTunes
             AssemblyResolver.Instance.Enable();
         }
 
+        public static string Unique
+        {
+            get
+            {
+                return Guid.NewGuid().ToString("d").Split('-')[0];
+            }
+        }
+
         protected TestBase()
             : this(DEFAULT)
         {

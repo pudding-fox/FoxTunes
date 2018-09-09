@@ -45,8 +45,12 @@
     <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
+    <Compile Include="Configuration\FileAssociation.cs" />
+    <Compile Include="Configuration\FileAssociations.cs" />
     <Compile Include="Configuration\TextConfigurationElement.cs" />
     <Compile Include="CoreValidator.cs" />
+    <Compile Include="Interfaces\Configuration\IFileAssociation.cs" />
+    <Compile Include="Interfaces\Configuration\IFileAssociations.cs" />
     <Compile Include="Interfaces\IInvocableComponent.cs" />
     <Compile Include="Interfaces\IInvocationComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />
