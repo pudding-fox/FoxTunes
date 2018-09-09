@@ -227,11 +227,18 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public override IEnumerable<string> SupportedExtensions
+        {
+            get
+            {
+                return BassUtils.GetInputFormats();
+            }
+        }
+
         public override bool IsSupported(string fileName)
         {
-            return BassUtils
-                .GetInputFormats()
-                .Contains(fileName.GetExtension(), true);
+            var extension = fileName.GetExtension();
+            return BassUtils.IsSupported(extension);
         }
 
         public override async Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate)

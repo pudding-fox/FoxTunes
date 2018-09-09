@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
@@ -14,6 +15,8 @@ namespace FoxTunes.Interfaces
         event EventHandler IsStartedChanged;
 
         Task Start();
+
+        IEnumerable<string> SupportedExtensions { get; }
 
         bool IsSupported(string fileName);
 

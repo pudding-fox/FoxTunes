@@ -20,6 +20,8 @@ namespace FoxTunes.Interfaces
 
         Task Play(PlaylistItem playlistItem);
 
+        Task Play(string fileName);
+
         bool CanNavigate { get; }
 
         PlaylistItem GetNext();

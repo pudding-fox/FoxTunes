@@ -12,15 +12,29 @@ namespace FoxTunes.Launcher
         [STAThread]
         public static void Main(string[] args)
         {
-            Log4NetLogger.EnableFileAppender();
-            using (var core = new Core())
+            using (var server = new Server())
             {
-                core.Load();
-                if (!CoreValidator.Instance.Validate(core))
+                if (server.IsDisposed)
                 {
-                    throw new InvalidOperationException("One or more required components were not loaded.");
+                    var client = new Client();
+                    //TODO: Bad .Wait()
+                    client.Send(Environment.CommandLine).Wait();
+                    return;
                 }
-                core.Components.UserInterface.Show();
+                Log4NetLogger.EnableFileAppender();
+                using (var core = new Core())
+                {
+                    core.Load();
+                    if (!CoreValidator.Instance.Validate(core))
+                    {
+                        throw new InvalidOperationException("One or more required components were not loaded.");
+                    }
+                    server.Message += (sender, e) =>
+                    {
+                        core.Components.UserInterface.Run(e.Message);
+                    };
+                    core.Components.UserInterface.Show();
+                }
             }
         }
     }

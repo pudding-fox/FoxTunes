@@ -44,6 +44,9 @@
     <Compile Include="Artwork.xaml.cs">
       <DependentUpon>Artwork.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AssociationsDialog.xaml.cs">
+      <DependentUpon>AssociationsDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BackgroundTasks.xaml.cs">
       <DependentUpon>BackgroundTasks.xaml</DependentUpon>
     </Compile>
@@ -119,6 +122,7 @@
     <Compile Include="Utilities\MouseCursorAdorner.cs" />
     <Compile Include="Utilities\RefreshableGridViewColumn.cs" />
     <Compile Include="ViewModel\Artwork.cs" />
+    <Compile Include="ViewModel\Associations.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
     <Compile Include="ViewModel\CommandBase.cs" />
@@ -161,6 +165,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Page Include="Artwork.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AssociationsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
