@@ -66,10 +66,10 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var fileName = match.Value;
-                if (File.Exists(fileName) && this.Output.IsSupported(fileName))
+                var path = match.Value;
+                if ((File.Exists(path) && this.Output.IsSupported(path)) || Directory.Exists(path))
                 {
-                    this.Queue.Enqueue(fileName);
+                    this.Queue.Enqueue(path);
                 }
             }
         }

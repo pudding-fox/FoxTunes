@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -56,6 +57,7 @@ namespace FoxTunes
 
         public void Enable()
         {
+            AddShortcuts(this.Create(null));
             AddProgram(this.Create(null));
         }
 
@@ -66,6 +68,7 @@ namespace FoxTunes
 
         public void Disable()
         {
+            RemoveShortcuts(this.Create(null));
             RemoveProgram(this.Create(null));
         }
 
@@ -119,10 +122,36 @@ namespace FoxTunes
             }
         }
 
+        private static bool AddShortcuts(IFileAssociation association)
+        {
+            Shell.CreateShortcut(
+                Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.SendTo),
+                    string.Format("{0}.lnk", association.ProgId)
+                ),
+                association.ExecutableFilePath
+            );
+            return true;
+        }
+
         private static bool AddProgram(IFileAssociation association)
         {
             var path = string.Format(@"Software\Classes\{0}\shell\open\command", association.ProgId);
             return SetKeyValue(path, GetOpenString(association.ExecutableFilePath));
+        }
+
+        private static bool RemoveShortcuts(IFileAssociation association)
+        {
+            var fileName = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.SendTo),
+                string.Format("{0}.lnk", association.ProgId)
+            );
+            if (!global::System.IO.File.Exists(fileName))
+            {
+                return false;
+            }
+            global::System.IO.File.Delete(fileName);
+            return true;
         }
 
         private static bool RemoveProgram(IFileAssociation association)
