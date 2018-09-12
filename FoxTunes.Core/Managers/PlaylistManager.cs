@@ -251,6 +251,13 @@ namespace FoxTunes.Managers
             }
         }
 
+        protected virtual PlaylistItem GetPlaylistItem(int sequence)
+        {
+            return this.Database.AsQueryable<PlaylistItem>()
+                .Where(playlistItem => playlistItem.Sequence == sequence)
+                .FirstOrDefault();
+        }
+
         protected virtual PlaylistItem GetPlaylistItem(string fileName)
         {
             return this.Database.AsQueryable<PlaylistItem>()
@@ -323,6 +330,16 @@ namespace FoxTunes.Managers
         public async Task Play(string fileName)
         {
             var playlistItem = this.GetPlaylistItem(fileName);
+            if (playlistItem == null)
+            {
+                return;
+            }
+            await this.Play(playlistItem);
+        }
+
+        public async Task Play(int sequence)
+        {
+            var playlistItem = this.GetPlaylistItem(sequence);
             if (playlistItem == null)
             {
                 return;

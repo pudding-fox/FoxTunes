@@ -42,6 +42,7 @@
     <Compile Include="DatabaseTests.cs" />
     <Compile Include="FileAssociationTests.cs" />
     <Compile Include="LibraryTests.cs" />
+    <Compile Include="PendingQueueTests.cs" />
     <Compile Include="PlaylistTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks.cs" />
