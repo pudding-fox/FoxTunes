@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Threading.Tasks;
 using System.Linq;
+using FoxDb;
 
 namespace FoxTunes
 {
@@ -33,6 +34,48 @@ namespace FoxTunes
                 TestInfo.AudioFileNames[3]
             );
             await this.Core.Managers.Playlist.Clear();
+        }
+
+        [Test]
+        public async Task CanMoveItemsInPlaylist()
+        {
+            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Add(new[]
+            {
+                TestInfo.AudioFileNames[0],
+                TestInfo.AudioFileNames[1],
+                TestInfo.AudioFileNames[2]
+            }, false);
+            await this.Core.Managers.Playlist.Move(
+                0,
+                new[]
+                {
+                    this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+                }
+            );
+            this.AssertPlaylistItems(
+                TestInfo.AudioFileNames[2],
+                TestInfo.AudioFileNames[0],
+                TestInfo.AudioFileNames[1]
+            );
+            await this.Core.Managers.Playlist.Move(
+                2,
+                new[]
+                {
+                    this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+                }
+            );
+            this.AssertPlaylistItems(
+                TestInfo.AudioFileNames[0],
+                TestInfo.AudioFileNames[1],
+                TestInfo.AudioFileNames[2]
+            );
+        }
+
+        protected virtual PlaylistItem GetPlaylistItem(string fileName)
+        {
+            return this.Core.Components.Database.AsQueryable<PlaylistItem>()
+                .FirstOrDefault(playlistItem => playlistItem.FileName == fileName);
         }
 
         protected virtual void AssertPlaylistItems(params string[] fileNames)

@@ -60,6 +60,8 @@
     <Compile Include="Extensions\GridView_ColumnsSource.cs" />
     <Compile Include="Extensions\ListView_DropInsert.cs" />
     <Compile Include="Extensions\ListView_SelectedItems.cs" />
+    <Compile Include="Extensions\ListView_DragSource.cs" />
+    <Compile Include="Extensions\TreeView_DragSource.cs" />
     <Compile Include="Extensions\TreeView_RightButtonSelect.cs" />
     <Compile Include="Extensions\TreeView_SelectedItem.cs" />
     <Compile Include="Integration\Explorer.cs" />

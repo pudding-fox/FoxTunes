@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public static partial class DependencyObjectExtensions
+    public static partial class Extensions
     {
         public static T FindAncestor<T>(this DependencyObject visual) where T : DependencyObject
         {
@@ -23,20 +23,30 @@ namespace FoxTunes
             return element.FindResource(resourceKey) as T;
         }
 
-        public static T GetData<T>(this IDataObject dataObject) where T : class
+        public static bool GetDataPresent<T>(this IDataObject dataObject, bool inferType)
         {
-            return dataObject.GetData(typeof(T)) as T;
+            foreach (var format in dataObject.GetFormats())
+            {
+                var data = dataObject.GetData(format);
+                if (data is T)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public static bool TryGetData<T>(this IDataObject dataObject, out T data) where T : class
+        public static T GetData<T>(this IDataObject dataObject, bool inferType)
         {
-            if (!dataObject.GetDataPresent(typeof(T)))
+            foreach (var format in dataObject.GetFormats())
             {
-                data = default(T);
-                return false;
+                var data = dataObject.GetData(format);
+                if (data is T)
+                {
+                    return (T)data;
+                }
             }
-            data = dataObject.GetData<T>();
-            return true;
+            return default(T);
         }
     }
 }

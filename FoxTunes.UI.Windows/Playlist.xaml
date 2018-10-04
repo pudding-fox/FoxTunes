@@ -37,7 +37,9 @@
                   Windows:ListViewExtensions.DropInsert="True"
                   Windows:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DropInsertIndex="{Binding InsertIndex, Source={StaticResource ViewModel}}"
-                  Windows:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}">
+                  Windows:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}"
+                  Windows:ListViewExtensions.DragSource="True"
+                  Windows:ListViewExtensions.DragSourceInitialized="DragSourceInitialized">
             <Windows:ListViewExtensions.DropInsertPen>
                 <Pen Brush="{DynamicResource TextBrush}" Thickness="3"/>
             </Windows:ListViewExtensions.DropInsertPen>

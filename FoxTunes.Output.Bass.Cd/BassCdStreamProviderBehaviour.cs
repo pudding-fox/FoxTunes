@@ -201,7 +201,7 @@ namespace FoxTunes
                     using (ITransactionSource transaction = this.Database.BeginTransaction())
                     {
                         this.AddPlaylistItems(transaction);
-                        this.ShiftItems(transaction);
+                        this.ShiftItems(transaction, QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
                         this.AddOrUpdateMetaData(transaction);
                         this.SetPlaylistItemsStatus(transaction);
                         transaction.Commit();
