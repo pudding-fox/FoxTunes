@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using FoxDb;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using FoxDb;
-using FoxDb.Interfaces;
 
 namespace FoxTunes
 {
@@ -23,12 +22,11 @@ namespace FoxTunes
             var query = this.Database.QueryFactory.Delete(this.Database.Tables.PlaylistItem).Build();
             using (var transaction = this.Database.BeginTransaction())
             {
-                var parameters = default(IDatabaseParameters);
-                using (var command = this.Database.CreateCommand(query, out parameters, transaction))
+                using (var command = this.Database.CreateCommand(query, transaction))
                 {
                     foreach (var playlistItem in this.PlaylistItems)
                     {
-                        parameters[Conventions.ParameterName(this.Database.Tables.PlaylistItem.PrimaryKey)] = playlistItem.Id;
+                        command.Parameters[Conventions.ParameterName(this.Database.Tables.PlaylistItem.PrimaryKey)] = playlistItem.Id;
                         command.ExecuteNonQuery();
                     }
                 }

@@ -3,7 +3,6 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace FoxTunes
 {
@@ -11,16 +10,12 @@ namespace FoxTunes
     {
         public LibraryHierarchyWriter(IDatabaseComponent database, ITransactionSource transaction, IScriptingRuntime runtime)
         {
-            var parameters = default(IDatabaseParameters);
-            this.Command = CreateCommand(database, transaction, out parameters);
-            this.Parameters = parameters;
+            this.Command = CreateCommand(database, transaction);
             this.Runtime = runtime;
             this.Context = runtime.CreateContext();
         }
 
-        public IDbCommand Command { get; private set; }
-
-        public IDatabaseParameters Parameters { get; private set; }
+        public IDatabaseCommand Command { get; private set; }
 
         public IScriptingRuntime Runtime { get; private set; }
 
@@ -28,12 +23,12 @@ namespace FoxTunes
 
         public void Write(IDatabaseReaderRecord record)
         {
-            this.Parameters["libraryHierarchyId"] = record["LibraryHierarchy_Id"];
-            this.Parameters["libraryHierarchyLevelId"] = record["LibraryHierarchyLevel_Id"];
-            this.Parameters["libraryItemId"] = record["LibraryItem_Id"];
-            this.Parameters["displayValue"] = this.ExecuteScript(record, "DisplayScript");
-            this.Parameters["sortValue"] = this.ExecuteScript(record, "SortScript");
-            this.Parameters["isLeaf"] = record["IsLeaf"];
+            this.Command.Parameters["libraryHierarchyId"] = record["LibraryHierarchy_Id"];
+            this.Command.Parameters["libraryHierarchyLevelId"] = record["LibraryHierarchyLevel_Id"];
+            this.Command.Parameters["libraryItemId"] = record["LibraryItem_Id"];
+            this.Command.Parameters["displayValue"] = this.ExecuteScript(record, "DisplayScript");
+            this.Command.Parameters["sortValue"] = this.ExecuteScript(record, "SortScript");
+            this.Command.Parameters["isLeaf"] = record["IsLeaf"];
             this.Command.ExecuteNonQuery();
         }
 
@@ -77,7 +72,7 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static IDbCommand CreateCommand(IDatabaseComponent database, ITransactionSource transaction, out IDatabaseParameters parameters)
+        private static IDatabaseCommand CreateCommand(IDatabaseComponent database, ITransactionSource transaction)
         {
             var table = database.Config.Table("LibraryHierarchy", TableFlags.None);
             table.Column("LibraryHierarchy_Id");
@@ -92,7 +87,7 @@ namespace FoxTunes
             query.Output.AddParameters(table.Columns);
             return database.CreateCommand(
                 query.Build(),
-                out parameters,
+                DatabaseCommandFlags.NoCache,
                 transaction
             );
         }

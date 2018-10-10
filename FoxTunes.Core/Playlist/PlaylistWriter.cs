@@ -1,7 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System.Data;
 using System.Linq;
 
 namespace FoxTunes
@@ -10,21 +9,17 @@ namespace FoxTunes
     {
         public PlaylistWriter(IDatabaseComponent database, ITransactionSource transaction)
         {
-            var parameters = default(IDatabaseParameters);
-            this.Command = CreateCommand(database, transaction, out parameters);
-            this.Parameters = parameters;
+            this.Command = CreateCommand(database, transaction);
         }
 
-        public IDbCommand Command { get; private set; }
-
-        public IDatabaseParameters Parameters { get; private set; }
+        public IDatabaseCommand Command { get; private set; }
 
         public void Write(PlaylistItem playlistItem)
         {
-            this.Parameters["directoryName"] = playlistItem.DirectoryName;
-            this.Parameters["fileName"] = playlistItem.FileName;
-            this.Parameters["sequence"] = playlistItem.Sequence;
-            this.Parameters["status"] = PlaylistItemStatus.Import;
+            this.Command.Parameters["directoryName"] = playlistItem.DirectoryName;
+            this.Command.Parameters["fileName"] = playlistItem.FileName;
+            this.Command.Parameters["sequence"] = playlistItem.Sequence;
+            this.Command.Parameters["status"] = PlaylistItemStatus.Import;
             this.Command.ExecuteNonQuery();
         }
 
@@ -34,7 +29,7 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static IDbCommand CreateCommand(IDatabaseComponent database, ITransactionSource transaction, out IDatabaseParameters parameters)
+        private static IDatabaseCommand CreateCommand(IDatabaseComponent database, ITransactionSource transaction)
         {
             var query = database.QueryFactory.Build();
             query.Add.SetTable(database.Tables.PlaylistItem);
@@ -46,7 +41,7 @@ namespace FoxTunes
                 subQuery.Filter.AddColumn(database.Tables.LibraryItem.Column("FileName"));
             }));
             query.Output.AddParameters(database.Tables.PlaylistItem.Columns.Except(database.Tables.PlaylistItem.PrimaryKeys.Concat(database.Tables.PlaylistItem.Column("LibraryItem_Id"))));
-            return database.CreateCommand(query.Build(), out parameters, transaction);
+            return database.CreateCommand(query.Build(), DatabaseCommandFlags.NoCache, transaction);
         }
     }
 }
