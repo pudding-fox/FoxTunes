@@ -1,7 +1,7 @@
-﻿using FoxDb.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
-using FoxDb;
 using System.Data;
 
 namespace FoxTunes
@@ -64,20 +64,25 @@ namespace FoxTunes
             query.Update.AddColumn(sequence).Right = query.Update.Fragment<IBinaryExpressionBuilder>().With(expression =>
             {
                 expression.Left = expression.CreateColumn(sequence);
-                expression.Operator = expression.CreateOperator(QueryOperator.Add);
-                expression.Right = expression.CreateParameter("offset", DbType.Int32, ParameterDirection.Input);
+                expression.Operator = expression.CreateOperator(QueryOperator.Plus);
+                expression.Right = expression.CreateParameter("offset", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             });
             query.Filter.AddColumn(status);
             query.Filter.AddColumn(sequence).With(expression =>
             {
                 expression.Operator = expression.CreateOperator(@operator);
-                expression.Right = expression.CreateParameter("sequence", DbType.Int32, ParameterDirection.Input);
+                expression.Right = expression.CreateParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             });
-            this.Database.Execute(query, parameters =>
+            this.Database.Execute(query, (parameters, phase) =>
             {
-                parameters["status"] = PlaylistItemStatus.None;
-                parameters["sequence"] = at;
-                parameters["offset"] = by;
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = PlaylistItemStatus.None;
+                        parameters["sequence"] = at;
+                        parameters["offset"] = by;
+                        break;
+                }
             }, transaction);
         }
 
@@ -86,9 +91,14 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             this.IsIndeterminate = true;
             var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
-            using (var reader = this.Database.ExecuteReader(this.Database.Queries.PlaylistSequenceBuilder(metaDataNames), parameters =>
+            using (var reader = this.Database.ExecuteReader(this.Database.Queries.PlaylistSequenceBuilder(metaDataNames), (parameters, phase) =>
             {
-                parameters["status"] = PlaylistItemStatus.Import;
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = PlaylistItemStatus.Import;
+                        break;
+                }
             }, transaction))
             {
                 this.SequenceItems(transaction, reader);
@@ -111,7 +121,15 @@ namespace FoxTunes
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
-            this.Database.Execute(query, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
+            this.Database.Execute(query, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = LibraryItemStatus.None;
+                        break;
+                }
+            }, transaction);
         }
 
         protected virtual void CleanupMetaData(ITransactionSource transaction)

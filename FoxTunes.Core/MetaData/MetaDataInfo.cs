@@ -25,10 +25,15 @@ namespace FoxTunes
 
         public static IEnumerable<MetaDataItem> GetMetaData(ICore core, IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType, ITransactionSource transaction = null)
         {
-            return database.ExecuteEnumerator<MetaDataItem>(database.Queries.GetLibraryHierarchyMetaDataItems, parameters =>
+            return database.ExecuteEnumerator<MetaDataItem>(database.Queries.GetLibraryHierarchyMetaDataItems, (parameters, phase) =>
             {
-                parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
-                parameters["type"] = metaDataItemType;
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
+                        parameters["type"] = metaDataItemType;
+                        break;
+                }
             }, transaction);
         }
     }

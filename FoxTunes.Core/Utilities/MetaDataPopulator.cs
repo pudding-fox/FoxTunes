@@ -43,7 +43,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void Populate(IEnumerable<IFileData> fileDatas)
+        public void Populate<T>(IEnumerable<T> fileDatas) where T : IFileData
         {
             Logger.Write(this, LogLevel.Debug, "Begin populating meta data.");
 
@@ -51,14 +51,7 @@ namespace FoxTunes
             {
                 this.Name = "Populating meta data";
                 this.Position = 0;
-                if (fileDatas is ICountable)
-                {
-                    this.Count = (fileDatas as ICountable).Count;
-                }
-                else
-                {
-                    this.Count = fileDatas.Count();
-                }
+                this.Count = fileDatas.Count();
             }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);

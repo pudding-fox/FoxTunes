@@ -22,9 +22,9 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.AddLibraryHierarchyNodeToPlaylist,
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("sequence", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("status", DbType.Byte, ParameterDirection.Input)
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -35,17 +35,17 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.AddPlaylistSequenceRecord,
-                    new DatabaseQueryParameter("playlistItemId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value1", DbType.Byte, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value2", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value3", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value4", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value5", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value6", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value7", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value8", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value9", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("value10", DbType.String, ParameterDirection.Input)
+                    new DatabaseQueryParameter("playlistItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value1", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value2", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value3", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value4", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value5", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value6", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value7", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value8", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value9", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("value10", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -56,12 +56,12 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.AddLibraryMetaDataItems,
-                    new DatabaseQueryParameter("itemId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("name", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("type", DbType.Byte, ParameterDirection.Input),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("textValue", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("fileValue", DbType.String, ParameterDirection.Input)
+                    new DatabaseQueryParameter("itemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("textValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("fileValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -72,12 +72,12 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.AddPlaylistMetaDataItems,
-                    new DatabaseQueryParameter("itemId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("name", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("type", DbType.Byte, ParameterDirection.Input),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("textValue", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("fileValue", DbType.String, ParameterDirection.Input)
+                    new DatabaseQueryParameter("itemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("textValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("fileValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -88,8 +88,8 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.GetLibraryHierarchyMetaDataItems,
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("type", DbType.Byte, ParameterDirection.Input)
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -100,8 +100,8 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.GetLibraryHierarchyNodes,
-                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, ParameterDirection.Input)
+                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -112,9 +112,9 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.GetLibraryHierarchyNodesWithFilter,
-                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, ParameterDirection.Input),
-                    new DatabaseQueryParameter("filter", DbType.String, ParameterDirection.Input)
+                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("filter", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -125,9 +125,9 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.VariousArtists,
-                    new DatabaseQueryParameter("name", DbType.String, ParameterDirection.Input),
-                    new DatabaseQueryParameter("type", DbType.Byte, ParameterDirection.Input),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, ParameterDirection.Input)
+                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -137,7 +137,7 @@ namespace FoxTunes
             var playlistSequenceBuilder = new PlaylistSequenceBuilder(this.Database, metaDataNames);
             return this.Database.QueryFactory.Create(
                 playlistSequenceBuilder.TransformText(),
-                new DatabaseQueryParameter("status", DbType.Byte, ParameterDirection.Input)
+                new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
             );
         }
 

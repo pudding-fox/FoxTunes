@@ -20,7 +20,7 @@ namespace FoxTunes
 
         public PlaylistItemStatus Status { get; set; }
 
-        [Relation(RelationFlags.ManyToMany)]
+        [Relation(Flags = RelationFlags.AutoExpression | RelationFlags.EagerFetch | RelationFlags.ManyToMany)]
         public ObservableCollection<MetaDataItem> MetaDatas { get; set; }
 
         protected virtual void OnMetaDatasChanged()

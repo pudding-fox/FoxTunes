@@ -58,7 +58,6 @@
     <Compile Include="Interfaces\Database\IDatabaseSets.cs" />
     <Compile Include="Interfaces\Database\IDatabaseTables.cs" />
     <Compile Include="Interfaces\ICoreValidator.cs" />
-    <Compile Include="Interfaces\ICountable.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />
     <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
