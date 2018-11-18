@@ -15,9 +15,12 @@ namespace FoxTunes
 
         public static MetaDataCategory Categories = MetaDataCategory.Standard | MetaDataCategory.First;
 
+        public static SemaphoreSlim Semaphore { get; private set; }
+
         static TagLibMetaDataSource()
         {
             FileTypes.Register(typeof(TagLib.Dsf.File));
+            Semaphore = new SemaphoreSlim(1, 1);
         }
 
         private TagLibMetaDataSource()
@@ -31,9 +34,9 @@ namespace FoxTunes
             this.FileName = fileName;
         }
 
-        public string FileName { get; private set; }
-
         public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
+
+        public string FileName { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -56,7 +59,8 @@ namespace FoxTunes
                     }
                     this.AddMetaDatas(file.Tag);
                     this.AddProperties(file.Properties);
-                    this.AddImages(file.Tag);
+                    //TODO: Bad .Wait()
+                    this.AddImages(file.Tag).Wait();
                 }
                 catch (UnsupportedFormatException)
                 {
@@ -234,10 +238,9 @@ namespace FoxTunes
             this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Property) { TextValue = value.Trim() });
         }
 
-        private void AddImages(Tag tag)
+        private Task AddImages(Tag tag)
         {
-            //TODO: Bad .Wait()
-            this.AddImage(tag, CommonMetaData.Pictures).Wait();
+            return this.AddImage(tag, CommonMetaData.Pictures);
         }
 
         private async Task AddImage(Tag tag, string name)
@@ -250,7 +253,11 @@ namespace FoxTunes
             {
                 var type = Enum.GetName(typeof(PictureType), value.Type);
                 var id = this.GetImageId(tag, value, type);
-                this.AddImage(await this.AddImage(value, id), type, value);
+                var fileName = await this.AddImage(value, id);
+                this.MetaDatas.Add(new MetaDataItem(type, MetaDataItemType.Image)
+                {
+                    FileValue = fileName
+                });
             }
         }
 
@@ -259,10 +266,7 @@ namespace FoxTunes
             var fileName = default(string);
             if (!FileMetaDataStore.Exists(id, out fileName))
             {
-                if (!Monitor.TryEnter(FileMetaDataStore.SyncRoot, FILE_STORE_LOCK_TIMEOUT))
-                {
-                    throw new TimeoutException("Timed out while attempting to synchronize file store.");
-                }
+                await Semaphore.WaitAsync();
                 try
                 {
                     if (!FileMetaDataStore.Exists(id, out fileName))
@@ -273,7 +277,7 @@ namespace FoxTunes
                 }
                 finally
                 {
-                    Monitor.Exit(FileMetaDataStore.SyncRoot);
+                    Semaphore.Release();
                 }
             }
             Logger.Write(this, LogLevel.Trace, "Re-using image from store: {0} => {1}", this.FileName, fileName);
@@ -293,11 +297,6 @@ namespace FoxTunes
             );
         }
 #pragma warning restore 612, 618
-
-        private void AddImage(string fileName, string type, IPicture value)
-        {
-            this.MetaDatas.Add(new MetaDataItem(type, MetaDataItemType.Image) { FileValue = fileName });
-        }
     }
 
     [Flags]

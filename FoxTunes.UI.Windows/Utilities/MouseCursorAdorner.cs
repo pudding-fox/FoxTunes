@@ -74,7 +74,7 @@ namespace FoxTunes.Utilities
 
         public void Show()
         {
-            if (this.Adorner == null)
+            if (this.Adorner == null || this.Adorner.Parent != null)
             {
                 return;
             }
@@ -83,7 +83,7 @@ namespace FoxTunes.Utilities
 
         public void Hide()
         {
-            if (this.Adorner == null)
+            if (this.Adorner == null || this.Adorner.Parent == null)
             {
                 return;
             }

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace FoxTunes
@@ -109,6 +110,23 @@ namespace FoxTunes
 
             public TreeView TreeView { get; private set; }
 
+            protected virtual bool ShouldInitializeDrag(object source, Point position)
+            {
+                if (source is Thumb)
+                {
+                    return false;
+                }
+                if (Math.Abs(position.X - this.DragStartPosition.X) < SystemParameters.MinimumHorizontalDragDistance)
+                {
+                    return false;
+                }
+                if (Math.Abs(position.Y - this.DragStartPosition.Y) < SystemParameters.MinimumVerticalDragDistance)
+                {
+                    return false;
+                }
+                return true;
+            }
+
             protected virtual void OnMouseDown(object sender, MouseButtonEventArgs e)
             {
                 if (e.LeftButton != MouseButtonState.Pressed)
@@ -126,7 +144,7 @@ namespace FoxTunes
                     return;
                 }
                 var position = e.GetPosition(null);
-                if (Math.Abs(position.X - this.DragStartPosition.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(position.Y - this.DragStartPosition.Y) > SystemParameters.MinimumVerticalDragDistance)
+                if (this.ShouldInitializeDrag(e.OriginalSource, position))
                 {
                     this.TreeView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
                 }

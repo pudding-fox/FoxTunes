@@ -119,15 +119,30 @@ namespace FoxTunes
             }
         }
 
-        public IDatabaseQuery VariousArtists
+        public IDatabaseQuery UpdatePlaylistVariousArtists
         {
             get
             {
                 return this.Database.QueryFactory.Create(
-                    Resources.VariousArtists,
+                    Resources.UpdatePlaylistVariousArtists,
                     new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
+
+        public IDatabaseQuery UpdateLibraryVariousArtists
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.UpdateLibraryVariousArtists,
+                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }

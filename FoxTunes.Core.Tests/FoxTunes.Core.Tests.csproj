@@ -39,6 +39,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackgroundTaskTests.cs" />
     <Compile Include="DatabaseTests.cs" />
     <Compile Include="FileAssociationTests.cs" />
     <Compile Include="LibraryTests.cs" />

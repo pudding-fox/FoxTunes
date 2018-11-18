@@ -22,20 +22,23 @@ namespace FoxTunes
             return File.Exists(fileName);
         }
 
-        public static Task<string> Write(string id, byte[] data)
+        public static async Task<string> Write(string id, byte[] data)
         {
             var fileName = GetFileName(id);
             LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             try
             {
-                File.WriteAllBytes(fileName, data);
+                using (var stream = File.OpenWrite(fileName))
+                {
+                    await stream.WriteAsync(data, 0, data.Length);
+                }
             }
             catch (Exception e)
             {
                 LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to write data: {0} => {1} => {2}", id, fileName, e.Message);
             }
-            return Task.FromResult(fileName);
+            return fileName;
         }
 
         public static async Task<string> Write(string id, Stream stream)

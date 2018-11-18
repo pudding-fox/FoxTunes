@@ -34,24 +34,24 @@ namespace FoxTunes.Managers
             base.InitializeComponent(core);
         }
 
-        protected virtual void OutputStreamQueueDequeued(object sender, OutputStreamQueueEventArgs e)
+        protected virtual async void OutputStreamQueueDequeued(object sender, OutputStreamQueueEventArgs e)
         {
-            Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
-            //TODO: Bad .Result
-            if (!this.Output.Preempt(e.OutputStream).Result)
+            using (e.Defer())
             {
-                Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                if (!await this.Output.Preempt(e.OutputStream))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                }
+                Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                if (this.CurrentStream != null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
+                    await this.Unload();
+                }
+                await this.ForegroundTaskRunner.RunAsync(() => this.CurrentStream = e.OutputStream);
+                Logger.Write(this, LogLevel.Debug, "Output stream loaded: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
             }
-            Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
-            if (this.CurrentStream != null)
-            {
-                Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
-                //TODO: Bad .Wait()
-                this.Unload().Wait();
-            }
-            //TODO: Bad .Wait()
-            this.ForegroundTaskRunner.RunAsync(() => this.CurrentStream = e.OutputStream).Wait();
-            Logger.Write(this, LogLevel.Debug, "Output stream loaded: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
         }
 
         public bool IsSupported(string fileName)

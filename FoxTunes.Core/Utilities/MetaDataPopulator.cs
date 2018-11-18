@@ -19,7 +19,7 @@ namespace FoxTunes
             this.Writers = new ThreadLocal<MetaDataWriter>(true);
         }
 
-        public MetaDataPopulator(IDatabase database, ITransactionSource transaction, IDatabaseQuery query, bool reportProgress)
+        public MetaDataPopulator(IDatabase database, IDatabaseQuery query, bool reportProgress, ITransactionSource transaction)
             : this(reportProgress)
         {
             this.Database = database;
@@ -90,7 +90,7 @@ namespace FoxTunes
             {
                 return this.Writers.Value;
             }
-            return this.Writers.Value = new MetaDataWriter(this.Database, this.Transaction, this.Query);
+            return this.Writers.Value = new MetaDataWriter(this.Database, this.Query, this.Transaction);
         }
 
         protected override void OnDisposing()

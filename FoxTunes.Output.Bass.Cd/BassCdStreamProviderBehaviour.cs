@@ -198,10 +198,10 @@ namespace FoxTunes
                     {
                         throw new InvalidOperationException("Drive is not ready.");
                     }
-                    using (ITransactionSource transaction = this.Database.BeginTransaction())
+                    using (var transaction = this.Database.BeginTransaction())
                     {
                         this.AddPlaylistItems(transaction);
-                        this.ShiftItems(transaction, QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                        this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
                         this.AddOrUpdateMetaData(transaction);
                         this.SetPlaylistItemsStatus(transaction);
                         transaction.Commit();
@@ -244,11 +244,11 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
                 var query = this.Database
-                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database)))
+                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
                     .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
                 var info = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
-                using (var writer = new MetaDataWriter(this.Database, transaction, this.Database.Queries.AddPlaylistMetaDataItems))
+                using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, transaction))
                 {
                     var strategy = this.GetStrategy();
                     foreach (var playlistItem in query)

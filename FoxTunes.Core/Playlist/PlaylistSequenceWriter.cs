@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public class PlaylistSequenceWriter : Disposable
     {
-        public PlaylistSequenceWriter(IDatabaseComponent database, ITransactionSource transaction, IScriptingRuntime runtime)
+        public PlaylistSequenceWriter(IDatabaseComponent database, IScriptingRuntime runtime, ITransactionSource transaction)
         {
             this.Command = CreateCommand(database, transaction);
             this.Runtime = runtime;

@@ -18,7 +18,7 @@ namespace FoxTunes
             this.Writers = new ThreadLocal<LibraryHierarchyWriter>(true);
         }
 
-        public LibraryHierarchyPopulator(IDatabaseComponent database, ITransactionSource transaction, bool reportProgress)
+        public LibraryHierarchyPopulator(IDatabaseComponent database, bool reportProgress, ITransactionSource transaction)
             : this(reportProgress)
         {
             this.Database = database;
@@ -80,7 +80,7 @@ namespace FoxTunes
             {
                 return this.Writers.Value;
             }
-            return this.Writers.Value = new LibraryHierarchyWriter(this.Database, this.Transaction, this.ScriptingRuntime);
+            return this.Writers.Value = new LibraryHierarchyWriter(this.Database, this.ScriptingRuntime, this.Transaction);
         }
 
         protected override void OnDisposing()

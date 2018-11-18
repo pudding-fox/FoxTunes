@@ -21,9 +21,14 @@ namespace FoxTunes
 
         public WindowsUserInterface()
         {
-            this.Queue = new PendingQueue<string>(TimeSpan.FromSeconds(1));
-            //TODO: Bad .Wait()
-            this.Queue.Complete += (sender, e) => this.OnOpen().Wait();
+            this.Queue = new PendingQueue<string>(TimeSpan.FromMilliseconds(100));
+            this.Queue.Complete += async (sender, e) =>
+            {
+                using (e.Defer())
+                {
+                    await this.OnOpen(e.Sequence);
+                }
+            };
         }
 
         public PendingQueue<string> Queue { get; private set; }
@@ -74,10 +79,10 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task OnOpen()
+        protected virtual Task OnOpen(IEnumerable<string> paths)
         {
             var index = this.Playlist.GetInsertIndex();
-            return this.Playlist.Add(this.Queue, false).ContinueWith(task => this.Playlist.Play(index));
+            return this.Playlist.Add(paths, false).ContinueWith(task => this.Playlist.Play(index));
         }
 
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

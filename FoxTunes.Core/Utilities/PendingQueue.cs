@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -12,6 +13,7 @@ namespace FoxTunes
         private PendingQueue()
         {
             this.Queue = new Queue<T>();
+            this.Semaphore = new SemaphoreSlim(1, 1);
         }
 
         public PendingQueue(int timeout)
@@ -28,13 +30,20 @@ namespace FoxTunes
 
         public Queue<T> Queue { get; private set; }
 
+        public SemaphoreSlim Semaphore { get; private set; }
+
         public int Timeout { get; private set; }
 
         public void Enqueue(T value)
         {
-            lock (this.Queue)
+            this.Semaphore.Wait();
+            try
             {
                 this.Queue.Enqueue(value);
+            }
+            finally
+            {
+                this.Semaphore.Release();
             }
             Task.Factory.StartNew(() => this.BeginComplete());
         }
@@ -47,25 +56,32 @@ namespace FoxTunes
                 return;
             }
             this.Completing = true;
-            lock (this.Queue)
+            await this.Semaphore.WaitAsync();
+            try
             {
-                this.OnComplete();
+                await this.OnComplete();
                 this.Queue.Clear();
+            }
+            finally
+            {
+                this.Semaphore.Release();
             }
             this.Completing = false;
         }
 
 
-        protected virtual void OnComplete()
+        protected virtual Task OnComplete()
         {
             if (this.Complete == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Complete(this, EventArgs.Empty);
+            var e = new PendingQueueEventArgs<T>(this);
+            this.Complete(this, e);
+            return e.Complete();
         }
 
-        public event EventHandler Complete = delegate { };
+        public event PendingQueueEventHandler<T> Complete = delegate { };
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -76,5 +92,17 @@ namespace FoxTunes
         {
             return this.GetEnumerator();
         }
+    }
+
+    public delegate void PendingQueueEventHandler<T>(object sender, PendingQueueEventArgs<T> e);
+
+    public class PendingQueueEventArgs<T> : AsyncEventArgs
+    {
+        public PendingQueueEventArgs(IEnumerable<T> sequence)
+        {
+            this.Sequence = sequence;
+        }
+
+        public IEnumerable<T> Sequence { get; private set; }
     }
 }

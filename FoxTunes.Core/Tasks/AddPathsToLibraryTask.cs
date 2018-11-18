@@ -44,12 +44,20 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected override Task OnStarted()
+        {
+            this.Name = "Getting file list";
+            this.IsIndeterminate = true;
+            return base.OnStarted();
+        }
+
         protected override async Task OnRun()
         {
             using (var transaction = this.Database.BeginTransaction())
             {
                 this.AddLibraryItems(transaction);
                 this.AddOrUpdateMetaData(transaction);
+                this.UpdateVariousArtists(transaction);
                 this.SetLibraryItemsStatus(transaction);
                 transaction.Commit();
             }
@@ -58,8 +66,6 @@ namespace FoxTunes
 
         private void AddLibraryItems(ITransactionSource transaction)
         {
-            this.Name = "Getting file list";
-            this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("DirectoryName"));
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
@@ -124,10 +130,10 @@ namespace FoxTunes
 
         private void AddOrUpdateMetaData(ITransactionSource transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddLibraryMetaDataItems, true))
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, true, transaction))
             {
                 var query = this.Database
-                    .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database)))
+                    .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
                     .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;

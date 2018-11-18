@@ -40,15 +40,16 @@
   <ItemGroup>
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="AsyncEventArgs.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
     <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
-    <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
     <Compile Include="Configuration\FileAssociation.cs" />
     <Compile Include="Configuration\FileAssociations.cs" />
     <Compile Include="Configuration\TextConfigurationElement.cs" />
     <Compile Include="CoreValidator.cs" />
+    <Compile Include="Deferral.cs" />
     <Compile Include="Interfaces\Configuration\IFileAssociation.cs" />
     <Compile Include="Interfaces\Configuration\IFileAssociations.cs" />
     <Compile Include="Interfaces\IInvocableComponent.cs" />

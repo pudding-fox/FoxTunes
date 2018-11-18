@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -8,16 +9,16 @@ namespace FoxTunes.Interfaces
 
         IOutputStream Peek(PlaylistItem playlistItem);
 
-        void Enqueue(IOutputStream outputStream, bool dequeue);
+        Task Enqueue(IOutputStream outputStream, bool dequeue);
 
-        void Dequeue(PlaylistItem playlistItem);
+        Task Dequeue(PlaylistItem playlistItem);
 
         event OutputStreamQueueEventHandler Dequeued;
     }
 
     public delegate void OutputStreamQueueEventHandler(object sender, OutputStreamQueueEventArgs e);
 
-    public class OutputStreamQueueEventArgs : EventArgs
+    public class OutputStreamQueueEventArgs : AsyncEventArgs
     {
         public OutputStreamQueueEventArgs(IOutputStream outputStream)
         {

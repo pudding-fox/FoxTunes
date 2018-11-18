@@ -43,7 +43,7 @@ namespace FoxTunes
                     this.ClearItems(transaction);
                 }
                 this.AddPlaylistItems(transaction);
-                this.ShiftItems(transaction, QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
                 this.SequenceItems(transaction);
                 this.SetPlaylistItemsStatus(transaction);
                 transaction.Commit();

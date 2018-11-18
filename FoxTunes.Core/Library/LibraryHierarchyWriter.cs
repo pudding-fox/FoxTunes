@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public class LibraryHierarchyWriter : Disposable
     {
-        public LibraryHierarchyWriter(IDatabaseComponent database, ITransactionSource transaction, IScriptingRuntime runtime)
+        public LibraryHierarchyWriter(IDatabaseComponent database, IScriptingRuntime runtime, ITransactionSource transaction)
         {
             this.Command = CreateCommand(database, transaction);
             this.Runtime = runtime;

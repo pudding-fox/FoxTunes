@@ -102,11 +102,12 @@
     <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
     <None Include="Resources\GetLibraryHierarchyNodes.sql" />
     <None Include="Resources\GetLibraryHierarchyNodesWithFilter.sql" />
-    <None Include="Resources\VariousArtists.sql" />
+    <None Include="Resources\UpdateLibraryVariousArtists.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AddLibraryMetaDataItems.sql" />
     <None Include="Resources\AddPlaylistMetaDataItems.sql" />
+    <None Include="Resources\UpdatePlaylistVariousArtists.sql" />
     <Content Include="Templates\LibraryHierarchyBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>

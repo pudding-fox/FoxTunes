@@ -22,6 +22,22 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected virtual void UpdateVariousArtists(ITransactionSource transaction)
+        {
+            this.Database.Execute(this.Database.Queries.UpdateLibraryVariousArtists, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["name"] = CustomMetaData.VariousArtists;
+                        parameters["type"] = MetaDataItemType.Tag;
+                        parameters["numericValue"] = 1;
+                        parameters["status"] = LibraryItemStatus.Import;
+                        break;
+                }
+            }, transaction);
+        }
+
         protected virtual void CleanupMetaData(ITransactionSource transaction)
         {
             var table = this.Database.Config.Table("LibraryItem_MetaDataItem", TableFlags.None);
