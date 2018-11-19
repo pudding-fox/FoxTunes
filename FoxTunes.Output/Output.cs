@@ -35,6 +35,8 @@ namespace FoxTunes
             this.OnPropertyChanged("IsStarted");
         }
 
+        public abstract bool ShowBuffering { get; }
+
         public event EventHandler IsStartedChanged = delegate { };
 
         public abstract IEnumerable<string> SupportedExtensions { get; }

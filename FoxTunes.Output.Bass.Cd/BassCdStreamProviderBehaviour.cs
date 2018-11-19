@@ -202,7 +202,7 @@ namespace FoxTunes
                     {
                         this.AddPlaylistItems(transaction);
                         this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
-                        this.AddOrUpdateMetaData(transaction);
+                        await this.AddOrUpdateMetaData(transaction);
                         this.SetPlaylistItemsStatus(transaction);
                         transaction.Commit();
                     }
@@ -240,25 +240,23 @@ namespace FoxTunes
                 }
             }
 
-            private void AddOrUpdateMetaData(ITransactionSource transaction)
+            private async Task AddOrUpdateMetaData(ITransactionSource transaction)
             {
                 Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
                 var query = this.Database
                     .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
                     .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
                 var info = default(CDInfo);
+                var strategy = this.GetStrategy();
+                var metaDataSource = new BassCdMetaDataSource(strategy);
                 BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
                 using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, transaction))
                 {
-                    var strategy = this.GetStrategy();
                     foreach (var playlistItem in query)
                     {
-                        var metaDataSource = new BassCdMetaDataSource(
-                            playlistItem.FileName,
-                            strategy
-                        );
                         metaDataSource.InitializeComponent(this.Core);
-                        foreach (var metaDataItem in metaDataSource.MetaDatas)
+                        var metaData = await metaDataSource.GetMetaData(playlistItem.FileName);
+                        foreach (var metaDataItem in metaData)
                         {
                             writer.Write(playlistItem.Id, metaDataItem);
                         }

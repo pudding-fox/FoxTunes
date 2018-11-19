@@ -11,6 +11,8 @@ namespace FoxTunes
 {
     public class MetaDataPopulator : PopulatorBase
     {
+        public const string ID = "EA40EA65-6F49-48A6-9469-DD5FC2E36EC0";
+
         public readonly object SyncRoot = new object();
 
         private MetaDataPopulator(bool reportProgress)
@@ -43,7 +45,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void Populate<T>(IEnumerable<T> fileDatas) where T : IFileData
+        public async Task Populate<T>(IEnumerable<T> fileDatas, CancellationToken cancellationToken) where T : IFileData
         {
             Logger.Write(this, LogLevel.Debug, "Begin populating meta data.");
 
@@ -56,15 +58,16 @@ namespace FoxTunes
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
+            var metaDataSource = this.MetaDataSourceFactory.Create();
 
-            Parallel.ForEach(fileDatas, this.ParallelOptions, fileData =>
+            await AsyncParallel.ForEach(fileDatas, async fileData =>
             {
                 Logger.Write(this, LogLevel.Debug, "Populating meta data for file: {0} => {1}", fileData.Id, fileData.FileName);
 
+                var metaData = await metaDataSource.GetMetaData(fileData.FileName);
                 var writer = this.GetOrAddWriter();
-                var metaDataSource = this.MetaDataSourceFactory.Create(fileData.FileName);
 
-                foreach (var metaDataItem in metaDataSource.MetaDatas)
+                foreach (var metaDataItem in metaData)
                 {
                     writer.Write(fileData.Id, metaDataItem);
                 }
@@ -81,7 +84,7 @@ namespace FoxTunes
                     }
                     Interlocked.Increment(ref position);
                 }
-            });
+            }, cancellationToken, this.ParallelOptions);
         }
 
         private MetaDataWriter GetOrAddWriter()

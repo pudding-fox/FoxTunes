@@ -2,6 +2,7 @@
 using ManagedBass;
 using ManagedBass.Cd;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -24,25 +25,29 @@ namespace FoxTunes
             return ParseUrl(playlistItem.FileName, out drive, out track);
         }
 
-        public override int CreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem)
         {
             var drive = default(int);
             var track = default(int);
             if (!ParseUrl(playlistItem.FileName, out drive, out track))
             {
-                return 0;
+                return Task.FromResult(0);
             }
             var channelHandle = default(int);
             if (this.GetCurrentStream(output, drive, track, out channelHandle))
             {
-                return channelHandle;
+                return Task.FromResult(channelHandle);
             }
             var flags = BassFlags.Decode;
             if (output.Float)
             {
                 flags |= BassFlags.Float;
             }
-            return BassCd.CreateStream(drive, track, flags);
+            if (output.PlayFromMemory)
+            {
+                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+            }
+            return Task.FromResult(BassCd.CreateStream(drive, track, flags));
         }
 
         protected virtual bool GetCurrentStream(IBassOutput output, int drive, int track, out int channelHandle)

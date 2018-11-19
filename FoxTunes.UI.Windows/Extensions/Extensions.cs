@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -27,10 +28,18 @@ namespace FoxTunes
         {
             foreach (var format in dataObject.GetFormats())
             {
-                var data = dataObject.GetData(format);
-                if (data is T)
+                try
                 {
-                    return true;
+                    var data = dataObject.GetData(format);
+                    if (data is T)
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    //TODO: Warn.
+                    continue;
                 }
             }
             return false;

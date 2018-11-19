@@ -10,11 +10,13 @@ namespace FoxTunes.Interfaces
 
         bool Float { get; }
 
+        bool PlayFromMemory { get; }
+
         IBassStreamFactory StreamFactory { get; }
 
         IBassStreamPipeline Pipeline { get; }
 
-        void FreeStream(int channelHandle);
+        IBassStreamPipeline GetOrCreatePipeline(BassOutputStream stream);
 
         event EventHandler Init;
 

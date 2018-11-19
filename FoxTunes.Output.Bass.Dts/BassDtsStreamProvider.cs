@@ -2,7 +2,9 @@
 using ManagedBass;
 using ManagedBass.Dts;
 using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -28,14 +30,18 @@ namespace FoxTunes
             return true;
         }
 
-        public override int CreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem)
         {
             var flags = BassFlags.Decode;
             if (output.Float)
             {
                 flags |= BassFlags.Float;
             }
-            return BassDts.CreateStream(playlistItem.FileName, 0, 0, flags);
+            if (output.PlayFromMemory)
+            {
+                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+            }
+            return Task.FromResult(BassDts.CreateStream(playlistItem.FileName, 0, 0, flags));
         }
     }
 }

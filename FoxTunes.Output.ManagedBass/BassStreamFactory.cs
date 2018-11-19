@@ -3,6 +3,7 @@ using ManagedBass;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -44,7 +45,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Registered bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
         }
 
-        public bool CreateStream(PlaylistItem playlistItem, bool immidiate, out int channelHandle)
+        public async Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate)
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             foreach (var provider in this.Providers.Values)
@@ -56,11 +57,11 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
                 for (var attempt = 0; attempt < CREATE_ATTEMPTS; attempt++)
                 {
-                    channelHandle = provider.CreateStream(this.Output, playlistItem);
+                    var channelHandle = await provider.CreateStream(this.Output, playlistItem);
                     if (channelHandle != 0)
                     {
                         Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
-                        return true;
+                        return new BassStream(provider, channelHandle);
                     }
                     else
                     {
@@ -68,8 +69,7 @@ namespace FoxTunes
                         {
                             if (!immidiate || !this.FreeActiveStreams())
                             {
-                                channelHandle = 0;
-                                return false;
+                                return BassStream.Empty;
                             }
                         }
                     }
@@ -77,8 +77,7 @@ namespace FoxTunes
                 }
                 Logger.Write(this, LogLevel.Warn, "The bass stream provider failed.");
             }
-            channelHandle = 0;
-            return false;
+            return BassStream.Empty;
         }
 
         protected virtual bool FreeActiveStreams()

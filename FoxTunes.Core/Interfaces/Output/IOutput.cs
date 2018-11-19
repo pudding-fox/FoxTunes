@@ -12,6 +12,8 @@ namespace FoxTunes.Interfaces
 
         bool IsStarted { get; }
 
+        bool ShowBuffering { get; }
+
         event EventHandler IsStartedChanged;
 
         Task Start();

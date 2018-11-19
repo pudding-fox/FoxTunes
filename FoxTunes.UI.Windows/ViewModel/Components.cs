@@ -34,10 +34,20 @@ namespace FoxTunes.ViewModel
             base.OnCoreChanged();
         }
 
-        protected virtual Task OnError(object sender, ComponentErrorEventArgs e)
+        protected virtual async Task OnError(object sender, ComponentErrorEventArgs e)
         {
             var component = sender as IBaseComponent;
-            return this.Add(new ComponentError(component, component.GetType().Name, e.Exception));
+            if (e.Exception is AggregateException)
+            {
+                foreach (var innerException in (e.Exception as AggregateException).InnerExceptions)
+                {
+                    await this.Add(new ComponentError(component, component.GetType().Name, innerException));
+                }
+            }
+            else
+            {
+                await this.Add(new ComponentError(component, component.GetType().Name, e.Exception));
+            }
         }
 
         protected virtual void OnBackgroundTask(object sender, BackgroundTaskEventArgs e)
@@ -45,10 +55,20 @@ namespace FoxTunes.ViewModel
             e.BackgroundTask.Faulted += this.OnFaulted;
         }
 
-        protected virtual void OnFaulted(object sender, EventArgs e)
+        protected virtual async void OnFaulted(object sender, EventArgs e)
         {
             var backgroundTask = sender as IBackgroundTask;
-            this.Add(new ComponentError(backgroundTask, backgroundTask.Name, backgroundTask.Exception));
+            if (backgroundTask.Exception is AggregateException)
+            {
+                foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
+                {
+                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, innerException));
+                }
+            }
+            else
+            {
+                await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, backgroundTask.Exception));
+            }
         }
 
         public Task Add(ComponentError error)

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Output.Bass.Tests
 {
+    [Explicit]
     [TestFixture(BassOutputTests.DEFAULT)]
     [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER)]
     [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.ASIO)]

@@ -1,7 +1,9 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -33,6 +35,11 @@ namespace FoxTunes
         }
 
         public event EventHandler MetaDatasChanged = delegate { };
+
+        public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
+        {
+            return Task.FromResult<IEnumerable<MetaDataItem>>(this.MetaDatas);
+        }
 
         public override bool Equals(IPersistableComponent other)
         {

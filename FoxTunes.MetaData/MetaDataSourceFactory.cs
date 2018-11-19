@@ -4,6 +4,6 @@ namespace FoxTunes
 {
     public abstract class MetaDataSourceFactory : StandardFactory, IMetaDataSourceFactory
     {
-        public abstract IMetaDataSource Create(string fileName);
+        public abstract IMetaDataSource Create();
     }
 }

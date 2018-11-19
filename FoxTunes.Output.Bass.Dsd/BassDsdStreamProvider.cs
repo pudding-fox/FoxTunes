@@ -2,7 +2,9 @@
 using ManagedBass;
 using ManagedBass.Dsd;
 using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -34,10 +36,32 @@ namespace FoxTunes
             return true;
         }
 
-        public override int CreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override async Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem)
         {
             var flags = BassFlags.Decode | BassFlags.DSDRaw;
-            var channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, flags);
+            var channelHandle = default(int);
+            if (output.PlayFromMemory)
+            {
+                Logger.Write(this, LogLevel.Debug, "Loading file \"{0}\" into memory.", playlistItem.FileName);
+                using (var stream = File.OpenRead(playlistItem.FileName))
+                {
+                    var buffer = new byte[stream.Length];
+                    await stream.ReadAsync(buffer, 0, buffer.Length);
+                    Logger.Write(this, LogLevel.Debug, "Buffered {0} bytes from file \"{0}\".", buffer.Length, playlistItem.FileName);
+                    channelHandle = BassDsd.CreateStream(buffer, 0, buffer.Length, flags);
+                    if (channelHandle != 0)
+                    {
+                        if (!this.Streams.TryAdd(channelHandle, buffer))
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Failed to pin handle of buffer for file \"{0}\". Playback may fail.", playlistItem.FileName);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, flags);
+            }
             if (channelHandle != 0)
             {
                 var query = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().QueryPipeline();
@@ -46,7 +70,7 @@ namespace FoxTunes
                 if (query.OutputChannels < channels || !query.OutputRates.Contains(rate))
                 {
                     Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported, the stream will be unloaded. This warning is expensive, please don't attempt to play unsupported DSD.", rate, channels);
-                    output.FreeStream(channelHandle);
+                    this.FreeStream(channelHandle);
                     channelHandle = 0;
                 }
             }

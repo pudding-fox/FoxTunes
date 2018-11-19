@@ -244,6 +244,14 @@ namespace FoxTunes
                     });
                     return;
                 }
+                catch (AggregateException e)
+                {
+                    foreach (var innerException in e.InnerExceptions)
+                    {
+                        Logger.Write(this, LogLevel.Error, "Background task failed: {0}", innerException.Message);
+                    }
+                    this.Exception = e;
+                }
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);

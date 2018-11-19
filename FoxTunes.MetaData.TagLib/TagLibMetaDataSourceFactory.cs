@@ -12,12 +12,10 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override IMetaDataSource Create(string fileName)
+        public override IMetaDataSource Create()
         {
-            Logger.Write(this, LogLevel.Trace, "Creating meta data source: {0}", fileName);
-            var source = new TagLibMetaDataSource(fileName);
+            var source = new TagLibMetaDataSource();
             source.InitializeComponent(this.Core);
-            Logger.Write(this, LogLevel.Trace, "Created meta data source: {0}, {1} items", fileName, source.MetaDatas.Count);
             return source;
         }
     }

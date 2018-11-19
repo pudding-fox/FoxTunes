@@ -84,6 +84,8 @@
     <Compile Include="MetaData\MetaDataInfo.cs" />
     <Compile Include="MetaData\MetaDataWriter.cs" />
     <Compile Include="Tasks\MovePlaylistItemsTask.cs" />
+    <Compile Include="Utilities\AsyncParallel.cs" />
+    <Compile Include="Utilities\CancellationToken.cs" />
     <Compile Include="Utilities\PendingQueue.cs" />
     <Compile Include="Playlist\PlaylistColumn.cs" />
     <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
@@ -187,6 +189,7 @@
     <Compile Include="Tasks\StopOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="Utilities\Shell.cs" />
+    <Compile Include="Utilities\SingletonReentrantTask.cs" />
     <Compile Include="Utilities\TwoWayConcurrentDictionary.cs" />
   </ItemGroup>
   <ItemGroup>

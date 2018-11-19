@@ -25,6 +25,18 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public override bool Visible
+        {
+            get
+            {
+                if (this.Output != null && this.Output.ShowBuffering && this.Immediate)
+                {
+                    return true;
+                }
+                return base.Visible;
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;

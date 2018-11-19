@@ -46,6 +46,7 @@
     <Compile Include="PendingQueueTests.cs" />
     <Compile Include="PlaylistTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReentrantTaskTests.cs" />
     <Compile Include="Tasks.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="TestCore.cs" />

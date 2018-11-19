@@ -60,16 +60,28 @@ namespace FoxTunes
                 }
                 this.AddPlaylistItems(transaction);
                 this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
-                this.AddOrUpdateMetaData(transaction);
-                this.UpdateVariousArtists(transaction);
-                this.SequenceItems(transaction);
-                this.SetPlaylistItemsStatus(transaction);
-                transaction.Commit();
+                using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+                {
+                    await this.AddOrUpdateMetaData(cancellationToken, transaction);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        this.Name = "Waiting..";
+                        this.Description = string.Empty;
+                        return;
+                    }
+                    this.UpdateVariousArtists(transaction);
+                    this.SequenceItems(transaction);
+                    this.SetPlaylistItemsStatus(transaction);
+                    transaction.Commit();
+                }))
+                {
+                    await task.Run();
+                }
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
-        private void AddPlaylistItems(ITransactionSource transaction)
+        protected virtual void AddPlaylistItems(ITransactionSource transaction)
         {
             using (var writer = new PlaylistWriter(this.Database, transaction))
             {
@@ -108,20 +120,19 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(ITransactionSource transaction)
+        protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken, ITransactionSource transaction)
         {
-            Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
+            var query = this.Database
+               .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
+               .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
             using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, true, transaction))
             {
-                var query = this.Database
-                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
-                    .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
                 metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
                 metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                metaDataPopulator.Populate(query);
+                await metaDataPopulator.Populate(query, cancellationToken);
             }
         }
     }

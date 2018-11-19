@@ -22,6 +22,23 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected virtual void SetLibraryItemsStatus(ITransactionSource transaction)
+        {
+            this.IsIndeterminate = true;
+            var query = this.Database.QueryFactory.Build();
+            query.Update.SetTable(this.Database.Tables.LibraryItem);
+            query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
+            this.Database.Execute(query, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = LibraryItemStatus.None;
+                        break;
+                }
+            }, transaction);
+        }
+
         protected virtual void UpdateVariousArtists(ITransactionSource transaction)
         {
             this.Database.Execute(this.Database.Queries.UpdateLibraryVariousArtists, (parameters, phase) =>

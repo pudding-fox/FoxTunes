@@ -48,7 +48,7 @@ namespace FoxTunes.Managers
         public Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.Database.ExecuteScalar<bool>(this.Database.QueryFactory.Build().With(query1 =>
+            this.CanNavigate = this.Database != null && this.Database.ExecuteScalar<bool>(this.Database.QueryFactory.Build().With(query1 =>
             {
                 query1.Output.AddFunction(QueryFunction.Exists, query1.Output.CreateSubQuery(this.Database.QueryFactory.Build().With(query2 =>
                 {

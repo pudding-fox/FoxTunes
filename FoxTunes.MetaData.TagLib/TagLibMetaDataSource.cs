@@ -1,8 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TagLib;
@@ -11,63 +10,36 @@ namespace FoxTunes
 {
     public class TagLibMetaDataSource : BaseComponent, IMetaDataSource
     {
-        private static readonly TimeSpan FILE_STORE_LOCK_TIMEOUT = TimeSpan.FromSeconds(10);
-
         public static MetaDataCategory Categories = MetaDataCategory.Standard | MetaDataCategory.First;
 
         public static SemaphoreSlim Semaphore { get; private set; }
 
         static TagLibMetaDataSource()
         {
-            FileTypes.Register(typeof(TagLib.Dsf.File));
             Semaphore = new SemaphoreSlim(1, 1);
         }
 
-        private TagLibMetaDataSource()
+        public async Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {
-            this.MetaDatas = new ObservableCollection<MetaDataItem>();
-        }
-
-        public TagLibMetaDataSource(string fileName)
-            : this()
-        {
-            this.FileName = fileName;
-        }
-
-        public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
-
-        public string FileName { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            if (!this.IsSupported(this.FileName))
+            if (!this.IsSupported(fileName))
             {
-                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", this.FileName);
+                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+                return Enumerable.Empty<MetaDataItem>();
             }
-            else
+            var metaData = new List<MetaDataItem>();
+            Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
+            try
             {
-                Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", this.FileName);
-                try
-                {
-                    var file = global::TagLib.File.Create(this.FileName);
-                    if (file.PossiblyCorrupt)
-                    {
-                        foreach (var reason in file.CorruptionReasons)
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Meta data corruption detected: {0} => {1}", this.FileName, reason);
-                        }
-                    }
-                    this.AddMetaDatas(file.Tag);
-                    this.AddProperties(file.Properties);
-                    //TODO: Bad .Wait()
-                    this.AddImages(file.Tag).Wait();
-                }
-                catch (UnsupportedFormatException)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", this.FileName);
-                }
+                var file = this.Create(fileName);
+                this.AddMetaDatas(metaData, file.Tag);
+                this.AddProperties(metaData, file.Properties);
+                await this.AddImages(metaData, CommonMetaData.Pictures, file.Tag, file.Tag.Pictures);
             }
-            base.InitializeComponent(core);
+            catch (UnsupportedFormatException)
+            {
+                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+            }
+            return metaData;
         }
 
         protected virtual bool IsSupported(string fileName)
@@ -76,185 +48,193 @@ namespace FoxTunes
             return FileTypes.AvailableTypes.ContainsKey(mimeType);
         }
 
-        private void AddMetaDatas(Tag tag)
+        protected virtual File Create(string fileName)
+        {
+            var file = File.Create(fileName);
+            if (file.PossiblyCorrupt)
+            {
+                foreach (var reason in file.CorruptionReasons)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Meta data corruption detected: {0} => {1}", fileName, reason);
+                }
+            }
+            return file;
+        }
+
+        private void AddMetaDatas(IList<MetaDataItem> metaData, Tag tag)
         {
             if (Categories.HasFlag(MetaDataCategory.Standard))
             {
-                this.AddMetaData(CommonMetaData.Album, tag.Album);
-                this.AddMetaData(CommonMetaData.AlbumArtists, tag.AlbumArtists);
+                this.AddMetaData(metaData, CommonMetaData.Album, tag.Album);
+                this.AddMetaData(metaData, CommonMetaData.AlbumArtists, tag.AlbumArtists);
 #pragma warning disable 612, 618
-                this.AddMetaData(CommonMetaData.Artists, tag.Artists);
+                this.AddMetaData(metaData, CommonMetaData.Artists, tag.Artists);
 #pragma warning restore 612, 618
-                this.AddMetaData(CommonMetaData.Composers, tag.Composers);
-                this.AddMetaData(CommonMetaData.Conductor, tag.Conductor);
-                this.AddMetaData(CommonMetaData.Disc, tag.Disc);
-                this.AddMetaData(CommonMetaData.DiscCount, tag.DiscCount);
-                this.AddMetaData(CommonMetaData.Genres, tag.Genres);
-                this.AddMetaData(CommonMetaData.Performers, tag.Performers);
-                this.AddMetaData(CommonMetaData.Title, tag.Title);
-                this.AddMetaData(CommonMetaData.Track, tag.Track);
-                this.AddMetaData(CommonMetaData.TrackCount, tag.TrackCount);
-                this.AddMetaData(CommonMetaData.Year, tag.Year);
+                this.AddMetaData(metaData, CommonMetaData.Composers, tag.Composers);
+                this.AddMetaData(metaData, CommonMetaData.Conductor, tag.Conductor);
+                this.AddMetaData(metaData, CommonMetaData.Disc, tag.Disc);
+                this.AddMetaData(metaData, CommonMetaData.DiscCount, tag.DiscCount);
+                this.AddMetaData(metaData, CommonMetaData.Genres, tag.Genres);
+                this.AddMetaData(metaData, CommonMetaData.Performers, tag.Performers);
+                this.AddMetaData(metaData, CommonMetaData.Title, tag.Title);
+                this.AddMetaData(metaData, CommonMetaData.Track, tag.Track);
+                this.AddMetaData(metaData, CommonMetaData.TrackCount, tag.TrackCount);
+                this.AddMetaData(metaData, CommonMetaData.Year, tag.Year);
             }
 
             if (Categories.HasFlag(MetaDataCategory.First))
             {
-                this.AddMetaData(CommonMetaData.FirstAlbumArtist, tag.FirstAlbumArtist);
+                this.AddMetaData(metaData, CommonMetaData.FirstAlbumArtist, tag.FirstAlbumArtist);
 #pragma warning disable 612, 618
-                this.AddMetaData(CommonMetaData.FirstArtist, tag.FirstArtist);
+                this.AddMetaData(metaData, CommonMetaData.FirstArtist, tag.FirstArtist);
 #pragma warning restore 612, 618
-                this.AddMetaData(CommonMetaData.FirstComposer, tag.FirstComposer);
-                this.AddMetaData(CommonMetaData.FirstGenre, tag.FirstGenre);
-                this.AddMetaData(CommonMetaData.FirstPerformer, tag.FirstPerformer);
+                this.AddMetaData(metaData, CommonMetaData.FirstComposer, tag.FirstComposer);
+                this.AddMetaData(metaData, CommonMetaData.FirstGenre, tag.FirstGenre);
+                this.AddMetaData(metaData, CommonMetaData.FirstPerformer, tag.FirstPerformer);
             }
 
             if (Categories.HasFlag(MetaDataCategory.Joined))
             {
-                this.AddMetaData(CommonMetaData.JoinedAlbumArtists, tag.JoinedAlbumArtists);
+                this.AddMetaData(metaData, CommonMetaData.JoinedAlbumArtists, tag.JoinedAlbumArtists);
 #pragma warning disable 612, 618
-                this.AddMetaData(CommonMetaData.JoinedArtists, tag.JoinedArtists);
+                this.AddMetaData(metaData, CommonMetaData.JoinedArtists, tag.JoinedArtists);
 #pragma warning restore 612, 618
-                this.AddMetaData(CommonMetaData.JoinedComposers, tag.JoinedComposers);
-                this.AddMetaData(CommonMetaData.JoinedGenres, tag.JoinedGenres);
-                this.AddMetaData(CommonMetaData.JoinedPerformers, tag.JoinedPerformers);
+                this.AddMetaData(metaData, CommonMetaData.JoinedComposers, tag.JoinedComposers);
+                this.AddMetaData(metaData, CommonMetaData.JoinedGenres, tag.JoinedGenres);
+                this.AddMetaData(metaData, CommonMetaData.JoinedPerformers, tag.JoinedPerformers);
             }
 
             if (Categories.HasFlag(MetaDataCategory.Extended))
             {
-                this.AddMetaData(CommonMetaData.MusicIpId, tag.MusicIpId);
-                this.AddMetaData(CommonMetaData.AmazonId, tag.AmazonId);
-                this.AddMetaData(CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute);
-                this.AddMetaData(CommonMetaData.Comment, tag.Comment);
-                this.AddMetaData(CommonMetaData.Copyright, tag.Copyright);
-                this.AddMetaData(CommonMetaData.Grouping, tag.Grouping);
-                this.AddMetaData(CommonMetaData.Lyrics, tag.Lyrics);
+                this.AddMetaData(metaData, CommonMetaData.MusicIpId, tag.MusicIpId);
+                this.AddMetaData(metaData, CommonMetaData.AmazonId, tag.AmazonId);
+                this.AddMetaData(metaData, CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute);
+                this.AddMetaData(metaData, CommonMetaData.Comment, tag.Comment);
+                this.AddMetaData(metaData, CommonMetaData.Copyright, tag.Copyright);
+                this.AddMetaData(metaData, CommonMetaData.Grouping, tag.Grouping);
+                this.AddMetaData(metaData, CommonMetaData.Lyrics, tag.Lyrics);
             }
 
             if (Categories.HasFlag(MetaDataCategory.MusicBrainz))
             {
-                this.AddMetaData(CommonMetaData.MusicBrainzArtistId, tag.MusicBrainzArtistId);
-                this.AddMetaData(CommonMetaData.MusicBrainzDiscId, tag.MusicBrainzDiscId);
-                this.AddMetaData(CommonMetaData.MusicBrainzReleaseArtistId, tag.MusicBrainzReleaseArtistId);
-                this.AddMetaData(CommonMetaData.MusicBrainzReleaseCountry, tag.MusicBrainzReleaseCountry);
-                this.AddMetaData(CommonMetaData.MusicBrainzReleaseId, tag.MusicBrainzReleaseId);
-                this.AddMetaData(CommonMetaData.MusicBrainzReleaseStatus, tag.MusicBrainzReleaseStatus);
-                this.AddMetaData(CommonMetaData.MusicBrainzReleaseType, tag.MusicBrainzReleaseType);
-                this.AddMetaData(CommonMetaData.MusicBrainzTrackId, tag.MusicBrainzTrackId);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzArtistId, tag.MusicBrainzArtistId);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzDiscId, tag.MusicBrainzDiscId);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzReleaseArtistId, tag.MusicBrainzReleaseArtistId);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzReleaseCountry, tag.MusicBrainzReleaseCountry);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzReleaseId, tag.MusicBrainzReleaseId);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzReleaseStatus, tag.MusicBrainzReleaseStatus);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzReleaseType, tag.MusicBrainzReleaseType);
+                this.AddMetaData(metaData, CommonMetaData.MusicBrainzTrackId, tag.MusicBrainzTrackId);
             }
 
             if (Categories.HasFlag(MetaDataCategory.Sort))
             {
-                this.AddMetaData(CommonMetaData.TitleSort, tag.TitleSort);
-                this.AddMetaData(CommonMetaData.PerformersSort, tag.PerformersSort);
-                this.AddMetaData(CommonMetaData.JoinedPerformersSort, tag.JoinedPerformersSort);
-                this.AddMetaData(CommonMetaData.ComposersSort, tag.ComposersSort);
-                this.AddMetaData(CommonMetaData.AlbumArtistsSort, tag.AlbumArtistsSort);
-                this.AddMetaData(CommonMetaData.AlbumSort, tag.AlbumSort);
+                this.AddMetaData(metaData, CommonMetaData.TitleSort, tag.TitleSort);
+                this.AddMetaData(metaData, CommonMetaData.PerformersSort, tag.PerformersSort);
+                this.AddMetaData(metaData, CommonMetaData.JoinedPerformersSort, tag.JoinedPerformersSort);
+                this.AddMetaData(metaData, CommonMetaData.ComposersSort, tag.ComposersSort);
+                this.AddMetaData(metaData, CommonMetaData.AlbumArtistsSort, tag.AlbumArtistsSort);
+                this.AddMetaData(metaData, CommonMetaData.AlbumSort, tag.AlbumSort);
                 if (Categories.HasFlag(MetaDataCategory.First))
                 {
-                    this.AddMetaData(CommonMetaData.FirstPerformerSort, tag.FirstPerformerSort);
-                    this.AddMetaData(CommonMetaData.FirstComposerSort, tag.FirstComposerSort);
-                    this.AddMetaData(CommonMetaData.FirstAlbumArtistSort, tag.FirstAlbumArtistSort);
+                    this.AddMetaData(metaData, CommonMetaData.FirstPerformerSort, tag.FirstPerformerSort);
+                    this.AddMetaData(metaData, CommonMetaData.FirstComposerSort, tag.FirstComposerSort);
+                    this.AddMetaData(metaData, CommonMetaData.FirstAlbumArtistSort, tag.FirstAlbumArtistSort);
                 }
             }
         }
 
-        private void AddMetaData(string name, uint? value)
+        private void AddMetaData(IList<MetaDataItem> metaData, string name, uint? value)
         {
-            this.AddMetaData(name, (int?)value);
+            this.AddMetaData(metaData, name, (int?)value);
         }
 
-        private void AddMetaData(string name, int? value)
+        private void AddMetaData(IList<MetaDataItem> metaData, string name, int? value)
         {
             if (!value.HasValue)
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Tag) { NumericValue = value.Value });
+            metaData.Add(new MetaDataItem(name, MetaDataItemType.Tag) { NumericValue = value.Value });
         }
 
-        private void AddMetaData(string name, string value)
+        private void AddMetaData(IList<MetaDataItem> metaData, string name, string value)
         {
             if (string.IsNullOrEmpty(value))
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Tag) { TextValue = value.Trim() });
+            metaData.Add(new MetaDataItem(name, MetaDataItemType.Tag) { TextValue = value.Trim() });
         }
 
-        private void AddMetaData(string name, string[] values)
+        private void AddMetaData(IList<MetaDataItem> metaData, string name, string[] values)
         {
             foreach (var value in values)
             {
-                this.AddMetaData(name, value);
+                this.AddMetaData(metaData, name, value);
             }
         }
 
-        private void AddProperties(Properties properties)
+        private void AddProperties(IList<MetaDataItem> metaData, Properties properties)
         {
             if (Categories.HasFlag(MetaDataCategory.Standard))
             {
-                this.AddProperty(CommonProperties.Duration, properties.Duration);
-                this.AddProperty(CommonProperties.AudioBitrate, properties.AudioBitrate);
-                this.AddProperty(CommonProperties.AudioChannels, properties.AudioChannels);
-                this.AddProperty(CommonProperties.AudioSampleRate, properties.AudioSampleRate);
-                this.AddProperty(CommonProperties.BitsPerSample, properties.BitsPerSample);
+                this.AddProperty(metaData, CommonProperties.Duration, properties.Duration);
+                this.AddProperty(metaData, CommonProperties.AudioBitrate, properties.AudioBitrate);
+                this.AddProperty(metaData, CommonProperties.AudioChannels, properties.AudioChannels);
+                this.AddProperty(metaData, CommonProperties.AudioSampleRate, properties.AudioSampleRate);
+                this.AddProperty(metaData, CommonProperties.BitsPerSample, properties.BitsPerSample);
             }
             if (Categories.HasFlag(MetaDataCategory.MultiMedia))
             {
-                this.AddProperty(CommonProperties.Description, properties.Description);
-                this.AddProperty(CommonProperties.PhotoHeight, properties.PhotoHeight);
-                this.AddProperty(CommonProperties.PhotoQuality, properties.PhotoQuality);
-                this.AddProperty(CommonProperties.PhotoWidth, properties.PhotoWidth);
-                this.AddProperty(CommonProperties.VideoHeight, properties.VideoHeight);
-                this.AddProperty(CommonProperties.VideoWidth, properties.VideoWidth);
+                this.AddProperty(metaData, CommonProperties.Description, properties.Description);
+                this.AddProperty(metaData, CommonProperties.PhotoHeight, properties.PhotoHeight);
+                this.AddProperty(metaData, CommonProperties.PhotoQuality, properties.PhotoQuality);
+                this.AddProperty(metaData, CommonProperties.PhotoWidth, properties.PhotoWidth);
+                this.AddProperty(metaData, CommonProperties.VideoHeight, properties.VideoHeight);
+                this.AddProperty(metaData, CommonProperties.VideoWidth, properties.VideoWidth);
             }
         }
 
-        private void AddProperty(string name, int? value)
+        private void AddProperty(IList<MetaDataItem> metaData, string name, int? value)
         {
             if (!value.HasValue)
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Property) { NumericValue = value });
+            metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { NumericValue = value });
         }
 
-        private void AddProperty(string name, TimeSpan? value)
+        private void AddProperty(IList<MetaDataItem> metaData, string name, TimeSpan? value)
         {
             if (!value.HasValue)
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Property) { NumericValue = Convert.ToInt32(value.Value.TotalMilliseconds) });
+            metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { NumericValue = Convert.ToInt32(value.Value.TotalMilliseconds) });
         }
 
-        private void AddProperty(string name, string value)
+        private void AddProperty(IList<MetaDataItem> metaData, string name, string value)
         {
             if (string.IsNullOrEmpty(value))
             {
                 return;
             }
-            this.MetaDatas.Add(new MetaDataItem(name, MetaDataItemType.Property) { TextValue = value.Trim() });
+            metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { TextValue = value.Trim() });
         }
 
-        private Task AddImages(Tag tag)
+        private async Task AddImages(IList<MetaDataItem> metaData, string name, Tag tag, IEnumerable<IPicture> pictures)
         {
-            return this.AddImage(tag, CommonMetaData.Pictures);
-        }
-
-        private async Task AddImage(Tag tag, string name)
-        {
-            if (tag.Pictures == null)
+            if (pictures == null)
             {
                 return;
             }
-            foreach (var value in tag.Pictures)
+            foreach (var picture in pictures)
             {
-                var type = Enum.GetName(typeof(PictureType), value.Type);
-                var id = this.GetImageId(tag, value, type);
-                var fileName = await this.AddImage(value, id);
-                this.MetaDatas.Add(new MetaDataItem(type, MetaDataItemType.Image)
+                var type = Enum.GetName(typeof(PictureType), picture.Type);
+                var id = this.GetImageId(tag, picture, type);
+                var fileName = await this.AddImage(picture, id);
+                metaData.Add(new MetaDataItem(type, MetaDataItemType.Image)
                 {
                     FileValue = fileName
                 });
@@ -271,7 +251,6 @@ namespace FoxTunes
                 {
                     if (!FileMetaDataStore.Exists(id, out fileName))
                     {
-                        Logger.Write(this, LogLevel.Trace, "Extracted image from meta data: {0} => {1}", this.FileName, fileName);
                         return await FileMetaDataStore.Write(id, value.Data.Data);
                     }
                 }
@@ -280,7 +259,6 @@ namespace FoxTunes
                     Semaphore.Release();
                 }
             }
-            Logger.Write(this, LogLevel.Trace, "Re-using image from store: {0} => {1}", this.FileName, fileName);
             return fileName;
         }
 
