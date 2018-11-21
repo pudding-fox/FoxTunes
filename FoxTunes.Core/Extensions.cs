@@ -174,51 +174,5 @@ namespace FoxTunes
             var value = default(TValue);
             return dictionary.TryRemove(key, out value);
         }
-
-        public static void PerformCritical(this BaseComponent component, Action action)
-        {
-            component.PerformCritical(0, action);
-        }
-
-        public static void PerformCritical(this BaseComponent component, int timeout, Action action)
-        {
-            var lockTaken = default(bool);
-            if (!Monitor.IsEntered(component))
-            {
-                Monitor.TryEnter(component, timeout, ref lockTaken);
-                if (!lockTaken)
-                {
-                    throw new InvalidOperationException("Failed to enter critical section.");
-                }
-            }
-            action();
-            if (lockTaken)
-            {
-                Monitor.Exit(component);
-            }
-        }
-
-        public static Task PerformCritical(this BaseComponent component, Func<Task> func)
-        {
-            return component.PerformCritical(0, func);
-        }
-
-        public static async Task PerformCritical(this BaseComponent component, int timeout, Func<Task> func)
-        {
-            var lockTaken = default(bool);
-            if (!Monitor.IsEntered(component))
-            {
-                Monitor.TryEnter(component, timeout, ref lockTaken);
-                if (!lockTaken)
-                {
-                    throw new InvalidOperationException("Failed to enter critical section.");
-                }
-            }
-            await func();
-            if (lockTaken)
-            {
-                Monitor.Exit(component);
-            }
-        }
     }
 }

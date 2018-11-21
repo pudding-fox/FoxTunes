@@ -60,7 +60,7 @@ namespace FoxTunes
             this.NotificationClient.DefaultDeviceChanged += this.OnDefaultDeviceChanged;
             this.NotificationClient.PropertyValueChanged += this.OnPropertyValueChanged;
             this.IsInitialized = true;
-            Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
+            Logger.Write(this, LogLevel.Debug, "BASS Device Monitor Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -138,7 +138,14 @@ namespace FoxTunes
             {
                 playlistItem = this.PlaylistManager.CurrentItem;
             }
-            await this.Output.Start();
+            try
+            {
+                await this.Output.Start();
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to start output: {0}", e.Message);
+            }
             if (playlistItem != null)
             {
                 await this.ForegroundTaskRunner.RunAsync(async () =>
