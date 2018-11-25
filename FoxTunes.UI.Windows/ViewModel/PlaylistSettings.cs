@@ -14,35 +14,9 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        private PlaylistColumn _SelectedPlaylistColumn { get; set; }
+        private CollectionManager<PlaylistColumn> _PlaylistColumns { get; set; }
 
-        public PlaylistColumn SelectedPlaylistColumn
-        {
-            get
-            {
-                return this._SelectedPlaylistColumn;
-            }
-            set
-            {
-                this._SelectedPlaylistColumn = value;
-                this.OnSelectedPlaylistColumnChanged();
-            }
-        }
-
-        protected virtual void OnSelectedPlaylistColumnChanged()
-        {
-            if (this.SelectedPlaylistColumnChanged != null)
-            {
-                this.SelectedPlaylistColumnChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SelectedPlaylistColumn");
-        }
-
-        public event EventHandler SelectedPlaylistColumnChanged = delegate { };
-
-        private ObservableCollection<PlaylistColumn> _PlaylistColumns { get; set; }
-
-        public ObservableCollection<PlaylistColumn> PlaylistColumns
+        public CollectionManager<PlaylistColumn> PlaylistColumns
         {
             get
             {
@@ -57,47 +31,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnPlaylistColumnsChanged()
         {
-            if (this.PlaylistColumnsChanged != null)
-            {
-                this.PlaylistColumnsChanged(this, EventArgs.Empty);
-            }
             this.OnPropertyChanged("PlaylistColumns");
-        }
-
-        public event EventHandler PlaylistColumnsChanged = delegate { };
-
-        public ICommand NewCommand
-        {
-            get
-            {
-                return new Command(
-                    () =>
-                    {
-                        this.Database.Sets.PlaylistColumn.Create().With(playlistColumn =>
-                        {
-                            playlistColumn.Name = "New";
-                            this.PlaylistColumns.Add(playlistColumn);
-                            this.SelectedPlaylistColumn = playlistColumn;
-                        });
-                    },
-                    () => this.PlaylistColumns != null
-                );
-            }
-        }
-
-        public ICommand DeleteCommand
-        {
-            get
-            {
-                return new Command(
-                    () =>
-                    {
-                        this.PlaylistColumns.Remove(this.SelectedPlaylistColumn);
-                        this.SelectedPlaylistColumn = this.PlaylistColumns.FirstOrDefault();
-                    },
-                    () => this.PlaylistColumns != null && this.SelectedPlaylistColumn != null
-                );
-            }
         }
 
         public ICommand SaveCommand
@@ -118,8 +52,8 @@ namespace FoxTunes.ViewModel
                 using (var transaction = this.Database.BeginTransaction())
                 {
                     var playlistColumns = this.Database.Set<PlaylistColumn>(transaction);
-                    playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns));
-                    playlistColumns.AddOrUpdate(this.PlaylistColumns);
+                    playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns.ItemsSource));
+                    playlistColumns.AddOrUpdate(this.PlaylistColumns.ItemsSource);
                     transaction.Commit();
                 }
                 this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
@@ -151,14 +85,27 @@ namespace FoxTunes.ViewModel
         {
             this.Database = this.Core.Components.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.PlaylistColumns = new CollectionManager<PlaylistColumn>()
+            {
+                ItemFactory = () => this.Database.Sets.PlaylistColumn.Create().With(playlistColumn =>
+                {
+                    playlistColumn.Name = "New";
+                    playlistColumn.DisplayScript = "'New'";
+                }),
+                ExchangeHandler = (item1, item2) =>
+                {
+                    var temp = item1.Sequence;
+                    item1.Sequence = item2.Sequence;
+                    item2.Sequence = temp;
+                }
+            };
             this.Refresh();
             base.OnCoreChanged();
         }
 
         protected virtual void Refresh()
         {
-            this.PlaylistColumns = new ObservableCollection<PlaylistColumn>(this.Database.Sets.PlaylistColumn);
-            this.SelectedPlaylistColumn = this.PlaylistColumns.FirstOrDefault();
+            this.PlaylistColumns.ItemsSource = new ObservableCollection<PlaylistColumn>(this.Database.Sets.PlaylistColumn);
         }
 
         protected override Freezable CreateInstanceCore()

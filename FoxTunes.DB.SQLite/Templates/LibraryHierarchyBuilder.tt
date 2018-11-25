@@ -17,9 +17,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS "IDX_LibraryHierarchyLevelLeaf" ON "LibraryHie
 DELETE FROM "LibraryHierarchyLevelLeaf";
 
 INSERT INTO "LibraryHierarchyLevelLeaf"
-SELECT LibraryHierarchy_Id, MAX("Id")
+SELECT LibraryHierarchy_Id, "Id"
 FROM "LibraryHierarchyLevels"
-GROUP BY "LibraryHierarchy_Id";
+GROUP BY "LibraryHierarchy_Id"
+HAVING MAX("Sequence")
+ORDER BY "Sequence";
 
 CREATE TEMPORARY TABLE IF NOT EXISTS "LibraryHierarchyLevelParent"
 (
@@ -34,12 +36,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS "IDX_LibraryHierarchyLevelParent" ON "LibraryH
 DELETE FROM "LibraryHierarchyLevelParent";
 
 INSERT INTO "LibraryHierarchyLevelParent"
-SELECT "LibraryHierarchyLevels"."Id" AS "Id", MAX("LibraryHierarchyLevels_Copy"."Id") AS "Parent_Id"
+SELECT "LibraryHierarchyLevels"."Id" AS "Id", "LibraryHierarchyLevels_Copy"."Id" AS "Parent_Id"
 FROM "LibraryHierarchyLevels"
 JOIN "LibraryHierarchyLevels" AS "LibraryHierarchyLevels_Copy"
 	ON "LibraryHierarchyLevels"."LibraryHierarchy_Id"  = "LibraryHierarchyLevels_Copy"."LibraryHierarchy_Id"
-		AND "LibraryHierarchyLevels_Copy"."Id" < "LibraryHierarchyLevels"."Id"
-GROUP BY "LibraryHierarchyLevels"."Id";
+		AND "LibraryHierarchyLevels_Copy"."Sequence" < "LibraryHierarchyLevels"."Sequence"
+GROUP BY "LibraryHierarchyLevels"."Id"
+ORDER BY "LibraryHierarchyLevels_Copy"."Sequence";
 
 CREATE TEMPORARY TABLE IF NOT EXISTS "LibraryHierarchy"
 (

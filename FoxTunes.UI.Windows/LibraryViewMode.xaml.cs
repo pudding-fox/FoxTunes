@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using FoxDb;
 
 namespace FoxTunes
 {
@@ -59,7 +60,8 @@ namespace FoxTunes
             {
                 return;
             }
-            this.SelectedLibraryHierarchy = this.Core.Components.Database.Sets.LibraryHierarchy.FirstOrDefault();
+            var queryable = this.Core.Components.Database.AsQueryable<LibraryHierarchy>();
+            this.SelectedLibraryHierarchy = queryable.OrderBy(libraryHierarchy => libraryHierarchy.Sequence).FirstOrDefault();
         }
     }
 }

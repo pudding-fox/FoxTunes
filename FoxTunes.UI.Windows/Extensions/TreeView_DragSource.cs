@@ -106,8 +106,6 @@ namespace FoxTunes
 
             public Point DragStartPosition { get; private set; }
 
-            public bool DragInitialized { get; private set; }
-
             public TreeView TreeView { get; private set; }
 
             protected virtual bool ShouldInitializeDrag(object source, Point position)
@@ -138,7 +136,7 @@ namespace FoxTunes
 
             protected virtual void OnMouseMove(object sender, MouseEventArgs e)
             {
-                if (e.LeftButton != MouseButtonState.Pressed || this.DragInitialized)
+                if (e.LeftButton != MouseButtonState.Pressed)
                 {
                     return;
                 }

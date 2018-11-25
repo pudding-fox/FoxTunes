@@ -18,6 +18,10 @@ namespace FoxTunes
         protected virtual void DragSourceInitialized(object sender, ListViewExtensions.DragSourceInitializedEventArgs e)
         {
             var items = (e.Data as IEnumerable).OfType<PlaylistItem>();
+            if (!items.Any())
+            {
+                return;
+            }
             DragDrop.DoDragDrop(
                 this,
                 items,

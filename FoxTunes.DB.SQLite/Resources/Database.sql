@@ -76,11 +76,12 @@ CREATE TABLE `LibraryHierarchyItem_LibraryItem` (
 );
 CREATE TABLE [LibraryHierarchies] ( 
   [Id] INTEGER NOT NULL 
+, [Sequence] INTEGER NOT NULL
 , [Name] TEXT NOT NULL 
 , CONSTRAINT [PK_LibraryHierarchies] PRIMARY KEY ([Id]) 
 );
-INSERT INTO `LibraryHierarchies` VALUES (1,'Artist/Album/Title');
-INSERT INTO `LibraryHierarchies` VALUES (2,'Genre/Album/Title');
+INSERT INTO `LibraryHierarchies` VALUES (1,0,'Artist/Album/Title');
+INSERT INTO `LibraryHierarchies` VALUES (2,1,'Genre/Album/Title');
 CREATE INDEX [IDX_PlaylistItem_MetaDataItem_1]
 ON [PlaylistItem_MetaDataItem](
     [PlaylistItem_Id]);
