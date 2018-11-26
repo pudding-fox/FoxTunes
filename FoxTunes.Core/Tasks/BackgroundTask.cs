@@ -228,17 +228,16 @@ namespace FoxTunes
                 {
                     await this.OnRun().ContinueWith(async task =>
                     {
-                        switch (task.Status)
+                        if (task.IsFaulted)
                         {
-                            case TaskStatus.Faulted:
-                                Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
-                                this.Exception = task.Exception.InnerException;
-                                await this.OnFaulted();
-                                break;
-                            default:
-                                Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
-                                await this.OnCompleted();
-                                break;
+                            Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
+                            this.Exception = task.Exception.InnerException;
+                            await this.OnFaulted();
+                        }
+                        else
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
+                            await this.OnCompleted();
                         }
                         Semaphore.Release();
                     });

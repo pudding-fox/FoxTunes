@@ -11,6 +11,6 @@ namespace FoxTunes.Interfaces
 
         Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem);
 
-        void FreeStream(int channelHandle);
+        void FreeStream(PlaylistItem playlistItem, int channelHandle);
     }
 }

@@ -7,6 +7,11 @@ namespace FoxTunes
 {
     public static class AsyncParallel
     {
+        public static Task For(int start, int count, Func<int, Task> factory, CancellationToken cancellationToken, ParallelOptions options)
+        {
+            return ForEach<int>(Enumerable.Range(start, count), factory, cancellationToken, options);
+        }
+
         public static async Task ForEach<T>(IEnumerable<T> sequence, Func<T, Task> factory, CancellationToken cancellationToken, ParallelOptions options)
         {
             var tasks = new List<Task>(options.MaxDegreeOfParallelism);

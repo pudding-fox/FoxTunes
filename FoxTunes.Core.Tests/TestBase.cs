@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -31,6 +32,17 @@ namespace FoxTunes
         protected TestBase(long configuration)
         {
             this.Configuration = configuration;
+        }
+
+        public ParallelOptions ParallelOptions
+        {
+            get
+            {
+                return new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                };
+            }
         }
 
         public long Configuration { get; private set; }

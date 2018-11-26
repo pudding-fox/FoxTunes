@@ -79,10 +79,11 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task OnOpen(IEnumerable<string> paths)
+        protected virtual async Task OnOpen(IEnumerable<string> paths)
         {
             var index = this.Playlist.GetInsertIndex();
-            return this.Playlist.Add(paths, false).ContinueWith(task => this.Playlist.Play(index));
+            await this.Playlist.Add(paths, false);
+            await this.Playlist.Play(index);
         }
 
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

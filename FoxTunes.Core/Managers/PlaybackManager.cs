@@ -12,24 +12,24 @@ namespace FoxTunes.Managers
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
+
         public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Output = core.Components.Output;
-            core.Components.Output.IsStartedChanged += (sender, e) =>
+            if (this.Output != null)
             {
-                if (this.CurrentStream == null)
+                this.Output.IsStartedChanged += (sender, e) =>
                 {
-                    return;
-                }
-                Logger.Write(this, LogLevel.Warn, "Output state changed, disposing current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
-                this.CurrentStream.Dispose();
-                this.ForegroundTaskRunner.RunAsync(() => this.CurrentStream = null);
-            };
+                    this.BackgroundTaskRunner.Run(() => this.Unload());
+                };
+            }
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;
+            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
         }
@@ -44,12 +44,7 @@ namespace FoxTunes.Managers
                     Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                 }
                 Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
-                if (this.CurrentStream != null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
-                    await this.Unload();
-                }
-                await this.ForegroundTaskRunner.RunAsync(() => this.CurrentStream = e.OutputStream);
+                await this.SetCurrentStream(e.OutputStream);
                 Logger.Write(this, LogLevel.Debug, "Output stream loaded: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
             }
         }
@@ -67,12 +62,27 @@ namespace FoxTunes.Managers
             {
                 return this._CurrentStream;
             }
-            private set
-            {
-                this._CurrentStream = value;
-                this.OnCurrentStreamChanged();
-            }
         }
+
+        protected virtual async Task SetCurrentStream(IOutputStream stream)
+        {
+            if (this.CurrentStream != null)
+            {
+                if (object.ReferenceEquals(this.CurrentStream, stream))
+                {
+                    return;
+                }
+                Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
+                await this.Unload(this.CurrentStream);
+            }
+            await this.ForegroundTaskRunner.RunAsync(() =>
+            {
+                this._CurrentStream = stream;
+                this.OnCurrentStreamChanged();
+            });
+        }
+
+        public event EventHandler CurrentStreamChanging = delegate { };
 
         protected virtual void OnCurrentStreamChanged()
         {
@@ -99,7 +109,12 @@ namespace FoxTunes.Managers
             {
                 return Task.CompletedTask;
             }
-            var task = new UnloadOutputStreamTask();
+            return this.Unload(this.CurrentStream);
+        }
+
+        public Task Unload(IOutputStream outputStream)
+        {
+            var task = new UnloadOutputStreamTask(outputStream);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run();
@@ -117,9 +132,10 @@ namespace FoxTunes.Managers
             return task.Run();
         }
 
-        public Task StopOutput()
+        public async Task StopOutput()
         {
-            return this.StopStream().ContinueWith(task => this.Output.Shutdown());
+            await this.StopStream();
+            await this.Output.Shutdown();
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)

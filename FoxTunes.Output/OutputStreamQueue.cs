@@ -19,14 +19,17 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            core.Components.Output.IsStartedChanged += (sender, e) =>
+            if (core.Components.Output != null)
             {
-                if (this.Queue.Count > 0)
+                core.Components.Output.IsStartedChanged += (sender, e) =>
                 {
-                    Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
-                    this.Clear();
-                }
-            };
+                    if (this.Queue.Count > 0)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
+                        this.Clear();
+                    }
+                };
+            }
             base.InitializeComponent(core);
         }
 

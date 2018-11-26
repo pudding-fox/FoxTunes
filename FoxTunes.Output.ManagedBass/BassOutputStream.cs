@@ -1,8 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Concurrent;
 
 namespace FoxTunes
 {
@@ -12,13 +11,10 @@ namespace FoxTunes
 
         static BassOutputStream()
         {
-            _ActiveStreams = new List<BassOutputStream>();
-            ActiveStreams = new ReadOnlyCollection<BassOutputStream>(_ActiveStreams);
+            ActiveStreams = new ConcurrentDictionary<PlaylistItem, BassOutputStream>();
         }
 
-        private static IList<BassOutputStream> _ActiveStreams { get; set; }
-
-        public static IReadOnlyCollection<BassOutputStream> ActiveStreams { get; private set; }
+        public static ConcurrentDictionary<PlaylistItem, BassOutputStream> ActiveStreams { get; private set; }
 
         public BassOutputStream(IBassOutput output, IBassStreamProvider provider, PlaylistItem playlistItem, int channelHandle)
             : base(playlistItem)
@@ -26,7 +22,10 @@ namespace FoxTunes
             this.Output = output;
             this.Provider = provider;
             this.ChannelHandle = channelHandle;
-            _ActiveStreams.Add(this);
+            if (!ActiveStreams.TryAdd(playlistItem, this))
+            {
+                //TODO: Warn.
+            }
         }
 
         public IBassOutput Output { get; private set; }
@@ -239,11 +238,14 @@ namespace FoxTunes
         {
             try
             {
-                this.Provider.FreeStream(this.ChannelHandle);
+                this.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
             }
             finally
             {
-                _ActiveStreams.Remove(this);
+                if (!ActiveStreams.TryRemove(this.PlaylistItem))
+                {
+                    //TODO: Warn.
+                }
             }
             this.ChannelHandle = 0;
         }
