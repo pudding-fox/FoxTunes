@@ -16,7 +16,7 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction())
             {
-                this.ClearItems(transaction);
+                await this.ClearItems(transaction);
                 transaction.Commit();
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));

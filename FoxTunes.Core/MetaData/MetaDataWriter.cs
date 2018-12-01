@@ -1,5 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -12,7 +13,7 @@ namespace FoxTunes
 
         public IDatabaseCommand Command { get; private set; }
 
-        public void Write(int itemId, MetaDataItem metaDataItem)
+        public Task Write(int itemId, MetaDataItem metaDataItem)
         {
             this.Command.Parameters["itemId"] = itemId;
             this.Command.Parameters["name"] = metaDataItem.Name;
@@ -20,7 +21,7 @@ namespace FoxTunes
             this.Command.Parameters["numericValue"] = metaDataItem.NumericValue;
             this.Command.Parameters["textValue"] = metaDataItem.TextValue;
             this.Command.Parameters["fileValue"] = metaDataItem.FileValue;
-            this.Command.ExecuteNonQuery();
+            return this.Command.ExecuteNonQueryAsync();
         }
 
         protected override void OnDisposing()

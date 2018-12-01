@@ -69,7 +69,7 @@ namespace FoxTunes
 
                 foreach (var metaDataItem in metaData)
                 {
-                    writer.Write(fileData.Id, metaDataItem);
+                    await writer.Write(fileData.Id, metaDataItem);
                 }
 
                 if (this.ReportProgress)

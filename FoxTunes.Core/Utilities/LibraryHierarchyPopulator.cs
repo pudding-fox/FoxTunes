@@ -39,7 +39,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void Populate(IDatabaseReader reader)
+        public Task Populate(IDatabaseReader reader, CancellationToken cancellationToken)
         {
             if (this.ReportProgress)
             {
@@ -52,11 +52,10 @@ namespace FoxTunes
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
-
-            Parallel.ForEach(reader, this.ParallelOptions, record =>
+            return AsyncParallel.ForEach(reader, async record =>
             {
                 var writer = this.GetOrAddWriter();
-                writer.Write(record);
+                await writer.Write(record);
 
                 if (this.ReportProgress)
                 {
@@ -71,7 +70,7 @@ namespace FoxTunes
                     }
                     Interlocked.Increment(ref position);
                 }
-            });
+            }, cancellationToken, this.ParallelOptions);
         }
 
         private LibraryHierarchyWriter GetOrAddWriter()

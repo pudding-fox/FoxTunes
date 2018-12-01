@@ -1,7 +1,9 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -14,13 +16,13 @@ namespace FoxTunes
 
         public IDatabaseCommand Command { get; private set; }
 
-        public void Write(PlaylistItem playlistItem)
+        public Task Write(PlaylistItem playlistItem)
         {
             this.Command.Parameters["directoryName"] = playlistItem.DirectoryName;
             this.Command.Parameters["fileName"] = playlistItem.FileName;
             this.Command.Parameters["sequence"] = playlistItem.Sequence;
             this.Command.Parameters["status"] = PlaylistItemStatus.Import;
-            this.Command.ExecuteNonQuery();
+            return this.Command.ExecuteNonQueryAsync();
         }
 
         protected override void OnDisposing()

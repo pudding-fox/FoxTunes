@@ -31,7 +31,8 @@ namespace FoxTunes.Managers
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Refresh();
+            //TODO: Bad .Wait().
+            this.Refresh().Wait();
             base.InitializeComponent(core);
         }
 
@@ -45,10 +46,10 @@ namespace FoxTunes.Managers
             return Task.CompletedTask;
         }
 
-        public Task Refresh()
+        public async Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.Database != null && this.Database.ExecuteScalar<bool>(this.Database.QueryFactory.Build().With(query1 =>
+            this.CanNavigate = this.Database != null && await this.Database.ExecuteScalarAsync<bool>(this.Database.QueryFactory.Build().With(query1 =>
             {
                 query1.Output.AddFunction(QueryFunction.Exists, query1.Output.CreateSubQuery(this.Database.QueryFactory.Build().With(query2 =>
                 {
@@ -62,7 +63,7 @@ namespace FoxTunes.Managers
                 if (this.CurrentItem != null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Refreshing current item.");
-                    if ((this.CurrentItem = this.Database.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
+                    if ((this.CurrentItem = await this.Database.Sets.PlaylistItem.FindAsync(this.CurrentItem.Id)) == null)
                     {
                         Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
                     }
@@ -72,7 +73,6 @@ namespace FoxTunes.Managers
             {
                 Logger.Write(this, LogLevel.Debug, "Navigation is not possible, playlist is empty.");
             }
-            return Task.CompletedTask;
         }
 
         protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)

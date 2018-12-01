@@ -1,6 +1,8 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -22,13 +24,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void SetLibraryItemsStatus(ITransactionSource transaction)
+        protected virtual Task SetLibraryItemsStatus(ITransactionSource transaction)
         {
             this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.LibraryItem);
             query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
-            this.Database.Execute(query, (parameters, phase) =>
+            return this.Database.ExecuteAsync(query, (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -39,9 +41,9 @@ namespace FoxTunes
             }, transaction);
         }
 
-        protected virtual void UpdateVariousArtists(ITransactionSource transaction)
+        protected virtual Task UpdateVariousArtists(ITransactionSource transaction)
         {
-            this.Database.Execute(this.Database.Queries.UpdateLibraryVariousArtists, (parameters, phase) =>
+            return this.Database.ExecuteAsync(this.Database.Queries.UpdateLibraryVariousArtists, (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -55,7 +57,7 @@ namespace FoxTunes
             }, transaction);
         }
 
-        protected virtual void CleanupMetaData(ITransactionSource transaction)
+        protected virtual Task CleanupMetaData(ITransactionSource transaction)
         {
             var table = this.Database.Config.Table("LibraryItem_MetaDataItem", TableFlags.None);
             var column = table.Column("LibraryItem_Id");
@@ -75,7 +77,7 @@ namespace FoxTunes
                     }))
                 );
             });
-            this.Database.Execute(query, transaction);
+            return this.Database.ExecuteAsync(query, transaction);
         }
     }
 }
