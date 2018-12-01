@@ -44,7 +44,7 @@ namespace FoxTunes
                 }
                 await this.AddPlaylistItems(transaction);
                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
-                this.SequenceItems(transaction);
+                await this.SequenceItems(new CancellationToken(), transaction);
                 await this.SetPlaylistItemsStatus(transaction);
                 transaction.Commit();
             }

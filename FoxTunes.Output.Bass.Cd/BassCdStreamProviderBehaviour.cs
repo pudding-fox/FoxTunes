@@ -201,10 +201,11 @@ namespace FoxTunes
 
             public string CdLookupHost { get; private set; }
 
+            public IPlaylistManager PlaylistManager { get; private set; }
+
             public override void InitializeComponent(ICore core)
             {
-                //Always append for now.
-                this.Sequence = core.Managers.Playlist.GetInsertIndex();
+                this.PlaylistManager = core.Managers.Playlist;
                 base.InitializeComponent(core);
             }
 
@@ -222,6 +223,8 @@ namespace FoxTunes
                     {
                         throw new InvalidOperationException("Drive is not ready.");
                     }
+                    //Always append for now.
+                    this.Sequence = await this.PlaylistManager.GetInsertIndex();
                     using (var transaction = this.Database.BeginTransaction())
                     {
                         await this.AddPlaylistItems(transaction);

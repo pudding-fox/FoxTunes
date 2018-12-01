@@ -23,7 +23,7 @@ namespace FoxTunes
 
         protected virtual Task OnPlaylistItemChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("PlaylistItem"));
+            return this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("PlaylistItem"));
         }
 
         public IDatabaseSet<PlaylistColumn> PlaylistColumn
@@ -36,7 +36,7 @@ namespace FoxTunes
 
         protected virtual Task OnPlaylistColumnChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("PlaylistColumn"));
+            return this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("PlaylistColumn"));
         }
 
         public IDatabaseSet<LibraryItem> LibraryItem
@@ -49,7 +49,7 @@ namespace FoxTunes
 
         protected virtual Task OnLibraryItemChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("LibraryItem"));
+            return this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("LibraryItem"));
         }
 
         public IDatabaseSet<LibraryHierarchy> LibraryHierarchy
@@ -62,7 +62,7 @@ namespace FoxTunes
 
         protected virtual Task OnLibraryHierarchyChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("LibraryHierarchy"));
+            return this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("LibraryHierarchy"));
         }
 
         public IDatabaseSet<LibraryHierarchyLevel> LibraryHierarchyLevel
@@ -75,7 +75,7 @@ namespace FoxTunes
 
         protected virtual Task OnLibraryHierarchyLevelChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() => this.OnPropertyChanged("LibraryHierarchyLevel"));
+            return this.ForegroundTaskRunner.Run(() => this.OnPropertyChanged("LibraryHierarchyLevel"));
         }
 
         public override void InitializeComponent(ICore core)

@@ -24,6 +24,7 @@ namespace FoxTunes.Managers
             {
                 this.Output.IsStartedChanged += (sender, e) =>
                 {
+                    //TODO: Bad awaited Task.
                     this.BackgroundTaskRunner.Run(() => this.Unload());
                 };
             }
@@ -75,25 +76,27 @@ namespace FoxTunes.Managers
                 Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
                 await this.Unload(this.CurrentStream);
             }
-            await this.ForegroundTaskRunner.RunAsync(() =>
+            await this.ForegroundTaskRunner.Run(() =>
             {
                 this._CurrentStream = stream;
-                this.OnCurrentStreamChanged();
+                return this.OnCurrentStreamChanged();
             });
         }
 
         public event EventHandler CurrentStreamChanging = delegate { };
 
-        protected virtual void OnCurrentStreamChanged()
+        protected virtual async Task OnCurrentStreamChanged()
         {
             if (this.CurrentStreamChanged != null)
             {
-                this.CurrentStreamChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.CurrentStreamChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("CurrentStream");
         }
 
-        public event EventHandler CurrentStreamChanged = delegate { };
+        public event AsyncEventHandler CurrentStreamChanged = delegate { };
 
         public Task Load(PlaylistItem playlistItem, bool immediate)
         {
@@ -109,32 +112,20 @@ namespace FoxTunes.Managers
             {
                 return Task.CompletedTask;
             }
-            return this.Unload(this.CurrentStream);
+            return this.SetCurrentStream(null);
         }
 
-        public Task Unload(IOutputStream outputStream)
+        public async Task Unload(IOutputStream outputStream)
         {
             var task = new UnloadOutputStreamTask(outputStream);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
-            return task.Run();
+            await task.Run();
         }
 
-        public Task StopStream()
+        public async Task Stop()
         {
-            if (this.CurrentStream == null)
-            {
-                return Task.CompletedTask;
-            }
-            var task = new StopOutputStreamTask();
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
-        }
-
-        public async Task StopOutput()
-        {
-            await this.StopStream();
+            await this.SetCurrentStream(null);
             await this.Output.Shutdown();
         }
 

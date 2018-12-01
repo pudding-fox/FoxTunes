@@ -70,7 +70,7 @@ namespace FoxTunes
                         return;
                     }
                     await this.UpdateVariousArtists(transaction);
-                    this.SequenceItems(transaction);
+                    await this.SequenceItems(cancellationToken, transaction);
                     await this.SetPlaylistItemsStatus(transaction);
                     transaction.Commit();
                 }))

@@ -9,12 +9,10 @@ namespace FoxTunes.Interfaces
 
         IOutputStream CurrentStream { get; }
 
-        event EventHandler CurrentStreamChanged;
+        event AsyncEventHandler CurrentStreamChanged;
 
         Task Load(PlaylistItem playlistItem, bool immediate);
 
-        Task StopStream();
-
-        Task StopOutput();
+        Task Stop();
     }
 }

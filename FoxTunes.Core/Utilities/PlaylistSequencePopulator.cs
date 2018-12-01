@@ -36,13 +36,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void Populate(IDatabaseReader reader)
+        public Task Populate(IDatabaseReader reader, CancellationToken cancellationToken)
         {
-            Parallel.ForEach(reader, this.ParallelOptions, record =>
+            return AsyncParallel.ForEach(reader, record =>
             {
                 var writer = this.GetOrAddWriter();
-                writer.Write(record);
-            });
+                return writer.Write(record);
+            }, cancellationToken, this.ParallelOptions);
         }
 
         private PlaylistSequenceWriter GetOrAddWriter()

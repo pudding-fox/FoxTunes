@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -12,7 +13,7 @@ namespace FoxTunes.Interfaces
 
         long Position { get; set; }
 
-        event EventHandler PositionChanged;
+        event AsyncEventHandler PositionChanged;
 
         long Length { get; }
 
@@ -22,44 +23,44 @@ namespace FoxTunes.Interfaces
 
         bool IsPlaying { get; }
 
-        event EventHandler IsPlayingChanged;
+        event AsyncEventHandler IsPlayingChanged;
 
         bool IsPaused { get; }
 
-        event EventHandler IsPausedChanged;
+        event AsyncEventHandler IsPausedChanged;
 
         bool IsStopped { get; }
 
-        event EventHandler IsStoppedChanged;
+        event AsyncEventHandler IsStoppedChanged;
 
-        void Play();
+        Task Play();
 
         event PlayedEventHandler Played;
 
-        void Pause();
+        Task Pause();
 
-        event EventHandler Paused;
+        event AsyncEventHandler Paused;
 
-        void Resume();
+        Task Resume();
 
-        event EventHandler Resumed;
+        event AsyncEventHandler Resumed;
 
-        void Stop();
+        Task Stop();
 
-        event EventHandler Stopping;
+        event AsyncEventHandler Stopping;
 
         event StoppedEventHandler Stopped;
 
         string Description { get; }
 
-        void BeginSeek();
+        Task BeginSeek();
 
-        void EndSeek();
+        Task EndSeek();
     }
 
     public delegate void PlayedEventHandler(object sender, PlayedEventArgs e);
 
-    public class PlayedEventArgs : EventArgs
+    public class PlayedEventArgs : AsyncEventArgs
     {
         public PlayedEventArgs(bool manual)
         {
@@ -71,7 +72,7 @@ namespace FoxTunes.Interfaces
 
     public delegate void StoppedEventHandler(object sender, StoppedEventArgs e);
 
-    public class StoppedEventArgs : EventArgs
+    public class StoppedEventArgs : AsyncEventArgs
     {
         public StoppedEventArgs(bool manual)
         {

@@ -82,7 +82,7 @@ namespace FoxTunes.Output.Bass.Tests
         public async Task CanPlayStream()
         {
             var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
-            outputStream.Play();
+            await outputStream.Play();
             for (var a = 0; a <= 15; a++)
             {
                 await Task.Delay(1000);
@@ -101,14 +101,14 @@ namespace FoxTunes.Output.Bass.Tests
         public async Task CanPauseAndResumeStream()
         {
             var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
-            outputStream.Play();
+            await outputStream.Play();
             await Task.Delay(1000);
             Assert.IsTrue(outputStream.Position > 0);
-            outputStream.Pause();
+            await outputStream.Pause();
             var position = outputStream.Position;
             await Task.Delay(1000);
             Assert.AreEqual(position, outputStream.Position);
-            outputStream.Resume();
+            await outputStream.Resume();
             await Task.Delay(1000);
             Assert.IsTrue(outputStream.Position > position);
         }
@@ -120,7 +120,7 @@ namespace FoxTunes.Output.Bass.Tests
             var quarter = outputStream.Length / 4;
             var half = outputStream.Length / 2;
             outputStream.Position = quarter;
-            outputStream.Play();
+            await outputStream.Play();
             await Task.Delay(1000);
             Assert.IsTrue(outputStream.Position > quarter);
             outputStream.Position = half;
@@ -136,7 +136,7 @@ namespace FoxTunes.Output.Bass.Tests
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[2], false),
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[3], false)
             };
-            outputStreams[0].Play();
+            await outputStreams[0].Play();
             await this.Core.Components.Output.Preempt(outputStreams[1]);
             outputStreams[0].Position = outputStreams[0].Length - 1000;
             await Task.Delay(1000);

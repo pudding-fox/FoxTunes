@@ -44,7 +44,16 @@ namespace FoxTunes
             var query = this.Database.QueryFactory.Build();
             query.Delete.Touch();
             query.Source.AddTable(this.Database.Tables.PlaylistItem);
-            await this.Database.ExecuteAsync(query, transaction);
+            query.Filter.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
+            await this.Database.ExecuteAsync(query, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = PlaylistItemStatus.None;
+                        break;
+                }
+            }, transaction);
             await this.CleanupMetaData(transaction);
         }
 
@@ -88,7 +97,7 @@ namespace FoxTunes
             }, transaction);
         }
 
-        protected virtual void SequenceItems(ITransactionSource transaction)
+        protected virtual async Task SequenceItems(CancellationToken cancellationToken, ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             this.IsIndeterminate = true;
@@ -103,16 +112,16 @@ namespace FoxTunes
                 }
             }, transaction))
             {
-                this.SequenceItems(reader, transaction);
+                await this.SequenceItems(reader, cancellationToken, transaction);
             }
         }
 
-        protected virtual void SequenceItems(IDatabaseReader reader, ITransactionSource transaction)
+        protected virtual async Task SequenceItems(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)
         {
             using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, transaction))
             {
                 playlistSequencePopulator.InitializeComponent(this.Core);
-                playlistSequencePopulator.Populate(reader);
+                await playlistSequencePopulator.Populate(reader, cancellationToken);
             }
         }
 
@@ -136,18 +145,18 @@ namespace FoxTunes
 
         protected virtual Task UpdateVariousArtists(ITransactionSource transaction)
         {
-           return this.Database.ExecuteAsync(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
-            {
-                switch (phase)
-                {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["name"] = CustomMetaData.VariousArtists;
-                        parameters["type"] = MetaDataItemType.Tag;
-                        parameters["numericValue"] = 1;
-                        parameters["status"] = PlaylistItemStatus.Import;
-                        break;
-                }
-            }, transaction);
+            return this.Database.ExecuteAsync(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
+             {
+                 switch (phase)
+                 {
+                     case DatabaseParameterPhase.Fetch:
+                         parameters["name"] = CustomMetaData.VariousArtists;
+                         parameters["type"] = MetaDataItemType.Tag;
+                         parameters["numericValue"] = 1;
+                         parameters["status"] = PlaylistItemStatus.Import;
+                         break;
+                 }
+             }, transaction);
         }
 
         protected virtual Task CleanupMetaData(ITransactionSource transaction)

@@ -29,14 +29,17 @@ namespace FoxTunes
             this.PlaybackManager.CurrentStream.Stopped += this.CurrentStream_Stopped;
         }
 
-        protected virtual void CurrentStream_Stopped(object sender, StoppedEventArgs e)
+        protected virtual async void CurrentStream_Stopped(object sender, StoppedEventArgs e)
         {
             if (e.Manual)
             {
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
-            this.BackgroundTaskRunner.Run(() => this.PlaylistManager.Next());
+            using (e.Defer())
+            {
+                await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.Next());
+            }
         }
     }
 }

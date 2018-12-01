@@ -11,31 +11,6 @@ namespace FoxTunes
         {
             if (Application.Current != null)
             {
-                return Application.Current.Dispatcher.InvokeAsync(action).Task;
-            }
-            else
-            {
-                action();
-                return Task.CompletedTask;
-            }
-        }
-
-        public Task Run(Func<Task> func)
-        {
-            if (Application.Current != null)
-            {
-                return Application.Current.Dispatcher.InvokeAsync(func).Task;
-            }
-            else
-            {
-                return func();
-            }
-        }
-
-        public Task RunAsync(Action action)
-        {
-            if (Application.Current != null)
-            {
                 return Application.Current.Dispatcher.BeginInvoke(action).Task;
             }
             else
@@ -45,7 +20,7 @@ namespace FoxTunes
             }
         }
 
-        public Task RunAsync(Func<Task> func)
+        public Task Run(Func<Task> func)
         {
             if (Application.Current != null)
             {

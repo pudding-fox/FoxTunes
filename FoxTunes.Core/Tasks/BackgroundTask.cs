@@ -81,7 +81,7 @@ namespace FoxTunes
 
         protected virtual Task OnNameChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() =>
+            return this.ForegroundTaskRunner.Run(() =>
             {
                 if (this.NameChanged != null)
                 {
@@ -110,7 +110,7 @@ namespace FoxTunes
 
         protected virtual Task OnDescriptionChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() =>
+            return this.ForegroundTaskRunner.Run(() =>
             {
                 if (this.DescriptionChanged != null)
                 {
@@ -139,7 +139,7 @@ namespace FoxTunes
 
         protected virtual Task OnPositionChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() =>
+            return this.ForegroundTaskRunner.Run(() =>
             {
                 if (this.PositionChanged != null)
                 {
@@ -169,7 +169,7 @@ namespace FoxTunes
 
         protected virtual Task OnCountChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() =>
+            return this.ForegroundTaskRunner.Run(() =>
             {
                 if (this.CountChanged != null)
                 {
@@ -205,7 +205,7 @@ namespace FoxTunes
 
         protected virtual Task OnIsIndeterminateChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() =>
+            return this.ForegroundTaskRunner.Run(() =>
             {
                 if (this.IsIndeterminateChanged != null)
                 {
@@ -269,10 +269,15 @@ namespace FoxTunes
             {
                 return Task.CompletedTask;
             }
-            return this.ForegroundTaskRunner.RunAsync(() => this.Started(this, EventArgs.Empty));
+            return this.ForegroundTaskRunner.Run(() =>
+            {
+                var e = new AsyncEventArgs();
+                this.Started(this, e);
+                return e.Complete();
+            });
         }
 
-        public event EventHandler Started = delegate { };
+        public event AsyncEventHandler Started = delegate { };
 
         protected virtual Task OnCompleted()
         {
@@ -280,10 +285,15 @@ namespace FoxTunes
             {
                 return Task.CompletedTask;
             }
-            return this.ForegroundTaskRunner.RunAsync(() => this.Completed(this, EventArgs.Empty));
+            return this.ForegroundTaskRunner.Run(() =>
+            {
+                var e = new AsyncEventArgs();
+                this.Completed(this, e);
+                return e.Complete();
+            });
         }
 
-        public event EventHandler Completed = delegate { };
+        public event AsyncEventHandler Completed = delegate { };
 
         private Exception _Exception { get; set; }
 
@@ -302,7 +312,7 @@ namespace FoxTunes
 
         protected virtual Task OnExceptionChanged()
         {
-            return this.ForegroundTaskRunner.RunAsync(() =>
+            return this.ForegroundTaskRunner.Run(() =>
             {
                 if (this.ExceptionChanged != null)
                 {
@@ -320,10 +330,15 @@ namespace FoxTunes
             {
                 return Task.CompletedTask;
             }
-            return this.ForegroundTaskRunner.RunAsync(() => this.Faulted(this, EventArgs.Empty));
+            return this.ForegroundTaskRunner.Run(() =>
+            {
+                var e = new AsyncEventArgs();
+                this.Faulted(this, e);
+                return e.Complete();
+            });
         }
 
-        public event EventHandler Faulted = delegate { };
+        public event AsyncEventHandler Faulted = delegate { };
 
         public override void InitializeComponent(ICore core)
         {

@@ -32,15 +32,15 @@ namespace FoxTunes.ViewModel
                         }
                         else if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
-                            this.PlaybackManager.CurrentStream.Resume();
+                            return this.PlaybackManager.CurrentStream.Resume();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsStopped)
                         {
-                            this.PlaybackManager.CurrentStream.Play();
+                            return this.PlaybackManager.CurrentStream.Play();
                         }
                         return Task.CompletedTask;
                     },
-                    () => this.PlaybackManager != null && this.PlaylistManager != null && (this.PlaybackManager.CurrentStream == null || (this.PlaybackManager.CurrentStream.IsPaused || this.PlaybackManager.CurrentStream.IsStopped))
+                    () => this.PlaybackManager != null && this.PlaylistManager != null && this.PlaylistManager.CanNavigate && (this.PlaybackManager.CurrentStream == null || (this.PlaybackManager.CurrentStream.IsPaused || this.PlaybackManager.CurrentStream.IsStopped))
                 );
             }
         }
@@ -49,19 +49,21 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(
+                return new AsyncCommand(
+                    this.BackgroundTaskRunner,
                     () =>
                     {
                         if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
-                            this.PlaybackManager.CurrentStream.Resume();
+                            return this.PlaybackManager.CurrentStream.Resume();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsPlaying)
                         {
-                            this.PlaybackManager.CurrentStream.Pause();
+                            return this.PlaybackManager.CurrentStream.Pause();
                         }
+                        return Task.CompletedTask;
                     },
-                    () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null
+                    () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && (this.PlaybackManager.CurrentStream.IsPlaying || this.PlaybackManager.CurrentStream.IsPaused)
                 );
             }
         }
@@ -72,7 +74,7 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     this.BackgroundTaskRunner,
-                    () => this.PlaybackManager.StopStream(),
+                    () => this.PlaybackManager.CurrentStream.Stop(),
                     () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsPlaying
                 );
             }
@@ -84,7 +86,7 @@ namespace FoxTunes.ViewModel
             {
                 return new AsyncCommand(
                     this.BackgroundTaskRunner,
-                    () => this.PlaybackManager.StopOutput(),
+                    () => this.PlaybackManager.Stop(),
                     () => this.PlaybackManager != null && this.Output != null && this.Output.IsStarted
                 );
             }
@@ -97,7 +99,7 @@ namespace FoxTunes.ViewModel
                 return new AsyncCommand(
                     this.BackgroundTaskRunner,
                     () => this.PlaylistManager.Previous(),
-                    async () => this.BackgroundTaskRunner != null && this.PlaylistManager != null && await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.CanNavigate)
+                    () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
                 );
             }
         }
@@ -109,7 +111,7 @@ namespace FoxTunes.ViewModel
                 return new AsyncCommand(
                     this.BackgroundTaskRunner,
                     () => this.PlaylistManager.Next(),
-                    async () => this.BackgroundTaskRunner != null && this.PlaylistManager != null && await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.CanNavigate)
+                    () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
                 );
             }
         }

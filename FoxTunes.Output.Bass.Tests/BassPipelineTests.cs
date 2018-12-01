@@ -22,7 +22,7 @@ namespace FoxTunes.Output.Bass.Tests
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false),
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[1], false)
             };
-            outputStreams[0].Play();
+            await outputStreams[0].Play();
             Assert.IsFalse(await this.Core.Components.Output.Preempt(outputStreams[1]));
         }
 
@@ -34,8 +34,8 @@ namespace FoxTunes.Output.Bass.Tests
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false),
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[1], false)
             };
-            outputStreams[0].Play();
-            outputStreams[1].Play();
+            await outputStreams[0].Play();
+            await outputStreams[1].Play();
             await Task.Delay(1000);
             Assert.IsTrue(outputStreams[1].Position > 0);
         }

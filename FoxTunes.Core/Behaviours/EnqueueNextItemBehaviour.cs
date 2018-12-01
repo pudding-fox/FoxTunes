@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -23,18 +24,21 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
+        protected virtual async void PlaybackManager_CurrentStreamChanged(object sender, AsyncEventArgs e)
         {
             if (this.PlaybackManager.CurrentStream == null)
             {
                 return;
             }
-            this.EnqueueItems();
+            using (e.Defer())
+            {
+                await this.EnqueueItems();
+            }
         }
 
-        private void EnqueueItems()
+        private async Task EnqueueItems()
         {
-            var playlistItem = this.PlaylistManager.GetNext();
+            var playlistItem = await this.PlaylistManager.GetNext();
             if (playlistItem == null)
             {
                 return;
@@ -44,7 +48,7 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            this.BackgroundTaskRunner.Run(async () =>
+            await this.BackgroundTaskRunner.Run(async () =>
             {
                 try
                 {

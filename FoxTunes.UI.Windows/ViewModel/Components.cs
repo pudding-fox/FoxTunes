@@ -55,25 +55,28 @@ namespace FoxTunes.ViewModel
             e.BackgroundTask.Faulted += this.OnFaulted;
         }
 
-        protected virtual async void OnFaulted(object sender, EventArgs e)
+        protected virtual async void OnFaulted(object sender, AsyncEventArgs e)
         {
             var backgroundTask = sender as IBackgroundTask;
-            if (backgroundTask.Exception is AggregateException)
+            using (e.Defer())
             {
-                foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
+                if (backgroundTask.Exception is AggregateException)
                 {
-                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, innerException));
+                    foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
+                    {
+                        await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, innerException));
+                    }
                 }
-            }
-            else
-            {
-                await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, backgroundTask.Exception));
+                else
+                {
+                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, backgroundTask.Exception));
+                }
             }
         }
 
         public Task Add(ComponentError error)
         {
-            return this.ForegroundTaskRunner.RunAsync(() =>
+            return this.ForegroundTaskRunner.Run(() =>
             {
                 if (this.Errors.Contains(error))
                 {
