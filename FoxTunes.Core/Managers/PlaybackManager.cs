@@ -98,12 +98,14 @@ namespace FoxTunes.Managers
 
         public event AsyncEventHandler CurrentStreamChanged = delegate { };
 
-        public Task Load(PlaylistItem playlistItem, bool immediate)
+        public async Task Load(PlaylistItem playlistItem, bool immediate)
         {
-            var task = new LoadOutputStreamTask(playlistItem, immediate);
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            using (var task = new LoadOutputStreamTask(playlistItem, immediate))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
         public Task Unload()
@@ -117,10 +119,12 @@ namespace FoxTunes.Managers
 
         public async Task Unload(IOutputStream outputStream)
         {
-            var task = new UnloadOutputStreamTask(outputStream);
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            await task.Run();
+            using (var task = new UnloadOutputStreamTask(outputStream))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
         public async Task Stop()
@@ -140,33 +144,11 @@ namespace FoxTunes.Managers
 
         public event BackgroundTaskEventHandler BackgroundTask = delegate { };
 
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
+        protected override void OnDisposing()
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
+            //TODO: Bad awaited Task.
             this.Unload();
-        }
-
-        ~PlaybackManager()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            this.Dispose(true);
+            base.OnDisposing();
         }
     }
 }

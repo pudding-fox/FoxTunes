@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,14 +24,43 @@ namespace FoxTunes.Managers
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public ITransactionSource Transaction { get; private set; }
+
+        private bool _CanNavigate { get; set; }
+
+        public bool CanNavigate
+        {
+            get
+            {
+                return this._CanNavigate;
+            }
+            set
+            {
+                this._CanNavigate = value;
+                this.OnCanNavigateChanged();
+            }
+        }
+
+        protected virtual void OnCanNavigateChanged()
+        {
+            if (this.CanNavigateChanged != null)
+            {
+                this.CanNavigateChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CanNavigate");
+        }
+
+        public event EventHandler CanNavigateChanged = delegate { };
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Database = core.Components.Database;
+            this.Database = core.Components.Database.New();
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.Transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted);
             //TODO: Bad .Wait().
             this.Refresh().Wait();
             base.InitializeComponent(core);
@@ -46,24 +76,43 @@ namespace FoxTunes.Managers
             return Task.CompletedTask;
         }
 
+        public Task<bool> HasItems()
+        {
+            return this.Database.ExecuteScalarAsync<bool>(this.Database.QueryFactory.Build().With(query1 =>
+            {
+                query1.Output.AddCase(
+                    query1.Output.CreateCaseCondition(
+                        query1.Output.CreateFunction(
+                            QueryFunction.Exists,
+                            query1.Output.CreateSubQuery(
+                                this.Database.QueryFactory.Build().With(query2 =>
+                                {
+                                    query2.Output.AddOperator(QueryOperator.Star);
+                                    query2.Source.AddTable(this.Database.Tables.PlaylistItem);
+                                })
+                            )
+                        ),
+                        query1.Output.CreateConstant(1)
+                    ),
+                    query1.Output.CreateCaseCondition(
+                        query1.Output.CreateConstant(0)
+                    )
+                );
+            }), this.Transaction);
+        }
+
         public async Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.Database != null && await this.Database.ExecuteScalarAsync<bool>(this.Database.QueryFactory.Build().With(query1 =>
-            {
-                query1.Output.AddFunction(QueryFunction.Exists, query1.Output.CreateSubQuery(this.Database.QueryFactory.Build().With(query2 =>
-                {
-                    query2.Output.AddOperator(QueryOperator.Star);
-                    query2.Source.AddTable(this.Database.Tables.PlaylistItem);
-                })));
-            }));
+            this.CanNavigate = this.Database != null && await this.HasItems();
             if (this.CanNavigate)
             {
                 Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
                 if (this.CurrentItem != null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Refreshing current item.");
-                    if ((this.CurrentItem = await this.Database.Sets.PlaylistItem.FindAsync(this.CurrentItem.Id)) == null)
+                    var set = this.Database.Set<PlaylistItem>(this.Transaction);
+                    if ((this.CurrentItem = await set.FindAsync(this.CurrentItem.Id)) == null)
                     {
                         Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
                     }
@@ -97,13 +146,15 @@ namespace FoxTunes.Managers
             await this.Insert(index, paths, clear);
         }
 
-        public Task Insert(int index, IEnumerable<string> paths, bool clear)
+        public async Task Insert(int index, IEnumerable<string> paths, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting paths into playlist at index: {0}", index);
-            var task = new AddPathsToPlaylistTask(index, paths, clear);
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            using (var task = new AddPathsToPlaylistTask(index, paths, clear))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
         public async Task Add(LibraryHierarchyNode libraryHierarchyNode, bool clear)
@@ -113,13 +164,15 @@ namespace FoxTunes.Managers
             await this.Insert(index, libraryHierarchyNode, clear);
         }
 
-        public Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
+        public async Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting library node into playlist at index: {0}", index);
-            var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode, clear);
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            using (var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode, clear))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
         public async Task Move(IEnumerable<PlaylistItem> playlistItems)
@@ -129,31 +182,38 @@ namespace FoxTunes.Managers
             await this.Move(index, playlistItems);
         }
 
-        public Task Move(int index, IEnumerable<PlaylistItem> playlistItems)
+        public async Task Move(int index, IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items at index: {0}", index);
-            var task = new MovePlaylistItemsTask(index, playlistItems);
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            using (var task = new MovePlaylistItemsTask(index, playlistItems))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
-        public Task Remove(IEnumerable<PlaylistItem> playlistItems)
+        public async Task Remove(IEnumerable<PlaylistItem> playlistItems)
         {
-            var task = new RemoveItemsFromPlaylistTask(playlistItems);
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            using (var task = new RemoveItemsFromPlaylistTask(playlistItems))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
-        public Task Crop(IEnumerable<PlaylistItem> playlistItems)
+        public async Task Crop(IEnumerable<PlaylistItem> playlistItems)
         {
-            var task = new RemoveItemsFromPlaylistTask(
-                this.Database.Sets.PlaylistItem.Except(playlistItems)
-            );
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            var queryable = this.Database.AsQueryable<PlaylistItem>(this.Transaction);
+            var query = queryable.Except(playlistItems);
+            //TODO: Bad .ToArray()
+            using (var task = new RemoveItemsFromPlaylistTask(query.ToArray()))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
         public async Task<int> GetInsertIndex()
@@ -168,8 +228,6 @@ namespace FoxTunes.Managers
                 return playlistItem.Sequence + 1;
             }
         }
-
-        public bool CanNavigate { get; private set; }
 
         public async Task<PlaylistItem> GetNext()
         {
@@ -267,50 +325,50 @@ namespace FoxTunes.Managers
             }
         }
 
-        protected virtual Task<PlaylistItem> GetPlaylistItem(int sequence)
+        protected virtual async Task<PlaylistItem> GetPlaylistItem(int sequence)
         {
-            return this.Database.AsQueryable<PlaylistItem>()
+            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
                 .Where(playlistItem => playlistItem.Sequence == sequence)
                 .Take(1)
                 .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
         }
 
-        protected virtual Task<PlaylistItem> GetPlaylistItem(string fileName)
+        protected virtual async Task<PlaylistItem> GetPlaylistItem(string fileName)
         {
-            return this.Database.AsQueryable<PlaylistItem>()
+            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
                 .Where(playlistItem => playlistItem.FileName == fileName)
                 .Take(1)
                 .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
         }
 
-        protected virtual Task<PlaylistItem> GetFirstPlaylistItem()
+        protected virtual async Task<PlaylistItem> GetFirstPlaylistItem()
         {
-            return this.Database.AsQueryable<PlaylistItem>()
+            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
                 .OrderBy(playlistItem => playlistItem.Sequence)
                 .Take(1)
                 .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
         }
 
-        protected virtual Task<PlaylistItem> GetLastPlaylistItem()
+        protected virtual async Task<PlaylistItem> GetLastPlaylistItem()
         {
-            return this.Database.AsQueryable<PlaylistItem>()
+            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
                 .OrderByDescending(playlistItem => playlistItem.Sequence)
                 .Take(1)
                 .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
         }
 
-        protected virtual Task<PlaylistItem> GetNextPlaylistItem(int sequence)
+        protected virtual async Task<PlaylistItem> GetNextPlaylistItem(int sequence)
         {
-            return this.Database.AsQueryable<PlaylistItem>()
+            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
                 .Where(playlistItem => playlistItem.Sequence > sequence)
                 .OrderBy(playlistItem => playlistItem.Sequence)
                 .Take(1)
                 .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
         }
 
-        protected virtual Task<PlaylistItem> GetPreviousPlaylistItem(int sequence)
+        protected virtual async Task<PlaylistItem> GetPreviousPlaylistItem(int sequence)
         {
-            return this.Database.AsQueryable<PlaylistItem>()
+            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
                 .Where(playlistItem => playlistItem.Sequence < sequence)
                 .OrderByDescending(playlistItem => playlistItem.Sequence)
                 .Take(1)
@@ -369,12 +427,14 @@ namespace FoxTunes.Managers
             await this.Play(playlistItem);
         }
 
-        public Task Clear()
+        public async Task Clear()
         {
-            var task = new ClearPlaylistTask();
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            using (var task = new ClearPlaylistTask())
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
         private PlaylistItem _CurrentItem { get; set; }
@@ -430,6 +490,15 @@ namespace FoxTunes.Managers
                     return this.Clear();
             }
             return Task.CompletedTask;
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
+            base.OnDisposing();
         }
     }
 }

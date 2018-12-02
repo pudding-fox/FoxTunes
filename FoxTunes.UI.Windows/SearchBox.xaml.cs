@@ -120,9 +120,9 @@ namespace FoxTunes
 
         public void Clear()
         {
-            this.Text = null;
+            this.Text = string.Empty;
             this.Timer.Stop();
-            this.SearchText = null;
+            this.SearchText = string.Empty;
         }
     }
 }

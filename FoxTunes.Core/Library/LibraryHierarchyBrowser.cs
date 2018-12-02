@@ -4,6 +4,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -69,25 +70,31 @@ namespace FoxTunes
             {
                 query = this.Database.Queries.GetLibraryHierarchyNodesWithFilter;
             }
-            var nodes = this.Database.ExecuteEnumerator<LibraryHierarchyNode>(query, (parameters, phase) =>
+            using (var database = this.Database.New())
             {
-                switch (phase)
+                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["libraryHierarchyId"] = libraryHierarchyId;
-                        parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
-                        if (parameters.Contains("filter"))
+                    var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(query, (parameters, phase) =>
+                    {
+                        switch (phase)
                         {
-                            parameters["filter"] = this.GetFilter();
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["libraryHierarchyId"] = libraryHierarchyId;
+                                parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
+                                if (parameters.Contains("filter"))
+                                {
+                                    parameters["filter"] = this.GetFilter();
+                                }
+                                break;
                         }
-                        break;
+                    }, transaction);
+                    foreach (var node in nodes)
+                    {
+                        node.InitializeComponent(this.Core);
+                        yield return node;
+                    }
                 }
-            }).ToArray();
-            foreach (var node in nodes)
-            {
-                node.InitializeComponent(this.Core);
             }
-            return nodes;
         }
 
         private string GetFilter()

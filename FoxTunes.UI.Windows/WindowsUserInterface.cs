@@ -4,10 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -77,6 +76,11 @@ namespace FoxTunes
                     this.Queue.Enqueue(path);
                 }
             }
+        }
+
+        public override void Fatal(Exception exception)
+        {
+            MessageBox.Show(exception.Message, "Fatal", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         protected virtual async Task OnOpen(IEnumerable<string> paths)

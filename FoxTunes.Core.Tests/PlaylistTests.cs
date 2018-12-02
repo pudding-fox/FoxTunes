@@ -2,12 +2,63 @@
 using System.Threading.Tasks;
 using System.Linq;
 using FoxDb;
+using System.Data;
 
 namespace FoxTunes
 {
-    [TestFixture]
-    public class PlaylistTests : TestBase
+    [TestFixture(SQLITE)]
+    [TestFixture(SQLSERVER)]
+    public class PlaylistTests : DatabaseTests
     {
+        public PlaylistTests(long configuration)
+            : base(configuration)
+        {
+
+        }
+
+        [Test]
+        public async Task CanAddFilesToPlaylist()
+        {
+            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Add(new[]
+            {
+                TestInfo.AudioFileNames[0],
+                TestInfo.AudioFileNames[2],
+                TestInfo.AudioFileNames[3]
+            }, false);
+            this.AssertPlaylistItems(
+                TestInfo.AudioFileNames[0],
+                TestInfo.AudioFileNames[2],
+                TestInfo.AudioFileNames[3]
+            );
+            await this.Core.Managers.Playlist.Clear();
+            this.AssertPlaylistItems();
+        }
+
+        [Test]
+        public async Task CanRemoveItemsFromPlaylist()
+        {
+            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Add(new[]
+            {
+                TestInfo.AudioFileNames[0],
+                TestInfo.AudioFileNames[1],
+                TestInfo.AudioFileNames[2],
+                TestInfo.AudioFileNames[3]
+            }, false);
+            await this.Core.Managers.Playlist.Remove(
+                new[]
+                {
+                    await this.GetPlaylistItem(TestInfo.AudioFileNames[1]),
+                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+                }
+            );
+            this.AssertPlaylistItems(
+                TestInfo.AudioFileNames[0],
+                TestInfo.AudioFileNames[3]
+            );
+        }
+
         [Test]
         public async Task CanInsertFilesIntoPlaylist()
         {
@@ -72,19 +123,25 @@ namespace FoxTunes
             );
         }
 
-        protected virtual Task<PlaylistItem> GetPlaylistItem(string fileName)
+        protected virtual async Task<PlaylistItem> GetPlaylistItem(string fileName)
         {
-            return this.Core.Components.Database.AsQueryable<PlaylistItem>()
-                .Where(playlistItem => playlistItem.FileName == fileName)
-                .Take(1)
-                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+            using (var database = this.Core.Components.Database.New())
+            {
+                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                {
+                    return await database.AsQueryable<PlaylistItem>(transaction)
+                        .Where(playlistItem => playlistItem.FileName == fileName)
+                        .Take(1)
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                }
+            }
         }
 
         protected virtual void AssertPlaylistItems(params string[] fileNames)
         {
-            var sequence = this.Core.Components.Database.Sets.PlaylistItem;
+            var set = this.Core.Components.Database.Set<PlaylistItem>();
             var query = (
-                from element in sequence
+                from element in set
                 orderby element.Sequence
                 select element
             ).ToArray();

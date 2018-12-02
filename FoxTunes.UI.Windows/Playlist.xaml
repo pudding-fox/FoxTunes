@@ -7,21 +7,11 @@
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             xmlns:System="clr-namespace:System;assembly=mscorlib" 
-             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              x:Class="FoxTunes.Playlist" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}" AutoSizeGridColumns="True"></ViewModel:Playlist>
-        <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Components.Database.Sets.PlaylistItem}" IsLiveSortingRequested="True">
-            <CollectionViewSource.LiveGroupingProperties>
-                <System:String>Sequence</System:String>
-            </CollectionViewSource.LiveGroupingProperties>
-            <CollectionViewSource.SortDescriptions>
-                <ComponentModel:SortDescription PropertyName="Sequence"/>
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -32,7 +22,7 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <Grid>
-        <ListView ItemsSource="{Binding Mode=OneWay, Source={StaticResource PlaylistItems}}" 
+        <ListView ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" 
                   Windows:ListViewExtensions.SelectedItems="{Binding SelectedItems, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DropInsert="True"
                   Windows:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"
@@ -60,7 +50,7 @@
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Components.Database.Sets.PlaylistItem.Count, Mode=OneWay}" Value="0">
+                        <DataTrigger Binding="{Binding Managers.Playlist.CanNavigate, Mode=OneWay}" Value="False">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>

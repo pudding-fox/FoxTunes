@@ -1,8 +1,9 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
-    public class PlaylistColumn : PersistableComponent
+    public class PlaylistColumn : PersistableComponent, ISequenceableComponent
     {
         public PlaylistColumn()
         {

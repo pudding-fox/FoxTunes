@@ -23,13 +23,22 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Windows:LibraryViewMode SelectedLibraryHierarchy="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"></Windows:LibraryViewMode>
-        <TreeView x:Name="TreeView" Grid.Row="1" 
+        <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
+        <ComboBox 
+            Grid.Column="1" 
+            ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" 
+            SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
+            DisplayMemberPath="Name"/>
+        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" Grid.Row="1" 
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.RightButtonSelect="True"
@@ -60,14 +69,14 @@
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"></Setter>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Items.Count, Mode=OneWay, Source={StaticResource ViewModel}}" Value="0">
+                        <DataTrigger Binding="{Binding Managers.Library.CanNavigate, Mode=OneWay}" Value="False">
                             <Setter Property="Visibility" Value="Visible"></Setter>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Windows:SearchBox Grid.Row="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
+        <Windows:SearchBox Grid.ColumnSpan="2" Grid.Row="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
         <Utilities:MouseCursorAdorner x:Name="MouseCursorAdorner">
             <Utilities:MouseCursorAdorner.Template>
                 <DataTemplate>

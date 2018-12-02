@@ -1,12 +1,22 @@
 ﻿using NUnit.Framework;
+using System;
+using FoxDb;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [TestFixture]
-    public class LibraryTests : TestBase
+    [TestFixture(SQLITE)]
+    [TestFixture(SQLSERVER)]
+    public class LibraryTests : DatabaseTests
     {
+        public LibraryTests(long configuration)
+            : base(configuration)
+        {
+
+        }
+
         [Test]
         public async Task CanAddFilesToLibrary()
         {
@@ -32,9 +42,9 @@ namespace FoxTunes
 
         protected virtual void AssertLibraryItems(params string[] fileNames)
         {
-            var sequence = this.Core.Components.Database.Sets.LibraryItem;
+            var set = this.Core.Components.Database.Set<LibraryItem>();
             var query = (
-                from element in sequence
+                from element in set
                 select element
             ).ToArray();
             Assert.AreEqual(fileNames.Length, query.Length);
@@ -46,10 +56,28 @@ namespace FoxTunes
 
         protected virtual void AssertLibraryHierarchy(params string[] fileNames)
         {
-            foreach (var hierarchy in this.Core.Components.Database.Sets.LibraryHierarchy)
+            var set = this.Core.Components.Database.Set<LibraryHierarchy>();
+            foreach (var hierarchy in set)
             {
                 var nodes = this.Core.Components.LibraryHierarchyBrowser.GetNodes(hierarchy);
+                this.AssertLibraryHierarchy(hierarchy, nodes, fileNames);
             }
+        }
+
+        private void AssertLibraryHierarchy(LibraryHierarchy hierarchy, IEnumerable<LibraryHierarchyNode> nodes, string[] fileNames)
+        {
+            var selector = default(Func<LibraryHierarchyNode, IEnumerable<LibraryHierarchyNode>>);
+            selector = node =>
+            {
+                if (node.IsLeaf)
+                {
+                    return new[] { node };
+                }
+                node.LoadChildren();
+                return node.Children.SelectMany(selector);
+            };
+            var leaves = nodes.SelectMany(selector);
+            Assert.AreEqual(fileNames.Count(), leaves.Count());
         }
     }
 }

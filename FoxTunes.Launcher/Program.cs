@@ -24,16 +24,27 @@ namespace FoxTunes.Launcher
                 Log4NetLogger.EnableFileAppender();
                 using (var core = new Core())
                 {
-                    core.Load();
-                    if (!CoreValidator.Instance.Validate(core))
+                    try
                     {
-                        throw new InvalidOperationException("One or more required components were not loaded.");
+                        core.Load();
+                        if (!CoreValidator.Instance.Validate(core))
+                        {
+                            throw new InvalidOperationException("One or more required components were not loaded.");
+                        }
+                        server.Message += (sender, e) =>
+                        {
+                            core.Components.UserInterface.Run(e.Message);
+                        };
+                        core.Components.UserInterface.Run(Environment.CommandLine);
                     }
-                    server.Message += (sender, e) =>
+                    catch (Exception e)
                     {
-                        core.Components.UserInterface.Run(e.Message);
-                    };
-                    core.Components.UserInterface.Run(Environment.CommandLine);
+                        if (core.Components.UserInterface != null)
+                        {
+                            core.Components.UserInterface.Fatal(e);
+                            return;
+                        }
+                    }
                     core.Components.UserInterface.Show();
                 }
             }

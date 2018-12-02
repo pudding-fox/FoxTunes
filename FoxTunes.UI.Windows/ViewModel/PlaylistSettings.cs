@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -49,12 +50,15 @@ namespace FoxTunes.ViewModel
         {
             try
             {
-                using (var transaction = this.Database.BeginTransaction())
+                using (var database = this.Database.New())
                 {
-                    var playlistColumns = this.Database.Set<PlaylistColumn>(transaction);
-                    playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns.ItemsSource));
-                    playlistColumns.AddOrUpdate(this.PlaylistColumns.ItemsSource);
-                    transaction.Commit();
+                    using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                    {
+                        var playlistColumns = database.Set<PlaylistColumn>(transaction);
+                        playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns.ItemsSource));
+                        playlistColumns.AddOrUpdate(this.PlaylistColumns.ItemsSource);
+                        transaction.Commit();
+                    }
                 }
                 this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
             }
@@ -87,10 +91,11 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.PlaylistColumns = new CollectionManager<PlaylistColumn>()
             {
-                ItemFactory = () => this.Database.Sets.PlaylistColumn.Create().With(playlistColumn =>
+                ItemFactory = () => this.Database.Set<PlaylistColumn>().Create().With(playlistColumn =>
                 {
                     playlistColumn.Name = "New";
                     playlistColumn.DisplayScript = "'New'";
+                    playlistColumn.Sequence = this.PlaylistColumns.ItemsSource.Count();
                 }),
                 ExchangeHandler = (item1, item2) =>
                 {
@@ -105,7 +110,15 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            this.PlaylistColumns.ItemsSource = new ObservableCollection<PlaylistColumn>(this.Database.Sets.PlaylistColumn);
+            using (var database = this.Database.New())
+            {
+                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                {
+                    this.PlaylistColumns.ItemsSource = new ObservableCollection<PlaylistColumn>(
+                        database.Set<PlaylistColumn>(transaction)
+                    );
+                }
+            }
         }
 
         protected override Freezable CreateInstanceCore()

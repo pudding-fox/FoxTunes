@@ -15,7 +15,7 @@ namespace FoxTunes
             }
             else
             {
-                action();
+                Logger.Write(this, LogLevel.Warn, "Cannot execute task: Application.Current is null.");
                 return Task.CompletedTask;
             }
         }
@@ -28,7 +28,8 @@ namespace FoxTunes
             }
             else
             {
-                return func();
+                Logger.Write(this, LogLevel.Warn, "Cannot execute task: Application.Current is null.");
+                return Task.CompletedTask;
             }
         }
     }

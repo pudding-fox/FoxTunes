@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using System;
+using FoxTunes.Interfaces;
 
 namespace FoxTunes
 {
@@ -7,5 +8,7 @@ namespace FoxTunes
         public abstract void Show();
 
         public abstract void Run(string message);
+
+        public abstract void Fatal(Exception exception);
     }
 }

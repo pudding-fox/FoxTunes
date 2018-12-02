@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -95,12 +96,15 @@ namespace FoxTunes.ViewModel
         {
             try
             {
-                using (var transaction = this.Database.BeginTransaction())
+                using (var database = this.Database.New())
                 {
-                    var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction);
-                    libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
-                    libraryHierarchies.AddOrUpdate(this.LibraryHierarchies.ItemsSource);
-                    transaction.Commit();
+                    using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                    {
+                        var libraryHierarchies = database.Set<LibraryHierarchy>(transaction);
+                        libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
+                        libraryHierarchies.AddOrUpdate(this.LibraryHierarchies.ItemsSource);
+                        transaction.Commit();
+                    }
                 }
                 this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
                 this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
@@ -134,10 +138,11 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.LibraryHierarchyLevels = new CollectionManager<LibraryHierarchyLevel>()
             {
-                ItemFactory = () => this.Database.Sets.LibraryHierarchyLevel.Create().With(libraryHierarchyLevel =>
+                ItemFactory = () => this.Database.Set<LibraryHierarchyLevel>().Create().With(libraryHierarchyLevel =>
                 {
                     libraryHierarchyLevel.Name = "New";
                     libraryHierarchyLevel.DisplayScript = "'New'";
+                    libraryHierarchyLevel.Sequence = this.LibraryHierarchyLevels.ItemsSource.Count();
                 }),
                 ExchangeHandler = (item1, item2) =>
                 {
@@ -148,9 +153,10 @@ namespace FoxTunes.ViewModel
             };
             this.LibraryHierarchies = new CollectionManager<LibraryHierarchy>()
             {
-                ItemFactory = () => this.Database.Sets.LibraryHierarchy.Create().With(libraryHierarchy =>
+                ItemFactory = () => this.Database.Set<LibraryHierarchy>().Create().With(libraryHierarchy =>
                 {
                     libraryHierarchy.Name = "New";
+                    libraryHierarchy.Sequence = this.LibraryHierarchies.ItemsSource.Count();
                 }),
                 ExchangeHandler = (item1, item2) =>
                 {
@@ -176,7 +182,15 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            this.LibraryHierarchies.ItemsSource = new ObservableCollection<LibraryHierarchy>(this.Database.Sets.LibraryHierarchy);
+            using (var database = this.Database.New())
+            {
+                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                {
+                    this.LibraryHierarchies.ItemsSource = new ObservableCollection<LibraryHierarchy>(
+                        database.Set<LibraryHierarchy>(transaction)
+                    );
+                }
+            }
         }
 
         protected override Freezable CreateInstanceCore()

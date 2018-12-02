@@ -5,6 +5,10 @@ namespace FoxTunes.Interfaces
 {
     public interface IDatabaseQueries : IBaseComponent
     {
+        IDatabaseQuery RemovePlaylistItems { get; }
+
+        IDatabaseQuery RemoveLibraryItems { get; }
+
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }
 
         IDatabaseQuery AddPlaylistSequenceRecord { get; }
@@ -23,8 +27,16 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery UpdateLibraryVariousArtists { get; }
 
-        IDatabaseQuery PlaylistSequenceBuilder(IEnumerable<string> metaDataNames);
+        IDatabaseQuery BeginSequencePlaylistItems { get; }
 
-        IDatabaseQuery LibraryHierarchyBuilder(IEnumerable<string> metaDataNames);
+        IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
+
+        IDatabaseQuery EndSequencePlaylistItems { get; }
+
+        IDatabaseQuery BeginBuildLibraryHierarchies { get; }
+
+        IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
+
+        IDatabaseQuery EndBuildLibraryHierarchies { get; }
     }
 }

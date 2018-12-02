@@ -13,13 +13,16 @@ namespace FoxTunes
         {
         }
 
+        public ICore Core { get; private set; }
+
         public IDatabaseComponent Database { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Database = core.Components.Database;
+            this.Core = core;
+            this.Database = core.Components.Database.New();
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
@@ -57,27 +60,13 @@ namespace FoxTunes
             }, transaction);
         }
 
-        protected virtual Task CleanupMetaData(ITransactionSource transaction)
+        protected override void OnDisposing()
         {
-            var table = this.Database.Config.Table("LibraryItem_MetaDataItem", TableFlags.None);
-            var column = table.Column("LibraryItem_Id");
-            var query = this.Database.QueryFactory.Build();
-            query.Delete.Touch();
-            query.Source.AddTable(table);
-            query.Filter.Add().With(expression =>
+            if (!object.ReferenceEquals(this.Core.Components.Database, this.Database))
             {
-                expression.Left = expression.CreateColumn(column);
-                expression.Operator = expression.CreateOperator(QueryOperator.Not);
-                expression.Right = expression.CreateUnary(
-                    QueryOperator.In,
-                    expression.CreateSubQuery(this.Database.QueryFactory.Build().With(subQuery =>
-                    {
-                        subQuery.Output.AddColumn(this.Database.Tables.LibraryItem.PrimaryKey);
-                        subQuery.Source.AddTable(this.Database.Tables.LibraryItem);
-                    }))
-                );
-            });
-            return this.Database.ExecuteAsync(query, transaction);
+                this.Database.Dispose();
+            }
+            base.OnDisposing();
         }
     }
 }

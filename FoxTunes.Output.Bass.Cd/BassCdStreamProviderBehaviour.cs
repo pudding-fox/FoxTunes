@@ -6,6 +6,7 @@ using ManagedBass.Cd;
 using ManagedBass.Gapless.Cd;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -156,12 +157,14 @@ namespace FoxTunes
             return Task.CompletedTask;
         }
 
-        public Task OpenCd()
+        public async Task OpenCd()
         {
-            var task = new AddCdToPlaylistTask(this.CdDrive, this.CdLookup, this.CdLookupHost);
-            task.InitializeComponent(this.Core);
-            this.OnBackgroundTask(task);
-            return task.Run();
+            using (var task = new AddCdToPlaylistTask(this.CdDrive, this.CdLookup, this.CdLookupHost))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
@@ -225,7 +228,7 @@ namespace FoxTunes
                     }
                     //Always append for now.
                     this.Sequence = await this.PlaylistManager.GetInsertIndex();
-                    using (var transaction = this.Database.BeginTransaction())
+                    using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
                     {
                         await this.AddPlaylistItems(transaction);
                         await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
