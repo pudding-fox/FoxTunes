@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
+﻿using FoxDb;
+using NUnit.Framework;
 using System;
-using FoxDb;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,25 +42,37 @@ namespace FoxTunes
 
         protected virtual void AssertLibraryItems(params string[] fileNames)
         {
-            var set = this.Core.Components.Database.Set<LibraryItem>();
-            var query = (
-                from element in set
-                select element
-            ).ToArray();
-            Assert.AreEqual(fileNames.Length, query.Length);
-            for (var a = 0; a < fileNames.Length; a++)
+            using (var database = this.Core.Factories.Database.Create())
             {
-                Assert.AreEqual(fileNames[a], query[a].FileName);
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var set = database.Set<LibraryItem>(transaction);
+                    var query = (
+                        from element in set
+                        select element
+                    ).ToArray();
+                    Assert.AreEqual(fileNames.Length, query.Length);
+                    for (var a = 0; a < fileNames.Length; a++)
+                    {
+                        Assert.AreEqual(fileNames[a], query[a].FileName);
+                    }
+                }
             }
         }
 
         protected virtual void AssertLibraryHierarchy(params string[] fileNames)
         {
-            var set = this.Core.Components.Database.Set<LibraryHierarchy>();
-            foreach (var hierarchy in set)
+            using (var database = this.Core.Factories.Database.Create())
             {
-                var nodes = this.Core.Components.LibraryHierarchyBrowser.GetNodes(hierarchy);
-                this.AssertLibraryHierarchy(hierarchy, nodes, fileNames);
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var set = database.Set<LibraryHierarchy>(transaction);
+                    foreach (var hierarchy in set)
+                    {
+                        var nodes = this.Core.Components.LibraryHierarchyBrowser.GetNodes(hierarchy);
+                        this.AssertLibraryHierarchy(hierarchy, nodes, fileNames);
+                    }
+                }
             }
         }
 

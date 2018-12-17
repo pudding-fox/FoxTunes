@@ -3,7 +3,6 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,13 +17,11 @@ namespace FoxTunes.Managers
 
         public ICore Core { get; private set; }
 
-        public IDatabaseComponent Database { get; private set; }
+        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
-
-        public ITransactionSource Transaction { get; private set; }
 
         private bool _CanNavigate { get; set; }
 
@@ -55,12 +52,11 @@ namespace FoxTunes.Managers
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Database = core.Components.Database.New();
+            this.DatabaseFactory = core.Factories.Database;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted);
             //TODO: Bad .Wait().
             this.Refresh().Wait();
             base.InitializeComponent(core);
@@ -76,45 +72,57 @@ namespace FoxTunes.Managers
             return Task.CompletedTask;
         }
 
-        public Task<bool> HasItems()
+        public async Task<bool> HasItems()
         {
-            return this.Database.ExecuteScalarAsync<bool>(this.Database.QueryFactory.Build().With(query1 =>
+            using (var database = this.DatabaseFactory.Create())
             {
-                query1.Output.AddCase(
-                    query1.Output.CreateCaseCondition(
-                        query1.Output.CreateFunction(
-                            QueryFunction.Exists,
-                            query1.Output.CreateSubQuery(
-                                this.Database.QueryFactory.Build().With(query2 =>
-                                {
-                                    query2.Output.AddOperator(QueryOperator.Star);
-                                    query2.Source.AddTable(this.Database.Tables.PlaylistItem);
-                                })
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    return await database.ExecuteScalarAsync<bool>(database.QueryFactory.Build().With(query1 =>
+                    {
+                        query1.Output.AddCase(
+                            query1.Output.CreateCaseCondition(
+                                query1.Output.CreateFunction(
+                                    QueryFunction.Exists,
+                                    query1.Output.CreateSubQuery(
+                                        database.QueryFactory.Build().With(query2 =>
+                                        {
+                                            query2.Output.AddOperator(QueryOperator.Star);
+                                            query2.Source.AddTable(database.Tables.PlaylistItem);
+                                        })
+                                    )
+                                ),
+                                query1.Output.CreateConstant(1)
+                            ),
+                            query1.Output.CreateCaseCondition(
+                                query1.Output.CreateConstant(0)
                             )
-                        ),
-                        query1.Output.CreateConstant(1)
-                    ),
-                    query1.Output.CreateCaseCondition(
-                        query1.Output.CreateConstant(0)
-                    )
-                );
-            }), this.Transaction);
+                        );
+                    }), transaction);
+                }
+            }
         }
 
         public async Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.Database != null && await this.HasItems();
+            this.CanNavigate = this.DatabaseFactory != null && await this.HasItems();
             if (this.CanNavigate)
             {
                 Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
                 if (this.CurrentItem != null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Refreshing current item.");
-                    var set = this.Database.Set<PlaylistItem>(this.Transaction);
-                    if ((this.CurrentItem = await set.FindAsync(this.CurrentItem.Id)) == null)
+                    using (var database = this.DatabaseFactory.Create())
                     {
-                        Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                        {
+                            var set = database.Set<PlaylistItem>(transaction);
+                            if ((this.CurrentItem = await set.FindAsync(this.CurrentItem.Id)) == null)
+                            {
+                                Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                            }
+                        }
                     }
                 }
             }
@@ -205,14 +213,20 @@ namespace FoxTunes.Managers
 
         public async Task Crop(IEnumerable<PlaylistItem> playlistItems)
         {
-            var queryable = this.Database.AsQueryable<PlaylistItem>(this.Transaction);
-            var query = queryable.Except(playlistItems);
-            //TODO: Bad .ToArray()
-            using (var task = new RemoveItemsFromPlaylistTask(query.ToArray()))
+            using (var database = this.DatabaseFactory.Create())
             {
-                task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
-                await task.Run();
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var queryable = database.AsQueryable<PlaylistItem>(transaction);
+                    var query = queryable.Except(playlistItems);
+                    //TODO: Bad .ToArray()
+                    using (var task = new RemoveItemsFromPlaylistTask(query.ToArray()))
+                    {
+                        task.InitializeComponent(this.Core);
+                        this.OnBackgroundTask(task);
+                        await task.Run();
+                    }
+                }
             }
         }
 
@@ -327,52 +341,88 @@ namespace FoxTunes.Managers
 
         protected virtual async Task<PlaylistItem> GetPlaylistItem(int sequence)
         {
-            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
-                .Where(playlistItem => playlistItem.Sequence == sequence)
-                .Take(1)
-                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    return await database.AsQueryable<PlaylistItem>(transaction)
+                        .Where(playlistItem => playlistItem.Sequence == sequence)
+                        .Take(1)
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                }
+            }
         }
 
         protected virtual async Task<PlaylistItem> GetPlaylistItem(string fileName)
         {
-            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
-                .Where(playlistItem => playlistItem.FileName == fileName)
-                .Take(1)
-                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    return await database.AsQueryable<PlaylistItem>(transaction)
+                        .Where(playlistItem => playlistItem.FileName == fileName)
+                        .Take(1)
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                }
+            }
         }
 
         protected virtual async Task<PlaylistItem> GetFirstPlaylistItem()
         {
-            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
-                .OrderBy(playlistItem => playlistItem.Sequence)
-                .Take(1)
-                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    return await database.AsQueryable<PlaylistItem>(transaction)
+                        .OrderBy(playlistItem => playlistItem.Sequence)
+                        .Take(1)
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                }
+            }
         }
 
         protected virtual async Task<PlaylistItem> GetLastPlaylistItem()
         {
-            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
-                .OrderByDescending(playlistItem => playlistItem.Sequence)
-                .Take(1)
-                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    return await database.AsQueryable<PlaylistItem>(transaction)
+                        .OrderByDescending(playlistItem => playlistItem.Sequence)
+                        .Take(1)
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                }
+            }
         }
 
         protected virtual async Task<PlaylistItem> GetNextPlaylistItem(int sequence)
         {
-            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
-                .Where(playlistItem => playlistItem.Sequence > sequence)
-                .OrderBy(playlistItem => playlistItem.Sequence)
-                .Take(1)
-                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    return await database.AsQueryable<PlaylistItem>(transaction)
+                        .Where(playlistItem => playlistItem.Sequence > sequence)
+                        .OrderBy(playlistItem => playlistItem.Sequence)
+                        .Take(1)
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                }
+            }
         }
 
         protected virtual async Task<PlaylistItem> GetPreviousPlaylistItem(int sequence)
         {
-            return await this.Database.AsQueryable<PlaylistItem>(this.Transaction)
-                .Where(playlistItem => playlistItem.Sequence < sequence)
-                .OrderByDescending(playlistItem => playlistItem.Sequence)
-                .Take(1)
-                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    return await database.AsQueryable<PlaylistItem>(transaction)
+                        .Where(playlistItem => playlistItem.Sequence < sequence)
+                        .OrderByDescending(playlistItem => playlistItem.Sequence)
+                        .Take(1)
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                }
+            }
         }
 
         public async Task Play(PlaylistItem playlistItem)
@@ -490,15 +540,6 @@ namespace FoxTunes.Managers
                     return this.Clear();
             }
             return Task.CompletedTask;
-        }
-
-        protected override void OnDisposing()
-        {
-            if (this.Database != null)
-            {
-                this.Database.Dispose();
-            }
-            base.OnDisposing();
         }
     }
 }

@@ -19,9 +19,7 @@ namespace FoxTunes
 
         }
 
-        public ICore Core { get; private set; }
-
-        public IDatabaseComponent Database { get; private set; }
+        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
@@ -176,8 +174,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Core = core;
-            this.Database = core.Components.Database;
+            this.DatabaseFactory = core.Factories.Database;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             if (this.IsLeaf)
             {
@@ -202,17 +199,16 @@ namespace FoxTunes
 
         public void LoadMetaDatas()
         {
-            if (this.Database == null)
+            if (this.DatabaseFactory == null)
             {
                 return;
             }
-            using (var database = this.Database.New())
+            using (var database = this.DatabaseFactory.Create())
             {
-                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     this.MetaDatas = new ObservableCollection<MetaDataItem>(
                         MetaDataInfo.GetMetaData(
-                            this.Core,
                             database,
                             this,
                             META_DATA_TYPE,

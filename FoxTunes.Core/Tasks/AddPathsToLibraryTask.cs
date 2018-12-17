@@ -49,7 +49,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 await this.AddLibraryItems(transaction);
                 using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>

@@ -22,7 +22,7 @@ namespace FoxTunes
         {
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Clearing library.");
-            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryItems, transaction);
                 transaction.Commit();

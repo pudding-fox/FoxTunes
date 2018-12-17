@@ -1,17 +1,16 @@
-﻿using FoxTunes.Integration;
+﻿using FoxDb;
+using FoxTunes.Integration;
 using FoxTunes.Interfaces;
 using FoxTunes.Utilities;
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
-using FoxDb;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Data;
 
 namespace FoxTunes.ViewModel
 {
@@ -28,7 +27,7 @@ namespace FoxTunes.ViewModel
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
-        public IDatabaseComponent Database { get; private set; }
+        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -42,11 +41,11 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Database != null)
+                if (this.DatabaseFactory != null)
                 {
-                    using (var database = this.Database.New())
+                    using (var database = this.DatabaseFactory.Create())
                     {
-                        using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var set = database.Set<PlaylistItem>(transaction);
                             set.Fetch.Sort.Expressions.Clear();
@@ -209,7 +208,7 @@ namespace FoxTunes.ViewModel
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
-            this.Database = this.Core.Components.Database;
+            this.DatabaseFactory = this.Core.Factories.Database;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
@@ -420,11 +419,11 @@ namespace FoxTunes.ViewModel
 
         protected virtual IEnumerable<GridViewColumn> GetGridColumns()
         {
-            if (this.Database != null && this.GridViewColumnFactory != null)
+            if (this.DatabaseFactory != null && this.GridViewColumnFactory != null)
             {
-                using (var database = this.Database.New())
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
                         var queryable = database.AsQueryable<PlaylistColumn>(transaction);
                         foreach (var column in queryable.OrderBy(playlistColumn => playlistColumn.Sequence))

@@ -33,7 +33,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
                 await this.Database.ExecuteAsync(this.Database.Queries.BeginBuildLibraryHierarchies, transaction);

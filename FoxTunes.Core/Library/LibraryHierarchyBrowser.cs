@@ -5,7 +5,6 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
 
 namespace FoxTunes
@@ -14,7 +13,7 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
-        public IDatabaseComponent Database { get; private set; }
+        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         private string _Filter { get; set; }
 
@@ -45,7 +44,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Database = core.Components.Database;
+            this.DatabaseFactory = core.Factories.Database;
             base.InitializeComponent(core);
         }
 
@@ -61,18 +60,18 @@ namespace FoxTunes
 
         protected virtual IEnumerable<LibraryHierarchyNode> GetNodes(int libraryHierarchyId, int? libraryHierarchyItemId = null)
         {
-            var query = default(IDatabaseQuery);
-            if (string.IsNullOrEmpty(this.Filter))
+            using (var database = this.DatabaseFactory.Create())
             {
-                query = this.Database.Queries.GetLibraryHierarchyNodes;
-            }
-            else
-            {
-                query = this.Database.Queries.GetLibraryHierarchyNodesWithFilter;
-            }
-            using (var database = this.Database.New())
-            {
-                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                var query = default(IDatabaseQuery);
+                if (string.IsNullOrEmpty(this.Filter))
+                {
+                    query = database.Queries.GetLibraryHierarchyNodes;
+                }
+                else
+                {
+                    query = database.Queries.GetLibraryHierarchyNodesWithFilter;
+                }
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(query, (parameters, phase) =>
                     {
