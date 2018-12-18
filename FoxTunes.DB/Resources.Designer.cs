@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -159,9 +159,22 @@ namespace FoxTunes {
         ///
         ///DELETE FROM [LibraryHierarchyItem_LibraryItem];
         ///
-        ///DELETE FROM [LibraryHierarchyItems];
-        ///
-        ///DELETE FROM [LibraryItem_MetaDataItem];
+        ///DELETE FROM [LibraryHierarchyItems];.
+        /// </summary>
+        internal static string RemoveLibraryHierarchyItems {
+            get {
+                return ResourceManager.GetString("RemoveLibraryHierarchyItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DELETE FROM [LibraryItem_MetaDataItem]
+        ///WHERE [LibraryItem_Id] IN
+        ///(
+        ///	SELECT [Id]
+        ///	FROM [LibraryItems]
+        ///	WHERE [LibraryItems].[Status] = @status
+        ///);
         ///
         ///DELETE FROM [PlaylistItem_MetaDataItem]
         ///WHERE [PlaylistItem_Id] IN
@@ -169,6 +182,7 @@ namespace FoxTunes {
         ///	SELECT [PlaylistItems].[Id]
         ///	FROM [PlaylistItems]
         ///		JOIN [LibraryItems] ON [PlaylistItems].[LibraryItem_Id] = [LibraryItems].[Id]
+        ///	WHERE [LibraryItems].[Status] = @status
         ///);
         ///
         ///DELETE FROM [PlaylistItems]
@@ -176,7 +190,7 @@ namespace FoxTunes {
         ///(
         ///	SELECT [PlaylistItems].[Id]
         ///	FROM [PlaylistItems]
-        ///		JOIN [Li [rest of string was truncated]&quot;;.
+        ///		JO [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string RemoveLibraryItems {
             get {

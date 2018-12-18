@@ -1,6 +1,4 @@
 ﻿using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
-using System.Data;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -28,14 +26,6 @@ namespace FoxTunes
 
         public bool Clear { get; private set; }
 
-        public IPlaybackManager PlaybackManager { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.PlaybackManager = core.Managers.Playback;
-            base.InitializeComponent(core);
-        }
-
         protected override async Task OnRun()
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
@@ -46,7 +36,7 @@ namespace FoxTunes
                 }
                 await this.AddPlaylistItems(transaction);
                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
-                await this.SequenceItems(new CancellationToken(), transaction);
+                await this.SequenceItems(CancellationToken.None, transaction);
                 await this.SetPlaylistItemsStatus(transaction);
                 transaction.Commit();
             }

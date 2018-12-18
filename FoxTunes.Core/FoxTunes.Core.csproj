@@ -92,6 +92,7 @@
     <Compile Include="MetaData\MetaDataInfo.cs" />
     <Compile Include="MetaData\MetaDataWriter.cs" />
     <Compile Include="Tasks\MovePlaylistItemsTask.cs" />
+    <Compile Include="Tasks\RescanLibraryTask.cs" />
     <Compile Include="Utilities\AsyncParallel.cs" />
     <Compile Include="Utilities\CancellationToken.cs" />
     <Compile Include="Utilities\NetworkDrive.cs" />

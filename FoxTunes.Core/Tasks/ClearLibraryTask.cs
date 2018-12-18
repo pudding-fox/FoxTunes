@@ -18,13 +18,27 @@ namespace FoxTunes
 
         }
 
+        public override bool Visible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        protected override Task OnStarted()
+        {
+            this.Name = "Clearing library";
+            this.IsIndeterminate = true;
+            return base.OnStarted();
+        }
+
         protected override async Task OnRun()
         {
-            this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Clearing library.");
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryItems, transaction);
+                await this.RemoveItems(LibraryItemStatus.None, transaction);
                 transaction.Commit();
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));

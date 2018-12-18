@@ -3,6 +3,7 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,6 +11,10 @@ namespace FoxTunes.ViewModel
 {
     public class LibrarySettings : ViewModelBase
     {
+        public ILibraryManager LibraryManager { get; private set; }
+
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -115,6 +120,38 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public ICommand RescanCommand
+        {
+            get
+            {
+                return new AsyncCommand(this.BackgroundTaskRunner, this.Rescan)
+                {
+                    Tag = CommandHints.DISMISS
+                };
+            }
+        }
+
+        public Task Rescan()
+        {
+            return this.LibraryManager.Rescan();
+        }
+
+        public ICommand ClearCommand
+        {
+            get
+            {
+                return new AsyncCommand(this.BackgroundTaskRunner, this.Clear)
+                {
+                    Tag = CommandHints.DISMISS
+                };
+            }
+        }
+
+        public Task Clear()
+        {
+            return this.LibraryManager.Clear();
+        }
+
         public ICommand CancelCommand
         {
             get
@@ -133,6 +170,8 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
+            this.LibraryManager = this.Core.Managers.Library;
+            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.LibraryHierarchyLevels = new CollectionManager<LibraryHierarchyLevel>()
@@ -188,7 +227,14 @@ namespace FoxTunes.ViewModel
                 }
             };
             this.Refresh();
+            this.OnCommandsChanged();
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnCommandsChanged()
+        {
+            this.OnPropertyChanged("RescanCommand");
+            this.OnPropertyChanged("ClearCommand");
         }
 
         protected virtual void Refresh()
