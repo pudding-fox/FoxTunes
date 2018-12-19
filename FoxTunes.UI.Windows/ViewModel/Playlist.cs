@@ -41,19 +41,24 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.DatabaseFactory != null)
+                return new ObservableCollection<PlaylistItem>(this.GetItems());
+            }
+        }
+
+        protected virtual IEnumerable<PlaylistItem> GetItems()
+        {
+            if (this.DatabaseFactory != null)
+            {
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var database = this.DatabaseFactory.Create())
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                        var set = database.Set<PlaylistItem>(transaction);
+                        set.Fetch.Sort.Expressions.Clear();
+                        set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
+                        foreach (var element in set)
                         {
-                            var set = database.Set<PlaylistItem>(transaction);
-                            set.Fetch.Sort.Expressions.Clear();
-                            set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
-                            foreach (var element in set)
-                            {
-                                yield return element;
-                            }
+                            yield return element;
                         }
                     }
                 }

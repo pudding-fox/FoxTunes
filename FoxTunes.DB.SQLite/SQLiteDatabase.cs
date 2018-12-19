@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using FoxDb.Utility;
 using FoxTunes.Interfaces;
 using System.Data;
+using System.Data.SQLite;
 using System.IO;
 
 namespace FoxTunes
@@ -24,7 +25,7 @@ namespace FoxTunes
         {
             get
             {
-                return IsolationLevel.Unspecified;
+                return IsolationLevel.ReadCommitted;
             }
         }
 
@@ -33,30 +34,12 @@ namespace FoxTunes
             return new SQLiteDatabaseQueries(this);
         }
 
-        public override ITransactionSource BeginTransaction()
-        {
-            //Transactions are disabled, they cause more problems than they solve here.
-            //We need to move to a reader/writer lock on the database.
-            //All long running tasks will need to be cancellable.
-            return new NullTransactionSource(this);
-        }
-
-        public override ITransactionSource BeginTransaction(IsolationLevel isolationLevel)
-        {
-            //Transactions are disabled, they cause more problems than they solve here.
-            //We need to move to a reader/writer lock on the database.
-            //All long running tasks will need to be cancellable.
-            return new NullTransactionSource(this);
-        }
-
         private static IProvider GetProvider()
         {
-            return new SQLiteProvider(FileName);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            //Nothing to do.
+            var builder = new SQLiteConnectionStringBuilder();
+            builder.DataSource = FileName;
+            builder.JournalMode = SQLiteJournalModeEnum.Wal;
+            return new SQLiteProvider(builder);
         }
     }
 }

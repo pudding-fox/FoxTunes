@@ -14,10 +14,25 @@ namespace FoxTunes
 
         public static async Task ForEach<T>(IEnumerable<T> sequence, Func<T, Task> factory, CancellationToken cancellationToken, ParallelOptions options)
         {
+            var exceptions = new List<Exception>();
             var tasks = new List<Task>(options.MaxDegreeOfParallelism);
-            foreach (var element in sequence.Select(element => Task.Run(() => factory(element))))
+            foreach (var element in sequence)
             {
-                tasks.Add(element);
+                tasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        await factory(element);
+                    }
+                    catch (Exception e)
+                    {
+                        exceptions.Add(e);
+                    }
+                }));
+                if (exceptions.Count > 0)
+                {
+                    break;
+                }
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;
@@ -29,6 +44,10 @@ namespace FoxTunes
                 }
             }
             await Task.WhenAll(tasks);
+            if (exceptions.Any())
+            {
+                throw new AggregateException(exceptions);
+            }
         }
     }
 }

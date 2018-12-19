@@ -1,7 +1,4 @@
-﻿DELETE FROM "LibraryHierarchyItem_LibraryItem"
-DELETE FROM "LibraryHierarchyItems";
-
-INSERT INTO "LibraryHierarchyItems" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf")
+﻿INSERT INTO "LibraryHierarchyItems" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf")
 SELECT "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf"
 FROM "LibraryHierarchy"
 GROUP BY "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf";

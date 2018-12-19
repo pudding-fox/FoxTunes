@@ -22,6 +22,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool Cancellable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public IEnumerable<string> Paths { get; private set; }
 
         public bool Clear { get; private set; }
@@ -35,15 +43,11 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            if (this.Clear)
             {
-                if (this.Clear)
-                {
-                    await this.RemoveItems(PlaylistItemStatus.None, transaction);
-                }
-                await this.AddPaths(this.Paths, transaction);
-                transaction.Commit();
+                await this.RemoveItems(PlaylistItemStatus.None);
             }
+            await this.AddPaths(this.Paths);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
     }

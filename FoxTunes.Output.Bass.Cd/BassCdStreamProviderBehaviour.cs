@@ -6,7 +6,6 @@ using ManagedBass.Cd;
 using ManagedBass.Gapless.Cd;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -226,15 +225,17 @@ namespace FoxTunes
                     {
                         throw new InvalidOperationException("Drive is not ready.");
                     }
-                    //Always append for now.
-                    this.Sequence = await this.PlaylistManager.GetInsertIndex();
-                    using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                    using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
-                        await this.AddPlaylistItems(transaction);
-                        await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
-                        await this.AddOrUpdateMetaData(transaction);
-                        await this.SetPlaylistItemsStatus(transaction);
-                        transaction.Commit();
+                        //Always append for now.
+                        this.Sequence = await this.PlaylistManager.GetInsertIndex();
+                        await this.AddPlaylistItems();
+                        await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                        await this.AddOrUpdateMetaData();
+                        await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+                    }))
+                    {
+                        await task.Run();
                     }
                 }
                 finally
@@ -245,52 +246,60 @@ namespace FoxTunes
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
             }
 
-            private async Task AddPlaylistItems(ITransactionSource transaction)
+            private async Task AddPlaylistItems()
             {
                 this.Name = "Getting track list";
                 this.IsIndeterminate = true;
                 var info = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
                 var directoryName = string.Format("{0}:\\", info.DriveLetter);
-                using (var writer = new PlaylistWriter(this.Database, transaction))
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    for (int a = 0, b = BassCd.GetTracks(this.Drive); a < b; a++)
+                    using (var writer = new PlaylistWriter(this.Database, transaction))
                     {
-                        var fileName = BassCdStreamProvider.CreateUrl(this.Drive, a);
-                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
-                        var playlistItem = new PlaylistItem()
+                        for (int a = 0, b = BassCd.GetTracks(this.Drive); a < b; a++)
                         {
-                            DirectoryName = directoryName,
-                            FileName = fileName,
-                            Sequence = this.Sequence + a
-                        };
-                        await writer.Write(playlistItem);
-                        this.Offset++;
+                            var fileName = BassCdStreamProvider.CreateUrl(this.Drive, a);
+                            Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
+                            var playlistItem = new PlaylistItem()
+                            {
+                                DirectoryName = directoryName,
+                                FileName = fileName,
+                                Sequence = this.Sequence + a
+                            };
+                            await writer.Write(playlistItem);
+                            this.Offset++;
+                        }
                     }
+                    transaction.Commit();
                 }
             }
 
-            private async Task AddOrUpdateMetaData(ITransactionSource transaction)
+            private async Task AddOrUpdateMetaData()
             {
                 Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
-                var query = this.Database
-                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
-                    .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
-                var info = default(CDInfo);
-                var strategy = this.GetStrategy();
-                var metaDataSource = new BassCdMetaDataSource(strategy);
-                BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
-                using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, transaction))
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    foreach (var playlistItem in query)
+                    var query = this.Database
+                        .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
+                        .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
+                    var info = default(CDInfo);
+                    var strategy = this.GetStrategy();
+                    var metaDataSource = new BassCdMetaDataSource(strategy);
+                    BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
+                    using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, transaction))
                     {
-                        metaDataSource.InitializeComponent(this.Core);
-                        var metaData = await metaDataSource.GetMetaData(playlistItem.FileName);
-                        foreach (var metaDataItem in metaData)
+                        foreach (var playlistItem in query)
                         {
-                            await writer.Write(playlistItem.Id, metaDataItem);
+                            metaDataSource.InitializeComponent(this.Core);
+                            var metaData = await metaDataSource.GetMetaData(playlistItem.FileName);
+                            foreach (var metaDataItem in metaData)
+                            {
+                                await writer.Write(playlistItem.Id, metaDataItem);
+                            }
                         }
                     }
+                    transaction.Commit();
                 }
             }
 

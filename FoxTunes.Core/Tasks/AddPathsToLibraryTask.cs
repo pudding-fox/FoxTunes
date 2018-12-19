@@ -33,11 +33,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                await this.AddPaths(this.Paths, transaction);
-                transaction.Commit();
-            }
+            await this.AddPaths(this.Paths);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
     }

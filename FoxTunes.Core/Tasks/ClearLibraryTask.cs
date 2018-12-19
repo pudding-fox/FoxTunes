@@ -1,9 +1,5 @@
 ﻿#pragma warning disable 612, 618
-using FoxDb;
-using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -36,11 +32,7 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             Logger.Write(this, LogLevel.Debug, "Clearing library.");
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                await this.RemoveItems(LibraryItemStatus.None, transaction);
-                transaction.Commit();
-            }
+            await this.RemoveItems(LibraryItemStatus.None);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
     }

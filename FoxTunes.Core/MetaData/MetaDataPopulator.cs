@@ -1,4 +1,4 @@
-﻿//#define PARALLEL_WRITER
+﻿#define PARALLEL_WRITER
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;

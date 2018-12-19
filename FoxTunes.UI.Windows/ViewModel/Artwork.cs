@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -51,7 +52,7 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.Image = playlistItem.MetaDatas.FirstOrDefault(
-                metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == CommonImageTypes.FrontCover
+                metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == CommonImageTypes.FrontCover && File.Exists(metaDataItem.FileValue)
             );
         }
 

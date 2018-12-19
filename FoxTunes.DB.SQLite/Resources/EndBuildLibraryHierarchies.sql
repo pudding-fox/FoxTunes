@@ -1,6 +1,4 @@
-﻿DELETE FROM "LibraryHierarchyItems";
-
-INSERT INTO "LibraryHierarchyItems" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf")
+﻿INSERT INTO "LibraryHierarchyItems" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf")
 SELECT "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf"
 FROM "LibraryHierarchy"
 GROUP BY "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf";
@@ -27,8 +25,6 @@ SET "Parent_Id" =
 			AND "LibraryHierarchy_Copy"."IsLeaf" = "LibraryHierarchyItems_Copy"."IsLeaf"
 	LIMIT 1
 );
-
-DELETE FROM "LibraryHierarchyItem_LibraryItem";
 
 INSERT INTO "LibraryHierarchyItem_LibraryItem" ("LibraryHierarchyItem_Id", "LibraryItem_Id")
 SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchy"."LibraryItem_Id"
