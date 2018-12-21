@@ -15,6 +15,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public IInputManager InputManager { get; private set; }
+
         public ICommand PlayCommand
         {
             get
@@ -119,6 +121,21 @@ namespace FoxTunes.ViewModel
             this.Output = this.Core.Components.Output;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
+            this.InputManager = this.Core.Managers.Input;
+            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaPlayPause), () =>
+            {
+                if (this.PauseCommand.CanExecute(null))
+                {
+                    this.PauseCommand.Execute(null);
+                }
+                else if (this.PlayCommand.CanExecute(null))
+                {
+                    this.PlayCommand.Execute(null);
+                }
+            });
+            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaPreviousTrack), this.PreviousCommand);
+            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaNextTrack), this.NextCommand);
+            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaStop), this.StopOutputCommand);
             this.Core.Components.Output.IsStartedChanged += (sender, e) => Command.InvalidateRequerySuggested();
             this.OnCommandsChanged();
             base.OnCoreChanged();

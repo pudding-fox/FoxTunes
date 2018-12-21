@@ -132,6 +132,7 @@
     <Compile Include="ViewModel\Components.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />
+    <Compile Include="ViewModel\Extensions.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryTree.cs" />

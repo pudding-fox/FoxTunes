@@ -41,6 +41,14 @@ namespace FoxTunes
             }
         }
 
+        public IInputManager Input
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IInputManager>();
+            }
+        }
+
         public static readonly IStandardManagers Instance = new StandardManagers();
     }
 }

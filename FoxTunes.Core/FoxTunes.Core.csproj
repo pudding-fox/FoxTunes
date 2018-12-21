@@ -70,6 +70,7 @@
     <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
     <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
+    <Compile Include="Interfaces\Managers\IInputManager.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
     <Compile Include="Interfaces\Scripting\ICoreScripts.cs" />
     <Compile Include="Interfaces\Signal\ISignal.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Library\LibraryWriter.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="Managers\HierarchyManager.cs" />
+    <Compile Include="Managers\InputManager.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
     <Compile Include="MetaData\CommonImageTypes.cs" />
     <Compile Include="MetaData\CustomMetaData.cs" />
