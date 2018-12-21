@@ -1,5 +1,4 @@
-﻿#define PARALLEL_WRITER
-using FoxDb.Interfaces;
+﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -22,12 +21,8 @@ namespace FoxTunes
             this.Database = database;
             this.Transaction = transaction;
             this.Query = query;
-#if PARALLEL_WRITER
-            this.Writers = new ThreadLocal<MetaDataWriter>(true);
-#else
             this.Semaphore = new SemaphoreSlim(1, 1);
             this.Writer = new MetaDataWriter(this.Database, this.Query, this.Transaction);
-#endif
         }
 
         public IDatabase Database { get; private set; }
@@ -38,13 +33,9 @@ namespace FoxTunes
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
-#if PARALLEL_WRITER
-        private ThreadLocal<MetaDataWriter> Writers { get; set; }
-#else
         private SemaphoreSlim Semaphore { get; set; }
 
         private MetaDataWriter Writer { get; set; }
-#endif
 
         public override void InitializeComponent(ICore core)
         {
@@ -73,13 +64,6 @@ namespace FoxTunes
 
                 var metaData = await metaDataSource.GetMetaData(fileData.FileName);
 
-#if PARALLEL_WRITER
-                var writer = this.GetOrAddWriter();
-                foreach (var metaDataItem in metaData)
-                {
-                    await writer.Write(fileData.Id, metaDataItem);
-                }
-#else
                 await this.Semaphore.WaitAsync();
                 try
                 {
@@ -92,7 +76,6 @@ namespace FoxTunes
                 {
                     this.Semaphore.Release();
                 }
-#endif
 
                 if (this.ReportProgress)
                 {
@@ -109,29 +92,10 @@ namespace FoxTunes
             }, cancellationToken, this.ParallelOptions);
         }
 
-#if PARALLEL_WRITER
-        private MetaDataWriter GetOrAddWriter()
-        {
-            if (this.Writers.IsValueCreated)
-            {
-                return this.Writers.Value;
-            }
-            return this.Writers.Value = new MetaDataWriter(this.Database, this.Query, this.Transaction);
-        }
-#endif
-
         protected override void OnDisposing()
         {
-#if PARALLEL_WRITER
-            foreach (var writer in this.Writers.Values)
-            {
-                writer.Dispose();
-            }
-            this.Writers.Dispose();
-#else
             this.Semaphore.Dispose();
             this.Writer.Dispose();
-#endif
             base.OnDisposing();
         }
     }
