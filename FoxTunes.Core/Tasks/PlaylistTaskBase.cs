@@ -12,8 +12,10 @@ namespace FoxTunes
 {
     public abstract class PlaylistTaskBase : BackgroundTask
     {
-        protected PlaylistTaskBase(string id, int sequence = 0)
-            : base(id)
+        public const string ID = "4403475F-D67C-4ED8-BF1F-68D22F28066F";
+
+        protected PlaylistTaskBase(int sequence = 0)
+            : base(ID)
         {
             this.Sequence = sequence;
         }

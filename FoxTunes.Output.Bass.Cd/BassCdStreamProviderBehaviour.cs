@@ -179,10 +179,7 @@ namespace FoxTunes
 
         private class AddCdToPlaylistTask : PlaylistTaskBase
         {
-            public const string ID = "8A0B7E8B-B601-4803-9163-B4D42FB0C304";
-
             public AddCdToPlaylistTask(int drive, bool cdLookup, string cdLookupHost)
-                : base(ID)
             {
                 this.Drive = drive;
                 this.CdLookup = cdLookup;

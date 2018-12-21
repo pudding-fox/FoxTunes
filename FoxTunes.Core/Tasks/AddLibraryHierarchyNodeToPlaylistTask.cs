@@ -5,10 +5,8 @@ namespace FoxTunes
 {
     public class AddLibraryHierarchyNodeToPlaylistTask : PlaylistTaskBase
     {
-        public const string ID = "4E0DD392-1138-4DA8-84C2-69B27D1E34EA";
-
         public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode, bool clear)
-            : base(ID, sequence)
+            : base(sequence)
         {
             this.LibraryHierarchyNode = libraryHierarchyNode;
             this.Clear = clear;

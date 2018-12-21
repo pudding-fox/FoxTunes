@@ -5,10 +5,8 @@ namespace FoxTunes
 {
     public class AddPathsToPlaylistTask : PlaylistTaskBase
     {
-        public const string ID = "7B564369-A6A0-4BAF-8C99-08AF27908591";
-
         public AddPathsToPlaylistTask(int sequence, IEnumerable<string> paths, bool clear)
-            : base(ID, sequence)
+            : base(sequence)
         {
             this.Paths = paths;
             this.Clear = clear;

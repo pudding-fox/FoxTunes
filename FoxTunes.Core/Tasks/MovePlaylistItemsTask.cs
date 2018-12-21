@@ -2,7 +2,6 @@
 using FoxDb;
 using FoxDb.Interfaces;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,10 +9,8 @@ namespace FoxTunes
 {
     public class MovePlaylistItemsTask : PlaylistTaskBase
     {
-        public const string ID = "A5B2BE8B-FD7A-47FF-9A12-B963AE619FE7";
-
         public MovePlaylistItemsTask(int sequence, IEnumerable<PlaylistItem> playlistItems)
-            : base(ID, sequence)
+            : base(sequence)
         {
             this.PlaylistItems = playlistItems;
             this.Offset = playlistItems.Count();
