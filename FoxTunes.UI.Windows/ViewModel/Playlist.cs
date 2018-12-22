@@ -229,10 +229,8 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnCommandsChanged()
         {
+            this.OnPropertyChanged("RemovePlaylistItemsCommand");
             this.OnPropertyChanged("PlaySelectedItemCommand");
-            this.OnPropertyChanged("LocateCommand");
-            this.OnPropertyChanged("ClearCommand");
-            this.OnPropertyChanged("SettingsCommand");
             this.OnPropertyChanged("DragEnterCommand");
             this.OnPropertyChanged("DropCommand");
         }
@@ -267,6 +265,14 @@ namespace FoxTunes.ViewModel
                     break;
             }
             return Task.CompletedTask;
+        }
+
+        public ICommand RemovePlaylistItemsCommand
+        {
+            get
+            {
+                return new AsyncCommand(this.BackgroundTaskRunner, this.RemovePlaylistItems);
+            }
         }
 
         protected virtual Task RemovePlaylistItems()
