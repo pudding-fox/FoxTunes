@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -10,6 +11,8 @@ namespace FoxTunes.ViewModel
         public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
 
         public IOutput Output { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -115,6 +118,92 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        private string _PlayCommandBinding { get; set; }
+
+        public string PlayCommandBinding
+        {
+            get
+            {
+                return this._PlayCommandBinding;
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(this.PlayCommandBinding))
+                {
+                    this.RemoveCommandBinding(this.PlayCommandBinding);
+                }
+                this._PlayCommandBinding = value;
+                this.AddCommandBinding(this.PlayCommandBinding, () =>
+                {
+                    if (this.PauseCommand.CanExecute(null))
+                    {
+                        this.PauseCommand.Execute(null);
+                    }
+                    else if (this.PlayCommand.CanExecute(null))
+                    {
+                        this.PlayCommand.Execute(null);
+                    }
+                });
+            }
+        }
+
+        private string _PreviousCommandBinding { get; set; }
+
+        public string PreviousCommandBinding
+        {
+            get
+            {
+                return this._PreviousCommandBinding;
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(this.PreviousCommandBinding))
+                {
+                    this.RemoveCommandBinding(this.PreviousCommandBinding);
+                }
+                this._PreviousCommandBinding = value;
+                this.AddCommandBinding(this.PreviousCommandBinding, this.PreviousCommand);
+            }
+        }
+
+        private string _NextCommandBinding { get; set; }
+
+        public string NextCommandBinding
+        {
+            get
+            {
+                return this._NextCommandBinding;
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(this.NextCommandBinding))
+                {
+                    this.RemoveCommandBinding(this.NextCommandBinding);
+                }
+                this._NextCommandBinding = value;
+                this.AddCommandBinding(this.NextCommandBinding, this.NextCommand);
+            }
+        }
+
+        private string _StopCommandBinding { get; set; }
+
+        public string StopCommandBinding
+        {
+            get
+            {
+                return this._StopCommandBinding;
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(this.StopCommandBinding))
+                {
+                    this.RemoveCommandBinding(this.StopCommandBinding);
+                }
+                this._StopCommandBinding = value;
+                this.AddCommandBinding(this.StopCommandBinding, this.StopOutputCommand);
+            }
+        }
+
         protected override void OnCoreChanged()
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
@@ -122,21 +211,24 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             this.InputManager = this.Core.Managers.Input;
-            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaPlayPause), () =>
-            {
-                if (this.PauseCommand.CanExecute(null))
-                {
-                    this.PauseCommand.Execute(null);
-                }
-                else if (this.PlayCommand.CanExecute(null))
-                {
-                    this.PlayCommand.Execute(null);
-                }
-            });
-            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaPreviousTrack), this.PreviousCommand);
-            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaNextTrack), this.NextCommand);
-            this.InputManager.AddInputHook(KeyboardInputType.KeyDown, KeyInterop.VirtualKeyFromKey(Key.MediaStop), this.StopOutputCommand);
             this.Core.Components.Output.IsStartedChanged += (sender, e) => Command.InvalidateRequerySuggested();
+            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration.GetElement<TextConfigurationElement>(
+                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                WindowsUserInterfaceConfiguration.PLAY_ELEMENT
+            ).ConnectValue<string>(value => this.PlayCommandBinding = value);
+            this.Configuration.GetElement<TextConfigurationElement>(
+                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                WindowsUserInterfaceConfiguration.PREVIOUS_ELEMENT
+            ).ConnectValue<string>(value => this.PreviousCommandBinding = value);
+            this.Configuration.GetElement<TextConfigurationElement>(
+                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                WindowsUserInterfaceConfiguration.NEXT_ELEMENT
+            ).ConnectValue<string>(value => this.NextCommandBinding = value);
+            this.Configuration.GetElement<TextConfigurationElement>(
+                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                WindowsUserInterfaceConfiguration.STOP_ELEMENT
+            ).ConnectValue<string>(value => this.StopCommandBinding = value);
             this.OnCommandsChanged();
             base.OnCoreChanged();
         }
@@ -149,6 +241,28 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("StopOutputCommand");
             this.OnPropertyChanged("PreviousCommand");
             this.OnPropertyChanged("NextCommand");
+        }
+
+        protected virtual void AddCommandBinding(string keys, ICommand command)
+        {
+            this.AddCommandBinding(keys, () =>
+            {
+                if (!command.CanExecute(null))
+                {
+                    return;
+                }
+                command.Execute(null);
+            });
+        }
+
+        protected virtual void AddCommandBinding(string keys, Action action)
+        {
+            this.InputManager.AddInputHook(keys, action);
+        }
+
+        protected virtual void RemoveCommandBinding(string keys)
+        {
+            this.InputManager.RemoveInputHook(keys);
         }
 
         protected override Freezable CreateInstanceCore()

@@ -65,7 +65,7 @@ namespace FoxTunes.ViewModel
             this.Configuration = this.Core.Components.Configuration;
             this.ShowLibrary = this.Configuration.GetElement<BooleanConfigurationElement>(
                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
-               WindowsUserInterfaceConfiguration.SHOW_LIBRARY
+               WindowsUserInterfaceConfiguration.SHOW_LIBRARY_ELEMENT
             );
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
               WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
