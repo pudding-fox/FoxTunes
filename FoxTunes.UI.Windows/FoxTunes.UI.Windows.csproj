@@ -55,6 +55,7 @@
     <Compile Include="BackgroundTasks.xaml.cs">
       <DependentUpon>BackgroundTasks.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviours\KeyboardShortcutsBehaviour.cs" />
     <Compile Include="Behaviours\LibraryActionsBehaviour.cs" />
     <Compile Include="Behaviours\PlaylistActionsBehaviour.cs" />
     <Compile Include="Components.xaml.cs">

@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public const string KEYBOARD_SHORTCUTS_SECTION = "4B5B0E73-8000-484E-8F68-77E11FC8AD45";
 
+        public const string KEYBOARD_SHORTCUTS_ENABLED_ELEMENT = "D60E41A0-976D-4573-8758-984AACBD235B";
+
         public const string PLAY_ELEMENT = "98B8D9B9-1D10-4EEB-81BA-7D54C7A86198";
 
         public const string PREVIOUS_ELEMENT = "D782497E-32FA-4E0F-B73F-8BF4705782B0";
@@ -42,6 +44,8 @@ namespace FoxTunes
             );
             yield return new ConfigurationSection(KEYBOARD_SHORTCUTS_SECTION, "Keyboard Shortcuts")
                 .WithElement(
+                    new BooleanConfigurationElement(KEYBOARD_SHORTCUTS_ENABLED_ELEMENT, "Enabled").WithValue(false))
+                .WithElement(
                     new TextConfigurationElement(PLAY_ELEMENT, "Play")
                         .WithValue(Enum.GetName(typeof(Key), Key.MediaPlayPause)))
                 .WithElement(
@@ -54,6 +58,7 @@ namespace FoxTunes
                     new TextConfigurationElement(STOP_ELEMENT, "Stop")
                         .WithValue(Enum.GetName(typeof(Key), Key.MediaStop))
             );
+            StandardComponents.Instance.Configuration.GetElement(KEYBOARD_SHORTCUTS_SECTION, KEYBOARD_SHORTCUTS_ENABLED_ELEMENT).ConnectValue<bool>(enabled => UpdateKeyboardShortcutsConfiguration(enabled));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetThemeOptions()
@@ -62,6 +67,24 @@ namespace FoxTunes
             foreach (var theme in themes)
             {
                 yield return new SelectionConfigurationOption(theme.Id, theme.Name, theme.Description);
+            }
+        }
+
+        private static void UpdateKeyboardShortcutsConfiguration(bool enabled)
+        {
+            if (enabled)
+            {
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PLAY_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PREVIOUS_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, NEXT_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, STOP_ELEMENT).Show();
+            }
+            else
+            {
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PLAY_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PREVIOUS_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, NEXT_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, STOP_ELEMENT).Hide();
             }
         }
     }
