@@ -47,6 +47,10 @@ System.Windows.Interactivity.dll
 taglib-sharp.dll
 "
 
+WINDOWS="
+FoxTunes.Core.Windows.dll
+"
+
 ASIO="
 bass_asio_handler.dll
 bassasio.dll
@@ -118,6 +122,7 @@ rm -rf "./release"
 mkdir -p "./release/Main"
 mkdir -p "./release/Main/Addon"
 mkdir -p "./release/Plugins"
+mkdir -p "./release/Plugins/windows"
 mkdir -p "./release/Plugins/asio"
 mkdir -p "./release/Plugins/cd"
 mkdir -p "./release/Plugins/dsd"
@@ -144,6 +149,12 @@ done
 tar -zcvf "./release/FoxTunes-$TAG.tar.gz" -C "./release/Main" . --xform='s!^\./!!'
 
 echo "Creating plugins package.."
+
+for file in $WINDOWS
+do
+	echo $file
+	cp "./distribution/Release/$file" "./release/Plugins/windows"
+done
 
 for file in $ASIO
 do

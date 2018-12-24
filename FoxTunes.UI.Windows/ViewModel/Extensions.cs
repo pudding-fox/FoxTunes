@@ -15,7 +15,7 @@ namespace FoxTunes.ViewModel
             {
                 throw new NotImplementedException();
             }
-            inputManager.AddInputHook(InputManager.WM_KEYDOWN, modifiers, keys, action);
+            inputManager.AddInputHook(modifiers, keys, action);
         }
 
         public static void RemoveInputHook(this IInputManager inputManager, string phrase)
@@ -26,7 +26,7 @@ namespace FoxTunes.ViewModel
             {
                 throw new NotImplementedException();
             }
-            inputManager.RemoveInputHook(InputManager.WM_KEYDOWN, modifiers, keys);
+            inputManager.RemoveInputHook(modifiers, keys);
         }
 
         private static bool TryGetKey(string phrase, out int modifiers, out int keys)

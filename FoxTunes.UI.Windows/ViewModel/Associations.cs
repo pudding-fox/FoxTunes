@@ -48,13 +48,18 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            var extensions = this.Core.Associations.Associations.Select(
+            var fileAssociations = ComponentRegistry.Instance.GetComponent<IFileAssociations>();
+            if (fileAssociations == null)
+            {
+                return;
+            }
+            var extensions = fileAssociations.Associations.Select(
                 association => association.Extension.TrimStart('.')
             ).ToArray();
             this.FileAssociations.Clear();
             this.FileAssociations.AddRange(
                 this.Output.SupportedExtensions.Select(extension => new Association(
-                    this.Core.Associations.Create(extension),
+                    fileAssociations.Create(extension),
                     extensions.Contains(extension)
                 ))
             );
@@ -100,16 +105,21 @@ namespace FoxTunes.ViewModel
 
         public void Save()
         {
+            var fileAssociations = ComponentRegistry.Instance.GetComponent<IFileAssociations>();
+            if (fileAssociations == null)
+            {
+                return;
+            }
             if (this.Enabled.Any())
             {
-                this.Core.Associations.Enable();
+                fileAssociations.Enable();
             }
             else
             {
-                this.Core.Associations.Disable();
+                fileAssociations.Disable();
             }
-            this.Core.Associations.Disable(this.Disabled);
-            this.Core.Associations.Enable(this.Enabled);
+            fileAssociations.Disable(this.Disabled);
+            fileAssociations.Enable(this.Enabled);
             this.Refresh();
         }
 

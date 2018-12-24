@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FoxTunes.Interfaces;
+using NUnit.Framework;
 using System.Linq;
 
 namespace FoxTunes
@@ -10,7 +11,7 @@ namespace FoxTunes
         public void CanAddFetchRemove_FileAssociation()
         {
             var extension = ".9a8bb147";
-            var fileAssociations = new FileAssociations();
+            var fileAssociations = ComponentRegistry.Instance.GetComponent<IFileAssociations>();
             var association = fileAssociations.Create(extension);
             try
             {
