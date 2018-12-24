@@ -42,9 +42,9 @@
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
     <Compile Include="AsyncEventArgs.cs" />
+    <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
     <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
-    <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
     <Compile Include="Configuration\ComponentResolver.cs" />
     <Compile Include="Configuration\TextConfigurationElement.cs" />
@@ -91,6 +91,7 @@
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="MetaData\MetaDataInfo.cs" />
     <Compile Include="MetaData\MetaDataWriter.cs" />
+    <Compile Include="Tasks\ClearLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\MovePlaylistItemsTask.cs" />
     <Compile Include="Tasks\RescanLibraryTask.cs" />
     <Compile Include="Utilities\AsyncParallel.cs" />

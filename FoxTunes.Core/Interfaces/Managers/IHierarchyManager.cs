@@ -4,6 +4,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IHierarchyManager : IStandardManager, IBackgroundTaskSource
     {
-        Task BuildHierarchies();
+        Task Build();
+
+        Task Clear();
     }
 }

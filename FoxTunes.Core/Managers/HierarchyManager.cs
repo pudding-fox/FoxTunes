@@ -13,9 +13,19 @@ namespace FoxTunes.Managers
             base.InitializeComponent(core);
         }
 
-        public async Task BuildHierarchies()
+        public async Task Build()
         {
             using (var task = new BuildLibraryHierarchiesTask())
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
+        }
+
+        public async Task Clear()
+        {
+            using (var task = new ClearLibraryHierarchiesTask())
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);

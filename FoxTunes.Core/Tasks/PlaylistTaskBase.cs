@@ -53,6 +53,7 @@ namespace FoxTunes
             {
                 await this.AddItems(paths);
                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
                 await this.AddOrUpdateMetaData(cancellationToken);
                 await this.UpdateVariousArtists();
                 await this.SequenceItems();
@@ -67,7 +68,7 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, true, transaction))
+                using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, this.Visible, transaction))
                 {
                     playlistPopulator.InitializeComponent(this.Core);
                     playlistPopulator.NameChanged += (sender, e) => this.Name = playlistPopulator.Name;
@@ -88,7 +89,7 @@ namespace FoxTunes
                 var query = this.Database
                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
                    .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
-                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, true, transaction))
+                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;

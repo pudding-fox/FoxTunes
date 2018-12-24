@@ -23,14 +23,9 @@ namespace FoxTunes.Behaviours
             switch (signal.Name)
             {
                 case CommonSignals.LibraryUpdated:
-                    return this.OnRun();
+                    return this.HierarchyManager.Build();
             }
             return Task.CompletedTask;
-        }
-
-        protected virtual Task OnRun()
-        {
-            return this.HierarchyManager.BuildHierarchies();
         }
     }
 }

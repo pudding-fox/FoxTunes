@@ -13,6 +13,8 @@ namespace FoxTunes.ViewModel
     {
         public ILibraryManager LibraryManager { get; private set; }
 
+        public IHierarchyManager HierarchyManager { get; private set; }
+
         public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -89,14 +91,14 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Save)
+                return new AsyncCommand(this.BackgroundTaskRunner, this.Save)
                 {
                     Tag = CommandHints.DISMISS
                 };
             }
         }
 
-        public void Save()
+        public async Task Save()
         {
             try
             {
@@ -105,17 +107,17 @@ namespace FoxTunes.ViewModel
                     using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
                         var libraryHierarchies = database.Set<LibraryHierarchy>(transaction);
-                        libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
-                        libraryHierarchies.AddOrUpdate(this.LibraryHierarchies.ItemsSource);
+                        await libraryHierarchies.RemoveAsync(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
+                        await libraryHierarchies.AddOrUpdateAsync(this.LibraryHierarchies.ItemsSource);
                         transaction.Commit();
                     }
                 }
-                this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
-                this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+                await this.HierarchyManager.Clear();
+                await this.HierarchyManager.Build();
             }
             catch (Exception e)
             {
-                this.OnError("Save", e);
+                await this.OnError("Save", e);
                 throw;
             }
         }
@@ -147,9 +149,10 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public Task Clear()
+        public async Task Clear()
         {
-            return this.LibraryManager.Clear();
+            await this.HierarchyManager.Clear();
+            await this.LibraryManager.Clear();
         }
 
         public ICommand CancelCommand
@@ -171,6 +174,7 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.LibraryManager = this.Core.Managers.Library;
+            this.HierarchyManager = this.Core.Managers.Hierarchy;
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
