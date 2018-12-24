@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -151,6 +151,20 @@ namespace FoxTunes {
         internal static string GetLibraryHierarchyNodes {
             get {
                 return ResourceManager.GetString("GetLibraryHierarchyNodes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UPDATE &quot;PlaylistItems&quot;
+        ///SET &quot;Sequence&quot; = &quot;Sequence&quot;
+        ///
+        ///UPDATE &quot;PlaylistItems&quot;
+        ///SET &quot;Sequence&quot; = @Sequence
+        ///WHERE &quot;Id&quot; = @id;.
+        /// </summary>
+        internal static string MovePlaylistItem {
+            get {
+                return ResourceManager.GetString("MovePlaylistItem", resourceCulture);
             }
         }
         

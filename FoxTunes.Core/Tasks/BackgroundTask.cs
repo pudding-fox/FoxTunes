@@ -15,20 +15,6 @@ namespace FoxTunes
 
         private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
 
-        public static async Task Idle()
-        {
-            foreach (var key in Semaphores.Keys)
-            {
-                var value = default(SemaphoreSlim);
-                if (!Semaphores.TryGetValue(key, out value))
-                {
-                    continue;
-                }
-                await value.WaitAsync();
-                value.Release();
-            }
-        }
-
         protected BackgroundTask(string id)
         {
             this.Id = id;
@@ -236,22 +222,16 @@ namespace FoxTunes
                 await Semaphore.WaitAsync();
                 try
                 {
-                    await this.OnRun().ContinueWith(async task =>
+                    try
                     {
-                        if (task.IsFaulted)
-                        {
-                            Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
-                            this.Exception = task.Exception.InnerException;
-                            await this.OnFaulted();
-                        }
-                        else
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
-                            await this.OnCompleted();
-                        }
+                        await this.OnRun();
+                    }
+                    finally
+                    {
                         Semaphore.Release();
-                    });
-                    return;
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
+                    await this.OnCompleted();
                 }
                 catch (AggregateException e)
                 {
@@ -260,14 +240,14 @@ namespace FoxTunes
                         Logger.Write(this, LogLevel.Error, "Background task failed: {0}", innerException.Message);
                     }
                     this.Exception = e;
+                    await this.OnFaulted();
                 }
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
                     this.Exception = e;
+                    await this.OnFaulted();
                 }
-                await this.OnFaulted();
-                Semaphore.Release();
             });
         }
 

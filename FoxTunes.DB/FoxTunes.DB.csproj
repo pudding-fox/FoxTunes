@@ -54,7 +54,7 @@
   <ItemGroup>
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
     <None Include="Resources\AddLibraryMetaDataItems.sql" />
-    <None Include="Resources\AddPlaylistMetaDataItems.sql" />
+    <None Include="Resources\MovePlaylistItem.sql" />
     <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
     <None Include="Resources\GetLibraryHierarchyNodes.sql" />
     <None Include="Resources\UpdateLibraryVariousArtists.sql" />
@@ -81,6 +81,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\RemoveLibraryHierarchyItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddPlaylistMetaDataItems.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

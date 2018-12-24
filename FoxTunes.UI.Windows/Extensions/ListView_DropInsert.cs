@@ -80,23 +80,6 @@ namespace FoxTunes
             source.SetValue(DropInsertPenProperty, value);
         }
 
-        public static readonly DependencyProperty DropInsertIndexProperty = DependencyProperty.RegisterAttached(
-            "DropInsertIndex",
-            typeof(int),
-            typeof(ListViewExtensions),
-            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
-        );
-
-        public static int GetDropInsertIndex(ListView source)
-        {
-            return (int)source.GetValue(DropInsertIndexProperty);
-        }
-
-        public static void SetDropInsertIndex(ListView source, int value)
-        {
-            source.SetValue(DropInsertIndexProperty, value);
-        }
-
         public static readonly DependencyProperty DropInsertItemProperty = DependencyProperty.RegisterAttached(
             "DropInsertItem",
             typeof(ListViewItem),
@@ -112,6 +95,23 @@ namespace FoxTunes
         public static void SetDropInsertItem(ListView source, ListViewItem value)
         {
             source.SetValue(DropInsertItemProperty, value);
+        }
+
+        public static readonly DependencyProperty DropInsertValueProperty = DependencyProperty.RegisterAttached(
+            "DropInsertValue",
+            typeof(object),
+            typeof(ListViewExtensions),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+        );
+
+        public static object GetDropInsertValue(ListView source)
+        {
+            return source.GetValue(DropInsertValueProperty);
+        }
+
+        public static void SetDropInsertValue(ListView source, object value)
+        {
+            source.SetValue(DropInsertValueProperty, value);
         }
 
         public static readonly DependencyProperty DropInsertOffsetProperty = DependencyProperty.RegisterAttached(
@@ -187,21 +187,13 @@ namespace FoxTunes
                     return;
                 }
                 var listViewItem = result.VisualHit.FindAncestor<ListViewItem>();
-                if (listViewItem == null)
-                {
-                    SetDropInsertActive(this.ListView, false);
-                    SetDropInsertItem(this.ListView, null);
-                    SetDropInsertOffset(this.ListView, 0);
-                    SetDropInsertIndex(this.ListView, 0);
-                }
-                else
+                if (listViewItem != null)
                 {
                     var offset = this.ListView.TranslatePoint(point, listViewItem).Y < (listViewItem.ActualHeight / 2) ? 0 : 1;
-                    var index = this.ListView.Items.IndexOf(listViewItem.DataContext);
                     SetDropInsertActive(this.ListView, true);
                     SetDropInsertItem(this.ListView, listViewItem);
+                    SetDropInsertValue(this.ListView, listViewItem.DataContext);
                     SetDropInsertOffset(this.ListView, offset);
-                    SetDropInsertIndex(this.ListView, index);
                 }
                 this.Adorner.InvalidateVisual();
             }
@@ -219,6 +211,7 @@ namespace FoxTunes
 
             protected override void OnRender(DrawingContext context)
             {
+                var item = GetDropInsertItem(this.ListView);
                 var listViewItem = GetDropInsertItem(this.ListView);
                 if (listViewItem != null && listViewItem.IsDescendantOf(this.ListView))
                 {
@@ -232,7 +225,6 @@ namespace FoxTunes
                 var scrollViewer = listViewItem.FindAncestor<ScrollViewer>();
                 //Translate the top left corner of the item to the position on the list view.
                 var point = listViewItem.TransformToAncestor(this.ListView).Transform(new Point());
-                var index = GetDropInsertIndex(this.ListView);
                 var offset = GetDropInsertOffset(this.ListView);
                 if (offset > 0)
                 {

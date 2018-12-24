@@ -5,6 +5,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IDatabaseQueries : IBaseComponent
     {
+        IDatabaseQuery MovePlaylistItem { get; }
+
         IDatabaseQuery RemovePlaylistItems { get; }
 
         IDatabaseQuery RemoveLibraryHierarchyItems { get; }

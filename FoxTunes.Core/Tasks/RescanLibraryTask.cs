@@ -36,7 +36,12 @@ namespace FoxTunes
             await this.SetLibraryItemsStatus(libraryItem => !File.Exists(libraryItem.FileName), LibraryItemStatus.Remove);
             await this.RemoveItems(LibraryItemStatus.Remove);
             await this.AddPaths(this.GetLibraryDirectories().ToArray());
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+            await base.OnCompleted();
         }
 
         protected virtual IEnumerable<string> GetLibraryDirectories()

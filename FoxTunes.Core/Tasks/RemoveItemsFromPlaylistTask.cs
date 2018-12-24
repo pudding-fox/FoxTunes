@@ -13,10 +13,15 @@ namespace FoxTunes
 
         public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            await this.RemoveItems(this.PlaylistItems);
+            return this.RemoveItems(this.PlaylistItems);
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted();
         }
     }
 }
