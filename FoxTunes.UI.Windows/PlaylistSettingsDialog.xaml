@@ -12,7 +12,7 @@
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
-        <CollectionViewSource x:Key="PlaylistColumns" Source="{Binding PlaylistColumns.ItemsSource, Source={StaticResource ViewModel}}" IsLiveSortingRequested="True">
+        <CollectionViewSource x:Key="PlaylistColumns" Source="" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Sequence</System:String>
             </CollectionViewSource.LiveGroupingProperties>
@@ -51,6 +51,12 @@
                             <Setter Property="Width" Value="60"></Setter>
                             <Setter Property="Height" Value="30"></Setter>
                             <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                            <!-- System -->
+                            <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+                            <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                            <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
                         </Style>
                     </StackPanel.Resources>
                     <Button Command="{Binding PlaylistColumns.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
@@ -91,6 +97,12 @@
                     <Setter Property="Width" Value="60"></Setter>
                     <Setter Property="Height" Value="30"></Setter>
                     <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                    <!-- System -->
+                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
                 </Style>
             </StackPanel.Resources>
             <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>

@@ -11,6 +11,8 @@ namespace FoxTunes.Theme
 
         string Description { get; }
 
-        void Apply(Application application);
+        void Enable();
+
+        void Disable();
     }
 }

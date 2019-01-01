@@ -51,6 +51,12 @@
                                 <Setter Property="Width" Value="60"></Setter>
                                 <Setter Property="Height" Value="30"></Setter>
                                 <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                                <!-- System -->
+                                <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+                                <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                                <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
                             </Style>
                         </StackPanel.Resources>
                         <Button Command="{Binding LibraryHierarchies.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
@@ -71,6 +77,12 @@
                                 <Setter Property="Width" Value="60"></Setter>
                                 <Setter Property="Height" Value="30"></Setter>
                                 <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                                <!-- System -->
+                                <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+                                <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                                <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
                             </Style>
                         </StackPanel.Resources>
                         <Button Command="{Binding LibraryHierarchyLevels.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
@@ -140,6 +152,12 @@
                     <Setter Property="Width" Value="60"></Setter>
                     <Setter Property="Height" Value="30"></Setter>
                     <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                    <!-- System -->
+                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
                 </Style>
             </StackPanel.Resources>
             <Button Command="{Binding ClearCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Clear</Button>

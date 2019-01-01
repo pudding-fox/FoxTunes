@@ -48,7 +48,7 @@
                 <GridView Windows:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}"></GridView>
             </ListView.View>
         </ListView>
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False">
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"/>

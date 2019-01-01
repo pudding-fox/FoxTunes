@@ -9,18 +9,22 @@ namespace FoxTunes
         public SystemTheme()
             : base("D4EBB53F-BF59-4D61-99E1-D6D52926AE3F", "System")
         {
-
+            this.ResourceDictionary = new ResourceDictionary()
+            {
+                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
+            };
         }
 
-        public override void Apply(Application application)
+        public ResourceDictionary ResourceDictionary { get; private set; }
+
+        public override void Enable()
         {
-            application.Resources.MergedDictionaries.Clear();
-            application.Resources.MergedDictionaries.Add(
-                new ResourceDictionary()
-                {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
-                }
-            );
+            Application.Current.Resources.MergedDictionaries.Add(this.ResourceDictionary);
+        }
+
+        public override void Disable()
+        {
+            Application.Current.Resources.MergedDictionaries.Remove(this.ResourceDictionary);
         }
     }
 }

@@ -9,18 +9,22 @@ namespace FoxTunes
         public ExpressionDarkTheme()
             : base("3E9EFE8C-5245-4F8B-97D1-EB47CC70E373", "ExpressionDark")
         {
-
+            this.ResourceDictionary = new ResourceDictionary()
+            {
+                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
+            };
         }
 
-        public override void Apply(Application application)
+        public ResourceDictionary ResourceDictionary { get; private set; }
+
+        public override void Enable()
         {
-            application.Resources.MergedDictionaries.Clear();
-            application.Resources.MergedDictionaries.Add(
-                new ResourceDictionary()
-                {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
-                }
-            );
+            Application.Current.Resources.MergedDictionaries.Add(this.ResourceDictionary);
+        }
+
+        public override void Disable()
+        {
+            Application.Current.Resources.MergedDictionaries.Remove(this.ResourceDictionary);
         }
     }
 }

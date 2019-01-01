@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace FoxTunes.Theme
+﻿namespace FoxTunes.Theme
 {
     public abstract class ThemeBase : StandardComponent, ITheme
     {
@@ -17,6 +15,8 @@ namespace FoxTunes.Theme
 
         public string Description { get; private set; }
 
-        public abstract void Apply(Application application);
+        public abstract void Enable();
+
+        public abstract void Disable();
     }
 }

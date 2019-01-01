@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
 namespace FoxTunes
 {
@@ -16,8 +15,6 @@ namespace FoxTunes
 
         public const string SHOW_LIBRARY_ELEMENT = "E21CDA77-129F-4988-99EC-6A21EB9096D8";
 
-        public const string SHOW_TRAY_ICON_ELEMENT = "82D11AC8-7D75-43C9-9E99-FF69EC5D8040";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var themeOptions = GetThemeOptions().ToArray();
@@ -30,9 +27,7 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_LIBRARY_ELEMENT, "Show Library").WithValue(true))
-                .WithElement(
-                    new BooleanConfigurationElement(SHOW_TRAY_ICON_ELEMENT, "Show Tray Icon").WithValue(false)
+                    new BooleanConfigurationElement(SHOW_LIBRARY_ELEMENT, "Show Library").WithValue(true)
             );
         }
 
@@ -43,6 +38,12 @@ namespace FoxTunes
             {
                 yield return new SelectionConfigurationOption(theme.Id, theme.Name, theme.Description);
             }
+        }
+
+        public static ITheme GetTheme(string id)
+        {
+            var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
+            return themes.FirstOrDefault(theme => string.Equals(theme.Id, id, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
