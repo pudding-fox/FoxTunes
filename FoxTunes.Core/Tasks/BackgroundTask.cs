@@ -232,6 +232,7 @@ namespace FoxTunes
                     }
                     Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
                     await this.OnCompleted();
+                    return;
                 }
                 catch (AggregateException e)
                 {
@@ -240,14 +241,13 @@ namespace FoxTunes
                         Logger.Write(this, LogLevel.Error, "Background task failed: {0}", innerException.Message);
                     }
                     this.Exception = e;
-                    await this.OnFaulted();
                 }
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
                     this.Exception = e;
-                    await this.OnFaulted();
                 }
+                await this.OnFaulted();
             });
         }
 
