@@ -88,35 +88,19 @@ namespace FoxTunes
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
             this.NotifyIcon = ComponentRegistry.Instance.GetComponent<INotifyIcon>();
-            if (this.NotifyIcon != null)
+            if (this.IsEnabled)
             {
-                if (this.IsEnabled)
-                {
-                    this.Show();
-                    if (this.NotifyIcon.MessageSink != null)
-                    {
-                        this.NotifyIcon.MessageSink.MouseLeftButtonDown += this.OnMouseLeftButtonDown;
-                        this.NotifyIcon.MessageSink.MouseLeftButtonUp += this.OnMouseLeftButtonUp;
-                        this.NotifyIcon.MessageSink.MouseRightButtonDown += this.OnMouseRightButtonDown;
-                        this.NotifyIcon.MessageSink.MouseRightButtonUp += this.OnMouseRightButtonUp;
-                    }
-                }
-                else
-                {
-                    if (this.NotifyIcon.MessageSink != null)
-                    {
-                        this.NotifyIcon.MessageSink.MouseLeftButtonDown -= this.OnMouseLeftButtonDown;
-                        this.NotifyIcon.MessageSink.MouseLeftButtonUp -= this.OnMouseLeftButtonUp;
-                        this.NotifyIcon.MessageSink.MouseRightButtonDown -= this.OnMouseRightButtonDown;
-                        this.NotifyIcon.MessageSink.MouseRightButtonUp -= this.OnMouseRightButtonUp;
-                    }
-                    this.Hide();
-                }
+                this.Show();
+            }
+            else
+            {
+                this.Hide();
             }
         }
 
         protected virtual void OnMouseLeftButtonDown(object sender, EventArgs e)
         {
+            //TODO: Respect IForegroundTaskRunner component.
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 this.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
@@ -129,6 +113,7 @@ namespace FoxTunes
 
         protected virtual void OnMouseLeftButtonUp(object sender, EventArgs e)
         {
+            //TODO: Respect IForegroundTaskRunner component.
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 this.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
@@ -141,6 +126,7 @@ namespace FoxTunes
 
         protected virtual void OnMouseRightButtonDown(object sender, EventArgs e)
         {
+            //TODO: Respect IForegroundTaskRunner component.
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 this.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right)
@@ -153,6 +139,7 @@ namespace FoxTunes
 
         protected virtual void OnMouseRightButtonUp(object sender, EventArgs e)
         {
+            //TODO: Respect IForegroundTaskRunner component.
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 this.ShowContextMenu();
@@ -213,6 +200,13 @@ namespace FoxTunes
                 this.NotifyIcon.Icon = icon.Handle;
             }
             this.NotifyIcon.Show();
+            if (this.NotifyIcon.MessageSink != null)
+            {
+                this.NotifyIcon.MessageSink.MouseLeftButtonDown += this.OnMouseLeftButtonDown;
+                this.NotifyIcon.MessageSink.MouseLeftButtonUp += this.OnMouseLeftButtonUp;
+                this.NotifyIcon.MessageSink.MouseRightButtonDown += this.OnMouseRightButtonDown;
+                this.NotifyIcon.MessageSink.MouseRightButtonUp += this.OnMouseRightButtonUp;
+            }
         }
 
         public void Hide()
@@ -220,6 +214,13 @@ namespace FoxTunes
             if (this.NotifyIcon == null)
             {
                 return;
+            }
+            if (this.NotifyIcon.MessageSink != null)
+            {
+                this.NotifyIcon.MessageSink.MouseLeftButtonDown -= this.OnMouseLeftButtonDown;
+                this.NotifyIcon.MessageSink.MouseLeftButtonUp -= this.OnMouseLeftButtonUp;
+                this.NotifyIcon.MessageSink.MouseRightButtonDown -= this.OnMouseRightButtonDown;
+                this.NotifyIcon.MessageSink.MouseRightButtonUp -= this.OnMouseRightButtonUp;
             }
             this.NotifyIcon.Hide();
         }

@@ -6,6 +6,14 @@
     <ContextMenu.Resources>
         <ViewModel:Menu x:Key="ViewModel" Core="{Binding}" Category="{Binding Category, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}"></ViewModel:Menu>
         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+            <Setter Property="Header" Value="{Binding Invocation.Name}"></Setter>
+            <Setter Property="Command" Value="{Binding Command}"></Setter>
+            <!-- System -->
+            <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+            <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Template" Value="{DynamicResource MenuItemTemplate}"></Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding}" Value="{x:Null}">
                     <Setter Property="Template">
@@ -17,13 +25,16 @@
                     </Setter>
                 </DataTrigger>
             </Style.Triggers>
-            <Setter Property="Header" Value="{Binding Invocation.Name}"></Setter>
-            <Setter Property="Command" Value="{Binding Command}"></Setter>
         </Style>
     </ContextMenu.Resources>
     <ContextMenu.Style>
         <Style TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource {x:Type ContextMenu}}">
             <Setter Property="ItemsSource" Value="{Binding Items, Source={StaticResource ViewModel}}"></Setter>
+            <!-- System -->
+            <Setter Property="Background" Value="{DynamicResource ShadeBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ShadeBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Template" Value="{DynamicResource ContextMenuTemplate}"></Setter>
         </Style>
     </ContextMenu.Style>
 </ContextMenu>
