@@ -174,6 +174,7 @@ namespace FoxTunes
             var x = default(int);
             var y = default(int);
             MouseHelper.GetPosition(out x, out y);
+            DpiHelper.TransformPosition(ref x, ref y);
 
             this.ContextMenu.DataContext = this.DataContext;
             this.ContextMenu.Placement = PlacementMode.AbsolutePoint;
