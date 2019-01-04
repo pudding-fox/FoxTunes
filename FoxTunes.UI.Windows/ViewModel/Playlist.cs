@@ -221,6 +221,7 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
+            this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
             this.RefreshColumns();
             this.ReloadItems();
@@ -463,8 +464,7 @@ namespace FoxTunes.ViewModel
                 {
                     using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        var queryable = database.AsQueryable<PlaylistColumn>(transaction);
-                        foreach (var column in queryable.OrderBy(playlistColumn => playlistColumn.Sequence))
+                        foreach (var column in database.Set<PlaylistColumn>(transaction))
                         {
                             yield return this.GridViewColumnFactory.Create(column);
                         }

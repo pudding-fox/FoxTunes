@@ -122,6 +122,7 @@ namespace FoxTunes.ViewModel
         {
             switch (signal.Name)
             {
+                case CommonSignals.SettingsUpdated:
                 case CommonSignals.PlaylistColumnsUpdated:
                     return this.ForegroundTaskRunner.Run(() => this.Refresh());
             }
