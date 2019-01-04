@@ -221,10 +221,27 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
+            this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
             this.RefreshColumns();
             this.ReloadItems();
             this.OnCommandsChanged();
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnColumnChanged(object sender, PlaylistColumn e)
+        {
+            if (this.DatabaseFactory != null)
+            {
+                using (var database = this.DatabaseFactory.Create())
+                {
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                    {
+                        var set = database.Set<PlaylistColumn>(transaction);
+                        set.AddOrUpdate(e);
+                        transaction.Commit();
+                    }
+                }
+            }
         }
 
         protected virtual void OnCommandsChanged()

@@ -134,6 +134,7 @@
     <Compile Include="ViewModel\AsyncCommand.cs" />
     <Compile Include="ViewModel\CommandBase.cs" />
     <Compile Include="ViewModel\Components.cs" />
+    <Compile Include="ViewModel\Converters\ColumnWidthConverter.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />
     <Compile Include="ViewModel\Extensions.cs" />
