@@ -150,6 +150,8 @@
     <Compile Include="ViewModel\Menu.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
     <Compile Include="Utilities\ScriptBinding.cs" />
+    <Compile Include="ViewModel\ValidationRule.cs" />
+    <Compile Include="ViewModel\Wrapper.cs" />
     <Compile Include="WindowsForegroundTaskRunner.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="ViewModel\Command.cs" />

@@ -48,6 +48,7 @@
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
     <Compile Include="Configuration\ComponentResolver.cs" />
     <Compile Include="Configuration\TextConfigurationElement.cs" />
+    <Compile Include="Configuration\ValidationRule.cs" />
     <Compile Include="CoreValidator.cs" />
     <Compile Include="Deferral.cs" />
     <Compile Include="Interfaces\Configuration\IComponentResolver.cs" />

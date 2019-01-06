@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:v4="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
@@ -57,7 +58,22 @@
                                                         <CheckBox IsChecked="{Binding Value}"></CheckBox>
                                                     </DataTemplate>
                                                     <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
-                                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus}"></TextBox>
+                                                        <TextBox>
+                                                            <TextBox.Resources>
+                                                                <ViewModel:Wrapper x:Key="Proxy" Value="{Binding}"></ViewModel:Wrapper>
+                                                            </TextBox.Resources>
+                                                            <TextBox.Text>
+                                                                <Binding Path="Value" UpdateSourceTrigger="LostFocus">
+                                                                    <Binding.ValidationRules>
+                                                                        <ViewModel:ValidationRule>
+                                                                            <ViewModel:ValidationRule.ConfigurationElement>
+                                                                                <ViewModel:Wrapper Value="{Binding Value, Source={StaticResource Proxy}}"></ViewModel:Wrapper>
+                                                                            </ViewModel:ValidationRule.ConfigurationElement>
+                                                                        </ViewModel:ValidationRule>
+                                                                    </Binding.ValidationRules>
+                                                                </Binding>
+                                                            </TextBox.Text>
+                                                        </TextBox>
                                                     </DataTemplate>
                                                 </ContentControl.Resources>
                                             </ContentControl>

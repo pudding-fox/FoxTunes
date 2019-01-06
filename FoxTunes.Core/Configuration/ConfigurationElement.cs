@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
     [Serializable]
     public abstract class ConfigurationElement : BaseComponent
     {
-        protected ConfigurationElement(string id, string name = null, string description = null)
+        private ConfigurationElement()
+        {
+            this.IsHidden = false;
+        }
+
+        protected ConfigurationElement(string id, string name = null, string description = null) : this()
         {
             this.Id = id;
             this.Name = name;
             this.Description = description;
-            this.IsHidden = false;
         }
 
         public string Id { get; private set; }
@@ -46,6 +51,44 @@ namespace FoxTunes
         [field: NonSerialized]
         public event EventHandler IsHiddenChanged = delegate { };
 
+        [field: NonSerialized]
+        private ObservableCollection<ValidationRule> _ValidationRules;
+
+        public ObservableCollection<ValidationRule> ValidationRules
+        {
+            get
+            {
+                return this._ValidationRules;
+            }
+            set
+            {
+                this._ValidationRules = value;
+                this.OnValidationRulesChanged();
+            }
+        }
+
+        protected virtual void OnValidationRulesChanged()
+        {
+            if (this.ValidationRulesChanged != null)
+            {
+                this.ValidationRulesChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ValidationRules");
+        }
+
+        [field: NonSerialized]
+        public event EventHandler ValidationRulesChanged = delegate { };
+
+        public ConfigurationElement WithValidationRule(ValidationRule validationRule)
+        {
+            if (this.ValidationRules == null)
+            {
+                this.ValidationRules = new ObservableCollection<ValidationRule>();
+            }
+            this.ValidationRules.Add(validationRule);
+            return this;
+        }
+
         public abstract ConfigurationElement ConnectValue<T>(Action<T> action);
 
         public void Update(ConfigurationElement element)
@@ -53,6 +96,7 @@ namespace FoxTunes
             this.Name = element.Name;
             this.Description = element.Description;
             this.IsHidden = false;
+            this.ValidationRules = element.ValidationRules;
             this.OnUpdate(element);
         }
 

@@ -29,6 +29,9 @@
         </Style>
     </UserControl.Resources>
     <Grid>
+        <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+        </Grid.LayoutTransform>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
