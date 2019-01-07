@@ -140,6 +140,7 @@
     <Compile Include="ViewModel\Converters\ColumnWidthConverter.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />
+    <Compile Include="ViewModel\Converters\GridLengthConverter.cs" />
     <Compile Include="ViewModel\Extensions.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />

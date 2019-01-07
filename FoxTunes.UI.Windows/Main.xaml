@@ -9,7 +9,7 @@
              xmlns:Properties="clr-namespace:FoxTunes.Properties"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
         <Style x:Key="LibraryTreeStyle" TargetType="{x:Type Windows:LibraryTree}">
@@ -28,6 +28,7 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
     </UserControl.Resources>
     <Grid>
         <Grid.LayoutTransform>
@@ -47,7 +48,7 @@
                 <ColumnDefinition>
                     <ColumnDefinition.Style>
                         <Style TargetType="{x:Type ColumnDefinition}">
-                            <Setter Property="Width" Value="{Binding ColumnWidth_FC87DEC38708, Source={x:Static Properties:Settings.Default}, Mode=TwoWay}"></Setter>
+                            <Setter Property="Width" Value="{Binding ColumnWidth_FC87DEC38708, Source={x:Static Properties:Settings.Default}, Converter={StaticResource GridLengthConverter}, Mode=TwoWay}"></Setter>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
                                     <Setter Property="Width" Value="0"></Setter>
@@ -56,17 +57,16 @@
                         </Style>
                     </ColumnDefinition.Style>
                 </ColumnDefinition>
-                <ColumnDefinition Width="5"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
-            <Windows:LibraryTree Style="{StaticResource LibraryTreeStyle}"></Windows:LibraryTree>
-            <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}"></Windows:Artwork>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></GridSplitter>
-            <Windows:Playlist Grid.Column="2" Grid.RowSpan="2"></Windows:Playlist>
+            <Windows:LibraryTree Style="{StaticResource LibraryTreeStyle}" Margin="2,2,4,2"></Windows:LibraryTree>
+            <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}" Margin="0,0,5,0"></Windows:Artwork>
+            <GridSplitter Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="4"></GridSplitter>
+            <Windows:Playlist Grid.Column="1" Grid.RowSpan="2" Margin="0,2,2,2"></Windows:Playlist>
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalAlignment="Bottom">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width=".35*"></ColumnDefinition>
