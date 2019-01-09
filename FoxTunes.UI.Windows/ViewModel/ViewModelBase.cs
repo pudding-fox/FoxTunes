@@ -40,6 +40,10 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
+            if (viewModel.Core != null && !viewModel.IsInitialized)
+            {
+                viewModel.InitializeComponent(viewModel.Core);
+            }
             viewModel.OnCoreChanged();
         }
 
@@ -66,9 +70,11 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler CoreChanged = delegate { };
 
+        public bool IsInitialized { get; private set; }
+
         public virtual void InitializeComponent(ICore core)
         {
-            throw new NotImplementedException();
+            this.IsInitialized = true;
         }
 
         protected virtual void OnPropertyChanging(string propertyName)

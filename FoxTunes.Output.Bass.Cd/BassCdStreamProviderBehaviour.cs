@@ -22,7 +22,7 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
-        public bool IsInitialized { get; private set; }
+        new public bool IsInitialized { get; private set; }
 
         public bool Enabled
         {

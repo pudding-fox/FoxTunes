@@ -75,6 +75,11 @@ namespace FoxTunes
         protected virtual void OnClose(object sender, EventArgs e)
         {
             this.Disable();
+            this.Quit();
+        }
+
+        protected virtual void Quit()
+        {
             //We have to close the main window as a low priority task otherwise the dispatcher 
             //running *this* task is shut down which causes an exception.
             if (Application.Current != null && Application.Current.Dispatcher != null)

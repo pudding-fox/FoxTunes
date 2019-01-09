@@ -88,7 +88,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.InvocableComponents.AddRange(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
             foreach (var item in this.GetItems().OrderBy(item => item.Invocation.Category).ThenBy(item => item.Invocation.Id))
@@ -99,7 +99,7 @@ namespace FoxTunes.ViewModel
                 }
                 this.Items.Add(item);
             }
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
         protected override Freezable CreateInstanceCore()
         {
@@ -143,10 +143,10 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual Task OnInvoke()

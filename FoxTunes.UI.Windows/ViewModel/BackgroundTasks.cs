@@ -14,10 +14,10 @@ namespace FoxTunes.ViewModel
 
         public ObservableCollection<IBackgroundTask> RunningTasks { get; set; }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask += this.OnBackgroundTask);
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnBackgroundTask(object sender, BackgroundTaskEventArgs e)

@@ -2,16 +2,46 @@
 using System;
 using System.Globalization;
 
-namespace FoxTunes.Utilities
+namespace FoxTunes
 {
     public class PlaylistScriptBinding : ScriptBinding
     {
-        public PlaylistScriptBinding(IPlaybackManager playbackManager, IScriptingContext scriptingContext, string script) : base(scriptingContext, script)
+        public PlaylistScriptBinding()
+        {
+
+        }
+
+        public PlaylistScriptBinding(IPlaybackManager playbackManager, IScriptingContext scriptingContext, string script)
+            : base(scriptingContext, script)
         {
             this.PlaybackManager = playbackManager;
         }
 
-        public IPlaybackManager PlaybackManager { get; private set; }
+        private IPlaybackManager _PlaybackManager { get; set; }
+
+        public IPlaybackManager PlaybackManager
+        {
+            get
+            {
+                return this._PlaybackManager;
+            }
+            set
+            {
+                this._PlaybackManager = value;
+                this.OnPlaybackManagerChanged();
+            }
+        }
+
+        protected virtual void OnPlaybackManagerChanged()
+        {
+            if (this.PlaybackManagerChanged != null)
+            {
+                this.PlaybackManagerChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("PlaybackManager");
+        }
+
+        public event EventHandler PlaybackManagerChanged = delegate { };
 
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

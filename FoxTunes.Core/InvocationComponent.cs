@@ -8,6 +8,8 @@ namespace FoxTunes
 
         public const string CATEGORY_LIBRARY = "CE91AB2A-3442-4019-B585-C4DCFEF1DB65";
 
+        public const string CATEGORY_MINI_PLAYER = "5C3822F2-6843-40B2-9A38-28EA191CC3AF";
+
         public const string CATEGORY_NOTIFY_ICON = "F9E060E6-D791-4E9A-A109-FD145EAECBA2";
 
         public const byte ATTRIBUTE_SEPARATOR = 1;

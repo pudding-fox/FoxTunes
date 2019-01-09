@@ -12,6 +12,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
+        <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
         <CollectionViewSource x:Key="Sections" Source="{Binding Components.Configuration.Sections}" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Name</System:String>
@@ -48,14 +49,14 @@
                                                 <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
                                                 <ColumnDefinition></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
-                                            <Label VerticalAlignment="Center" Padding="0,0,7,0" Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
+                                            <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
                                             <ContentControl Grid.Column="1" Content="{Binding}">
                                                 <ContentControl.Resources>
                                                     <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
                                                         <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
                                                     </DataTemplate>
                                                     <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
-                                                        <CheckBox IsChecked="{Binding Value}"></CheckBox>
+                                                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding Value}"></CheckBox>
                                                     </DataTemplate>
                                                     <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
                                                         <TextBox>
@@ -73,6 +74,29 @@
                                                                     </Binding.ValidationRules>
                                                                 </Binding>
                                                             </TextBox.Text>
+                                                            <TextBox.Style>
+                                                                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                    <!-- System -->
+                                                                    <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+                                                                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                                                    <Setter Property="AllowDrop" Value="true" />
+                                                                    <Setter Property="Template" Value="{DynamicResource TextBoxTemplate}" />
+                                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                                    <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource SolidBorderBrush}"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Flags, Converter={StaticResource HasFlagConverter}, ConverterParameter={x:Static Core:ConfigurationElementFlags.MultiLine}}" Value="True">
+                                                                            <Setter Property="AcceptsReturn" Value="True"></Setter>
+                                                                            <Setter Property="AcceptsTab" Value="True"></Setter>
+                                                                            <Setter Property="SpellCheck.IsEnabled" Value="False"></Setter>
+                                                                            <Setter Property="MinLines" Value="10"></Setter>
+                                                                            <Setter Property="MaxLines" Value="10"></Setter>
+                                                                            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"></Setter>
+                                                                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"></Setter>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBox.Style>
                                                         </TextBox>
                                                     </DataTemplate>
                                                 </ContentControl.Resources>

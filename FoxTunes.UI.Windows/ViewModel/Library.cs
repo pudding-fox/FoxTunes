@@ -174,7 +174,7 @@ namespace FoxTunes.ViewModel
             this.Refresh();
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
@@ -187,7 +187,7 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.Reload();
             this.OnCommandsChanged();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnCommandsChanged()

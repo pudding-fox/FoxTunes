@@ -174,7 +174,7 @@ namespace FoxTunes.ViewModel
             this.Refresh();
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.LibraryManager = this.Core.Managers.Library;
             this.HierarchyManager = this.Core.Managers.Hierarchy;
@@ -235,7 +235,7 @@ namespace FoxTunes.ViewModel
             };
             this.Refresh();
             this.OnCommandsChanged();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnCommandsChanged()

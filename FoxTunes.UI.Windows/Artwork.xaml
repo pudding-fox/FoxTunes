@@ -11,6 +11,18 @@
         <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}"/>
     </UserControl.Resources>
     <Grid>
-        <Image Source="{Binding Image.FileValue, Source={StaticResource ViewModel}}"></Image>
+        <Grid.Background>
+            <ImageBrush ImageSource="{Binding Image.FileValue, Source={StaticResource ViewModel}}"></ImageBrush>
+        </Grid.Background>
+        <Grid.Style>
+            <Style TargetType="{x:Type Grid}">
+                <Setter Property="Height" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Image.FileValue, Source={StaticResource ViewModel}}" Value="{x:Null}">
+                        <Setter Property="Height" Value="0"></Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
     </Grid>
 </UserControl>

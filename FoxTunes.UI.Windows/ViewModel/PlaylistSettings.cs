@@ -87,7 +87,7 @@ namespace FoxTunes.ViewModel
             this.Refresh();
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.DatabaseFactory = this.Core.Factories.Database;
@@ -115,7 +115,7 @@ namespace FoxTunes.ViewModel
                 }
             };
             this.Refresh();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         private Task OnSignal(object sender, ISignal signal)

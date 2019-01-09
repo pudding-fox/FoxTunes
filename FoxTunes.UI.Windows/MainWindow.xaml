@@ -5,8 +5,49 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
         xmlns:Windows="clr-namespace:FoxTunes" 
+        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+        xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         x:Class="FoxTunes.MainWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
         Title="Fox Tunes" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico">
-    <Windows:Main></Windows:Main>
+    <Window.Resources>
+        <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
+    </Window.Resources>
+    <Grid Background="{DynamicResource NormalBrush}">
+        <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+        </Grid.LayoutTransform>
+        <ContentPresenter>
+            <ContentPresenter.Style>
+                <Style TargetType="{x:Type ContentPresenter}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding MiniPlayer.Value, Source={StaticResource ViewModel}}" Value="True">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <Windows:Mini></Windows:Mini>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MiniPlayer.Value, Source={StaticResource ViewModel}}" Value="False">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <Windows:Main></Windows:Main>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentPresenter.Style>
+        </ContentPresenter>
+        <Windows:NotifyIconElement ImageSource="Images/Fox.ico" IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="MouseLeftButtonUp">
+                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding RestoreCommand, Source={StaticResource ViewModel}}" />
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
+            <Windows:NotifyIconElement.ContextMenu>
+                <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_NOTIFY_ICON}}"></Windows:Menu>
+            </Windows:NotifyIconElement.ContextMenu>
+        </Windows:NotifyIconElement>
+    </Grid>
 </Window>

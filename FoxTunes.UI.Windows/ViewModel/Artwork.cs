@@ -56,11 +56,12 @@ namespace FoxTunes.ViewModel
             );
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaylistManager.CurrentItemChanged += (sender, e) => this.Refresh();
-            base.OnCoreChanged();
+            this.Refresh();
+            base.InitializeComponent(core);
         }
 
         protected override Freezable CreateInstanceCore()

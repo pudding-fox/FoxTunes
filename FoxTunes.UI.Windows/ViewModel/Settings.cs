@@ -66,10 +66,10 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.SignalEmitter = this.Core.Components.SignalEmitter;
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected override Freezable CreateInstanceCore()
