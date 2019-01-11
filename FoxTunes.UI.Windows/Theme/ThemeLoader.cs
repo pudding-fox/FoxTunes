@@ -44,7 +44,7 @@ namespace FoxTunes.Theme
         {
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
-                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+                WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.THEME_ELEMENT
             ).ConnectValue<string>(value => this.Theme = WindowsUserInterfaceConfiguration.GetTheme(value));
             base.InitializeComponent(core);

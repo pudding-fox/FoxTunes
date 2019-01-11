@@ -130,11 +130,11 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.Configuration = this.Core.Components.Configuration;
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
-              WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+              WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.SHOW_ARTWORK_ELEMENT
             );
             this.ResetPlaylist = this.Configuration.GetElement<BooleanConfigurationElement>(
-              MiniPlayerBehaviourConfiguration.MINI_PLAYER_SECTION,
+              MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.RESET_PLAYLIST_ELEMENT
             );
             this.OnCommandsChanged();

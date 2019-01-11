@@ -60,7 +60,7 @@ namespace FoxTunes
             this.PlaybackManager = core.Managers.Playback;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
-                ExecutionStateBehaviourConfiguration.POWER_SECTION,
+                ExecutionStateBehaviourConfiguration.SECTION,
                 ExecutionStateBehaviourConfiguration.SLEEP_ELEMENT
             ).ConnectValue<string>(value => this.ExecutionState = ExecutionStateBehaviourConfiguration.GetExecutionState(value));
             base.InitializeComponent(core);

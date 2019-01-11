@@ -37,7 +37,7 @@ namespace FoxTunes
             this.Output.Free += this.OnFree;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.RESAMPLER_ELEMENT
             ).ConnectValue<bool>(value => this.Enabled = value);
             ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().CreatingPipeline += this.OnCreatingPipeline;

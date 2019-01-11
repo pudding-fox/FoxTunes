@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core", "FoxTunes.Core\FoxTunes.Core.csproj", "{62CD8F70-8415-4C15-B672-CB18475ABD7E}"
 EndProject
@@ -66,6 +66,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.SqlServer", "FoxTunes.DB.SqlServer\FoxTunes.DB.SqlServer.csproj", "{9FFD320F-9DCD-49C6-9F55-502B70508A20}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core.Windows", "FoxTunes.Core.Windows\FoxTunes.Core.Windows.csproj", "{43EAACF1-6538-4D96-A209-E5A0BEA1F60E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.MetaData.FileName", "FoxTunes.MetaData.FileName\FoxTunes.MetaData.FileName.csproj", "{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -276,6 +278,14 @@ Global
 		{43EAACF1-6538-4D96-A209-E5A0BEA1F60E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{43EAACF1-6538-4D96-A209-E5A0BEA1F60E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{43EAACF1-6538-4D96-A209-E5A0BEA1F60E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

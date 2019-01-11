@@ -31,7 +31,7 @@
             <ViewModel:InvokeParameterizedCommandAction Command="{Binding DropCommand, Source={StaticResource ViewModel}}" />
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
-    <Grid Background="Transparent">
+    <Grid Background="Transparent" Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>

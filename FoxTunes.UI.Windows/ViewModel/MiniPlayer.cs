@@ -38,7 +38,7 @@ namespace FoxTunes.ViewModel
         {
             this.Configuration = this.Core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.MINI_PLAYER_SECTION,
+                MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
             );
             base.InitializeComponent(core);

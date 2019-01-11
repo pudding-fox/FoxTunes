@@ -43,7 +43,7 @@ namespace FoxTunes
             this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.SECTION,
                 InputManagerConfiguration.ENABLED_ELEMENT
             ).ConnectValue<bool>(value => this.Enabled = value);
             base.InitializeComponent(core);

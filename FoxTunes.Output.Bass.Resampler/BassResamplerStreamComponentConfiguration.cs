@@ -8,7 +8,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.OUTPUT_SECTION, "Output")
+            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new BooleanConfigurationElement(RESAMPLER_ELEMENT, "High Quality Resampler").WithValue(false)
             );
         }

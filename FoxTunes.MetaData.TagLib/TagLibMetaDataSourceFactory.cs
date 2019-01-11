@@ -2,6 +2,7 @@
 
 namespace FoxTunes
 {
+    [Component("679D9459-BBCE-4D95-BB65-DD20C335719C", ComponentSlots.MetaData)]
     public class TagLibMetaDataSourceFactory : MetaDataSourceFactory
     {
         public ICore Core { get; private set; }

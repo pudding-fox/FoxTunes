@@ -87,19 +87,19 @@ namespace FoxTunes
             this.Output.Free += this.OnFree;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.MODE_ELEMENT
             ).ConnectValue<string>(value => this.Enabled = string.Equals(value, BassWasapiStreamOutputConfiguration.MODE_WASAPI_OPTION, StringComparison.OrdinalIgnoreCase));
             this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_DEVICE
             ).ConnectValue<string>(value => this.WasapiDevice = BassWasapiStreamOutputConfiguration.GetWasapiDevice(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_EXCLUSIVE
             ).ConnectValue<bool>(value => this.Exclusive = value);
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_EVENT
             ).ConnectValue<bool>(value => this.EventDriven = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();

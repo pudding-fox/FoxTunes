@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public const int CD_NO_DRIVE = -1;
 
-        public const string CD_SECTION = "220BF762-28B1-436C-951D-5B0359473A40";
+        public const string SECTION = "220BF762-28B1-436C-951D-5B0359473A40";
 
         public const string DRIVE_ELEMENT = "99BD557F-62E7-4152-88DF-BF90C7C661F5";
 
@@ -19,14 +19,14 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(CD_SECTION, "CD")
+            yield return new ConfigurationSection(SECTION, "CD")
                 .WithElement(new SelectionConfigurationElement(DRIVE_ELEMENT, "Drive")
                     .WithOptions(() => GetDrives()))
                 .WithElement(new BooleanConfigurationElement(LOOKUP_ELEMENT, "Lookup Tags")
                     .WithValue(true))
                 .WithElement(new TextConfigurationElement(LOOKUP_HOST_ELEMENT, "Host")
                     .WithValue(BassCd.CDDBServer));
-            StandardComponents.Instance.Configuration.GetElement(CD_SECTION, LOOKUP_ELEMENT).ConnectValue<bool>(value => UpdateConfiguration(value));
+            StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_ELEMENT).ConnectValue<bool>(value => UpdateConfiguration(value));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetDrives()
@@ -58,11 +58,11 @@ namespace FoxTunes
         {
             if (cdda)
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(CD_SECTION, LOOKUP_HOST_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, LOOKUP_HOST_ELEMENT).Show();
             }
             else
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(CD_SECTION, LOOKUP_HOST_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, LOOKUP_HOST_ELEMENT).Hide();
             }
         }
     }

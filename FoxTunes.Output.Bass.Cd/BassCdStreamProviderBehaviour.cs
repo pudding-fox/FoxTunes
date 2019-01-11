@@ -86,15 +86,15 @@ namespace FoxTunes
             this.Output.Free += this.OnFree;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassCdStreamProviderBehaviourConfiguration.CD_SECTION,
+                BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.DRIVE_ELEMENT
             ).ConnectValue<string>(value => this.CdDrive = BassCdStreamProviderBehaviourConfiguration.GetDrive(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassCdStreamProviderBehaviourConfiguration.CD_SECTION,
+                BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_ELEMENT
             ).ConnectValue<bool>(value => this.CdLookup = value);
             this.Configuration.GetElement<TextConfigurationElement>(
-                BassCdStreamProviderBehaviourConfiguration.CD_SECTION,
+                BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_HOST_ELEMENT
             ).ConnectValue<string>(value => this.CdLookupHost = value);
             ComponentRegistry.Instance.GetComponent<IBassStreamFactory>().Register(new BassCdStreamProvider());

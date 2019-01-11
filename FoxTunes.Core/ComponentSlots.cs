@@ -16,6 +16,8 @@
 
         public const string Output = "CC3CEC0B-D882-4A4F-BD4D-A0A505CFD9E1";
 
+        public const string MetaData = "7339A28B-94CA-454D-811F-A8EF61663AD2";
+
         public const string ScriptingRuntime = "24ECF207-EC44-4E98-9533-B78B050DCFDA";
 
         public const string Logger = "4F0E4441-89E9-45A4-9B05-94491ACF0A99";

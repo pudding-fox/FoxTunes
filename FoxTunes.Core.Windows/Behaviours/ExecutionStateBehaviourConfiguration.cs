@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public static class ExecutionStateBehaviourConfiguration
     {
-        public const string POWER_SECTION = "A01D8E9B-004B-48D5-B8A5-7ACCCC6D560F";
+        public const string SECTION = "A01D8E9B-004B-48D5-B8A5-7ACCCC6D560F";
 
         public const string SLEEP_ELEMENT = "FBD451E4-6DC4-411E-A02C-0B41FB641778";
 
@@ -19,7 +19,7 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var sleepOptions = GetSleepOptions().ToArray();
-            yield return new ConfigurationSection(POWER_SECTION, "Power")
+            yield return new ConfigurationSection(SECTION, "Power")
                 .WithElement(
                     new SelectionConfigurationElement(SLEEP_ELEMENT, "Sleep")
                     {
