@@ -32,8 +32,12 @@ namespace FoxTunes
             if (miniPlayerBehaviour == null || !miniPlayerBehaviour.Enabled)
             {
                 global::FoxTunes.Properties.Settings.Default.MainWindowBounds = this.RestoreBounds;
-                global::FoxTunes.Properties.Settings.Default.Save();
             }
+            else
+            {
+                global::FoxTunes.Properties.Settings.Default.MiniWindowBounds = this.RestoreBounds;
+            }
+            global::FoxTunes.Properties.Settings.Default.Save();
             base.OnClosing(e);
         }
     }
@@ -42,7 +46,11 @@ namespace FoxTunes
     {
         public static bool IsEmpty(this Rect rect)
         {
-            return rect.Left == 0 && rect.Top == 0 && rect.Width == 0 && rect.Height == 0;
+            return
+                (rect.Left == 0 || double.IsInfinity(rect.Left)) &&
+                (rect.Top == 0 || double.IsInfinity(rect.Top)) &&
+                (rect.Width == 0 || double.IsInfinity(rect.Width)) &&
+                (rect.Height == 0 || double.IsInfinity(rect.Height));
         }
     }
 }
