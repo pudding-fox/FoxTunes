@@ -102,6 +102,7 @@
     <Compile Include="Tasks\ClearLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\MovePlaylistItemsTask.cs" />
     <Compile Include="Tasks\RescanLibraryTask.cs" />
+    <Compile Include="Utilities\ArtworkLocator.cs" />
     <Compile Include="Utilities\AsyncParallel.cs" />
     <Compile Include="Utilities\CancellationToken.cs" />
     <Compile Include="Utilities\NetworkDrive.cs" />

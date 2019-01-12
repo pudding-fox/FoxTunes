@@ -217,12 +217,14 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
+            //TODO: Bad awaited Task.
             this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.RefreshColumns();
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
             this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
+            //TODO: Bad awaited Task.
             this.RefreshColumns();
             this.ReloadItems();
             this.OnCommandsChanged();
@@ -473,27 +475,30 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void RefreshColumns()
+        protected virtual Task RefreshColumns()
         {
-            if (this.GridColumns == null)
+            return this.ForegroundTaskRunner.Run(() =>
             {
-                this.ReloadColumns();
-            }
-            if (this.GridColumns != null)
-            {
-                foreach (var column in this.GridColumns)
+                if (this.GridColumns == null)
                 {
-                    this.GridViewColumnFactory.Refresh(column);
-                    if (this.AutoSizeGridColumns)
+                    this.ReloadColumns();
+                }
+                if (this.GridColumns != null)
+                {
+                    foreach (var column in this.GridColumns)
                     {
-                        if (double.IsNaN(column.Width))
+                        this.GridViewColumnFactory.Refresh(column);
+                        if (this.AutoSizeGridColumns)
                         {
-                            column.Width = column.ActualWidth;
-                            column.Width = double.NaN;
+                            if (double.IsNaN(column.Width))
+                            {
+                                column.Width = column.ActualWidth;
+                                column.Width = double.NaN;
+                            }
                         }
                     }
                 }
-            }
+            });
         }
 
         protected virtual void ReloadColumns()
