@@ -1,1 +1,4 @@
-﻿.*DIR(?<artist>[^DIR]+)DIR(?<album>[^DIR]+)DIR(?:(?<disc>\d+)SEP(?=\d))?((?<track>\d+)SEP)?(?<title>.+?)\.[^\.]+$
+﻿//Artist/Year - Album/Disc - Track - Perfomer - Title
+.*DIR(?<artist>[^DIR]+)DIR(?:(?<year>\d{4})SEP)?(?<album>[^DIR]+)DIR(?:(?<disc>\d+)SEP(?=\d))?((?<track>\d+)SEP)?(:?(?<performer>.+)HYP)?(?<title>.+?)\.[^\.]+$
+//Artist/Album/Disc - Track - Title
+.*DIR(?<artist>[^DIR]+)DIR(?:(?<year>\d{4})SEP)?(?<album>[^DIR]+)DIR(?:(?<disc>\d+)SEP(?=\d))?((?<track>\d+)SEP)?(?<title>.+?)\.[^\.]+$
