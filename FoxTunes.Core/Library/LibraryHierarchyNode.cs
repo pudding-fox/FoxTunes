@@ -2,7 +2,6 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.IO;
 using System.Linq;
 

@@ -8,9 +8,9 @@ namespace FoxTunes.ViewModel
 {
     public class Artwork : ViewModelBase
     {
-        private static readonly ArtworkLocator ArtworkLocator = new ArtworkLocator();
-
         public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
+        public IArtworkProvider ArtworkProvider { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -53,12 +53,10 @@ namespace FoxTunes.ViewModel
             var playlistItem = this.PlaylistManager.CurrentItem;
             if (playlistItem != null)
             {
-                image = playlistItem.MetaDatas.FirstOrDefault(
-                    metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == CommonImageTypes.FrontCover && File.Exists(metaDataItem.FileValue)
-                );
+                image = this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
                 if (image == null)
                 {
-                    image = ArtworkLocator.Find(playlistItem.FileName, ArtworkType.FrontCover);
+                    image = this.ArtworkProvider.Find(playlistItem.FileName, ArtworkType.FrontCover);
                 }
             }
             //TODO: Bad awaited Task.
@@ -68,6 +66,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
+            this.ArtworkProvider = this.Core.Components.ArtworkProvider;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaylistManager.CurrentItemChanged += (sender, e) => this.Refresh();
             this.Refresh();
