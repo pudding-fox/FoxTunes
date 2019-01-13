@@ -61,6 +61,7 @@
     <Compile Include="Behaviours\MiniPlayerBehaviourConfiguration.cs" />
     <Compile Include="Behaviours\PlaylistActionsBehaviour.cs" />
     <Compile Include="Behaviours\TrayIconBehaviour.cs" />
+    <Compile Include="Behaviours\WindowStateBehaviour.cs" />
     <Compile Include="Components.xaml.cs">
       <DependentUpon>Components.xaml</DependentUpon>
     </Compile>
@@ -142,6 +143,9 @@
     <Compile Include="Theme\ITheme.cs" />
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
+    <Compile Include="Titlebar.xaml.cs">
+      <DependentUpon>Titlebar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\BindingHelper.cs" />
     <Compile Include="Utilities\CollectionManager.cs" />
     <Compile Include="Utilities\DiagonalStackPanel.cs" />
@@ -177,6 +181,7 @@
     <Compile Include="ViewModel\NowPlaying.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
     <Compile Include="Utilities\ScriptBinding.cs" />
+    <Compile Include="ViewModel\Titlebar.cs" />
     <Compile Include="ViewModel\ValidationRule.cs" />
     <Compile Include="ViewModel\Wrapper.cs" />
     <Compile Include="WindowsForegroundTaskRunner.cs" />
@@ -290,6 +295,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="StreamPosition.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Titlebar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

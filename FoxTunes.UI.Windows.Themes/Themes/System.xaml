@@ -8,5 +8,6 @@
     <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource {x:Static SystemColors.ControlTextColorKey}}" />
     <SolidColorBrush x:Key="NormalBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
     <SolidColorBrush x:Key="NormalBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
+    <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
 
 </ResourceDictionary>

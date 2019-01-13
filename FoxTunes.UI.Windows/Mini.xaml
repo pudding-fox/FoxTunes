@@ -31,23 +31,25 @@
             <ViewModel:InvokeParameterizedCommandAction Command="{Binding DropCommand, Source={StaticResource ViewModel}}" />
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
-    <Grid Background="Transparent" Margin="2">
-        <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-        </Grid.RowDefinitions>
-        <Windows:NowPlaying Margin="0,0,0,2" ToolTipService.ShowDuration="60000">
-            <Windows:NowPlaying.ToolTip>
-                <Windows:PlaybackDetails></Windows:PlaybackDetails>
-            </Windows:NowPlaying.ToolTip>
-        </Windows:NowPlaying>
-        <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}"></Windows:Artwork>
-        <Windows:StreamPosition x:Name="StreamPosition" Grid.Row="2" Margin="0,0,0,2"></Windows:StreamPosition>
-        <StackPanel Grid.Row="3" Orientation="Horizontal">
-            <Windows:Playback Grid.Row="2" Margin="0,0,2,0"></Windows:Playback>
-            <Windows:MiniPlayer Grid.Column="1" Grid.Row="2"></Windows:MiniPlayer>
-        </StackPanel>
-    </Grid>
+    <Border Padding="5" CornerRadius="5" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" Background="{DynamicResource NormalBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Windows:NowPlaying Margin="0,0,0,4" ToolTipService.ShowDuration="60000">
+                <Windows:NowPlaying.ToolTip>
+                    <Windows:PlaybackDetails></Windows:PlaybackDetails>
+                </Windows:NowPlaying.ToolTip>
+            </Windows:NowPlaying>
+            <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}" Margin="0,0,0,2"></Windows:Artwork>
+            <Windows:StreamPosition x:Name="StreamPosition" Grid.Row="2" Margin="0,0,0,2"></Windows:StreamPosition>
+            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                <Windows:Playback Grid.Row="2" Margin="0,0,2,0"></Windows:Playback>
+                <Windows:MiniPlayer Grid.Column="1" Grid.Row="2"></Windows:MiniPlayer>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>
