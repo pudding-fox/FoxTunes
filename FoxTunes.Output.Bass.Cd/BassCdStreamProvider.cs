@@ -52,15 +52,30 @@ namespace FoxTunes
 
         protected virtual bool GetCurrentStream(IBassOutput output, int drive, int track, out int channelHandle)
         {
-            if (output.Pipeline != null)
+            if (output.IsStarted)
             {
-                foreach (var enqueuedChannelHandle in output.Pipeline.Input.Queue)
+                var enqueuedChannelHandle = default(int);
+                output.WithPipeline(pipeline =>
                 {
-                    if (BassCd.StreamGetTrack(enqueuedChannelHandle) == track)
+                    if (pipeline != null)
                     {
-                        channelHandle = enqueuedChannelHandle;
-                        return true;
+                        using (var sequence = pipeline.Input.Queue.GetEnumerator())
+                        {
+                            while (sequence.MoveNext())
+                            {
+                                if (BassCd.StreamGetTrack(sequence.Current) == track)
+                                {
+                                    enqueuedChannelHandle = sequence.Current;
+                                    break;
+                                }
+                            }
+                        }
                     }
+                });
+                if (enqueuedChannelHandle != 0)
+                {
+                    channelHandle = enqueuedChannelHandle;
+                    return true;
                 }
             }
             channelHandle = 0;

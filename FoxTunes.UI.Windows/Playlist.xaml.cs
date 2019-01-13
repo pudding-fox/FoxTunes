@@ -28,5 +28,15 @@ namespace FoxTunes
                 DragDropEffects.Copy
             );
         }
+
+        protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var viewModel = this.FindResource<global::FoxTunes.ViewModel.Playlist>("ViewModel");
+            if (viewModel == null)
+            {
+                return;
+            }
+            var task = viewModel.RefreshColumns();
+        }
     }
 }

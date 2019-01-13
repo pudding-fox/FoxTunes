@@ -1,15 +1,23 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public abstract class PopulatorBase : BaseComponent, IReportsProgress, IDisposable
     {
-        public PopulatorBase(bool reportProgress)
+        private PopulatorBase()
+        {
+            this.Semaphore = new SemaphoreSlim(1, 1);
+        }
+
+        public PopulatorBase(bool reportProgress) : this()
         {
             this.ReportProgress = reportProgress;
         }
+
+        public SemaphoreSlim Semaphore { get; private set; }
 
         public bool ReportProgress { get; private set; }
 
@@ -21,23 +29,26 @@ namespace FoxTunes
             {
                 return this._Name;
             }
-            protected set
-            {
-                this._Name = value;
-                this.OnNameChanged();
-            }
         }
 
-        protected virtual void OnNameChanged()
+        protected Task SetName(string value)
+        {
+            this._Name = value;
+            return this.OnNameChanged();
+        }
+
+        protected virtual async Task OnNameChanged()
         {
             if (this.NameChanged != null)
             {
-                this.NameChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.NameChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("Name");
         }
 
-        public event EventHandler NameChanged = delegate { };
+        public event AsyncEventHandler NameChanged = delegate { };
 
         private string _Description { get; set; }
 
@@ -47,23 +58,26 @@ namespace FoxTunes
             {
                 return this._Description;
             }
-            protected set
-            {
-                this._Description = value;
-                this.OnDescriptionChanged();
-            }
         }
 
-        protected virtual void OnDescriptionChanged()
+        protected Task SetDescription(string value)
+        {
+            this._Description = value;
+            return this.OnDescriptionChanged();
+        }
+
+        protected virtual async Task OnDescriptionChanged()
         {
             if (this.DescriptionChanged != null)
             {
-                this.DescriptionChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.DescriptionChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("Description");
         }
 
-        public event EventHandler DescriptionChanged = delegate { };
+        public event AsyncEventHandler DescriptionChanged = delegate { };
 
         private int _Position { get; set; }
 
@@ -73,23 +87,26 @@ namespace FoxTunes
             {
                 return this._Position;
             }
-            protected set
-            {
-                this._Position = value;
-                this.OnPositionChanged();
-            }
         }
 
-        protected virtual void OnPositionChanged()
+        protected Task SetPosition(int value)
+        {
+            this._Position = value;
+            return this.OnPositionChanged();
+        }
+
+        protected virtual async Task OnPositionChanged()
         {
             if (this.PositionChanged != null)
             {
-                this.PositionChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.PositionChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("Position");
         }
 
-        public event EventHandler PositionChanged = delegate { };
+        public event AsyncEventHandler PositionChanged = delegate { };
 
         private int _Count { get; set; }
 
@@ -99,23 +116,26 @@ namespace FoxTunes
             {
                 return this._Count;
             }
-            protected set
-            {
-                this._Count = value;
-                this.OnCountChanged();
-            }
         }
 
-        protected virtual void OnCountChanged()
+        protected Task SetCount(int value)
+        {
+            this._Count = value;
+            return this.OnCountChanged();
+        }
+
+        protected virtual async Task OnCountChanged()
         {
             if (this.CountChanged != null)
             {
-                this.CountChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.CountChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("Count");
         }
 
-        public event EventHandler CountChanged = delegate { };
+        public event AsyncEventHandler CountChanged = delegate { };
 
         public bool IsIndeterminate
         {
@@ -125,7 +145,18 @@ namespace FoxTunes
             }
         }
 
-        public event EventHandler IsIndeterminateChanged = delegate { };
+        protected virtual async Task OnIsIndeterminateChanged()
+        {
+            if (this.IsIndeterminateChanged != null)
+            {
+                var e = new AsyncEventArgs();
+                this.IsIndeterminateChanged(this, e);
+                await e.Complete();
+            }
+            this.OnPropertyChanged("IsIndeterminate");
+        }
+
+        public event AsyncEventHandler IsIndeterminateChanged = delegate { };
 
         public ParallelOptions ParallelOptions
         {

@@ -71,11 +71,9 @@ namespace FoxTunes
                 using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, this.Visible, transaction))
                 {
                     playlistPopulator.InitializeComponent(this.Core);
-                    playlistPopulator.NameChanged += (sender, e) => this.Name = playlistPopulator.Name;
-                    playlistPopulator.DescriptionChanged += (sender, e) => this.Description = playlistPopulator.Description;
-                    playlistPopulator.PositionChanged += (sender, e) => this.Position = playlistPopulator.Position;
-                    playlistPopulator.CountChanged += (sender, e) => this.Count = playlistPopulator.Count;
-                    await playlistPopulator.Populate(paths);
+                    await this.WithPopulator(playlistPopulator,
+                        async () => await playlistPopulator.Populate(paths)
+                    );
                     this.Offset = playlistPopulator.Offset;
                 }
                 transaction.Commit();
@@ -92,11 +90,9 @@ namespace FoxTunes
                 using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
-                    metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
-                    metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
-                    metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
-                    metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                    await metaDataPopulator.Populate(query, cancellationToken);
+                    await this.WithPopulator(metaDataPopulator,
+                        async () => await metaDataPopulator.Populate(query, cancellationToken)
+                    );
                 }
                 transaction.Commit();
             }
@@ -152,7 +148,7 @@ namespace FoxTunes
 
         protected virtual async Task RemoveItems(PlaylistItemStatus status)
         {
-            this.IsIndeterminate = true;
+            await this.SetIsIndeterminate(true);
             Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
             using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
@@ -185,7 +181,7 @@ namespace FoxTunes
                 at,
                 by
             );
-            this.IsIndeterminate = true;
+            await this.SetIsIndeterminate(true);
             var query = this.Database.QueryFactory.Build();
             var sequence = this.Database.Tables.PlaylistItem.Column("Sequence");
             var status = this.Database.Tables.PlaylistItem.Column("Status");
@@ -222,7 +218,7 @@ namespace FoxTunes
         protected virtual async Task SequenceItems()
         {
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
-            this.IsIndeterminate = true;
+            await this.SetIsIndeterminate(true);
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
@@ -264,7 +260,7 @@ namespace FoxTunes
         protected virtual async Task SetPlaylistItemsStatus(PlaylistItemStatus status)
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
-            this.IsIndeterminate = true;
+            await this.SetIsIndeterminate(true);
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));

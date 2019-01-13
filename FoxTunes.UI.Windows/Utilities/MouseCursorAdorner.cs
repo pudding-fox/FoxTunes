@@ -6,7 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace FoxTunes.Utilities
+namespace FoxTunes
 {
     public class MouseCursorAdorner : UIElement
     {
@@ -114,13 +114,16 @@ namespace FoxTunes.Utilities
 
             protected override void OnVisualParentChanged(DependencyObject oldParent)
             {
-                if (this.VisualParent != null)
+                if (Windows.ActiveWindow != null)
                 {
-                    Application.Current.MainWindow.PreviewDragOver += this.OnPreviewDragOver;
-                }
-                else
-                {
-                    Application.Current.MainWindow.PreviewDragOver -= this.OnPreviewDragOver;
+                    if (this.VisualParent != null)
+                    {
+                        Windows.ActiveWindow.PreviewDragOver += this.OnPreviewDragOver;
+                    }
+                    else
+                    {
+                        Windows.ActiveWindow.PreviewDragOver -= this.OnPreviewDragOver;
+                    }
                 }
                 base.OnVisualParentChanged(oldParent);
             }

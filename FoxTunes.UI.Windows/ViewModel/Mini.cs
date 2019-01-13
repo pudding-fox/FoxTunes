@@ -9,8 +9,6 @@ namespace FoxTunes.ViewModel
 {
     public class Mini : ViewModelBase
     {
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -41,6 +39,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowArtworkChanged = delegate { };
 
+        private BooleanConfigurationElement _ShowPlaylist { get; set; }
+
+        public BooleanConfigurationElement ShowPlaylist
+        {
+            get
+            {
+                return this._ShowPlaylist;
+            }
+            set
+            {
+                this._ShowPlaylist = value;
+                this.OnShowPlaylistChanged();
+            }
+        }
+
+        protected virtual void OnShowPlaylistChanged()
+        {
+            if (this.ShowPlaylistChanged != null)
+            {
+                this.ShowPlaylistChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowPlaylist");
+        }
+
+        public event EventHandler ShowPlaylistChanged = delegate { };
+
         private BooleanConfigurationElement _ResetPlaylist { get; set; }
 
         public BooleanConfigurationElement ResetPlaylist
@@ -66,6 +90,84 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ResetPlaylistChanged = delegate { };
+
+        private BooleanConfigurationElement _AutoPlay { get; set; }
+
+        public BooleanConfigurationElement AutoPlay
+        {
+            get
+            {
+                return this._AutoPlay;
+            }
+            set
+            {
+                this._AutoPlay = value;
+                this.OnAutoPlayChanged();
+            }
+        }
+
+        protected virtual void OnAutoPlayChanged()
+        {
+            if (this.AutoPlayChanged != null)
+            {
+                this.AutoPlayChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("AutoPlay");
+        }
+
+        public event EventHandler AutoPlayChanged = delegate { };
+
+        private BooleanConfigurationElement _ShowNotifyIcon { get; set; }
+
+        public BooleanConfigurationElement ShowNotifyIcon
+        {
+            get
+            {
+                return this._ShowNotifyIcon;
+            }
+            set
+            {
+                this._ShowNotifyIcon = value;
+                this.OnShowNotifyIconChanged();
+            }
+        }
+
+        protected virtual void OnShowNotifyIconChanged()
+        {
+            if (this.ShowNotifyIconChanged != null)
+            {
+                this.ShowNotifyIconChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowNotifyIcon");
+        }
+
+        public event EventHandler ShowNotifyIconChanged = delegate { };
+
+        private TextConfigurationElement _ScalingFactor { get; set; }
+
+        public TextConfigurationElement ScalingFactor
+        {
+            get
+            {
+                return this._ScalingFactor;
+            }
+            set
+            {
+                this._ScalingFactor = value;
+                this.OnScalingFactorChanged();
+            }
+        }
+
+        protected virtual void OnScalingFactorChanged()
+        {
+            if (this.ScalingFactorChanged != null)
+            {
+                this.ScalingFactorChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ScalingFactor");
+        }
+
+        public event EventHandler ScalingFactorChanged = delegate { };
 
         public ICommand DragEnterCommand
         {
@@ -96,7 +198,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand<DragEventArgs>(this.BackgroundTaskRunner, this.OnDrop);
+                return CommandFactory.Instance.CreateCommand<DragEventArgs>(
+                    new Func<DragEventArgs, Task>(this.OnDrop)
+                );
             }
         }
 
@@ -121,30 +225,62 @@ namespace FoxTunes.ViewModel
         {
             var index = await this.PlaylistManager.GetInsertIndex();
             await this.PlaylistManager.Add(paths, this.ResetPlaylist.Value);
-            await this.PlaylistManager.Play(index);
+            if (this.AutoPlay.Value)
+            {
+                await this.PlaylistManager.Play(index);
+            }
         }
 
         public override void InitializeComponent(ICore core)
         {
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.Configuration = this.Core.Components.Configuration;
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.SHOW_ARTWORK_ELEMENT
+              MiniPlayerBehaviourConfiguration.SECTION,
+              MiniPlayerBehaviourConfiguration.SHOW_ARTWORK_ELEMENT
+            );
+            this.ShowPlaylist = this.Configuration.GetElement<BooleanConfigurationElement>(
+              MiniPlayerBehaviourConfiguration.SECTION,
+              MiniPlayerBehaviourConfiguration.SHOW_PLAYLIST_ELEMENT
             );
             this.ResetPlaylist = this.Configuration.GetElement<BooleanConfigurationElement>(
               MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.RESET_PLAYLIST_ELEMENT
             );
-            this.OnCommandsChanged();
+            this.AutoPlay = this.Configuration.GetElement<BooleanConfigurationElement>(
+              MiniPlayerBehaviourConfiguration.SECTION,
+              MiniPlayerBehaviourConfiguration.AUTO_PLAY_ELEMENT
+            );
+            this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
+              NotifyIconConfiguration.SECTION,
+              NotifyIconConfiguration.ENABLED_ELEMENT
+            );
+            this.ScalingFactor = this.Configuration.GetElement<TextConfigurationElement>(
+              WindowsUserInterfaceConfiguration.SECTION,
+              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+            );
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCommandsChanged()
+        public ICommand RestoreCommand
         {
-            this.OnPropertyChanged("DragEnterCommand");
-            this.OnPropertyChanged("DropCommand");
+            get
+            {
+                return new Command(this.Restore);
+            }
+        }
+
+        public void Restore()
+        {
+            if (Windows.IsMiniWindowCreated && Windows.ActiveWindow == Windows.MiniWindow)
+            {
+                Windows.ActiveWindow.Show();
+                if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
+                {
+                    Windows.ActiveWindow.WindowState = WindowState.Normal;
+                }
+                Windows.ActiveWindow.BringToFront();
+            }
         }
 
         protected override Freezable CreateInstanceCore()

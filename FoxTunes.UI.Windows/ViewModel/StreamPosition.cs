@@ -1,4 +1,6 @@
 ﻿using FoxTunes.Interfaces;
+using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -6,14 +8,39 @@ namespace FoxTunes.ViewModel
 {
     public class StreamPosition : ViewModelBase
     {
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
+        public IPlaybackManager PlaybackManager { get; private set; }
+
+        private OutputStream _CurrentStream { get; set; }
+
+        public OutputStream CurrentStream
+        {
+            get
+            {
+                return this._CurrentStream;
+            }
+            private set
+            {
+                this._CurrentStream = value;
+                this.OnCurrentStreamChanged();
+            }
+        }
+
+        protected virtual void OnCurrentStreamChanged()
+        {
+            if (this.CurrentStreamChanged != null)
+            {
+                this.CurrentStreamChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CurrentStream");
+        }
+
+        public event EventHandler CurrentStreamChanged = delegate { };
 
         public ICommand BeginSeekCommand
         {
             get
             {
-                return new AsyncCommand<IPlaybackManager>(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand<IPlaybackManager>(
                     playback => playback.CurrentStream.BeginSeek(),
                     playback => playback != null && playback.CurrentStream != null
                 );
@@ -24,8 +51,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand<IPlaybackManager>(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand<IPlaybackManager>(
                     playback => playback.CurrentStream.EndSeek(),
                     playback => playback != null && playback.CurrentStream != null
                 );
@@ -34,15 +60,42 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
-            this.OnCommandsChanged();
+            this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            var task = this.Refresh();
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCommandsChanged()
+        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
-            this.OnPropertyChanged("BeginSeekCommand");
-            this.OnPropertyChanged("EndSeekCommand");
+            using (e.Defer())
+            {
+                await this.Refresh();
+            }
+        }
+
+        public Task Refresh()
+        {
+            return Windows.Invoke(() =>
+            {
+                if (this.PlaybackManager.CurrentStream != null)
+                {
+                    this.CurrentStream = new OutputStream(this.PlaybackManager.CurrentStream);
+                }
+                else
+                {
+                    this.CurrentStream = null;
+                }
+            });
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

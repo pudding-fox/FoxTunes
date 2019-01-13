@@ -18,11 +18,11 @@ namespace FoxTunes
             }
         }
 
-        protected override Task OnStarted()
+        protected override async Task OnStarted()
         {
-            this.Name = "Clearing library";
-            this.IsIndeterminate = true;
-            return base.OnStarted();
+            await this.SetName("Clearing library");
+            await this.SetIsIndeterminate(true);
+            await base.OnStarted();
         }
 
         protected override Task OnRun()
@@ -32,8 +32,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
             await base.OnCompleted();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
     }
 }

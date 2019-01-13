@@ -57,5 +57,25 @@ namespace FoxTunes
             }
             return default(T);
         }
+
+        public static bool IsEmpty(this Rect rect)
+        {
+            return
+                (rect.Left == 0 || double.IsInfinity(rect.Left)) &&
+                (rect.Top == 0 || double.IsInfinity(rect.Top)) &&
+                (rect.Width == 0 || double.IsInfinity(rect.Width)) &&
+                (rect.Height == 0 || double.IsInfinity(rect.Height));
+        }
+
+        public static void BringToFront(this Window window)
+        {
+            window.Activate();
+            if (!window.Topmost)
+            {
+                window.Topmost = true;
+                window.Topmost = false;
+            }
+            window.Focus();
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace FoxTunes.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -62,6 +62,9 @@ namespace FoxTunes.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
+        ///    if (item == null) {
+        ///        return version();
+        ///    }
         ///    var parts = [];
         ///    if (tag.disccount != 1 &amp;&amp; tag.disc) {
         ///        parts.push(tag.disc);
@@ -78,13 +81,38 @@ namespace FoxTunes.Properties {
         ///    }
         ///    if (tag.title) {
         ///        parts.push(tag.title);
-        ///    }
-        ///    else {
-        ///        parts.push(filename(item.FileName));        /// [rest of string was truncated]&quot;;.
+        ///    } [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NowPlaying {
             get {
                 return ResourceManager.GetString("NowPlaying", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    if (item == null) {
+        ///        return version();
+        ///    }
+        ///    var parts = [];
+        ///    if (tag.disccount != 1 &amp;&amp; tag.disc) {
+        ///        parts.push(tag.disc);
+        ///    }
+        ///    if (tag.track) {
+        ///        parts.push(zeropad(tag.track, 2));
+        ///    }
+        ///    if (tag.title) {
+        ///        parts.push(tag.title);
+        ///    }
+        ///    else {
+        ///        parts.push(filename(item.FileName));
+        ///    }
+        ///    return parts.join(&quot; - &quot;);
+        ///})().
+        /// </summary>
+        internal static string Playlist {
+            get {
+                return ResourceManager.GetString("Playlist", resourceCulture);
             }
         }
     }

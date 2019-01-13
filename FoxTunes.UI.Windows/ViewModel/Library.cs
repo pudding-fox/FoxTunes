@@ -19,10 +19,6 @@ namespace FoxTunes.ViewModel
             this._SelectedItem = LibraryHierarchyNode.Empty;
         }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
-
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -159,25 +155,28 @@ namespace FoxTunes.ViewModel
             this.OnItemsChanged();
         }
 
-        public virtual void Reload()
+        public virtual Task Reload()
         {
+            var selectedHierarchy = default(LibraryHierarchy);
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     var queryable = database.AsQueryable<LibraryHierarchy>(transaction);
-                    this.SelectedHierarchy = queryable.OrderBy(libraryHierarchy => libraryHierarchy.Sequence).FirstOrDefault();
+                    selectedHierarchy = queryable.OrderBy(libraryHierarchy => libraryHierarchy.Sequence).FirstOrDefault();
                 }
             }
-            this.OnHierarchiesChanged();
-            this._Items.Clear();
-            this.Refresh();
+            return Windows.Invoke(() =>
+            {
+                this.SelectedHierarchy = selectedHierarchy;
+                this.OnHierarchiesChanged();
+                this._Items.Clear();
+                this.Refresh();
+            });
         }
 
         public override void InitializeComponent(ICore core)
         {
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
-            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.PlaylistManager = this.Core.Managers.Playlist;
@@ -185,15 +184,8 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.LibraryManager = this.Core.Managers.Library;
-            this.Reload();
-            this.OnCommandsChanged();
+            var task = this.Reload();
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnCommandsChanged()
-        {
-            this.OnPropertyChanged("AddToPlaylistCommand");
-            this.OnPropertyChanged("DropCommand");
         }
 
         protected virtual void OnFilterChanged(object sender, EventArgs e)
@@ -206,7 +198,7 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    return this.ForegroundTaskRunner.Run(() => this.Reload());
+                    return this.Reload();
                 case CommonSignals.PluginInvocation:
                     var invocation = signal.State as IInvocationComponent;
                     if (invocation != null)
@@ -233,7 +225,10 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(this.BackgroundTaskRunner, () => this.AddToPlaylist(this.SelectedItem, false), () => this.SelectedItem != null && this.SelectedItem.IsLeaf);
+                return CommandFactory.Instance.CreateCommand(
+                    () => this.AddToPlaylist(this.SelectedItem, false),
+                    () => this.SelectedItem != null && this.SelectedItem.IsLeaf
+                );
             }
         }
 
@@ -275,7 +270,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand<DragEventArgs>(this.BackgroundTaskRunner, this.OnDrop);
+                return CommandFactory.Instance.CreateCommand<DragEventArgs>(
+                    new Func<DragEventArgs, Task>(this.OnDrop)
+                );
             }
         }
 
@@ -297,5 +294,18 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler SelectedHierarchyChanged = delegate { };
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.LibraryHierarchyBrowser != null)
+            {
+                this.LibraryHierarchyBrowser.FilterChanged -= this.OnFilterChanged;
+            }
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
+            }
+            base.Dispose(disposing);
+        }
     }
 }

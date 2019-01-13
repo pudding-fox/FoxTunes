@@ -34,13 +34,10 @@ namespace FoxTunes
             //Nothing to do.
         }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 InputManagerConfiguration.SECTION,

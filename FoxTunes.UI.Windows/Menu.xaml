@@ -4,10 +4,11 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel">
     <ContextMenu.Resources>
-        <ViewModel:Menu x:Key="ViewModel" Core="{Binding}" Category="{Binding Category, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}"></ViewModel:Menu>
+        <ViewModel:Menu x:Key="ViewModel" Core="{Binding}" Category="{Binding Category, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}" MenuVisible="{Binding IsOpen, Mode=TwoWay, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}"></ViewModel:Menu>
         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
             <Setter Property="Header" Value="{Binding Invocation.Name}"></Setter>
             <Setter Property="Command" Value="{Binding Command}"></Setter>
+            <Setter Property="IsChecked" Value="{Binding Selected, Mode=OneWay}"></Setter>
             <!-- System -->
             <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
             <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />

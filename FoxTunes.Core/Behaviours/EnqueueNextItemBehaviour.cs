@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class EnqueueNextItemBehaviour : StandardBehaviour
+    public class EnqueueNextItemBehaviour : StandardBehaviour, IDisposable
     {
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -12,29 +12,27 @@ namespace FoxTunes
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
-            this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
-            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             base.InitializeComponent(core);
         }
 
-        protected virtual async void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        {
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            var task = this.EnqueueItems();
+        }
+
+        private async Task EnqueueItems()
         {
             if (this.PlaybackManager.CurrentStream == null)
             {
                 return;
             }
-            await this.EnqueueItems();
-        }
-
-        private async Task EnqueueItems()
-        {
             var playlistItem = await this.PlaylistManager.GetNext();
             if (playlistItem == null)
             {
@@ -45,17 +43,39 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            await this.BackgroundTaskRunner.Run(async () =>
+            await this.PlaybackManager.Load(playlistItem, false);
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
             {
-                try
-                {
-                    await this.PlaybackManager.Load(playlistItem, false);
-                }
-                catch
-                {
-                    //Nothing can be done.
-                }
-            });
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
+        }
+
+        ~EnqueueNextItemBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

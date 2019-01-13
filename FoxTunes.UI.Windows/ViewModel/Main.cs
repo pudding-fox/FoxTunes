@@ -113,32 +113,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged = delegate { };
 
-        private BooleanConfigurationElement _MiniPlayer { get; set; }
-
-        public BooleanConfigurationElement MiniPlayer
-        {
-            get
-            {
-                return this._MiniPlayer;
-            }
-            set
-            {
-                this._MiniPlayer = value;
-                this.OnMiniPlayerChanged();
-            }
-        }
-
-        protected virtual void OnMiniPlayerChanged()
-        {
-            if (this.MiniPlayerChanged != null)
-            {
-                this.MiniPlayerChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("MiniPlayer");
-        }
-
-        public event EventHandler MiniPlayerChanged = delegate { };
-
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;
@@ -158,10 +132,6 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            this.MiniPlayer = this.Configuration.GetElement<BooleanConfigurationElement>(
-              MiniPlayerBehaviourConfiguration.SECTION,
-              MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
-            );
             base.InitializeComponent(core);
         }
 
@@ -175,14 +145,14 @@ namespace FoxTunes.ViewModel
 
         public void Restore()
         {
-            if (Application.Current != null && Application.Current.MainWindow != null)
+            if (Windows.IsMainWindowCreated && Windows.ActiveWindow == Windows.MainWindow)
             {
-                Application.Current.MainWindow.Show();
-                if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
+                Windows.ActiveWindow.Show();
+                if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
                 {
-                    Application.Current.MainWindow.WindowState = WindowState.Normal;
+                    Windows.ActiveWindow.WindowState = WindowState.Normal;
                 }
-                Application.Current.MainWindow.Activate();
+                Windows.ActiveWindow.BringToFront();
             }
         }
 

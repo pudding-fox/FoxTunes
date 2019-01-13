@@ -35,8 +35,6 @@ namespace FoxTunes
 
         public int ChannelHandle { get; private set; }
 
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
-
         public BassNotificationSource NotificationSource { get; private set; }
 
         public override long Position
@@ -54,26 +52,38 @@ namespace FoxTunes
         protected virtual long GetPosition()
         {
             var position = Bass.ChannelGetPosition(this.ChannelHandle);
-            if (this.Output != null && this.Output.Pipeline != null)
+            if (this.Output != null)
             {
-                var buffer = this.Output.Pipeline.BufferLength;
-                if (buffer > 0)
+                this.Output.WithPipeline(pipeline =>
                 {
-                    position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, buffer);
-                }
+                    if (pipeline != null)
+                    {
+                        var buffer = pipeline.BufferLength;
+                        if (buffer > 0)
+                        {
+                            position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, buffer);
+                        }
+                    }
+                });
             }
             return position;
         }
 
         protected virtual void SetPosition(long position)
         {
-            if (this.Output != null && this.Output.Pipeline != null)
+            if (this.Output != null)
             {
-                var buffer = this.Output.Pipeline.BufferLength;
-                if (buffer > 0)
+                this.Output.WithPipeline(pipeline =>
                 {
-                    this.Output.Pipeline.ClearBuffer();
-                }
+                    if (pipeline != null)
+                    {
+                        var buffer = pipeline.BufferLength;
+                        if (buffer > 0)
+                        {
+                            pipeline.ClearBuffer();
+                        }
+                    }
+                });
             }
             if (position >= this.Length)
             {
@@ -113,48 +123,48 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             this.NotificationSource = new BassNotificationSource(this);
-            this.NotificationSource.Interval = UPDATE_INTERVAL;
-            this.NotificationSource.Updated += this.NotificationSource_Updated;
             this.NotificationSource.Stopping += this.NotificationSource_Stopping;
             this.NotificationSource.Stopped += this.NotificationSource_Stopped;
             this.NotificationSource.InitializeComponent(core);
             base.InitializeComponent(core);
         }
 
-        protected virtual void NotificationSource_Updated(object sender, BassNotificationSourceEventArgs e)
+        protected virtual async void NotificationSource_Stopping(object sender, AsyncEventArgs e)
         {
-            this.ForegroundTaskRunner.Run(() => this.OnPositionChanged());
-        }
-
-        protected virtual void NotificationSource_Stopping(object sender, BassNotificationSourceEventArgs e)
-        {
-            this.ForegroundTaskRunner.Run(async () =>
+            using (e.Defer())
             {
                 await this.EmitState();
                 await this.OnStopping();
-            });
+            }
         }
 
-        protected virtual void NotificationSource_Stopped(object sender, BassNotificationSourceEventArgs e)
+        protected virtual async void NotificationSource_Stopped(object sender, AsyncEventArgs e)
         {
-            this.ForegroundTaskRunner.Run(async () =>
+            using (e.Defer())
             {
                 await this.EmitState();
                 await this.OnStopped(false);
-            });
+            }
         }
 
         public override bool IsPlaying
         {
             get
             {
-                if (!this.Output.IsStarted || this.Output.Pipeline == null)
+                if (!this.Output.IsStarted)
                 {
                     return false;
                 }
-                return this.Output.Pipeline.Output.IsPlaying;
+                var result = default(bool);
+                this.Output.WithPipeline(pipeline =>
+                {
+                    if (pipeline != null)
+                    {
+                        result = pipeline.Output.IsPlaying;
+                    }
+                });
+                return result;
             }
         }
 
@@ -162,11 +172,19 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.Output.IsStarted || this.Output.Pipeline == null)
+                if (!this.Output.IsStarted)
                 {
                     return false;
                 }
-                return this.Output.Pipeline.Output.IsPaused;
+                var result = default(bool);
+                this.Output.WithPipeline(pipeline =>
+                {
+                    if (pipeline != null)
+                    {
+                        result = pipeline.Output.IsPaused;
+                    }
+                });
+                return result;
             }
         }
 
@@ -174,45 +192,68 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.Output.IsStarted || this.Output.Pipeline == null)
+                if (!this.Output.IsStarted)
                 {
                     return false;
                 }
-                return this.Output.Pipeline.Output.IsStopped;
+                var result = default(bool);
+                this.Output.WithPipeline(pipeline =>
+                {
+                    if (pipeline != null)
+                    {
+                        result = pipeline.Output.IsStopped;
+                    }
+                });
+                return result;
             }
         }
 
-        public override async Task Play()
+        public override Task Play()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.GetOrCreatePipeline(this).Play();
-            await this.ForegroundTaskRunner.Run(() => this.EmitState());
-            await this.OnPlayed(true);
+            this.Output.WithPipeline(this, pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    pipeline.Play();
+                }
+            });
+            return this.EmitState();
         }
 
-        public override async Task Pause()
+        public override Task Pause()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.GetOrCreatePipeline(this).Pause();
-            await this.ForegroundTaskRunner.Run(() => this.EmitState());
-            await this.OnPaused();
+            this.Output.WithPipeline(this, pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    pipeline.Pause();
+                }
+            });
+            return this.EmitState();
         }
 
-        public override async Task Resume()
+        public override Task Resume()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.GetOrCreatePipeline(this).Resume();
-            await this.ForegroundTaskRunner.Run(() => this.EmitState());
-            await this.OnResumed();
+            this.Output.WithPipeline(this, pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    pipeline.Resume();
+                }
+            });
+            return this.EmitState();
         }
 
         public override async Task Stop()
@@ -221,22 +262,24 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            if (this.Output.Pipeline != null)
+            this.Output.WithPipeline(this, pipeline =>
             {
-                this.Output.Pipeline.Stop();
-            }
-            await this.ForegroundTaskRunner.Run(() => this.EmitState());
+                if (pipeline != null)
+                {
+                    pipeline.Stop();
+                }
+            });
+            await this.EmitState();
             await this.OnStopped(true);
-        }
-
-        protected virtual void ChannelSyncEnd(int handle, int channel, int data, IntPtr user)
-        {
-            this.ForegroundTaskRunner.Run(() => this.EmitState());
-            this.OnStopped(false);
         }
 
         protected override void OnDisposing()
         {
+            if (this.NotificationSource != null)
+            {
+                this.NotificationSource.Stopping -= this.NotificationSource_Stopping;
+                this.NotificationSource.Stopped -= this.NotificationSource_Stopped;
+            }
             try
             {
                 this.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);

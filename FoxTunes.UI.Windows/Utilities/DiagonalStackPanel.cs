@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace FoxTunes.Utilities
+namespace FoxTunes
 {
     public class DiagonalStackPanel : Panel
     {

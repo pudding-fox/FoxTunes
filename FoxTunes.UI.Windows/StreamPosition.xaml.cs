@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public StreamPosition()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

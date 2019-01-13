@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,18 +9,21 @@ namespace FoxTunes
     {
         protected AsyncEventArgs()
         {
-            this.Sources = new List<TaskCompletionSource<T>>();
+            this.Sources = new ConcurrentBag<TaskCompletionSource<T>>();
         }
 
         public Deferral<T> Defer()
         {
             var source = new TaskCompletionSource<T>();
             var deferral = new Deferral<T>(result => source.SetResult(result));
-            this.Sources.Add(source);
+            if (!this.Sources.TryAdd(source))
+            {
+                //TODO: Warn.
+            }
             return deferral;
         }
 
-        public IList<TaskCompletionSource<T>> Sources { get; private set; }
+        public IProducerConsumerCollection<TaskCompletionSource<T>> Sources { get; private set; }
 
         public async Task Complete()
         {

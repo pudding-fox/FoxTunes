@@ -21,7 +21,6 @@ namespace FoxTunes
             this.Database = database;
             this.Transaction = transaction;
             this.Query = query;
-            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Writer = new MetaDataWriter(this.Database, this.Query, this.Transaction);
         }
 
@@ -32,8 +31,6 @@ namespace FoxTunes
         public IDatabaseQuery Query { get; private set; }
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
-
-        private SemaphoreSlim Semaphore { get; set; }
 
         private MetaDataWriter Writer { get; set; }
 
@@ -49,9 +46,9 @@ namespace FoxTunes
 
             if (this.ReportProgress)
             {
-                this.Name = "Populating meta data";
-                this.Position = 0;
-                this.Count = fileDatas.Count();
+                await this.SetName("Populating meta data");
+                await this.SetPosition(0);
+                await this.SetCount(fileDatas.Count());
             }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
@@ -81,10 +78,15 @@ namespace FoxTunes
                 {
                     if (position % interval == 0)
                     {
-                        lock (this.SyncRoot)
+                        await this.Semaphore.WaitAsync();
+                        try
                         {
-                            this.Description = new FileInfo(fileData.FileName).Name;
-                            this.Position = position;
+                            await this.SetDescription(new FileInfo(fileData.FileName).Name);
+                            await this.SetPosition(position);
+                        }
+                        finally
+                        {
+                            this.Semaphore.Release();
                         }
                     }
                     Interlocked.Increment(ref position);

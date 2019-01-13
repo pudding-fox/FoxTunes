@@ -12,27 +12,22 @@ namespace FoxTunes.Managers
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Output = core.Components.Output;
-            if (this.Output != null)
-            {
-                this.Output.IsStartedChanged += (sender, e) =>
-                {
-                    //TODO: Bad awaited Task.
-                    this.BackgroundTaskRunner.Run(() => this.Unload());
-                };
-            }
+            this.Output.IsStartedChanged += this.OnIsStartedChanged;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;
-            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
-            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
+        }
+
+        protected virtual async void OnIsStartedChanged(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await this.Unload();
+            }
         }
 
         protected virtual async void OutputStreamQueueDequeued(object sender, OutputStreamQueueEventArgs e)
@@ -74,14 +69,46 @@ namespace FoxTunes.Managers
                     return;
                 }
                 Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
-                await this.Unload(this.CurrentStream);
+                var currentStream = this.CurrentStream;
+                this.OnCurrentStreamChanging();
+                this._CurrentStream = stream;
+                await this.Unload(currentStream);
             }
-            this._CurrentStream = stream;
+            else
+            {
+                this.OnCurrentStreamChanging();
+                this._CurrentStream = stream;
+            }
+            if (this._CurrentStream != null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Playing stream: {0} => {1}", this._CurrentStream.Id, this._CurrentStream.FileName);
+                await this._CurrentStream.Play();
+            }
             await this.OnCurrentStreamChanged();
+        }
+
+        protected virtual void OnCurrentStreamChanging()
+        {
+            if (this.CurrentStream != null)
+            {
+                this.CurrentStream.IsPlayingChanged -= this.IsPlayingChanged;
+                this.CurrentStream.IsPausedChanged -= this.IsPausedChanged;
+                this.CurrentStream.IsStoppedChanged -= this.IsStoppedChanged;
+                this.CurrentStream.Stopping -= this.Stopping;
+                this.CurrentStream.Stopped -= this.Stopped;
+            }
         }
 
         protected virtual async Task OnCurrentStreamChanged()
         {
+            if (this.CurrentStream != null)
+            {
+                this.CurrentStream.IsPlayingChanged += this.IsPlayingChanged;
+                this.CurrentStream.IsPausedChanged += this.IsPausedChanged;
+                this.CurrentStream.IsStoppedChanged += this.IsStoppedChanged;
+                this.CurrentStream.Stopping += this.Stopping;
+                this.CurrentStream.Stopped += this.Stopped;
+            }
             if (this.CurrentStreamChanged != null)
             {
                 var e = new AsyncEventArgs();
@@ -92,6 +119,16 @@ namespace FoxTunes.Managers
         }
 
         public event AsyncEventHandler CurrentStreamChanged = delegate { };
+
+        public event AsyncEventHandler IsPlayingChanged = delegate { };
+
+        public event AsyncEventHandler IsPausedChanged = delegate { };
+
+        public event AsyncEventHandler IsStoppedChanged = delegate { };
+
+        public event AsyncEventHandler Stopping = delegate { };
+
+        public event StoppedEventHandler Stopped = delegate { };
 
         public async Task Load(PlaylistItem playlistItem, bool immediate)
         {
@@ -139,10 +176,17 @@ namespace FoxTunes.Managers
 
         public event BackgroundTaskEventHandler BackgroundTask = delegate { };
 
-        protected override void OnDisposing()
+        protected override async void OnDisposing()
         {
-            //TODO: Bad awaited Task.
-            this.Unload();
+            await this.Unload();
+            if (this.Output != null)
+            {
+                this.Output.IsStartedChanged -= this.OnIsStartedChanged;
+            }
+            if (this.OutputStreamQueue != null)
+            {
+                this.OutputStreamQueue.Dequeued -= this.OutputStreamQueueDequeued;
+            }
             base.OnDisposing();
         }
     }

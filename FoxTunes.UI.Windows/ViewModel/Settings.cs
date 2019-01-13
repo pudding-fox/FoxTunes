@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -8,6 +9,8 @@ namespace FoxTunes.ViewModel
     public class Settings : ViewModelBase
     {
         public ISignalEmitter SignalEmitter { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
 
         private bool _SettingsVisible { get; set; }
 
@@ -59,16 +62,19 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() => this.Core.Components.Configuration.Save())
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                var command = CommandFactory.Instance.CreateCommand(
+                    () => Task.Run(() => this.Configuration.Save()),
+                    () => this.Configuration != null
+                );
+                command.Tag = CommandHints.DISMISS;
+                return command;
             }
         }
 
         public override void InitializeComponent(ICore core)
         {
             this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.Configuration = this.Core.Components.Configuration;
             base.InitializeComponent(core);
         }
 

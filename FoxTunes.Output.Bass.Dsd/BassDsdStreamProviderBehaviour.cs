@@ -1,10 +1,10 @@
-﻿using System;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using ManagedBass.Dsd;
+using System;
 
 namespace FoxTunes
 {
-    public class BassDsdStreamProviderBehaviour : StandardBehaviour
+    public class BassDsdStreamProviderBehaviour : StandardBehaviour, IDisposable
     {
         public IBassOutput Output { get; private set; }
 
@@ -13,7 +13,6 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
-            ComponentRegistry.Instance.GetComponent<IBassStreamFactory>().Register(new BassDsdStreamProvider());
             base.InitializeComponent(core);
         }
 
@@ -26,6 +25,39 @@ namespace FoxTunes
         protected virtual void OnFree(object sender, EventArgs e)
         {
             //Nothing to do.
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
+        }
+
+        ~BassDsdStreamProviderBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

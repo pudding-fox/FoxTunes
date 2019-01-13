@@ -1,5 +1,4 @@
-﻿using FoxTunes.Theme;
-using System;
+﻿using System;
 using System.Windows;
 
 namespace FoxTunes
@@ -16,6 +15,14 @@ namespace FoxTunes
         }
 
         public ResourceDictionary ResourceDictionary { get; private set; }
+
+        public override string ArtworkPlaceholder
+        {
+            get
+            {
+                return string.Format("/{0};Component/Resources/System_Artwork.png", typeof(ExpressionDarkTheme).Assembly.FullName);
+            }
+        }
 
         public override void Enable()
         {

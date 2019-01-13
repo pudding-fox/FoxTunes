@@ -19,25 +19,28 @@ namespace FoxTunes
             {
                 return this._IsStarted;
             }
-            protected set
-            {
-                this._IsStarted = value;
-                this.OnIsStartedChanged();
-            }
         }
 
-        protected virtual void OnIsStartedChanged()
+        protected Task SetIsStarted(bool value)
+        {
+            this._IsStarted = value;
+            return this.OnIsStartedChanged();
+        }
+
+        protected virtual async Task OnIsStartedChanged()
         {
             if (this.IsStartedChanged != null)
             {
-                this.IsStartedChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.IsStartedChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("IsStarted");
         }
 
-        public abstract bool ShowBuffering { get; }
+        public event AsyncEventHandler IsStartedChanged = delegate { };
 
-        public event EventHandler IsStartedChanged = delegate { };
+        public abstract bool ShowBuffering { get; }
 
         public abstract IEnumerable<string> SupportedExtensions { get; }
 

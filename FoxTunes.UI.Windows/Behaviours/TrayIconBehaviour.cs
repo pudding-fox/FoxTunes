@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -12,7 +11,23 @@ namespace FoxTunes
     {
         public const string QUIT = "ZZZZ";
 
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+        public TrayIconBehaviour()
+        {
+            Windows.ActiveWindowChanging += (sener, e) =>
+            {
+                if (this.Enabled)
+                {
+                    this.Disable();
+                }
+            };
+            Windows.ActiveWindowChanged += (sender, e) =>
+            {
+                if (this.Enabled)
+                {
+                    this.Enable();
+                }
+            };
+        }
 
         public bool _Enabled { get; private set; }
 
@@ -47,7 +62,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
                 NotifyIconConfiguration.SECTION,
                 NotifyIconConfiguration.ENABLED_ELEMENT
@@ -65,10 +79,19 @@ namespace FoxTunes
 
         protected virtual void Enable()
         {
-            if (Application.Current != null && Application.Current.MainWindow != null)
+            if (Windows.ActiveWindow != null)
             {
-                Application.Current.MainWindow.StateChanged += this.OnStateChanged;
-                Application.Current.MainWindow.Closing += this.OnClosing;
+                Windows.ActiveWindow.StateChanged += this.OnStateChanged;
+                Windows.ActiveWindow.Closing += this.OnClosing;
+            }
+        }
+
+        protected virtual void Disable()
+        {
+            if (Windows.ActiveWindow != null)
+            {
+                Windows.ActiveWindow.StateChanged -= this.OnStateChanged;
+                Windows.ActiveWindow.Closing -= this.OnClosing;
             }
         }
 
@@ -80,32 +103,18 @@ namespace FoxTunes
 
         protected virtual void Quit()
         {
-            //We have to close the main window as a low priority task otherwise the dispatcher 
-            //running *this* task is shut down which causes an exception.
-            if (Application.Current != null && Application.Current.Dispatcher != null)
-            {
-                Application.Current.Dispatcher.BeginInvoke(
-                    DispatcherPriority.ApplicationIdle,
-                    new Action(() =>
-                    {
-                        if (Application.Current != null && Application.Current.MainWindow != null)
-                        {
-                            Application.Current.MainWindow.Close();
-                        }
-                    })
-                );
-            }
+            Windows.Shutdown();
         }
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
         {
             if (this.MinimizeToTray)
             {
-                if (Application.Current != null && Application.Current.MainWindow != null)
+                if (Windows.ActiveWindow != null)
                 {
-                    if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
+                    if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
                     {
-                        Application.Current.MainWindow.Hide();
+                        Windows.ActiveWindow.Hide();
                     }
                 }
             }
@@ -116,16 +125,7 @@ namespace FoxTunes
             if (this.CloseToTray)
             {
                 e.Cancel = true;
-                Application.Current.MainWindow.Hide();
-            }
-        }
-
-        protected virtual void Disable()
-        {
-            if (Application.Current != null && Application.Current.MainWindow != null)
-            {
-                Application.Current.MainWindow.StateChanged -= this.OnStateChanged;
-                Application.Current.MainWindow.Closing -= this.OnClosing;
+                Windows.ActiveWindow.Hide();
             }
         }
 
@@ -145,7 +145,7 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case QUIT:
-                    return this.ForegroundTaskRunner.Run(() =>
+                    return Windows.Invoke(() =>
                     {
                         this.Disable();
                         this.OnClose(this, EventArgs.Empty);

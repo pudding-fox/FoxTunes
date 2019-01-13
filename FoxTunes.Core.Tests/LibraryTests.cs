@@ -7,19 +7,43 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [TestFixture(SQLITE)]
-    [TestFixture(SQLSERVER)]
+    [TestFixture(SQLITE | TAGLIB)]
+    [TestFixture(SQLSERVER | TAGLIB)]
     public class LibraryTests : DatabaseTests
     {
+        public const long TAGLIB = 512;
+
+        public const long FILENAME = 1024;
+
         public LibraryTests(long configuration)
             : base(configuration)
         {
 
         }
 
+        public override void SetUp()
+        {
+            if ((this.Configuration & TAGLIB) != 0)
+            {
+                ComponentResolver.Slots.Add(ComponentSlots.MetaData, "679D9459-BBCE-4D95-BB65-DD20C335719C");
+            }
+            else if ((this.Configuration & FILENAME) != 0)
+            {
+                ComponentResolver.Slots.Add(ComponentSlots.MetaData, "BDAAF3E1-84CC-4D36-A7CB-278663E65844");
+            }
+            base.SetUp();
+        }
+
+        public override void TearDown()
+        {
+            ComponentResolver.Slots.Remove(ComponentSlots.MetaData);
+            base.TearDown();
+        }
+
         [Test]
         public async Task CanAddFilesToLibrary()
         {
+            await this.Core.Managers.Hierarchy.Clear();
             await this.Core.Managers.Library.Clear();
             await this.Core.Managers.Library.Add(new[]
             {

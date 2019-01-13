@@ -1,7 +1,6 @@
 ﻿using FoxDb;
 using FoxTunes.Integration;
 using FoxTunes.Interfaces;
-using FoxTunes.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,95 +13,16 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class Playlist : ViewModelBase
+    public class Playlist : PlaylistBase
     {
         public Playlist()
         {
             this.SelectedItems = new ObservableCollection<PlaylistItem>();
         }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
-
-        public IScriptingRuntime ScriptingRuntime { get; private set; }
-
-        public IDatabaseFactory DatabaseFactory { get; private set; }
-
-        public IPlaybackManager PlaybackManager { get; private set; }
-
-        public IPlaylistManager PlaylistManager { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
 
-        public IEnumerable Items
-        {
-            get
-            {
-                return new ObservableCollection<PlaylistItem>(this.GetItems());
-            }
-        }
-
-        protected virtual IEnumerable<PlaylistItem> GetItems()
-        {
-            if (this.DatabaseFactory != null)
-            {
-                using (var database = this.DatabaseFactory.Create())
-                {
-                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                    {
-                        var set = database.Set<PlaylistItem>(transaction);
-                        set.Fetch.Sort.Expressions.Clear();
-                        set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
-                        foreach (var element in set)
-                        {
-                            yield return element;
-                        }
-                    }
-                }
-            }
-        }
-
-        protected virtual void OnItemsChanged()
-        {
-            if (this.ItemsChanged != null)
-            {
-                this.ItemsChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Items");
-        }
-
-        public event EventHandler ItemsChanged = delegate { };
-
         public IList SelectedItems { get; set; }
-
-        private bool _AutoSizeGridColumns { get; set; }
-
-        public bool AutoSizeGridColumns
-        {
-            get
-            {
-                return this._AutoSizeGridColumns;
-            }
-            set
-            {
-                this._AutoSizeGridColumns = value;
-                this.OnAutoSizeGridColumnsChanged();
-            }
-        }
-
-        protected virtual void OnAutoSizeGridColumnsChanged()
-        {
-            if (this.AutoSizeGridColumnsChanged != null)
-            {
-                this.AutoSizeGridColumnsChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("AutoSizeGridColumns");
-        }
-
-        public event EventHandler AutoSizeGridColumnsChanged = delegate { };
 
         private bool _InsertActive { get; set; }
 
@@ -210,25 +130,21 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
-            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
-            this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
-            this.DatabaseFactory = this.Core.Factories.Database;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaybackManager = this.Core.Managers.Playback;
+            base.InitializeComponent(core);
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
-            //TODO: Bad awaited Task.
-            this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.RefreshColumns();
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
-            this.SignalEmitter.Signal += this.OnSignal;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
             this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
-            //TODO: Bad awaited Task.
-            this.RefreshColumns();
-            this.ReloadItems();
-            this.OnCommandsChanged();
-            base.InitializeComponent(core);
+            var task = this.RefreshColumns();
+        }
+
+        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await this.RefreshColumns();
+            }
         }
 
         protected virtual void OnColumnChanged(object sender, PlaylistColumn e)
@@ -247,22 +163,12 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void OnCommandsChanged()
-        {
-            this.OnPropertyChanged("RemovePlaylistItemsCommand");
-            this.OnPropertyChanged("PlaySelectedItemCommand");
-            this.OnPropertyChanged("DragEnterCommand");
-            this.OnPropertyChanged("DropCommand");
-        }
-
-        protected virtual Task OnSignal(object sender, ISignal signal)
+        protected override Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
-                case CommonSignals.PlaylistUpdated:
-                    return this.ForegroundTaskRunner.Run(() => this.ReloadItems());
                 case CommonSignals.PlaylistColumnsUpdated:
-                    return this.ForegroundTaskRunner.Run(() => this.ReloadColumns());
+                    return this.ReloadColumns();
                 case CommonSignals.PluginInvocation:
                     var invocation = signal.State as IInvocationComponent;
                     if (invocation != null)
@@ -284,14 +190,16 @@ namespace FoxTunes.ViewModel
                     }
                     break;
             }
-            return Task.CompletedTask;
+            return base.OnSignal(sender, signal);
         }
 
         public ICommand RemovePlaylistItemsCommand
         {
             get
             {
-                return new AsyncCommand(this.BackgroundTaskRunner, this.RemovePlaylistItems);
+                return CommandFactory.Instance.CreateCommand(
+                    new Func<Task>(this.RemovePlaylistItems)
+                );
             }
         }
 
@@ -318,14 +226,13 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand(
                     () =>
                     {
                         var playlistItem = this.SelectedItems[0] as PlaylistItem;
                         return this.PlaylistManager.Play(playlistItem);
                     },
-                    () => this.PlaybackManager != null && this.SelectedItems.Count > 0
+                    () => this.PlaylistManager != null && this.SelectedItems.Count > 0
                 );
             }
         }
@@ -367,7 +274,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand<DragEventArgs>(this.BackgroundTaskRunner, this.OnDrop);
+                return CommandFactory.Instance.CreateCommand<DragEventArgs>(
+                    new Func<DragEventArgs, Task>(this.OnDrop)
+                );
             }
         }
 
@@ -475,40 +384,51 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual Task RefreshColumns()
+        public virtual async Task RefreshColumns()
         {
-            return this.ForegroundTaskRunner.Run(() =>
+            if (this.GridColumns == null || this.GridColumns.Count == 0)
             {
-                if (this.GridColumns == null)
+                await this.ReloadColumns();
+            }
+            if (this.GridColumns != null)
+            {
+                foreach (var column in this.GridColumns)
                 {
-                    this.ReloadColumns();
+                    await this.RefreshColumn(column);
                 }
-                if (this.GridColumns != null)
-                {
-                    foreach (var column in this.GridColumns)
-                    {
-                        this.GridViewColumnFactory.Refresh(column);
-                        if (this.AutoSizeGridColumns)
-                        {
-                            if (double.IsNaN(column.Width))
-                            {
-                                column.Width = column.ActualWidth;
-                                column.Width = double.NaN;
-                            }
-                        }
-                    }
-                }
-            });
+            }
         }
 
-        protected virtual void ReloadColumns()
+        protected virtual Task RefreshColumn(GridViewColumn column)
         {
-            this.GridColumns = new ObservableCollection<GridViewColumn>(this.GetGridColumns());
+            return Windows.Invoke(() => this.GridViewColumnFactory.Refresh(column));
         }
 
-        protected virtual void ReloadItems()
+        protected virtual Task ReloadColumns()
         {
-            this.OnItemsChanged();
+            var columns = this.GetGridColumns();
+            return Windows.Invoke(() => this.GridColumns = new ObservableCollection<GridViewColumn>(columns));
+        }
+
+        protected override async Task ReloadItems()
+        {
+            await base.ReloadItems();
+            await this.RefreshColumns();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
+            if (this.GridViewColumnFactory != null)
+            {
+                this.GridViewColumnFactory.PositionChanged -= this.OnColumnChanged;
+                this.GridViewColumnFactory.WidthChanged -= this.OnColumnChanged;
+                this.GridViewColumnFactory.Dispose();
+            }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

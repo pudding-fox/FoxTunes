@@ -45,8 +45,8 @@ namespace FoxTunes
                 await this.AddLibraryItems(paths, cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    this.Name = "Waiting..";
-                    this.Description = string.Empty;
+                    await this.SetName("Waiting..");
+                    await this.SetDescription(string.Empty);
                 }
             }))
             {
@@ -57,8 +57,8 @@ namespace FoxTunes
                 await this.AddOrUpdateMetaData(cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    this.Name = "Waiting..";
-                    this.Description = string.Empty;
+                    await this.SetName("Waiting..");
+                    await this.SetDescription(string.Empty);
                 }
             }))
             {
@@ -75,11 +75,7 @@ namespace FoxTunes
                 using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, this.Visible, transaction))
                 {
                     libraryPopulator.InitializeComponent(this.Core);
-                    libraryPopulator.NameChanged += (sender, e) => this.Name = libraryPopulator.Name;
-                    libraryPopulator.DescriptionChanged += (sender, e) => this.Description = libraryPopulator.Description;
-                    libraryPopulator.PositionChanged += (sender, e) => this.Position = libraryPopulator.Position;
-                    libraryPopulator.CountChanged += (sender, e) => this.Count = libraryPopulator.Count;
-                    await libraryPopulator.Populate(paths, cancellationToken);
+                    await this.WithPopulator(libraryPopulator, async () => await libraryPopulator.Populate(paths, cancellationToken));
                 }
                 transaction.Commit();
             }
@@ -95,11 +91,7 @@ namespace FoxTunes
                 using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
-                    metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
-                    metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
-                    metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
-                    metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                    await metaDataPopulator.Populate(query, cancellationToken);
+                    await this.WithPopulator(metaDataPopulator, async () => await metaDataPopulator.Populate(query, cancellationToken));
                 }
                 transaction.Commit();
             }
@@ -126,13 +118,13 @@ namespace FoxTunes
                         await this.AddHiearchies(reader, cancellationToken, transaction);
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            this.Name = "Waiting..";
-                            this.Description = string.Empty;
+                            await this.SetName("Waiting..");
+                            await this.SetDescription(string.Empty);
                         }
                         else
                         {
-                            this.Description = "Finalizing";
-                            this.IsIndeterminate = true;
+                            await this.SetDescription("Finalizing");
+                            await this.SetIsIndeterminate(true);
                         }
                     }
                     transaction.Commit();
@@ -153,11 +145,7 @@ namespace FoxTunes
             using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, this.Visible, transaction))
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
-                libraryHierarchyPopulator.NameChanged += (sender, e) => this.Name = libraryHierarchyPopulator.Name;
-                libraryHierarchyPopulator.DescriptionChanged += (sender, e) => this.Description = libraryHierarchyPopulator.Description;
-                libraryHierarchyPopulator.PositionChanged += (sender, e) => this.Position = libraryHierarchyPopulator.Position;
-                libraryHierarchyPopulator.CountChanged += (sender, e) => this.Count = libraryHierarchyPopulator.Count;
-                await libraryHierarchyPopulator.Populate(reader, cancellationToken, transaction);
+                await this.WithPopulator(libraryHierarchyPopulator, async () => await libraryHierarchyPopulator.Populate(reader, cancellationToken, transaction));
             }
         }
 
@@ -172,7 +160,7 @@ namespace FoxTunes
 
         protected virtual async Task RemoveItems(LibraryItemStatus status)
         {
-            this.IsIndeterminate = true;
+            await this.SetIsIndeterminate(true);
             Logger.Write(this, LogLevel.Debug, "Removing library items.");
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
@@ -191,7 +179,7 @@ namespace FoxTunes
 
         protected virtual async Task SetLibraryItemsStatus(LibraryItemStatus status)
         {
-            this.IsIndeterminate = true;
+            await this.SetIsIndeterminate(true);
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.LibraryItem);
             query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));

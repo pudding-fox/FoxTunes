@@ -1,13 +1,12 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
     public class NowPlaying : ViewModelBase, IDisposable
     {
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
-
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
@@ -50,16 +49,17 @@ namespace FoxTunes.ViewModel
             {
                 return this._DisplayScript;
             }
-            set
-            {
-                this._DisplayScript = value;
-                this.OnDisplayScriptChanged();
-            }
         }
 
-        protected virtual void OnDisplayScriptChanged()
+        public Task SetDisplayScript(string value)
         {
-            this.Refresh();
+            this._DisplayScript = value;
+            return this.OnDisplayScriptChanged();
+        }
+
+        protected virtual async Task OnDisplayScriptChanged()
+        {
+            await this.Refresh();
             if (this.DisplayScriptChanged != null)
             {
                 this.DisplayScriptChanged(this, EventArgs.Empty);
@@ -97,29 +97,36 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaylistManager.CurrentItemChanged += (sender, e) => this.Refresh();
+            this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
-            ).ConnectValue<string>(value => this.DisplayScript = value);
-            this.Refresh();
+            ).ConnectValue<string>(async value => await this.SetDisplayScript(value));
+            var task = this.Refresh();
             base.InitializeComponent(core);
         }
 
-        protected virtual void Refresh()
+        protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
         {
-            //TODO: Bad awaited Task.
-            this.ForegroundTaskRunner.Run(() =>
+            using (e.Defer())
             {
-                var runner = new PlaylistItemScriptRunner(this.ScriptingContext, this.PlaylistManager.CurrentItem, this.DisplayScript);
-                runner.Prepare();
+                await this.Refresh();
+            }
+        }
+
+        protected virtual Task Refresh()
+        {
+            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, this.PlaylistManager.CurrentItem, this.DisplayScript);
+            runner.Prepare();
+            var displayValue = runner.Run();
+            return Windows.Invoke(() =>
+            {
                 this.CurrentItem = this.PlaylistManager.CurrentItem;
-                this.DisplayValue = runner.Run();
+                this.DisplayValue = displayValue;
             });
         }
 
@@ -128,36 +135,17 @@ namespace FoxTunes.ViewModel
             return new NowPlaying();
         }
 
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
+        protected override void OnDisposing()
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
+            if (this.PlaylistManager != null)
             {
-                return;
+                this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
             }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
             if (this.ScriptingContext != null)
             {
                 this.ScriptingContext.Dispose();
             }
-        }
-
-        ~NowPlaying()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            this.Dispose(true);
+            base.OnDisposing();
         }
     }
 }

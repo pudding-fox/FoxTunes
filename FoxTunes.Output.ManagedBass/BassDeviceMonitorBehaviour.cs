@@ -4,13 +4,9 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class BassDeviceMonitorBehaviour : StandardBehaviour
+    public abstract class BassDeviceMonitorBehaviour : StandardBehaviour, IDisposable
     {
         public IBassOutput Output { get; private set; }
-
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -40,8 +36,6 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
-            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
-            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             base.InitializeComponent(core);
@@ -49,7 +43,7 @@ namespace FoxTunes
 
         protected virtual void OnInit(object sender, EventArgs e)
         {
-            if (!this.Enabled)
+            if (!this.Enabled || !this.IsInitialized)
             {
                 return;
             }
@@ -69,8 +63,16 @@ namespace FoxTunes
             {
                 return;
             }
-            this.NotificationClient.Dispose();
-            this.NotificationClient = null;
+            if (this.NotificationClient != null)
+            {
+                this.NotificationClient.DeviceAdded -= this.OnDeviceAdded;
+                this.NotificationClient.DeviceRemoved -= this.OnDeviceRemoved;
+                this.NotificationClient.DeviceStateChanged -= this.OnDeviceStateChanged;
+                this.NotificationClient.DefaultDeviceChanged -= this.OnDefaultDeviceChanged;
+                this.NotificationClient.PropertyValueChanged -= this.OnPropertyValueChanged;
+                this.NotificationClient.Dispose();
+                this.NotificationClient = null;
+            }
             this.IsInitialized = false;
         }
 
@@ -89,7 +91,7 @@ namespace FoxTunes
             //Nothing to do.
         }
 
-        protected virtual void OnDefaultDeviceChanged(object sender, NotificationClientEventArgs e)
+        protected virtual async void OnDefaultDeviceChanged(object sender, NotificationClientEventArgs e)
         {
             if (!this.RestartRequired(e.Flow, e.Role))
             {
@@ -97,8 +99,10 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
             Logger.Write(this, LogLevel.Debug, "Restarting the output.");
-            //TODO: Bad awaited Task.
-            this.BackgroundTaskRunner.Run(() => this.Restart());
+            using (e.Defer())
+            {
+                await this.Restart();
+            }
         }
 
         protected virtual void OnPropertyValueChanged(object sender, NotificationClientEventArgs e)
@@ -149,15 +153,46 @@ namespace FoxTunes
             }
             if (playlistItem != null)
             {
-                await this.ForegroundTaskRunner.Run(async () =>
+                await this.PlaylistManager.Play(playlistItem);
+                if (this.PlaybackManager.CurrentStream != null && position > 0)
                 {
-                    await this.PlaylistManager.Play(playlistItem);
-                    if (this.PlaybackManager.CurrentStream != null && position > 0)
-                    {
-                        this.PlaybackManager.CurrentStream.Position = position;
-                    }
-                });
+                    this.PlaybackManager.CurrentStream.Position = position;
+                }
             }
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
+            this.OnFree(this, EventArgs.Empty);
+        }
+
+        ~BassDeviceMonitorBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

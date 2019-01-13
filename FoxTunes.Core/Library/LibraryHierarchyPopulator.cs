@@ -19,7 +19,6 @@ namespace FoxTunes
             this.Database = database;
             this.Transaction = transaction;
             this.Contexts = new ThreadLocal<IScriptingContext>(true);
-            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Writer = new LibraryHierarchyWriter(this.Database, this.Transaction);
         }
 
@@ -31,8 +30,6 @@ namespace FoxTunes
 
         private ThreadLocal<IScriptingContext> Contexts { get; set; }
 
-        private SemaphoreSlim Semaphore { get; set; }
-
         private LibraryHierarchyWriter Writer { get; set; }
 
         public override void InitializeComponent(ICore core)
@@ -41,13 +38,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public Task Populate(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction = null)
+        public async Task Populate(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction = null)
         {
             if (this.ReportProgress)
             {
-                this.Name = "Populating library hierarchies";
-                this.Position = 0;
-                this.Count = (
+                await this.SetName("Populating library hierarchies");
+                await this.SetPosition(0);
+                await this.SetCount(
                     this.Database.Set<LibraryHierarchyLevel>(transaction).Count * this.Database.Set<LibraryItem>(transaction).Count
                 );
             }
@@ -55,7 +52,7 @@ namespace FoxTunes
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
 
-            return AsyncParallel.ForEach(reader, async record =>
+            await AsyncParallel.ForEach(reader, async record =>
             {
                 var context = this.GetOrAddContext();
                 var displayValue = this.ExecuteScript(record, "DisplayScript");
@@ -75,11 +72,15 @@ namespace FoxTunes
                 {
                     if (position % interval == 0)
                     {
-                        lock (this.SyncRoot)
+                        await this.Semaphore.WaitAsync();
+                        try
                         {
-                            var fileName = record["FileName"] as string;
-                            this.Description = new FileInfo(fileName).Name;
-                            this.Position = position;
+                            await this.SetDescription(new FileInfo(record["FileName"] as string).Name);
+                            await this.SetPosition(position);
+                        }
+                        finally
+                        {
+                            this.Semaphore.Release();
                         }
                     }
                     Interlocked.Increment(ref position);

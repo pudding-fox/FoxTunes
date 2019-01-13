@@ -38,14 +38,14 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
             await base.OnCompleted();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
         private async Task AddPlaylistItems()
         {
-            this.Name = "Getting file list";
-            this.IsIndeterminate = true;
+            await this.SetName("Getting file list");
+            await this.SetIsIndeterminate(true);
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>

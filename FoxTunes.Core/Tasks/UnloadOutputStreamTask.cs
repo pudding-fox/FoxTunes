@@ -28,8 +28,12 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            Logger.Write(this, LogLevel.Debug, "Unloading output stream: {0} => {1}", this.OutputStream.Id, this.OutputStream.FileName);
-            return this.Output.Unload(this.OutputStream);
+            if (this.OutputStream != null && !this.OutputStream.IsDisposed)
+            {
+                Logger.Write(this, LogLevel.Debug, "Unloading output stream: {0} => {1}", this.OutputStream.Id, this.OutputStream.FileName);
+                return this.Output.Unload(this.OutputStream);
+            }
+            return Task.CompletedTask;
         }
     }
 }

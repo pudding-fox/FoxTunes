@@ -6,11 +6,13 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassResamplerStreamComponentBehaviour : StandardBehaviour, IConfigurableComponent
+    public class BassResamplerStreamComponentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public IBassOutput Output { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
+
+        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         new public bool IsInitialized { get; private set; }
 
@@ -40,7 +42,11 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.RESAMPLER_ELEMENT
             ).ConnectValue<bool>(value => this.Enabled = value);
-            ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().CreatingPipeline += this.OnCreatingPipeline;
+            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
             base.InitializeComponent(core);
         }
 
@@ -86,6 +92,43 @@ namespace FoxTunes
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return BassResamplerStreamComponentConfiguration.GetConfigurationSections();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
+            }
+        }
+
+        ~BassResamplerStreamComponentBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

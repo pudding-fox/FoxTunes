@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class PreemptNextItemBehaviour : StandardBehaviour
+    public class PreemptNextItemBehaviour : StandardBehaviour, IDisposable
     {
         public IOutput Output { get; private set; }
 
@@ -14,37 +14,25 @@ namespace FoxTunes
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.Stopping += this.OnStopping;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
-            this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
-            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
             base.InitializeComponent(core);
         }
 
-        protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
-        {
-            if (this.PlaybackManager.CurrentStream == null)
-            {
-                return;
-            }
-            this.PlaybackManager.CurrentStream.Stopping += this.PlaybackManager_CurrentStream_Stopping;
-        }
-
-        protected virtual async void PlaybackManager_CurrentStream_Stopping(object sender, AsyncEventArgs e)
+        protected virtual async void OnStopping(object sender, AsyncEventArgs e)
         {
             using (e.Defer())
             {
-                await this.Preempt();
+                await this.PreemptItems();
             }
         }
 
-        public async Task Preempt()
+        private async Task PreemptItems()
         {
             var playlistItem = await this.PlaylistManager.GetNext();
             if (playlistItem == null)
@@ -57,13 +45,42 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Current stream is about to end, pre-empting the next stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-            await this.BackgroundTaskRunner.Run(async () =>
+            if (!await this.Output.Preempt(outputStream))
             {
-                if (!await this.Output.Preempt(outputStream))
-                {
-                    Logger.Write(this, LogLevel.Debug, "Pre-empt failed for stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-                }
-            });
+                Logger.Write(this, LogLevel.Debug, "Pre-empt failed for stream: {0} => {1}", outputStream.Id, outputStream.FileName);
+            }
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.Stopping -= this.OnStopping;
+            }
+        }
+
+        ~PreemptNextItemBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

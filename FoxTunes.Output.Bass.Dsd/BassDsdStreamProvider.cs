@@ -2,7 +2,6 @@
 using ManagedBass;
 using ManagedBass.Dsd;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,12 +9,20 @@ namespace FoxTunes
 {
     public class BassDsdStreamProvider : BassStreamProvider
     {
+        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
+
         public override byte Priority
         {
             get
             {
                 return PRIORITY_HIGH;
             }
+        }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
+            base.InitializeComponent(core);
         }
 
         public override bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem)
@@ -28,7 +35,7 @@ namespace FoxTunes
             {
                 return false;
             }
-            var query = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().QueryPipeline();
+            var query = this.BassStreamPipelineFactory.QueryPipeline();
             if ((query.OutputCapabilities & BassCapability.DSD_RAW) != BassCapability.DSD_RAW)
             {
                 return false;
@@ -49,7 +56,7 @@ namespace FoxTunes
                     channelHandle = BassDsd.CreateStream(buffer, 0, buffer.Length, flags);
                     if (channelHandle != 0)
                     {
-                        if (!this.Streams.TryAdd(new BassStreamProviderKey(playlistItem, channelHandle), buffer))
+                        if (!this.Streams.TryAdd(new BassStreamProviderKey(playlistItem.FileName, channelHandle), buffer))
                         {
                             Logger.Write(this, LogLevel.Warn, "Failed to pin handle of buffer for file \"{0}\". Playback may fail.", playlistItem.FileName);
                         }
@@ -61,7 +68,7 @@ namespace FoxTunes
                 }
                 if (channelHandle != 0)
                 {
-                    var query = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().QueryPipeline();
+                    var query = this.BassStreamPipelineFactory.QueryPipeline();
                     var channels = BassUtils.GetChannelCount(channelHandle);
                     var rate = BassUtils.GetChannelDsdRate(channelHandle);
                     if (query.OutputChannels < channels || !query.OutputRates.Contains(rate))

@@ -50,20 +50,6 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public static Task InvalidateRequerySuggested()
-        {
-            var foregroundTaskRunner = ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>();
-            if (foregroundTaskRunner != null)
-            {
-                return foregroundTaskRunner.Run(() => CommandManager.InvalidateRequerySuggested());
-            }
-            else
-            {
-                CommandManager.InvalidateRequerySuggested();
-                return Task.CompletedTask;
-            }
-        }
-
         public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);
     }
 

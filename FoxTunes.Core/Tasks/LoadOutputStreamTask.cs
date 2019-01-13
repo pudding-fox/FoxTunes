@@ -45,17 +45,16 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override Task OnStarted()
+        protected override async Task OnStarted()
         {
-            this.Name = "Buffering";
-            this.Description = this.PlaylistItem.FileName.GetName();
-            this.IsIndeterminate = true;
-            return base.OnStarted();
+            await this.SetName("Buffering");
+            await this.SetDescription(this.PlaylistItem.FileName.GetName());
+            await this.SetIsIndeterminate(true);
+            await base.OnStarted();
         }
 
         protected override async Task OnRun()
         {
-            Logger.Write(this, LogLevel.Debug, "Loading play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             if (this.OutputStreamQueue.IsQueued(this.PlaylistItem))
             {
                 Logger.Write(this, LogLevel.Debug, "Play list item already exists in the queue:  {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
@@ -93,8 +92,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
             await base.OnCompleted();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
         }
     }
 }

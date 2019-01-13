@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public class BassDirectSoundStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent
+    public class BassDirectSoundStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public IBassOutput Output { get; private set; }
 
@@ -62,8 +62,11 @@ namespace FoxTunes
                 BassDirectSoundStreamOutputConfiguration.ELEMENT_DS_DEVICE
             ).ConnectValue<string>(value => this.DirectSoundDevice = BassDirectSoundStreamOutputConfiguration.GetDsDevice(value));
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
-            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
             base.InitializeComponent(core);
         }
 
@@ -132,6 +135,44 @@ namespace FoxTunes
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return BassDirectSoundStreamOutputConfiguration.GetConfigurationSections();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.QueryingPipeline -= this.OnQueryingPipeline;
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
+            }
+        }
+
+        ~BassDirectSoundStreamOutputBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

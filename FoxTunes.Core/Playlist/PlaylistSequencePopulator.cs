@@ -17,7 +17,6 @@ namespace FoxTunes
             this.Database = database;
             this.Transaction = transaction;
             this.Contexts = new ThreadLocal<IScriptingContext>(true);
-            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Writer = new PlaylistSequenceWriter(this.Database, this.Transaction);
         }
 
@@ -28,8 +27,6 @@ namespace FoxTunes
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
         private ThreadLocal<IScriptingContext> Contexts { get; set; }
-
-        private SemaphoreSlim Semaphore { get; set; }
 
         private PlaylistSequenceWriter Writer { get; set; }
 

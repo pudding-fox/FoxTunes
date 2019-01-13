@@ -4,9 +4,11 @@ using System;
 
 namespace FoxTunes
 {
-    public class BassGaplessStreamInputBehaviour : StandardBehaviour
+    public class BassGaplessStreamInputBehaviour : StandardBehaviour, IDisposable
     {
         public IBassOutput Output { get; private set; }
+
+        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         new public bool IsInitialized { get; private set; }
 
@@ -15,7 +17,11 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
-            ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().CreatingPipeline += this.OnCreatingPipeline;
+            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
             base.InitializeComponent(core);
         }
 
@@ -36,6 +42,43 @@ namespace FoxTunes
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
             e.Input = new BassGaplessStreamInput(this, e.Stream);
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
+            }
+        }
+
+        ~BassGaplessStreamInputBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 

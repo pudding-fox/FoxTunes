@@ -43,6 +43,11 @@ namespace FoxTunes
             return this;
         }
 
+        public void Toggle()
+        {
+            this.Value = !this.Value;
+        }
+
         public override ConfigurationElement ConnectValue<T>(Action<T> action)
         {
             var payload = new Action(() => action((T)Convert.ChangeType(this.Value, typeof(T))));

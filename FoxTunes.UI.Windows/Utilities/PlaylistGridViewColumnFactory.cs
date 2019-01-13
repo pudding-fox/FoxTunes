@@ -5,15 +5,25 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace FoxTunes.Utilities
+namespace FoxTunes
 {
-    public class PlaylistGridViewColumnFactory
+    public class PlaylistGridViewColumnFactory : IDisposable
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public PlaylistGridViewColumnFactory(IPlaybackManager playbackManager, IScriptingRuntime scriptingRuntime)
         {
             this.PlaybackManager = playbackManager;
             this.ScriptingRuntime = scriptingRuntime;
         }
+
+        public bool Suspended { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -34,7 +44,12 @@ namespace FoxTunes.Utilities
                 gridViewColumn = new GridViewColumn();
             }
             gridViewColumn.Header = column.Name;
-            gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding(this.PlaybackManager, this.ScriptingContext, column.DisplayScript);
+            gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding()
+            {
+                PlaybackManager = this.PlaybackManager,
+                ScriptingContext = this.ScriptingContext,
+                Script = column.DisplayScript
+            };
             BindingHelper.Create(
                 gridViewColumn,
                 GridViewColumn.WidthProperty,
@@ -57,7 +72,7 @@ namespace FoxTunes.Utilities
 
         protected virtual void OnWidthChanged(PlaylistColumn column)
         {
-            if (this.WidthChanged == null)
+            if (this.Suspended || this.WidthChanged == null)
             {
                 return;
             }
@@ -68,7 +83,7 @@ namespace FoxTunes.Utilities
 
         protected virtual void OnPositionChanged(PlaylistColumn column)
         {
-            if (this.PositionChanged == null)
+            if (this.Suspended || this.PositionChanged == null)
             {
                 return;
             }
@@ -79,10 +94,23 @@ namespace FoxTunes.Utilities
 
         public void Refresh(GridViewColumn column)
         {
-            var refreshable = column as RefreshableGridViewColumn;
-            if (refreshable != null)
+            this.Suspended = true;
+            try
             {
-                refreshable.Refresh();
+                var refreshable = column as RefreshableGridViewColumn;
+                if (refreshable != null)
+                {
+                    refreshable.Refresh();
+                }
+                if (double.IsNaN(column.Width))
+                {
+                    column.Width = column.ActualWidth;
+                    column.Width = double.NaN;
+                }
+            }
+            finally
+            {
+                this.Suspended = false;
             }
         }
 
@@ -93,6 +121,38 @@ namespace FoxTunes.Utilities
                 return;
             }
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.ScriptingContext != null)
+            {
+                this.ScriptingContext.Dispose();
+            }
+        }
+
+        ~PlaylistGridViewColumnFactory()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

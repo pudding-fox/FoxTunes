@@ -11,12 +11,6 @@ namespace FoxTunes
 
         }
 
-        public PlaylistScriptBinding(IPlaybackManager playbackManager, IScriptingContext scriptingContext, string script)
-            : base(scriptingContext, script)
-        {
-            this.PlaybackManager = playbackManager;
-        }
-
         private IPlaybackManager _PlaybackManager { get; set; }
 
         public IPlaybackManager PlaybackManager

@@ -50,22 +50,6 @@ namespace FoxTunes
             }
         }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner
-        {
-            get
-            {
-                return ComponentRegistry.Instance.GetComponent<IBackgroundTaskRunner>();
-            }
-        }
-
-        public IForegroundTaskRunner ForegroundTaskRunner
-        {
-            get
-            {
-                return ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>();
-            }
-        }
-
         public ILogger Logger
         {
             get
