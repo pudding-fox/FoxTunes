@@ -11,14 +11,6 @@
              AllowDrop="True" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Mini x:Key="ViewModel" Core="{Binding}"></ViewModel:Mini>
-        <Style x:Key="NowPlayingStyle" TargetType="{x:Type Windows:NowPlaying}">
-            <Setter Property="Visibility" Value="Visible"></Setter>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding ShowPlaylist.Value, Source={StaticResource ViewModel}}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed"></Setter>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
         <Style x:Key="ArtworkStyle" TargetType="{x:Type Windows:Artwork}">
             <Setter Property="Visibility" Value="Visible"></Setter>
             <Style.Triggers>
@@ -58,29 +50,31 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <Border Padding="5" CornerRadius="5" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" Background="{DynamicResource NormalBrush}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <Windows:NowPlaying x:Name="NowPlaying" Margin="0,0,0,4" ToolTipService.ShowDuration="60000" Style="{StaticResource NowPlayingStyle}">
+        <StackPanel>
+            <Windows:NowPlaying x:Name="NowPlaying" Margin="0,0,0,4" ToolTipService.ShowDuration="60000">
                 <Windows:NowPlaying.ToolTip>
                     <Windows:PlaybackDetails></Windows:PlaybackDetails>
                 </Windows:NowPlaying.ToolTip>
             </Windows:NowPlaying>
-            <Windows:Artwork x:Name="Artwork" Grid.Row="1" Style="{StaticResource ArtworkStyle}" ShowPlaceholder="True" Margin="0,0,0,2"></Windows:Artwork>
-            <Windows:StreamPosition x:Name="StreamPosition" Grid.Row="2" Margin="0,0,0,2"></Windows:StreamPosition>
-            <StackPanel x:Name="StackPanel" Grid.Row="3" Orientation="Horizontal">
-                <Windows:Playback Grid.Row="2" Margin="0,0,2,0"></Windows:Playback>
-                <Windows:MiniPlayer Grid.Column="1" Grid.Row="2"></Windows:MiniPlayer>
-            </StackPanel>
-            <Windows:MiniPlaylist x:Name="MiniPlaylist" Style="{StaticResource PlaylistStyle}"></Windows:MiniPlaylist>
-        </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Windows:MiniPlaylist x:Name="MiniPlaylist" Style="{StaticResource PlaylistStyle}"></Windows:MiniPlaylist>
+                <Windows:Artwork x:Name="Artwork" Grid.Row="2" Style="{StaticResource ArtworkStyle}" ShowPlaceholder="True" Margin="0,0,0,2"></Windows:Artwork>
+                <Windows:StreamPosition x:Name="StreamPosition" Grid.Row="3" Margin="0,0,0,2"></Windows:StreamPosition>
+                <StackPanel x:Name="StackPanel" Grid.Row="4" Orientation="Horizontal">
+                    <Windows:Playback Grid.Row="2" Margin="0,0,2,0"></Windows:Playback>
+                    <Windows:MiniPlayer Grid.Column="1" Grid.Row="2"></Windows:MiniPlayer>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
     </Border>
 </UserControl>
