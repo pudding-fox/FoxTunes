@@ -1,11 +1,18 @@
 ﻿using FoxTunes.Interfaces;
-using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Managers
 {
     public class PlaybackManager : StandardManager, IPlaybackManager
     {
+        static PlaybackManager()
+        {
+            Semaphore = new SemaphoreSlim(1, 1);
+        }
+
+        public static SemaphoreSlim Semaphore { get; private set; }
+
         public ICore Core { get; private set; }
 
         public IOutput Output { get; private set; }
@@ -41,7 +48,6 @@ namespace FoxTunes.Managers
                 }
                 Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                 await this.SetCurrentStream(e.OutputStream);
-                Logger.Write(this, LogLevel.Debug, "Output stream loaded: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
             }
         }
 
@@ -62,29 +68,37 @@ namespace FoxTunes.Managers
 
         protected virtual async Task SetCurrentStream(IOutputStream stream)
         {
-            if (this.CurrentStream != null)
+            await Semaphore.WaitAsync();
+            try
             {
-                if (object.ReferenceEquals(this.CurrentStream, stream))
+                if (this.CurrentStream != null)
                 {
-                    return;
+                    if (object.ReferenceEquals(this.CurrentStream, stream))
+                    {
+                        return;
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
+                    var currentStream = this.CurrentStream;
+                    this.OnCurrentStreamChanging();
+                    this._CurrentStream = stream;
+                    await this.Unload(currentStream);
                 }
-                Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
-                var currentStream = this.CurrentStream;
-                this.OnCurrentStreamChanging();
-                this._CurrentStream = stream;
-                await this.Unload(currentStream);
+                else
+                {
+                    this.OnCurrentStreamChanging();
+                    this._CurrentStream = stream;
+                }
+                if (this._CurrentStream != null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Playing stream: {0} => {1}", this._CurrentStream.Id, this._CurrentStream.FileName);
+                    await this._CurrentStream.Play();
+                }
+                await this.OnCurrentStreamChanged();
             }
-            else
+            finally
             {
-                this.OnCurrentStreamChanging();
-                this._CurrentStream = stream;
+                Semaphore.Release();
             }
-            if (this._CurrentStream != null)
-            {
-                Logger.Write(this, LogLevel.Debug, "Playing stream: {0} => {1}", this._CurrentStream.Id, this._CurrentStream.FileName);
-                await this._CurrentStream.Play();
-            }
-            await this.OnCurrentStreamChanged();
         }
 
         protected virtual void OnCurrentStreamChanging()

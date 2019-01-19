@@ -43,7 +43,7 @@ namespace FoxTunes
 
         protected virtual void OnInit(object sender, EventArgs e)
         {
-            if (!this.Enabled || !this.IsInitialized)
+            if (!this.Enabled || this.IsInitialized)
             {
                 return;
             }
@@ -143,13 +143,20 @@ namespace FoxTunes
             {
                 playlistItem = this.PlaylistManager.CurrentItem;
             }
+            var exception = default(Exception);
             try
             {
+                await this.Output.Shutdown();
                 await this.Output.Start();
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to start output: {0}", e.Message);
+                exception = e;
+            }
+            if (exception != null)
+            {
+                await this.OnError(exception);
+                return;
             }
             if (playlistItem != null)
             {
