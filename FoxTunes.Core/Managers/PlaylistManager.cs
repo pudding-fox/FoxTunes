@@ -175,7 +175,7 @@ namespace FoxTunes.Managers
             using (var task = new AddPathsToPlaylistTask(index, paths, clear))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
@@ -193,7 +193,7 @@ namespace FoxTunes.Managers
             using (var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode, clear))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
@@ -211,7 +211,7 @@ namespace FoxTunes.Managers
             using (var task = new MovePlaylistItemsTask(index, playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
@@ -221,7 +221,7 @@ namespace FoxTunes.Managers
             using (var task = new RemoveItemsFromPlaylistTask(playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
@@ -238,7 +238,7 @@ namespace FoxTunes.Managers
                     using (var task = new RemoveItemsFromPlaylistTask(query.ToArray()))
                     {
                         task.InitializeComponent(this.Core);
-                        this.OnBackgroundTask(task);
+                        await this.OnBackgroundTask(task);
                         await task.Run();
                     }
                 }
@@ -480,7 +480,7 @@ namespace FoxTunes.Managers
             using (var task = new ClearPlaylistTask())
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
@@ -514,13 +514,15 @@ namespace FoxTunes.Managers
 
         public event AsyncEventHandler CurrentItemChanged = delegate { };
 
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
+        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
+            var e = new BackgroundTaskEventArgs(backgroundTask);
+            this.BackgroundTask(this, e);
+            return e.Complete();
         }
 
         public event BackgroundTaskEventHandler BackgroundTask = delegate { };

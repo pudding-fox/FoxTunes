@@ -104,7 +104,7 @@ namespace FoxTunes.Managers
             using (var task = new AddPathsToLibraryTask(paths))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
@@ -114,7 +114,7 @@ namespace FoxTunes.Managers
             using (var task = new ClearLibraryTask())
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
@@ -124,18 +124,20 @@ namespace FoxTunes.Managers
             using (var task = new RescanLibraryTask())
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.OnBackgroundTask(task);
                 await task.Run();
             }
         }
 
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
+        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
+            var e = new BackgroundTaskEventArgs(backgroundTask);
+            this.BackgroundTask(this, e);
+            return e.Complete();
         }
 
         public event BackgroundTaskEventHandler BackgroundTask = delegate { };
