@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -9,7 +10,17 @@ namespace FoxTunes
     {
         public Playback()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+        }
+
+        protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var viewModel = this.FindResource<global::FoxTunes.ViewModel.Playback>("ViewModel");
+            if (viewModel == null)
+            {
+                return;
+            }
+            var task = viewModel.Refresh();
         }
     }
 }
