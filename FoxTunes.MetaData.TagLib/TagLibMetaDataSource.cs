@@ -12,6 +12,8 @@ namespace FoxTunes
     {
         public static MetaDataCategory Categories = MetaDataCategory.Standard | MetaDataCategory.First;
 
+        public static ArtworkType ArtworkTypes = ArtworkType.FrontCover | ArtworkType.BackCover;
+
         public static SemaphoreSlim Semaphore { get; private set; }
 
         static TagLibMetaDataSource()
@@ -231,6 +233,10 @@ namespace FoxTunes
             }
             foreach (var picture in pictures)
             {
+                if (!ArtworkTypes.HasFlag(GetArtworkType(picture.Type)))
+                {
+                    continue;
+                }
                 var type = Enum.GetName(typeof(PictureType), picture.Type);
                 var id = this.GetImageId(tag, picture, type);
                 var fileName = await this.AddImage(picture, id);
@@ -275,18 +281,21 @@ namespace FoxTunes
             );
         }
 #pragma warning restore 612, 618
-    }
 
-    [Flags]
-    public enum MetaDataCategory : byte
-    {
-        None = 0,
-        Standard = 1,
-        Extended = 2,
-        First = 4,
-        Sort = 8,
-        Joined = 16,
-        MusicBrainz = 32,
-        MultiMedia = 64
+        public static readonly IDictionary<PictureType, ArtworkType> PictureTypeMapping = new Dictionary<PictureType, ArtworkType>()
+        {
+            { PictureType.FrontCover, ArtworkType.FrontCover },
+            { PictureType.BackCover, ArtworkType.BackCover },
+        };
+
+        public static ArtworkType GetArtworkType(PictureType pictureType)
+        {
+            var artworkType = default(ArtworkType);
+            if (PictureTypeMapping.TryGetValue(pictureType, out artworkType))
+            {
+                return artworkType;
+            }
+            return ArtworkType.Unknown;
+        }
     }
 }

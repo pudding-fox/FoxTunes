@@ -6,11 +6,4 @@
 
         MetaDataItem Find(string path, ArtworkType type);
     }
-
-    public enum ArtworkType
-    {
-        None,
-        FrontCover,
-        BackCover
-    }
 }
