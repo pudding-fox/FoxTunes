@@ -46,7 +46,7 @@
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
             </TreeView.ContextMenu>
             <TreeView.ItemContainerStyle>
-                <Style>
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="TreeViewItem.IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
                     <Setter Property="TreeViewItem.IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
                 </Style>

@@ -28,7 +28,7 @@
                         Windows:TreeViewExtensions.SelectedItem="{Binding SelectedSection, Source={StaticResource ViewModel}}"
                         Windows:TreeViewExtensions.RightButtonSelect="True">
                     <TreeView.ItemContainerStyle>
-                        <Style>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                             <Setter Property="TreeViewItem.IsSelected" Value="{Binding IsSelected}"></Setter>
                             <Setter Property="TreeViewItem.IsExpanded" Value="{Binding IsExpanded}"></Setter>
                         </Style>
