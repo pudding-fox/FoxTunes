@@ -1,9 +1,11 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace FoxTunes.Interfaces
 {
     public interface IArtworkProvider : IStandardComponent
     {
-        MetaDataItem Find(PlaylistItem playlistItem, ArtworkType type);
+        Task<MetaDataItem> Find(PlaylistItem playlistItem, ArtworkType type);
 
-        MetaDataItem Find(string path, ArtworkType type);
+        Task<MetaDataItem> Find(string path, ArtworkType type);
     }
 }

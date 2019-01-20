@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -19,35 +20,50 @@ namespace FoxTunes
             };
         }
 
-        public MetaDataItem Find(string path, ArtworkType type)
+        public async Task<MetaDataItem> Find(string path, ArtworkType type)
         {
             var names = default(string[]);
             if (!Names.TryGetValue(type, out names))
             {
                 throw new NotImplementedException();
             }
-            var directoryName = Path.GetDirectoryName(path);
-            foreach (var name in names)
+            if (!string.IsNullOrEmpty(Path.GetPathRoot(path)))
             {
-                foreach (var fileName in Directory.EnumerateFileSystemEntries(directoryName, string.Format("{0}.*", name)))
+                var exception = default(Exception);
+                try
                 {
-                    return new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
+                    var directoryName = Path.GetDirectoryName(path);
+                    foreach (var name in names)
                     {
-                        FileValue = fileName
-                    };
+                        foreach (var fileName in Directory.EnumerateFileSystemEntries(directoryName, string.Format("{0}.*", name)))
+                        {
+                            return new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
+                            {
+                                FileValue = fileName
+                            };
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+                if (exception != null)
+                {
+                    await this.OnError(exception);
                 }
             }
             return default(MetaDataItem);
         }
 
-        public MetaDataItem Find(PlaylistItem playlistItem, ArtworkType type)
+        public Task<MetaDataItem> Find(PlaylistItem playlistItem, ArtworkType type)
         {
-            return playlistItem.MetaDatas.FirstOrDefault(
-                 metaDataItem => 
-                     metaDataItem.Type == MetaDataItemType.Image && 
-                     string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) && 
+            return Task.FromResult(playlistItem.MetaDatas.FirstOrDefault(
+                 metaDataItem =>
+                     metaDataItem.Type == MetaDataItemType.Image &&
+                     string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) &&
                      File.Exists(metaDataItem.FileValue)
-             );
+             ));
         }
     }
 }

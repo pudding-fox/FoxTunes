@@ -10,6 +10,10 @@ namespace FoxTunes
         public static bool IsRemotePath(string path)
         {
             var letter = Path.GetPathRoot(path);
+            if (string.IsNullOrEmpty(letter))
+            {
+                return false;
+            }
             var info = new DriveInfo(letter);
             return info.DriveType == DriveType.Network || info.DriveType == DriveType.NoRootDirectory;
         }

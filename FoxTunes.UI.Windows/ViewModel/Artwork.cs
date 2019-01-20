@@ -92,23 +92,23 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ImageChanged = delegate { };
 
-        public Task Refresh()
+        public async Task Refresh()
         {
             if (this.PlaylistManager == null)
             {
-                return Task.CompletedTask;
+                return;
             }
             var image = default(MetaDataItem);
             var playlistItem = this.PlaylistManager.CurrentItem;
             if (playlistItem != null)
             {
-                image = this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
+                image = await this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
                 if (image == null)
                 {
-                    image = this.ArtworkProvider.Find(playlistItem.FileName, ArtworkType.FrontCover);
+                    image = await this.ArtworkProvider.Find(playlistItem.FileName, ArtworkType.FrontCover);
                 }
             }
-            return Windows.Invoke(() => this.Image = image);
+            await Windows.Invoke(() => this.Image = image);
         }
 
         public override void InitializeComponent(ICore core)
