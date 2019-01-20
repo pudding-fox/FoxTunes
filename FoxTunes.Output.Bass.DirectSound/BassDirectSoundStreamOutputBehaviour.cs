@@ -27,7 +27,8 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -43,7 +44,8 @@ namespace FoxTunes
             {
                 this._DirectSoundDevice = value;
                 Logger.Write(this, LogLevel.Debug, "Direct Sound Device = {0}", this.DirectSoundDevice);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 

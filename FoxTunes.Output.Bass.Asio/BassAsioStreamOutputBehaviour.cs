@@ -28,7 +28,8 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -44,7 +45,8 @@ namespace FoxTunes
             {
                 this._AsioDevice = value;
                 Logger.Write(this, LogLevel.Debug, "ASIO Device = {0}", this.AsioDevice);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -60,7 +62,8 @@ namespace FoxTunes
             {
                 this._DsdDirect = value;
                 Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DsdDirect);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 

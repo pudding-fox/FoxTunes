@@ -25,7 +25,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override bool CanCreateStream(PlaylistItem playlistItem)
         {
             if (!new[]
             {
@@ -43,14 +43,14 @@ namespace FoxTunes
             return true;
         }
 
-        public override async Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override async Task<int> CreateStream(PlaylistItem playlistItem)
         {
             var flags = BassFlags.Decode | BassFlags.DSDRaw;
             var channelHandle = default(int);
             await this.Semaphore.WaitAsync();
             try
             {
-                if (output.PlayFromMemory)
+                if (this.Output.PlayFromMemory)
                 {
                     var buffer = await this.GetBuffer(playlistItem);
                     channelHandle = BassDsd.CreateStream(buffer, 0, buffer.Length, flags);

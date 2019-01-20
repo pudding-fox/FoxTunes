@@ -26,7 +26,11 @@ namespace FoxTunes
 
         public ConcurrentDictionary<BassStreamProviderKey, byte[]> Streams { get; private set; }
 
+        public IBassOutput Output { get; private set; }
+
         public IBassStreamFactory StreamFactory { get; private set; }
+
+        public IBassStreamPipelineManager PipelineManager { get; private set; }
 
         public virtual byte Priority
         {
@@ -38,7 +42,9 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Output = core.Components.Output as IBassOutput;
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
+            this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             if (this.StreamFactory != null)
             {
                 this.StreamFactory.Register(this);
@@ -46,22 +52,22 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public virtual bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public virtual bool CanCreateStream(PlaylistItem playlistItem)
         {
             return true;
         }
 
-        public virtual async Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public virtual async Task<int> CreateStream(PlaylistItem playlistItem)
         {
             var flags = BassFlags.Decode;
-            if (output.Float)
+            if (this.Output.Float)
             {
                 flags |= BassFlags.Float;
             }
             await this.Semaphore.WaitAsync();
             try
             {
-                if (output.PlayFromMemory)
+                if (this.Output.PlayFromMemory)
                 {
                     var buffer = await this.GetBuffer(playlistItem);
                     var channelHandle = Bass.CreateStream(buffer, 0, buffer.Length, flags);

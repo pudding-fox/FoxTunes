@@ -28,7 +28,8 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -44,7 +45,8 @@ namespace FoxTunes
             {
                 this._WasapiDevice = value;
                 Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -60,7 +62,8 @@ namespace FoxTunes
             {
                 this._Exclusive = value;
                 Logger.Write(this, LogLevel.Debug, "Exclusive = {0}", this.Exclusive);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -76,7 +79,8 @@ namespace FoxTunes
             {
                 this._EventDriven = value;
                 Logger.Write(this, LogLevel.Debug, "EventDriven = {0}", this.EventDriven);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 

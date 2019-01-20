@@ -17,10 +17,11 @@ namespace FoxTunes
 
         public static ConcurrentDictionary<PlaylistItem, BassOutputStream> ActiveStreams { get; private set; }
 
-        public BassOutputStream(IBassOutput output, IBassStreamProvider provider, PlaylistItem playlistItem, int channelHandle)
+        public BassOutputStream(IBassOutput output, IBassStreamPipelineManager manager, IBassStreamProvider provider, PlaylistItem playlistItem, int channelHandle)
             : base(playlistItem)
         {
             this.Output = output;
+            this.Manager = manager;
             this.Provider = provider;
             this.ChannelHandle = channelHandle;
             if (!ActiveStreams.TryAdd(playlistItem, this))
@@ -30,6 +31,8 @@ namespace FoxTunes
         }
 
         public IBassOutput Output { get; private set; }
+
+        public IBassStreamPipelineManager Manager { get; private set; }
 
         public IBassStreamProvider Provider { get; private set; }
 
@@ -52,39 +55,33 @@ namespace FoxTunes
         protected virtual long GetPosition()
         {
             var position = Bass.ChannelGetPosition(this.ChannelHandle);
-            if (this.Output != null)
+            this.Manager.WithPipeline(pipeline =>
             {
-                this.Output.WithPipeline(pipeline =>
+                if (pipeline != null)
                 {
-                    if (pipeline != null)
+                    var buffer = pipeline.BufferLength;
+                    if (buffer > 0)
                     {
-                        var buffer = pipeline.BufferLength;
-                        if (buffer > 0)
-                        {
-                            position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, buffer);
-                        }
+                        position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, buffer);
                     }
-                });
-            }
+                }
+            });
             return position;
         }
 
         protected virtual void SetPosition(long position)
         {
-            if (this.Output != null)
+            this.Manager.WithPipeline(pipeline =>
             {
-                this.Output.WithPipeline(pipeline =>
+                if (pipeline != null)
                 {
-                    if (pipeline != null)
+                    var buffer = pipeline.BufferLength;
+                    if (buffer > 0)
                     {
-                        var buffer = pipeline.BufferLength;
-                        if (buffer > 0)
-                        {
-                            pipeline.ClearBuffer();
-                        }
+                        pipeline.ClearBuffer();
                     }
-                });
-            }
+                }
+            });
             if (position >= this.Length)
             {
                 position = this.Length - 1;
@@ -154,10 +151,10 @@ namespace FoxTunes
             {
                 if (!this.Output.IsStarted)
                 {
-                    return false;
+                    throw BassOutputStreamException.StaleStream;
                 }
                 var result = default(bool);
-                this.Output.WithPipeline(pipeline =>
+                this.Manager.WithPipeline(pipeline =>
                 {
                     if (pipeline != null)
                     {
@@ -174,10 +171,10 @@ namespace FoxTunes
             {
                 if (!this.Output.IsStarted)
                 {
-                    return false;
+                    throw BassOutputStreamException.StaleStream;
                 }
                 var result = default(bool);
-                this.Output.WithPipeline(pipeline =>
+                this.Manager.WithPipeline(pipeline =>
                 {
                     if (pipeline != null)
                     {
@@ -194,10 +191,10 @@ namespace FoxTunes
             {
                 if (!this.Output.IsStarted)
                 {
-                    return false;
+                    throw BassOutputStreamException.StaleStream;
                 }
                 var result = default(bool);
-                this.Output.WithPipeline(pipeline =>
+                this.Manager.WithPipeline(pipeline =>
                 {
                     if (pipeline != null)
                     {
@@ -208,52 +205,52 @@ namespace FoxTunes
             }
         }
 
-        public override Task Play()
+        public override async Task Play()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.WithPipeline(this, pipeline =>
+            await this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {
                     pipeline.Play();
                 }
             });
-            return this.EmitState();
+            await this.EmitState();
         }
 
-        public override Task Pause()
+        public override async Task Pause()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.WithPipeline(this, pipeline =>
+            await this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {
                     pipeline.Pause();
                 }
             });
-            return this.EmitState();
+            await this.EmitState();
         }
 
-        public override Task Resume()
+        public override async Task Resume()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.WithPipeline(this, pipeline =>
+            await this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {
                     pipeline.Resume();
                 }
             });
-            return this.EmitState();
+            await this.EmitState();
         }
 
         public override async Task Stop()
@@ -262,7 +259,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.WithPipeline(this, pipeline =>
+            await this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {

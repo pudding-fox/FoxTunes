@@ -44,7 +44,8 @@ namespace FoxTunes
             {
                 this._CdDrive = value;
                 Logger.Write(this, LogLevel.Debug, "CD Drive = {0}", this.CdDrive);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
