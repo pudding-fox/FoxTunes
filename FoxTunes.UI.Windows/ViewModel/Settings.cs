@@ -157,7 +157,7 @@ namespace FoxTunes.ViewModel
         }
     }
 
-    public class ConfigurationSection : ViewModelBase
+    public class ConfigurationSection : ViewModelBase, ISelectable, IExpandable
     {
         private ConfigurationSection()
         {

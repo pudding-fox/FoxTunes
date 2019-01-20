@@ -36,17 +36,6 @@ namespace FoxTunes
             {
                 SelectedItemBehaviours.Add(treeView, new SelectedItemBehaviour(treeView));
             }
-            if (object.ReferenceEquals(e.NewValue, treeView.SelectedItem))
-            {
-                return;
-            }
-            //TODO: Why doesn't this work?
-            //var treeViewItem = treeView.ItemContainerGenerator.ContainerFromItem(e.NewValue) as TreeViewItem;
-            //if (treeViewItem == null)
-            //{
-            //    return;
-            //}
-            //treeViewItem.IsSelected = true;
         }
 
         private class SelectedItemBehaviour

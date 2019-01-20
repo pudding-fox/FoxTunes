@@ -12,7 +12,9 @@
 
     <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
     <SolidColorBrush x:Key="SolidBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
-    
+
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF9BDDFB"/>
+
     <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
         <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
         <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
