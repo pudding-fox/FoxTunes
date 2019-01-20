@@ -12,7 +12,9 @@
     <Popup PlacementTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
 		Placement="Center" 
 		AllowsTransparency="True" 
-		StaysOpen="True">
+		StaysOpen="True"
+        Width="600"
+        Height="400">
         <Popup.Style>
             <Style TargetType="{x:Type Popup}">
                 <Setter Property="IsOpen" Value="True"/>
@@ -23,35 +25,36 @@
                 </Style.Triggers>
             </Style>
         </Popup.Style>
-        <Border Background="{DynamicResource NormalBrush}" 
-			BorderBrush="{DynamicResource NormalBorderBrush}" 
-			BorderThickness="1" 
-			CornerRadius="8,8,3,3" 
-			Padding="10"
-			MinWidth="300">
+        <Border 
+                Background="{DynamicResource NormalBrush}" 
+			    BorderBrush="{DynamicResource NormalBorderBrush}" 
+			    BorderThickness="1" 
+			    CornerRadius="8,8,3,3" 
+			    Padding="10">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Error" Foreground="{DynamicResource TextBrush}"></TextBlock>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Errors, Source={StaticResource ViewModel}}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <GroupBox Header="{Binding Source, Mode=OneWay}" Padding="0,7,0,0">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Text="{Binding Message, Mode=OneWay}"/>
-                                    <TextBlock Grid.Row="1" Text="{Binding Exception.Message, Mode=OneWay}" Foreground="Red"/>
-                                </Grid>
-                            </GroupBox>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <TextBlock Text="Error" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,5"></TextBlock>
+                <Border Grid.Row="1" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" Padding="3">
+                    <ScrollViewer  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Padding="5">
+                        <ItemsControl  ItemsSource="{Binding Errors, Source={StaticResource ViewModel}}" FontFamily="Consolas">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock>
+                                        <Run Text="{Binding Source, Mode=OneWay, StringFormat='\{0\}: '}"></Run>
+                                        <Run Text="{Binding Exception.Message, Mode=OneWay}"></Run>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Exception.StackTrace, Mode=OneWay}"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
                 <Button Grid.Row="2" Command="{Binding ClearErrorsCommand, Mode=OneWay, Source={StaticResource ViewModel}}" HorizontalAlignment="Right" Height="30" Width="60" Margin="0,7,0,0" Content="Dismiss"/>
             </Grid>
         </Border>
