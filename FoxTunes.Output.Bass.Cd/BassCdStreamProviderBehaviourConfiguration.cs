@@ -11,11 +11,11 @@ namespace FoxTunes
 
         public const string SECTION = "220BF762-28B1-436C-951D-5B0359473A40";
 
-        public const string DRIVE_ELEMENT = "99BD557F-62E7-4152-88DF-BF90C7C661F5";
+        public const string DRIVE_ELEMENT = "AAAA557F-62E7-4152-88DF-BF90C7C661F5";
 
-        public const string LOOKUP_ELEMENT = "4C1F29AB-ED22-4AB2-AD79-0EFE4EAB39B7";
+        public const string LOOKUP_ELEMENT = "BBBB29AB-ED22-4AB2-AD79-0EFE4EAB39B7";
 
-        public const string LOOKUP_HOST_ELEMENT = "D1D587EE-07E2-4B95-8F9D-039738956A30";
+        public const string LOOKUP_HOST_ELEMENT = "CCCC87EE-07E2-4B95-8F9D-039738956A30";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {

@@ -9,21 +9,20 @@ namespace FoxTunes
     {
         public const int ASIO_NO_DEVICE = -1;
 
-        public const string ELEMENT_ASIO_DEVICE = "2E20B9CE-96FC-4FBB-8956-84B9A7E3FEB3";
+        public const string ELEMENT_ASIO_DEVICE = "AAAAB9CE-96FC-4FBB-8956-84B9A7E3FEB3";
 
-        public const string DSD_RAW_ELEMENT = "9044043A-8A30-42A0-B2CB-3DE379636DD6";
+        public const string DSD_RAW_ELEMENT = "BBBB043A-8A30-42A0-B2CB-3DE379636DD6";
 
-        public const string MODE_ASIO_OPTION = "598987DA-EE55-467A-B2F5-61480F2F12F6";
+        public const string MODE_ASIO_OPTION = "CCCC87DA-EE55-467A-B2F5-61480F2F12F6";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
                     .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO")))
-                .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device")
+                .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device", path: "ASIO")
                     .WithOptions(() => GetASIODevices()))
-                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct").WithValue(false));
-            StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BassOutputConfiguration.MODE_ELEMENT).ConnectValue<string>(mode => UpdateConfiguration(mode));
+                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO").WithValue(false));
         }
 
         public static int GetAsioDevice(string value)
@@ -48,21 +47,6 @@ namespace FoxTunes
                 BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
                 LogManager.Logger.Write(typeof(BassAsioStreamOutputConfiguration), LogLevel.Debug, "ASIO Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
                 yield return new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.Driver);
-            }
-        }
-
-        private static void UpdateConfiguration(string mode)
-        {
-            switch (mode)
-            {
-                case MODE_ASIO_OPTION:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_ASIO_DEVICE).Show();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, DSD_RAW_ELEMENT).Show();
-                    break;
-                default:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_ASIO_DEVICE).Hide();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, DSD_RAW_ELEMENT).Hide();
-                    break;
             }
         }
     }

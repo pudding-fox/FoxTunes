@@ -143,7 +143,7 @@ namespace FoxTunes.ViewModel
             return Windows.Invoke(() =>
             {
                 this.Sections.Clear();
-                foreach (var section in this.Configuration.Sections)
+                foreach (var section in this.Configuration.Sections.OrderBy(section => section.Id))
                 {
                     this.Sections.Add(new ConfigurationSection(section));
                 }
@@ -172,7 +172,7 @@ namespace FoxTunes.ViewModel
             this.Path = path;
             if (string.IsNullOrEmpty(this.Path))
             {
-                foreach (var element in this.Section.Elements)
+                foreach (var element in this.Section.Elements.OrderBy(element => element.Id))
                 {
                     this.AddElement(element);
                 }
