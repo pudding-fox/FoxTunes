@@ -9,8 +9,8 @@ namespace FoxTunes
     [Serializable]
     public class SelectionConfigurationElement : ConfigurationElement
     {
-        public SelectionConfigurationElement(string id, string name = null, string description = null)
-            : base(id, name, description)
+        public SelectionConfigurationElement(string id, string name = null, string description = null, string path = null)
+            : base(id, name, description, path)
         {
             this.Options = new ObservableCollection<SelectionConfigurationOption>();
         }

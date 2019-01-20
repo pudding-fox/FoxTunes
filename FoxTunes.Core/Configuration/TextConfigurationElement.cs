@@ -5,8 +5,8 @@ namespace FoxTunes
     [Serializable]
     public class TextConfigurationElement : ConfigurationElement
     {
-        public TextConfigurationElement(string id, string name = null, string description = null)
-            : base(id, name, description)
+        public TextConfigurationElement(string id, string name = null, string description = null, string path = null)
+            : base(id, name, description, path)
         {
         }
 

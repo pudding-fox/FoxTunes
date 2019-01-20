@@ -12,12 +12,13 @@ namespace FoxTunes
             this.Flags = ConfigurationElementFlags.None;
         }
 
-        protected ConfigurationElement(string id, string name = null, string description = null)
+        protected ConfigurationElement(string id, string name = null, string description = null, string path = null)
             : this()
         {
             this.Id = id;
             this.Name = name;
             this.Description = description;
+            this.Path = path;
         }
 
         public string Id { get; private set; }
@@ -25,6 +26,8 @@ namespace FoxTunes
         public string Name { get; private set; }
 
         public string Description { get; private set; }
+
+        public string Path { get; private set; }
 
         private bool _IsHidden { get; set; }
 
@@ -130,6 +133,7 @@ namespace FoxTunes
         {
             this.Name = element.Name;
             this.Description = element.Description;
+            this.Path = element.Path;
             this.IsHidden = false;
             this.ValidationRules = element.ValidationRules;
             this.Flags = element.Flags;

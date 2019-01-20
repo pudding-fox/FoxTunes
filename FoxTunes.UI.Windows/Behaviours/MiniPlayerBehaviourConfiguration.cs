@@ -29,9 +29,9 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false).Hide())
                 .WithElement(
-                    new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, "Playing Script").WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.MultiLine))
+                    new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, "Playing Script", path: "Advanced").WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(
-                    new TextConfigurationElement(PLAYLIST_SCRIPT_ELEMENT, "Playlist Script").WithValue(Resources.Playlist).WithFlags(ConfigurationElementFlags.MultiLine))
+                    new TextConfigurationElement(PLAYLIST_SCRIPT_ELEMENT, "Playlist Script", path: "Advanced").WithValue(Resources.Playlist).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(
                     new BooleanConfigurationElement(TOPMOST_ELEMENT, "Always On Top").WithValue(false))
                 .WithElement(

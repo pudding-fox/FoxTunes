@@ -4,30 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:System="clr-namespace:System;assembly=mscorlib" 
-             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
         <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
-        <CollectionViewSource x:Key="Sections" Source="{Binding Components.Configuration.Sections}" IsLiveSortingRequested="True">
-            <CollectionViewSource.LiveGroupingProperties>
-                <System:String>Name</System:String>
-            </CollectionViewSource.LiveGroupingProperties>
-            <CollectionViewSource.SortDescriptions>
-                <ComponentModel:SortDescription PropertyName="Name"/>
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
-        <CollectionViewSource x:Key="Elements" Source="{Binding SelectedValue.Elements, ElementName=Sections}" IsLiveSortingRequested="True">
-            <CollectionViewSource.LiveGroupingProperties>
-                <System:String>Name</System:String>
-            </CollectionViewSource.LiveGroupingProperties>
-            <CollectionViewSource.SortDescriptions>
-                <ComponentModel:SortDescription PropertyName="Name"/>
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -40,9 +23,31 @@
                     <ColumnDefinition Width="200"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <ListBox x:Name="Sections" ItemsSource="{Binding Mode=OneWay, Source={StaticResource Sections}}" DisplayMemberPath="Name"></ListBox>
+                <TreeView 
+                        ItemsSource="{Binding Sections, Source={StaticResource ViewModel}}" 
+                        Windows:TreeViewExtensions.SelectedItem="{Binding SelectedSection, Source={StaticResource ViewModel}}"
+                        Windows:TreeViewExtensions.RightButtonSelect="True">
+                    <TreeView.Resources>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
+                            <!-- System -->
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Padding" Value="1,0,0,0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
+                            <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
+                            <Setter Property="Template" Value="{DynamicResource TreeViewItemTemplate}"></Setter>
+                        </Style>
+                    </TreeView.Resources>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
                 <ScrollViewer Grid.Column="1" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding Mode=OneWay, Source={StaticResource Elements}}">
+                    <ItemsControl ItemsSource="{Binding SelectedSection.Elements, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemContainerStyle>
                             <Style TargetType="{x:Type ContentPresenter}">
                                 <Style.Triggers>
