@@ -7,13 +7,15 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
 			 d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" SizeChanged="OnSizeChanged">
-    <Grid>
+    <!-- TODO: I can't work out how to make the area hit test visible with a transparent background. -->
+    <Grid Background="#01000000">
         <Canvas Height="{Binding ActualHeight, ElementName=TextBlock, Mode=OneWay}" ClipToBounds="True">
-            <TextBlock x:Name="TextBlock" 
-                       Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Marquee}}}" 
-                       SizeChanged="OnSizeChanged" 
-                       Foreground="{DynamicResource TextBrush}">
-            </TextBlock>
+            <Windows:GlassLabel x:Name="TextBlock"
+                Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Marquee}}}"
+                Section="F3E58830-97C0-4BA2-9E07-3EC27E3D4418"
+                Element="IIII7881-D4F6-484C-8E4E-E3CD5802F8B5"
+                SizeChanged="OnSizeChanged">
+            </Windows:GlassLabel>
         </Canvas>
     </Grid>
 </UserControl>

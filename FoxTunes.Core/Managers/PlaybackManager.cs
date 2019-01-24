@@ -99,6 +99,7 @@ namespace FoxTunes.Managers
             await this.OnCurrentStreamChanged();
         }
 
+
         protected virtual void OnCurrentStreamChanging()
         {
             if (this.CurrentStream != null)
