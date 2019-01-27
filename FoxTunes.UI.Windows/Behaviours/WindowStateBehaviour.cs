@@ -39,7 +39,7 @@ namespace FoxTunes
         {
             if (Windows.MainWindow != null)
             {
-                this.Handle = new WindowInteropHelper(Windows.MainWindow).Handle;
+                this.Handle = Windows.MainWindow.GetHandle();
                 HwndSource.FromHwnd(this.Handle).AddHook(this.Hook);
             }
         }

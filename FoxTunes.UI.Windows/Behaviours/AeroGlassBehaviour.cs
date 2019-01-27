@@ -48,11 +48,6 @@ namespace FoxTunes
 
         protected virtual void OnMiniWindowCreated(object sender, EventArgs e)
         {
-            ((Window)sender).Loaded += this.OnLoaded;
-        }
-
-        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
-        {
             if (this.ExtendGlass.Value)
             {
                 this.EnableGlass();
@@ -78,7 +73,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var handle = new WindowInteropHelper(Windows.MiniWindow).Handle;
+            var handle = Windows.MiniWindow.GetHandle();
             var source = HwndSource.FromHwnd(handle);
             source.CompositionTarget.BackgroundColor = Colors.Transparent;
             try

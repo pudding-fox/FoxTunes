@@ -46,7 +46,7 @@
                                     <StackPanel>
                                         <TextBlock>
                                         <Run Text="{Binding Source, Mode=OneWay, StringFormat='\{0\}: '}"></Run>
-                                        <Run Text="{Binding Exception.Message, Mode=OneWay}"></Run>
+                                        <Run Text="{Binding Message, Mode=OneWay}"></Run>
                                         </TextBlock>
                                         <TextBlock Text="{Binding Exception.StackTrace, Mode=OneWay}"></TextBlock>
                                     </StackPanel>

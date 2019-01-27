@@ -100,17 +100,6 @@ namespace FoxTunes
             return (GetKeyState(key) & 0x8000) != 0;
         }
 
-        protected virtual void OnInputEvent(int modifiers, int keys)
-        {
-            var registration = default(Action);
-            if (!this.Registrations.TryGetValue(new Tuple<int, int>(modifiers, keys), out registration))
-            {
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "Executing global keyboard shortcut: {0} => {1}", modifiers, keys);
-            registration();
-        }
-
         protected virtual void Enable()
         {
             if (this.Hook == IntPtr.Zero)

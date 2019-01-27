@@ -346,7 +346,14 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.InputManager.AddInputHook(keys, action);
+            try
+            {
+                this.InputManager.AddInputHook(keys, action);
+            }
+            catch (Exception e)
+            {
+                this.OnError(string.Format("Failed to register input hook {0}: {1}", keys, e.Message), e);
+            }
         }
 
         protected virtual void RemoveCommandBinding(string keys)
@@ -355,7 +362,14 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.InputManager.RemoveInputHook(keys);
+            try
+            {
+                this.InputManager.RemoveInputHook(keys);
+            }
+            catch
+            {
+                //Nothing can be done.
+            }
         }
 
         protected override void OnDisposing()
@@ -370,6 +384,22 @@ namespace FoxTunes.ViewModel
                 this.PlaybackManager.IsPausedChanged -= this.OnIsPausedChanged;
                 this.PlaybackManager.IsStoppedChanged -= this.OnIsStoppedChanged;
                 this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
+            if (!string.IsNullOrEmpty(this.PlayCommandBinding))
+            {
+                this.RemoveCommandBinding(this.PlayCommandBinding);
+            }
+            if (!string.IsNullOrEmpty(this.PreviousCommandBinding))
+            {
+                this.RemoveCommandBinding(this.PreviousCommandBinding);
+            }
+            if (!string.IsNullOrEmpty(this.NextCommandBinding))
+            {
+                this.RemoveCommandBinding(this.NextCommandBinding);
+            }
+            if (!string.IsNullOrEmpty(this.StopCommandBinding))
+            {
+                this.RemoveCommandBinding(this.StopCommandBinding);
             }
             base.OnDisposing();
         }
