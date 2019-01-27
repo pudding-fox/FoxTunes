@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.DB.SqlServer.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -92,10 +92,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 
-        ///BEGIN TRANSACTION;
-        ///
-        ///CREATE TABLE [MetaDataItems](
+        ///   Looks up a localized string similar to CREATE TABLE [MetaDataItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///    [Name] nvarchar(250) NOT NULL, 
         ///	[Type] INTEGER NOT NULL,
@@ -110,7 +107,8 @@ namespace FoxTunes {
         ///	Status INTEGER NOT NULL);
         ///
         ///CREATE TABLE [PlaylistItems](
-        ///    [Id] INTEGER IDENTITY(1,1) PRIMARY K [rest of string was truncated]&quot;;.
+        ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
+        ///	[Librar [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
@@ -119,18 +117,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM &quot;LibraryHierarchyItem_LibraryItem&quot;
-        ///DELETE FROM &quot;LibraryHierarchyItems&quot;;
-        ///
-        ///INSERT INTO &quot;LibraryHierarchyItems&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;)
+        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryHierarchyItems&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;)
         ///SELECT &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;
         ///FROM &quot;LibraryHierarchy&quot;
         ///GROUP BY &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;;
         ///
         ///UPDATE &quot;LibraryHierarchyItems&quot;
-        ///SET &quot;Parent_Id&quot; = 
-        ///(
-        ///	SELECT TOP 1 &quot;Li [rest of string was truncated]&quot;;.
+        ///SET &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = &quot;LibraryHierarchyItems_Parent&quot;.&quot;Id&quot;
+        ///FROM &quot;LibraryHierarchyItems&quot; 
+        ///	JOIN &quot;LibraryHier [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EndBuildLibraryHierarchies {
             get {

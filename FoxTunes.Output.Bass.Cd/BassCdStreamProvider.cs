@@ -31,12 +31,20 @@ namespace FoxTunes
             var track = default(int);
             if (!ParseUrl(playlistItem.FileName, out drive, out track))
             {
+#if NET40
+                return TaskEx.FromResult(0);
+#else
                 return Task.FromResult(0);
+#endif
             }
             var channelHandle = default(int);
             if (this.GetCurrentStream(drive, track, out channelHandle))
             {
+#if NET40
+                return TaskEx.FromResult(channelHandle);
+#else
                 return Task.FromResult(channelHandle);
+#endif
             }
             var flags = BassFlags.Decode;
             if (this.Output.Float)
@@ -47,7 +55,11 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
             }
+#if NET40
+            return TaskEx.FromResult(BassCd.CreateStream(drive, track, flags));
+#else
             return Task.FromResult(BassCd.CreateStream(drive, track, flags));
+#endif
         }
 
         protected virtual bool GetCurrentStream(int drive, int track, out int channelHandle)

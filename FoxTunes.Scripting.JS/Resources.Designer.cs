@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Scripting.JS.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -62,7 +62,20 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///  var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist];
+        ///  var parts = [];
+        ///
+        ///  if (tag.__ft_variousartists) {
+        ///    parts.push(&quot;Various Artists&quot;);
+        ///  }
+        ///  else {
+        ///    if (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist) {
+        ///      parts.push(tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist);
+        ///    }
+        ///  }
+        ///
+        ///  if (tag.year) {
+        ///    parts.push(tag.year);
+        ///  }
         ///
         ///  if (tag.album) {
         ///    parts.push(tag.album);
@@ -73,11 +86,7 @@ namespace FoxTunes {
         ///  }
         ///
         ///  if (tag.track) {
-        ///    parts.push(zeropad(tag.track, 2));
-        ///  }
-        ///
-        ///  return parts.join(&quot; - &quot;);
-        ///})();.
+        ///    p [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PlaylistSortValues {
             get {
@@ -86,7 +95,16 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to function timestamp(value) {
+        ///   Looks up a localized string similar to function version() {
+        ///    return &quot;Fox Tunes 0.9&quot;;
+        ///}
+        ///
+        ///function timestamp(value) {
+        ///
+        ///    if (!value) {
+        ///        return value;
+        ///    }
+        ///
         ///    var s = parseInt((value / 1000) % 60);
         ///    var m = parseInt((value / (1000 * 60)) % 60);
         ///    var h = parseInt((value / (1000 * 60 * 60)) % 24);
@@ -105,14 +123,7 @@ namespace FoxTunes {
         ///    }
         ///    parts.push(m);
         ///    if (s &lt; 10) {
-        ///        s = &quot;0&quot; + s;
-        ///    }
-        ///    parts.push(s);
-        ///
-        ///    return parts.join(&quot;:&quot;);
-        ///}
-        ///
-        ///function zeropad(value,  [rest of string was truncated]&quot;;.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string utils {
             get {

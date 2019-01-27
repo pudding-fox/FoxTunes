@@ -20,7 +20,11 @@ namespace FoxTunes
                     {
                         break;
                     }
+#if NET40
+                    await TaskEx.Delay(100);
+#else
                     await Task.Delay(100);
+#endif
                 }
             });
             var task2 = new SingletonReentrantTask(id, 10, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
@@ -31,10 +35,18 @@ namespace FoxTunes
                     {
                         break;
                     }
+#if NET40
+                    await TaskEx.Delay(100);
+#else
                     await Task.Delay(100);
+#endif
                 }
             });
+#if NET40
+            await TaskEx.WhenAll(task1.Run(), task2.Run());
+#else
             await Task.WhenAll(task1.Run(), task2.Run());
+#endif
             Assert.AreEqual(10, counter1 + counter2);
             Assert.Less(counter1, counter2);
         }

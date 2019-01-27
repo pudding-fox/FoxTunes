@@ -36,7 +36,11 @@ namespace FoxTunes.Output.Bass.Tests
             };
             await outputStreams[0].Play();
             await outputStreams[1].Play();
+#if NET40
+            await TaskEx.Delay(1000);
+#else
             await Task.Delay(1000);
+#endif
             Assert.IsTrue(outputStreams[1].Position > 0);
         }
     }

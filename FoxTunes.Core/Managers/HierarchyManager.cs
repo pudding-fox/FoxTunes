@@ -37,7 +37,11 @@ namespace FoxTunes.Managers
         {
             if (this.BackgroundTask == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             var e = new BackgroundTaskEventArgs(backgroundTask);
             this.BackgroundTask(this, e);

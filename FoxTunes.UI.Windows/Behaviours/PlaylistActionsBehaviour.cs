@@ -39,7 +39,11 @@ namespace FoxTunes
                 case LOCATE_PLAYLIST_ITEMS:
                     return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, component));
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
             return Task.CompletedTask;
+#endif
         }
     }
 }

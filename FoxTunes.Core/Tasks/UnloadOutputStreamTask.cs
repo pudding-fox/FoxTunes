@@ -33,7 +33,11 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Unloading output stream: {0} => {1}", this.OutputStream.Id, this.OutputStream.FileName);
                 return this.Output.Unload(this.OutputStream);
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
             return Task.CompletedTask;
+#endif
         }
     }
 }

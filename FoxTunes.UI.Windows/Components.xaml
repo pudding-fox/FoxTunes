@@ -44,11 +44,11 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <TextBlock>
-                                        <Run Text="{Binding Source, Mode=OneWay, StringFormat='\{0\}: '}"></Run>
-                                        <Run Text="{Binding Message, Mode=OneWay}"></Run>
+                                        <TextBlock Foreground="{DynamicResource TextBrush}">
+                                            <Run Text="{Binding Source, Mode=OneWay, StringFormat='\{0\}: '}"></Run>
+                                            <Run Text="{Binding Message, Mode=OneWay}"></Run>
                                         </TextBlock>
-                                        <TextBlock Text="{Binding Exception.StackTrace, Mode=OneWay}"></TextBlock>
+                                        <TextBlock Text="{Binding Exception.StackTrace, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

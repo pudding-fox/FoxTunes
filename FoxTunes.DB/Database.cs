@@ -81,7 +81,11 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Error, message, exception);
             if (this.Error == null)
             {
-                return Task.CompletedTask;
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.FromResult(false);
+#endif
             }
             return this.Error(this, new ComponentErrorEventArgs(message, exception));
         }

@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
 
@@ -8,6 +9,21 @@ namespace FoxTunes.ViewModel
     public class Main : ViewModelBase
     {
         public IConfiguration Configuration { get; private set; }
+
+        public Icon Icon
+        {
+            get
+            {
+                using (var stream = typeof(Main).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico"))
+                {
+                    if (stream == null)
+                    {
+                        return null;
+                    }
+                    return new Icon(stream);
+                }
+            }
+        }
 
         private BooleanConfigurationElement _ShowLibrary { get; set; }
 

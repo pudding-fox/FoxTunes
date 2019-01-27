@@ -13,13 +13,13 @@
     </UserControl.Resources>
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="{Binding Image.FileValue, Source={StaticResource ViewModel}}"/>
+            <ImageBrush ImageSource="{Binding ImageSource, Source={StaticResource ViewModel}}"/>
         </Grid.Background>
         <Grid.Style>
             <Style TargetType="{x:Type Grid}">
                 <Setter Property="Height" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Image.FileValue, Source={StaticResource ViewModel}}" Value="{x:Null}">
+                    <DataTrigger Binding="{Binding ImageSource, Source={StaticResource ViewModel}}" Value="{x:Null}">
                         <Setter Property="Height" Value="0"/>
                     </DataTrigger>
                 </Style.Triggers>

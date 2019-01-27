@@ -1,7 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace FoxTunes.ViewModel
 {
@@ -59,38 +62,31 @@ namespace FoxTunes.ViewModel
             //Nothing to do.
         }
 
-        private MetaDataItem _Image { get; set; }
+        private ImageSource _ImageSource { get; set; }
 
-        public MetaDataItem Image
+        public ImageSource ImageSource
         {
             get
             {
-                if (this._Image == null && this.ShowPlaceholder)
-                {
-                    return new MetaDataItem(Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover), MetaDataItemType.Image)
-                    {
-                        FileValue = this.ThemeLoader.Theme.ArtworkPlaceholder
-                    };
-                }
-                return this._Image;
+                return this._ImageSource;
             }
             set
             {
-                this._Image = value;
-                this.OnImageChanged();
+                this._ImageSource = value;
+                this.OnImageSourceChanged();
             }
         }
 
-        protected virtual void OnImageChanged()
+        protected virtual void OnImageSourceChanged()
         {
-            if (this.ImageChanged != null)
+            if (this.ImageSourceChanged != null)
             {
-                this.ImageChanged(this, EventArgs.Empty);
+                this.ImageSourceChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Image");
+            this.OnPropertyChanged("ImageSource");
         }
 
-        public event EventHandler ImageChanged = delegate { };
+        public event EventHandler ImageSourceChanged = delegate { };
 
         public async Task Refresh()
         {
@@ -98,17 +94,63 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            var image = default(MetaDataItem);
+            var metaDataItem = default(MetaDataItem);
             var playlistItem = this.PlaylistManager.CurrentItem;
             if (playlistItem != null)
             {
-                image = await this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
-                if (image == null)
+                metaDataItem = await this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
+                if (metaDataItem == null)
                 {
-                    image = await this.ArtworkProvider.Find(playlistItem.FileName, ArtworkType.FrontCover);
+                    metaDataItem = await this.ArtworkProvider.Find(playlistItem.FileName, ArtworkType.FrontCover);
                 }
             }
-            await Windows.Invoke(() => this.Image = image);
+            if (metaDataItem == null || !File.Exists(metaDataItem.FileValue))
+            {
+                await Windows.Invoke(() =>
+                {
+                    if (this.ShowPlaceholder && this.ThemeLoader.Theme != null)
+                    {
+                        this.ImageSource = this.LoadImage(this.ThemeLoader.Theme.ArtworkPlaceholder);
+                    }
+                    else
+                    {
+                        this.ImageSource = null;
+                    }
+                });
+            }
+            else
+            {
+                await Windows.Invoke(() => this.ImageSource = this.LoadImage(metaDataItem.FileValue));
+            }
+        }
+
+        protected virtual ImageSource LoadImage(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return null;
+            }
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = new Uri(fileName);
+            //TODO: I don't know if we can use caching, there doesn't appear to be a way to set the cache capacity?
+            image.CacheOption = BitmapCacheOption.None;
+            image.EndInit();
+            return image;
+        }
+
+        protected virtual ImageSource LoadImage(Stream stream)
+        {
+            if (stream == null)
+            {
+                return null;
+            }
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.StreamSource = stream;
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.EndInit();
+            return image;
         }
 
         public override void InitializeComponent(ICore core)
@@ -132,12 +174,9 @@ namespace FoxTunes.ViewModel
 
         protected virtual async void OnThemeChanged(object sender, AsyncEventArgs e)
         {
-            if (this._Image == null)
+            using (e.Defer())
             {
-                using (e.Defer())
-                {
-                    await Windows.Invoke(new Action(this.OnImageChanged));
-                }
+                await this.Refresh();
             }
         }
 

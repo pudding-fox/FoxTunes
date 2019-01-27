@@ -1,96 +1,54 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{64ED8F47-C8A1-4D23-943D-1C0F74D39D9D}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FoxTunes</RootNamespace>
+    <TargetFrameworks>net40;net461</TargetFrameworks>
     <AssemblyName>FoxTunes.DB</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <OutputPath>..\distribution\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\distribution\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>..\distribution\Release\</OutputPath>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="FoxDb.Core">
+    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\FoxDb.Core.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
+    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
+    </Reference>
   </ItemGroup>
+  
   <ItemGroup>
-    <Compile Include="Database.cs" />
-    <Compile Include="DatabaseFactory.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>FoxTunes</CustomToolNamespace>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="DatabaseQueries.cs" />
-    <Compile Include="DatabaseTables.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
-      <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
-      <Name>FoxTunes.Core</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
-    <None Include="Resources\AddLibraryMetaDataItems.sql" />
-    <None Include="Resources\MovePlaylistItem.sql" />
-    <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
-    <None Include="Resources\GetLibraryHierarchyNodes.sql" />
-    <None Include="Resources\UpdateLibraryVariousArtists.sql" />
-    <None Include="Resources\UpdatePlaylistVariousArtists.sql" />
+    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AddPlaylistSequenceRecord.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RemovePlaylistItems.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RemoveLibraryItems.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RemoveLibraryHierarchyItems.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AddPlaylistMetaDataItems.sql" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+ <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+
 </Project>

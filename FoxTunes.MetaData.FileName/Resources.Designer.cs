@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.MetaData.FileName.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,10 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to %artist%/%track% %title%.
+        ///   Looks up a localized string similar to //Artist/Year - Album/Disc - Track - Perfomer - Title
+        ///.*DIR(?&lt;artist&gt;[^DIR]+)DIR(?:(?&lt;year&gt;\d{4})SEP)?(?&lt;album&gt;[^DIR]+)DIR(?:(?&lt;disc&gt;\d+)SEP(?=\d))?((?&lt;track&gt;\d+)SEP)?(:?(?&lt;performer&gt;.+)HYP)?(?&lt;title&gt;.+?)\.[^\.]+$
+        /////Artist/Album/Disc - Track - Title
+        ///.*DIR(?&lt;artist&gt;[^DIR]+)DIR(?:(?&lt;year&gt;\d{4})SEP)?(?&lt;album&gt;[^DIR]+)DIR(?:(?&lt;disc&gt;\d+)SEP(?=\d))?((?&lt;track&gt;\d+)SEP)?(?&lt;title&gt;.+?)\.[^\.]+$.
         /// </summary>
         internal static string Patterns {
             get {

@@ -57,7 +57,11 @@ namespace FoxTunes
             this.EnsureCapacity(outputStream.PlaylistItem);
             if (!dequeue)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             return this.Dequeue(outputStream.PlaylistItem);
         }
@@ -102,7 +106,11 @@ namespace FoxTunes
         {
             if (this.Dequeued == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             var e = new OutputStreamQueueEventArgs(outputStream);
             this.Dequeued(this, e);

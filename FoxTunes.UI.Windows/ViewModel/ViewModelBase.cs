@@ -104,7 +104,11 @@ namespace FoxTunes.ViewModel
             Logger.Write(this, LogLevel.Error, message, exception);
             if (Error == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             return Error(this, new ComponentErrorEventArgs(message, exception));
         }

@@ -16,7 +16,7 @@ namespace FoxTunes
 
         public bool Validate(ICore core)
         {
-            var types = typeof(ICore).Assembly.ExportedTypes.Where(IsRequiredInterface);
+            var types = typeof(ICore).Assembly.GetExportedTypes().Where(IsRequiredInterface);
             foreach (var type in types)
             {
                 if (ComponentRegistry.Instance.GetComponent(type) == null)

@@ -13,10 +13,7 @@
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
         <ViewModel:ColumnWidthConverter x:Key="ColumnWidthConverter"></ViewModel:ColumnWidthConverter>
-        <CollectionViewSource x:Key="PlaylistColumns" Source="{Binding PlaylistColumns.ItemsSource, Source={StaticResource ViewModel}}" IsLiveSortingRequested="True">
-            <CollectionViewSource.LiveGroupingProperties>
-                <System:String>Sequence</System:String>
-            </CollectionViewSource.LiveGroupingProperties>
+        <CollectionViewSource x:Key="PlaylistColumns" Source="{Binding PlaylistColumns.ItemsSource, Source={StaticResource ViewModel}}">
             <CollectionViewSource.SortDescriptions>
                 <ComponentModel:SortDescription PropertyName="Sequence"/>
             </CollectionViewSource.SortDescriptions>

@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.DB.SQLite.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,24 +61,22 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TEMPORARY TABLE IF NOT EXISTS &quot;LibraryHierarchyLevelLeaf&quot;
-        ///(
-        ///	&quot;LibraryHierarchy_Id&quot; INTEGER NOT NULL, 
-        ///	&quot;LibraryHierarchyLevel_Id&quot; INTEGER NOT NULL
-        ///);
-        ///CREATE UNIQUE INDEX IF NOT EXISTS &quot;IDX_LibraryHierarchyLevelLeaf&quot; ON &quot;LibraryHierarchyLevelLeaf&quot;
-        ///(
-        ///	&quot;LibraryHierarchy_Id&quot;
-        ///);
-        ///
-        ///DELETE FROM &quot;LibraryHierarchyLevelLeaf&quot;;
+        ///   Looks up a localized string similar to DELETE FROM &quot;LibraryHierarchyLevelLeaf&quot;;
         ///
         ///INSERT INTO &quot;LibraryHierarchyLevelLeaf&quot;
         ///SELECT LibraryHierarchy_Id, &quot;Id&quot;
         ///FROM &quot;LibraryHierarchyLevels&quot;
         ///GROUP BY &quot;LibraryHierarchy_Id&quot;
         ///HAVING MAX(&quot;Sequence&quot;)
-        ///ORDER BY &quot;Seq [rest of string was truncated]&quot;;.
+        ///ORDER BY &quot;Sequence&quot;;
+        ///
+        ///DELETE FROM &quot;LibraryHierarchyLevelParent&quot;;
+        ///
+        ///INSERT INTO &quot;LibraryHierarchyLevelParent&quot;
+        ///SELECT &quot;LibraryHierarchyLevels&quot;.&quot;Id&quot; AS &quot;Id&quot;, &quot;LibraryHierarchyLevels_Copy&quot;.&quot;Id&quot; AS &quot;Parent_Id&quot;
+        ///FROM &quot;LibraryHierarchyLevels&quot;
+        ///JOIN &quot;LibraryHierarchyLevels&quot; AS &quot;LibraryHierarchyLevels_Copy&quot;
+        ///	 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string BeginBuildLibraryHierarchies {
             get {
@@ -87,29 +85,8 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TEMPORARY TABLE IF NOT EXISTS &quot;PlaylistSort&quot;
-        ///(
-        ///	&quot;PlaylistItem_Id&quot; INTEGER NOT NULL, 
-        ///	&quot;Value1&quot; text NULL,
-        ///	&quot;Value2&quot; text NULL,
-        ///	&quot;Value3&quot; text NULL,
-        ///	&quot;Value4&quot; text NULL,
-        ///	&quot;Value5&quot; text NULL,
-        ///	&quot;Value6&quot; text NULL,
-        ///	&quot;Value7&quot; text NULL,
-        ///	&quot;Value8&quot; text NULL,
-        ///	&quot;Value9&quot; text NULL,
-        ///	&quot;Value10&quot; text NULL
-        ///);
-        ///
-        ///CREATE TEMPORARY TABLE IF NOT EXISTS &quot;PlaylistSequence&quot;
-        ///(
-        ///	&quot;Id&quot; INTEGER PRIMARY KEY NOT NULL,
-        ///	&quot;PlaylistItem_Id&quot; INTEGER NOT NULL
-        ///);
-        ///
-        ///DELETE FROM &quot;PlaylistSort&quot;;
-        ///DELETE FROM &quot;PlaylistS [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistSort&quot;;
+        ///DELETE FROM &quot;PlaylistSequence&quot;;.
         /// </summary>
         internal static string BeginSequencePlaylistItems {
             get {
@@ -118,20 +95,25 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BEGIN TRANSACTION;
+        ///   Looks up a localized string similar to CREATE TABLE [MetaDataItems](
+        ///	[Id] INTEGER PRIMARY KEY NOT NULL, 
+        ///	[Name] text NOT NULL, 
+        ///	[Type] bigint NOT NULL,
+        ///	[NumericValue] INTEGER, 
+        ///	[TextValue] text, 
+        ///	[FileValue] text);
+        ///
+        ///CREATE TABLE LibraryItems (
+        ///	Id INTEGER PRIMARY KEY NOT NULL, 
+        ///	DirectoryName text NOT NULL, 
+        ///	FileName text NOT NULL, 
+        ///	Status INTEGER NOT NULL);
+        ///
         ///CREATE TABLE [PlaylistItems](
-        ///    [Id] INTEGER CONSTRAINT [sqlite_master_PK_PlaylistItems] PRIMARY KEY NOT NULL, 
-        ///	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]) ON DELETE CASCADE,
-        ///    [Sequence] bigint NOT NULL, 
-        ///    [DirectoryName] text NOT NULL, 
-        ///    [FileName] text NOT NULL, 
-        ///    [Status] bigint NOT NULL);
-        ///CREATE INDEX [IDX_PlaylistItems]
-        ///ON [PlaylistItems](
-        ///    [Status]);
-        ///CREATE TABLE [PlaylistItem_MetaDataItem](
         ///    [Id] INTEGER PRIMARY KEY NOT NULL, 
-        ///    [PlaylistItem_ [rest of string was truncated]&quot;;.
+        ///	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]),
+        ///    [Sequence] bigint NOT NULL, 
+        ///    [DirectoryNa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
@@ -140,9 +122,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM &quot;LibraryHierarchyItems&quot;;
-        ///
-        ///INSERT INTO &quot;LibraryHierarchyItems&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;)
+        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryHierarchyItems&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;)
         ///SELECT &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;
         ///FROM &quot;LibraryHierarchy&quot;
         ///GROUP BY &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;;
@@ -150,8 +130,9 @@ namespace FoxTunes {
         ///UPDATE &quot;LibraryHierarchyItems&quot;
         ///SET &quot;Parent_Id&quot; = 
         ///(
-        ///	SELECT &quot;LibraryHierarchyItems_Copy&quot;.&quot;Id&quot;
-        ///	FROM &quot;LibraryHierarch [rest of string was truncated]&quot;;.
+        ///	SELECT &quot;LibraryHierarchyItems_Parent&quot;.&quot;Id&quot;
+        ///	FROM &quot;LibraryHierarchy&quot; 
+        ///	JOIN &quot;LibraryHierarchyLevelParen [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EndBuildLibraryHierarchies {
             get {

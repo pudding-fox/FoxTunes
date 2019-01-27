@@ -35,7 +35,11 @@ namespace FoxTunes
                 {
                     while (!this.IsDisposed)
                     {
+#if NET40
+                        server.WaitForConnection();
+#else
                         await server.WaitForConnectionAsync();
+#endif
                         await this.OnConnection(server, reader);
                     }
                 }

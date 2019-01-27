@@ -37,7 +37,11 @@ namespace FoxTunes.ViewModel
                         {
                             return this.PlaybackManager.CurrentStream.Play();
                         }
+#if NET40
+                        return TaskEx.FromResult(false);
+#else
                         return Task.CompletedTask;
+#endif
                     },
                     () =>
                     {
@@ -74,7 +78,11 @@ namespace FoxTunes.ViewModel
                         {
                             return this.PlaybackManager.CurrentStream.Pause();
                         }
+#if NET40
+                        return TaskEx.FromResult(false);
+#else
                         return Task.CompletedTask;
+#endif
                     },
                     () =>
                     {

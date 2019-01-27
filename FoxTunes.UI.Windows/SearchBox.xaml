@@ -13,7 +13,7 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <TextBox x:Name="TextBox" Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
-        <TextBlock Text="Search" Opacity="0.5" FontStyle="Italic" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="Search" Opacity="0.5" FontStyle="Italic" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"></Setter>

@@ -46,7 +46,11 @@ namespace FoxTunes
                 }
                 break;
             }
+#if NET40
+            return TaskEx.FromResult<IEnumerable<MetaDataItem>>(result);
+#else
             return Task.FromResult<IEnumerable<MetaDataItem>>(result);
+#endif
         }
 
         protected virtual MetaDataItem GetMetaData(string name, string value)

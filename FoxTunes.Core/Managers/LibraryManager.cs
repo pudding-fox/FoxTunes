@@ -59,7 +59,11 @@ namespace FoxTunes.Managers
                 case CommonSignals.LibraryUpdated:
                     return this.Refresh();
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
             return Task.CompletedTask;
+#endif
         }
 
         public Task<bool> HasItems()
@@ -133,7 +137,11 @@ namespace FoxTunes.Managers
         {
             if (this.BackgroundTask == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             var e = new BackgroundTaskEventArgs(backgroundTask);
             this.BackgroundTask(this, e);

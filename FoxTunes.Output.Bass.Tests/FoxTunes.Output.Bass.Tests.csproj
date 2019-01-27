@@ -1,100 +1,51 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FoxTunes.Output.Bass.Tests</RootNamespace>
+    <TargetFrameworks>net40;net461</TargetFrameworks>
     <AssemblyName>FoxTunes.Output.Bass.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <OutputPath>..\distribution\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\distribution\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BassCdTests.cs" />
-    <Compile Include="BassOutputTests.cs" />
-    <Compile Include="BassPipelineTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <ProjectReference Include="..\FoxTunes.Core.Tests\FoxTunes.Core.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Core.Tests\FoxTunes.Core.Tests.csproj">
-      <Project>{c5c3bd3a-e2b7-4258-b705-704c502af38b}</Project>
-      <Name>FoxTunes.Core.Tests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
-      <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
-      <Name>FoxTunes.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.Bass.Asio\FoxTunes.Output.Bass.Asio.csproj">
-      <Project>{3e8a3809-3fba-4024-9343-2a54dae013ca}</Project>
-      <Name>FoxTunes.Output.Bass.Asio</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.Bass.Cd\FoxTunes.Output.Bass.Cd.csproj">
-      <Project>{23d4420f-18ba-4a72-bc63-8acb7fa2b09a}</Project>
-      <Name>FoxTunes.Output.Bass.Cd</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.Bass.DirectSound\FoxTunes.Output.Bass.DirectSound.csproj">
-      <Project>{4eaf00da-fe41-46ed-afb5-3a543bcf0bf9}</Project>
-      <Name>FoxTunes.Output.Bass.DirectSound</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.Bass.Dsd\FoxTunes.Output.Bass.Dsd.csproj">
-      <Project>{2e2722f2-8c19-4022-8e5e-36b9a9983cb3}</Project>
-      <Name>FoxTunes.Output.Bass.Dsd</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.Bass.Gapless\FoxTunes.Output.Bass.Gapless.csproj">
-      <Project>{526df089-aa89-45c8-8c8a-a5e6780075dc}</Project>
-      <Name>FoxTunes.Output.Bass.Gapless</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.Bass.Resampler\FoxTunes.Output.Bass.Resampler.csproj">
-      <Project>{a638a91c-bd8e-4475-a5fb-e4fcff7ba61d}</Project>
-      <Name>FoxTunes.Output.Bass.Resampler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.Bass.Wasapi\FoxTunes.Output.Bass.Wasapi.csproj">
-      <Project>{e334ba97-5450-4960-84da-b7c5e09589e4}</Project>
-      <Name>FoxTunes.Output.Bass.Wasapi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output.ManagedBass\FoxTunes.Output.Bass.csproj">
-      <Project>{676f7dd1-bf13-4317-819f-9b5d85df18b5}</Project>
-      <Name>FoxTunes.Output.Bass</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Output\FoxTunes.Output.csproj">
-      <Project>{c031b8f2-b799-4881-8140-de1d11a23fd8}</Project>
-      <Name>FoxTunes.Output</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output\FoxTunes.Output.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <ProjectReference Include="..\FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Asio\FoxTunes.Output.Bass.Asio.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Cd\FoxTunes.Output.Bass.Cd.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.DirectSound\FoxTunes.Output.Bass.DirectSound.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Resampler\FoxTunes.Output.Bass.Resampler.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Wasapi\FoxTunes.Output.Bass.Wasapi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.9.0" />
+  </ItemGroup>
+
+ <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+
 </Project>
