@@ -16,6 +16,10 @@ namespace FoxTunes
 
         public const string UI_SCALING_ELEMENT = "DDDDFB85-BA70-4412-87BA-E4DC58AD9BA8";
 
+        public const string MARQUEE_INTERVAL_ELEMENT = "EEEE685A-4D15-4AE1-B7AD-3E5786CB8EDB";
+
+        public const string MARQUEE_STEP_ELEMENT = "FFFFDCB3-69C3-4F73-966C-6A7738E359A1";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var themeOptions = GetThemeOptions().ToArray();
@@ -30,7 +34,11 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_LIBRARY_ELEMENT, "Show Library").WithValue(true))
                 .WithElement(
-                    new TextConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor").WithValue("1").WithValidationRule(new ScalingFactorValidationRule())
+                    new TextConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue("1").WithValidationRule(new DoubleValidationRule(0.5, 10)))
+                .WithElement(
+                    new TextConfigurationElement(MARQUEE_INTERVAL_ELEMENT, "Marquee Interval", path: "Advanced").WithValue("50").WithValidationRule(new IntegerValidationRule(10, 1000)))
+                .WithElement(
+                    new TextConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue("0.75").WithValidationRule(new DoubleValidationRule(0.50, 10))
             );
         }
 
@@ -47,33 +55,6 @@ namespace FoxTunes
         {
             var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
             return themes.FirstOrDefault(theme => string.Equals(theme.Id, id, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private class ScalingFactorValidationRule : ValidationRule
-        {
-            public override bool Validate(object value, out string message)
-            {
-                var scalingFactor = default(double);
-                if (value is double)
-                {
-                    scalingFactor = (double)value;
-                }
-                else if (value is string)
-                {
-                    if (!double.TryParse((string)value, out scalingFactor))
-                    {
-                        message = "Numeric value expected.";
-                        return false;
-                    }
-                }
-                if (scalingFactor < 0.5 || scalingFactor > 10)
-                {
-                    message = "Value between 0.5 and 10 expected.";
-                    return false;
-                }
-                message = null;
-                return true;
-            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Controls;
@@ -43,6 +44,7 @@ namespace FoxTunes.ViewModel
                     var message = default(string);
                     if (!validationRule.Validate(value, out message))
                     {
+                        ComponentRegistry.Instance.GetComponent<IUserInterface>().Warn(message);
                         return new ValidationResult(false, message);
                     }
                 }

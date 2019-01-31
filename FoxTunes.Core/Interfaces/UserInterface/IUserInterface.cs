@@ -10,6 +10,8 @@ namespace FoxTunes.Interfaces
 
         void Run(string message);
 
+        void Warn(string message);
+
         void Fatal(Exception exception);
 
         void Restart();

@@ -29,7 +29,7 @@
                 </Canvas>
             </Viewbox>
         </ToggleButton>
-        <Popup PlacementTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Main}}}" 
+        <Windows:Popup PlacementTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Main}}}" 
                Placement="Center" 
                AllowsTransparency="True" 
                IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" 
@@ -59,6 +59,6 @@
                     </TabItem>
                 </TabControl>
             </Border>
-        </Popup>
+        </Windows:Popup>
     </Grid>
 </UserControl>

@@ -29,6 +29,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\lib\bass_dts.dll" Link="bass_dts.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 

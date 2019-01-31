@@ -5,14 +5,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Markup;
 using System.Windows.Threading;
-
-#if NET40
-[assembly: XmlnsDefinition("NET40", "System")]
-#else
-[assembly: XmlnsDefinition("NET45", "System")]
-#endif
 
 namespace FoxTunes
 {
@@ -112,6 +105,11 @@ namespace FoxTunes
                     var task = this.Queue.Enqueue(path);
                 }
             }
+        }
+
+        public override void Warn(string message)
+        {
+            MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         public override void Fatal(Exception exception)

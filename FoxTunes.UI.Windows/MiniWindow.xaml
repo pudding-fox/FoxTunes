@@ -17,25 +17,35 @@
     <Window.Resources>
         <ViewModel:Mini x:Key="ViewModel" Core="{Binding}"></ViewModel:Mini>
     </Window.Resources>
-    <Grid>
-        <Grid.LayoutTransform>
-            <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
-        </Grid.LayoutTransform>
-        <Border Margin="8">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="50"/>
-            </Border.Effect>
+    <Border Margin="8" Padding="5" CornerRadius="5" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="50"/>
+        </Border.Effect>
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="Background" Value="{DynamicResource NormalBrush}"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding ExtendGlass.Value, Source={StaticResource ViewModel}}" Value="True">
+                        <Setter Property="Background" Value="#3FFFFFFF"></Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid>
+            <Grid.LayoutTransform>
+                <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+            </Grid.LayoutTransform>
             <Windows:Mini MouseDown="OnMouseDown"></Windows:Mini>
-        </Border>
-        <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}"  IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
-            <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="MouseLeftButtonUp">
-                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding RestoreCommand, Source={StaticResource ViewModel}}" />
-                </Interactivity:EventTrigger>
-            </Interactivity:Interaction.Triggers>
-            <Windows:NotifyIconElement.ContextMenu>
-                <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_NOTIFY_ICON}}"></Windows:Menu>
-            </Windows:NotifyIconElement.ContextMenu>
-        </Windows:NotifyIconElement>
-    </Grid>
+            <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}"  IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
+                <Interactivity:Interaction.Triggers>
+                    <Interactivity:EventTrigger EventName="MouseLeftButtonUp">
+                        <ViewModel:InvokeParameterizedCommandAction Command="{Binding RestoreCommand, Source={StaticResource ViewModel}}" />
+                    </Interactivity:EventTrigger>
+                </Interactivity:Interaction.Triggers>
+                <Windows:NotifyIconElement.ContextMenu>
+                    <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_NOTIFY_ICON}}"></Windows:Menu>
+                </Windows:NotifyIconElement.ContextMenu>
+            </Windows:NotifyIconElement>
+        </Grid>
+    </Border>
 </Window>

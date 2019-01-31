@@ -11,6 +11,8 @@ namespace FoxTunes
 
         public abstract void Run(string message);
 
+        public abstract void Warn(string message);
+
         public abstract void Fatal(Exception exception);
 
         public abstract void Restart();
