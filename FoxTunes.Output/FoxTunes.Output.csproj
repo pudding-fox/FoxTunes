@@ -6,6 +6,10 @@
     <OutputPath>..\distribution\</OutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+    <DefineConstants>VISTA</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if VISTA
+using System;
 using System.Runtime.InteropServices;
 
 namespace FoxTunes
@@ -98,3 +99,4 @@ namespace FoxTunes
 #pragma warning restore 0649
     }
 }
+#endif

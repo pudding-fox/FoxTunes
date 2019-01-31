@@ -41,6 +41,9 @@
     <None Include="..\lib\basswasapi.dll" Link="basswasapi.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\lib\bass_wasapi_handler.dll" Link="bass_wasapi_handler.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

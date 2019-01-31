@@ -32,7 +32,7 @@
                 </Interactivity:Interaction.Triggers>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type Core:PlaylistItem}">
-                        <TextBlock Text="{Binding Converter={StaticResource ViewModel}}" TextTrimming="CharacterEllipsis"></TextBlock>
+                        <TextBlock Text="{Binding Converter={StaticResource ViewModel}}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

@@ -71,7 +71,15 @@ namespace FoxTunes
             if (outputStream == null)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to load play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-                throw new InvalidOperationException(string.Format("Failed to load stream: {0}", this.PlaylistItem.FileName));
+                if (this.Immediate)
+                {
+                    throw new InvalidOperationException(string.Format("Failed to load stream: {0}", this.PlaylistItem.FileName));
+                }
+                else
+                {
+                    //This can happen when attempting to preemptively load the next track of something that doesn't allow concurrent streams, like a CD.
+                    return;
+                }
             }
             Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             await this.OutputStreamQueue.Enqueue(outputStream, this.Immediate);
