@@ -22,8 +22,6 @@ namespace FoxTunes
 
         public const string PLAYLIST_SCRIPT_ELEMENT = "HHHHD917-2172-421D-9E22-F549B17CE0C8";
 
-        public const string EXTEND_GLASS_ELEMENT = "IIII7881-D4F6-484C-8E4E-E3CD5802F8B5";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "Mini Player")
@@ -42,9 +40,7 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_PLAYLIST_ELEMENT, "Show Playlist").WithValue(false))
-                .WithElement(
-                    new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, "Extend Glass").WithValue(false)
+                    new BooleanConfigurationElement(SHOW_PLAYLIST_ELEMENT, "Show Playlist").WithValue(false)
             );
         }
     }

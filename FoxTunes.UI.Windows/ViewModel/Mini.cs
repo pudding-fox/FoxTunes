@@ -306,8 +306,8 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
             this.ExtendGlass = this.Configuration.GetElement<BooleanConfigurationElement>(
-              MiniPlayerBehaviourConfiguration.SECTION,
-              MiniPlayerBehaviourConfiguration.EXTEND_GLASS_ELEMENT
+              WindowsUserInterfaceConfiguration.SECTION,
+              WindowsUserInterfaceConfiguration.EXTEND_GLASS_ELEMENT
             );
             base.InitializeComponent(core);
         }

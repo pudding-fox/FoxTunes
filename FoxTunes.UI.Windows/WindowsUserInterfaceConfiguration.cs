@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public const string MARQUEE_STEP_ELEMENT = "FFFFDCB3-69C3-4F73-966C-6A7738E359A1";
 
+        public const string EXTEND_GLASS_ELEMENT = "IIII7881-D4F6-484C-8E4E-E3CD5802F8B5";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var themeOptions = GetThemeOptions().ToArray();
@@ -38,7 +40,9 @@ namespace FoxTunes
                 .WithElement(
                     new TextConfigurationElement(MARQUEE_INTERVAL_ELEMENT, "Marquee Interval", path: "Advanced").WithValue("50").WithValidationRule(new IntegerValidationRule(10, 1000)))
                 .WithElement(
-                    new TextConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue("0.75").WithValidationRule(new DoubleValidationRule(0.50, 10))
+                    new TextConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue("0.75").WithValidationRule(new DoubleValidationRule(0.50, 10)))
+                .WithElement(
+                    new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, "Extend Glass").WithValue(false)
             );
         }
 
