@@ -63,6 +63,33 @@ namespace FoxTunes
             glassLabel.OnTextChanged();
         }
 
+        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register(
+            "TextTrimming",
+            typeof(TextTrimming),
+            typeof(GlassLabel),
+            new FrameworkPropertyMetadata(TextTrimming.None, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnTextTrimmingChanged))
+        );
+
+        public static TextTrimming GetTextTrimming(GlassLabel source)
+        {
+            return (TextTrimming)source.GetValue(TextTrimmingProperty);
+        }
+
+        public static void SetTextTrimming(GlassLabel source, TextTrimming value)
+        {
+            source.SetValue(TextTrimmingProperty, value);
+        }
+
+        private static void OnTextTrimmingChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var glassLabel = sender as GlassLabel;
+            if (glassLabel == null)
+            {
+                return;
+            }
+            glassLabel.OnTextTrimmingChanged();
+        }
+
         public GlassLabel()
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
@@ -110,6 +137,23 @@ namespace FoxTunes
         }
 
         protected virtual void OnTextChanged()
+        {
+            //Nothing to do.
+        }
+
+        public TextTrimming TextTrimming
+        {
+            get
+            {
+                return GetTextTrimming(this);
+            }
+            set
+            {
+                SetTextTrimming(this, value);
+            }
+        }
+
+        protected virtual void OnTextTrimmingChanged()
         {
             //Nothing to do.
         }
