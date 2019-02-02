@@ -12,7 +12,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION, "Logging")
                 .WithElement(
-                    new BooleanConfigurationElement(DEFAULT_APPENDER_ELEMENT, "Default Appender").WithValue(false)
+                    new BooleanConfigurationElement(DEFAULT_APPENDER_ELEMENT, "Default Appender").WithValue(true)
                 );
         }
     }

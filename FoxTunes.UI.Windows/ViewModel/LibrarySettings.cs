@@ -112,8 +112,7 @@ namespace FoxTunes.ViewModel
                         transaction.Commit();
                     }
                 }
-                await this.HierarchyManager.Clear();
-                await this.HierarchyManager.Build();
+                await this.HierarchyManager.Build(true);
                 return;
             }
             catch (Exception e)

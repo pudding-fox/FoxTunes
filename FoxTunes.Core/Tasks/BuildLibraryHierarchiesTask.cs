@@ -4,10 +4,13 @@ namespace FoxTunes
 {
     public class BuildLibraryHierarchiesTask : LibraryTaskBase
     {
-        public BuildLibraryHierarchiesTask()
+        public BuildLibraryHierarchiesTask(bool reset)
             : base()
         {
+            this.Reset = reset;
         }
+
+        public bool Reset { get; private set; }
 
         public override bool Visible
         {
@@ -25,9 +28,13 @@ namespace FoxTunes
             await base.OnStarted();
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
-            return this.BuildHierarchies();
+            if (this.Reset)
+            {
+                await this.RemoveHierarchies();
+            }
+            await this.BuildHierarchies();
         }
 
         protected override async Task OnCompleted()

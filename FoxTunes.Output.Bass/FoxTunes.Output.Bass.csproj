@@ -48,6 +48,9 @@
     <None Include="..\lib\Addon\bass_ape.dll" Link="Addon\bass_ape.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\lib\Addon\basswv.dll" Link="Addon\basswv.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\lib\bass.dll" Link="bass.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
