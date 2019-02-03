@@ -11,18 +11,10 @@ namespace FoxTunes
 
         public BassStreamPipelineManager()
         {
-#if NET40
-            this.Semaphore = new AsyncSemaphore(1);
-#else
             this.Semaphore = new SemaphoreSlim(1, 1);
-#endif
         }
 
-#if NET40
-        public AsyncSemaphore Semaphore { get; private set; }
-#else
         public SemaphoreSlim Semaphore { get; private set; }
-#endif
 
         public IBassStreamPipelineFactory PipelineFactory { get; private set; }
 
@@ -34,13 +26,25 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+#if NET40
+        public Task WithPipelineExclusive(Action<IBassStreamPipeline> action)
+#else
         public async Task WithPipelineExclusive(Action<IBassStreamPipeline> action)
+#endif
         {
             if (this.Semaphore == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return;
+#endif
             }
+#if NET40
+            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#else
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
             }
@@ -52,6 +56,9 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#endif
         }
 
         public void WithPipeline(Action<IBassStreamPipeline> action)
@@ -59,19 +66,35 @@ namespace FoxTunes
             action(this.Pipeline);
         }
 
+#if NET40
+        public Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func)
+#else
         public async Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func)
+#endif
         {
             if (this.Semaphore == null)
             {
+#if NET40
+                return TaskEx.FromResult(default(T));
+#else
                 return default(T);
+#endif
             }
+#if NET40
+            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#else
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
             }
             try
             {
+#if NET40
+                return TaskEx.FromResult(this.WithPipeline(func));
+#else
                 return this.WithPipeline(func);
+#endif
             }
             finally
             {
@@ -90,7 +113,11 @@ namespace FoxTunes
             {
                 return;
             }
+#if NET40
+            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#else
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
             }
@@ -120,13 +147,25 @@ namespace FoxTunes
             action(this.Pipeline);
         }
 
+#if NET40
+        protected virtual Task CreatePipeline(BassOutputStream stream)
+#else
         protected virtual async Task CreatePipeline(BassOutputStream stream)
+#endif
         {
             if (this.Semaphore == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return;
+#endif
             }
+#if NET40
+            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#else
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
             }
@@ -138,6 +177,9 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#endif
         }
 
         protected virtual void CreatePipelineCore(BassOutputStream stream)
@@ -147,13 +189,25 @@ namespace FoxTunes
             this.Pipeline.Error += this.OnError;
         }
 
+#if NET40
+        public Task FreePipeline()
+#else
         public async Task FreePipeline()
+#endif
         {
             if (this.Semaphore == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return;
+#endif
             }
+#if NET40
+            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#else
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+#endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
             }
@@ -165,6 +219,9 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#endif
         }
 
         protected virtual void FreePipelineCore()

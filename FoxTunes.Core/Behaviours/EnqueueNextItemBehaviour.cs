@@ -24,7 +24,11 @@ namespace FoxTunes
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
-            var task = this.EnqueueItems();
+#if NET40
+            var task = TaskEx.Run(() => this.EnqueueItems());
+#else
+            var task = Task.Run(() => this.EnqueueItems());
+#endif
         }
 
         private async Task EnqueueItems()

@@ -61,7 +61,12 @@ namespace FoxTunes
 
                 var metaData = await metaDataSource.GetMetaData(fileData.FileName);
 
+#if NET40
+                this.Semaphore.Wait();
+#else
                 await this.Semaphore.WaitAsync();
+#endif
+
                 try
                 {
                     foreach (var metaDataItem in metaData)
@@ -78,7 +83,11 @@ namespace FoxTunes
                 {
                     if (position % interval == 0)
                     {
+#if NET40
+                        this.Semaphore.Wait();
+#else
                         await this.Semaphore.WaitAsync();
+#endif
                         try
                         {
                             await this.SetDescription(new FileInfo(fileData.FileName).Name);

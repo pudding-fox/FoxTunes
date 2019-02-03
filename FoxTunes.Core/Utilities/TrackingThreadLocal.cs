@@ -1,6 +1,7 @@
 ﻿#if NET40
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -19,12 +20,12 @@ namespace FoxTunes
         public TrackingThreadLocal()
         {
             this.ThreadLocal = new ThreadLocal<T>();
-            this.Values = new HashSet<T>();
+            this.Values = new ConcurrentBag<T>();
         }
 
         public ThreadLocal<T> ThreadLocal { get; private set; }
 
-        public HashSet<T> Values { get; private set; }
+        public ConcurrentBag<T> Values { get; private set; }
 
         public bool IsValueCreated
         {

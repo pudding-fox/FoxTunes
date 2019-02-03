@@ -47,7 +47,11 @@ namespace FoxTunes
         {
             var flags = BassFlags.Decode | BassFlags.DSDRaw;
             var channelHandle = default(int);
+#if NET40
+            this.Semaphore.Wait();
+#else
             await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 if (this.Output.PlayFromMemory)

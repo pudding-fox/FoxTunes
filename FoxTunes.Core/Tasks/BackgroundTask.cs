@@ -10,18 +10,10 @@ namespace FoxTunes
     {
         static BackgroundTask()
         {
-#if NET40
-            Semaphores = new ConcurrentDictionary<string, AsyncSemaphore>();
-#else
             Semaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
-#endif
         }
 
-#if NET40
-        private static ConcurrentDictionary<string, AsyncSemaphore> Semaphores { get; set; }
-#else
         private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
-#endif
 
         protected BackgroundTask(string id)
         {
@@ -56,15 +48,6 @@ namespace FoxTunes
             }
         }
 
-#if NET40
-        public AsyncSemaphore Semaphore
-        {
-            get
-            {
-                return Semaphores.GetOrAdd(this.Id, key => new AsyncSemaphore(this.Concurrency));
-            }
-        }
-#else
         public SemaphoreSlim Semaphore
         {
             get
@@ -72,7 +55,6 @@ namespace FoxTunes
                 return Semaphores.GetOrAdd(this.Id, key => new SemaphoreSlim(this.Concurrency, this.Concurrency));
             }
         }
-#endif
 
         private string _Name { get; set; }
 
@@ -231,7 +213,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Running background task.");
             await this.OnStarted();
+#if NET40
+            Semaphore.Wait();
+#else
             await Semaphore.WaitAsync();
+#endif
             try
             {
                 try
