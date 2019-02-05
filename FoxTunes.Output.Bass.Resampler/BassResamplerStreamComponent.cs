@@ -7,8 +7,6 @@ namespace FoxTunes
 {
     public class BassResamplerStreamComponent : BassStreamComponent, IBassStreamControllable
     {
-        private readonly Metric BufferLengthMetric = new Metric(3);
-
         public static bool KEEP_ALIVE = true;
 
         public static int BUFFER_LENGTH = 3;
@@ -69,7 +67,7 @@ namespace FoxTunes
             {
                 var length = default(int);
                 BassUtils.OK(BassSox.StreamBufferLength(this.ChannelHandle, out length));
-                return this.BufferLengthMetric.Average(length);
+                return length;
             }
         }
 
@@ -90,7 +88,6 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Clearing BASS SOX buffer: {0}", this.ChannelHandle);
             BassUtils.OK(BassSox.StreamBufferClear(this.ChannelHandle));
-            this.BufferLengthMetric.Reset();
         }
 
         public bool IsBackground

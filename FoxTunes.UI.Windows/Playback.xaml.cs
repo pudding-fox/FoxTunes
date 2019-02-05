@@ -12,15 +12,5 @@ namespace FoxTunes
         {
             this.InitializeComponent();
         }
-
-        protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            var viewModel = this.FindResource<global::FoxTunes.ViewModel.Playback>("ViewModel");
-            if (viewModel == null)
-            {
-                return;
-            }
-            var task = viewModel.Refresh();
-        }
     }
 }

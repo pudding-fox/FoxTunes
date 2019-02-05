@@ -289,6 +289,10 @@ namespace FoxTunes.Managers
 
         public async Task Next()
         {
+            if (!this.CanNavigate)
+            {
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Navigating to next playlist item.");
             if (this.IsNavigating)
             {
@@ -339,6 +343,10 @@ namespace FoxTunes.Managers
 
         public async Task Previous()
         {
+            if (!this.CanNavigate)
+            {
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Navigating to previous playlist item.");
             if (this.IsNavigating)
             {

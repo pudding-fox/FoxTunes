@@ -39,48 +39,9 @@ namespace FoxTunes
 
         public abstract bool IsPlaying { get; }
 
-        protected virtual async Task OnIsPlayingChanged()
-        {
-            if (this.IsPlayingChanged != null)
-            {
-                var e = new AsyncEventArgs();
-                this.IsPlayingChanged(this, e);
-                await e.Complete();
-            }
-            this.OnPropertyChanged("IsPlaying");
-        }
-
-        public event AsyncEventHandler IsPlayingChanged = delegate { };
-
         public abstract bool IsPaused { get; }
 
-        protected virtual async Task OnIsPausedChanged()
-        {
-            if (this.IsPausedChanged != null)
-            {
-                var e = new AsyncEventArgs();
-                this.IsPausedChanged(this, e);
-                await e.Complete();
-            }
-            this.OnPropertyChanged("IsPaused");
-        }
-
-        public event AsyncEventHandler IsPausedChanged = delegate { };
-
         public abstract bool IsStopped { get; }
-
-        protected virtual async Task OnIsStoppedChanged()
-        {
-            if (this.IsStoppedChanged != null)
-            {
-                var e = new AsyncEventArgs();
-                this.IsStoppedChanged(this, e);
-                await e.Complete();
-            }
-            this.OnPropertyChanged("IsStopped");
-        }
-
-        public event AsyncEventHandler IsStoppedChanged = delegate { };
 
         public abstract Task Play();
 
@@ -90,9 +51,9 @@ namespace FoxTunes
 
         public abstract Task Stop();
 
-        protected virtual Task OnStopping()
+        protected virtual Task OnEnding()
         {
-            if (this.Stopping == null)
+            if (this.Ending == null)
             {
 #if NET40
                 return TaskEx.FromResult(false);
@@ -101,15 +62,15 @@ namespace FoxTunes
 #endif
             }
             var e = new AsyncEventArgs();
-            this.Stopping(this, e);
+            this.Ending(this, e);
             return e.Complete();
         }
 
-        public event AsyncEventHandler Stopping = delegate { };
+        public event AsyncEventHandler Ending = delegate { };
 
-        protected virtual Task OnStopped(bool manual)
+        protected virtual Task OnEnded()
         {
-            if (this.Stopped == null)
+            if (this.Ended == null)
             {
 #if NET40
                 return TaskEx.FromResult(false);
@@ -117,12 +78,12 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            var e = new StoppedEventArgs(manual);
-            this.Stopped(this, e);
+            var e = new AsyncEventArgs();
+            this.Ended(this, e);
             return e.Complete();
         }
 
-        public event StoppedEventHandler Stopped = delegate { };
+        public event AsyncEventHandler Ended = delegate { };
 
         public virtual Task BeginSeek()
         {
@@ -148,19 +109,6 @@ namespace FoxTunes
 #endif
             }
             return this.Play();
-        }
-
-        protected virtual async Task EmitState()
-        {
-            //It takes a moment for the stream to start playing or whatever.
-#if NET40
-            await TaskEx.Delay(500);
-#else
-            await Task.Delay(500);
-#endif
-            await this.OnIsPlayingChanged();
-            await this.OnIsPausedChanged();
-            await this.OnIsStoppedChanged();
         }
 
         public string Description

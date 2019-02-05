@@ -11,15 +11,9 @@ namespace FoxTunes.Interfaces
 
         event AsyncEventHandler CurrentStreamChanged;
 
-        event AsyncEventHandler IsPlayingChanged;
+        event AsyncEventHandler Ending;
 
-        event AsyncEventHandler IsPausedChanged;
-
-        event AsyncEventHandler IsStoppedChanged;
-
-        event AsyncEventHandler Stopping;
-
-        event StoppedEventHandler Stopped;
+        event AsyncEventHandler Ended;
 
         Task Load(PlaylistItem playlistItem, bool immediate);
 

@@ -6,7 +6,7 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" IsVisibleChanged="OnIsVisibleChanged">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Playback x:Key="ViewModel" Core="{Binding}"></ViewModel:Playback>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
