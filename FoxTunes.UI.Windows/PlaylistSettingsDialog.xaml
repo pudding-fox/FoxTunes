@@ -6,18 +6,11 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:System="clr-namespace:System;assembly=mscorlib" 
-             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
         <ViewModel:ColumnWidthConverter x:Key="ColumnWidthConverter"></ViewModel:ColumnWidthConverter>
-        <CollectionViewSource x:Key="PlaylistColumns" Source="{Binding PlaylistColumns.ItemsSource, Source={StaticResource ViewModel}}">
-            <CollectionViewSource.SortDescriptions>
-                <ComponentModel:SortDescription PropertyName="Sequence"/>
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -37,7 +30,7 @@
                 <ListBox 
                     Grid.Column="0" 
                     Grid.Row="0" 
-                    ItemsSource="{Binding Mode=OneWay, Source={StaticResource PlaylistColumns}}" 
+                    ItemsSource="{Binding PlaylistColumns.OrderedItemsSource, Source={StaticResource ViewModel}}" 
                     SelectedValue="{Binding PlaylistColumns.SelectedValue, Source={StaticResource ViewModel}}" 
                     DisplayMemberPath="Name"
                     Windows:ListBoxExtensions.DragDropReorder="True"

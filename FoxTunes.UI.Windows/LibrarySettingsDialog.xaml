@@ -6,22 +6,11 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:LibrarySettings x:Key="ViewModel" Core="{Binding}"/>
-        <CollectionViewSource x:Key="LibraryHierarchies" Source="{Binding LibraryHierarchies.ItemsSource, Source={StaticResource ViewModel}}">
-            <CollectionViewSource.SortDescriptions>
-                <ComponentModel:SortDescription PropertyName="Sequence"/>
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
-        <CollectionViewSource x:Key="LibraryHierarchyLevels" Source="{Binding LibraryHierarchyLevels.ItemsSource, Source={StaticResource ViewModel}}">
-            <CollectionViewSource.SortDescriptions>
-                <ComponentModel:SortDescription PropertyName="Sequence"/>
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -57,7 +46,7 @@
                         <Button Command="{Binding LibraryHierarchies.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                     </StackPanel>
                     <ListBox 
-                        ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchies}}" 
+                        ItemsSource="{Binding LibraryHierarchies.OrderedItemsSource, Source={StaticResource ViewModel}}" 
                         SelectedValue="{Binding LibraryHierarchies.SelectedValue, Source={StaticResource ViewModel}}" 
                         DisplayMemberPath="Name"
                         Windows:ListBoxExtensions.DragDropReorder="True"
@@ -84,7 +73,7 @@
                     </StackPanel>
                     <ListBox 
                         Margin="0,7,0,0" 
-                        ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyLevels}}" 
+                        ItemsSource="{Binding LibraryHierarchyLevels.OrderedItemsSource, Source={StaticResource ViewModel}}" 
                         SelectedValue="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}" 
                         DisplayMemberPath="Name"
                         Windows:ListBoxExtensions.DragDropReorder="True"

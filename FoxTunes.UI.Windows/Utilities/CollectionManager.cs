@@ -1,4 +1,5 @@
-﻿using FoxTunes.ViewModel;
+﻿using FoxTunes.Interfaces;
+using FoxTunes.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -73,19 +74,37 @@ namespace FoxTunes
             set
             {
                 this._ItemsSource = value;
-                this.OnItemsSourceChanged();
+                this.OnItemsSourceChanged(true);
             }
         }
 
-        protected virtual void OnItemsSourceChanged()
+        protected virtual void OnItemsSourceChanged(bool resetSelection)
         {
-            if (this.ItemsSource != null)
+            if (this._ItemsSource != null && typeof(ISequenceableComponent).IsAssignableFrom(typeof(T)))
             {
-                this.SelectedValue = this.ItemsSource.FirstOrDefault();
+                this.OrderedItemsSource = this._ItemsSource
+                    .OfType<ISequenceableComponent>()
+                    .OrderBy(element => element.Sequence)
+                    .OfType<T>();
             }
             else
             {
-                this.SelectedValue = default(T);
+                this.OrderedItemsSource = this._ItemsSource;
+            }
+            if (resetSelection)
+            {
+                if (this.OrderedItemsSource != null)
+                {
+                    this.SelectedValue = this.OrderedItemsSource.FirstOrDefault();
+                }
+                else if (this.ItemsSource != null)
+                {
+                    this.SelectedValue = this.ItemsSource.FirstOrDefault();
+                }
+                else
+                {
+                    this.SelectedValue = default(T);
+                }
             }
             if (this.ItemsSourceChanged != null)
             {
@@ -95,6 +114,32 @@ namespace FoxTunes
         }
 
         public event EventHandler ItemsSourceChanged = delegate { };
+
+        private IEnumerable<T> _OrderedItemsSource { get; set; }
+
+        public IEnumerable<T> OrderedItemsSource
+        {
+            get
+            {
+                return this._OrderedItemsSource;
+            }
+            set
+            {
+                this._OrderedItemsSource = value;
+                this.OnOrderedItemsSourceChanged();
+            }
+        }
+
+        protected virtual void OnOrderedItemsSourceChanged()
+        {
+            if (this.OrderedItemsSourceChanged != null)
+            {
+                this.OrderedItemsSourceChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("OrderedItemsSource");
+        }
+
+        public event EventHandler OrderedItemsSourceChanged = delegate { };
 
         private T _SelectedValue { get; set; }
 
@@ -148,6 +193,7 @@ namespace FoxTunes
             var collection = this.ItemsSource as ICollection<T>;
             var item = this.ItemFactory();
             collection.Add(item);
+            this.Refresh();
             this.SelectedValue = item;
         }
 
@@ -172,6 +218,7 @@ namespace FoxTunes
         {
             var collection = this.ItemsSource as ICollection<T>;
             collection.Remove(this.SelectedValue);
+            this.Refresh();
             this.SelectedValue = default(T);
         }
 
@@ -203,6 +250,12 @@ namespace FoxTunes
         public void Exchange(object[] items)
         {
             this.ExchangeHandler((T)items[0], (T)items[1]);
+            this.Refresh();
+        }
+
+        public void Refresh()
+        {
+            this.OnItemsSourceChanged(false);
         }
 
         protected virtual void OnPropertyChanged(string propertyName)
