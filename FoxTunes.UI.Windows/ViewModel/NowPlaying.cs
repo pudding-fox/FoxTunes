@@ -93,59 +93,59 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler CurrentItemChanged = delegate { };
 
-        private string _DisplayScript { get; set; }
+        private string _Script { get; set; }
 
-        public string DisplayScript
+        public string Script
         {
             get
             {
-                return this._DisplayScript;
+                return this._Script;
             }
         }
 
-        public Task SetDisplayScript(string value)
+        public Task SetScript(string value)
         {
-            this._DisplayScript = value;
-            return this.OnDisplayScriptChanged();
+            this._Script = value;
+            return this.OnScriptChanged();
         }
 
-        protected virtual async Task OnDisplayScriptChanged()
+        protected virtual async Task OnScriptChanged()
         {
             await this.Refresh();
-            if (this.DisplayScriptChanged != null)
+            if (this.ScriptChanged != null)
             {
-                this.DisplayScriptChanged(this, EventArgs.Empty);
+                this.ScriptChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("DisplayScript");
+            this.OnPropertyChanged("Script");
         }
 
-        public event EventHandler DisplayScriptChanged = delegate { };
+        public event EventHandler ScriptChanged = delegate { };
 
-        private object _DisplayValue { get; set; }
+        private object _Value { get; set; }
 
-        public object DisplayValue
+        public object Value
         {
             get
             {
-                return this._DisplayValue;
+                return this._Value;
             }
             set
             {
-                this._DisplayValue = value;
-                this.OnDisplayValueChanged();
+                this._Value = value;
+                this.OnValueChanged();
             }
         }
 
-        protected virtual void OnDisplayValueChanged()
+        protected virtual void OnValueChanged()
         {
-            if (this.DisplayValueChanged != null)
+            if (this.ValueChanged != null)
             {
-                this.DisplayValueChanged(this, EventArgs.Empty);
+                this.ValueChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("DisplayValue");
+            this.OnPropertyChanged("Value");
         }
 
-        public event EventHandler DisplayValueChanged = delegate { };
+        public event EventHandler ValueChanged = delegate { };
 
         private object _IsBuffering { get; set; }
 
@@ -184,7 +184,7 @@ namespace FoxTunes.ViewModel
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
-            ).ConnectValue<string>(async value => await this.SetDisplayScript(value));
+            ).ConnectValue<string>(async value => await this.SetScript(value));
             this.MarqueeInterval = this.Configuration.GetElement<TextConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.MARQUEE_INTERVAL_ELEMENT
@@ -236,13 +236,13 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task Refresh()
         {
-            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, this.PlaylistManager.CurrentItem, this.DisplayScript);
+            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, this.PlaylistManager.CurrentItem, this.Script);
             runner.Prepare();
-            var displayValue = runner.Run();
+            var value = runner.Run();
             return Windows.Invoke(() =>
             {
                 this.CurrentItem = this.PlaylistManager.CurrentItem;
-                this.DisplayValue = displayValue;
+                this.Value = value;
             });
         }
 

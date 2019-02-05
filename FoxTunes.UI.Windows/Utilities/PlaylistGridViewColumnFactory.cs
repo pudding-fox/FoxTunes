@@ -48,7 +48,7 @@ namespace FoxTunes
             {
                 PlaybackManager = this.PlaybackManager,
                 ScriptingContext = this.ScriptingContext,
-                Script = column.DisplayScript
+                Script = column.Script
             };
             BindingHelper.Create(
                 gridViewColumn,

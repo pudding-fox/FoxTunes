@@ -50,9 +50,9 @@ namespace FoxTunes
                     set.Remove(set);
                     Assert.AreEqual(0, set.Count);
                     set.AddOrUpdate(new[] {
-                        new PlaylistColumn() { Name = "Test1", DisplayScript = "N/A" },
-                        new PlaylistColumn() { Name = "Test2", DisplayScript = "N/A" },
-                        new PlaylistColumn() { Name = "Test3", DisplayScript = "N/A" }
+                        new PlaylistColumn() { Name = "Test1", Script = "N/A" },
+                        new PlaylistColumn() { Name = "Test2", Script = "N/A" },
+                        new PlaylistColumn() { Name = "Test3", Script = "N/A" }
                     });
                     {
                         var items = set.ToArray();

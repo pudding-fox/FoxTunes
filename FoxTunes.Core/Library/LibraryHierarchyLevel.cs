@@ -64,56 +64,30 @@ namespace FoxTunes
 
         public event EventHandler NameChanged = delegate { };
 
-        private string _DisplayScript { get; set; }
+        private string _Script { get; set; }
 
-        public string DisplayScript
+        public string Script
         {
             get
             {
-                return this._DisplayScript;
+                return this._Script;
             }
             set
             {
-                this._DisplayScript = value;
-                this.OnDisplayScriptChanged();
+                this._Script = value;
+                this.OnScriptChanged();
             }
         }
 
-        protected virtual void OnDisplayScriptChanged()
+        protected virtual void OnScriptChanged()
         {
-            if (this.DisplayScriptChanged != null)
+            if (this.ScriptChanged != null)
             {
-                this.DisplayScriptChanged(this, EventArgs.Empty);
+                this.ScriptChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("DisplayScript");
+            this.OnPropertyChanged("Script");
         }
 
-        public event EventHandler DisplayScriptChanged = delegate { };
-
-        private string _SortScript { get; set; }
-
-        public string SortScript
-        {
-            get
-            {
-                return this._SortScript;
-            }
-            set
-            {
-                this._SortScript = value;
-                this.OnSortScriptChanged();
-            }
-        }
-
-        protected virtual void OnSortScriptChanged()
-        {
-            if (this.SortScriptChanged != null)
-            {
-                this.SortScriptChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SortScript");
-        }
-
-        public event EventHandler SortScriptChanged = delegate { };
+        public event EventHandler ScriptChanged = delegate { };
     }
 }

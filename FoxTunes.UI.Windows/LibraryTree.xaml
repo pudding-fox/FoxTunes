@@ -53,7 +53,7 @@
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding DisplayValue, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"/>
+                    <TextBlock Text="{Binding Value, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"/>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

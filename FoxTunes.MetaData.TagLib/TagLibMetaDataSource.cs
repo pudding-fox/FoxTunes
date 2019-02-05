@@ -10,9 +10,9 @@ namespace FoxTunes
 {
     public class TagLibMetaDataSource : BaseComponent, IMetaDataSource
     {
-        public static MetaDataCategory Categories = MetaDataCategory.Standard | MetaDataCategory.First;
+        public static MetaDataCategory Categories = MetaDataCategory.Standard;
 
-        public static ArtworkType ArtworkTypes = ArtworkType.FrontCover | ArtworkType.BackCover;
+        public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
 
         public static SemaphoreSlim Semaphore { get; private set; }
 
@@ -68,42 +68,20 @@ namespace FoxTunes
             if (Categories.HasFlag(MetaDataCategory.Standard))
             {
                 this.AddMetaData(metaData, CommonMetaData.Album, tag.Album);
-                this.AddMetaData(metaData, CommonMetaData.AlbumArtists, tag.AlbumArtists);
+                this.AddMetaData(metaData, CommonMetaData.AlbumArtist, tag.FirstAlbumArtist);
 #pragma warning disable 612, 618
-                this.AddMetaData(metaData, CommonMetaData.Artists, tag.Artists);
+                this.AddMetaData(metaData, CommonMetaData.Artist, tag.FirstArtist);
 #pragma warning restore 612, 618
-                this.AddMetaData(metaData, CommonMetaData.Composers, tag.Composers);
+                this.AddMetaData(metaData, CommonMetaData.Composer, tag.FirstComposer);
                 this.AddMetaData(metaData, CommonMetaData.Conductor, tag.Conductor);
                 this.AddMetaData(metaData, CommonMetaData.Disc, tag.Disc);
                 this.AddMetaData(metaData, CommonMetaData.DiscCount, tag.DiscCount);
-                this.AddMetaData(metaData, CommonMetaData.Genres, tag.Genres);
-                this.AddMetaData(metaData, CommonMetaData.Performers, tag.Performers);
+                this.AddMetaData(metaData, CommonMetaData.Genre, tag.FirstGenre);
+                this.AddMetaData(metaData, CommonMetaData.Performer, tag.FirstPerformer);
                 this.AddMetaData(metaData, CommonMetaData.Title, tag.Title);
                 this.AddMetaData(metaData, CommonMetaData.Track, tag.Track);
                 this.AddMetaData(metaData, CommonMetaData.TrackCount, tag.TrackCount);
                 this.AddMetaData(metaData, CommonMetaData.Year, tag.Year);
-            }
-
-            if (Categories.HasFlag(MetaDataCategory.First))
-            {
-                this.AddMetaData(metaData, CommonMetaData.FirstAlbumArtist, tag.FirstAlbumArtist);
-#pragma warning disable 612, 618
-                this.AddMetaData(metaData, CommonMetaData.FirstArtist, tag.FirstArtist);
-#pragma warning restore 612, 618
-                this.AddMetaData(metaData, CommonMetaData.FirstComposer, tag.FirstComposer);
-                this.AddMetaData(metaData, CommonMetaData.FirstGenre, tag.FirstGenre);
-                this.AddMetaData(metaData, CommonMetaData.FirstPerformer, tag.FirstPerformer);
-            }
-
-            if (Categories.HasFlag(MetaDataCategory.Joined))
-            {
-                this.AddMetaData(metaData, CommonMetaData.JoinedAlbumArtists, tag.JoinedAlbumArtists);
-#pragma warning disable 612, 618
-                this.AddMetaData(metaData, CommonMetaData.JoinedArtists, tag.JoinedArtists);
-#pragma warning restore 612, 618
-                this.AddMetaData(metaData, CommonMetaData.JoinedComposers, tag.JoinedComposers);
-                this.AddMetaData(metaData, CommonMetaData.JoinedGenres, tag.JoinedGenres);
-                this.AddMetaData(metaData, CommonMetaData.JoinedPerformers, tag.JoinedPerformers);
             }
 
             if (Categories.HasFlag(MetaDataCategory.Extended))
@@ -132,17 +110,10 @@ namespace FoxTunes
             if (Categories.HasFlag(MetaDataCategory.Sort))
             {
                 this.AddMetaData(metaData, CommonMetaData.TitleSort, tag.TitleSort);
-                this.AddMetaData(metaData, CommonMetaData.PerformersSort, tag.PerformersSort);
-                this.AddMetaData(metaData, CommonMetaData.JoinedPerformersSort, tag.JoinedPerformersSort);
-                this.AddMetaData(metaData, CommonMetaData.ComposersSort, tag.ComposersSort);
-                this.AddMetaData(metaData, CommonMetaData.AlbumArtistsSort, tag.AlbumArtistsSort);
+                this.AddMetaData(metaData, CommonMetaData.PerformerSort, tag.FirstPerformerSort);
+                this.AddMetaData(metaData, CommonMetaData.ComposerSort, tag.FirstComposerSort);
+                this.AddMetaData(metaData, CommonMetaData.AlbumArtistSort, tag.FirstAlbumArtistSort);
                 this.AddMetaData(metaData, CommonMetaData.AlbumSort, tag.AlbumSort);
-                if (Categories.HasFlag(MetaDataCategory.First))
-                {
-                    this.AddMetaData(metaData, CommonMetaData.FirstPerformerSort, tag.FirstPerformerSort);
-                    this.AddMetaData(metaData, CommonMetaData.FirstComposerSort, tag.FirstComposerSort);
-                    this.AddMetaData(metaData, CommonMetaData.FirstAlbumArtistSort, tag.FirstAlbumArtistSort);
-                }
             }
         }
 
@@ -167,14 +138,6 @@ namespace FoxTunes
                 return;
             }
             metaData.Add(new MetaDataItem(name, MetaDataItemType.Tag) { TextValue = value.Trim() });
-        }
-
-        private void AddMetaData(IList<MetaDataItem> metaData, string name, string[] values)
-        {
-            foreach (var value in values)
-            {
-                this.AddMetaData(metaData, name, value);
-            }
         }
 
         private void AddProperties(IList<MetaDataItem> metaData, Properties properties)
@@ -277,9 +240,7 @@ namespace FoxTunes
         {
             return string.Format(
                 "{0}_{1}_{2}",
-                tag.FirstAlbumArtist
-                    .IfNullOrEmpty(tag.FirstAlbumArtistSort)
-                    .IfNullOrEmpty(tag.FirstArtist),
+                tag.FirstAlbumArtist.IfNullOrEmpty(tag.FirstArtist),
                 tag.Album,
                 type
             );

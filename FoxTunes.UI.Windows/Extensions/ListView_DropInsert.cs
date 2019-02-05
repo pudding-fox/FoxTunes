@@ -149,6 +149,7 @@ namespace FoxTunes
 
             protected virtual void ListView_DragEnter(object sender, DragEventArgs e)
             {
+                this.Remove();
                 this.Add();
             }
 

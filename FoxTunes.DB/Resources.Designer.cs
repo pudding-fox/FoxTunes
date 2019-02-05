@@ -142,11 +142,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
+        ///   Looks up a localized string similar to SELECT &quot;Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;
         ///FROM &quot;LibraryHierarchyItems&quot;
         ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
         ///	AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
-        ///ORDER BY &quot;SortValue&quot;, &quot;DisplayValue&quot;.
+        ///ORDER BY &quot;Value&quot;.
         /// </summary>
         internal static string GetLibraryHierarchyNodes {
             get {

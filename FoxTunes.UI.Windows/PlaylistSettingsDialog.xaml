@@ -81,7 +81,7 @@
                     <Label Grid.Column="0" Grid.Row="2">Auto Size</Label>
                     <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding Width, Converter={StaticResource ColumnWidthConverter}}"></CheckBox>
                     <Label Grid.Column="0" Grid.Row="3">Script</Label>
-                    <TextBox Grid.Column="1" Grid.Row="3" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Text="{Binding DisplayScript}"></TextBox>
+                    <TextBox Grid.Column="1" Grid.Row="3" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Text="{Binding Script}"></TextBox>
                 </Grid>
             </Grid>
         </GroupBox>

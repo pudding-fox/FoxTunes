@@ -12,9 +12,7 @@ namespace FoxTunes
         private static IDictionary<string, string> GetLookup()
         {
             var lookup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            lookup.Add("artist", CommonMetaData.FirstAlbumArtist);
-            lookup.Add("performer", CommonMetaData.FirstPerformer);
-            lookup.Add("genre", CommonMetaData.FirstGenre);
+            lookup.Add("artist", CommonMetaData.AlbumArtist);
             return lookup;
         }
 

@@ -154,9 +154,9 @@ namespace FoxTunes
         {
             //It takes a moment for the stream to start playing or whatever.
 #if NET40
-            await TaskEx.Delay(100);
+            await TaskEx.Delay(500);
 #else
-            await Task.Delay(100);
+            await Task.Delay(500);
 #endif
             await this.OnIsPlayingChanged();
             await this.OnIsPausedChanged();

@@ -39,10 +39,10 @@ namespace FoxTunes
         {
             var metaDataSource = this.Core.Factories.MetaDataSource.Create();
             var metaData = (await metaDataSource.GetMetaData(fileName)).ToDictionary(metaDataItem => metaDataItem.Name, metaDataItem => metaDataItem.Value);
-            Assert.AreEqual(artist, metaData[CommonMetaData.FirstAlbumArtist]);
+            Assert.AreEqual(artist, metaData[CommonMetaData.AlbumArtist]);
             if (!string.IsNullOrEmpty(performer))
             {
-                Assert.AreEqual(performer, metaData[CommonMetaData.FirstPerformer]);
+                Assert.AreEqual(performer, metaData[CommonMetaData.Performer]);
             }
             if (year.HasValue)
             {

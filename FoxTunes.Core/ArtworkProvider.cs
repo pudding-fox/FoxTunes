@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public class ArtworkProvider : StandardComponent, IArtworkProvider
     {
+        const int MAX_LENGTH = 1024000;
+
         public static IDictionary<ArtworkType, string[]> Names = GetNames();
 
         private static IDictionary<ArtworkType, string[]> GetNames()
@@ -37,10 +39,14 @@ namespace FoxTunes
                     {
                         foreach (var fileName in Directory.EnumerateFileSystemEntries(directoryName, string.Format("{0}.*", name)))
                         {
-                            return new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
+                            var info = new FileInfo(fileName);
+                            if (info.Length <= MAX_LENGTH)
                             {
-                                FileValue = fileName
-                            };
+                                return new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
+                                {
+                                    FileValue = fileName
+                                };
+                            }
                         }
                     }
                 }

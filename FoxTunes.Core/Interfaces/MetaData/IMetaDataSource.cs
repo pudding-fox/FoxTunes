@@ -15,11 +15,9 @@ namespace FoxTunes.Interfaces
         None = 0,
         Standard = 1,
         Extended = 2,
-        First = 4,
-        Sort = 8,
-        Joined = 16,
-        MusicBrainz = 32,
-        MultiMedia = 64
+        Sort = 4,
+        MusicBrainz = 8,
+        MultiMedia = 16
     }
 
     [Flags]

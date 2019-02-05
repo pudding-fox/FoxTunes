@@ -99,7 +99,7 @@ namespace FoxTunes.ViewModel
                         return database.Set<PlaylistColumn>().Create().With(playlistColumn =>
                         {
                             playlistColumn.Name = "New";
-                            playlistColumn.DisplayScript = "'New'";
+                            playlistColumn.Script = "'New'";
                             playlistColumn.Sequence = this.PlaylistColumns.ItemsSource.Count();
                         });
                     }

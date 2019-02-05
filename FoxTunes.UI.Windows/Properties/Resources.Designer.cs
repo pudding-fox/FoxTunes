@@ -72,7 +72,7 @@ namespace FoxTunes {
         ///    if (tag.track) {
         ///        parts.push(zeropad(tag.track, 2));
         ///    }
-        ///    var artist = tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist;
+        ///    var artist = tag.albumartist || tag.artist;
         ///    if (artist) {
         ///        parts.push(artist);
         ///    }
@@ -81,7 +81,9 @@ namespace FoxTunes {
         ///    }
         ///    if (tag.title) {
         ///        parts.push(tag.title);
-        ///    } [rest of string was truncated]&quot;;.
+        ///    }
+        ///    else {
+        ///        parts.push(filen [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NowPlaying {
             get {
