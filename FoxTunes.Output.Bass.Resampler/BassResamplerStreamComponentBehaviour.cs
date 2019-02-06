@@ -8,6 +8,8 @@ namespace FoxTunes
 {
     public class BassResamplerStreamComponentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public ICore Core { get; private set; }
+
         public IBassOutput Output { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -35,13 +37,14 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
-                BassResamplerStreamComponentConfiguration.RESAMPLER_ELEMENT
+                BassResamplerStreamComponentConfiguration.ENABLED_ELEMENT
             ).ConnectValue<bool>(value => this.Enabled = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
@@ -87,7 +90,9 @@ namespace FoxTunes
             {
                 return;
             }
-            e.Components.Add(new BassResamplerStreamComponent(this, e.Stream));
+            var component = new BassResamplerStreamComponent(this, e.Stream);
+            component.InitializeComponent(this.Core);
+            e.Components.Add(component);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
