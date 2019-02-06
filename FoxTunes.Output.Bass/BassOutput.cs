@@ -259,7 +259,7 @@ namespace FoxTunes
             this.Init(this, EventArgs.Empty);
         }
 
-        public event EventHandler Init = delegate { };
+        public event EventHandler Init;
 
         protected virtual void OnFree()
         {
@@ -270,7 +270,7 @@ namespace FoxTunes
             this.Free(this, EventArgs.Empty);
         }
 
-        public event EventHandler Free = delegate { };
+        public event EventHandler Free;
 
         public override void InitializeComponent(ICore core)
         {

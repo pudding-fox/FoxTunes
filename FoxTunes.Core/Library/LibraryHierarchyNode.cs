@@ -56,7 +56,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Children");
         }
 
-        public event EventHandler ChildrenChanged = delegate { };
+        public event EventHandler ChildrenChanged;
 
         private ObservableCollection<MetaDataItem> _MetaDatas { get; set; }
 
@@ -86,7 +86,7 @@ namespace FoxTunes
             this.OnPropertyChanged("MetaDatas");
         }
 
-        public event EventHandler MetaDatasChanged = delegate { };
+        public event EventHandler MetaDatasChanged;
 
         private bool _IsLoaded { get; set; }
 
@@ -112,7 +112,7 @@ namespace FoxTunes
             this.OnPropertyChanged("IsLoaded");
         }
 
-        public event EventHandler IsLoadedChanged = delegate { };
+        public event EventHandler IsLoadedChanged;
 
         private bool _IsExpanded { get; set; }
 
@@ -142,7 +142,7 @@ namespace FoxTunes
             this.OnPropertyChanged("IsExpanded");
         }
 
-        public event EventHandler IsExpandedChanged = delegate { };
+        public event EventHandler IsExpandedChanged;
 
         private bool _IsSelected { get; set; }
 
@@ -168,7 +168,7 @@ namespace FoxTunes
             this.OnPropertyChanged("IsSelected");
         }
 
-        public event EventHandler IsSelectedChanged = delegate { };
+        public event EventHandler IsSelectedChanged;
 
         public override void InitializeComponent(ICore core)
         {

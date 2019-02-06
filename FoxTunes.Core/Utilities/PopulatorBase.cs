@@ -48,7 +48,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Name");
         }
 
-        public event AsyncEventHandler NameChanged = delegate { };
+        public event AsyncEventHandler NameChanged;
 
         private string _Description { get; set; }
 
@@ -77,7 +77,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Description");
         }
 
-        public event AsyncEventHandler DescriptionChanged = delegate { };
+        public event AsyncEventHandler DescriptionChanged;
 
         private int _Position { get; set; }
 
@@ -106,7 +106,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Position");
         }
 
-        public event AsyncEventHandler PositionChanged = delegate { };
+        public event AsyncEventHandler PositionChanged;
 
         private int _Count { get; set; }
 
@@ -135,7 +135,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Count");
         }
 
-        public event AsyncEventHandler CountChanged = delegate { };
+        public event AsyncEventHandler CountChanged;
 
         public bool IsIndeterminate
         {
@@ -156,7 +156,7 @@ namespace FoxTunes
             this.OnPropertyChanged("IsIndeterminate");
         }
 
-        public event AsyncEventHandler IsIndeterminateChanged = delegate { };
+        public event AsyncEventHandler IsIndeterminateChanged;
 
         public ParallelOptions ParallelOptions
         {

@@ -117,7 +117,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event OutputStreamQueueEventHandler Dequeued = delegate { };
+        public event OutputStreamQueueEventHandler Dequeued;
 
         public void Clear()
         {

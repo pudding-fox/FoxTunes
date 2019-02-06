@@ -45,7 +45,7 @@ namespace FoxTunes
             this.OnPropertyChanged("ScriptingContext");
         }
 
-        public event EventHandler ScriptingContextChanged = delegate { };
+        public event EventHandler ScriptingContextChanged;
 
         private string _Script { get; set; }
 
@@ -71,7 +71,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Script");
         }
 
-        public event EventHandler ScriptChanged = delegate { };
+        public event EventHandler ScriptChanged;
 
         public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -92,6 +92,6 @@ namespace FoxTunes
             this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

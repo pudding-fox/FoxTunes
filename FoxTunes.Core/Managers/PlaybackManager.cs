@@ -124,11 +124,11 @@ namespace FoxTunes.Managers
             this.OnPropertyChanged("CurrentStream");
         }
 
-        public event AsyncEventHandler CurrentStreamChanged = delegate { };
+        public event AsyncEventHandler CurrentStreamChanged;
 
-        public event AsyncEventHandler Ending = delegate { };
+        public event AsyncEventHandler Ending;
 
-        public event AsyncEventHandler Ended = delegate { };
+        public event AsyncEventHandler Ended;
 
         public async Task Load(PlaylistItem playlistItem, bool immediate)
         {
@@ -184,7 +184,7 @@ namespace FoxTunes.Managers
             return e.Complete();
         }
 
-        public event BackgroundTaskEventHandler BackgroundTask = delegate { };
+        public event BackgroundTaskEventHandler BackgroundTask;
 
         protected override async void OnDisposing()
         {

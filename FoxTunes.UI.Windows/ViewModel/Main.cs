@@ -49,7 +49,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ShowLibrary");
         }
 
-        public event EventHandler ShowLibraryChanged = delegate { };
+        public event EventHandler ShowLibraryChanged;
 
         private BooleanConfigurationElement _ShowArtwork { get; set; }
 
@@ -75,7 +75,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ShowArtwork");
         }
 
-        public event EventHandler ShowArtworkChanged = delegate { };
+        public event EventHandler ShowArtworkChanged;
 
         private BooleanConfigurationElement _ShowNotifyIcon { get; set; }
 
@@ -101,7 +101,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ShowNotifyIcon");
         }
 
-        public event EventHandler ShowNotifyIconChanged = delegate { };
+        public event EventHandler ShowNotifyIconChanged;
 
         private TextConfigurationElement _ScalingFactor { get; set; }
 
@@ -127,7 +127,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ScalingFactor");
         }
 
-        public event EventHandler ScalingFactorChanged = delegate { };
+        public event EventHandler ScalingFactorChanged;
 
         public override void InitializeComponent(ICore core)
         {

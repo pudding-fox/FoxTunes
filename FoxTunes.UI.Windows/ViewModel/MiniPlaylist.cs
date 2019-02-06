@@ -38,7 +38,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("SelectedItem");
         }
 
-        public event EventHandler SelectedItemChanged = delegate { };
+        public event EventHandler SelectedItemChanged;
 
         private string _Script { get; set; }
 
@@ -66,7 +66,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Script");
         }
 
-        public event EventHandler ScriptChanged = delegate { };
+        public event EventHandler ScriptChanged;
 
         public override void InitializeComponent(ICore core)
         {

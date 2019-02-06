@@ -33,7 +33,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public event PropertyChangingEventHandler PropertyChanging = delegate { };
+        public event PropertyChangingEventHandler PropertyChanging;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -45,7 +45,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual Task OnError(string message)
         {

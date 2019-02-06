@@ -340,7 +340,7 @@ FROM ""LibraryHierarchyLevels""
             {
                 get
                 {
-                    return this.formatProviderField ;
+                    return this.formatProviderField;
                 }
                 set
                 {

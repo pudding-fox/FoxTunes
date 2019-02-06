@@ -34,7 +34,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("CurrentStream");
         }
 
-        public event EventHandler CurrentStreamChanged = delegate { };
+        public event EventHandler CurrentStreamChanged;
 
         public ICommand BeginSeekCommand
         {

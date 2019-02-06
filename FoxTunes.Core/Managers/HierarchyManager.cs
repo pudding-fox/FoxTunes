@@ -48,6 +48,6 @@ namespace FoxTunes.Managers
             return e.Complete();
         }
 
-        public event BackgroundTaskEventHandler BackgroundTask = delegate { };
+        public event BackgroundTaskEventHandler BackgroundTask;
     }
 }

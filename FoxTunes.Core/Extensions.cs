@@ -93,7 +93,7 @@ namespace FoxTunes
 
         public static IEnumerable<T> Enumerate<T>(this IEnumerable<T> sequence)
         {
-            foreach (var element in sequence) ;
+            foreach (var element in sequence);
             return sequence;
         }
 

@@ -35,7 +35,7 @@ namespace FoxTunes
             this.OnPropertyChanged("PlaybackManager");
         }
 
-        public event EventHandler PlaybackManagerChanged = delegate { };
+        public event EventHandler PlaybackManagerChanged;
 
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -39,7 +39,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("MarqueeInterval");
         }
 
-        public event EventHandler MarqueeIntervalChanged = delegate { };
+        public event EventHandler MarqueeIntervalChanged;
 
         private TextConfigurationElement _MarqueeStep { get; set; }
 
@@ -65,7 +65,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("MarqueeStep");
         }
 
-        public event EventHandler MarqueeStepChanged = delegate { };
+        public event EventHandler MarqueeStepChanged;
 
         private PlaylistItem _CurrentItem { get; set; }
 
@@ -91,7 +91,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("CurrentItem");
         }
 
-        public event EventHandler CurrentItemChanged = delegate { };
+        public event EventHandler CurrentItemChanged;
 
         private string _Script { get; set; }
 
@@ -119,7 +119,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Script");
         }
 
-        public event EventHandler ScriptChanged = delegate { };
+        public event EventHandler ScriptChanged;
 
         private object _Value { get; set; }
 
@@ -145,7 +145,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Value");
         }
 
-        public event EventHandler ValueChanged = delegate { };
+        public event EventHandler ValueChanged;
 
         private object _IsBuffering { get; set; }
 
@@ -171,7 +171,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("IsBuffering");
         }
 
-        public event EventHandler IsBufferingChanged = delegate { };
+        public event EventHandler IsBufferingChanged;
 
         public override void InitializeComponent(ICore core)
         {

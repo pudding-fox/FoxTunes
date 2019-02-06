@@ -66,7 +66,7 @@ namespace FoxTunes
             this.Message(this, new ListenerEventArgs(message));
         }
 
-        public event ListenerEventHandler Message = delegate { };
+        public event ListenerEventHandler Message;
 
         public bool IsDisposed { get; private set; }
 

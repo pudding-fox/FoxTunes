@@ -59,7 +59,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Title");
         }
 
-        public event EventHandler TitleChanged = delegate { };
+        public event EventHandler TitleChanged;
 
         public WindowState WindowState
         {
@@ -90,7 +90,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("WindowState");
         }
 
-        public event EventHandler WindowStateChanged = delegate { };
+        public event EventHandler WindowStateChanged;
 
         public ICommand MinimizeCommand
         {

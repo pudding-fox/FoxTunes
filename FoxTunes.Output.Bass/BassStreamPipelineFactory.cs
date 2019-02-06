@@ -16,7 +16,7 @@ namespace FoxTunes
             this.QueryingPipeline(this, e);
         }
 
-        public event QueryingPipelineEventHandler QueryingPipeline = delegate { };
+        public event QueryingPipelineEventHandler QueryingPipeline;
 
         protected virtual void OnCreatingPipeline(CreatingPipelineEventArgs e)
         {
@@ -27,7 +27,7 @@ namespace FoxTunes
             this.CreatingPipeline(this, e);
         }
 
-        public event CreatingPipelineEventHandler CreatingPipeline = delegate { };
+        public event CreatingPipelineEventHandler CreatingPipeline;
 
         public IBassStreamPipelineQueryResult QueryPipeline()
         {

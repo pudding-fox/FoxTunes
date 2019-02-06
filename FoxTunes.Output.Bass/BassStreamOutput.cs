@@ -44,7 +44,7 @@ namespace FoxTunes
             this.Invalidate(this, EventArgs.Empty);
         }
 
-        public event EventHandler Invalidate = delegate { };
+        public event EventHandler Invalidate;
 
         public abstract bool IsPlaying { get; protected set; }
 

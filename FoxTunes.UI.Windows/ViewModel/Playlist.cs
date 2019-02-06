@@ -48,7 +48,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("InsertActive");
         }
 
-        public event EventHandler InsertActiveChanged = delegate { };
+        public event EventHandler InsertActiveChanged;
 
         private PlaylistItem _InsertItem { get; set; }
 
@@ -74,7 +74,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("InsertItem");
         }
 
-        public event EventHandler InsertItemChanged = delegate { };
+        public event EventHandler InsertItemChanged;
 
         private int _InsertOffset { get; set; }
 
@@ -100,7 +100,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("InsertOffset");
         }
 
-        public event EventHandler InsertOffsetChanged = delegate { };
+        public event EventHandler InsertOffsetChanged;
 
         private ObservableCollection<GridViewColumn> _GridColumns { get; set; }
 
@@ -126,7 +126,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("GridColumns");
         }
 
-        public event EventHandler GridColumnsChanged = delegate { };
+        public event EventHandler GridColumnsChanged;
 
         public override void InitializeComponent(ICore core)
         {

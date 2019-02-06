@@ -25,7 +25,7 @@ namespace FoxTunes
             this.OnPropertyChanged("MetaDatas");
         }
 
-        public event EventHandler MetaDatasChanged = delegate { };
+        public event EventHandler MetaDatasChanged;
 
         public override bool Equals(IPersistableComponent other)
         {

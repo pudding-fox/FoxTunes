@@ -35,7 +35,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public event EventHandler ValueChanged = delegate { };
+        public event EventHandler ValueChanged;
 
         public BooleanConfigurationElement WithValue(bool value)
         {

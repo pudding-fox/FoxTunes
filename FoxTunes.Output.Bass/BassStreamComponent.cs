@@ -42,7 +42,7 @@ namespace FoxTunes
             this.Invalidate(this, EventArgs.Empty);
         }
 
-        public event EventHandler Invalidate = delegate { };
+        public event EventHandler Invalidate;
 
         public bool IsDisposed { get; private set; }
 

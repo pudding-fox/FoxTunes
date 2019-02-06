@@ -83,7 +83,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Name");
         }
 
-        public event AsyncEventHandler NameChanged = delegate { };
+        public event AsyncEventHandler NameChanged;
 
         private string _Description { get; set; }
 
@@ -112,7 +112,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Description");
         }
 
-        public event AsyncEventHandler DescriptionChanged = delegate { };
+        public event AsyncEventHandler DescriptionChanged;
 
         private int _Position { get; set; }
 
@@ -142,7 +142,7 @@ namespace FoxTunes
             await this.OnIsIndeterminateChanged();
         }
 
-        public event AsyncEventHandler PositionChanged = delegate { };
+        public event AsyncEventHandler PositionChanged;
 
         private int _Count { get; set; }
 
@@ -172,7 +172,7 @@ namespace FoxTunes
             await this.OnIsIndeterminateChanged();
         }
 
-        public event AsyncEventHandler CountChanged = delegate { };
+        public event AsyncEventHandler CountChanged;
 
         public bool IsIndeterminate
         {
@@ -207,7 +207,7 @@ namespace FoxTunes
             this.OnPropertyChanged("IsIndeterminate");
         }
 
-        public event AsyncEventHandler IsIndeterminateChanged = delegate { };
+        public event AsyncEventHandler IsIndeterminateChanged;
 
         public virtual async Task Run()
         {
@@ -265,7 +265,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event AsyncEventHandler Started = delegate { };
+        public event AsyncEventHandler Started;
 
         protected virtual Task OnCompleted()
         {
@@ -282,7 +282,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event AsyncEventHandler Completed = delegate { };
+        public event AsyncEventHandler Completed;
 
         private Exception _Exception { get; set; }
 
@@ -308,7 +308,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Exception");
         }
 
-        public event EventHandler ExceptionChanged = delegate { };
+        public event EventHandler ExceptionChanged;
 
         protected virtual Task OnFaulted()
         {
@@ -325,7 +325,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event AsyncEventHandler Faulted = delegate { };
+        public event AsyncEventHandler Faulted;
 
         public virtual void Cancel()
         {

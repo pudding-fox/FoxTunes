@@ -49,7 +49,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("SettingsVisible");
         }
 
-        public event EventHandler SettingsVisibleChanged = delegate { };
+        public event EventHandler SettingsVisibleChanged;
 
         private ConfigurationSection _SelectedSection { get; set; }
 
@@ -84,7 +84,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanging("SelectedSection");
         }
 
-        public event EventHandler SelectedSectionChanging = delegate { };
+        public event EventHandler SelectedSectionChanging;
 
         protected virtual void OnSelectedSectionChanged()
         {
@@ -99,7 +99,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("SelectedSection");
         }
 
-        public event EventHandler SelectedSectionChanged = delegate { };
+        public event EventHandler SelectedSectionChanged;
 
         public ICommand ShowCommand
         {
@@ -227,7 +227,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("IsExpanded");
         }
 
-        public event EventHandler IsExpandedChanged = delegate { };
+        public event EventHandler IsExpandedChanged;
 
         private bool _IsSelected { get; set; }
 
@@ -253,7 +253,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("IsSelected");
         }
 
-        public event EventHandler IsSelectedChanged = delegate { };
+        public event EventHandler IsSelectedChanged;
 
         protected virtual void AddElement(ConfigurationElement element)
         {

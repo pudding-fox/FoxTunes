@@ -55,7 +55,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Application");
         }
 
-        public event EventHandler ApplicationChanged = delegate { };
+        public event EventHandler ApplicationChanged;
 
         public PendingQueue<string> Queue { get; private set; }
 
