@@ -7,14 +7,15 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" d:DesignHeight="30" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Focusable="False" MouseDown="OnMouseDown">
     <UserControl.Resources>
-        <ViewModel:Titlebar x:Key="ViewModel"></ViewModel:Titlebar>
+        <ViewModel:Titlebar x:Key="ViewModel"/>
+        <ViewModel:WindowStateConverter x:Key="WindowStateConverter"/>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Width" Value="30"></Setter>
-            <Setter Property="Height" Value="25"></Setter>
-            <Setter Property="VerticalAlignment" Value="Top"></Setter>
-            <Setter Property="Margin" Value="0,0,0,5"></Setter>
-            <Setter Property="FontFamily" Value="Marlett"></Setter>
-            <Setter Property="FontSize" Value="12"></Setter>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="FontFamily" Value="Marlett"/>
+            <Setter Property="FontSize" Value="12"/>
             <!-- System -->
             <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -57,21 +58,14 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.Column="0" Margin="3,3,10,3" Width="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}" Fill="{Binding Icon, Mode=OneWay, Source={StaticResource ViewModel}}"></Rectangle>
+        <Rectangle Grid.Column="0" Margin="3,3,10,3" Width="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}">
+            <Rectangle.Fill>
+                <ImageBrush ImageSource="pack://siteoforigin:,,,/Images/Fox.ico"></ImageBrush>
+            </Rectangle.Fill>
+        </Rectangle>
         <TextBlock Grid.Column="1" Text="{Binding Title, Source={StaticResource ViewModel}}" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"></TextBlock>
         <Button Name="Minimize" Grid.Column="2" Command="{Binding MinimizeCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x30;</Button>
-        <Button Name="MaximizeRestore" Grid.Column="3" Command="{Binding MaximizeRestoreCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
-            <Button.Style>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                    <Setter Property="Content" Value="&#x31;"></Setter>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding WindowState, Source={StaticResource ViewModel}}" Value="Maximized">
-                            <Setter Property="Content" Value="&#x32;"></Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
+        <Button Name="MaximizeRestore" Grid.Column="3" Command="{Binding MaximizeRestoreCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{Binding WindowState, Converter={StaticResource WindowStateConverter}, Source={StaticResource ViewModel}}"></Button>
         <Button Name="Close" Grid.Column="4" Command="{Binding CloseCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x72;</Button>
     </Grid>
 </UserControl>

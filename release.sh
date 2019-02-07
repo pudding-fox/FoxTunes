@@ -110,6 +110,10 @@ FoxDb.SqlServer.dll
 FoxDb.SqlServer.2012.dll
 "
 
+FASTMETADATA="
+FoxTunes.MetaData.FileName.dll
+"
+
 TAG=$(git describe --abbrev=0 --tags)
 
 echo "Current version is $TAG.."
@@ -157,7 +161,7 @@ do
 		cp "./distribution/$target/$file" "./release/$target/Main"
 	done
 
-	tar -zcvf "./release/$target/FoxTunes-$TAG.tar.gz" -C "./release/$target/Main" . --xform='s!^\./!!'
+	tar -zcvf "./release/$target/FoxTunes-$TAG-$TARGET.tar.gz" -C "./release/$target/Main" . --xform='s!^\./!!'
 
 	echo "Creating plugins package.."
 
@@ -209,7 +213,13 @@ do
 			cp "./distribution/$target/$file" "./release/$target/Plugins/sqlserver"
 	done
 
-	tar -zcvf "./release/$target/FoxTunes-$TAG-Plugins.tar.gz" -C "./release/$target/Plugins" . --xform='s!^\./!!'
+	for file in $FASTMETADATA
+	do
+			echo $file
+			cp "./distribution/$target/$file" "./release/$target/Plugins/metadata"
+	done
+
+	tar -zcvf "./release/$target/FoxTunes-$TAG-Plugins-$TARGET.tar.gz" -C "./release/$target/Plugins" . --xform='s!^\./!!'
 done
 
 echo "All done."

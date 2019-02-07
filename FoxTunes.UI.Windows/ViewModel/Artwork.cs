@@ -4,12 +4,13 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace FoxTunes.ViewModel
 {
     public class Artwork : ViewModelBase
     {
+        private static readonly ImageSourceConverter ImageSourceConverter = new ImageSourceConverter();
+
         public static readonly DependencyProperty ShowPlaceholderProperty = DependencyProperty.Register(
             "ShowPlaceholder",
             typeof(bool),
@@ -110,10 +111,7 @@ namespace FoxTunes.ViewModel
                 {
                     if (this.ShowPlaceholder && this.ThemeLoader.Theme != null)
                     {
-                        using (var stream = this.ThemeLoader.Theme.ArtworkPlaceholder)
-                        {
-                            this.ImageSource = this.LoadImage(stream);
-                        }
+                        this.ImageSource = (ImageSource)ImageSourceConverter.ConvertFrom(this.ThemeLoader.Theme.ArtworkPlaceholder);
                     }
                     else
                     {
@@ -123,37 +121,8 @@ namespace FoxTunes.ViewModel
             }
             else
             {
-                await Windows.Invoke(() => this.ImageSource = this.LoadImage(metaDataItem.FileValue));
+                await Windows.Invoke(() => this.ImageSource = (ImageSource)ImageSourceConverter.ConvertFrom(metaDataItem.FileValue));
             }
-        }
-
-        protected virtual ImageSource LoadImage(string fileName)
-        {
-            if (string.IsNullOrEmpty(fileName))
-            {
-                return null;
-            }
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.UriSource = new Uri(fileName);
-            //TODO: I don't know if we can use caching, there doesn't appear to be a way to set the cache capacity?
-            image.CacheOption = BitmapCacheOption.None;
-            image.EndInit();
-            return image;
-        }
-
-        protected virtual ImageSource LoadImage(Stream stream)
-        {
-            if (stream == null)
-            {
-                return null;
-            }
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.StreamSource = stream;
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.EndInit();
-            return image;
         }
 
         public override void InitializeComponent(ICore core)

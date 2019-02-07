@@ -28,8 +28,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ExpressionDark_Artwork.png" />
-    <EmbeddedResource Include="Resources\System_Artwork.png" />
+    <None Remove="Images\ExpressionDark_Artwork.png" />
+    <None Remove="Images\System_Artwork.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Images\ExpressionDark_Artwork.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\System_Artwork.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
