@@ -34,7 +34,7 @@ namespace FoxTunes
                     ComponentResolver.Instance.Add(value);
                     if (core.Components.UserInterface != null)
                     {
-                        core.Components.UserInterface.Warn(string.Format("Multiple components are installed for slot \"{0}\".\nEdit {1} to resolve the conflict.", key, ComponentResolver.FILE_NAME));
+                        core.Components.UserInterface.Warn(string.Format("Multiple components are installed for slot \"{0}\".\nEdit {1} to resolve the conflict.", key, ComponentResolver.FILE_NAME.GetName()));
                     }
                     success = false;
                 }

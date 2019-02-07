@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace FoxTunes.Launcher
 {
@@ -23,6 +24,13 @@ namespace FoxTunes.Launcher
                 }
                 using (var core = new Core())
                 {
+                    AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+                    {
+                        if (core.Components.UserInterface != null)
+                        {
+                            core.Components.UserInterface.Fatal(e.ExceptionObject as Exception);
+                        }
+                    };
                     try
                     {
                         core.Load();
