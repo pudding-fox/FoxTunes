@@ -15,6 +15,11 @@ namespace FoxTunes
                 {
                     continue;
                 }
+                var directory = Path.GetDirectoryName(path);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
                 using (var input = owner.Assembly.GetManifestResourceStream(key))
                 {
                     using (var output = File.Create(path))
