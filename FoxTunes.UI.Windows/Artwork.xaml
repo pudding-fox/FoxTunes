@@ -7,7 +7,7 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" >
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}" ShowPlaceholder="{Binding ShowPlaceholder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}"/>
     </UserControl.Resources>
@@ -17,10 +17,11 @@
         </Grid.Background>
         <Grid.Style>
             <Style TargetType="{x:Type Grid}">
-                <Setter Property="Height" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
+                <Setter Property="MinWidth" Value="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
+                <Setter Property="MinHeight" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding ImageSource, Source={StaticResource ViewModel}}" Value="{x:Null}">
-                        <Setter Property="Height" Value="0"/>
+                        <Setter Property="Visibility" Value="Collapsed"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

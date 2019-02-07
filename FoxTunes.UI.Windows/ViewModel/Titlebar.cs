@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -13,20 +14,11 @@ namespace FoxTunes.ViewModel
             Windows.MainWindowCreated += this.OnMainWindowCreated;
         }
 
-        public Brush Icon
+        public Stream Icon
         {
             get
             {
-                using (var stream = typeof(Titlebar).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico"))
-                {
-                    if (stream == null)
-                    {
-                        return null;
-                    }
-                    var decoder = new IconBitmapDecoder(stream, BitmapCreateOptions.None, BitmapCacheOption.None);
-                    var source = decoder.Frames[0];
-                    return new ImageBrush(source);
-                }
+                return typeof(Titlebar).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico");
             }
         }
 

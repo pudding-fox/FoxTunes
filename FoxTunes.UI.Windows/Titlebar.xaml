@@ -60,7 +60,7 @@
         </Grid.ColumnDefinitions>
         <Rectangle Grid.Column="0" Margin="3,3,10,3" Width="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}">
             <Rectangle.Fill>
-                <ImageBrush ImageSource="pack://siteoforigin:,,,/Images/Fox.ico"></ImageBrush>
+                <ImageBrush ImageSource="{Binding Icon, Mode=OneWay, Source={StaticResource ViewModel}}"></ImageBrush>
             </Rectangle.Fill>
         </Rectangle>
         <TextBlock Grid.Column="1" Text="{Binding Title, Source={StaticResource ViewModel}}" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"></TextBlock>

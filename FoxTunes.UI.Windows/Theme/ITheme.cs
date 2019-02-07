@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.IO;
 
 namespace FoxTunes
 {
@@ -10,7 +11,7 @@ namespace FoxTunes
 
         string Description { get; }
 
-        string ArtworkPlaceholder { get; }
+        Stream ArtworkPlaceholder { get; }
 
         void Enable();
 

@@ -60,7 +60,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnShowPlaceholderChanged()
         {
-            //Nothing to do.
+            var task = this.Refresh();
         }
 
         private ImageSource _ImageSource { get; set; }
@@ -111,7 +111,10 @@ namespace FoxTunes.ViewModel
                 {
                     if (this.ShowPlaceholder && this.ThemeLoader.Theme != null)
                     {
-                        this.ImageSource = (ImageSource)ImageSourceConverter.ConvertFrom(this.ThemeLoader.Theme.ArtworkPlaceholder);
+                        using (var stream = this.ThemeLoader.Theme.ArtworkPlaceholder)
+                        {
+                            this.ImageSource = (ImageSource)ImageSourceConverter.ConvertFrom(stream);
+                        }
                     }
                     else
                     {
