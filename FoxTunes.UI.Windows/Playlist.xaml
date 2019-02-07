@@ -22,7 +22,7 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <Grid>
-        <ListView ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" 
+        <ListView ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.SelectedItems="{Binding SelectedItems, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DropInsert="True"
                   Windows:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"

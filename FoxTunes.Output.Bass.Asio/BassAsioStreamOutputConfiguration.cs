@@ -46,7 +46,12 @@ namespace FoxTunes
                 var deviceInfo = default(AsioDeviceInfo);
                 BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
                 LogManager.Logger.Write(typeof(BassAsioStreamOutputConfiguration), LogLevel.Debug, "ASIO Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
-                yield return new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.Driver);
+                var option = new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.Driver);
+                if (a == 0)
+                {
+                    option.Default();
+                }
+                yield return option;
             }
         }
     }

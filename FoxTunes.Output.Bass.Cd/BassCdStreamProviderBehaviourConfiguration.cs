@@ -36,7 +36,12 @@ namespace FoxTunes
                 var cdInfo = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(a, out cdInfo));
                 LogManager.Logger.Write(typeof(BassCdStreamProviderBehaviourConfiguration), LogLevel.Debug, "CD Drive: {0} => {1} => {2}", a, cdInfo.Name, cdInfo.Manufacturer);
-                yield return new SelectionConfigurationOption(cdInfo.Name, string.Format("{0} ({1}:\\)", cdInfo.Name, cdInfo.DriveLetter), cdInfo.Name);
+                var option = new SelectionConfigurationOption(cdInfo.Name, string.Format("{0} ({1}:\\)", cdInfo.Name, cdInfo.DriveLetter), cdInfo.Name);
+                if (a == 0)
+                {
+                    option.Default();
+                }
+                yield return option;
             }
         }
 

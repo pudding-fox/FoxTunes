@@ -109,7 +109,12 @@ namespace FoxTunes
 
             protected virtual bool ShouldInitializeDrag(object source, Point position)
             {
-                if (this.DragStartPosition.Equals(default(Point)) || source is Thumb)
+                if (this.DragStartPosition.Equals(default(Point)))
+                {
+                    return false;
+                }
+                var dependencyObject = source as DependencyObject;
+                if (dependencyObject == null || dependencyObject.FindAncestor<ListViewItem>() == null)
                 {
                     return false;
                 }

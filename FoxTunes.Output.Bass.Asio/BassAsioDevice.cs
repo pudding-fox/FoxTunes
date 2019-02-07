@@ -128,6 +128,11 @@ namespace FoxTunes
             public IEnumerable<int> SupportedRates { get; private set; }
 
             public AsioSampleFormat Format { get; private set; }
+
+            public bool ControlPanel()
+            {
+                return BassAsio.ControlPanel();
+            }
         }
     }
 }
