@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -42,6 +43,14 @@ namespace FoxTunes
                 FileNameMetaDataSourceFactoryConfiguration.PATTERNS_ELEMENT
             ).ConnectValue<string>(value => this.Patterns = value);
             base.InitializeComponent(core);
+        }
+
+        public override bool Enabled
+        {
+            get
+            {
+                return this.Extractors != null && this.Extractors.Any();
+            }
         }
 
         public override IMetaDataSource Create()
