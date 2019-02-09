@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 
 namespace FoxTunes
@@ -14,6 +15,17 @@ namespace FoxTunes
         }
 
         public bool Topmost { get; private set; }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    this.IsOpen = false;
+                    break;
+            }
+            base.OnKeyUp(e);
+        }
 
         protected virtual void OnPopupLoaded(object sender, RoutedEventArgs e)
         {

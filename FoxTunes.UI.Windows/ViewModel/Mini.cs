@@ -159,9 +159,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowNotifyIconChanged;
 
-        private IntegerConfigurationElement _ScalingFactor { get; set; }
+        private DoubleConfigurationElement _ScalingFactor { get; set; }
 
-        public IntegerConfigurationElement ScalingFactor
+        public DoubleConfigurationElement ScalingFactor
         {
             get
             {
@@ -301,7 +301,7 @@ namespace FoxTunes.ViewModel
               NotifyIconConfiguration.SECTION,
               NotifyIconConfiguration.ENABLED_ELEMENT
             );
-            this.ScalingFactor = this.Configuration.GetElement<IntegerConfigurationElement>(
+            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
