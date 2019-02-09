@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
+    [Component("7D83EFFF-94BA-4CD4-A737-0AB635364F86", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class BassDirectSoundStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public IBassOutput Output { get; private set; }
@@ -58,11 +59,11 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.MODE_ELEMENT
-            ).ConnectValue<string>(value => this.Enabled = string.Equals(value, BassDirectSoundStreamOutputConfiguration.MODE_DS_OPTION, StringComparison.OrdinalIgnoreCase));
+            ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassDirectSoundStreamOutputConfiguration.MODE_DS_OPTION, StringComparison.OrdinalIgnoreCase));
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassDirectSoundStreamOutputConfiguration.ELEMENT_DS_DEVICE
-            ).ConnectValue<string>(value => this.DirectSoundDevice = BassDirectSoundStreamOutputConfiguration.GetDsDevice(value));
+            ).ConnectValue(value => this.DirectSoundDevice = BassDirectSoundStreamOutputConfiguration.GetDsDevice(value));
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {

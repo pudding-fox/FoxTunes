@@ -117,6 +117,28 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public ICommand ResetAllCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(
+                     () => this.Configuration.Reset(),
+                     () => this.Configuration != null
+                 );
+            }
+        }
+
+        public ICommand ResetPageCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(
+                    () => this.SelectedSection.Reset(),
+                    () => this.Configuration != null && this.SelectedSection != null
+                );
+            }
+        }
+
         public ICommand SaveCommand
         {
             get
@@ -289,6 +311,14 @@ namespace FoxTunes.ViewModel
                 var child = new ConfigurationSection(this.Section, path);
                 section.Children.Add(child);
                 return child;
+            }
+        }
+
+        public void Reset()
+        {
+            foreach (var element in this.Elements)
+            {
+                element.Reset();
             }
         }
 

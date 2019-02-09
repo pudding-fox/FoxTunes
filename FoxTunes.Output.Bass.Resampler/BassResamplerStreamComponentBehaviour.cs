@@ -45,7 +45,7 @@ namespace FoxTunes
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.ENABLED_ELEMENT
-            ).ConnectValue<bool>(value => this.Enabled = value);
+            ).ConnectValue(value => this.Enabled = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {

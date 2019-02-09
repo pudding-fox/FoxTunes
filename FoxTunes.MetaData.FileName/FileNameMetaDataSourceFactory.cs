@@ -41,7 +41,7 @@ namespace FoxTunes
             this.Configuration.GetElement<TextConfigurationElement>(
                 FileNameMetaDataSourceFactoryConfiguration.SECTION,
                 FileNameMetaDataSourceFactoryConfiguration.PATTERNS_ELEMENT
-            ).ConnectValue<string>(value => this.Patterns = value);
+            ).ConnectValue(value => this.Patterns = value);
             base.InitializeComponent(core);
         }
 

@@ -61,12 +61,12 @@
                                     <ContentControl Grid.Column="1" Content="{Binding}">
                                         <ContentControl.Resources>
                                             <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
-                                                <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
+                                                <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding Value}" DisplayMemberPath="Name"></ComboBox>
                                             </DataTemplate>
                                             <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
                                                 <CheckBox VerticalAlignment="Center" IsChecked="{Binding Value}"></CheckBox>
                                             </DataTemplate>
-                                            <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
+                                            <DataTemplate DataType="{x:Type Core:ConfigurationElement}">
                                                 <TextBox>
                                                     <TextBox.Resources>
                                                         <ViewModel:Wrapper x:Key="Proxy" Value="{Binding}"></ViewModel:Wrapper>
@@ -116,21 +116,12 @@
                 </ScrollViewer>
             </Grid>
         </GroupBox>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+            <Button Width="70" Height="30" Margin="0,7,0,0" Command="{Binding ResetAllCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Reset All</Button>
+            <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding ResetPageCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Reset Page</Button>
+        </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                    <Setter Property="Width" Value="60"></Setter>
-                    <Setter Property="Height" Value="30"></Setter>
-                    <Setter Property="Margin" Value="7,7,0,0"></Setter>
-                    <!-- System -->
-                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
-                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
-                </Style>
-            </StackPanel.Resources>
-            <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
+            <Button Width="70" Height="30" Margin="0,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -87,12 +87,10 @@ namespace FoxTunes
 
         public void Reset()
         {
-            if (!File.Exists(ConfigurationFileName))
+            foreach (var section in this.Sections)
             {
-                return;
+                section.Reset();
             }
-            File.Delete(ConfigurationFileName);
-            this.Sections.Clear();
         }
 
         public ConfigurationSection GetSection(string sectionId)

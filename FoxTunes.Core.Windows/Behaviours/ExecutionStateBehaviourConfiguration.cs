@@ -18,13 +18,9 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var sleepOptions = GetSleepOptions().ToArray();
             yield return new ConfigurationSection(SECTION, "Power")
                 .WithElement(
-                    new SelectionConfigurationElement(SLEEP_ELEMENT, "Sleep")
-                    {
-                        SelectedOption = sleepOptions.FirstOrDefault()
-                    }.WithOptions(() => sleepOptions)
+                    new SelectionConfigurationElement(SLEEP_ELEMENT, "Sleep").WithOptions(GetSleepOptions())
                );
         }
 
@@ -35,9 +31,9 @@ namespace FoxTunes
             yield return new SelectionConfigurationOption(SLEEP_DISPLAY_OPTION, "Prevent Display Sleep");
         }
 
-        public static EXECUTION_STATE GetExecutionState(string value)
+        public static EXECUTION_STATE GetExecutionState(SelectionConfigurationOption option)
         {
-            switch (value)
+            switch (option.Id)
             {
                 default:
                 case SLEEP_NONE_OPTION:

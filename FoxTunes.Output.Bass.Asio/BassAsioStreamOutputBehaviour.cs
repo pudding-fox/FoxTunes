@@ -79,15 +79,15 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.MODE_ELEMENT
-            ).ConnectValue<string>(value => this.Enabled = string.Equals(value, BassAsioStreamOutputConfiguration.MODE_ASIO_OPTION, StringComparison.OrdinalIgnoreCase));
+            ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassAsioStreamOutputConfiguration.MODE_ASIO_OPTION, StringComparison.OrdinalIgnoreCase));
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassAsioStreamOutputConfiguration.ELEMENT_ASIO_DEVICE
-            ).ConnectValue<string>(value => this.AsioDevice = BassAsioStreamOutputConfiguration.GetAsioDevice(value));
+            ).ConnectValue(value => this.AsioDevice = BassAsioStreamOutputConfiguration.GetAsioDevice(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassAsioStreamOutputConfiguration.DSD_RAW_ELEMENT
-            ).ConnectValue<bool>(value => this.DsdDirect = value);
+            ).ConnectValue(value => this.DsdDirect = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {

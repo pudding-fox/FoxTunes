@@ -19,22 +19,25 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
-                    .WithOption(new SelectionConfigurationOption(MODE_WASAPI_OPTION, "WASAPI")))
+                    .WithOptions(new[] { new SelectionConfigurationOption(MODE_WASAPI_OPTION, "WASAPI") }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_WASAPI_DEVICE, "Device", path: "WASAPI")
-                    .WithOptions(() => GetWASAPIDevices()))
+                    .WithOptions(GetWASAPIDevices()))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EXCLUSIVE, "Exclusive", path: "WASAPI").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EVENT, "Event", path: "WASAPI").WithValue(false));
         }
 
-        public static int GetWasapiDevice(string value)
+        public static int GetWasapiDevice(SelectionConfigurationOption option)
         {
-            for (int a = 0, b = BassWasapi.DeviceCount; a < b; a++)
+            if (!string.Equals(option.Id, BassWasapi.DefaultDevice.ToString()))
             {
-                var deviceInfo = default(WasapiDeviceInfo);
-                BassUtils.OK(BassWasapi.GetDeviceInfo(a, out deviceInfo));
-                if (string.Equals(deviceInfo.ID, value, StringComparison.OrdinalIgnoreCase))
+                for (int a = 0, b = BassWasapi.DeviceCount; a < b; a++)
                 {
-                    return a;
+                    var deviceInfo = default(WasapiDeviceInfo);
+                    BassUtils.OK(BassWasapi.GetDeviceInfo(a, out deviceInfo));
+                    if (string.Equals(deviceInfo.ID, option.Id, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return a;
+                    }
                 }
             }
             return BassWasapi.DefaultDevice;
@@ -42,7 +45,7 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetWASAPIDevices()
         {
-            yield return new SelectionConfigurationOption(BassWasapi.DefaultDevice.ToString(), "Default Device").Default();
+            yield return new SelectionConfigurationOption(BassWasapi.DefaultDevice.ToString(), "Default Device");
             for (int a = 0, b = BassWasapi.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(WasapiDeviceInfo);

@@ -19,19 +19,19 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
-                    .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO")))
+                    .WithOptions(new[] { new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO") }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device", path: "ASIO")
-                    .WithOptions(() => GetASIODevices()))
+                    .WithOptions(GetASIODevices()))
                 .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO").WithValue(false));
         }
 
-        public static int GetAsioDevice(string value)
+        public static int GetAsioDevice(SelectionConfigurationOption option)
         {
             for (int a = 0, b = BassAsio.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(AsioDeviceInfo);
                 BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
-                if (string.Equals(deviceInfo.Name, value, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(deviceInfo.Name, option.Id, StringComparison.OrdinalIgnoreCase))
                 {
                     return a;
                 }
@@ -46,12 +46,7 @@ namespace FoxTunes
                 var deviceInfo = default(AsioDeviceInfo);
                 BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
                 LogManager.Logger.Write(typeof(BassAsioStreamOutputConfiguration), LogLevel.Debug, "ASIO Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
-                var option = new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.Driver);
-                if (a == 0)
-                {
-                    option.Default();
-                }
-                yield return option;
+                yield return new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.Driver);
             }
         }
     }

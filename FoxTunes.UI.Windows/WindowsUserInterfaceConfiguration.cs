@@ -24,23 +24,19 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var themeOptions = GetThemeOptions().ToArray();
             yield return new ConfigurationSection(SECTION, "Appearance")
                 .WithElement(
-                    new SelectionConfigurationElement(THEME_ELEMENT, "Theme")
-                    {
-                        SelectedOption = themeOptions.FirstOrDefault()
-                    }.WithOptions(() => themeOptions))
+                    new SelectionConfigurationElement(THEME_ELEMENT, "Theme").WithOptions(GetThemeOptions()))
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_LIBRARY_ELEMENT, "Show Library").WithValue(true))
                 .WithElement(
-                    new TextConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue("1").WithValidationRule(new DoubleValidationRule(0.5, 10)))
+                    new DoubleConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue(1.0).WithValidationRule(new DoubleValidationRule(0.5, 10)))
                 .WithElement(
-                    new TextConfigurationElement(MARQUEE_INTERVAL_ELEMENT, "Marquee Interval", path: "Advanced").WithValue("50").WithValidationRule(new IntegerValidationRule(10, 1000)))
+                    new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, "Marquee Interval", path: "Advanced").WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
                 .WithElement(
-                    new TextConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue("0.75").WithValidationRule(new DoubleValidationRule(0.50, 10)))
+                    new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue(0.75).WithValidationRule(new DoubleValidationRule(0.50, 10)))
                 .WithElement(
                     new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, "Extend Glass").WithValue(false)
             );
@@ -55,10 +51,10 @@ namespace FoxTunes
             }
         }
 
-        public static ITheme GetTheme(string id)
+        public static ITheme GetTheme(SelectionConfigurationOption option)
         {
             var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
-            return themes.FirstOrDefault(theme => string.Equals(theme.Id, id, StringComparison.OrdinalIgnoreCase));
+            return themes.FirstOrDefault(theme => string.Equals(theme.Id, option.Id, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
