@@ -17,6 +17,14 @@ namespace FoxTunes
 
         public ObservableCollection<SelectionConfigurationOption> Options { get; set; }
 
+        new public SelectionConfigurationOption DefaultValue
+        {
+            get
+            {
+                return base.DefaultValue as SelectionConfigurationOption;
+            }
+        }
+
         private bool Contains(string id)
         {
             return this.GetOption(id) != null;

@@ -11,5 +11,11 @@
     <UserControl.Resources>
         <ViewModel:IntegerConfigurationElement x:Key="ViewModel" Element="{Binding}"></ViewModel:IntegerConfigurationElement>
     </UserControl.Resources>
-    <Slider Value="{Binding Value}" Minimum="{Binding MinValue, Mode=OneWay, Source={StaticResource ViewModel}}" Maximum="{Binding MaxValue, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding Value}"></Slider>
+    <Slider
+        Name="Slider"  
+        Value="{Binding Value}" 
+        Minimum="{Binding MinValue, Mode=OneWay, Source={StaticResource ViewModel}}" 
+        Maximum="{Binding MaxValue, Mode=OneWay, Source={StaticResource ViewModel}}" 
+        ToolTip="{Binding Value}"
+        Thumb.DragCompleted="OnDragCompleted"/>
 </UserControl>

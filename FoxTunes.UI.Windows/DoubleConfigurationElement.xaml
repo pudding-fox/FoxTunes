@@ -11,5 +11,13 @@
     <UserControl.Resources>
         <ViewModel:DoubleConfigurationElement x:Key="ViewModel" Element="{Binding}"></ViewModel:DoubleConfigurationElement>
     </UserControl.Resources>
-    <Slider Value="{Binding Value}" Minimum="{Binding MinValue, Mode=OneWay, Source={StaticResource ViewModel}}" Maximum="{Binding MaxValue, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding Value}" IsSnapToTickEnabled="True" TickFrequency="0.1"></Slider>
+    <Slider 
+        Name="Slider" 
+        Value="{Binding Value, UpdateSourceTrigger=Explicit}" 
+        Minimum="{Binding MinValue, Mode=OneWay, Source={StaticResource ViewModel}}" 
+        Maximum="{Binding MaxValue, Mode=OneWay, Source={StaticResource ViewModel}}" 
+        ToolTip="{Binding Value}" 
+        IsSnapToTickEnabled="True" 
+        TickFrequency="0.1"
+        Thumb.DragCompleted="OnDragCompleted"/>
 </UserControl>

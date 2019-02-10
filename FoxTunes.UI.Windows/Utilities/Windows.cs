@@ -129,6 +129,53 @@ namespace FoxTunes
             CheckShutdown();
         }
 
+        private static Lazy<Window> _SettingsWindow { get; set; }
+
+        public static bool IsSettingsWindowCreated
+        {
+            get
+            {
+                return _SettingsWindow.IsValueCreated;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public static Window SettingsWindow
+        {
+            get
+            {
+                var raiseEvent = !IsSettingsWindowCreated;
+                try
+                {
+                    return _SettingsWindow.Value;
+                }
+                finally
+                {
+                    if (IsSettingsWindowCreated && raiseEvent)
+                    {
+                        OnSettingsWindowCreated();
+                    }
+                }
+            }
+        }
+
+        private static void OnSettingsWindowCreated()
+        {
+            SettingsWindow.Closed += OnSettingsWindowClosed;
+            if (SettingsWindowCreated == null)
+            {
+                return;
+            }
+            SettingsWindowCreated(SettingsWindow, EventArgs.Empty);
+        }
+
+        public static event EventHandler SettingsWindowCreated;
+
+        private static void OnSettingsWindowClosed(object sender, EventArgs e)
+        {
+            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow());
+        }
+
         private static Window _ActiveWindow { get; set; }
 
         public static Window ActiveWindow
@@ -205,6 +252,10 @@ namespace FoxTunes
                         {
                             MainWindow.Close();
                         }
+                        if (IsSettingsWindowCreated)
+                        {
+                            SettingsWindow.Close();
+                        }
                         Reset();
                     })
                 );
@@ -215,6 +266,7 @@ namespace FoxTunes
         {
             _MainWindow = new Lazy<Window>(() => new MainWindow());
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
+            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow());
         }
 
         public static Task Invoke(Action action)

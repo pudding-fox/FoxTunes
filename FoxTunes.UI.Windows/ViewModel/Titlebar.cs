@@ -2,17 +2,62 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace FoxTunes.ViewModel
 {
     public class Titlebar : ViewModelBase
     {
-        public Titlebar()
+        public static readonly DependencyProperty WindowProperty = DependencyProperty.Register(
+            "Window",
+            typeof(Window),
+            typeof(Titlebar),
+            new PropertyMetadata(new PropertyChangedCallback(OnWindowChanged))
+        );
+
+        public static Window GetWindow(Titlebar source)
         {
-            Windows.MainWindowCreated += this.OnMainWindowCreated;
+            return (Window)source.GetValue(WindowProperty);
         }
+
+        public static void SetWindow(Titlebar source, Window value)
+        {
+            source.SetValue(WindowProperty, value);
+        }
+
+        public static void OnWindowChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var titlebar = sender as Titlebar;
+            if (titlebar == null)
+            {
+                return;
+            }
+            titlebar.OnWindowChanged();
+        }
+
+        public Window Window
+        {
+            get
+            {
+                return this.GetValue(WindowProperty) as Window;
+            }
+            set
+            {
+                this.SetValue(WindowProperty, value);
+            }
+        }
+
+        protected virtual void OnWindowChanged()
+        {
+            this.OnTitleChanged();
+            this.OnWindowStateChanged();
+            if (this.WindowChanged != null)
+            {
+                this.WindowChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Window");
+        }
+
+        public event EventHandler WindowChanged;
 
         public Stream Icon
         {
@@ -26,17 +71,17 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (Windows.IsMainWindowCreated)
+                if (this.Window != null)
                 {
-                    return Windows.MainWindow.Title;
+                    return this.Window.Title;
                 }
                 return null;
             }
             set
             {
-                if (Windows.IsMainWindowCreated)
+                if (this.Window != null)
                 {
-                    Windows.MainWindow.Title = value;
+                    this.Window.Title = value;
                 }
                 this.OnTitleChanged();
             }
@@ -57,17 +102,17 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (Windows.IsMainWindowCreated)
+                if (this.Window != null)
                 {
-                    return Windows.MainWindow.WindowState;
+                    return this.Window.WindowState;
                 }
                 return WindowState.Normal;
             }
             set
             {
-                if (Windows.IsMainWindowCreated)
+                if (this.Window != null)
                 {
-                    Windows.MainWindow.WindowState = value;
+                    this.Window.WindowState = value;
                 }
                 this.OnWindowStateChanged();
             }
@@ -128,16 +173,10 @@ namespace FoxTunes.ViewModel
 
         public void Close()
         {
-            if (Windows.IsMainWindowCreated)
+            if (this.Window != null)
             {
-                Windows.MainWindow.Close();
+                this.Window.Close();
             }
-        }
-
-        protected virtual void OnMainWindowCreated(object sender, EventArgs e)
-        {
-            this.OnTitleChanged();
-            this.OnWindowStateChanged();
         }
 
         protected override Freezable CreateInstanceCore()

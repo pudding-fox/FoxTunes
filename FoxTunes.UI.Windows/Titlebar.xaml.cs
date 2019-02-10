@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 #if NET40
@@ -26,9 +27,10 @@ namespace FoxTunes
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                if (Windows.ActiveWindow != null)
+                var window = this.FindAncestor<Window>();
+                if (window != null)
                 {
-                    Windows.ActiveWindow.DragMove();
+                    window.DragMove();
                 }
             }
         }
