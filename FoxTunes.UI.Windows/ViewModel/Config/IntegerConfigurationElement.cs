@@ -49,6 +49,8 @@ namespace FoxTunes.ViewModel.Config
         {
             this.OnMinValueChanged();
             this.OnMaxValueChanged();
+            this.OnSmallChangeChanged();
+            this.OnLargeChangeChanged();
             if (this.ElementChanged != null)
             {
                 this.ElementChanged(this, EventArgs.Empty);
@@ -109,6 +111,51 @@ namespace FoxTunes.ViewModel.Config
         }
 
         public event EventHandler MaxValueChanged;
+
+        public int SmallChange
+        {
+            get
+            {
+                if (this.Element != null && this.Element.ValidationRules != null)
+                {
+                    foreach (var validationRule in this.Element.ValidationRules.OfType<IntegerValidationRule>())
+                    {
+                        return ((validationRule.MaxValue - validationRule.MinValue) / 10).ToNearestPower();
+                    }
+                }
+                return 1;
+            }
+        }
+
+        protected virtual void OnSmallChangeChanged()
+        {
+            if (this.SmallChangeChanged != null)
+            {
+                this.SmallChangeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SmallChange");
+        }
+
+        public event EventHandler SmallChangeChanged;
+
+        public int LargeChange
+        {
+            get
+            {
+                return this.SmallChange * 2;
+            }
+        }
+
+        protected virtual void OnLargeChangeChanged()
+        {
+            if (this.LargeChangeChanged != null)
+            {
+                this.LargeChangeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("LargeChange");
+        }
+
+        public event EventHandler LargeChangeChanged;
 
         protected override Freezable CreateInstanceCore()
         {

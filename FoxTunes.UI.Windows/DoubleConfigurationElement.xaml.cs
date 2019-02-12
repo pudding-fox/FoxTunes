@@ -14,7 +14,17 @@ namespace FoxTunes.Config
             this.InitializeComponent();
         }
 
+        protected virtual void OnKeyUp(object sender, RoutedEventArgs e)
+        {
+            this.UpdateSource();
+        }
+
         protected virtual void OnDragCompleted(object sender, RoutedEventArgs e)
+        {
+            this.UpdateSource();
+        }
+
+        protected virtual void UpdateSource()
         {
             var expression = BindingOperations.GetBindingExpression(this.Slider, Slider.ValueProperty);
             if (expression != null)

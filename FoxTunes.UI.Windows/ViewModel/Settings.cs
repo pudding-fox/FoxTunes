@@ -58,9 +58,10 @@ namespace FoxTunes.ViewModel
             {
                 this.SignalEmitter.Send(new Signal(this, CommonSignals.SettingsUpdated));
                 Windows.SettingsWindow.DataContext = this.Core;
+                Windows.SettingsWindow.Closed += (sender, e) => this.SettingsVisible = false;
                 Windows.SettingsWindow.Show();
             }
-            else
+            else if (Windows.IsSettingsWindowCreated)
             {
                 Windows.SettingsWindow.Close();
             }

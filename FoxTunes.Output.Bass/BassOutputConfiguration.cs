@@ -36,6 +36,8 @@ namespace FoxTunes
 
         public const string PLAY_FROM_RAM_ELEMENT = "OOOOBED1-7965-47A3-9798-E46124386A8D";
 
+        public const string BUFFER_LENGTH_ELEMENT = "PPPP3629-1AE5-451F-A545-8B864FEAD038";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "Output")
@@ -43,7 +45,8 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: "Advanced").WithOptions(GetDepthOptions()))
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode"))
                 .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate", path: "Advanced").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory", path: "Advanced").WithValue(false)
+                .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory", path: "Advanced").WithValue(false))
+                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Advanced").WithValue(500).WithValidationRule(new IntegerValidationRule(10, 5000))
             );
         }
 

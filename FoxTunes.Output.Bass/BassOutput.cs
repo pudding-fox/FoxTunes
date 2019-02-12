@@ -137,6 +137,23 @@ namespace FoxTunes
             }
         }
 
+        private int _BufferLength { get; set; }
+
+        public int BufferLength
+        {
+            get
+            {
+                return this._BufferLength;
+            }
+            set
+            {
+                this._BufferLength = value;
+                Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
+                //TODO: Bad .Wait().
+                this.Shutdown().Wait();
+            }
+        }
+
         public override bool ShowBuffering
         {
             get
@@ -292,6 +309,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.PLAY_FROM_RAM_ELEMENT
             ).ConnectValue(value => this.PlayFromMemory = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.BUFFER_LENGTH_ELEMENT
+            ).ConnectValue(value => this.BufferLength = value);
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             base.InitializeComponent(core);
