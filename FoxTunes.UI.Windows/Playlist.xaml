@@ -37,9 +37,9 @@
                 <Pen Brush="{DynamicResource TextBrush}" Thickness="3"/>
             </Windows:ListViewExtensions.DropInsertPen>
             <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="MouseDoubleClick">
+                <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type ListViewItem}">
                     <Interactivity:InvokeCommandAction Command="{Binding PlaySelectedItemCommand, Source={StaticResource ViewModel}}"/>
-                </Interactivity:EventTrigger>
+                </Windows:FilteredEventTrigger>
             </Interactivity:Interaction.Triggers>
             <ListView.ContextMenu>
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLIST}}"></Windows:Menu>
