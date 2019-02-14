@@ -29,26 +29,15 @@ namespace FoxTunes.ViewModel
 
         public ILibraryManager LibraryManager { get; private set; }
 
-        public IEnumerable Hierarchies
+        public IEnumerable<LibraryHierarchy> Hierarchies
         {
             get
             {
-                if (this.DatabaseFactory != null)
+                if (this.LibraryHierarchyBrowser != null)
                 {
-                    using (var database = this.DatabaseFactory.Create())
-                    {
-                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                        {
-                            var set = database.Set<LibraryHierarchy>(transaction);
-                            set.Fetch.Sort.Expressions.Clear();
-                            set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
-                            foreach (var element in set)
-                            {
-                                yield return element;
-                            }
-                        }
-                    }
+                    return this.LibraryHierarchyBrowser.GetHierarchies();
                 }
+                return Enumerable.Empty<LibraryHierarchy>();
             }
         }
 
@@ -63,17 +52,19 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HierarchiesChanged;
 
-        private LibraryHierarchy _SelectedHierarchy { get; set; }
-
         public LibraryHierarchy SelectedHierarchy
         {
             get
             {
-                return this._SelectedHierarchy;
+                if (this.LibraryManager != null)
+                {
+                    return this.LibraryManager.SelectedHierarchy;
+                }
+                return null;
             }
             set
             {
-                this._SelectedHierarchy = value;
+                this.LibraryManager.SelectedHierarchy = value;
                 this.OnSelectedHierarchyChanged();
             }
         }
@@ -148,6 +139,7 @@ namespace FoxTunes.ViewModel
                 }
                 this.OnSelectedItemChanging();
                 this._SelectedItem[this.SelectedHierarchy] = value;
+                this.LibraryManager.SelectedNode = value;
                 this.OnSelectedItemChanged();
             }
         }

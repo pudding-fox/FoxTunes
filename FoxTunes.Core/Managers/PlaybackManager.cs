@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace FoxTunes.Managers
+namespace FoxTunes
 {
     public class PlaybackManager : StandardManager, IPlaybackManager
     {

@@ -7,7 +7,8 @@
     <ApplicationIcon>Fox.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>
     <StartupObject />
-    <Platforms>AnyCPU;x86</Platforms>
+    <Platforms>x86</Platforms>
+    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>

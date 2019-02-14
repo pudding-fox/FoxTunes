@@ -4,7 +4,7 @@
     <TargetFrameworks>net40;net461</TargetFrameworks>
     <AssemblyName>FoxTunes.Output.Bass.Asio</AssemblyName>
     <OutputPath>..\distribution\</OutputPath>
-    <Platforms>AnyCPU;x86</Platforms>
+    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>
