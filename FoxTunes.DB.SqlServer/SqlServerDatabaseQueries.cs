@@ -55,14 +55,6 @@ namespace FoxTunes
             return this.Database.QueryFactory.Create(libraryHierarchyBuilder.TransformText());
         }
 
-        public override IDatabaseQuery EndBuildLibraryHierarchies
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(Resources.EndBuildLibraryHierarchies);
-            }
-        }
-
         public override IDatabaseQuery GetLibraryHierarchyNodesWithFilter
         {
             get

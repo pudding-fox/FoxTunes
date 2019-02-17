@@ -187,6 +187,12 @@ namespace FoxTunes
 
         public abstract IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
 
-        public abstract IDatabaseQuery EndBuildLibraryHierarchies { get; }
+        public IDatabaseQuery EndBuildLibraryHierarchies
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(Resources.EndBuildLibraryHierarchies);
+            }
+        }
     }
 }

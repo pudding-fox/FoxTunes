@@ -61,6 +61,19 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to INSERT OR IGNORE INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;, &quot;TextValue&quot;, &quot;FileValue&quot;) 
+        ///SELECT @name, @type, @numericValue, @textValue, @fileValue;
+        ///
+        ///INSERT OR IGNORE INTO &quot;LibraryItem_MetaDataItem&quot; (&quot;LibraryItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
+        ///SELECT @itemId, last_insert_rowid();.
+        /// </summary>
+        internal static string AddLibraryMetaDataItems {
+            get {
+                return ResourceManager.GetString("AddLibraryMetaDataItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DELETE FROM &quot;LibraryHierarchyLevelLeaf&quot;;
         ///
         ///INSERT INTO &quot;LibraryHierarchyLevelLeaf&quot;
@@ -122,26 +135,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryHierarchyItems&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;)
-        ///SELECT &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;
-        ///FROM &quot;LibraryHierarchy&quot;
-        ///GROUP BY &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;;
-        ///
-        ///UPDATE &quot;LibraryHierarchyItems&quot;
-        ///SET &quot;Parent_Id&quot; = 
-        ///(
-        ///	SELECT &quot;LibraryHierarchyItems_Parent&quot;.&quot;Id&quot;
-        ///	FROM &quot;LibraryHierarchy&quot; 
-        ///	JOIN &quot;LibraryHierarchyLevelParent&quot; 
-        ///			ON &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchyLevel_Id [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string EndBuildLibraryHierarchies {
-            get {
-                return ResourceManager.GetString("EndBuildLibraryHierarchies", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistSequence&quot; (&quot;PlaylistItem_Id&quot;)
         ///SELECT &quot;PlaylistItem_Id&quot;
         ///FROM &quot;PlaylistSort&quot;
@@ -165,16 +158,19 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to WITH RECURSIVE 
         ///
+        ///LibraryHierarchyParent
+        ///AS
+        ///(
+        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Parent_Id&quot; AS &quot;Parent_Id&quot;, &quot;Value&quot;
+        ///	FROM &quot;LibraryHierarchyItems&quot;
+        ///		LEFT JOIN &quot;LibraryHierarchyItem_Parent&quot;
+        ///			ON &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Id&quot; = &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;
+        ///),
+        ///
         ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
         ///AS
         ///(
-        ///	SELECT &quot;Id&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///		AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
-        ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
-        ///	FROM &quot;LibraryH [rest of string was truncated]&quot;;.
+        ///	SELECT LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Pare [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyNodesWithFilter {
             get {

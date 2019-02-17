@@ -35,11 +35,15 @@ CREATE TABLE "LibraryHierarchyLevels" (
 
 CREATE TABLE [LibraryHierarchyItems](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
-    [Parent_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]), 
     [LibraryHierarchy_Id] INTEGER NOT NULL REFERENCES LibraryHierarchies([Id]), 
     [LibraryHierarchyLevel_Id] INTEGER NOT NULL REFERENCES LibraryHierarchyLevels([Id]), 
     [Value] nvarchar(250) NOT NULL, 
     [IsLeaf] bit NOT NULL);
+
+CREATE TABLE [LibraryHierarchyItem_Parent](
+    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
+	[LibraryHierarchyItem_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]), 
+	[LibraryHierarchyItem_Parent_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]));
 
 CREATE TABLE [PlaylistItem_MetaDataItem](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
@@ -189,7 +193,6 @@ ON "LibraryHierarchyItem_LibraryItem" (
 
 CREATE INDEX [IDX_LibraryHierarchyItem]
 ON [LibraryHierarchyItems](
-	[Parent_Id],
 	[LibraryHierarchy_Id], 
 	[LibraryHierarchyLevel_Id]);
 

@@ -1,35 +1,42 @@
 ﻿WITH 
 
+LibraryHierarchyParent
+AS
+(
+	SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" AS "Parent_Id", "Value"
+	FROM "LibraryHierarchyItems"
+		LEFT JOIN "LibraryHierarchyItem_Parent"
+			ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = "LibraryHierarchyItems"."Id"
+),
+
 LibraryHierarchyParents("Root", "Id", "Parent_Id", "Value")
 AS
 (
-	SELECT "Id", "Id", "Parent_Id", "Value"
-	FROM "LibraryHierarchyItems"
-	WHERE "LibraryHierarchy_Id" = @libraryHierarchyId
-		AND ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItems"."Parent_Id" IS NULL) OR "LibraryHierarchyItems"."Parent_Id" = @libraryHierarchyItemId)
+	SELECT LibraryHierarchyParent."Id", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
+	FROM LibraryHierarchyParent
 	UNION ALL 
-	SELECT "Root", "LibraryHierarchyItems"."Id", "LibraryHierarchyItems"."Parent_Id", "LibraryHierarchyItems"."Value"
-	FROM "LibraryHierarchyItems"
-		JOIN LibraryHierarchyParents ON "LibraryHierarchyItems"."Id" = LibraryHierarchyParents."Parent_Id"
+	SELECT "Root", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
+	FROM LibraryHierarchyParent
+		JOIN LibraryHierarchyParents ON LibraryHierarchyParent."Id" = LibraryHierarchyParents."Parent_Id"
 ),
 
 LibraryHierarchyChildren("Root", "Id", "Parent_Id", "Value")
 AS
 (
-	SELECT "Id", "Id", "Parent_Id", "Value"
-	FROM "LibraryHierarchyItems"
-	WHERE "LibraryHierarchy_Id" = @libraryHierarchyId
-		AND ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItems"."Parent_Id" IS NULL) OR "LibraryHierarchyItems"."Parent_Id" = @libraryHierarchyItemId)
+	SELECT LibraryHierarchyParent."Id", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
+	FROM LibraryHierarchyParent
 	UNION ALL 
-	SELECT "Root", "LibraryHierarchyItems"."Id", "LibraryHierarchyItems"."Parent_Id", "LibraryHierarchyItems"."Value"
-	FROM "LibraryHierarchyItems"
-		JOIN LibraryHierarchyChildren ON "LibraryHierarchyItems"."Parent_Id" = LibraryHierarchyChildren."Id"
+	SELECT "Root", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
+	FROM LibraryHierarchyParent
+		JOIN LibraryHierarchyChildren ON LibraryHierarchyParent."Parent_Id" = LibraryHierarchyChildren."Id"
 )
 
-SELECT "Id", "LibraryHierarchy_Id", "Value", "IsLeaf"
+SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchy_Id", "Value", "IsLeaf"
 FROM "LibraryHierarchyItems"
+	LEFT JOIN "LibraryHierarchyItem_Parent"
+		ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = "LibraryHierarchyItems"."Id"
 WHERE "LibraryHierarchy_Id" = @libraryHierarchyId
-	AND ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItems"."Parent_Id" IS NULL) OR "LibraryHierarchyItems"."Parent_Id" = @libraryHierarchyItemId)
+	AND ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" IS NULL) OR "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" = @libraryHierarchyItemId)
 	AND 
 	(
 		@filter IS NULL OR EXISTS
