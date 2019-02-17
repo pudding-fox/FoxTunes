@@ -11,13 +11,19 @@ namespace FoxTunes.Interfaces
 
         event AsyncEventHandler Started;
 
+        bool IsStarted { get; }
+
         event AsyncEventHandler Completed;
+
+        bool IsCompleted { get; }
 
         Exception Exception { get; }
 
         event EventHandler ExceptionChanged;
 
         event AsyncEventHandler Faulted;
+
+        bool IsFaulted { get; }
 
         Task Run();
 

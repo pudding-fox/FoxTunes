@@ -1,9 +1,7 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,14 +9,8 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public abstract class Library : ViewModelBase
+    public abstract class LibraryBase : ViewModelBase
     {
-        public Library()
-        {
-            this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>>();
-            this._SelectedItem = new Dictionary<LibraryHierarchy, LibraryHierarchyNode>();
-        }
-
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -79,98 +71,7 @@ namespace FoxTunes.ViewModel
             this.Refresh();
         }
 
-        private Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>> _Items { get; set; }
-
-        public ObservableCollection<LibraryHierarchyNode> Items
-        {
-            get
-            {
-                if (this.LibraryHierarchyBrowser == null || this.SelectedHierarchy == null)
-                {
-                    return null;
-                }
-                if (!this._Items.ContainsKey(this.SelectedHierarchy))
-                {
-                    this._Items[this.SelectedHierarchy] = new ObservableCollection<LibraryHierarchyNode>(
-                        this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy)
-                    );
-                }
-                return this._Items[this.SelectedHierarchy];
-            }
-            protected set
-            {
-                this._Items[this.SelectedHierarchy] = value;
-                this.OnItemsChanged();
-            }
-        }
-
-        protected virtual void OnItemsChanged()
-        {
-            if (this.ItemsChanged != null)
-            {
-                this.ItemsChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Items");
-        }
-
-        public event EventHandler ItemsChanged;
-
-        private Dictionary<LibraryHierarchy, LibraryHierarchyNode> _SelectedItem { get; set; }
-
-        public LibraryHierarchyNode SelectedItem
-        {
-            get
-            {
-                if (this.SelectedHierarchy == null)
-                {
-                    return null;
-                }
-                if (!this._SelectedItem.ContainsKey(this.SelectedHierarchy))
-                {
-                    this._SelectedItem[this.SelectedHierarchy] = LibraryHierarchyNode.Empty;
-                }
-                return this._SelectedItem[this.SelectedHierarchy];
-            }
-            set
-            {
-                if (this.SelectedHierarchy == null || object.ReferenceEquals(this.SelectedItem, value))
-                {
-                    return;
-                }
-                this.OnSelectedItemChanging();
-                this._SelectedItem[this.SelectedHierarchy] = value;
-                this.LibraryManager.SelectedNode = value;
-                this.OnSelectedItemChanged();
-            }
-        }
-
-        protected virtual void OnSelectedItemChanging()
-        {
-            if (this.SelectedItemChanging != null)
-            {
-                this.SelectedItemChanging(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanging("SelectedItem");
-        }
-
-        public event EventHandler SelectedItemChanging;
-
-        protected virtual void OnSelectedItemChanged()
-        {
-            if (this.SelectedItemChanged != null)
-            {
-                this.SelectedItemChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SelectedItem");
-        }
-
-        public event EventHandler SelectedItemChanged;
-
-        public virtual void Refresh()
-        {
-            this.OnItemsChanged();
-            this.OnSelectedItemChanged();
-        }
+        public abstract void Refresh();
 
         public virtual Task Reload()
         {
@@ -187,7 +88,6 @@ namespace FoxTunes.ViewModel
             {
                 this.SelectedHierarchy = selectedHierarchy;
                 this.OnHierarchiesChanged();
-                this._Items.Clear();
                 this.Refresh();
             });
         }
@@ -210,6 +110,8 @@ namespace FoxTunes.ViewModel
             //Nothing to do.
         }
 
+        protected abstract LibraryHierarchyNode GetSelectedItem();
+
         protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
@@ -226,9 +128,9 @@ namespace FoxTunes.ViewModel
                                 switch (invocation.Id)
                                 {
                                     case LibraryActionsBehaviour.APPEND_PLAYLIST:
-                                        return this.AddToPlaylist(this.SelectedItem, false);
+                                        return this.AddToPlaylist(this.GetSelectedItem(), false);
                                     case LibraryActionsBehaviour.REPLACE_PLAYLIST:
-                                        return this.AddToPlaylist(this.SelectedItem, true);
+                                        return this.AddToPlaylist(this.GetSelectedItem(), true);
                                 }
                                 break;
                         }
@@ -247,18 +149,14 @@ namespace FoxTunes.ViewModel
             get
             {
                 return CommandFactory.Instance.CreateCommand(
-                    () => this.AddToPlaylist(this.SelectedItem, false),
-                    () => this.SelectedItem != null && this.SelectedItem.IsLeaf
+                    () => this.AddToPlaylist(this.GetSelectedItem(), false),
+                    () => this.GetSelectedItem() != null && this.GetSelectedItem().IsLeaf
                 );
             }
         }
 
         private async Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
-            if (this.SelectedItem == null)
-            {
-                return;
-            }
             await this.PlaylistManager.Add(libraryHierarchyNode, clear);
         }
 

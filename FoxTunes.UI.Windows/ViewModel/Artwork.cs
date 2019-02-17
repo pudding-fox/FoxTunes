@@ -40,7 +40,7 @@ namespace FoxTunes.ViewModel
 
         public IArtworkProvider ArtworkProvider { get; private set; }
 
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public IPlaybackManager PlaybackManager { get; private set; }
 
         public ThemeLoader ThemeLoader { get; private set; }
 
@@ -91,18 +91,18 @@ namespace FoxTunes.ViewModel
 
         public async Task Refresh()
         {
-            if (this.PlaylistManager == null)
+            if (this.PlaybackManager == null)
             {
                 return;
             }
             var metaDataItem = default(MetaDataItem);
-            var playlistItem = this.PlaylistManager.CurrentItem;
-            if (playlistItem != null)
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream != null)
             {
-                metaDataItem = await this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
+                metaDataItem = await this.ArtworkProvider.Find(outputStream.PlaylistItem, ArtworkType.FrontCover);
                 if (metaDataItem == null)
                 {
-                    metaDataItem = await this.ArtworkProvider.Find(playlistItem.FileName, ArtworkType.FrontCover);
+                    metaDataItem = await this.ArtworkProvider.Find(outputStream.PlaylistItem.FileName, ArtworkType.FrontCover);
                 }
             }
             if (metaDataItem == null || !File.Exists(metaDataItem.FileValue))
@@ -131,15 +131,15 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.ArtworkProvider = this.Core.Components.ArtworkProvider;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
+            this.PlaybackManager = this.Core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
             var task = this.Refresh();
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
+        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
             using (e.Defer())
             {
@@ -157,9 +157,9 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.PlaylistManager != null)
+            if (this.PlaybackManager != null)
             {
-                this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
             }
             if (this.ThemeLoader != null)
             {

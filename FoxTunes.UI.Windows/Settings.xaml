@@ -19,7 +19,7 @@
             <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_SETTINGS}}"></Windows:Menu>
         </ToggleButton.ContextMenu>
         <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
-            <Canvas Name="Layer_1" Width="64" Height="64">
+            <Canvas Width="64" Height="64">
                 <Canvas >
                     <Ellipse Canvas.Left="27.8" Canvas.Top="27.8" Width="8.3" Height="8.3" Fill="{DynamicResource TextBrush}"/>
                     <Path Fill="{DynamicResource TextBrush}">

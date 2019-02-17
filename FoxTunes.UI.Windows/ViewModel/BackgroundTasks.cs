@@ -31,7 +31,7 @@ namespace FoxTunes.ViewModel
         protected virtual void OnBackgroundTaskStarted(object sender, EventArgs e)
         {
             var backgroundTask = sender as IBackgroundTask;
-            if (backgroundTask == null || !backgroundTask.Visible)
+            if (backgroundTask == null || !backgroundTask.Visible || backgroundTask.IsCompleted ||  backgroundTask.IsFaulted)
             {
                 return;
             }

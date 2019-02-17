@@ -201,7 +201,7 @@ namespace FoxTunes
                     continue;
                 }
                 var type = Enum.GetName(typeof(PictureType), picture.Type);
-                var id = this.GetImageId(tag, picture, type);
+                var id = this.GetImageId(tag, type);
                 var fileName = await this.AddImage(picture, id);
                 metaData.Add(new MetaDataItem(type, MetaDataItemType.Image)
                 {
@@ -236,14 +236,19 @@ namespace FoxTunes
         }
 
 #pragma warning disable 612, 618
-        private string GetImageId(Tag tag, IPicture value, string type)
+        private string GetImageId(Tag tag, string type)
         {
-            return string.Format(
-                "{0}_{1}_{2}",
-                tag.FirstAlbumArtist.IfNullOrEmpty(tag.FirstArtist),
-                tag.Album,
-                type
-            );
+            var hashCode = default(int);
+            //Hopefully this is unique enough. We can't use the artist as compilations are not reliable.
+            foreach (var value in new object[] { tag.Year, tag.Album })
+            {
+                if (value == null)
+                {
+                    continue;
+                }
+                hashCode += value.GetHashCode();
+            }
+            return hashCode.ToString();
         }
 #pragma warning restore 612, 618
 

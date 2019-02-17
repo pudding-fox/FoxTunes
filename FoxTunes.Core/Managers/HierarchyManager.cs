@@ -58,7 +58,7 @@ namespace FoxTunes
             using (var transaction = database.BeginTransaction())
             {
                 var set = database.Set<LibraryHierarchy>(transaction);
-                set.ClearAsync();
+                set.Clear();
                 set.Add(new LibraryHierarchy()
                 {
                     Name = "Artist/Album/Title",
