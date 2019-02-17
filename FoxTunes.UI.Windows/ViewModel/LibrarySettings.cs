@@ -17,8 +17,6 @@ namespace FoxTunes.ViewModel
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         private CollectionManager<LibraryHierarchy> _LibraryHierarchies { get; set; }
 
         public CollectionManager<LibraryHierarchy> LibraryHierarchies
@@ -171,7 +169,24 @@ namespace FoxTunes.ViewModel
 
         public void Cancel()
         {
-            this.Refresh();
+            var task = this.Refresh();
+        }
+
+        public ICommand ResetCommand
+        {
+            get
+            {
+                return new Command(this.Reset);
+            }
+        }
+
+        public void Reset()
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+            }
+            var task = this.Refresh();
         }
 
         public override void InitializeComponent(ICore core)
@@ -179,7 +194,6 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.HierarchyManager = this.Core.Managers.Hierarchy;
             this.DatabaseFactory = this.Core.Factories.Database;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.LibraryHierarchyLevels = new CollectionManager<LibraryHierarchyLevel>()
             {
                 ItemFactory = () =>
@@ -222,7 +236,7 @@ namespace FoxTunes.ViewModel
                 }
             };
             this.LibraryHierarchies.SelectedValueChanged += this.OnSelectedValueChanged;
-            this.Refresh();
+            var task = this.Refresh();
             base.InitializeComponent(core);
         }
 
@@ -238,17 +252,20 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void Refresh()
+        protected virtual Task Refresh()
         {
-            using (var database = this.DatabaseFactory.Create())
+            return Windows.Invoke(() =>
             {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    this.LibraryHierarchies.ItemsSource = new ObservableCollection<LibraryHierarchy>(
-                        database.Set<LibraryHierarchy>(transaction)
-                    );
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                    {
+                        this.LibraryHierarchies.ItemsSource = new ObservableCollection<LibraryHierarchy>(
+                            database.Set<LibraryHierarchy>(transaction)
+                        );
+                    }
                 }
-            }
+            });
         }
 
         protected override void OnDisposing()

@@ -563,5 +563,20 @@ namespace FoxTunes
             return Task.CompletedTask;
 #endif
         }
+
+        public static void CreateDefaultData(IDatabase database, ICoreScripts scripts)
+        {
+            using (var transaction = database.BeginTransaction())
+            {
+                var set = database.Set<PlaylistColumn>(transaction);
+                set.ClearAsync();
+                set.Add(new PlaylistColumn() { Name = "Playing", Sequence = 0, Script = scripts.Playing, IsDynamic = true });
+                set.Add(new PlaylistColumn() { Name = "Artist / album", Sequence = 1, Script = scripts.Artist_Album });
+                set.Add(new PlaylistColumn() { Name = "Track no", Sequence = 2, Script = scripts.Track });
+                set.Add(new PlaylistColumn() { Name = "Title / track artist", Sequence = 3, Script = scripts.Title_Performer });
+                set.Add(new PlaylistColumn() { Name = "Duration", Sequence = 4, Script = scripts.Duration });
+                transaction.Commit();
+            }
+        }
     }
 }
