@@ -25,58 +25,6 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        private BooleanConfigurationElement _ShowLibrary { get; set; }
-
-        public BooleanConfigurationElement ShowLibrary
-        {
-            get
-            {
-                return this._ShowLibrary;
-            }
-            set
-            {
-                this._ShowLibrary = value;
-                this.OnShowLibraryChanged();
-            }
-        }
-
-        protected virtual void OnShowLibraryChanged()
-        {
-            if (this.ShowLibraryChanged != null)
-            {
-                this.ShowLibraryChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ShowLibrary");
-        }
-
-        public event EventHandler ShowLibraryChanged;
-
-        private BooleanConfigurationElement _ShowArtwork { get; set; }
-
-        public BooleanConfigurationElement ShowArtwork
-        {
-            get
-            {
-                return this._ShowArtwork;
-            }
-            set
-            {
-                this._ShowArtwork = value;
-                this.OnShowArtworkChanged();
-            }
-        }
-
-        protected virtual void OnShowArtworkChanged()
-        {
-            if (this.ShowArtworkChanged != null)
-            {
-                this.ShowArtworkChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ShowArtwork");
-        }
-
-        public event EventHandler ShowArtworkChanged;
-
         private BooleanConfigurationElement _ShowNotifyIcon { get; set; }
 
         public BooleanConfigurationElement ShowNotifyIcon
@@ -129,17 +77,35 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged;
 
+        private LayoutManager _LayoutManager { get; set; }
+
+        public LayoutManager LayoutManager
+        {
+            get
+            {
+                return this._LayoutManager;
+            }
+            set
+            {
+                this._LayoutManager = value;
+                this.OnLayoutManagerChanged();
+            }
+        }
+
+        protected virtual void OnLayoutManagerChanged()
+        {
+            if (this.LayoutManagerChanged != null)
+            {
+                this.LayoutManagerChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("LayoutManager");
+        }
+
+        public event EventHandler LayoutManagerChanged;
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;
-            this.ShowLibrary = this.Configuration.GetElement<BooleanConfigurationElement>(
-               WindowsUserInterfaceConfiguration.SECTION,
-               WindowsUserInterfaceConfiguration.SHOW_LIBRARY_ELEMENT
-            );
-            this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.SHOW_ARTWORK_ELEMENT
-           );
             this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
               NotifyIconConfiguration.SECTION,
               NotifyIconConfiguration.ENABLED_ELEMENT
@@ -148,6 +114,7 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
+            this.LayoutManager = ComponentRegistry.Instance.GetComponent<LayoutManager>();
             base.InitializeComponent(core);
         }
 

@@ -3,13 +3,11 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 
 namespace FoxTunes
 {
     [Table(Name = "LibraryHierarchyItems")]
-    public class LibraryHierarchyNode : BaseComponent, ISelectable, IExpandable
+    public class LibraryHierarchyNode : PersistableComponent, ISelectable, IExpandable
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Image;
 
@@ -17,14 +15,14 @@ namespace FoxTunes
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
-        public int Id { get; set; }
-
         [Column(Name = "LibraryHierarchy_Id")]
         public int LibraryHierarchyId { get; set; }
 
         public string Value { get; set; }
 
         public bool IsLeaf { get; set; }
+
+        public LibraryHierarchyNode Parent { get; set; }
 
         private ObservableCollection<LibraryHierarchyNode> _Children { get; set; }
 

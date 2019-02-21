@@ -200,7 +200,7 @@ namespace FoxTunes
 
             protected virtual void RemoveCore()
             {
-                var task = Windows.Dispatcher.BeginInvoke(new Action(() =>
+                var task = Windows.Invoke(() =>
                 {
                     if (this.Adorner.Parent != null)
                     {
@@ -210,7 +210,7 @@ namespace FoxTunes
                     SetDropInsertActive(this.ListView, false);
                     SetDropInsertItem(this.ListView, null);
                     SetDropInsertOffset(this.ListView, 0);
-                }));
+                });
             }
 
             protected virtual void UpdateDropInsertIndex(Point point)

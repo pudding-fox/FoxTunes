@@ -8,7 +8,7 @@ namespace FoxTunes.ViewModel
     {
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement _Enabled { get; private set; }
+        private BooleanConfigurationElement _Enabled { get; set; }
 
         public BooleanConfigurationElement Enabled
         {

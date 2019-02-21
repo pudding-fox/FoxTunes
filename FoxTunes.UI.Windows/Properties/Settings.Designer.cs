@@ -70,5 +70,29 @@ namespace FoxTunes.Properties {
                 this["SettingsWindowBounds"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.35*")]
+        public string ColumnWidth_427FFD701CC2 {
+            get {
+                return ((string)(this["ColumnWidth_427FFD701CC2"]));
+            }
+            set {
+                this["ColumnWidth_427FFD701CC2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1*")]
+        public string ColumnHeight_6F3FDC8521DA {
+            get {
+                return ((string)(this["ColumnHeight_6F3FDC8521DA"]));
+            }
+            set {
+                this["ColumnHeight_6F3FDC8521DA"] = value;
+            }
+        }
     }
 }

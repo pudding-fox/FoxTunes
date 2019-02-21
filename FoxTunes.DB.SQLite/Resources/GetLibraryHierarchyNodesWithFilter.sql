@@ -7,6 +7,7 @@ AS
 	FROM "LibraryHierarchyItems"
 		LEFT JOIN "LibraryHierarchyItem_Parent"
 			ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = "LibraryHierarchyItems"."Id"
+	WHERE "LibraryHierarchy_Id" = @libraryHierarchyId
 ),
 
 LibraryHierarchyParents("Root", "Id", "Parent_Id", "Value")
@@ -14,6 +15,9 @@ AS
 (
 	SELECT LibraryHierarchyParent."Id", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent
+		LEFT JOIN "LibraryHierarchyItem_Parent"
+			ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = LibraryHierarchyParent."Id"
+	WHERE ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" IS NULL) OR "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" = @libraryHierarchyItemId)
 	UNION ALL 
 	SELECT "Root", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent
@@ -25,6 +29,9 @@ AS
 (
 	SELECT LibraryHierarchyParent."Id", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent
+	LEFT JOIN "LibraryHierarchyItem_Parent"
+			ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = LibraryHierarchyParent."Id"
+	WHERE ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" IS NULL) OR "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" = @libraryHierarchyItemId)
 	UNION ALL 
 	SELECT "Root", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent

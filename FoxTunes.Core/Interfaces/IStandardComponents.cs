@@ -18,6 +18,8 @@
 
         ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; }
 
+        ILibraryHierarchyCache LibraryHierarchyCache { get; }
+
         IArtworkProvider ArtworkProvider { get; }
     }
 }

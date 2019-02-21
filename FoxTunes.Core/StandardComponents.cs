@@ -74,6 +74,14 @@ namespace FoxTunes
             }
         }
 
+        public ILibraryHierarchyCache LibraryHierarchyCache
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILibraryHierarchyCache>();
+            }
+        }
+
         public IArtworkProvider ArtworkProvider
         {
             get

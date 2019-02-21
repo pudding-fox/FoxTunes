@@ -11,7 +11,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryTree>
+        <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}" SearchCompleted="OnSearchCompleted"></ViewModel:LibraryTree>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -49,6 +49,7 @@
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="TreeViewItem.IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
                     <Setter Property="TreeViewItem.IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
+                    <EventSetter Event="Selected" Handler="OnSelected"></EventSetter>
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>

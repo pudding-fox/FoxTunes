@@ -1,8 +1,7 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,135 +9,98 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowser : LibraryBase
     {
-        public LibraryBrowser()
-        {
-            this._Items = new Dictionary<LibraryHierarchy, Stack<ObservableCollection<LibraryHierarchyNode>>>();
-            this._SelectedItem = new Dictionary<LibraryHierarchy, Stack<LibraryHierarchyNode>>();
-        }
+        public IConfiguration Configuration { get; private set; }
 
-        private Dictionary<LibraryHierarchy, Stack<LibraryHierarchyNode>> _SelectedItem { get; set; }
+        public LayoutManager LayoutManager { get; private set; }
 
-        public LibraryHierarchyNode SelectedItem
+        private IntegerConfigurationElement _TileSize { get; set; }
+
+        public IntegerConfigurationElement TileSize
         {
             get
             {
-                if (this.SelectedHierarchy == null)
-                {
-                    return LibraryHierarchyNode.Empty;
-                }
-                if (!this._SelectedItem.ContainsKey(this.SelectedHierarchy))
-                {
-                    return LibraryHierarchyNode.Empty;
-                }
-                if (this._SelectedItem[this.SelectedHierarchy].Count == 0)
-                {
-                    return LibraryHierarchyNode.Empty;
-                }
-                return this._SelectedItem[this.SelectedHierarchy].Peek();
+                return this._TileSize;
             }
             set
             {
-                if (this.SelectedHierarchy == null || object.ReferenceEquals(this.SelectedItem, value))
-                {
-                    return;
-                }
-                this.OnSelectedItemChanging();
-                if (value != null)
-                {
-                    this._SelectedItem[this.SelectedHierarchy].Pop();
-                    this._SelectedItem[this.SelectedHierarchy].Push(value);
-                    this.LibraryManager.SelectedNode = value;
-                }
-                this.OnSelectedItemChanged();
+                this._TileSize = value;
+                this.OnTileSizeChanged();
             }
         }
 
-        protected virtual void OnSelectedItemChanging()
+        protected virtual void OnTileSizeChanged()
         {
-            if (this.SelectedItemChanging != null)
+            if (this.TileSizeChanged != null)
             {
-                this.SelectedItemChanging(this, EventArgs.Empty);
+                this.TileSizeChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanging("SelectedItem");
+            this.OnPropertyChanged("TileSize");
         }
 
-        public event EventHandler SelectedItemChanging;
+        public event EventHandler TileSizeChanged;
 
-        protected virtual void OnSelectedItemChanged()
-        {
-            if (this.SelectedItemChanged != null)
-            {
-                this.SelectedItemChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SelectedItem");
-        }
-
-        public event EventHandler SelectedItemChanged;
-
-        private Dictionary<LibraryHierarchy, Stack<ObservableCollection<LibraryHierarchyNode>>> _Items { get; set; }
-
-        public ObservableCollection<LibraryHierarchyNode> Items
+        public bool IsSlave
         {
             get
             {
-                if (this.LibraryHierarchyBrowser == null || this.SelectedHierarchy == null)
+                if (this.LayoutManager == null)
                 {
-                    return null;
+                    return false;
                 }
-                if (!this._Items.ContainsKey(this.SelectedHierarchy))
-                {
-                    return null;
-                }
-                if (this._Items[this.SelectedHierarchy].Count == 0)
-                {
-                    return null;
-                }
-                return this._Items[this.SelectedHierarchy].Peek();
+                return this.LayoutManager.ActiveControls.Contains(typeof(global::FoxTunes.LibraryTree));
             }
         }
 
-        protected virtual void OnItemsChanged()
+        protected virtual void OnIsSlaveChanged()
         {
-            if (this.ItemsChanged != null)
+            if (this.IsSlaveChanged != null)
             {
-                this.ItemsChanged(this, EventArgs.Empty);
+                this.IsSlaveChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Items");
+            this.OnPropertyChanged("IsSlave");
         }
 
-        public event EventHandler ItemsChanged;
+        public event EventHandler IsSlaveChanged;
 
-        public override Task Reload()
-        {
-            this._Items.Clear();
-            this._SelectedItem.Clear();
-            return base.Reload();
-        }
+        private LibraryHierarchyNode ItemsSource { get; set; }
 
-        public override void Refresh()
+        public override IEnumerable<LibraryHierarchyNode> Items
         {
-            if (this.SelectedHierarchy != null)
+            get
             {
-                if (!this._Items.ContainsKey(this.SelectedHierarchy))
+                if (this.ItemsSource != null && !LibraryHierarchyNode.Empty.Equals(this.ItemsSource))
                 {
-                    this._Items[this.SelectedHierarchy] = new Stack<ObservableCollection<LibraryHierarchyNode>>();
-                    this._Items[this.SelectedHierarchy].Push(
-                        new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy))
-                    );
+                    return new[] { LibraryHierarchyNode.Empty }.Concat(this.LibraryHierarchyBrowser.GetNodes(this.ItemsSource));
                 }
-                if (!this._SelectedItem.ContainsKey(this.SelectedHierarchy))
-                {
-                    this._SelectedItem[this.SelectedHierarchy] = new Stack<LibraryHierarchyNode>();
-                    this._SelectedItem[this.SelectedHierarchy].Push(LibraryHierarchyNode.Empty);
-                }
+                return base.Items;
             }
-            this.OnItemsChanged();
-            this.OnSelectedItemChanged();
         }
 
-        protected override LibraryHierarchyNode GetSelectedItem()
+        public override void InitializeComponent(ICore core)
         {
-            return this.SelectedItem;
+            this.Configuration = core.Components.Configuration;
+            this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.LIBRARY_BROWSER_TILE_SIZE
+            );
+            this.LayoutManager = ComponentRegistry.Instance.GetComponent<LayoutManager>();
+            this.LayoutManager.ActiveControlsChanged += this.OnActiveControlsChanged;
+            this.OnIsSlaveChanged();
+            base.InitializeComponent(core);
+        }
+
+        protected virtual void OnActiveControlsChanged(object sender, EventArgs e)
+        {
+            this.OnIsSlaveChanged();
+        }
+
+        protected override void OnSelectedItemChanged(object sender, EventArgs e)
+        {
+            if (!this.IsNavigating)
+            {
+                this.Synchronize();
+            }
+            base.OnSelectedItemChanged(sender, e);
         }
 
         public ICommand BrowseCommand
@@ -151,6 +113,11 @@ namespace FoxTunes.ViewModel
 
         public void Browse()
         {
+            if (this.AddToPlaylistCommand.CanExecute(null))
+            {
+                this.AddToPlaylistCommand.Execute(null);
+                return;
+            }
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
                 this.Up();
@@ -161,28 +128,52 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public void Up()
+        private void Up()
         {
-            if (this._Items[this.SelectedHierarchy] == null || this._Items[this.SelectedHierarchy].Count <= 1)
+            var itemsSource = this.ItemsSource;
+            if (itemsSource != null)
             {
-                return;
+                this.ItemsSource = itemsSource.Parent;
             }
-            this._Items[this.SelectedHierarchy].Pop();
-            this._SelectedItem[this.SelectedHierarchy].Pop();
-            this.Refresh();
+            this.OnItemsChanged();
+            this.SelectedItem = itemsSource;
         }
 
-        public void Down()
+        private void Down()
         {
-            if (this._Items[this.SelectedHierarchy] == null || this.SelectedItem == null)
+            this.ItemsSource = this.SelectedItem;
+            this.OnItemsChanged();
+            this.SelectedItem = LibraryHierarchyNode.Empty;
+        }
+
+        private void Synchronize()
+        {
+            if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
-                return;
+                if (this.ItemsSource == null)
+                {
+                    return;
+                }
+                this.ItemsSource = null;
             }
-            this._Items[this.SelectedHierarchy].Push(
-                new ObservableCollection<LibraryHierarchyNode>(new[] { LibraryHierarchyNode.Empty }.Concat(this.LibraryHierarchyBrowser.GetNodes(this.SelectedItem)))
-            );
-            this._SelectedItem[this.SelectedHierarchy].Push(LibraryHierarchyNode.Empty);
-            this.Refresh();
+            else
+            {
+                if (this.ItemsSource == this.SelectedItem.Parent)
+                {
+                    return;
+                }
+                this.ItemsSource = this.SelectedItem.Parent;
+            }
+            this.OnItemsChanged();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.LayoutManager != null)
+            {
+                this.LayoutManager.ActiveControlsChanged -= this.OnActiveControlsChanged;
+            }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

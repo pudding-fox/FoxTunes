@@ -20,8 +20,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="taglib-sharp">
-      <HintPath>../lib/taglib-sharp.dll</HintPath>
+    <Reference Include="taglib-sharp" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\taglib-sharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="taglib-sharp" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\taglib-sharp.dll</HintPath>
     </Reference>
   </ItemGroup>
 

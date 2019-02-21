@@ -32,10 +32,12 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
             try
             {
-                var file = this.Create(fileName);
-                this.AddMetaDatas(metaData, file.Tag);
-                this.AddProperties(metaData, file.Properties);
-                await this.AddImages(metaData, CommonMetaData.Pictures, file.Tag, file.Tag.Pictures);
+                using (var file = this.Create(fileName))
+                {
+                    this.AddMetaDatas(metaData, file.Tag);
+                    this.AddProperties(metaData, file.Properties);
+                    await this.AddImages(metaData, CommonMetaData.Pictures, file.Tag, file.Tag.Pictures);
+                }
             }
             catch (UnsupportedFormatException)
             {
@@ -212,8 +214,9 @@ namespace FoxTunes
 
         private async Task<string> AddImage(IPicture value, string id)
         {
+            var prefix = this.GetType().Name;
             var fileName = default(string);
-            if (!FileMetaDataStore.Exists(id, out fileName))
+            if (!FileMetaDataStore.Exists(prefix, id, out fileName))
             {
 #if NET40
                 Semaphore.Wait();
@@ -222,9 +225,9 @@ namespace FoxTunes
 #endif
                 try
                 {
-                    if (!FileMetaDataStore.Exists(id, out fileName))
+                    if (!FileMetaDataStore.Exists(prefix, id, out fileName))
                     {
-                        return await FileMetaDataStore.Write(id, value.Data.Data);
+                        return await FileMetaDataStore.Write(prefix, id, value.Data.Data);
                     }
                 }
                 finally

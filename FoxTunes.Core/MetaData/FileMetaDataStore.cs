@@ -16,15 +16,15 @@ namespace FoxTunes
 
         public static readonly object SyncRoot = new object();
 
-        public static bool Exists(string id, out string fileName)
+        public static bool Exists(string prefix, string id, out string fileName)
         {
-            fileName = GetFileName(id);
+            fileName = GetFileName(prefix, id);
             return File.Exists(fileName);
         }
 
-        public static async Task<string> Write(string id, byte[] data)
+        public static async Task<string> Write(string prefix, string id, byte[] data)
         {
-            var fileName = GetFileName(id);
+            var fileName = GetFileName(prefix, id);
             LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             try
@@ -41,10 +41,11 @@ namespace FoxTunes
             return fileName;
         }
 
-        public static async Task<string> Write(string id, Stream stream)
+        public static async Task<string> Write(string prefix, string id, Stream stream)
         {
-            var fileName = GetFileName(id);
+            var fileName = GetFileName(prefix, id);
             LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             using (var file = File.OpenWrite(fileName))
             {
                 try
@@ -59,14 +60,19 @@ namespace FoxTunes
             return fileName;
         }
 
+        public static void Clear(string prefix)
+        {
+            //TODO: Implement me. Tricky due to file locking.
+        }
+
         private static IEnumerable<string> GetSegments(string id)
         {
             return BitConverter.GetBytes(id.GetHashCode()).Select(value => Convert.ToString(value));
         }
 
-        public static string GetFileName(string id)
+        public static string GetFileName(string prefix, string id)
         {
-            return Path.Combine(DataStoreDirectoryName, string.Concat(Path.Combine(GetSegments(id).ToArray()), ".bin"));
+            return Path.Combine(DataStoreDirectoryName, prefix, string.Concat(Path.Combine(GetSegments(id).ToArray()), ".bin"));
         }
     }
 }
