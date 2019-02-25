@@ -114,6 +114,10 @@ FASTMETADATA="
 FoxTunes.MetaData.FileName.dll
 "
 
+LIBRARYBROWSER="
+FoxTunes.UI.Windows.LibraryBrowser.dll
+"
+
 TAG=$(git describe --abbrev=0 --tags)
 
 echo "Current version is $TAG.."
@@ -142,6 +146,7 @@ do
 	mkdir -p "./release/$target/Plugins/wasapi"
 	mkdir -p "./release/$target/Plugins/sqlserver"
 	mkdir -p "./release/$target/Plugins/metadata"
+	mkdir -p "./release/$target/Plugins/librarybrowser"
 
 	echo "Creating main package.."
 
@@ -227,6 +232,12 @@ do
 			echo $file
 			cp "./distribution/$target/$file" "./release/$target/Plugins/metadata"
 	done
+
+	for file in $LIBRARYBROWSER
+        do
+                        echo $file
+                        cp "./distribution/$target/$file" "./release/$target/Plugins/librarybrowser"
+        done
 
 	cd "./release/$target/Plugins"
 
