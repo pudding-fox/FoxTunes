@@ -54,6 +54,7 @@ namespace FoxTunes.ViewModel
                 }
             });
             ViewModelBase.Error += this.OnError;
+            UIComponentBase.Error += this.OnError;
             base.InitializeComponent(core);
         }
 

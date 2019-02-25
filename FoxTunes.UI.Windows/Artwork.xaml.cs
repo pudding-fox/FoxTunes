@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +10,8 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for Artwork.xaml
     /// </summary>
-    public partial class Artwork : UserControl
+    [UIComponent("66C8A9E7-0891-48DD-8086-E40F72D4D030", UIComponentSlots.BOTTOM_LEFT, "Artwork")]
+    public partial class Artwork : UIComponentBase
     {
         public static readonly IArtworkProvider ArtworkProvider = ComponentRegistry.Instance.GetComponent<IArtworkProvider>();
 

@@ -1,11 +1,20 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
     public class LayoutManager : StandardComponent
     {
+        public static readonly Type PLACEHOLDER = typeof(object);
+
+        public LayoutManager()
+        {
+            this._Components = new Lazy<IEnumerable<UIComponent>>(this.GetComponents);
+            Instance = this;
+        }
+
         public IConfiguration Configuration { get; private set; }
 
         private SelectionConfigurationElement _TopLeft { get; set; }
@@ -164,7 +173,7 @@ namespace FoxTunes
 
         public event EventHandler BottomRightChanged;
 
-        public IEnumerable<Type> ActiveControls
+        public IEnumerable<Type> ActiveComponents
         {
             get
             {
@@ -188,16 +197,51 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnActiveControlsChanged()
+        protected virtual void OnActiveComponentsChanged()
         {
-            if (this.ActiveControlsChanged != null)
+            if (this.ActiveComponentsChanged != null)
             {
-                this.ActiveControlsChanged(this, EventArgs.Empty);
+                this.ActiveComponentsChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("ActiveControls");
+            this.OnPropertyChanged("ActiveComponents");
         }
 
-        public event EventHandler ActiveControlsChanged;
+        public event EventHandler ActiveComponentsChanged;
+
+        public bool IsComponentActive(Type type)
+        {
+            return this.ActiveComponents.Any(component => string.Equals(component.AssemblyQualifiedName, type.AssemblyQualifiedName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private Lazy<IEnumerable<UIComponent>> _Components { get; set; }
+
+        public IEnumerable<UIComponent> Components
+        {
+            get
+            {
+                return this._Components.Value;
+            }
+        }
+
+        private IEnumerable<UIComponent> GetComponents()
+        {
+            var components = new List<UIComponent>();
+            foreach (var type in ComponentScanner.Instance.GetComponents(typeof(IUIComponent)))
+            {
+                var attribute = default(UIComponentAttribute);
+                if (!type.HasCustomAttribute<UIComponentAttribute>(false, out attribute))
+                {
+                    attribute = new UIComponentAttribute(type.AssemblyQualifiedName, UIComponentSlots.NONE, type.Name);
+                }
+                components.Add(new UIComponent(attribute, type));
+            }
+            return components;
+        }
+
+        public UIComponent GetComponent(string id)
+        {
+            return this.Components.FirstOrDefault(component => string.Equals(component.Id, id, StringComparison.OrdinalIgnoreCase));
+        }
 
         public override void InitializeComponent(ICore core)
         {
@@ -237,7 +281,9 @@ namespace FoxTunes
 
         protected virtual void OnLayoutUpdated(object sender, EventArgs e)
         {
-            this.OnActiveControlsChanged();
+            this.OnActiveComponentsChanged();
         }
+
+        public static LayoutManager Instance { get; private set; }
     }
 }

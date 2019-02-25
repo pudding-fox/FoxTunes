@@ -11,8 +11,6 @@ namespace FoxTunes.ViewModel
     {
         public IConfiguration Configuration { get; private set; }
 
-        public LayoutManager LayoutManager { get; private set; }
-
         private IntegerConfigurationElement _TileSize { get; set; }
 
         public IntegerConfigurationElement TileSize
@@ -43,11 +41,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.LayoutManager == null)
-                {
-                    return false;
-                }
-                return this.LayoutManager.ActiveControls.Contains(typeof(global::FoxTunes.LibraryTree));
+                return LayoutManager.Instance.IsComponentActive(typeof(global::FoxTunes.LibraryTree));
             }
         }
 
@@ -83,13 +77,12 @@ namespace FoxTunes.ViewModel
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.LIBRARY_BROWSER_TILE_SIZE
             );
-            this.LayoutManager = ComponentRegistry.Instance.GetComponent<LayoutManager>();
-            this.LayoutManager.ActiveControlsChanged += this.OnActiveControlsChanged;
+            LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnActiveControlsChanged(object sender, EventArgs e)
+        protected virtual void OnActiveComponentsChanged(object sender, EventArgs e)
         {
             this.OnIsSlaveChanged();
         }
@@ -169,10 +162,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.LayoutManager != null)
-            {
-                this.LayoutManager.ActiveControlsChanged -= this.OnActiveControlsChanged;
-            }
+            LayoutManager.Instance.ActiveComponentsChanged -= this.OnActiveComponentsChanged;
             base.OnDisposing();
         }
 

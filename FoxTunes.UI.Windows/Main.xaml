@@ -56,21 +56,21 @@
                 x:Name="LeftPanel"
                 Grid.Column="0"
                 Margin="0,0,4,0"
-                ControlType1="{Binding LayoutManager.TopLeft.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}" 
-                ControlType2="{Binding LayoutManager.BottomLeft.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}"/>
+                ControlType1="{Binding TopLeft.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}" 
+                ControlType2="{Binding BottomLeft.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}"/>
             <GridSplitter Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="4"></GridSplitter>
             <Windows:VerticalSplitPanel 
                 Grid.Column="1"
-                ControlType1="{Binding LayoutManager.TopCenter.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}" 
-                ControlType2="{Binding LayoutManager.BottomCenter.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}"
+                ControlType1="{Binding TopCenter.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}" 
+                ControlType2="{Binding BottomCenter.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}"
                 SplitterHeight="{Binding ColumnHeight_6F3FDC8521DA, Source={x:Static Properties:Settings.Default}, Converter={StaticResource GridLengthConverter}, Mode=TwoWay}"/>
             <GridSplitter Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="4"></GridSplitter>
             <Windows:VerticalSplitPanel 
                 x:Name="RightPanel"
                 Grid.Column="2"
                 Margin="4,0,0,0"
-                ControlType1="{Binding LayoutManager.TopRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}" 
-                ControlType2="{Binding LayoutManager.BottomRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}"/>
+                ControlType1="{Binding TopRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}" 
+                ControlType2="{Binding BottomRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}"/>
             <Windows:BackgroundTasks Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="200"></Windows:BackgroundTasks>
             <Windows:Components></Windows:Components>
         </Grid>

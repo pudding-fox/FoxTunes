@@ -6,7 +6,8 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for LibraryBrowser.xaml
     /// </summary>
-    public partial class LibraryBrowser : UserControl
+    [UIComponent("FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3", UIComponentSlots.TOP_CENTER, "Library Browser")]
+    public partial class LibraryBrowser : UIComponentBase
     {
         public LibraryBrowser()
         {
