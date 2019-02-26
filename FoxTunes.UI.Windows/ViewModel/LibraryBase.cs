@@ -153,6 +153,14 @@ namespace FoxTunes.ViewModel
 
         public virtual Task Reload()
         {
+            if (this.DatabaseFactory == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             var selectedHierarchy = default(LibraryHierarchy);
             using (var database = this.DatabaseFactory.Create())
             {
@@ -221,24 +229,6 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.HierarchiesUpdated:
                     return this.Reload();
-                case CommonSignals.PluginInvocation:
-                    var invocation = signal.State as IInvocationComponent;
-                    if (invocation != null)
-                    {
-                        switch (invocation.Category)
-                        {
-                            case InvocationComponent.CATEGORY_LIBRARY:
-                                switch (invocation.Id)
-                                {
-                                    case LibraryActionsBehaviour.APPEND_PLAYLIST:
-                                        return this.AddToPlaylist(this.SelectedItem, false);
-                                    case LibraryActionsBehaviour.REPLACE_PLAYLIST:
-                                        return this.AddToPlaylist(this.SelectedItem, true);
-                                }
-                                break;
-                        }
-                    }
-                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);

@@ -227,7 +227,7 @@ namespace FoxTunes
                         case DatabaseParameterPhase.Fetch:
                             parameters["name"] = CustomMetaData.VariousArtists;
                             parameters["type"] = MetaDataItemType.Tag;
-                            parameters["numericValue"] = 1;
+                            parameters["value"] = bool.TrueString;
                             parameters["status"] = LibraryItemStatus.Import;
                             break;
                     }

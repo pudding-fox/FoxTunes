@@ -107,15 +107,26 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
-            if (libraryHierarchyNode == null)
+            var task = this.Refresh();
+        }
+
+        public Task Refresh()
+        {
+            return Task.Run(() =>
             {
-                return;
-            }
-            var imageSource = await Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight);
-            await Windows.Invoke(() => this.ImageSource = imageSource);
+                var libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
+                if (libraryHierarchyNode == null || libraryHierarchyNode.MetaDatas == null)
+                {
+                    return;
+                }
+                return Windows.Dispatcher.BeginInvoke(new Func<Task>(async () =>
+                {
+                    var imageSource = await Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight);
+                    await Windows.Invoke(() => this.ImageSource = imageSource);
+                }));
+            });
         }
     }
 }

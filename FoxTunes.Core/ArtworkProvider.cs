@@ -44,7 +44,7 @@ namespace FoxTunes
                             {
                                 return new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
                                 {
-                                    FileValue = fileName
+                                    Value = fileName
                                 };
                             }
                         }
@@ -68,7 +68,7 @@ namespace FoxTunes
                  metaDataItem =>
                      metaDataItem.Type == MetaDataItemType.Image &&
                      string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) &&
-                     File.Exists(metaDataItem.FileValue)
+                     File.Exists(metaDataItem.Value)
              );
 #if NET40
             return TaskEx.FromResult(result);

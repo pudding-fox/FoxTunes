@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +12,11 @@ namespace FoxTunes
     public class PlaylistManager : StandardManager, IPlaylistManager, IDisposable
     {
         public const string CLEAR_PLAYLIST = "ZZZZ";
+
+        public PlaylistManager()
+        {
+            this.SelectedItems = new ObservableCollection<PlaylistItem>();
+        }
 
         private volatile bool IsNavigating = false;
 
@@ -524,6 +530,32 @@ namespace FoxTunes
         }
 
         public event AsyncEventHandler CurrentItemChanged;
+
+        private ObservableCollection<PlaylistItem> _SelectedItems { get; set; }
+
+        public ObservableCollection<PlaylistItem> SelectedItems
+        {
+            get
+            {
+                return this._SelectedItems;
+            }
+            set
+            {
+                this._SelectedItems = value;
+                this.OnSelectedItemsChanged();
+            }
+        }
+
+        protected virtual void OnSelectedItemsChanged()
+        {
+            if (this.SelectedItemsChanged != null)
+            {
+                this.SelectedItemsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedItems");
+        }
+
+        public event EventHandler SelectedItemsChanged;
 
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {

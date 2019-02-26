@@ -65,7 +65,7 @@ namespace FoxTunes {
         ///    if (tag.__ft_variousartists) {
         ///        return &quot;Various Artists&quot;;
         ///    }
-        ///    return tag.albumartist || tag.artist || &quot;No Artist&quot;;
+        ///    return tag.artist || &quot;No Artist&quot;;
         ///})().
         /// </summary>
         internal static string Artist {
@@ -76,7 +76,7 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///    var parts = [tag.albumartist || tag.artist || &quot;No Artist&quot;];
+        ///    var parts = [tag.artist || &quot;No Artist&quot;];
         ///    if (tag.album) {
         ///        parts.push(tag.album);
         ///    }
@@ -145,8 +145,8 @@ namespace FoxTunes {
         ///    parts.push(&quot;Various Artists&quot;);
         ///  }
         ///  else {
-        ///    if (tag.firstalbumartist || tag.firstartist) {
-        ///      parts.push(tag.firstalbumartist || tag.firstartist);
+        ///    if (tag.artist) {
+        ///        parts.push(tag.artist);
         ///    }
         ///  }
         ///
@@ -166,7 +166,10 @@ namespace FoxTunes {
         ///    parts.push(zeropad(tag.track, 2));
         ///  }
         ///
-        ///  parts.push(f [rest of string was truncated]&quot;;.
+        ///  parts.push(fileName);
+        ///
+        ///  return parts;
+        ///})();.
         /// </summary>
         internal static string PlaylistSortValues {
             get {
@@ -180,7 +183,7 @@ namespace FoxTunes {
         ///    if (tag.title) {
         ///        parts.push(tag.title);
         ///    }
-        ///    if (tag.performer &amp;&amp; tag.performer != (tag.albumartist || tag.artist)) {
+        ///    if (tag.performer &amp;&amp; tag.performer != tag.artist) {
         ///        parts.push(tag.performer);
         ///    }
         ///    if (parts.length) {

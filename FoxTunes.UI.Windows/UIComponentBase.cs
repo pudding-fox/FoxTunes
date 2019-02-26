@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace FoxTunes
@@ -15,6 +16,56 @@ namespace FoxTunes
                 return LogManager.Logger;
             }
         }
+
+        public static readonly DependencyProperty IsComponentEnabledProperty = DependencyProperty.Register(
+           "IsComponentEnabled",
+           typeof(bool),
+           typeof(UIComponentBase),
+           new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnIsComponentEnabledChanged))
+       );
+
+        public static bool GetIsComponentEnabled(UIComponentBase source)
+        {
+            return (bool)source.GetValue(IsComponentEnabledProperty);
+        }
+
+        public static void SetIsComponentEnabled(UIComponentBase source, bool value)
+        {
+            source.SetValue(IsComponentEnabledProperty, value);
+        }
+
+        private static void OnIsComponentEnabledChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var componentBase = sender as UIComponentBase;
+            if (componentBase == null)
+            {
+                return;
+            }
+            componentBase.OnIsComponentEnabledChanged();
+        }
+
+        public bool IsComponentEnabled
+        {
+            get
+            {
+                return GetIsComponentEnabled(this);
+            }
+            set
+            {
+                SetIsComponentEnabled(this, value);
+            }
+        }
+
+        protected virtual void OnIsComponentEnabledChanged()
+        {
+            if (this.IsComponentEnabledChanged != null)
+            {
+                this.IsComponentEnabledChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsComponentEnabled");
+        }
+
+        public event EventHandler IsComponentEnabledChanged;
 
         public virtual void InitializeComponent(ICore core)
         {

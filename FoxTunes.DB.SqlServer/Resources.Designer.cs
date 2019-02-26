@@ -66,14 +66,25 @@ namespace FoxTunes {
         ///(
         ///	SELECT *
         ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type
-        ///		AND ((&quot;NumericValue&quot; IS NULL AND @numericValue IS NULL) OR &quot;NumericValue&quot; = @numericValue)
-        ///		AND ((&quot;TextValue&quot; IS NULL AND @textValue IS NULL) OR &quot;TextValue&quot; = @textValue) 
-        ///		AND ((&quot;FileValue&quot; IS NULL AND @fileValue IS NULL) OR &quot;FileValue&quot; = @fileValue)
+        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
         ///)
         ///
-        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;, &quot;TextValue&quot;, &quot;FileValue&quot;) 
-        ///SELECT @name, @type, @numericValue, @textValu [rest of string was truncated]&quot;;.
+        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
+        ///SELECT @name, @type, @value
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems_Lookup&quot;);
+        ///
+        ///WITH 
+        ///&quot;MetaDataItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;MetaDataItems&quot; 
+        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
+        ///),
+        ///
+        ///&quot;LibraryItem_MetaDataItem_Lookup&quot; AS 
+        ///(
+        ///	SELECT &quot;LibraryItem_MetaDataItem&quot;.*
+        ///	FROM &quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddLibraryMetaDataItems {
             get {
@@ -117,9 +128,7 @@ namespace FoxTunes {
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///    [Name] nvarchar(250) NOT NULL, 
         ///	[Type] INTEGER NOT NULL,
-        ///    [NumericValue] INTEGER, 
-        ///    [TextValue] nvarchar(250), 
-        ///    [FileValue] nvarchar(250));
+        ///    [Value] nvarchar(250));
         ///
         ///CREATE TABLE LibraryItems (
         ///	Id INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
@@ -129,7 +138,8 @@ namespace FoxTunes {
         ///
         ///CREATE TABLE [PlaylistItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
-        ///	[Librar [rest of string was truncated]&quot;;.
+        ///	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]),
+        ///    [Sequen [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
@@ -154,12 +164,13 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP 5 &quot;MetaDataItems&quot;.&quot;NumericValue&quot;,  &quot;MetaDataItems&quot;.&quot;TextValue&quot;, &quot;MetaDataItems&quot;.&quot;FileValue&quot;
+        ///   Looks up a localized string similar to SELECT TOP 5 &quot;MetaDataItems&quot;.&quot;Value&quot;
         ///FROM &quot;LibraryHierarchyItems&quot;
         ///	JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot;
         ///	JOIN &quot;LibraryItem_MetaDataItem&quot; ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot;
         ///	JOIN &quot;MetaDataItems&quot; ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
-        ///WHERE &quot;Libra [rest of string was truncated]&quot;;.
+        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId 
+        ///	AND (@type &amp; &quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyMetaData {
             get {

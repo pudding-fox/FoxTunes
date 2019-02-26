@@ -4,31 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
-        <Style x:Key="FillStyle" TargetType="{x:Type UserControl}">
-            <Setter Property="Content">
-                <Setter.Value>
-                    <Windows:ControlSlot ControlType="{Binding ControlType, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:VerticalSplitPanel}}}"></Windows:ControlSlot>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="SplitStyle" TargetType="{x:Type UserControl}">
-            <Setter Property="Content">
-                <Setter.Value>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition Height="{Binding SplitterHeight, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:VerticalSplitPanel}}}"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Windows:ControlSlot Grid.Row="0" Margin="0,0,0,4" ControlType="{Binding ControlType1, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:VerticalSplitPanel}}}"></Windows:ControlSlot>
-                        <GridSplitter Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="4"></GridSplitter>
-                        <Windows:ControlSlot Grid.Row="1" ControlType="{Binding ControlType2, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:VerticalSplitPanel}}}"></Windows:ControlSlot>
-                    </Grid>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
 </UserControl>

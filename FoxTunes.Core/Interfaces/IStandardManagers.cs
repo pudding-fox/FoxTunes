@@ -9,5 +9,7 @@
         ILibraryManager Library { get; }
 
         IHierarchyManager Hierarchy { get; }
+
+        IMetaDataManager MetaData { get; }
     }
 }

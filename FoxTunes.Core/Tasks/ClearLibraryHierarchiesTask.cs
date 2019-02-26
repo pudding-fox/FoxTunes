@@ -9,6 +9,21 @@ namespace FoxTunes
         {
         }
 
+        public override bool Visible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        protected override async Task OnStarted()
+        {
+            await this.SetName("Clearing hierarchies");
+            await this.SetIsIndeterminate(true);
+            await base.OnStarted();
+        }
+
         protected override Task OnRun()
         {
             return this.RemoveHierarchies();

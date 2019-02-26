@@ -1,8 +1,8 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -18,6 +18,8 @@ namespace FoxTunes
         public static readonly IPlaybackManager PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
 
         public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+
+        private static Lazy<Size> PixelSize { get; set; }
 
         public static readonly DependencyProperty ShowPlaceholderProperty = DependencyProperty.Register(
             "ShowPlaceholder",
@@ -76,25 +78,29 @@ namespace FoxTunes
         public Artwork()
         {
             this.InitializeComponent();
+            this.SizeChanged += this.OnSizeChanged;
+            if (PixelSize == null)
+            {
+                PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
+            }
             PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             ThemeLoader.ThemeChanged += this.OnThemeChanged;
             var task = this.Refresh();
         }
 
-        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.Refresh();
-            }
+            var task = this.Refresh();
         }
 
-        protected virtual async void OnThemeChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.Refresh();
-            }
+            var task = this.Refresh();
+        }
+
+        protected virtual void OnThemeChanged(object sender, AsyncEventArgs e)
+        {
+            var task = this.Refresh();
         }
 
         public bool ShowPlaceholder
@@ -111,7 +117,7 @@ namespace FoxTunes
 
         protected virtual void OnShowPlaceholderChanged()
         {
-            //Nothing to do.
+            var task = this.Refresh();
         }
 
         public ImageSource ImageSource
@@ -135,7 +141,14 @@ namespace FoxTunes
         {
             get
             {
-                return 0;
+                if (!PixelSize.IsValueCreated)
+                {
+                    if (this.ActualWidth == 0 || this.ActualHeight == 0)
+                    {
+                        return 0;
+                    }
+                }
+                return (int)PixelSize.Value.Width;
             }
         }
 
@@ -143,12 +156,23 @@ namespace FoxTunes
         {
             get
             {
-                return 0;
+                if (!PixelSize.IsValueCreated)
+                {
+                    if (this.ActualWidth == 0 || this.ActualHeight == 0)
+                    {
+                        return 0;
+                    }
+                }
+                return (int)PixelSize.Value.Height;
             }
         }
 
         public async Task Refresh()
         {
+            if (this.DecodePixelWidth == 0 || this.DecodePixelHeight == 0)
+            {
+                return;
+            }
             var metaDataItem = default(MetaDataItem);
             var outputStream = PlaybackManager.CurrentStream;
             if (outputStream != null)
@@ -159,7 +183,7 @@ namespace FoxTunes
                     metaDataItem = await ArtworkProvider.Find(outputStream.PlaylistItem.FileName, ArtworkType.FrontCover);
                 }
             }
-            if (metaDataItem == null || !File.Exists(metaDataItem.FileValue))
+            if (metaDataItem == null || !File.Exists(metaDataItem.Value))
             {
                 await Windows.Invoke(() =>
                 {
@@ -167,18 +191,25 @@ namespace FoxTunes
                     {
                         using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
                         {
+                            this.Visibility = Visibility.Visible;
                             this.ImageSource = ImageLoader.Load(stream, this.DecodePixelWidth, this.DecodePixelHeight);
+
                         }
                     }
                     else
                     {
+                        this.Visibility = Visibility.Collapsed;
                         this.ImageSource = null;
                     }
                 });
             }
             else
             {
-                await Windows.Invoke(() => this.ImageSource = ImageLoader.Load(metaDataItem.FileValue, this.DecodePixelWidth, this.DecodePixelHeight));
+                await Windows.Invoke(() =>
+                {
+                    this.Visibility = Visibility.Visible;
+                    this.ImageSource = ImageLoader.Load(metaDataItem.Value, this.DecodePixelWidth, this.DecodePixelHeight);
+                });
             }
         }
     }

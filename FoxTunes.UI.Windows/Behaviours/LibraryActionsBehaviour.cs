@@ -10,13 +10,17 @@ namespace FoxTunes
 
         public const string REPLACE_PLAYLIST = "AAAC";
 
-        public ISignalEmitter SignalEmitter { get; private set; }
+        public ILibraryManager LibraryManager { get; private set; }
+
+        public IPlaylistManager PlaylistManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.SignalEmitter = core.Components.SignalEmitter;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.LibraryManager = core.Managers.Library;
             base.InitializeComponent(core);
         }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get
@@ -31,14 +35,20 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case APPEND_PLAYLIST:
+                    return this.AddToPlaylist(false);
                 case REPLACE_PLAYLIST:
-                    return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, component));
+                    return this.AddToPlaylist(true);
             }
 #if NET40
             return TaskEx.FromResult(false);
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        private async Task AddToPlaylist(bool clear)
+        {
+            await this.PlaylistManager.Add(this.LibraryManager.SelectedItem, clear);
         }
     }
 }

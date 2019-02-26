@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxDb.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces

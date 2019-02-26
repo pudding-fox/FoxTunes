@@ -10,7 +10,7 @@ namespace FoxTunes
         private static IDictionary<string, string> NAMES = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "TTITLE", CommonMetaData.Title },
-            { "DARTIST", CommonMetaData.AlbumArtist },
+            { "DARTIST", CommonMetaData.Artist },
             { "DALBUM", CommonMetaData.Album },
             { "DGENRE", CommonMetaData.Genre },
             { "DYEAR", CommonMetaData.Year }
@@ -52,7 +52,7 @@ namespace FoxTunes
                         names.Add(name);
                         yield return new MetaDataItem(name, MetaDataItemType.Tag)
                         {
-                            TextValue = element.Value
+                            Value = element.Value
                         };
                     }
                 }

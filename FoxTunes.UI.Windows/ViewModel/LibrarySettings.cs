@@ -176,17 +176,18 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Reset);
+                return CommandFactory.Instance.CreateCommand(this.Reset);
             }
         }
 
-        public void Reset()
+        public async Task Reset()
         {
+            await this.Clear();
             using (var database = this.DatabaseFactory.Create())
             {
                 global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
             }
-            var task = this.Refresh();
+            await this.Refresh();
         }
 
         public override void InitializeComponent(ICore core)

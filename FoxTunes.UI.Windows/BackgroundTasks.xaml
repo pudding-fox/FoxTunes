@@ -19,13 +19,13 @@
             <Style TargetType="{x:Type Border}">
                 <Setter Property="Visibility" Value="Visible"></Setter>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={StaticResource ViewModel}, Path=RunningTasks.Count}" Value="0">
+                    <DataTrigger Binding="{Binding Items.Count, Mode=OneWay, Source={StaticResource ViewModel}}" Value="0">
                         <Setter Property="Visibility" Value="Collapsed"></Setter>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
         </Border.Style>
-        <ItemsControl ItemsSource="{Binding Source={StaticResource ViewModel}, Path=RunningTasks}">
+        <ItemsControl ItemsSource="{Binding Items, Source={StaticResource ViewModel}}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid>

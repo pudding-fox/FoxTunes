@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 
@@ -98,7 +99,7 @@ namespace FoxTunes
             return source.EnsureHandle();
         }
 
-        public static Size GetElementPixelSize(this UIElement element)
+        public static Size GetElementPixelSize(this FrameworkElement element)
         {
             var matrix = default(Matrix);
             var presentationSource = PresentationSource.FromVisual(element);
@@ -114,12 +115,35 @@ namespace FoxTunes
                 }
             }
 
-            if (element.DesiredSize.Width == 0 && element.DesiredSize.Height == 0)
+            if (element.ActualWidth != 0 && element.ActualHeight != 0)
             {
-                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                return (Size)matrix.Transform(new Vector(element.ActualWidth, element.ActualHeight));
             }
+            else
+            {
+                if (element.DesiredSize.Width == 0 && element.DesiredSize.Height == 0)
+                {
+                    element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                }
+                return (Size)matrix.Transform((Vector)element.DesiredSize);
+            }
+        }
 
-            return (Size)matrix.Transform((Vector)element.DesiredSize);
+        public static void Disconnect(this FrameworkElement element)
+        {
+            var parent = element.Parent;
+            if (parent == null)
+            {
+                return;
+            }
+            else if (parent is ContentControl)
+            {
+                (parent as ContentControl).Content = null;
+            }
+            else if (parent is Panel)
+            {
+                (parent as Panel).Children.Remove(element);
+            }
         }
     }
 }

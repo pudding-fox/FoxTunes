@@ -4,6 +4,6 @@
     {
         string Name { get; }
 
-        object Value { get; }
+        string Value { get; }
     }
 }

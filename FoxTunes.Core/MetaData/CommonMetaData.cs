@@ -7,8 +7,6 @@ namespace FoxTunes
     public static class CommonMetaData
     {
         public const string Album = "Album";
-        public const string AlbumArtist = "AlbumArtist";
-        public const string AlbumArtistSort = "AlbumArtistSort";
         public const string AlbumSort = "AlbumSort";
         public const string AmazonId = "AmazonId";
         public const string Artist = "Artist";
@@ -33,6 +31,7 @@ namespace FoxTunes
         public const string MusicBrainzTrackId = "MusicBrainzTrackId";
         public const string MusicIpId = "MusicIpId";
         public const string Performer = "Performer";
+        public const string ArtistSort = "ArtistSort";
         public const string PerformerSort = "PerformerSort";
         public const string Pictures = "Pictures";
         public const string Title = "Title";

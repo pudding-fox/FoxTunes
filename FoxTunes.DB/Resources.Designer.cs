@@ -82,14 +82,25 @@ namespace FoxTunes {
         ///(
         ///	SELECT *
         ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type
-        ///		AND ((&quot;NumericValue&quot; IS NULL AND @numericValue IS NULL) OR &quot;NumericValue&quot; = @numericValue)
-        ///		AND ((&quot;TextValue&quot; IS NULL AND @textValue IS NULL) OR &quot;TextValue&quot; = @textValue) 
-        ///		AND ((&quot;FileValue&quot; IS NULL AND @fileValue IS NULL) OR &quot;FileValue&quot; = @fileValue)
+        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
         ///)
         ///
-        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;, &quot;TextValue&quot;, &quot;FileValue&quot;) 
-        ///SELECT @name, @type, @numericValue, @textValu [rest of string was truncated]&quot;;.
+        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
+        ///SELECT @name, @type, @value
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems_Lookup&quot;);
+        ///
+        ///WITH 
+        ///&quot;MetaDataItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;MetaDataItems&quot; 
+        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
+        ///),
+        ///
+        ///&quot;LibraryItem_MetaDataItem_Lookup&quot; AS 
+        ///(
+        ///	SELECT &quot;LibraryItem_MetaDataItem&quot;.*
+        ///	FROM &quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddLibraryMetaDataItems {
             get {
@@ -103,14 +114,25 @@ namespace FoxTunes {
         ///(
         ///	SELECT *
         ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type
-        ///		AND ((&quot;NumericValue&quot; IS NULL AND @numericValue IS NULL) OR &quot;NumericValue&quot; = @numericValue)
-        ///		AND ((&quot;TextValue&quot; IS NULL AND @textValue IS NULL) OR &quot;TextValue&quot; = @textValue) 
-        ///		AND ((&quot;FileValue&quot; IS NULL AND @fileValue IS NULL) OR &quot;FileValue&quot; = @fileValue)
+        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
         ///)
         ///
-        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;, &quot;TextValue&quot;, &quot;FileValue&quot;) 
-        ///SELECT @name, @type, @numericValue, @textValu [rest of string was truncated]&quot;;.
+        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
+        ///SELECT @name, @type, @value
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems_Lookup&quot;);
+        ///
+        ///WITH 
+        ///&quot;MetaDataItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;MetaDataItems&quot; 
+        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
+        ///),
+        ///
+        ///&quot;PlaylistItem_MetaDataItem_Lookup&quot; AS 
+        ///(
+        ///	SELECT &quot;PlaylistItem_MetaDataItem&quot;.*
+        ///	FROM [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddPlaylistMetaDataItems {
             get {
@@ -125,6 +147,26 @@ namespace FoxTunes {
         internal static string AddPlaylistSequenceRecord {
             get {
                 return ResourceManager.GetString("AddPlaylistSequenceRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DELETE FROM &quot;LibraryItem_MetaDataItem&quot;
+        ///WHERE &quot;LibraryItem_Id&quot; = @itemId.
+        /// </summary>
+        internal static string ClearLibraryMetaDataItems {
+            get {
+                return ResourceManager.GetString("ClearLibraryMetaDataItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistItem_MetaDataItem&quot;
+        ///WHERE &quot;PlaylistItem_Id&quot; = @itemId.
+        /// </summary>
+        internal static string ClearPlaylistMetaDataItems {
+            get {
+                return ResourceManager.GetString("ClearPlaylistMetaDataItems", resourceCulture);
             }
         }
         
@@ -261,9 +303,9 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;)
-        ///SELECT @name, @type, @numericValue
-        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;NumericValue&quot; = @numericValue);
+        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;)
+        ///SELECT @name, @type, @value
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value);
         ///
         ///WITH &quot;MetaData&quot;
         ///AS
@@ -271,11 +313,16 @@ namespace FoxTunes {
         ///	SELECT 
         ///		&quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot; AS &quot;Id&quot;,
         ///		&quot;MetaDataItems&quot;.&quot;Name&quot;,
-        ///		&quot;MetaDataItems&quot;.&quot;NumericValue&quot;,
-        ///		&quot;MetaDataItems&quot;.&quot;TextValue&quot;
+        ///		&quot;MetaDataItems&quot;.&quot;Value&quot;
         ///	FROM &quot;LibraryItem_MetaDataItem&quot; 
         ///		JOIN &quot;MetaDataItems&quot; 
-        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_Me [rest of string was truncated]&quot;;.
+        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
+        ///),
+        ///
+        ///&quot;Artist&quot;
+        ///AS
+        ///(
+        ///	SELECT &quot;Arti [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string UpdateLibraryVariousArtists {
             get {
@@ -284,9 +331,9 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;)
-        ///SELECT @name, @type, @numericValue
-        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;NumericValue&quot; = @numericValue);
+        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;)
+        ///SELECT @name, @type, @value
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value);
         ///
         ///WITH &quot;MetaData&quot;
         ///AS
@@ -294,11 +341,16 @@ namespace FoxTunes {
         ///	SELECT 
         ///		&quot;PlaylistItem_MetaDataItem&quot;.&quot;PlaylistItem_Id&quot; AS &quot;Id&quot;,
         ///		&quot;MetaDataItems&quot;.&quot;Name&quot;,
-        ///		&quot;MetaDataItems&quot;.&quot;NumericValue&quot;,
-        ///		&quot;MetaDataItems&quot;.&quot;TextValue&quot;
+        ///		&quot;MetaDataItems&quot;.&quot;Value&quot;
         ///	FROM &quot;PlaylistItem_MetaDataItem&quot; 
         ///		JOIN &quot;MetaDataItems&quot; 
-        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;PlaylistIte [rest of string was truncated]&quot;;.
+        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;PlaylistItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
+        ///),
+        ///
+        ///&quot;Artist&quot;
+        ///AS
+        ///(
+        ///	SELECT &quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string UpdatePlaylistVariousArtists {
             get {

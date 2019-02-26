@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,11 @@ namespace FoxTunes
 #else
             return Task.FromResult<IEnumerable<MetaDataItem>>(metaData);
 #endif
+        }
+
+        public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems)
+        {
+            throw new NotImplementedException();
         }
     }
 }

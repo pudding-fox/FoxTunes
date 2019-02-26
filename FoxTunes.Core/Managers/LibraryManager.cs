@@ -10,6 +10,22 @@ namespace FoxTunes
 {
     public class LibraryManager : StandardManager, ILibraryManager
     {
+        public LibraryManagerState State
+        {
+            get
+            {
+                if (global::FoxTunes.BackgroundTask.Active.Any(backgroundTask =>
+                {
+                    var type = backgroundTask.GetType();
+                    return type == typeof(AddPathsToLibraryTask) || type == typeof(ClearLibraryTask) || type == typeof(RescanLibraryTask);
+                }))
+                {
+                    return LibraryManagerState.Updating;
+                }
+                return LibraryManagerState.None;
+            }
+        }
+
         public ICore Core { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -192,7 +208,7 @@ namespace FoxTunes
                 await task.Run();
             }
         }
-
+        
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)

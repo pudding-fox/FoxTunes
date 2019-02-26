@@ -177,42 +177,52 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void LoadChildren()
+        public virtual void LoadChildren()
         {
             if (this.LibraryHierarchyBrowser == null)
             {
                 return;
             }
-            this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
-            this.IsLoaded = true;
+            CollectionLoader<LibraryHierarchyNode>.Instance.Load(
+                () => this.LibraryHierarchyBrowser.GetNodes(this),
+                children =>
+                {
+                    this.Children = children;
+                    this.IsLoaded = true;
+                }
+            );
         }
 
-        public void LoadMetaDatas()
+        public virtual void LoadMetaDatas()
         {
             if (this.DatabaseFactory == null)
             {
                 return;
             }
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            CollectionLoader<MetaDataItem>.Instance.Load(
+                () =>
                 {
-                    using (var reader = MetaDataInfo.GetMetaData(database, this, META_DATA_TYPE, transaction))
+                    using (var database = this.DatabaseFactory.Create())
                     {
-                        var metaDatas = new List<MetaDataItem>();
-                        foreach (var record in reader)
+                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
-                            metaDatas.Add(new MetaDataItem()
+                            using (var reader = MetaDataInfo.GetMetaData(database, this, META_DATA_TYPE, transaction))
                             {
-                                NumericValue = record.IsNull("NumericValue") ? default(int?) : record.Get<int>("NumericValue"),
-                                TextValue = record.Get<string>("TextValue"),
-                                FileValue = record.Get<string>("FileValue")
-                            });
+                                var metaDatas = new List<MetaDataItem>();
+                                foreach (var record in reader)
+                                {
+                                    metaDatas.Add(new MetaDataItem()
+                                    {
+                                        Value = record.Get<string>("Value")
+                                    });
+                                }
+                                return metaDatas;
+                            }
                         }
-                        this.MetaDatas = new ObservableCollection<MetaDataItem>(metaDatas);
                     }
-                }
-            }
+                },
+                metaDatas => this.MetaDatas = metaDatas
+            );
         }
 
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();

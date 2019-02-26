@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -13,6 +14,7 @@ namespace FoxTunes
         public Playlist()
         {
             this.InitializeComponent();
+            this.IsVisibleChanged += this.OnIsVisibleChanged;
         }
 
         protected virtual void DragSourceInitialized(object sender, ListViewExtensions.DragSourceInitializedEventArgs e)
@@ -29,14 +31,25 @@ namespace FoxTunes
             );
         }
 
-        protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        protected virtual async void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var viewModel = this.FindResource<global::FoxTunes.ViewModel.Playlist>("ViewModel");
-            if (viewModel == null)
+            await Windows.Invoke(() =>
+            {
+                if (this.ListView.SelectedItem != null)
+                {
+                    this.ListView.ScrollIntoView(this.ListView.SelectedItem);
+                }
+            });
+        }
+
+        protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listView = sender as ListView;
+            if (listView == null || listView.SelectedItem == null)
             {
                 return;
             }
-            var task = viewModel.RefreshColumns();
+            listView.ScrollIntoView(listView.SelectedItem);
         }
     }
 }

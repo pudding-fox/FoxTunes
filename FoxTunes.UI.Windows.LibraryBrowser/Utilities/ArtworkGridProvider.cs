@@ -67,7 +67,7 @@ namespace FoxTunes
 
         private Task<ImageSource> CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
-            var fileName = libraryHierarchyNode.MetaDatas[0].FileValue;
+            var fileName = libraryHierarchyNode.MetaDatas[0].Value;
             if (!File.Exists(fileName))
             {
                 return this.CreateImageSource0(libraryHierarchyNode, decodePixelWidth, decodePixelHeight);
@@ -117,7 +117,7 @@ namespace FoxTunes
 
         private void DrawImage(LibraryHierarchyNode libraryHierarchyNode, DrawingContext context, int position, int count, int decodePixelWidth, int decodePixelHeight)
         {
-            var fileName = libraryHierarchyNode.MetaDatas[position].FileValue;
+            var fileName = libraryHierarchyNode.MetaDatas[position].Value;
             if (!File.Exists(fileName))
             {
                 return;
@@ -214,14 +214,14 @@ namespace FoxTunes
         private string GetImageId(LibraryHierarchyNode libraryHierarchyNode)
         {
             var hashCode = default(int);
-            foreach (var value in new object[] { libraryHierarchyNode.Id, libraryHierarchyNode.Value })
+            do
             {
-                if (value == null)
+                if (!string.IsNullOrEmpty(libraryHierarchyNode.Value))
                 {
-                    continue;
+                    hashCode += libraryHierarchyNode.Value.GetHashCode();
                 }
-                hashCode += value.GetHashCode();
-            }
+                libraryHierarchyNode = libraryHierarchyNode.Parent;
+            } while (libraryHierarchyNode != null);
             return hashCode.ToString();
         }
     }
