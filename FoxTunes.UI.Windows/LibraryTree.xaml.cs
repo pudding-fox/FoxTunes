@@ -22,6 +22,15 @@ namespace FoxTunes
 
         protected virtual void DragSourceInitialized(object sender, TreeViewExtensions.DragSourceInitializedEventArgs e)
         {
+            var viewModel = this.FindResource<global::FoxTunes.ViewModel.LibraryTree>("ViewModel");
+            if (viewModel != null)
+            {
+                if (!viewModel.SelectedItem.IsMetaDatasLoaded)
+                {
+                    viewModel.SelectedItem.LoadMetaDatas();
+                }
+                this.MouseCursorAdorner.DataContext = viewModel.SelectedItem;
+            }
             this.MouseCursorAdorner.Show();
             try
             {

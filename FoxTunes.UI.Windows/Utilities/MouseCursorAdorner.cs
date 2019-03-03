@@ -1,5 +1,4 @@
 ﻿using FoxTunes.ViewModel;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -8,20 +7,8 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public class MouseCursorAdorner : UIElement
+    public class MouseCursorAdorner : FrameworkElement
     {
-        public static readonly DependencyProperty FlowDirectionProperty = Block.FlowDirectionProperty.AddOwner(typeof(MouseCursorAdorner));
-
-        public static FlowDirection GetFlowDirection(MouseCursorAdorner source)
-        {
-            return (FlowDirection)source.GetValue(FlowDirectionProperty);
-        }
-
-        public static void SetFlowDirection(MouseCursorAdorner source, FlowDirection value)
-        {
-            source.SetValue(FlowDirectionProperty, value);
-        }
-
         public static readonly DependencyProperty TemplateProperty = DependencyProperty.Register(
             "Template",
             typeof(DataTemplate),
@@ -54,7 +41,7 @@ namespace FoxTunes
             this.Adorner = new InternalMouseCursorAdorner(this, GetTemplate(this));
         }
 
-        private Adorner Adorner { get; set; }
+        private InternalMouseCursorAdorner Adorner { get; set; }
 
         public ICommand ShowCommand
         {
@@ -78,6 +65,7 @@ namespace FoxTunes
             {
                 return;
             }
+            this.Adorner.ContentControl.Content = this.DataContext;
             AdornerLayer.GetAdornerLayer(this).Add(this.Adorner);
         }
 
@@ -88,6 +76,7 @@ namespace FoxTunes
                 return;
             }
             AdornerLayer.GetAdornerLayer(this).Remove(this.Adorner);
+            this.Adorner.ContentControl.Content = null;
         }
 
         private class InternalMouseCursorAdorner : Adorner
