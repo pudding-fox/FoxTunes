@@ -67,7 +67,7 @@ namespace FoxTunes.ViewModel
 
         public Menu()
         {
-            this.InvocableComponents = new ObservableCollection<IInvocableComponent>();
+            this.InvocableComponents = new ObservableCollection<IInvocableComponent>(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
             this.Items = new ObservableCollection<MenuItem>();
         }
 
@@ -157,11 +157,6 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
-        {
-            this.InvocableComponents.AddRange(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
-            base.InitializeComponent(core);
-        }
         protected override Freezable CreateInstanceCore()
         {
             return new Menu();
