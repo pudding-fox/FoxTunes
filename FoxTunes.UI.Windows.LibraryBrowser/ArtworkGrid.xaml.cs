@@ -109,17 +109,25 @@ namespace FoxTunes
 
         protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var task = this.Refresh();
+            var libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
+            if (libraryHierarchyNode == null)
+            {
+                return;
+            }
+            var task = this.Refresh(libraryHierarchyNode);
         }
 
-        public Task Refresh()
+        public Task Refresh(LibraryHierarchyNode libraryHierarchyNode)
         {
-            return Task.Run(() =>
+#if NET40
+            return TaskEx.Run(async () =>
+#else
+            return Task.Run(async () =>
+#endif
             {
-                var libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
-                if (libraryHierarchyNode == null || libraryHierarchyNode.MetaDatas == null)
+                if (!libraryHierarchyNode.IsMetaDatasLoaded)
                 {
-                    return;
+                    await libraryHierarchyNode.LoadMetaDatas();
                 }
                 return Windows.Dispatcher.BeginInvoke(new Func<Task>(async () =>
                 {

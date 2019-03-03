@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -43,7 +44,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.ExpandAll(view.OfType<LibraryHierarchyNode>());
+            var task = this.ExpandAll(view.OfType<LibraryHierarchyNode>());
         }
 
         protected virtual void OnSelected(object sender, RoutedEventArgs e)
@@ -56,7 +57,22 @@ namespace FoxTunes
             treeViewItem.BringIntoView();
         }
 
-        public void ExpandAll(IEnumerable<LibraryHierarchyNode> sequence)
+        protected virtual void OnExpanded(object sender, RoutedEventArgs e)
+        {
+            var treeViewItem = sender as TreeViewItem;
+            if (treeViewItem == null)
+            {
+                return;
+            }
+            var libraryHierarchyNode = treeViewItem.DataContext as LibraryHierarchyNode;
+            if (libraryHierarchyNode == null || libraryHierarchyNode.IsChildrenLoaded)
+            {
+                return;
+            }
+            var task = libraryHierarchyNode.LoadChildren();
+        }
+
+        public async Task ExpandAll(IEnumerable<LibraryHierarchyNode> sequence)
         {
             var stack = new Stack<LibraryHierarchyNode>(sequence);
             while (stack.Count > 0)
@@ -64,7 +80,8 @@ namespace FoxTunes
                 var node = stack.Pop();
                 if (!node.IsExpanded)
                 {
-                    node.IsExpanded = true;
+                    await node.LoadChildren();
+                    await Windows.Invoke(() => node.IsExpanded = true);
                 }
                 foreach (var child in node.Children)
                 {

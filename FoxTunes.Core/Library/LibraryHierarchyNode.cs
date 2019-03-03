@@ -3,6 +3,7 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -50,16 +51,38 @@ namespace FoxTunes
 
         public event EventHandler ChildrenChanged;
 
+        private bool _IsChildrenLoaded { get; set; }
+
+        public bool IsChildrenLoaded
+        {
+            get
+            {
+                return this._IsChildrenLoaded;
+            }
+            set
+            {
+                this._IsChildrenLoaded = value;
+                this.OnIsChildrenLoadedChanged();
+            }
+        }
+
+        protected virtual void OnIsChildrenLoadedChanged()
+        {
+            if (this.IsChildrenLoadedChanged != null)
+            {
+                this.IsChildrenLoadedChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsChildrenLoaded");
+        }
+
+        public event EventHandler IsChildrenLoadedChanged;
+
         private ObservableCollection<MetaDataItem> _MetaDatas { get; set; }
 
         public ObservableCollection<MetaDataItem> MetaDatas
         {
             get
             {
-                if (this._MetaDatas == null)
-                {
-                    this.LoadMetaDatas();
-                }
                 return this._MetaDatas;
             }
             set
@@ -80,31 +103,31 @@ namespace FoxTunes
 
         public event EventHandler MetaDatasChanged;
 
-        private bool _IsLoaded { get; set; }
+        private bool _IsMetaDatasLoaded { get; set; }
 
-        public bool IsLoaded
+        public bool IsMetaDatasLoaded
         {
             get
             {
-                return this._IsLoaded;
+                return this._IsMetaDatasLoaded;
             }
             set
             {
-                this._IsLoaded = value;
-                this.OnIsLoadedChanged();
+                this._IsMetaDatasLoaded = value;
+                this.OnIsMetaDatasLoadedChanged();
             }
         }
 
-        protected virtual void OnIsLoadedChanged()
+        protected virtual void OnIsMetaDatasLoadedChanged()
         {
-            if (this.IsLoadedChanged != null)
+            if (this.IsMetaDatasLoadedChanged != null)
             {
-                this.IsLoadedChanged(this, EventArgs.Empty);
+                this.IsMetaDatasLoadedChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("IsLoaded");
+            this.OnPropertyChanged("IsMetaDatasLoaded");
         }
 
-        public event EventHandler IsLoadedChanged;
+        public event EventHandler IsMetaDatasLoadedChanged;
 
         private bool _IsExpanded { get; set; }
 
@@ -123,10 +146,6 @@ namespace FoxTunes
 
         protected virtual void OnIsExpandedChanged()
         {
-            if (this.IsExpanded && !this.IsLeaf && !this.IsLoaded)
-            {
-                this.LoadChildren();
-            }
             if (this.IsExpandedChanged != null)
             {
                 this.IsExpandedChanged(this, EventArgs.Empty);
@@ -177,29 +196,31 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public virtual void LoadChildren()
+        public virtual Task LoadChildren()
         {
-            if (this.LibraryHierarchyBrowser == null)
-            {
-                return;
-            }
-            CollectionLoader<LibraryHierarchyNode>.Instance.Load(
+            return this.LoadChildren(CollectionLoader<LibraryHierarchyNode>.Instance);
+        }
+
+        public virtual Task LoadChildren(ICollectionLoader<LibraryHierarchyNode> collectionLoader)
+        {
+            return collectionLoader.Load(
                 () => this.LibraryHierarchyBrowser.GetNodes(this),
                 children =>
                 {
                     this.Children = children;
-                    this.IsLoaded = true;
+                    this.IsChildrenLoaded = true;
                 }
             );
         }
 
-        public virtual void LoadMetaDatas()
+        public virtual Task LoadMetaDatas()
         {
-            if (this.DatabaseFactory == null)
-            {
-                return;
-            }
-            CollectionLoader<MetaDataItem>.Instance.Load(
+            return this.LoadMetaDatas(CollectionLoader<MetaDataItem>.Instance);
+        }
+
+        public virtual Task LoadMetaDatas(ICollectionLoader<MetaDataItem> collectionLoader)
+        {
+            return collectionLoader.Load(
                 () =>
                 {
                     using (var database = this.DatabaseFactory.Create())
@@ -221,7 +242,11 @@ namespace FoxTunes
                         }
                     }
                 },
-                metaDatas => this.MetaDatas = metaDatas
+                metaDatas =>
+                {
+                    this.MetaDatas = metaDatas;
+                    this.IsMetaDatasLoaded = true;
+                }
             );
         }
 

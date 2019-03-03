@@ -16,6 +16,9 @@ namespace FoxTunes
 
         public static SemaphoreSlim Semaphore { get; private set; }
 
+        //2MB
+        public static int MAX_IMAGE_SIZE = 2048000;
+
         static TagLibMetaDataSource()
         {
             Semaphore = new SemaphoreSlim(1, 1);
@@ -36,7 +39,7 @@ namespace FoxTunes
                 {
                     this.AddTags(metaData, file.Tag);
                     this.AddProperties(metaData, file.Properties);
-                    await this.AddImages(metaData, CommonMetaData.Pictures, file.Tag);
+                    await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, file.Tag.Pictures);
                 }
             }
             catch (UnsupportedFormatException)
@@ -66,6 +69,16 @@ namespace FoxTunes
         {
             var mimeType = string.Format("taglib/{0}", fileName.GetExtension());
             return FileTypes.AvailableTypes.ContainsKey(mimeType);
+        }
+
+        protected virtual bool IsSupported(File file, Tag tag, IPicture picture)
+        {
+            if (picture.Data.Data.Length > MAX_IMAGE_SIZE)
+            {
+                Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Data.Length, MAX_IMAGE_SIZE);
+                return false;
+            }
+            return true;
         }
 
         protected virtual File Create(string fileName)
@@ -171,16 +184,21 @@ namespace FoxTunes
             metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { Value = value.Trim() });
         }
 
-        private async Task AddImages(IList<MetaDataItem> metaData, string name, Tag tag)
+        private async Task AddImages(IList<MetaDataItem> metaData, string name, File file, Tag tag, IPicture[] pictures)
         {
-            if (tag.Pictures == null)
+            if (pictures == null)
             {
                 return;
             }
-            foreach (var picture in tag.Pictures)
+            var types = new List<ArtworkType>();
+            foreach (var picture in pictures)
             {
                 var type = GetArtworkType(picture.Type);
-                if (!ArtworkTypes.HasFlag(type))
+                if (!ArtworkTypes.HasFlag(type) || types.Contains(type))
+                {
+                    continue;
+                }
+                if (!this.IsSupported(file, tag, picture))
                 {
                     continue;
                 }
@@ -188,13 +206,13 @@ namespace FoxTunes
                 {
                     Value = await this.ImportImage(tag, picture, type, false)
                 });
+                types.Add(type);
             }
         }
 
         private async Task<string> ImportImage(Tag tag, IPicture picture, ArtworkType type, bool overwrite)
         {
-            var id = this.GetImageId(tag, type);
-            return await this.AddImage(picture, id, overwrite);
+            return await this.AddImage(picture, picture.Data.Checksum.ToString(), overwrite);
         }
 
         private async Task<string> AddImage(IPicture value, string id, bool overwrite)
@@ -285,29 +303,31 @@ namespace FoxTunes
         private async Task SetImage(MetaDataItem metaDataItem, Tag tag)
         {
             var index = default(int);
-            if (this.HasImage(metaDataItem.Name, tag, out index))
+            var pictures = new List<IPicture>(tag.Pictures);
+            if (this.HasImage(metaDataItem.Name, tag, pictures, out index))
             {
                 if (!string.IsNullOrEmpty(metaDataItem.Value))
                 {
-                    await this.ReplaceImage(metaDataItem, tag, index);
+                    await this.ReplaceImage(metaDataItem, tag, pictures, index);
                 }
                 else
                 {
-                    this.RemoveImage(metaDataItem, tag, index);
+                    this.RemoveImage(metaDataItem, tag, pictures, index);
                 }
             }
             else if (!string.IsNullOrEmpty(metaDataItem.Value))
             {
-                await this.AddImage(metaDataItem, tag);
+                await this.AddImage(metaDataItem, tag, pictures);
             }
+            tag.Pictures = pictures.ToArray();
         }
 
-        private bool HasImage(string name, Tag tag, out int index)
+        private bool HasImage(string name, Tag tag, IList<IPicture> pictures, out int index)
         {
             var type = GetArtworkType(name);
-            for (var a = 0; a < tag.Pictures.Length; a++)
+            for (var a = 0; a < pictures.Count; a++)
             {
-                if (tag.Pictures[a] != null && GetArtworkType(tag.Pictures[a].Type) == type)
+                if (pictures[a] != null && GetArtworkType(pictures[a].Type) == type)
                 {
                     index = a;
                     return true;
@@ -317,25 +337,19 @@ namespace FoxTunes
             return false;
         }
 
-        private async Task AddImage(MetaDataItem metaDataItem, Tag tag)
+        private async Task AddImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures)
         {
-            var pictures = new List<IPicture>(tag.Pictures);
             pictures.Add(await this.CreateImage(metaDataItem, tag));
-            tag.Pictures = pictures.ToArray();
         }
 
-        private async Task ReplaceImage(MetaDataItem metaDataItem, Tag tag, int index)
+        private async Task ReplaceImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
         {
-            var pictures = tag.Pictures;
             pictures[index] = await this.CreateImage(metaDataItem, tag);
-            tag.Pictures = pictures;
         }
 
-        private void RemoveImage(MetaDataItem metaDataItem, Tag tag, int index)
+        private void RemoveImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
         {
-            var pictures = new List<IPicture>(tag.Pictures);
             pictures.RemoveAt(index);
-            tag.Pictures = pictures.ToArray();
         }
 
         private async Task<IPicture> CreateImage(MetaDataItem metaDataItem, Tag tag)
@@ -348,23 +362,6 @@ namespace FoxTunes
             metaDataItem.Value = await this.ImportImage(tag, picture, type, true);
             return picture;
         }
-
-#pragma warning disable 612, 618
-        private string GetImageId(Tag tag, ArtworkType type)
-        {
-            var hashCode = default(int);
-            //Hopefully this is unique enough. We can't use the artist as compilations are not reliable.
-            foreach (var value in new object[] { tag.Year, tag.Album, type })
-            {
-                if (value == null)
-                {
-                    continue;
-                }
-                hashCode += value.GetHashCode();
-            }
-            return hashCode.ToString();
-        }
-#pragma warning restore 612, 618
 
         public static readonly IDictionary<ArtworkType, PictureType> ArtworkTypeMapping = new Dictionary<ArtworkType, PictureType>()
         {
