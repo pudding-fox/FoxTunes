@@ -99,6 +99,7 @@ namespace FoxTunes
             {
                 this.ListBox = listBox;
                 this.ListBox.PreviewMouseDown += this.OnMouseDown;
+                this.ListBox.PreviewMouseUp += this.OnMouseUp;
                 this.ListBox.MouseMove += this.OnMouseMove;
             }
 
@@ -117,11 +118,11 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                if (Math.Abs(position.X - this.DragStartPosition.X) > SystemParameters.MinimumHorizontalDragDistance)
+                if (Math.Abs(position.X - this.DragStartPosition.X) > (SystemParameters.MinimumHorizontalDragDistance * 2))
                 {
                     return true;
                 }
-                if (Math.Abs(position.Y - this.DragStartPosition.Y) > SystemParameters.MinimumVerticalDragDistance)
+                if (Math.Abs(position.Y - this.DragStartPosition.Y) > (SystemParameters.MinimumVerticalDragDistance * 2))
                 {
                     return true;
                 }
@@ -135,6 +136,11 @@ namespace FoxTunes
                     return;
                 }
                 this.DragStartPosition = e.GetPosition(null);
+            }
+
+            protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
+            {
+                this.DragStartPosition = default(Point);
             }
 
             protected virtual void OnMouseMove(object sender, MouseEventArgs e)
