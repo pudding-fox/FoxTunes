@@ -1,12 +1,10 @@
-﻿WITH RECURSIVE 
+﻿WITH RECURSIVE
 
 LibraryHierarchyParent
 AS
 (
-	SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" AS "Parent_Id", "Value"
+	SELECT "LibraryHierarchyItems"."Id", "Parent_Id", "Value"
 	FROM "LibraryHierarchyItems"
-		LEFT JOIN "LibraryHierarchyItem_Parent"
-			ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = "LibraryHierarchyItems"."Id"
 	WHERE "LibraryHierarchy_Id" = @libraryHierarchyId
 ),
 
@@ -15,9 +13,7 @@ AS
 (
 	SELECT LibraryHierarchyParent."Id", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent
-		LEFT JOIN "LibraryHierarchyItem_Parent"
-			ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = LibraryHierarchyParent."Id"
-	WHERE ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" IS NULL) OR "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" = @libraryHierarchyItemId)
+	WHERE ((@libraryHierarchyItemId IS NULL AND LibraryHierarchyParent."Parent_Id" IS NULL) OR LibraryHierarchyParent."Parent_Id" = @libraryHierarchyItemId)
 	UNION ALL 
 	SELECT "Root", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent
@@ -29,9 +25,7 @@ AS
 (
 	SELECT LibraryHierarchyParent."Id", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent
-	LEFT JOIN "LibraryHierarchyItem_Parent"
-			ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = LibraryHierarchyParent."Id"
-	WHERE ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" IS NULL) OR "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" = @libraryHierarchyItemId)
+	WHERE ((@libraryHierarchyItemId IS NULL AND LibraryHierarchyParent."Parent_Id" IS NULL) OR LibraryHierarchyParent."Parent_Id" = @libraryHierarchyItemId)
 	UNION ALL 
 	SELECT "Root", LibraryHierarchyParent."Id", LibraryHierarchyParent."Parent_Id", LibraryHierarchyParent."Value"
 	FROM LibraryHierarchyParent
@@ -40,10 +34,8 @@ AS
 
 SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchy_Id", "Value", "IsLeaf"
 FROM "LibraryHierarchyItems"
-	LEFT JOIN "LibraryHierarchyItem_Parent"
-		ON "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Id" = "LibraryHierarchyItems"."Id"
 WHERE "LibraryHierarchy_Id" = @libraryHierarchyId
-	AND ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" IS NULL) OR "LibraryHierarchyItem_Parent"."LibraryHierarchyItem_Parent_Id" = @libraryHierarchyItemId)
+	AND ((@libraryHierarchyItemId IS NULL AND "Parent_Id" IS NULL) OR "Parent_Id" = @libraryHierarchyItemId)
 	AND 
 	(
 		@filter IS NULL OR EXISTS

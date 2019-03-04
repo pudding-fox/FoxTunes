@@ -53,6 +53,45 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\LibraryHierarchyBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
+    </None>
+    <Compile Update="Templates\LibraryHierarchyBuilder.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\PivotViewBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>PivotViewBuilder.cs</LastGenOutput>
+    </None>
+    <Compile Update="Templates\PivotViewBuilder.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PivotViewBuilder.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\PlaylistSequenceBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>PlaylistSequenceBuilder.cs</LastGenOutput>
+    </None>
+    <Compile Update="Templates\PlaylistSequenceBuilder.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PlaylistSequenceBuilder.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 
@@ -62,6 +101,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />

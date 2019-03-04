@@ -13,6 +13,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery RemoveLibraryItems { get; }
 
+        IDatabaseQuery AddLibraryHierarchyNode { get; }
+
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }
 
         IDatabaseQuery AddPlaylistSequenceRecord { get; }
@@ -44,7 +46,5 @@ namespace FoxTunes.Interfaces
         IDatabaseQuery BeginBuildLibraryHierarchies { get; }
 
         IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
-
-        IDatabaseQuery EndBuildLibraryHierarchies { get; }
     }
 }

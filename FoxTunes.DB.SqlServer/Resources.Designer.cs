@@ -93,27 +93,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM &quot;LibraryHierarchyLevelLeaf&quot;;
-        ///
-        ///INSERT INTO &quot;LibraryHierarchyLevelLeaf&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;)
-        ///SELECT &quot;LibraryHierarchyLevels&quot;.&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevels&quot;.&quot;Id&quot;
-        ///FROM &quot;LibraryHierarchyLevels&quot;
-        ///JOIN 
-        ///(
-        ///	SELECT &quot;LibraryHierarchy_Id&quot;, MAX(&quot;Sequence&quot;) AS &quot;Sequence&quot;
-        ///	FROM &quot;LibraryHierarchyLevels&quot;
-        ///	GROUP BY &quot;LibraryHierarchy_Id&quot;
-        ///) AS &quot;Leaves&quot; 
-        ///	ON &quot;LibraryHierarchyLevels&quot;.&quot;LibraryHierarchy_Id&quot; = &quot;Leaves&quot;.&quot;LibraryHierarchy_Id&quot;
-        ///		AND &quot;LibraryHierar [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string BeginBuildLibraryHierarchies {
-            get {
-                return ResourceManager.GetString("BeginBuildLibraryHierarchies", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistSort&quot;;
         ///DELETE FROM &quot;PlaylistSequence&quot;;.
         /// </summary>
@@ -130,7 +109,7 @@ namespace FoxTunes {
         ///	[Type] INTEGER NOT NULL,
         ///    [Value] nvarchar(250));
         ///
-        ///CREATE TABLE LibraryItems (
+        ///CREATE TABLE [LibraryItems] (
         ///	Id INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///	DirectoryName nvarchar(250) NOT NULL, 
         ///	FileName nvarchar(250) NOT NULL, 
@@ -139,7 +118,7 @@ namespace FoxTunes {
         ///CREATE TABLE [PlaylistItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]),
-        ///    [Sequen [rest of string was truncated]&quot;;.
+        ///    [Sequ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
@@ -184,17 +163,17 @@ namespace FoxTunes {
         ///LibraryHierarchyParent
         ///AS
         ///(
-        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Parent_Id&quot; AS &quot;Parent_Id&quot;, &quot;Value&quot;
+        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;
         ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///		LEFT JOIN &quot;LibraryHierarchyItem_Parent&quot;
-        ///			ON &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Id&quot; = &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;
         ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
         ///),
         ///
         ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
         ///AS
         ///(
-        ///	SELECT LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarch [rest of string was truncated]&quot;;.
+        ///	SELECT LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Parent_Id&quot;, LibraryHierarchyParent.&quot;Value&quot;
+        ///	FROM LibraryHierarchyParent
+        ///	WHERE ((@libraryHierarchyItemId IS NULL AND LibraryHierarchyParent.&quot;Parent_Id&quot; IS NULL) OR [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyNodesWithFilter {
             get {

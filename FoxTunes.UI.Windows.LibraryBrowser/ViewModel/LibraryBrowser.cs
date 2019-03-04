@@ -10,14 +10,33 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowser : LibraryBase
     {
-        public LibraryBrowser()
+        public IConfiguration Configuration { get; private set; }
+
+        private ObservableCollection<LibraryBrowserFrame> _Frames { get; set; }
+
+        public ObservableCollection<LibraryBrowserFrame> Frames
         {
-            this.Frames = new ObservableCollection<LibraryBrowserFrame>();
+            get
+            {
+                return this._Frames;
+            }
+            set
+            {
+                this._Frames = value;
+                this.OnFramesChanged();
+            }
         }
 
-        public ObservableCollection<LibraryBrowserFrame> Frames { get; private set; }
+        protected virtual void OnFramesChanged()
+        {
+            if (this.FramesChanged != null)
+            {
+                this.FramesChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Frames");
+        }
 
-        public IConfiguration Configuration { get; private set; }
+        public event EventHandler FramesChanged;
 
         private IntegerConfigurationElement _TileSize { get; set; }
 
@@ -74,7 +93,16 @@ namespace FoxTunes.ViewModel
             LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
-            this.Frames.Add(new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items));
+
+        }
+
+        public override void Refresh()
+        {
+            this.Frames = new ObservableCollection<LibraryBrowserFrame>(new[]
+            {
+                new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+            });
+            base.Refresh();
         }
 
         protected virtual void OnActiveComponentsChanged(object sender, EventArgs e)

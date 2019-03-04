@@ -425,7 +425,7 @@ namespace FoxTunes.Templates
             {
                 get
                 {
-                    return this.formatProviderField;
+                    return this.formatProviderField ;
                 }
                 set
                 {

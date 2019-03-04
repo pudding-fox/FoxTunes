@@ -133,11 +133,6 @@ namespace FoxTunes
             {
                 await task.Run();
             }
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                await this.Database.ExecuteAsync(this.Database.Queries.EndBuildLibraryHierarchies, transaction);
-                transaction.Commit();
-            }
         }
 
         private async Task AddHiearchies(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)

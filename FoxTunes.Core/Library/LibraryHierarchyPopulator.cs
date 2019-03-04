@@ -4,6 +4,7 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,13 +49,17 @@ namespace FoxTunes
 
         public async Task Populate(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction = null)
         {
+            var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction).ToArray();
+            var libraryHierarchyLevels = libraryHierarchies.ToDictionary(
+                libraryHierarchy => libraryHierarchy,
+                libraryHierarchy => libraryHierarchy.Levels.OrderBy(libraryHierarchyLevel => libraryHierarchyLevel.Sequence).ToArray()
+            );
+
             if (this.ReportProgress)
             {
                 await this.SetName("Populating library hierarchies");
                 await this.SetPosition(0);
-                await this.SetCount(
-                    this.Database.Set<LibraryHierarchyLevel>(transaction).Count * this.Database.Set<LibraryItem>(transaction).Count
-                );
+                //TODO: Estimate count.
             }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
@@ -62,21 +67,9 @@ namespace FoxTunes
 
             await AsyncParallel.ForEach(reader, async record =>
             {
-                var context = this.GetOrAddContext();
-                var value = this.ExecuteScript(record, "Script");
-
-#if NET40
-                this.Semaphore.Wait();
-#else
-                await this.Semaphore.WaitAsync();
-#endif
-                try
+                foreach (var libraryHierarchy in libraryHierarchies)
                 {
-                    await this.Writer.Write(record, value);
-                }
-                finally
-                {
-                    this.Semaphore.Release();
+                    await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[libraryHierarchy]);
                 }
 
                 if (this.ReportProgress)
@@ -98,20 +91,46 @@ namespace FoxTunes
                             this.Semaphore.Release();
                         }
                     }
-                    Interlocked.Increment(ref position);
                 }
+                Interlocked.Increment(ref position);
             }, cancellationToken, this.ParallelOptions);
         }
 
-        private object ExecuteScript(IDatabaseReaderRecord record, string name)
+        private async Task Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel[] libraryHierarchyLevels)
         {
-            var script = record[name] as string;
+            var parentId = default(int?);
+            for (int a = 0, b = libraryHierarchyLevels.Length - 1; a <= b; a++)
+            {
+                parentId = await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[a], parentId, a == b);
+            }
+        }
+
+        private async Task<int> Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel libraryHierarchyLevel, int? parentId, bool isLeaf)
+        {
+            var value = this.ExecuteScript(record, libraryHierarchyLevel.Script);
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync();
+#endif
+            try
+            {
+                return await this.Writer.Write(libraryHierarchy, libraryHierarchyLevel, record.Get<int>("Id"), parentId, value, isLeaf);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+        }
+
+        private string ExecuteScript(IDatabaseReaderRecord record, string script)
+        {
             if (string.IsNullOrEmpty(script))
             {
                 return string.Empty;
             }
-            var fileName = record["FileName"] as string;
-            var metaData = new Dictionary<string, object>();
+            var fileName = record.Get<string>("FileName");
+            var metaData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             for (var a = 0; true; a++)
             {
                 var keyName = string.Format("Key_{0}", a);
@@ -119,9 +138,9 @@ namespace FoxTunes
                 {
                     break;
                 }
-                var key = (record[keyName] as string).ToLower();
+                var key = record.Get<string>(keyName).ToLower();
                 var valueName = string.Format("Value_{0}_Value", a);
-                var value = record[valueName] == DBNull.Value ? null : record[valueName];
+                var value = record.Get<string>(valueName);
                 metaData.Add(key, value);
             }
             var context = this.GetOrAddContext();
@@ -129,7 +148,7 @@ namespace FoxTunes
             context.SetValue("tag", metaData);
             try
             {
-                return context.Run(script);
+                return Convert.ToString(context.Run(script));
             }
             catch (ScriptingException e)
             {

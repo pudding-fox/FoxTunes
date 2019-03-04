@@ -15,5 +15,7 @@ namespace FoxTunes.Interfaces
         ITableConfig LibraryHierarchy { get; }
 
         ITableConfig LibraryHierarchyLevel { get; }
+
+        ITableConfig LibraryHierarchyNode { get; }
     }
 }

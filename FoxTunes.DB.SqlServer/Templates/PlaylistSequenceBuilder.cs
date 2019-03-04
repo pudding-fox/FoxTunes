@@ -50,7 +50,7 @@ AS
 (
 ");
             
-            #line 36 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 26 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 		this.Database,
 		"VerticalMetaData", 
@@ -65,7 +65,7 @@ AS
             this.Write("\r\n)\r\n\r\nSELECT \"HorizontalMetaData\".\"Id\" AS \"PlaylistItem_Id\", \"HorizontalMetaData" +
                     "\".\"FileName\" AS \"FileName\"\r\n");
             
-            #line 49 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 39 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
 
 	for(var index = 0; index < this.MetaDataNames.Length; index++)
 	{
@@ -75,21 +75,21 @@ AS
             #line hidden
             this.Write(",\"Key_");
             
-            #line 52 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 42 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 52 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 42 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 52 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 42 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
 
 	}
 
@@ -328,7 +328,7 @@ AS
             {
                 get
                 {
-                    return this.formatProviderField;
+                    return this.formatProviderField ;
                 }
                 set
                 {
