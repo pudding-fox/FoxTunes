@@ -7,7 +7,7 @@ namespace FoxTunes.Interfaces
     {
         HierarchyManagerState State { get; }
 
-        Task Build(bool reset);
+        Task Build(LibraryItemStatus? status);
 
         Task Clear();
     }

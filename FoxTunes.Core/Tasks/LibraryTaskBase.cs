@@ -97,7 +97,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task BuildHierarchies()
+        protected virtual async Task BuildHierarchies(LibraryItemStatus? status)
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
@@ -106,26 +106,18 @@ namespace FoxTunes
             }
             using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
-                var metaDataNames = default(IEnumerable<string>);
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction).ToArray();
-                }
-                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-                {
-                    using (var reader = this.Database.ExecuteReader(this.Database.Queries.BuildLibraryHierarchies(metaDataNames), null, transaction))
+                    await this.AddHiearchies(status, cancellationToken, transaction);
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        await this.AddHiearchies(reader, cancellationToken, transaction);
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            await this.SetName("Waiting..");
-                            await this.SetDescription(string.Empty);
-                        }
-                        else
-                        {
-                            await this.SetDescription("Finalizing");
-                            await this.SetIsIndeterminate(true);
-                        }
+                        await this.SetName("Waiting..");
+                        await this.SetDescription(string.Empty);
+                    }
+                    else
+                    {
+                        await this.SetDescription("Finalizing");
+                        await this.SetIsIndeterminate(true);
                     }
                     transaction.Commit();
                 }
@@ -135,12 +127,12 @@ namespace FoxTunes
             }
         }
 
-        private async Task AddHiearchies(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)
+        private async Task AddHiearchies(LibraryItemStatus? status, CancellationToken cancellationToken, ITransactionSource transaction)
         {
             using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, this.Visible, transaction))
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
-                await this.WithPopulator(libraryHierarchyPopulator, async () => await libraryHierarchyPopulator.Populate(reader, cancellationToken, transaction));
+                await this.WithPopulator(libraryHierarchyPopulator, async () => await libraryHierarchyPopulator.Populate(status, cancellationToken, transaction));
             }
         }
 

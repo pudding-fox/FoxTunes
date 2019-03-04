@@ -36,13 +36,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public async Task Build(bool reset)
+        public async Task Build(LibraryItemStatus? status)
         {
             if (this.LibraryManager.State.HasFlag(LibraryManagerState.Updating))
             {
                 return;
             }
-            using (var task = new BuildLibraryHierarchiesTask(reset))
+            using (var task = new BuildLibraryHierarchiesTask(status))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task);
