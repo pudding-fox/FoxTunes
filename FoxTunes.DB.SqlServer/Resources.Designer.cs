@@ -130,29 +130,5 @@ namespace FoxTunes {
                 return ResourceManager.GetString("GetLibraryHierarchyMetaData", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to WITH 
-        ///
-        ///LibraryHierarchyParent
-        ///AS
-        ///(
-        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///),
-        ///
-        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
-        ///AS
-        ///(
-        ///	SELECT LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Parent_Id&quot;, LibraryHierarchyParent.&quot;Value&quot;
-        ///	FROM LibraryHierarchyParent
-        ///	WHERE ((@libraryHierarchyItemId IS NULL AND LibraryHierarchyParent.&quot;Parent_Id&quot; IS NULL) OR [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GetLibraryHierarchyNodesWithFilter {
-            get {
-                return ResourceManager.GetString("GetLibraryHierarchyNodesWithFilter", resourceCulture);
-            }
-        }
     }
 }

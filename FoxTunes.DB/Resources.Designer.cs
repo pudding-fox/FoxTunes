@@ -229,6 +229,25 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to WITH
+        ///
+        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
+        ///AS
+        ///(
+        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
+        ///	FROM &quot;LibraryHierarchyItems&quot;
+        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
+        ///		AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
+        ///	UNION ALL 
+        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;,  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GetLibraryHierarchyNodesWithFilter {
+            get {
+                return ResourceManager.GetString("GetLibraryHierarchyNodesWithFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to WITH &quot;CurrentSequence&quot;
         ///AS
         ///(	

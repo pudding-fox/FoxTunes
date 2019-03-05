@@ -26,6 +26,10 @@ namespace FoxTunes
             }
             set
             {
+                if (string.Equals(this._Filter, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
                 this._Filter = value;
                 this.OnFilterChanged();
             }

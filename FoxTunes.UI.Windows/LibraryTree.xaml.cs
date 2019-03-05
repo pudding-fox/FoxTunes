@@ -13,7 +13,7 @@ namespace FoxTunes
     [UIComponent("86276AD4-3962-4659-A00F-95065CD92117", UIComponentSlots.TOP_LEFT, "Library Tree")]
     public partial class LibraryTree : UIComponentBase
     {
-        const int EXPAND_ALL_LIMIT = 3;
+        const int EXPAND_ALL_LIMIT = 5;
 
         public LibraryTree()
         {
