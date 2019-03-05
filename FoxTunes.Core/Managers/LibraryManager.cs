@@ -70,6 +70,10 @@ namespace FoxTunes
             }
             set
             {
+                if (object.Equals(this._SelectedItem, value))
+                {
+                    return;
+                }
                 this._SelectedItem = value;
                 this.OnSelectedItemChanged();
             }
@@ -208,7 +212,7 @@ namespace FoxTunes
                 await task.Run();
             }
         }
-        
+
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)

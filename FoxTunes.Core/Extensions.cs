@@ -108,13 +108,20 @@ namespace FoxTunes
             return alternative;
         }
 
-        public static int IndexOf<T>(this IEnumerable<T> sequence, T element)
+        public static int IndexOf<T>(this IEnumerable<T> sequence, T element, IEqualityComparer<T> comparer = null)
         {
             var index = 0;
             var enumerator = sequence.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                if (enumerator.Current != null && enumerator.Current.Equals(element))
+                if (comparer != null)
+                {
+                    if (comparer.Equals(enumerator.Current, element))
+                    {
+                        return index;
+                    }
+                }
+                else if (enumerator.Current != null && enumerator.Current.Equals(element))
                 {
                     return index;
                 }

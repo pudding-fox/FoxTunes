@@ -74,16 +74,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistSort&quot;;
-        ///DELETE FROM &quot;PlaylistSequence&quot;;.
-        /// </summary>
-        internal static string BeginSequencePlaylistItems {
-            get {
-                return ResourceManager.GetString("BeginSequencePlaylistItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to CREATE TABLE [MetaDataItems](
         ///	[Id] INTEGER PRIMARY KEY NOT NULL, 
         ///	[Name] text NOT NULL, 
@@ -106,27 +96,6 @@ namespace FoxTunes {
         internal static string Database {
             get {
                 return ResourceManager.GetString("Database", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistSequence&quot; (&quot;PlaylistItem_Id&quot;)
-        ///SELECT &quot;PlaylistItem_Id&quot;
-        ///FROM &quot;PlaylistSort&quot;
-        ///ORDER BY &quot;Value1&quot;, &quot;Value2&quot;, &quot;Value3&quot;, &quot;Value4&quot;, &quot;Value5&quot;, &quot;Value6&quot;, &quot;Value7&quot;, &quot;Value8&quot;, &quot;Value9&quot;, &quot;Value10&quot;;
-        ///
-        ///UPDATE &quot;PlaylistItems&quot;
-        ///SET &quot;Sequence&quot; = &quot;Sequence&quot; +
-        ///(
-        ///	SELECT &quot;Id&quot; - 1
-        ///	FROM &quot;PlaylistSequence&quot;
-        ///	WHERE &quot;PlaylistSequence&quot;.&quot;PlaylistItem_Id&quot; = &quot;PlaylistItems&quot;.&quot;Id&quot;
-        ///)
-        ///WHERE &quot;Status&quot; = @status;.
-        /// </summary>
-        internal static string EndSequencePlaylistItems {
-            get {
-                return ResourceManager.GetString("EndSequencePlaylistItems", resourceCulture);
             }
         }
         

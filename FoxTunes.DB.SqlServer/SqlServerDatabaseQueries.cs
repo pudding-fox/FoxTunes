@@ -13,14 +13,6 @@ namespace FoxTunes
         {
         }
 
-        public override IDatabaseQuery BeginSequencePlaylistItems
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(Resources.BeginSequencePlaylistItems);
-            }
-        }
-
         public override IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames)
         {
             var playlistSequenceBuilder = new PlaylistSequenceBuilder(this.Database, metaDataNames);
@@ -28,17 +20,6 @@ namespace FoxTunes
                 playlistSequenceBuilder.TransformText(),
                 new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
             );
-        }
-
-        public override IDatabaseQuery EndSequencePlaylistItems
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.EndSequencePlaylistItems,
-                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
         }
 
         public override IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames)

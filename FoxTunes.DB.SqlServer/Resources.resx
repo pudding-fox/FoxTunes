@@ -121,14 +121,8 @@
   <data name="AddLibraryMetaDataItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addlibrarymetadataitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="BeginSequencePlaylistItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\beginsequenceplaylistitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="Database" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\database.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="EndSequencePlaylistItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\endsequenceplaylistitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="GetLibraryHierarchyMetaData" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\getlibraryhierarchymetadata.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

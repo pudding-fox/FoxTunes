@@ -201,11 +201,7 @@ namespace FoxTunes
             }
         }
 
-        public abstract IDatabaseQuery BeginSequencePlaylistItems { get; }
-
         public abstract IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
-
-        public abstract IDatabaseQuery EndSequencePlaylistItems { get; }
 
         public IDatabaseQuery BeginBuildLibraryHierarchies
         {

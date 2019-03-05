@@ -37,11 +37,7 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery UpdateLibraryVariousArtists { get; }
 
-        IDatabaseQuery BeginSequencePlaylistItems { get; }
-
         IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
-
-        IDatabaseQuery EndSequencePlaylistItems { get; }
 
         IDatabaseQuery BeginBuildLibraryHierarchies { get; }
 

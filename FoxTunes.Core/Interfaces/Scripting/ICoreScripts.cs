@@ -2,8 +2,6 @@
 {
     public interface ICoreScripts : IBaseComponent
     {
-        string PlaylistSortValues { get; }
-
         string Artist { get; }
 
         string Artist_Album { get; }

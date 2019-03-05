@@ -93,16 +93,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistSort&quot;;
-        ///DELETE FROM &quot;PlaylistSequence&quot;;.
-        /// </summary>
-        internal static string BeginSequencePlaylistItems {
-            get {
-                return ResourceManager.GetString("BeginSequencePlaylistItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to CREATE TABLE [MetaDataItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///    [Name] nvarchar(250) NOT NULL, 
@@ -123,22 +113,6 @@ namespace FoxTunes {
         internal static string Database {
             get {
                 return ResourceManager.GetString("Database", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to UPDATE &quot;PlaylistItems&quot;
-        ///SET &quot;Sequence&quot; = &quot;Sequence&quot; + (&quot;RowNumber&quot; - 1)
-        ///FROM
-        ///(
-        ///	SELECT &quot;PlaylistItems&quot;.*, ROW_NUMBER() OVER (ORDER BY &quot;PlaylistSort&quot;.&quot;Value1&quot;, &quot;PlaylistSort&quot;.&quot;Value2&quot;, &quot;PlaylistSort&quot;.&quot;Value3&quot;, &quot;PlaylistSort&quot;.&quot;Value4&quot;, &quot;PlaylistSort&quot;.&quot;Value5&quot;, &quot;PlaylistSort&quot;.&quot;Value6&quot;, &quot;PlaylistSort&quot;.&quot;Value7&quot;, &quot;PlaylistSort&quot;.&quot;Value8&quot;, &quot;PlaylistSort&quot;.&quot;Value9&quot;, &quot;PlaylistSort&quot;.&quot;Value10&quot;) AS &quot;RowNumber&quot;
-        ///	FROM &quot;PlaylistItems&quot;
-        ///		JOIN &quot;PlaylistSort&quot; ON &quot;PlaylistItems&quot;.&quot;Id&quot; = &quot;PlaylistSort&quot;.&quot;PlaylistItem_Id&quot;
-        ///	WH [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string EndSequencePlaylistItems {
-            get {
-                return ResourceManager.GetString("EndSequencePlaylistItems", resourceCulture);
             }
         }
         
