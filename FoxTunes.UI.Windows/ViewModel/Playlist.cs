@@ -188,14 +188,18 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected override Task OnSignal(object sender, ISignal signal)
+        protected override async Task OnSignal(object sender, ISignal signal)
         {
+            await base.OnSignal(sender, signal);
             switch (signal.Name)
             {
+                case CommonSignals.PlaylistUpdated:
+                    await this.RefreshColumns();
+                    break;
                 case CommonSignals.PlaylistColumnsUpdated:
-                    return this.ReloadColumns();
+                    await this.ReloadColumns();
+                    break;
             }
-            return base.OnSignal(sender, signal);
         }
 
         public ICommand RemovePlaylistItemsCommand
