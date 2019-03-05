@@ -110,12 +110,28 @@ FoxDb.SqlServer.dll
 FoxDb.SqlServer.2012.dll
 "
 
-FASTMETADATA="
+SIMPLEMETADATA="
 FoxTunes.MetaData.FileName.dll
 "
 
 LIBRARYBROWSER="
 FoxTunes.UI.Windows.LibraryBrowser.dll
+"
+
+METADATAEDITOR="
+FoxTunes.UI.Windows.MetaDataEditor.dll
+"
+
+BUNDLED="
+windows
+asio
+cd
+dsd
+dts
+sox
+wasapi
+librarybrowser
+metadataeditor
 "
 
 TAG=$(git describe --abbrev=0 --tags)
@@ -145,8 +161,9 @@ do
 	mkdir -p "./release/$target/Plugins/sox"
 	mkdir -p "./release/$target/Plugins/wasapi"
 	mkdir -p "./release/$target/Plugins/sqlserver"
-	mkdir -p "./release/$target/Plugins/metadata"
+	mkdir -p "./release/$target/Plugins/simplemetadata"
 	mkdir -p "./release/$target/Plugins/librarybrowser"
+	mkdir -p "./release/$target/Plugins/metadataeditor"
 
 	echo "Creating main package.."
 
@@ -169,9 +186,9 @@ do
 
 	cd "./release/$target/Main"
 
-	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target.zip" "*.*" -r
+	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target-Minimal.zip" "*.*" -r
 
-	cp "./FoxTunes-$TAG-$target.zip" "../../"
+	mv "./FoxTunes-$TAG-$target-Minimal.zip" "../../"
 
 	cd ..
 	cd ..
@@ -227,27 +244,51 @@ do
 			cp "./distribution/$target/$file" "./release/$target/Plugins/sqlserver"
 	done
 
-	for file in $FASTMETADATA
+	for file in $SIMPLEMETADATA
 	do
 			echo $file
-			cp "./distribution/$target/$file" "./release/$target/Plugins/metadata"
+			cp "./distribution/$target/$file" "./release/$target/Plugins/simplemetadata"
 	done
 
 	for file in $LIBRARYBROWSER
-        do
-                        echo $file
-                        cp "./distribution/$target/$file" "./release/$target/Plugins/librarybrowser"
-        done
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/librarybrowser"
+    done
+
+	for file in $METADATAEDITOR
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/metadataeditor"
+    done
 
 	cd "./release/$target/Plugins"
 
 	"../../../.7z/7za.exe" a "FoxTunes-$TAG-Plugins-$target.zip" "*.*" -r
 
-	cp "./FoxTunes-$TAG-Plugins-$target.zip" "../../"
+	mv "./FoxTunes-$TAG-Plugins-$target.zip" "../../"
 
 	cd ..
 	cd ..
 	cd ..
+
+	for bundled in $BUNDLED
+	do
+		echo "Installing plugin: $bundled"
+		mkdir -p "./release/$target/Main/$bundled"
+		cp "./release/$target/Plugins/$bundled/"* "./release/$target/Main/$bundled"
+	done
+
+	cd "./release/$target/Main"
+
+	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target.zip" "*.*" -r
+
+	mv "./FoxTunes-$TAG-$target.zip" "../../"
+
+	cd ..
+	cd ..
+	cd ..
+
 done
 
 echo "All done."
