@@ -1,7 +1,13 @@
 # FoxTunes
 A modular music player using the BASS framework.
 
+The main release is [FoxTunes-1.3-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/1.3/FoxTunes-1.3-net461.zip)
+
 ![Main](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/Main.PNG)
+
+The UI components can be relocated and removed.
+
+![Main](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/Browser.PNG)
 
 Library, playlist and other elements can be customized using Javascript.
 
@@ -18,6 +24,9 @@ Includes a mini player with optional artwork and playlist.
 ![Mini B](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/MiniPlayerB.PNG)
 
 A Windows XP compatibile .NET 4.0 build is available, can be configured minimally.
+It needs at least;
+1) [KB2468871](http://support.microsoft.com/kb/2468871) - Portable class libraries patch.
+2) [msvcp100.dll and msvcr100.dll](https://github.com/aidan-g/FoxTunes/releases/download/0.8/FoxTunes-0.8-Dependencies.tar.gz) - Microsoft Visual C++ 2010
 
 ![Minimal](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/Minimal.PNG)
 
