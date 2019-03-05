@@ -109,7 +109,7 @@ namespace FoxTunes
 
         protected virtual void OnPhase(object sender, CommandPhaseEventArgs e)
         {
-            Windows.Invoke(() =>
+            var task = Windows.Invoke(() =>
             {
                 var tag = GetTag(this);
                 if (!string.Equals(tag, e.Tag, StringComparison.OrdinalIgnoreCase))

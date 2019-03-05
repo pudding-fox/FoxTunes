@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -17,26 +16,17 @@ namespace FoxTunes
 
         private static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
 
-        public void Clear()
-        {
-            FileMetaDataStore.Clear(PREFIX);
-        }
-
-        public Task<ImageSource> CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
+        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
             var fileName = default(string);
             if (FileMetaDataStore.Exists(PREFIX, this.GetImageId(libraryHierarchyNode), out fileName))
             {
-#if NET40
-                return TaskEx.FromResult<ImageSource>(ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight));
-#else
-                return Task.FromResult<ImageSource>(ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight));
-#endif
+                return ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
             }
             return this.CreateImageSourceCore(libraryHierarchyNode, decodePixelWidth, decodePixelHeight);
         }
 
-        private Task<ImageSource> CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
+        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
             switch (libraryHierarchyNode.MetaDatas.Count)
             {
@@ -53,33 +43,25 @@ namespace FoxTunes
             }
         }
 
-        private Task<ImageSource> CreateImageSource0(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
+        private ImageSource CreateImageSource0(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
             using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
             {
-#if NET40
-                return TaskEx.FromResult(ImageLoader.Load(stream, decodePixelWidth, decodePixelHeight));
-#else
-                return Task.FromResult(ImageLoader.Load(stream, decodePixelWidth, decodePixelHeight));
-#endif
+                return ImageLoader.Load(stream, decodePixelWidth, decodePixelHeight);
             }
         }
 
-        private Task<ImageSource> CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
+        private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
             var fileName = libraryHierarchyNode.MetaDatas[0].Value;
             if (!File.Exists(fileName))
             {
                 return this.CreateImageSource0(libraryHierarchyNode, decodePixelWidth, decodePixelHeight);
             }
-#if NET40
-            return TaskEx.FromResult(ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight));
-#else
-            return Task.FromResult(ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight));
-#endif
+            return ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
         }
 
-        private Task<ImageSource> CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
+        private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -90,7 +72,7 @@ namespace FoxTunes
             return this.Render(libraryHierarchyNode, visual, decodePixelWidth, decodePixelHeight);
         }
 
-        private Task<ImageSource> CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
+        private ImageSource CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -102,7 +84,7 @@ namespace FoxTunes
             return this.Render(libraryHierarchyNode, visual, decodePixelWidth, decodePixelHeight);
         }
 
-        private Task<ImageSource> CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
+        private ImageSource CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -195,7 +177,7 @@ namespace FoxTunes
             );
         }
 
-        private async Task<ImageSource> Render(LibraryHierarchyNode libraryHierarchyNode, DrawingVisual visual, int decodePixelWidth, int decodePixelHeight)
+        private ImageSource Render(LibraryHierarchyNode libraryHierarchyNode, DrawingVisual visual, int decodePixelWidth, int decodePixelHeight)
         {
             var target = new RenderTargetBitmap(decodePixelWidth, decodePixelHeight, DPIX, DPIY, PixelFormats.Pbgra32);
             target.Render(visual);
@@ -205,7 +187,7 @@ namespace FoxTunes
             {
                 encoder.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
-                await FileMetaDataStore.Write(PREFIX, this.GetImageId(libraryHierarchyNode), stream);
+                FileMetaDataStore.Write(PREFIX, this.GetImageId(libraryHierarchyNode), stream);
                 stream.Seek(0, SeekOrigin.Begin);
             }
             return target;
@@ -223,6 +205,11 @@ namespace FoxTunes
                 libraryHierarchyNode = libraryHierarchyNode.Parent;
             } while (libraryHierarchyNode != null);
             return hashCode.ToString();
+        }
+
+        public void Clear()
+        {
+            FileMetaDataStore.Clear(PREFIX);
         }
     }
 }

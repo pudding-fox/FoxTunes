@@ -230,7 +230,7 @@ namespace FoxTunes
                 {
                     if (overwrite || !FileMetaDataStore.Exists(prefix, id, out fileName))
                     {
-                        return await FileMetaDataStore.Write(prefix, id, value.Data.Data);
+                        return await FileMetaDataStore.WriteAsync(prefix, id, value.Data.Data);
                     }
                 }
                 finally
