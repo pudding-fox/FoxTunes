@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public ArtworkStack()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

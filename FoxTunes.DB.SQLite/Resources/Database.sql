@@ -62,6 +62,10 @@ CREATE TABLE [LibraryHierarchyItem_LibraryItem] (
 	[LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) 
 );
 
+CREATE INDEX [IDX_LibraryHierarchyLevels_LibraryHierarchy_Id] ON [LibraryHierarchyLevels](
+	[LibraryHierarchy_Id]
+);
+
 CREATE INDEX [IDX_PlaylistItem_MetaDataItem_PlaylistItem_Id] ON [PlaylistItem_MetaDataItem](
 	[PlaylistItem_Id]
 );

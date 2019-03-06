@@ -27,20 +27,23 @@ namespace FoxTunes
 
         static ArtworkGrid()
         {
-            SignalEmitter.Signal += (sender, e) =>
+            if (SignalEmitter != null)
             {
-                switch (e.Name)
+                SignalEmitter.Signal += (sender, e) =>
                 {
-                    case CommonSignals.HierarchiesUpdated:
-                        Provider.Clear();
-                        break;
-                }
+                    switch (e.Name)
+                    {
+                        case CommonSignals.HierarchiesUpdated:
+                            Provider.Clear();
+                            break;
+                    }
 #if NET40
-                return TaskEx.FromResult(false);
+                    return TaskEx.FromResult(false);
 #else
                 return Task.CompletedTask;
 #endif
-            };
+                };
+            }
         }
 
         public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register(
@@ -78,6 +81,7 @@ namespace FoxTunes
                 PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
             }
             this.SizeChanged += this.OnSizeChanged;
+            this.Unloaded += this.OnUnloaded;
         }
 
         public ImageSource ImageSource
@@ -121,6 +125,12 @@ namespace FoxTunes
                 return;
             }
             var task = this.Refresh(libraryHierarchyNode);
+        }
+
+        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            this.SizeChanged -= this.OnSizeChanged;
+            this.Unloaded -= this.OnUnloaded;
         }
 
         public Task Refresh(LibraryHierarchyNode libraryHierarchyNode)

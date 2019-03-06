@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -79,18 +80,39 @@ namespace FoxTunes
         {
             this.InitializeComponent();
             this.SizeChanged += this.OnSizeChanged;
+            this.Unloaded += this.OnUnloaded;
             if (PixelSize == null)
             {
                 PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
             }
-            PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-            ThemeLoader.ThemeChanged += this.OnThemeChanged;
+            if (PlaybackManager != null)
+            {
+                PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            }
+            if (ThemeLoader != null)
+            {
+                ThemeLoader.ThemeChanged += this.OnThemeChanged;
+            }
             var task = this.Refresh();
         }
 
         protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             var task = this.Refresh();
+        }
+
+        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            this.SizeChanged -= this.OnSizeChanged;
+            this.Unloaded -= this.OnUnloaded;
+            if (PlaybackManager != null)
+            {
+                PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
+            if (ThemeLoader != null)
+            {
+                ThemeLoader.ThemeChanged -= this.OnThemeChanged;
+            }
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
@@ -191,7 +213,10 @@ namespace FoxTunes
                     {
                         using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
                         {
-                            this.Visibility = Visibility.Visible;
+                            if (this.Visibility != Visibility.Visible)
+                            {
+                                this.Visibility = Visibility.Visible;
+                            }
                             this.ImageSource = ImageLoader.Load(stream, this.DecodePixelWidth, this.DecodePixelHeight);
 
                         }
@@ -207,7 +232,10 @@ namespace FoxTunes
             {
                 await Windows.Invoke(() =>
                 {
-                    this.Visibility = Visibility.Visible;
+                    if (this.Visibility != Visibility.Visible)
+                    {
+                        this.Visibility = Visibility.Visible;
+                    }
                     this.ImageSource = ImageLoader.Load(metaDataItem.Value, this.DecodePixelWidth, this.DecodePixelHeight);
                 });
             }
