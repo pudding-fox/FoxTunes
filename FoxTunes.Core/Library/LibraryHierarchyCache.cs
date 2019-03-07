@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,9 +8,9 @@ namespace FoxTunes
 {
     public class LibraryHierarchyCache : StandardComponent, ILibraryHierarchyCache
     {
-        public IList<LibraryHierarchy> Hierarchies { get; private set; }
+        public Lazy<IList<LibraryHierarchy>> Hierarchies { get; private set; }
 
-        public IDictionary<Key, IList<LibraryHierarchyNode>> Nodes { get; private set; }
+        public ConcurrentDictionary<Key, Lazy<IList<LibraryHierarchyNode>>> Nodes { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -44,9 +45,9 @@ namespace FoxTunes
         {
             if (this.Hierarchies == null)
             {
-                this.Hierarchies = new List<LibraryHierarchy>(factory());
+                this.Hierarchies = new Lazy<IList<LibraryHierarchy>>(() => new List<LibraryHierarchy>(factory()));
             }
-            return this.Hierarchies;
+            return this.Hierarchies.Value;
         }
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy, string filter, Func<IEnumerable<LibraryHierarchyNode>> factory)
@@ -63,19 +64,13 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(Key key, Func<IEnumerable<LibraryHierarchyNode>> factory)
         {
-            var value = default(IList<LibraryHierarchyNode>);
-            if (!this.Nodes.TryGetValue(key, out value))
-            {
-                value = new List<LibraryHierarchyNode>(factory());
-                this.Nodes.Add(key, value);
-            }
-            return value;
+            return this.Nodes.GetOrAdd(key, _key => new Lazy<IList<LibraryHierarchyNode>>(() => new List<LibraryHierarchyNode>(factory()))).Value;
         }
 
         public void Reset()
         {
             this.Hierarchies = null;
-            this.Nodes = new Dictionary<Key, IList<LibraryHierarchyNode>>();
+            this.Nodes = new ConcurrentDictionary<Key, Lazy<IList<LibraryHierarchyNode>>>();
         }
 
         public class Key : IEquatable<Key>

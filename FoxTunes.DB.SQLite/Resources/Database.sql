@@ -71,6 +71,10 @@ CREATE INDEX [IDX_MetaDataItems_Value] ON [MetaDataItems](
 	[Value]
 );
 
+CREATE INDEX [IDX_LibraryHierarchyItems_Parent_Id] ON [LibraryHierarchyItems](
+	[Parent_Id]
+);
+
 CREATE INDEX [IDX_LibraryHierarchyLevels_LibraryHierarchy_Id] ON [LibraryHierarchyLevels](
 	[LibraryHierarchy_Id]
 );
