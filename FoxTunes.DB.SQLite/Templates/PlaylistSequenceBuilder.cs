@@ -129,7 +129,7 @@ FROM ""HorizontalMetaData"";
 UPDATE ""PlaylistItems""
 SET ""Sequence"" = ""Sequence"" + 
 (
-	SELECT ""PlaylistItemsRowNumber"".""RowNumber""
+	SELECT ""PlaylistItemsRowNumber"".""RowNumber"" - 1
 	FROM ""PlaylistItemsRowNumber""
 	WHERE ""PlaylistItemsRowNumber"".""Id"" = ""PlaylistItems"".""Id""
 )
