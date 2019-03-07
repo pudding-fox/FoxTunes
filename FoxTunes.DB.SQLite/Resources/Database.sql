@@ -8,6 +8,7 @@ CREATE TABLE [LibraryItems] (
 	[Id] INTEGER PRIMARY KEY NOT NULL, 
 	[DirectoryName] text NOT NULL, 
 	[FileName] text NOT NULL, 
+	[ImportDate] text NOT NULL,
 	[Status] INTEGER NOT NULL);
 
 CREATE TABLE [PlaylistItems](

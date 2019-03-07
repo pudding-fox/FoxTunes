@@ -53,7 +53,10 @@ namespace FoxTunes
         {
             get
             {
-                return this.Database.QueryFactory.Create(Resources.RemoveLibraryHierarchyItems);
+                return this.Database.QueryFactory.Create(
+                    Resources.RemoveLibraryHierarchyItems,
+                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
             }
         }
 
@@ -213,17 +216,6 @@ namespace FoxTunes
         }
 
         public abstract IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
-
-        public IDatabaseQuery BeginBuildLibraryHierarchies
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.BeginBuildLibraryHierarchies,
-                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
 
         public abstract IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
     }

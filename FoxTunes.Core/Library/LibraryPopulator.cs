@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -76,6 +77,7 @@ namespace FoxTunes
                 FileName = fileName,
                 Status = LibraryItemStatus.Import
             };
+            libraryItem.SetImportDate(DateTime.UtcNow);
             return writer.Write(libraryItem);
         }
     }

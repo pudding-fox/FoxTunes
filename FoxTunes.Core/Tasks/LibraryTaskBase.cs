@@ -103,19 +103,6 @@ namespace FoxTunes
 
         protected virtual async Task BuildHierarchies(LibraryItemStatus? status)
         {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                await this.Database.ExecuteAsync(this.Database.Queries.BeginBuildLibraryHierarchies, (parameters, phase) =>
-                {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["status"] = status;
-                            break;
-                    }
-                }, transaction);
-                transaction.Commit();
-            }
             using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
@@ -148,11 +135,19 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task RemoveHierarchies()
+        protected virtual async Task RemoveHierarchies(LibraryItemStatus? status)
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryHierarchyItems, transaction);
+                await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryHierarchyItems, (parameters, phase) =>
+                {
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = status;
+                            break;
+                    }
+                }, transaction);
                 transaction.Commit();
             }
         }
@@ -212,24 +207,6 @@ namespace FoxTunes
                             break;
                     }
                 }, transaction);
-                transaction.Commit();
-            }
-        }
-
-        protected static async Task SetLibraryItemsStatus(IDatabaseComponent database, Func<LibraryItem, bool> predicate, LibraryItemStatus status)
-        {
-            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-            {
-                var set = database.Set<LibraryItem>(transaction);
-                foreach (var libraryItem in set)
-                {
-                    if (!predicate(libraryItem))
-                    {
-                        continue;
-                    }
-                    libraryItem.Status = status;
-                    await set.AddOrUpdateAsync(libraryItem);
-                }
                 transaction.Commit();
             }
         }
