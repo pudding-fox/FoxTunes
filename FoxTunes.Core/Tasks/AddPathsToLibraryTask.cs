@@ -35,13 +35,14 @@ namespace FoxTunes
             {
                 throw new InvalidOperationException("Cannot add to library, meta data extraction is disabled.");
             }
-            return this.AddPaths(this.Paths);
+            return this.AddPaths(this.Paths, true);
         }
 
         protected override async Task OnCompleted()
         {
             await base.OnCompleted();
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
     }
 }

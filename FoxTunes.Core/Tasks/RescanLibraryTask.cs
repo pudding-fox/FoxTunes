@@ -32,16 +32,17 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             await this.RemoveHierarchies();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
-            await this.SetLibraryItemsStatus(libraryItem => !File.Exists(libraryItem.FileName), LibraryItemStatus.Remove);
+            await SetLibraryItemsStatus(this.Database, libraryItem => !File.Exists(libraryItem.FileName), LibraryItemStatus.Remove);
             await this.RemoveItems(LibraryItemStatus.Remove);
-            await this.AddPaths(this.GetLibraryDirectories().ToArray());
+            await this.AddPaths(this.GetLibraryDirectories().ToArray(), false);
+            await this.BuildHierarchies(null);
         }
 
         protected override async Task OnCompleted()
         {
             await base.OnCompleted();
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
 
         protected virtual IEnumerable<string> GetLibraryDirectories()
