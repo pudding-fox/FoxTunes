@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace FoxTunes
 {
     public static partial class ListViewExtensions
     {
-        private static readonly ConcurrentDictionary<ListView, DragSourceBehaviour> DragSourceBehaviours = new ConcurrentDictionary<ListView, DragSourceBehaviour>();
+        private static readonly ConditionalWeakTable<ListView, DragSourceBehaviour> DragSourceBehaviours = new ConditionalWeakTable<ListView, DragSourceBehaviour>();
 
         public static readonly DependencyProperty DragSourceProperty = DependencyProperty.RegisterAttached(
             "DragSource",
@@ -37,11 +36,15 @@ namespace FoxTunes
             }
             if (GetDragSource(listView))
             {
-                DragSourceBehaviours.TryAdd(listView, new DragSourceBehaviour(listView));
+                var behaviour = default(DragSourceBehaviour);
+                if (!DragSourceBehaviours.TryGetValue(listView, out behaviour))
+                {
+                    DragSourceBehaviours.Add(listView, new DragSourceBehaviour(listView));
+                }
             }
             else
             {
-                DragSourceBehaviours.TryRemove(listView);
+                DragSourceBehaviours.Remove(listView);
             }
         }
 

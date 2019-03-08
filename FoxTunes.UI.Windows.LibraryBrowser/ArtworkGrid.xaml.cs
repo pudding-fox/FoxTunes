@@ -46,33 +46,6 @@ namespace FoxTunes
             }
         }
 
-        public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register(
-            "ImageSource",
-            typeof(ImageSource),
-            typeof(ArtworkGrid),
-            new FrameworkPropertyMetadata(default(ImageSource), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnImageSourceChanged))
-        );
-
-        public static ImageSource GetImageSource(ArtworkGrid source)
-        {
-            return (ImageSource)source.GetValue(ImageSourceProperty);
-        }
-
-        public static void SetImageSource(ArtworkGrid source, ImageSource value)
-        {
-            source.SetValue(ImageSourceProperty, value);
-        }
-
-        private static void OnImageSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var artworkGrid = sender as ArtworkGrid;
-            if (artworkGrid == null)
-            {
-                return;
-            }
-            artworkGrid.OnImageSourceChanged();
-        }
-
         public ArtworkGrid()
         {
             this.InitializeComponent();
@@ -80,25 +53,6 @@ namespace FoxTunes
             {
                 PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
             }
-            this.SizeChanged += this.OnSizeChanged;
-            this.Unloaded += this.OnUnloaded;
-        }
-
-        public ImageSource ImageSource
-        {
-            get
-            {
-                return GetImageSource(this);
-            }
-            set
-            {
-                SetImageSource(this, value);
-            }
-        }
-
-        protected virtual void OnImageSourceChanged()
-        {
-
         }
 
         public int DecodePixelWidth
@@ -117,31 +71,24 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        public Task Refresh()
         {
             var libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
-            if (libraryHierarchyNode == null)
+            if (this.Background != null || libraryHierarchyNode == null)
             {
-                return;
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
-            var task = this.Refresh(libraryHierarchyNode);
-        }
-
-        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
-        {
-            this.SizeChanged -= this.OnSizeChanged;
-            this.Unloaded -= this.OnUnloaded;
-        }
-
-        public Task Refresh(LibraryHierarchyNode libraryHierarchyNode)
-        {
             return Factory.StartNew(async () =>
             {
                 if (!libraryHierarchyNode.IsMetaDatasLoaded)
                 {
                     await libraryHierarchyNode.LoadMetaDatasAsync();
                 }
-                await Windows.Invoke(() => this.ImageSource = Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight));
+                await Windows.Invoke(() => this.Background = new ImageBrush(Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight)));
             });
         }
     }

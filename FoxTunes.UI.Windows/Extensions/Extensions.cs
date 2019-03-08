@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -144,6 +146,25 @@ namespace FoxTunes
             {
                 (parent as Panel).Children.Remove(element);
             }
+        }
+
+        public static T GetVisualChild<T>(this FrameworkElement parent) where T : FrameworkElement
+        {
+            var stack = new Stack<DependencyObject>();
+            stack.Push(parent);
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                if (current is T)
+                {
+                    return current as T;
+                }
+                for (int a = 0, b = VisualTreeHelper.GetChildrenCount(current); a < b; a++)
+                {
+                    stack.Push(VisualTreeHelper.GetChild(current, a));
+                }
+            }
+            return default(T);
         }
     }
 }

@@ -49,33 +49,6 @@ namespace FoxTunes
             artwork.OnShowPlaceholderChanged();
         }
 
-        public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register(
-            "ImageSource",
-            typeof(ImageSource),
-            typeof(Artwork),
-            new FrameworkPropertyMetadata(default(ImageSource), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnImageSourceChanged))
-        );
-
-        public static ImageSource GetImageSource(Artwork source)
-        {
-            return (ImageSource)source.GetValue(ImageSourceProperty);
-        }
-
-        public static void SetImageSource(Artwork source, ImageSource value)
-        {
-            source.SetValue(ImageSourceProperty, value);
-        }
-
-        private static void OnImageSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var artwork = sender as Artwork;
-            if (artwork == null)
-            {
-                return;
-            }
-            artwork.OnImageSourceChanged();
-        }
-
         public Artwork()
         {
             this.InitializeComponent();
@@ -142,23 +115,6 @@ namespace FoxTunes
             var task = this.Refresh();
         }
 
-        public ImageSource ImageSource
-        {
-            get
-            {
-                return GetImageSource(this);
-            }
-            set
-            {
-                SetImageSource(this, value);
-            }
-        }
-
-        protected virtual void OnImageSourceChanged()
-        {
-
-        }
-
         public int DecodePixelWidth
         {
             get
@@ -217,14 +173,14 @@ namespace FoxTunes
                             {
                                 this.Visibility = Visibility.Visible;
                             }
-                            this.ImageSource = ImageLoader.Load(stream, this.DecodePixelWidth, this.DecodePixelHeight);
+                            this.Background = new ImageBrush(ImageLoader.Load(stream, this.DecodePixelWidth, this.DecodePixelHeight));
 
                         }
                     }
                     else
                     {
                         this.Visibility = Visibility.Collapsed;
-                        this.ImageSource = null;
+                        this.Background = null;
                     }
                 });
             }
@@ -236,7 +192,7 @@ namespace FoxTunes
                     {
                         this.Visibility = Visibility.Visible;
                     }
-                    this.ImageSource = ImageLoader.Load(metaDataItem.Value, this.DecodePixelWidth, this.DecodePixelHeight);
+                    this.Background = new ImageBrush(ImageLoader.Load(metaDataItem.Value, this.DecodePixelWidth, this.DecodePixelHeight));
                 });
             }
         }
