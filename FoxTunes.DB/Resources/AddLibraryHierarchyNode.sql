@@ -32,7 +32,7 @@ FROM "LibraryHierarchyItems_Lookup"
 WHERE NOT EXISTS(
 	SELECT * 
 	FROM [LibraryHierarchyItem_LibraryItem]
-	WHERE [LibraryHierarchyItem_Id] = [Id]
+	WHERE [LibraryHierarchyItem_Id] = "LibraryHierarchyItems_Lookup".[Id]
 		AND [LibraryItem_Id] = @libraryItemId
 );
 
