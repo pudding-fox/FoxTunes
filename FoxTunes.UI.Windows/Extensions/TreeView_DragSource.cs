@@ -97,7 +97,7 @@ namespace FoxTunes
             public object Data { get; private set; }
         }
 
-        private class DragSourceBehaviour
+        private class DragSourceBehaviour : UIBehaviour
         {
             public DragSourceBehaviour(TreeView treeView)
             {
@@ -164,6 +164,14 @@ namespace FoxTunes
                     this.DragStartPosition = default(Point);
                     this.TreeView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
                 }
+            }
+
+            protected override void OnDisposing()
+            {
+                this.TreeView.PreviewMouseDown -= this.OnMouseDown;
+                this.TreeView.PreviewMouseUp -= this.OnMouseUp;
+                this.TreeView.MouseMove -= this.OnMouseMove;
+                base.OnDisposing();
             }
         }
     }

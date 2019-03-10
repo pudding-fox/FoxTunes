@@ -97,12 +97,13 @@ namespace FoxTunes
             public object Data { get; private set; }
         }
 
-        private class DragSourceBehaviour
+        private class DragSourceBehaviour : UIBehaviour
         {
             public DragSourceBehaviour(ListView listView)
             {
                 this.ListView = listView;
                 this.ListView.PreviewMouseDown += this.OnMouseDown;
+                this.ListView.PreviewMouseUp += this.OnMouseUp;
                 this.ListView.MouseMove += this.OnMouseMove;
             }
 
@@ -121,11 +122,11 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                if (Math.Abs(position.X - this.DragStartPosition.X) > SystemParameters.MinimumHorizontalDragDistance)
+                if (Math.Abs(position.X - this.DragStartPosition.X) > (SystemParameters.MinimumHorizontalDragDistance * 2))
                 {
                     return true;
                 }
-                if (Math.Abs(position.Y - this.DragStartPosition.Y) > SystemParameters.MinimumVerticalDragDistance)
+                if (Math.Abs(position.Y - this.DragStartPosition.Y) > (SystemParameters.MinimumVerticalDragDistance * 2))
                 {
                     return true;
                 }
@@ -139,6 +140,11 @@ namespace FoxTunes
                     return;
                 }
                 this.DragStartPosition = e.GetPosition(null);
+            }
+
+            protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
+            {
+                this.DragStartPosition = default(Point);
             }
 
             protected virtual void OnMouseMove(object sender, MouseEventArgs e)
@@ -158,6 +164,14 @@ namespace FoxTunes
                     this.DragStartPosition = default(Point);
                     this.ListView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItems));
                 }
+            }
+
+            protected override void OnDisposing()
+            {
+                this.ListView.PreviewMouseDown -= this.OnMouseDown;
+                this.ListView.PreviewMouseUp -= this.OnMouseUp;
+                this.ListView.MouseMove -= this.OnMouseMove;
+                base.OnDisposing();
             }
         }
     }

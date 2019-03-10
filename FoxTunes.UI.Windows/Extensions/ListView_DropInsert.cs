@@ -133,7 +133,7 @@ namespace FoxTunes
             source.SetValue(DropInsertOffsetProperty, value);
         }
 
-        private class DropInsertBehaviour
+        private class DropInsertBehaviour : UIBehaviour
         {
             private DropInsertBehaviour()
             {
@@ -230,6 +230,15 @@ namespace FoxTunes
                     SetDropInsertOffset(this.ListView, offset);
                 }
                 this.Adorner.InvalidateVisual();
+            }
+
+            protected override void OnDisposing()
+            {
+                this.ListView.DragEnter -= this.ListView_DragEnter;
+                this.ListView.DragOver -= this.ListView_DragOver;
+                this.ListView.Drop -= this.ListView_Drop;
+                this.ListView.DragLeave -= this.ListView_DragLeave;
+                base.OnDisposing();
             }
         }
 

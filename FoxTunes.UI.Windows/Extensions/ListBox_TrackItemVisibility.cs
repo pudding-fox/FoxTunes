@@ -97,7 +97,7 @@ namespace FoxTunes
             public bool IsItemVisible { get; private set; }
         }
 
-        private class TrackItemVisibilityBehaviour
+        private class TrackItemVisibilityBehaviour : UIBehaviour
         {
             private TrackItemVisibilityBehaviour()
             {

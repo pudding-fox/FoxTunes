@@ -97,7 +97,7 @@ namespace FoxTunes
             public object Data { get; private set; }
         }
 
-        private class DragSourceBehaviour
+        private class DragSourceBehaviour : UIBehaviour
         {
             public DragSourceBehaviour(ListBox listBox)
             {
@@ -164,6 +164,14 @@ namespace FoxTunes
                     this.DragStartPosition = default(Point);
                     this.ListBox.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
                 }
+            }
+
+            protected override void OnDisposing()
+            {
+                this.ListBox.PreviewMouseDown -= this.OnMouseDown;
+                this.ListBox.PreviewMouseUp -= this.OnMouseUp;
+                this.ListBox.MouseMove -= this.OnMouseMove;
+                base.OnDisposing();
             }
         }
     }

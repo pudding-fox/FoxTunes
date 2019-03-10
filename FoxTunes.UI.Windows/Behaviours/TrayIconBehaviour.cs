@@ -13,7 +13,7 @@ namespace FoxTunes
 
         public TrayIconBehaviour()
         {
-            Windows.ActiveWindowChanging += (sener, e) =>
+            Windows.ActiveWindowChanging += (sender, e) =>
             {
                 if (this.Enabled)
                 {

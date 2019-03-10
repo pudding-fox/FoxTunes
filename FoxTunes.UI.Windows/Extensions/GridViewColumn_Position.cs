@@ -41,7 +41,7 @@ namespace FoxTunes
             }
         }
 
-        public class PositionBehaviour
+        public class PositionBehaviour : UIBehaviour
         {
             private static volatile bool IsUpdating;
 
@@ -118,6 +118,12 @@ namespace FoxTunes
                     return;
                 }
                 SetPosition(this.GridViewColumn, position);
+            }
+
+            protected override void OnDisposing()
+            {
+                InheritanceContextHelper.RemoveEventHandler(this.GridViewColumn, this.OnInheritanceContextChanged);
+                base.OnDisposing();
             }
         }
     }
