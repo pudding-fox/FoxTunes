@@ -332,6 +332,22 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO [LibraryHierarchyItem_LibraryItem] ([LibraryHierarchyItem_Id], [LibraryItem_Id])
+        ///SELECT @libraryHierarchyItemId, @libraryItemId
+        ///WHERE NOT EXISTS(
+        ///	SELECT * 
+        ///	FROM [LibraryHierarchyItem_LibraryItem]
+        ///	WHERE [LibraryHierarchyItem_Id] = @libraryHierarchyItemId
+        ///		AND [LibraryItem_Id] = @libraryItemId
+        ///);.
+        /// </summary>
+        internal static string UpdateLibraryHierarchyNode {
+            get {
+                return ResourceManager.GetString("UpdateLibraryHierarchyNode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;)
         ///SELECT @name, @type, @value
         ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value);

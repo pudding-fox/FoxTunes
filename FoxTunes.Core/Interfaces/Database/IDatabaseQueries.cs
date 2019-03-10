@@ -15,6 +15,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery AddLibraryHierarchyNode { get; }
 
+        IDatabaseQuery UpdateLibraryHierarchyNode { get; }
+
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }
 
         IDatabaseQuery AddPlaylistSequenceRecord { get; }
