@@ -166,5 +166,20 @@ namespace FoxTunes
             }
             return default(T);
         }
+
+        public static bool IsMouseOver(this FrameworkElement element)
+        {
+            var x = default(int);
+            var y = default(int);
+            MouseHelper.GetPosition(out x, out y);
+            DpiHelper.TransformPosition(ref x, ref y);
+            var window = element.FindAncestor<Window>();
+            var result = VisualTreeHelper.HitTest(window, window.PointFromScreen(new Point(x, y)));
+            if (result == null || result.VisualHit == null)
+            {
+                return false;
+            }
+            return element.IsAncestorOf(result.VisualHit);
+        }
     }
 }

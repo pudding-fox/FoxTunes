@@ -17,6 +17,9 @@
         <Interactivity:EventTrigger EventName="DragEnter">
             <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragEnterCommand, Source={StaticResource ViewModel}}" />
         </Interactivity:EventTrigger>
+        <Interactivity:EventTrigger EventName="DragOver">
+            <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragOverCommand, Source={StaticResource ViewModel}}" />
+        </Interactivity:EventTrigger>
         <Interactivity:EventTrigger EventName="Drop">
             <ViewModel:InvokeParameterizedCommandAction Command="{Binding DropCommand, Source={StaticResource ViewModel}}" />
         </Interactivity:EventTrigger>
