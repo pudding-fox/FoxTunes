@@ -22,6 +22,8 @@ namespace FoxTunes.Interfaces
 
         Task Rescan();
 
+        Task Set(LibraryItemStatus status);
+
         Task Clear();
     }
 

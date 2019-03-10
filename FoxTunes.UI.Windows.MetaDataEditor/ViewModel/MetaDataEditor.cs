@@ -162,6 +162,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public ILibraryManager LibraryManager { get; private set; }
+
         public IMetaDataManager MetaDataManager { get; private set; }
 
         public IHierarchyManager HierarchyManager { get; private set; }
@@ -171,6 +173,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = core.Managers.Playlist;
+            this.LibraryManager = core.Managers.Library;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -278,6 +281,7 @@ namespace FoxTunes.ViewModel
             }
             await this.MetaDataManager.Save(this.PlaylistItems);
             await this.HierarchyManager.Build(LibraryItemStatus.Import);
+            await this.LibraryManager.Set(LibraryItemStatus.None);
             this.Cancel();
         }
 
