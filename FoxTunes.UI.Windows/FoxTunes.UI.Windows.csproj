@@ -7,6 +7,10 @@
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+    <DefineConstants>VISTA</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup>
     <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
   </PropertyGroup>

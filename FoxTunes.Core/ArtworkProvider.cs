@@ -37,7 +37,7 @@ namespace FoxTunes
                     var directoryName = Path.GetDirectoryName(path);
                     foreach (var name in names)
                     {
-                        foreach (var fileName in Directory.EnumerateFileSystemEntries(directoryName, string.Format("{0}.*", name)))
+                        foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name)))
                         {
                             var info = new FileInfo(fileName);
                             if (info.Length <= MAX_LENGTH)
