@@ -35,8 +35,8 @@ namespace FoxTunes
                     "{0} ({1}/{2}/{3})",
                     this.Name,
                     BassUtils.DepthDescription(this.Flags),
-                    BassUtils.RateDescription(this.Rate),
-                    BassUtils.ChannelDescription(this.Channels)
+                    MetaDataInfo.SampleRateDescription(this.Rate),
+                    MetaDataInfo.ChannelDescription(this.Channels)
                 );
             }
         }

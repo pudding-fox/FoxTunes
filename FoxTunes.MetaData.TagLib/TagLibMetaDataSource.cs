@@ -149,20 +149,16 @@ namespace FoxTunes
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseType, tag.MusicBrainzReleaseType), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzTrackId, tag.MusicBrainzTrackId), this.ErrorHandler);
             }
+        }
 
-            if (Categories.HasFlag(MetaDataCategory.Sort))
-            {
-                this.Try(() => this.AddTag(metaData, CommonMetaData.TitleSort, tag.TitleSort), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.PerformerSort, tag.FirstPerformerSort), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.ComposerSort, tag.FirstComposerSort), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.ArtistSort, tag.FirstAlbumArtistSort), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.AlbumSort, tag.AlbumSort), this.ErrorHandler);
-            }
+        private bool HasValue(string value)
+        {
+            return !string.IsNullOrEmpty(value) && !string.Equals(value, 0.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
         private void AddTag(IList<MetaDataItem> metaData, string name, string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (!this.HasValue(value))
             {
                 return;
             }
@@ -192,13 +188,12 @@ namespace FoxTunes
 
         private void AddProperty(IList<MetaDataItem> metaData, string name, string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (!this.HasValue(value))
             {
                 return;
             }
             metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { Value = value.Trim() });
         }
-
 
         private async Task AddImages(List<MetaDataItem> metaData, File file)
         {

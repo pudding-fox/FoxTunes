@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class NowPlaying : ViewModelBase, IDisposable
+    public class NowPlaying : ViewModelBase
     {
         public IPlaylistManager PlaylistManager { get; private set; }
 

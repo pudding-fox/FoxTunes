@@ -1,5 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -24,11 +25,24 @@ namespace FoxTunes
 
         public Task Write(int itemId, MetaDataItem metaDataItem)
         {
+            if (!this.HasValue(metaDataItem.Value))
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             this.Command.Parameters["itemId"] = itemId;
             this.Command.Parameters["name"] = metaDataItem.Name;
             this.Command.Parameters["type"] = metaDataItem.Type;
             this.Command.Parameters["value"] = metaDataItem.Value;
             return this.Command.ExecuteNonQueryAsync();
+        }
+
+        private bool HasValue(string value)
+        {
+            return !string.IsNullOrEmpty(value) && !string.Equals(value, 0.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
         protected override void OnDisposing()

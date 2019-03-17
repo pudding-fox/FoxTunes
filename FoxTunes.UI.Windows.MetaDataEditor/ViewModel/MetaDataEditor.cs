@@ -32,21 +32,11 @@ namespace FoxTunes.ViewModel
             CommonImageTypes.FrontCover
         };
 
-        private static readonly string[] PROPERTIES = new[]
-        {
-            CommonProperties.Duration,
-            CommonProperties.AudioBitrate,
-            CommonProperties.AudioChannels,
-            CommonProperties.AudioSampleRate,
-            CommonProperties.BitsPerSample
-        };
-
         public MetaDataEditor()
         {
             this.PlaylistItems = Enumerable.Empty<PlaylistItem>();
             this.Tags = new ObservableCollection<MetaDataEntry>();
             this.Images = new ObservableCollection<MetaDataEntry>();
-            this.Properties = new ObservableCollection<MetaDataEntry>();
         }
 
         public bool HasItems
@@ -122,44 +112,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ImagesChanged;
 
-        private ObservableCollection<MetaDataEntry> _Properties { get; set; }
-
-        public ObservableCollection<MetaDataEntry> Properties
-        {
-            get
-            {
-                return this._Properties;
-            }
-            set
-            {
-                this.OnPropertiesChanging();
-                this._Properties = value;
-                this.OnPropertiesChanged();
-            }
-        }
-
-        protected virtual void OnPropertiesChanging()
-        {
-            if (this.Properties != null)
-            {
-                foreach (var metaDataEntry in this.Properties)
-                {
-                    metaDataEntry.Dispose();
-                }
-            }
-        }
-
-        protected virtual void OnPropertiesChanged()
-        {
-            if (this.PropertiesChanged != null)
-            {
-                this.PropertiesChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Properties");
-        }
-
-        public event EventHandler PropertiesChanged;
-
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public ILibraryManager LibraryManager { get; private set; }
@@ -225,7 +177,6 @@ namespace FoxTunes.ViewModel
             {
                 this.Tags = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Tag]);
                 this.Images = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Image]);
-                this.Properties = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Property]);
                 this.OnHasItemsChanged();
             });
         }
@@ -235,7 +186,6 @@ namespace FoxTunes.ViewModel
             var result = new Dictionary<MetaDataItemType, IEnumerable<MetaDataEntry>>();
             result[MetaDataItemType.Tag] = TAGS.Select(name => new MetaDataEntry(name, MetaDataItemType.Tag)).ToArray();
             result[MetaDataItemType.Image] = IMAGES.Select(name => new MetaDataEntry(name, MetaDataItemType.Image)).ToArray();
-            result[MetaDataItemType.Property] = PROPERTIES.Select(name => new MetaDataEntry(name, MetaDataItemType.Property)).ToArray();
             foreach (var playlistItem in this.PlaylistItems)
             {
                 foreach (var key in result.Keys)

@@ -229,20 +229,17 @@ namespace FoxTunes
             {
                 if (this.HasComponent1 && this.HasComponent2)
                 {
-                    if (!this.HasSplitPanel)
-                    {
-                        this.Component1.Disconnect();
-                        this.Component2.Disconnect();
-                        this.Component1.SetValue(Grid.RowProperty, 0);
-                        this.Component1.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 0, 0, 4));
-                        this.Component2.SetValue(Grid.RowProperty, 1);
-                        this.Content = this.CreateSplitPanel();
-                    }
+                    this.Component1.Disconnect();
+                    this.Component2.Disconnect();
+                    this.Component1.SetValue(Grid.RowProperty, 0);
+                    this.Component1.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 0, 0, 4));
+                    this.Component2.SetValue(Grid.RowProperty, 1);
+                    this.Content = this.CreateSplitPanel();
                     this.Visibility = Visibility.Visible;
                 }
                 else if (this.HasComponent1 || this.HasComponent2)
                 {
-                    var component = this.Component1 ?? this.Component2;
+                    var component = this.HasComponent1 ? this.Component1 : this.Component2;
                     component.SetValue(FrameworkElement.MarginProperty, new Thickness());
                     component.Disconnect();
                     this.Content = component;
