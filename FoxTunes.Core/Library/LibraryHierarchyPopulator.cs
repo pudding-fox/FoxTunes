@@ -106,20 +106,39 @@ namespace FoxTunes
                     Interlocked.Increment(ref position);
                 }, cancellationToken, this.ParallelOptions);
             }
+
+            await this.Cleanup(libraryHierarchies);
         }
 
         private async Task Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel[] libraryHierarchyLevels)
         {
             var parentId = default(int?);
-            for (int a = 0, b = libraryHierarchyLevels.Length - 1; a <= b; a++)
+            switch (libraryHierarchy.Type)
             {
-                parentId = await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[a], parentId, a == b);
+                case LibraryHierarchyType.Script:
+                    for (int a = 0, b = libraryHierarchyLevels.Length - 1; a <= b; a++)
+                    {
+                        parentId = await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[a], parentId, a == b);
+                    }
+                    break;
+                case LibraryHierarchyType.FileSystem:
+                    var pathSegments = this.GetPathSegments(record);
+                    for (int a = 0, b = pathSegments.Length - 1; a <= b; a++)
+                    {
+                        parentId = await this.Populate(record, libraryHierarchy, pathSegments[a], parentId, a == b);
+                    }
+                    break;
             }
         }
 
-        private async Task<int> Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel libraryHierarchyLevel, int? parentId, bool isLeaf)
+        private Task<int> Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel libraryHierarchyLevel, int? parentId, bool isLeaf)
         {
             var value = this.ExecuteScript(record, libraryHierarchyLevel.Script);
+            return this.Populate(record, libraryHierarchy, value, parentId, isLeaf);
+        }
+
+        private async Task<int> Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, string value, int? parentId, bool isLeaf)
+        {
 #if NET40
             this.Semaphore.Wait();
 #else
@@ -127,7 +146,7 @@ namespace FoxTunes
 #endif
             try
             {
-                return await this.Writer.Write(libraryHierarchy, libraryHierarchyLevel, record.Get<int>("Id"), parentId, value, isLeaf);
+                return await this.Writer.Write(libraryHierarchy, record.Get<int>("Id"), parentId, value, isLeaf);
             }
             finally
             {
@@ -139,7 +158,7 @@ namespace FoxTunes
         {
             if (status.HasValue)
             {
-                var queryable = this.Database.AsQueryable<LibraryItem>();
+                var queryable = this.Database.AsQueryable<LibraryItem>(transaction);
                 return queryable.Count(libraryItem => libraryItem.Status == status.Value);
             }
             var set = this.Database.Set<LibraryItem>(transaction);
@@ -179,6 +198,15 @@ namespace FoxTunes
             }
         }
 
+        private string[] GetPathSegments(IDatabaseReaderRecord record)
+        {
+            var fileName = record.Get<string>("FileName");
+            return fileName.Split(
+                new[] { Path.DirectorySeparatorChar.ToString() },
+                StringSplitOptions.RemoveEmptyEntries
+            ).Skip(1).ToArray();
+        }
+
         private IScriptingContext GetOrAddContext()
         {
             if (this.Contexts.IsValueCreated)
@@ -186,6 +214,33 @@ namespace FoxTunes
                 return this.Contexts.Value;
             }
             return this.Contexts.Value = this.ScriptingRuntime.CreateContext();
+        }
+
+        private async Task Cleanup(IEnumerable<LibraryHierarchy> libraryHierarchies)
+        {
+            foreach (var libraryHierarchy in libraryHierarchies)
+            {
+                switch (libraryHierarchy.Type)
+                {
+                    case LibraryHierarchyType.FileSystem:
+                        await this.Cleanup(libraryHierarchy);
+                        break;
+                }
+            }
+        }
+
+        private Task Cleanup(LibraryHierarchy libraryHierarchy)
+        {
+            return this.Database.ExecuteAsync(
+                this.Database.Queries.CleanupLibraryHierarchyNodes, (parameters, phase) =>
+                {
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["libraryHierarchyId"] = libraryHierarchy.Id;
+                            break;
+                    }
+                }, this.Transaction);
         }
 
         protected override void OnDisposing()

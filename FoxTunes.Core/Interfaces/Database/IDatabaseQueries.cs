@@ -23,6 +23,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery AddLibraryMetaDataItems { get; }
 
+        IDatabaseQuery CleanupLibraryHierarchyNodes { get; }
+
         IDatabaseQuery ClearLibraryMetaDataItems { get; }
 
         IDatabaseQuery AddPlaylistMetaDataItems { get; }

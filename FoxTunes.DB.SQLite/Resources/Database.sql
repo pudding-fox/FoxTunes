@@ -22,7 +22,8 @@ CREATE TABLE [PlaylistItems](
 CREATE TABLE [LibraryHierarchies] ( 
 	[Id] INTEGER PRIMARY KEY NOT NULL, 
 	[Sequence] INTEGER NOT NULL, 
-	[Name] TEXT NOT NULL);
+	[Name] TEXT NOT NULL,
+	[Type] bigint NOT NULL);
 
 CREATE TABLE [LibraryHierarchyLevels] (
 	[Id]	INTEGER PRIMARY KEY NOT NULL,
@@ -35,7 +36,6 @@ CREATE TABLE [LibraryHierarchyItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
 	[Parent_Id] INTEGER NULL REFERENCES LibraryHierarchyItems([Id]),
     [LibraryHierarchy_Id] bigint NOT NULL REFERENCES LibraryHierarchies([Id]),
-    [LibraryHierarchyLevel_Id] bigint NOT NULL REFERENCES LibraryHierarchyLevels([Id]),
     [Value] text NOT NULL COLLATE NOCASE, 
     [IsLeaf] bit NOT NULL);
 

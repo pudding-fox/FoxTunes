@@ -68,13 +68,16 @@ namespace FoxTunes {
         ///	FROM [LibraryHierarchyItems]
         ///	WHERE ((@parentId IS NULL AND [Parent_Id] IS NULL) OR [Parent_Id] = @parentId)
         ///		AND [LibraryHierarchy_Id] = @libraryHierarchyId
-        ///		AND [LibraryHierarchyLevel_Id] = @libraryHierarchyLevelId
         ///		AND [Value] = @value
         ///		AND [IsLeaf] = @isLeaf
         ///)
         ///
-        ///INSERT INTO [LibraryHierarchyItems] ([Parent_Id], [LibraryHierarchy_Id], [LibraryHierarchyLevel_Id], [Value], [IsLeaf])
-        ///SELECT @parentId, @libraryHierarchyId, @libraryHierarchy [rest of string was truncated]&quot;;.
+        ///INSERT INTO [LibraryHierarchyItems] ([Parent_Id], [LibraryHierarchy_Id], [Value], [IsLeaf])
+        ///SELECT @parentId, @libraryHierarchyId, @value, @isLeaf
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;LibraryHierarchyItems_Lookup&quot;);
+        ///
+        ///WITH
+        ///&quot;LibraryHierarch [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddLibraryHierarchyNode {
             get {
@@ -169,6 +172,29 @@ namespace FoxTunes {
         internal static string AddPlaylistSequenceRecord {
             get {
                 return ResourceManager.GetString("AddPlaylistSequenceRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WITH 
+        ///PopulatedNodes AS
+        ///(
+        ///	SELECT [LibraryHierarchyItems].[Id], [LibraryHierarchyItems].[Value]
+        ///	FROM [LibraryHierarchyItems]
+        ///		JOIN [LibraryHierarchyItems] Children
+        ///			ON [LibraryHierarchyItems].[Id] = Children.[Parent_Id]
+        ///	GROUP BY [LibraryHierarchyItems].[Id], [LibraryHierarchyItems].[Value]
+        ///	HAVING COUNT(Children.[Id]) &gt; 1
+        ///),
+        ///
+        ///DefunctNodes(Id, Parent_Id, Value) AS
+        ///(
+        ///	SELECT [LibraryHierarchyItems].[Id], [LibraryHierarchyItems].[Parent_Id], [LibraryHierarchyItems].[Value]
+        ///	FROM [LibraryHier [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CleanupLibraryHierarchyNodes {
+            get {
+                return ResourceManager.GetString("CleanupLibraryHierarchyNodes", resourceCulture);
             }
         }
         

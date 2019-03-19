@@ -5,13 +5,12 @@
 	FROM [LibraryHierarchyItems]
 	WHERE ((@parentId IS NULL AND [Parent_Id] IS NULL) OR [Parent_Id] = @parentId)
 		AND [LibraryHierarchy_Id] = @libraryHierarchyId
-		AND [LibraryHierarchyLevel_Id] = @libraryHierarchyLevelId
 		AND [Value] = @value
 		AND [IsLeaf] = @isLeaf
 )
 
-INSERT INTO [LibraryHierarchyItems] ([Parent_Id], [LibraryHierarchy_Id], [LibraryHierarchyLevel_Id], [Value], [IsLeaf])
-SELECT @parentId, @libraryHierarchyId, @libraryHierarchyLevelId, @value, @isLeaf
+INSERT INTO [LibraryHierarchyItems] ([Parent_Id], [LibraryHierarchy_Id], [Value], [IsLeaf])
+SELECT @parentId, @libraryHierarchyId, @value, @isLeaf
 WHERE NOT EXISTS(SELECT * FROM "LibraryHierarchyItems_Lookup");
 
 WITH
@@ -21,7 +20,6 @@ WITH
 	FROM [LibraryHierarchyItems]
 	WHERE ((@parentId IS NULL AND [Parent_Id] IS NULL) OR [Parent_Id] = @parentId)
 		AND [LibraryHierarchy_Id] = @libraryHierarchyId
-		AND [LibraryHierarchyLevel_Id] = @libraryHierarchyLevelId
 		AND [Value] = @value
 		AND [IsLeaf] = @isLeaf
 )
@@ -43,7 +41,6 @@ WITH
 	FROM [LibraryHierarchyItems]
 	WHERE ((@parentId IS NULL AND [Parent_Id] IS NULL) OR [Parent_Id] = @parentId)
 		AND [LibraryHierarchy_Id] = @libraryHierarchyId
-		AND [LibraryHierarchyLevel_Id] = @libraryHierarchyLevelId
 		AND [Value] = @value
 		AND [IsLeaf] = @isLeaf
 )

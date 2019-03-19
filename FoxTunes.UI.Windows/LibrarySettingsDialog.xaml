@@ -3,14 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:LibrarySettings x:Key="ViewModel" Core="{Binding}"/>
+        <ObjectDataProvider x:Key="LibraryHierarchyTypes" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="Core:LibraryHierarchyType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -72,9 +77,12 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Label Grid.Column="0" Grid.Row="0">Heirarchy Name</Label>
                         <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,0,0,5"></TextBox>
+                        <Label Grid.Column="0" Grid.Row="1">Heirarchy Type</Label>
+                        <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Type}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyTypes}}" Margin="0,0,0,5"></ComboBox>
                     </Grid>
                     <Grid DockPanel.Dock="Bottom" DataContext="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}">
                         <Grid.Style>

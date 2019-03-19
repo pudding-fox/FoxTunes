@@ -103,12 +103,12 @@ namespace FoxTunes {
         ///	Id INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///	DirectoryName nvarchar(250) NOT NULL, 
         ///	FileName nvarchar(250) NOT NULL, 
+        ///	ImportDate varchar(50) NOT NULL,
         ///	Status INTEGER NOT NULL);
         ///
         ///CREATE TABLE [PlaylistItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
-        ///	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]),
-        ///    [Sequ [rest of string was truncated]&quot;;.
+        ///	[LibraryItem_Id] INTEGER NULL REFERE [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
