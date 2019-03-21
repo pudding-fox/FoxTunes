@@ -4,9 +4,8 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
 namespace FoxTunes
 {
@@ -71,6 +70,9 @@ namespace FoxTunes
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     var set = database.Set<LibraryHierarchy>(transaction);
+                    set.Fetch.Filter.AddColumn(
+                        set.Table.GetColumn(ColumnConfig.By("Enabled", ColumnFlags.None))
+                    ).With(filter => filter.Right = filter.CreateConstant(1));
                     set.Fetch.Sort.Expressions.Clear();
                     set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
                     foreach (var element in set)

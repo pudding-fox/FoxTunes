@@ -133,6 +133,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.LibraryUpdated:
+                case CommonSignals.HierarchiesUpdated:
                     return this.Refresh();
             }
 #if NET40
@@ -175,6 +176,10 @@ namespace FoxTunes
 
         public async Task Refresh()
         {
+            if (this.SelectedHierarchy != null)
+            {
+                this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault(libraryHierarchy => libraryHierarchy.Id == this.SelectedHierarchy.Id);
+            }
             if (this.SelectedHierarchy == null)
             {
                 this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault();

@@ -161,19 +161,11 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             }
-            var selectedHierarchy = default(LibraryHierarchy);
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    var queryable = database.AsQueryable<LibraryHierarchy>(transaction);
-                    selectedHierarchy = queryable.OrderBy(libraryHierarchy => libraryHierarchy.Sequence).FirstOrDefault();
-                }
-            }
             return Windows.Invoke(() =>
             {
                 this.OnHierarchiesChanged();
-                this.SelectedHierarchy = selectedHierarchy;
+                this.OnSelectedHierarchyChanged();
+                this.OnItemsChanged();
             });
         }
 

@@ -29,6 +29,7 @@ namespace FoxTunes
 
         protected virtual void OnSequenceChanged()
         {
+            this.OnNameChanged();
             if (this.SequenceChanged != null)
             {
                 this.SequenceChanged(this, EventArgs.Empty);
@@ -38,18 +39,11 @@ namespace FoxTunes
 
         public event EventHandler SequenceChanged;
 
-        private string _Name { get; set; }
-
         public string Name
         {
             get
             {
-                return this._Name;
-            }
-            set
-            {
-                this._Name = value;
-                this.OnNameChanged();
+                return string.Format("Level {0}", this.Sequence + 1);
             }
         }
 

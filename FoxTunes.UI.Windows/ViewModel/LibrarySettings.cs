@@ -221,7 +221,6 @@ namespace FoxTunes.ViewModel
                     {
                         return database.Set<LibraryHierarchyLevel>().Create().With(libraryHierarchyLevel =>
                         {
-                            libraryHierarchyLevel.Name = "New";
                             libraryHierarchyLevel.Script = "'New'";
                             libraryHierarchyLevel.Sequence = this.LibraryHierarchyLevels.ItemsSource.Count();
                         });

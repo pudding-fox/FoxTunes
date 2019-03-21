@@ -51,11 +51,8 @@ namespace FoxTunes
         {
             var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction).ToArray();
 
-            var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction).ToArray();
-            var libraryHierarchyLevels = libraryHierarchies.ToDictionary(
-                libraryHierarchy => libraryHierarchy,
-                libraryHierarchy => libraryHierarchy.Levels.OrderBy(libraryHierarchyLevel => libraryHierarchyLevel.Sequence).ToArray()
-            );
+            var libraryHierarchies = this.GetHierarchies(transaction);
+            var libraryHierarchyLevels = this.GetLevels(libraryHierarchies);
 
             if (this.ReportProgress)
             {
@@ -152,6 +149,20 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
+        }
+
+        private LibraryHierarchy[] GetHierarchies(ITransactionSource transaction)
+        {
+            var queryable = this.Database.AsQueryable<LibraryHierarchy>(transaction);
+            return queryable.Where(libraryHierarchy => libraryHierarchy.Enabled).ToArray();
+        }
+
+        private IDictionary<LibraryHierarchy, LibraryHierarchyLevel[]> GetLevels(IEnumerable<LibraryHierarchy> libraryHierarchies)
+        {
+            return libraryHierarchies.ToDictionary(
+                libraryHierarchy => libraryHierarchy,
+                libraryHierarchy => libraryHierarchy.Levels.OrderBy(libraryHierarchyLevel => libraryHierarchyLevel.Sequence).ToArray()
+            );
         }
 
         private async Task<int> GetCount(LibraryItemStatus? status, ITransactionSource transaction)
