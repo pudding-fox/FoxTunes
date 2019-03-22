@@ -7,9 +7,11 @@ namespace FoxTunes
 {
     public class MiniPlayerBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
-        public const string SHOW_ARTWORK = "AAAA";
+        public const string TOPMOST = "AAAA";
 
-        public const string SHOW_PLAYLIST = "BBBB";
+        public const string SHOW_ARTWORK = "BBBB";
+
+        public const string SHOW_PLAYLIST = "CCCC";
 
         public const string QUIT = "ZZZZ";
 
@@ -76,7 +78,7 @@ namespace FoxTunes
             {
                 if (Windows.IsMiniWindowCreated)
                 {
-                    Windows.MiniWindow.Topmost = value;
+                    Windows.Invoke(() => Windows.MiniWindow.Topmost = value);
                 }
             });
 
@@ -135,6 +137,7 @@ namespace FoxTunes
             {
                 if (this.Enabled.Value)
                 {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, TOPMOST, "Always On Top", attributes: this.Topmost.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_ARTWORK, "Show Artwork", attributes: this.ShowArtwork.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_PLAYLIST, "Show Playlist", attributes: this.ShowPlaylist.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, QUIT, "Quit", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
@@ -146,6 +149,13 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
+                case TOPMOST:
+                    this.Topmost.Toggle();
+#if NET40
+                    return TaskEx.Run(() => this.Configuration.Save());
+#else
+                    return Task.Run(() => this.Configuration.Save());
+#endif
                 case SHOW_ARTWORK:
                     this.ShowArtwork.Toggle();
 #if NET40
