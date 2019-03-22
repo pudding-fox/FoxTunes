@@ -47,15 +47,49 @@ AS
 INSERT INTO "PlaylistItemsRowNumber" ("Id", "RowNumber")
 SELECT "HorizontalMetaData"."Id", ROW_NUMBER() OVER 
 (
-	ORDER BY CASE 
-		WHEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("__FT_VariousArtists")) #> IS NOT NULL THEN <#= this.Database.QueryFactory.Dialect.String("1") #>
-		ELSE <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Artist")) #> 
-	END, 
-	<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Year")) #>, 
-	<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Album")) #>, 
-	CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Disc")) #> AS int), 
-	CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Track")) #> AS int), 
-	"HorizontalMetaData"."FileName"
+ORDER BY 
+<#
+	if (this.HasColumn(CustomMetaData.VariousArtists) && this.HasColumn("Artist"))
+	{
+#>
+			CASE 
+				WHEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("__FT_VariousArtists")) #> IS NOT NULL THEN <#= this.Database.QueryFactory.Dialect.String("1") #>
+				ELSE <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Artist")) #> 
+			END, 
+<#
+	}
+	else if (this.HasColumn("Artist"))
+	{
+#>
+			<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Artist")) #>,
+<#
+	}
+	if (this.HasColumn("Year"))
+	{
+#>
+			<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Year")) #>, 
+<#
+	}
+	if (this.HasColumn("Album"))
+	{
+#>
+			<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Album")) #>, 
+<#
+	}
+	if (this.HasColumn("Disc"))
+	{
+#>
+			CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Disc")) #> AS int), 
+<#
+	}
+	if (this.HasColumn("Track"))
+	{
+#>
+			CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Track")) #> AS int), 
+<#
+	}
+#>
+			"HorizontalMetaData"."FileName"
 ) AS "RowNumber"
 FROM "HorizontalMetaData";
 

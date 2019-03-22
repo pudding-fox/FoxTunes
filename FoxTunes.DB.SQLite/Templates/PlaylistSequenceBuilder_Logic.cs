@@ -17,12 +17,19 @@ namespace FoxTunes.Templates
 
         public string[] MetaDataNames { get; private set; }
 
+        public bool HasColumn(string name)
+        {
+            return this.MetaDataNames.IndexOf(name, StringComparer.OrdinalIgnoreCase) != -1;
+        }
+
         public string GetColumn(string name)
         {
-            return string.Format(
-                "Value_{0}_Value",
-                this.MetaDataNames.IndexOf(name, StringComparer.OrdinalIgnoreCase)
-            );
+            var index = this.MetaDataNames.IndexOf(name, StringComparer.OrdinalIgnoreCase);
+            if (index == -1)
+            {
+                throw new NotImplementedException();
+            }
+            return string.Format("Value_{0}_Value", index);
         }
     }
 }
