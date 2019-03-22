@@ -2264,6 +2264,7 @@
                     <Grid Width="15" Height="13">
                         <Path Visibility="Collapsed" HorizontalAlignment="Left" Margin="1,1,1,1" x:Name="IsExpandedPath" VerticalAlignment="Center" Fill="{DynamicResource GlyphBrush}" Data="M 0 4 L 8 4 L 4 8 Z" />
                         <Path HorizontalAlignment="Left" Margin="1,1,1,1" x:Name="ExpandPath" VerticalAlignment="Center" Fill="{DynamicResource GlyphBrush}" Data="M 4 0 L 8 4 L 4 8 Z" />
+                        <Rectangle Fill="Transparent"></Rectangle>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
