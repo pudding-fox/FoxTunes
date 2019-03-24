@@ -20,19 +20,26 @@ namespace FoxTunes
 
         public static readonly IOutput Output = ComponentRegistry.Instance.GetComponent<IOutput>();
 
-        public static readonly BooleanConfigurationElement Enabled = ComponentRegistry.Instance
-            .GetComponent<IConfiguration>()
-            .GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.ENABLED_ELEMENT
-        );
+        public static readonly BooleanConfigurationElement Enabled;
 
-        public static readonly SelectionConfigurationElement Bars = ComponentRegistry.Instance
-            .GetComponent<IConfiguration>()
-            .GetElement<SelectionConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.BARS_ELEMENT
-        );
+        public static readonly SelectionConfigurationElement Bars;
+
+        static Spectrum()
+        {
+            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            if (configuration == null)
+            {
+                return;
+            }
+            Enabled = configuration.GetElement<BooleanConfigurationElement>(
+                    SpectrumBehaviourConfiguration.SECTION,
+                    SpectrumBehaviourConfiguration.ENABLED_ELEMENT
+            );
+            Bars = configuration.GetElement<SelectionConfigurationElement>(
+                    SpectrumBehaviourConfiguration.SECTION,
+                    SpectrumBehaviourConfiguration.BARS_ELEMENT
+            );
+        }
 
         public static readonly int SampleCount = 512;
 
@@ -59,22 +66,28 @@ namespace FoxTunes
             this.Timer.Interval = UPDATE_INTERVAL;
             this.Timer.AutoReset = false;
             this.Timer.Elapsed += this.OnElapsed;
-            Enabled.ConnectValue(value =>
+            if (Enabled != null)
             {
-                if (value)
+                Enabled.ConnectValue(value =>
                 {
-                    this.Visibility = Visibility.Visible;
-                    this.Timer.Start();
-                }
-                else
-                {
-                    this.Visibility = Visibility.Collapsed;
-                    this.Timer.Stop();
-                }
-            });
-            Bars.ConnectValue(value =>
-                this.Configure(SpectrumBehaviourConfiguration.GetBars(value))
-            );
+                    if (value)
+                    {
+                        this.Visibility = Visibility.Visible;
+                        this.Timer.Start();
+                    }
+                    else
+                    {
+                        this.Visibility = Visibility.Collapsed;
+                        this.Timer.Stop();
+                    }
+                });
+            }
+            if (Bars != null)
+            {
+                Bars.ConnectValue(value =>
+                    this.Configure(SpectrumBehaviourConfiguration.GetBars(value))
+                );
+            }
         }
 
         public Timer Timer { get; private set; }
