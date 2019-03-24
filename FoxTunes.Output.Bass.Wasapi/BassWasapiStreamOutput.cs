@@ -226,6 +226,11 @@ namespace FoxTunes
             }
         }
 
+        public override int GetData(float[] buffer)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void OnDisposing()
         {
             if (BassWasapi.IsStarted)

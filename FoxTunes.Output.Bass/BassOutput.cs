@@ -419,6 +419,19 @@ namespace FoxTunes
             outputStream.Dispose();
         }
 
+        public override int GetData(float[] buffer)
+        {
+            var result = default(int);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    result = pipeline.Output.GetData(buffer);
+                }
+            });
+            return result;
+        }
+
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return BassOutputConfiguration.GetConfigurationSections();

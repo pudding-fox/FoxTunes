@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FoxTunes.Interfaces
+﻿namespace FoxTunes.Interfaces
 {
     public interface IBassStreamOutput : IBassStreamControllable, IBassStreamComponent
     {
@@ -13,5 +11,7 @@ namespace FoxTunes.Interfaces
         int Latency { get; }
 
         bool CheckFormat(int rate, int channels);
+
+        int GetData(float[] buffer);
     }
 }
