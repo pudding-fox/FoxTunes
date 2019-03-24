@@ -10,17 +10,17 @@ namespace FoxTunes
 
         public const string BARS_ELEMENT = "CF0A0663-7CBF-4EE4-99C8-A0A096D4E876";
 
-        public const string BARS_16_OPTION = "4201DF84-DC4C-463E-9A76-D9D424890D91";
+        public const string BARS_16_OPTION = "AAAADF84-DC4C-463E-9A76-D9D424890D91";
 
-        public const string BARS_32_OPTION = "917ABA8B-CBA3-4800-B4BE-30D0C0758F7E";
+        public const string BARS_32_OPTION = "BBBBBA8B-CBA3-4800-B4BE-30D0C0758F7E";
 
-        public const string BARS_64_OPTION = "E0879524-BC5A-48C0-8210-921B204307FC";
+        public const string BARS_64_OPTION = "CCCC9524-BC5A-48C0-8210-921B204307FC";
 
-        public const string BARS_128_OPTION = "47FB558E-7B9C-4101-992A-709B87756991";
+        public const string BARS_128_OPTION = "DDDD558E-7B9C-4101-992A-709B87756991";
 
-        public const string BARS_256_OPTION = "1642FFC1-592E-4EC6-9CCD-5182935AD12E";
+        public const string BARS_256_OPTION = "EEEEFFC1-592E-4EC6-9CCD-5182935AD12E";
 
-        public const string BARS_512_OPTION = "DC1897F3-1C4A-4660-ABC8-8E686F921FBF";
+        public const string BARS_512_OPTION = "FFFF97F3-1C4A-4660-ABC8-8E686F921FBF";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -33,7 +33,7 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetBarsOptions()
         {
             yield return new SelectionConfigurationOption(BARS_16_OPTION, "16");
-            yield return new SelectionConfigurationOption(BARS_32_OPTION, "32");
+            yield return new SelectionConfigurationOption(BARS_32_OPTION, "32").Default();
             yield return new SelectionConfigurationOption(BARS_64_OPTION, "64");
             yield return new SelectionConfigurationOption(BARS_128_OPTION, "128");
             yield return new SelectionConfigurationOption(BARS_256_OPTION, "256");
