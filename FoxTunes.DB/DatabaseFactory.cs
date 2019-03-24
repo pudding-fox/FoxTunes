@@ -17,6 +17,26 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public bool Test()
+        {
+            using (var database = this.OnCreate())
+            {
+                return this.OnTest(database);
+            }
+        }
+
+        protected abstract bool OnTest(IDatabase database);
+
+        public void Initialize()
+        {
+            using (var database = this.OnCreate())
+            {
+                this.OnInitialize(database);
+            }
+        }
+
+        protected abstract void OnInitialize(IDatabase database);
+
         public IDatabaseComponent Create()
         {
             var database = this.OnCreate();

@@ -2,6 +2,8 @@
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
+using System.Data;
+using System.Data.SQLite;
 using System.IO;
 
 namespace FoxTunes
@@ -9,19 +11,35 @@ namespace FoxTunes
     [Component("13A75018-8A24-413D-A731-C558C8FAF08F", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class SQLiteDatabaseFactory : DatabaseFactory
     {
-        protected override IDatabaseComponent OnCreate()
-        {
-            return new SQLiteDatabase();
-        }
-
-        protected override void Configure(IDatabase database)
+        protected override bool OnTest(IDatabase database)
         {
             if (!File.Exists(SQLiteDatabase.FileName))
             {
-                this.CreateDatabase(database);
-                this.Core.CreateDefaultData(database);
+                return false;
             }
-            base.Configure(database);
+            try
+            {
+                switch (database.Connection.State)
+                {
+                    case ConnectionState.Open:
+                        return true;
+                }
+            }
+            catch (SQLiteException)
+            {
+                //Nothing can be done.
+            }
+            return false;
+        }
+
+        protected override void OnInitialize(IDatabase database)
+        {
+            this.CreateDatabase(database);
+        }
+
+        protected override IDatabaseComponent OnCreate()
+        {
+            return new SQLiteDatabase();
         }
 
         protected virtual void CreateDatabase(IDatabase database)

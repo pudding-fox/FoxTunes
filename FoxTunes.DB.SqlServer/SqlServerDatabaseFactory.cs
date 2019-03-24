@@ -11,29 +11,32 @@ namespace FoxTunes
     [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class SqlServerDatabaseFactory : DatabaseFactory
     {
-        protected override IDatabaseComponent OnCreate()
-        {
-            return new SqlServerDatabase();
-        }
-
-        protected override void Configure(IDatabase database)
+        protected override bool OnTest(IDatabase database)
         {
             try
             {
                 switch (database.Connection.State)
                 {
                     case ConnectionState.Open:
-                        break;
+                        return true;
                 }
             }
             catch (SqlException)
             {
-                this.CreateDatabase(database);
-                this.Core.CreateDefaultData(database);
+                //Nothing can be done.
             }
-            base.Configure(database);
+            return false;
         }
 
+        protected override void OnInitialize(IDatabase database)
+        {
+            this.CreateDatabase(database);
+        }
+
+        protected override IDatabaseComponent OnCreate()
+        {
+            return new SqlServerDatabase();
+        }
 
         protected virtual void CreateDatabase(IDatabase database)
         {
