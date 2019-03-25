@@ -1,7 +1,7 @@
 # FoxTunes
 A modular music player using the BASS framework.
 
-The main release is [FoxTunes-1.5-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/1.4/FoxTunes-1.5-net461.zip)
+The main release is [FoxTunes-1.5-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/1.5/FoxTunes-1.5-net461.zip)
 
 ![Main](Media/Screenshots/Main.PNG)
 

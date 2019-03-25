@@ -58,23 +58,26 @@ namespace FoxTunes
             }
             if (metaDataItem == null || !File.Exists(metaDataItem.Value))
             {
+                var source = default(ImageSource);
+                using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
+                {
+                    source = ImageLoader.Load(stream, 0, 0);
+                }
                 await Windows.Invoke(() =>
                 {
-                    using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
+                    this.Background = new ImageBrush(source)
                     {
-                        this.Background = new ImageBrush(ImageLoader.Load(stream, 0, 0))
-                        {
-                            Stretch = Stretch.Uniform
-                        };
-                    }
+                        Stretch = Stretch.Uniform
+                    };
                     this.IsComponentEnabled = false;
                 });
             }
             else
             {
+                var source = ImageLoader.Load(metaDataItem.Value, 0, 0);
                 await Windows.Invoke(() =>
                 {
-                    this.Background = new ImageBrush(ImageLoader.Load(metaDataItem.Value, 0, 0))
+                    this.Background = new ImageBrush(source)
                     {
                         Stretch = Stretch.Uniform
                     };

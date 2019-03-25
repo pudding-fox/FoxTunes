@@ -14,6 +14,7 @@ namespace FoxTunes.ViewModel
         {
             this.ItemsSource = itemsSource;
             this.Items = items;
+            this.Freeze();
         }
 
         public LibraryHierarchyNode ItemsSource { get; private set; }

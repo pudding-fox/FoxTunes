@@ -114,6 +114,7 @@ namespace FoxTunes
             if (region.Width != region.Height)
             {
                 source = this.CropImage(source, region, decodePixelWidth, decodePixelHeight);
+                source.Freeze();
             }
             context.DrawImage(source, region);
         }
@@ -195,6 +196,7 @@ namespace FoxTunes
                 FileMetaDataStore.Write(PREFIX, this.GetImageId(libraryHierarchyNode), stream);
                 stream.Seek(0, SeekOrigin.Begin);
             }
+            target.Freeze();
             return target;
         }
 

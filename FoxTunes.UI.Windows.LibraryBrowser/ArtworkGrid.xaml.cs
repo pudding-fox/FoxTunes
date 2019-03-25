@@ -88,7 +88,18 @@ namespace FoxTunes
                 {
                     await libraryHierarchyNode.LoadMetaDatasAsync();
                 }
-                await Windows.Invoke(() => this.Background = new ImageBrush(Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight)));
+                var width = default(int);
+                var height = default(int);
+                await Windows.Invoke(() =>
+                {
+                    width = this.DecodePixelWidth;
+                    height = this.DecodePixelHeight;
+                });
+                var source = Provider.CreateImageSource(libraryHierarchyNode, width, height);
+                await Windows.Invoke(() => this.Background = new ImageBrush(source)
+                {
+                    Stretch = Stretch.Uniform
+                });
             });
         }
     }

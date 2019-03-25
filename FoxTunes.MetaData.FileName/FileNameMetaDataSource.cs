@@ -14,7 +14,15 @@ namespace FoxTunes
 
         public IEnumerable<IFileNameMetaDataExtractor> Extractors { get; private set; }
 
-        public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
+        public IArtworkProvider ArtworkProvider { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.ArtworkProvider = core.Components.ArtworkProvider;
+            base.InitializeComponent(core);
+        }
+
+        public async Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {
             var result = new List<MetaDataItem>();
             var metaData = default(IDictionary<string, string>);
@@ -35,11 +43,12 @@ namespace FoxTunes
                 }
                 break;
             }
-#if NET40
-            return TaskEx.FromResult<IEnumerable<MetaDataItem>>(result);
-#else
-            return Task.FromResult<IEnumerable<MetaDataItem>>(result);
-#endif
+            var metaDataItem = await this.ArtworkProvider.Find(fileName, ArtworkType.FrontCover);
+            if (metaDataItem != null)
+            {
+                result.Add(metaDataItem);
+            }
+            return result;
         }
 
         protected virtual MetaDataItem GetMetaData(string name, string value)
