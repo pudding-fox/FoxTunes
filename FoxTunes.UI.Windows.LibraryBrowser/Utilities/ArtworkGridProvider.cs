@@ -3,10 +3,11 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using FoxTunes.Interfaces;
 
 namespace FoxTunes
 {
-    public class ArtworkGridProvider
+    public class ArtworkGridProvider : StandardComponent
     {
         const double DPIX = 96;
 
@@ -14,16 +15,32 @@ namespace FoxTunes
 
         private static readonly string PREFIX = typeof(ArtworkGridProvider).Name;
 
-        private static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+        private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
+
+        public ThemeLoader ThemeLoader { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            base.InitializeComponent(core);
+        }
 
         public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
+            var id = this.GetImageId(libraryHierarchyNode);
             var fileName = default(string);
-            if (FileMetaDataStore.Exists(PREFIX, this.GetImageId(libraryHierarchyNode), out fileName))
+            if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
             {
                 return ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
             }
-            return this.CreateImageSourceCore(libraryHierarchyNode, decodePixelWidth, decodePixelHeight);
+            using (KeyLock.Lock(id))
+            {
+                if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                {
+                    return ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
+                }
+                return this.CreateImageSourceCore(libraryHierarchyNode, decodePixelWidth, decodePixelHeight);
+            }
         }
 
         private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
@@ -216,7 +233,24 @@ namespace FoxTunes
 
         public void Clear()
         {
-            FileMetaDataStore.Clear(PREFIX);
+            try
+            {
+                FileMetaDataStore.Clear(PREFIX);
+            }
+            finally
+            {
+                this.OnCleared();
+            }
         }
+
+        protected virtual void OnCleared()
+        {
+            if (this.Cleared != null)
+            {
+                this.Cleared(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler Cleared;
     }
 }

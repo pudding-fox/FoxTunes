@@ -39,6 +39,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler FramesChanged;
 
+        private DoubleConfigurationElement _ScalingFactor { get; set; }
+
+        public DoubleConfigurationElement ScalingFactor
+        {
+            get
+            {
+                return this._ScalingFactor;
+            }
+            set
+            {
+                this._ScalingFactor = value;
+                this.OnScalingFactorChanged();
+            }
+        }
+
+        protected virtual void OnScalingFactorChanged()
+        {
+            if (this.ScalingFactorChanged != null)
+            {
+                this.ScalingFactorChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ScalingFactor");
+        }
+
+        public event EventHandler ScalingFactorChanged;
+
         private IntegerConfigurationElement _TileSize { get; set; }
 
         public IntegerConfigurationElement TileSize
@@ -87,14 +113,29 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
+            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+            );
+            this.ScalingFactor.ValueChanged += this.OnValueChanged;
             this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.LIBRARY_BROWSER_TILE_SIZE
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
             );
+            this.TileSize.ValueChanged += this.OnValueChanged;
             LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
 
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+#if NET40
+            var task = TaskEx.Run(() => this.Refresh());
+#else
+            var task = Task.Run(() => this.Refresh());
+#endif
         }
 
         public override void Refresh()
@@ -237,7 +278,7 @@ namespace FoxTunes.ViewModel
                 }
                 position++;
             }
-            for (; position < frames.Count; position++)
+            for (var count = frames.Count; position < count; position++)
             {
                 frames.RemoveAt(frames.Count - 1);
             }
