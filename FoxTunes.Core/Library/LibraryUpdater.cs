@@ -58,7 +58,7 @@ namespace FoxTunes
 #if NET40
                         this.Semaphore.Wait();
 #else
-                            await this.Semaphore.WaitAsync();
+                        await this.Semaphore.WaitAsync();
 #endif
                         try
                         {

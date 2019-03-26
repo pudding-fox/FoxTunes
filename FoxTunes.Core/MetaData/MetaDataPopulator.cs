@@ -30,12 +30,32 @@ namespace FoxTunes
 
         public IDatabaseQuery Query { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public IntegerConfigurationElement Threads { get; private set; }
+
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
         private MetaDataWriter Writer { get; set; }
 
+        public override ParallelOptions ParallelOptions
+        {
+            get
+            {
+                return new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = this.Threads.Value
+                };
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
+            this.Configuration = core.Components.Configuration;
+            this.Threads = this.Configuration.GetElement<IntegerConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.THREADS_ELEMENT
+            );
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             base.InitializeComponent(core);
         }
@@ -100,7 +120,7 @@ namespace FoxTunes
                     }
                     Interlocked.Increment(ref position);
                 }
-            }, cancellationToken, this.ParallelOptions);
+            }, cancellationToken, this.Threads);
         }
 
         protected override void OnDisposing()

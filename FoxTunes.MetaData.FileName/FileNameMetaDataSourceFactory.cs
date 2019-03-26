@@ -39,7 +39,7 @@ namespace FoxTunes
             this.Core = core;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
-                FileNameMetaDataSourceFactoryConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.SECTION,
                 FileNameMetaDataSourceFactoryConfiguration.PATTERNS_ELEMENT
             ).ConnectValue(value => this.Patterns = value);
             base.InitializeComponent(core);
