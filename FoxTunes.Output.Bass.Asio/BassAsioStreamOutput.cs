@@ -437,7 +437,7 @@ namespace FoxTunes
 
         public override int GetData(float[] buffer)
         {
-            throw new NotImplementedException();
+            return -1;
         }
 
         protected override void OnDisposing()

@@ -12,6 +12,14 @@ namespace FoxTunes
     /// </summary>
     public partial class Spectrum : UserControl
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         const int FACTOR = 4;
 
         const float BOOST = 0.005f;
@@ -125,17 +133,24 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            var length = Output.GetData(Buffer);
-            if (length <= 0)
+            try
             {
-                this.HasData = false;
+                var length = Output.GetData(Buffer);
+                if (length <= 0)
+                {
+                    this.HasData = false;
+                }
+                else
+                {
+                    this.HasData = true;
+                    this.Update();
+                }
+                Windows.Invoke(() => this.InvalidateVisual());
             }
-            else
+            catch (Exception exception)
             {
-                this.HasData = true;
-                this.Update();
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
             }
-            Windows.Invoke(() => this.InvalidateVisual());
         }
 
         protected virtual void Configure(int count)

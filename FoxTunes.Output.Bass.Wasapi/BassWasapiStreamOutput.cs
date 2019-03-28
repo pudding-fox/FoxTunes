@@ -3,6 +3,7 @@ using ManagedBass;
 using ManagedBass.Mix;
 using ManagedBass.Wasapi;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -21,6 +22,7 @@ namespace FoxTunes
         private BassWasapiStreamOutput()
         {
             this.Flags = BassFlags.Default;
+            this.MixerChannelHandles = new HashSet<int>();
         }
 
         public BassWasapiStreamOutput(BassWasapiStreamOutputBehaviour behaviour, BassOutputStream stream)
@@ -73,6 +75,8 @@ namespace FoxTunes
 
         public override int ChannelHandle { get; protected set; }
 
+        public HashSet<int> MixerChannelHandles { get; protected set; }
+
         public override bool CheckFormat(int rate, int channels)
         {
             return BassWasapiDevice.Info.SupportedRates.Contains(rate) && channels <= BassWasapiDevice.Info.Outputs;
@@ -87,9 +91,10 @@ namespace FoxTunes
                 BassUtils.Throw();
             }
             Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
-            BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default));
+            BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
             BassWasapiDevice.Init(this.Rate, this.Channels);
             BassUtils.OK(BassWasapiHandler.StreamSet(this.ChannelHandle));
+            this.MixerChannelHandles.Add(previous.ChannelHandle);
         }
 
         protected virtual bool StartWASAPI()
@@ -228,7 +233,26 @@ namespace FoxTunes
 
         public override int GetData(float[] buffer)
         {
-            throw new NotImplementedException();
+            var length = default(uint);
+            switch (buffer.Length)
+            {
+                case 128:
+                    length = FFT256;
+                    break;
+                case 256:
+                    length = FFT512;
+                    break;
+                case 512:
+                    length = FFT1024;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            foreach (var channelHandle in this.MixerChannelHandles)
+            {
+                return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
+            }
+            return 0;
         }
 
         protected override void OnDisposing()
