@@ -84,6 +84,23 @@ namespace FoxTunes
             }
         }
 
+        private bool _Dither { get; set; }
+
+        public bool Dither
+        {
+            get
+            {
+                return this._Dither;
+            }
+            private set
+            {
+                this._Dither = value;
+                Logger.Write(this, LogLevel.Debug, "Dither = {0}", this.Dither);
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
@@ -106,6 +123,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_EVENT
             ).ConnectValue(value => this.EventDriven = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_DITHER
+            ).ConnectValue(value => this.Dither = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
@@ -134,7 +155,7 @@ namespace FoxTunes
             {
                 return;
             }
-            BassWasapiDevice.Init(this.WasapiDevice, this.Exclusive, this.EventDriven);
+            BassWasapiDevice.Init(this.WasapiDevice, this.Exclusive, this.EventDriven, this.Dither);
             if (!BassWasapiDevice.Info.SupportedRates.Contains(this.Output.Rate))
             {
                 Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device.", this.Output.Rate);

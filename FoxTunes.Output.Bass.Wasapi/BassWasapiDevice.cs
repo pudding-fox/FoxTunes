@@ -9,6 +9,14 @@ namespace FoxTunes
 {
     public static class BassWasapiDevice
     {
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         const int INIT_ATTEMPTS = 5;
 
         const int INIT_ATTEMPT_INTERVAL = 400;
@@ -60,14 +68,16 @@ namespace FoxTunes
 
         public static bool EventDriven { get; private set; }
 
+        public static bool Dither { get; private set; }
+
         public static bool IsInitialized { get; private set; }
 
         public static void Init(int frequency = 0, int channels = 0)
         {
-            Init(Device, Exclusive, EventDriven, frequency, channels);
+            Init(Device, Exclusive, EventDriven, Dither, frequency, channels);
         }
 
-        public static void Init(int device, bool exclusive, bool eventDriven, int frequency = 0, int channels = 0)
+        public static void Init(int device, bool exclusive, bool eventDriven, bool dither, int frequency = 0, int channels = 0)
         {
             LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initializing BASS WASAPI.");
             var flags = WasapiInitFlags.Shared;
@@ -78,6 +88,10 @@ namespace FoxTunes
             if (eventDriven)
             {
                 flags |= WasapiInitFlags.EventDriven;
+            }
+            if (dither)
+            {
+                flags |= WasapiInitFlags.Dither;
             }
             BassUtils.OK(BassWasapiHandler.Init(device, frequency, channels, flags, 0, 0));
             IsInitialized = true;
