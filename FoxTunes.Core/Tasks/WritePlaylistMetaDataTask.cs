@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxDb.Interfaces;
+﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.IO;
@@ -44,7 +43,7 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Savin meta data");
+            await this.SetName("Saving meta data");
             await this.SetPosition(0);
             await this.SetCount(this.PlaylistItems.Count());
             await base.OnStarted();

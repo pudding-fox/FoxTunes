@@ -4,10 +4,13 @@ namespace FoxTunes
 {
     public class ClearLibraryHierarchiesTask : LibraryTaskBase
     {
-        public ClearLibraryHierarchiesTask()
+        public ClearLibraryHierarchiesTask(LibraryItemStatus? status)
             : base()
         {
+            this.Status = status;
         }
+
+        public LibraryItemStatus? Status { get; private set; }
 
         public override bool Visible
         {
@@ -26,7 +29,7 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            return this.RemoveHierarchies(null);
+            return this.RemoveHierarchies(this.Status);
         }
 
         protected override async Task OnCompleted()

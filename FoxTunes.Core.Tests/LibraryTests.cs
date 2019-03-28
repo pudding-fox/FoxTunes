@@ -43,7 +43,7 @@ namespace FoxTunes
         [Test]
         public async Task CanAddFilesToLibrary()
         {
-            await this.Core.Managers.Hierarchy.Clear();
+            await this.Core.Managers.Hierarchy.Clear(null);
             await this.Core.Managers.Library.Clear();
             await this.Core.Managers.Library.Add(new[]
             {

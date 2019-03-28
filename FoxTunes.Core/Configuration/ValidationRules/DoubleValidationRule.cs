@@ -2,15 +2,18 @@
 {
     public class DoubleValidationRule : ValidationRule
     {
-        public DoubleValidationRule(double minValue, double maxValue)
+        public DoubleValidationRule(double minValue, double maxValue, double step = 1)
         {
             this.MinValue = minValue;
             this.MaxValue = maxValue;
+            this.Step = step;
         }
 
         public double MinValue { get; private set; }
 
         public double MaxValue { get; private set; }
+
+        public double Step { get; private set; }
 
         public override bool Validate(object value, out string message)
         {
