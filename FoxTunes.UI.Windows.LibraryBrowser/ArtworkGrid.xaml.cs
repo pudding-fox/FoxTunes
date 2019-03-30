@@ -12,13 +12,6 @@ namespace FoxTunes
     /// </summary>
     public partial class ArtworkGrid : UserControl
     {
-        public static TaskScheduler Scheduler = new TaskScheduler(new ParallelOptions()
-        {
-            MaxDegreeOfParallelism = Environment.ProcessorCount
-        });
-
-        public static TaskFactory Factory = new TaskFactory(Scheduler);
-
         public static Lazy<Size> PixelSize;
 
         public static readonly DoubleConfigurationElement ScalingFactor;
@@ -83,7 +76,11 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return Factory.StartNew(async () =>
+#if NET40
+            return TaskEx.Run(async () =>
+#else
+            return Task.Run(async () =>
+#endif
             {
                 if (!libraryHierarchyNode.IsMetaDatasLoaded)
                 {

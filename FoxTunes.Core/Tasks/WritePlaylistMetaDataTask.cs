@@ -145,7 +145,6 @@ namespace FoxTunes
         {
             await base.OnCompleted();
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
         protected override void OnDisposing()
