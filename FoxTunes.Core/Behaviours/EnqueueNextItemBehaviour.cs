@@ -37,7 +37,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var playlistItem = await this.PlaylistManager.GetNext();
+            var playlistItem = await this.PlaylistManager.GetNext(false);
             if (playlistItem == null)
             {
                 return;

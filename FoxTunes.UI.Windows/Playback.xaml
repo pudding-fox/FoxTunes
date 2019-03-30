@@ -4,12 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Playback x:Key="ViewModel" Core="{Binding}"></ViewModel:Playback>
     </UserControl.Resources>
+    <UserControl.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYBACK}}"></Windows:Menu>
+    </UserControl.ContextMenu>
     <StackPanel Orientation="Horizontal">
         <Button Command="{Binding StopOutputCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0">&lt;</Button>
         <Button Command="{Binding PlayCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0">4</Button>

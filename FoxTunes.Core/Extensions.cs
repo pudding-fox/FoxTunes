@@ -261,5 +261,17 @@ namespace FoxTunes
             }
             return value;
         }
+
+        public static void Shuffle<T>(this IList<T> sequence)
+        {
+            var random = new Random(unchecked((int)DateTime.Now.Ticks));
+            for (var a = 0; a < sequence.Count; a++)
+            {
+                var b = sequence[a];
+                var c = random.Next(sequence.Count);
+                sequence[a] = sequence[c];
+                sequence[c] = b;
+            }
+        }
     }
 }
