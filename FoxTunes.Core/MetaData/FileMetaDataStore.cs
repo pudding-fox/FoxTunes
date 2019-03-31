@@ -79,6 +79,15 @@ namespace FoxTunes
             return fileName;
         }
 
+
+        public static string Write(string prefix, string id, string fileName)
+        {
+            using (var stream = File.OpenRead(fileName))
+            {
+                return Write(prefix, id, stream);
+            }
+        }
+
         public static async Task<string> WriteAsync(string prefix, string id, Stream stream)
         {
             var fileName = GetFileName(prefix, id);
@@ -96,6 +105,14 @@ namespace FoxTunes
                 }
             }
             return fileName;
+        }
+
+        public static async Task<string> WriteAsync(string prefix, string id, string fileName)
+        {
+            using (var stream = File.OpenRead(fileName))
+            {
+                return await WriteAsync(prefix, id, stream);
+            }
         }
 
         public static void Clear(string prefix)

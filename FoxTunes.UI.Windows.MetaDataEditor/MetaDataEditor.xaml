@@ -54,6 +54,7 @@
                             <StackPanel>
                                 <StackPanel.ContextMenu>
                                     <ContextMenu>
+                                        <MenuItem Header="Replace" Command="{Binding BrowseCommand, Mode=OneWay}"></MenuItem>
                                         <MenuItem Header="Remove" Command="{Binding ClearCommand, Mode=OneWay}"></MenuItem>
                                     </ContextMenu>
                                 </StackPanel.ContextMenu>
