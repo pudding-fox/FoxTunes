@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
@@ -12,6 +13,8 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}" SearchCompleted="OnSearchCompleted"></ViewModel:LibraryTree>
+        <System:Boolean x:Key="True">True</System:Boolean>
+        <System:Boolean x:Key="False">False</System:Boolean>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -41,9 +44,12 @@
                   TextSearch.TextPath="Value">
             <Interactivity:Interaction.Triggers>
                 <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TreeViewItem}">
-                    <Interactivity:InvokeCommandAction Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}"/>
+                    <Interactivity:InvokeCommandAction Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource False}"/>
                 </Windows:FilteredEventTrigger>
             </Interactivity:Interaction.Triggers>
+            <TreeView.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource True}"></KeyBinding>
+            </TreeView.InputBindings>
             <TreeView.ContextMenu>
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
             </TreeView.ContextMenu>
