@@ -135,10 +135,12 @@ namespace FoxTunes
                 return;
             }
             var position = default(long);
+            var paused = default(bool);
             var playlistItem = default(PlaylistItem);
             if (this.PlaybackManager.CurrentStream != null)
             {
                 position = this.PlaybackManager.CurrentStream.Position;
+                paused = this.PlaybackManager.CurrentStream.IsPaused;
             }
             if (this.PlaylistManager.CurrentItem != null)
             {
@@ -162,9 +164,16 @@ namespace FoxTunes
             if (playlistItem != null)
             {
                 await this.PlaylistManager.Play(playlistItem);
-                if (this.PlaybackManager.CurrentStream != null && position > 0)
+                if (this.PlaybackManager.CurrentStream != null)
                 {
-                    this.PlaybackManager.CurrentStream.Position = position;
+                    if (position > 0)
+                    {
+                        this.PlaybackManager.CurrentStream.Position = position;
+                    }
+                    if (paused)
+                    {
+                        await this.PlaybackManager.CurrentStream.Pause();
+                    }
                 }
             }
         }
