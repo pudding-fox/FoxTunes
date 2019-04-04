@@ -18,6 +18,8 @@ namespace FoxTunes.Interfaces
 
         bool CanNavigate { get; }
 
+        event AsyncEventHandler CanNavigateChanged;
+
         Task Add(IEnumerable<string> paths);
 
         Task Rescan();

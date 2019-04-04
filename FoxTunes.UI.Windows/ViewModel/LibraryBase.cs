@@ -58,7 +58,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.LibraryManager == null)
+                if (this.LibraryManager == null || value == null)
                 {
                     return;
                 }
@@ -166,6 +166,7 @@ namespace FoxTunes.ViewModel
                 this.OnHierarchiesChanged();
                 this.OnSelectedHierarchyChanged();
                 this.OnItemsChanged();
+                this.OnSelectedItemChanged();
             });
         }
 
@@ -180,7 +181,8 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
-            var task = this.Reload();
+            //TODO: Bad .Wait().
+            this.Reload().Wait();
             base.InitializeComponent(core);
         }
 

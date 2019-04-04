@@ -64,7 +64,18 @@ namespace FoxTunes
                     //Nothing can be done.
                 }
             }
-            throw new InvalidOperationException("Failed to create the database.", exception);
+            if (File.Exists(SQLiteDatabase.FileName))
+            {
+                try
+                {
+                    File.Delete(SQLiteDatabase.FileName);
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
+            }
+            throw new InvalidOperationException(string.Format("Failed to create the database: {0}", exception.Message), exception);
         }
     }
 }

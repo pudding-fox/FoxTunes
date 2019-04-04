@@ -4,8 +4,6 @@ namespace FoxTunes.Interfaces
 {
     public interface IUserInterface : IStandardComponent
     {
-        bool RestartPending { get; }
-
         void Show();
 
         void Run(string message);

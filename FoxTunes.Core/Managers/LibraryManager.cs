@@ -44,6 +44,10 @@ namespace FoxTunes
             }
             set
             {
+                if (object.Equals(this._SelectedHierarchy, value))
+                {
+                    return;
+                }
                 this._SelectedHierarchy = value;
                 this.OnSelectedHierarchyChanged();
             }
@@ -98,23 +102,26 @@ namespace FoxTunes
             {
                 return this._CanNavigate;
             }
-            set
-            {
-                this._CanNavigate = value;
-                this.OnCanNavigateChanged();
-            }
         }
 
-        protected virtual void OnCanNavigateChanged()
+        protected Task SetCanNavigate(bool value)
+        {
+            this._CanNavigate = value;
+            return this.OnCanNavigateChanged();
+        }
+
+        protected virtual async Task OnCanNavigateChanged()
         {
             if (this.CanNavigateChanged != null)
             {
-                this.CanNavigateChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.CanNavigateChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("CanNavigate");
         }
 
-        public event EventHandler CanNavigateChanged;
+        public event AsyncEventHandler CanNavigateChanged;
 
         public override void InitializeComponent(ICore core)
         {
@@ -179,13 +186,30 @@ namespace FoxTunes
             if (this.SelectedHierarchy != null)
             {
                 this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault(libraryHierarchy => libraryHierarchy.Id == this.SelectedHierarchy.Id);
+                Logger.Write(this, LogLevel.Debug, "Refreshed selected hierarchy: {0} => {1}", this.SelectedHierarchy.Id, this.SelectedHierarchy.Name);
             }
             if (this.SelectedHierarchy == null)
             {
                 this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault();
+                if (this.SelectedHierarchy == null)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to select a hierarchy, perhaps none are enabled?");
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Selected first hierarchy: {0} => {1}", this.SelectedHierarchy.Id, this.SelectedHierarchy.Name);
+                }
             }
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.DatabaseFactory != null && await this.HasItems();
+            await this.SetCanNavigate(this.DatabaseFactory != null && await this.HasItems());
+            if (this.CanNavigate)
+            {
+                Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Navigation is not possible, library is empty.");
+            }
         }
 
         public async Task Add(IEnumerable<string> paths)

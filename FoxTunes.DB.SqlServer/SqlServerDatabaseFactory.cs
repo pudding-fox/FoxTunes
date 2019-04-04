@@ -66,7 +66,7 @@ namespace FoxTunes
             {
                 //Nothing can be done.
             }
-            throw new InvalidOperationException("Failed to create the database.", exception);
+            throw new InvalidOperationException(string.Format("Failed to create the database: {0}", exception.Message), exception);
         }
     }
 }
