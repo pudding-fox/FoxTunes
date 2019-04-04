@@ -69,7 +69,6 @@ namespace FoxTunes.ViewModel
 
         public override bool CanExecute(object parameter)
         {
-
             if (this.Predicate != null)
             {
                 return this.Predicate((T)parameter);
