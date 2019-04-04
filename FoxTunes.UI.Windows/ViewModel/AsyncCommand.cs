@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace FoxTunes.ViewModel
@@ -71,7 +70,14 @@ namespace FoxTunes.ViewModel
         {
             if (this.Predicate != null)
             {
-                return this.Predicate((T)parameter);
+                if (parameter is T)
+                {
+                    return this.Predicate((T)parameter);
+                }
+                else
+                {
+                    return this.Predicate(default(T));
+                }
             }
             return true;
         }
@@ -89,7 +95,14 @@ namespace FoxTunes.ViewModel
             var task = Task.Run(() =>
 #endif
             {
-                this.Func((T)parameter);
+                if (parameter is T)
+                {
+                    this.Func((T)parameter);
+                }
+                else
+                {
+                    this.Func(default(T));
+                }
                 this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 return Windows.Invoke(() => this.OnCanExecuteChanged());
             });

@@ -77,7 +77,14 @@ namespace FoxTunes.ViewModel
             {
                 return true;
             }
-            return this.Predicate((T)parameter);
+            if (parameter is T)
+            {
+                return this.Predicate((T)parameter);
+            }
+            else
+            {
+                return this.Predicate(default(T));
+            }
         }
 
         public override void Execute(object parameter)
