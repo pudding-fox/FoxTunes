@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -139,12 +140,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var position = e.GetPosition(null);
-                if (position.X < 0 || position.Y < 0)
-                {
-                    return;
-                }
-                this.DragStartPosition = position;
+                this.DragStartPosition = e.GetPosition(this.ListBox);
             }
 
             protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
@@ -163,7 +159,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var position = e.GetPosition(null);
+                var position = e.GetPosition(this.ListBox);
                 if (this.ShouldInitializeDrag(e.OriginalSource, position))
                 {
                     this.DragStartPosition = default(Point);
