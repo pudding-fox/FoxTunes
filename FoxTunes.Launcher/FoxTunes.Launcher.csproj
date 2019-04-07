@@ -9,6 +9,7 @@
     <StartupObject />
     <Platforms>x86</Platforms>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
 
   <ItemGroup>

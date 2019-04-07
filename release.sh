@@ -21,6 +21,7 @@ MAIN="
 x86/SQLite.Interop.dll
 bass.dll
 bass_gapless.dll
+bass_inmemory_handler.dll
 bassmix.dll
 FoxDb.Core.dll
 FoxDb.Linq.dll
@@ -81,6 +82,7 @@ ManagedBass.Gapless.Cd.dll
 "
 
 DSD="
+bass_inmemory_handler_dsd.dll
 FoxTunes.Output.Bass.Dsd.dll
 ManagedBass.Dsd.dll
 "

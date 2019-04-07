@@ -22,7 +22,8 @@ namespace FoxTunes
                     Path.Combine(CurrentDirectory, "Audio", "A.mp3"),
                     Path.Combine(CurrentDirectory, "Audio", "B.ogg"),
                     Path.Combine(CurrentDirectory, "Audio", "C.mp3"),
-                    Path.Combine(CurrentDirectory, "Audio", "D.mp3")
+                    Path.Combine(CurrentDirectory, "Audio", "D.mp3"),
+                    Path.Combine(CurrentDirectory, "Audio", "E.dsf")
                 };
             }
         }

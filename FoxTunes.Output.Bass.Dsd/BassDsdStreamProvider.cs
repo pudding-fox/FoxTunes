@@ -43,10 +43,13 @@ namespace FoxTunes
             return true;
         }
 
+#if NET40
+        public override Task<int> CreateStream(PlaylistItem playlistItem)
+#else
         public override async Task<int> CreateStream(PlaylistItem playlistItem)
+#endif
         {
             var flags = BassFlags.Decode | BassFlags.DSDRaw;
-            var channelHandle = default(int);
 #if NET40
             this.Semaphore.Wait();
 #else
@@ -54,16 +57,13 @@ namespace FoxTunes
 #endif
             try
             {
+                var channelHandle = default(int);
                 if (this.Output.PlayFromMemory)
                 {
-                    var buffer = await this.GetBuffer(playlistItem);
-                    channelHandle = BassDsd.CreateStream(buffer, 0, buffer.Length, flags);
-                    if (channelHandle != 0)
+                    channelHandle = BassDsdInMemoryHandler.CreateStream(playlistItem.FileName, 0, 0, flags);
+                    if (channelHandle == 0)
                     {
-                        if (!this.Streams.TryAdd(new BassStreamProviderKey(playlistItem.FileName, channelHandle), buffer))
-                        {
-                            Logger.Write(this, LogLevel.Warn, "Failed to pin handle of buffer for file \"{0}\". Playback may fail.", playlistItem.FileName);
-                        }
+                        Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", playlistItem.FileName);
                     }
                 }
                 else
@@ -82,7 +82,11 @@ namespace FoxTunes
                         channelHandle = 0;
                     }
                 }
+#if NET40
+                return TaskEx.FromResult(channelHandle);
+#else
                 return channelHandle;
+#endif
             }
             finally
             {

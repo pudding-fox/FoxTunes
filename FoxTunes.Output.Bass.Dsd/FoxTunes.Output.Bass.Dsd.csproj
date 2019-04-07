@@ -30,6 +30,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\lib\bass_inmemory_handler_dsd.dll" Link="bass_inmemory_handler_dsd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 
