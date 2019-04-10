@@ -7,7 +7,6 @@
 #include "bass_inmemory_handler_dsd.h"
 #include "../bass_inmemory_handler/inmemory_stream.h"
 #include "../bass_inmemory_handler/reader.h"
-#include "../bass_inmemory_handler/file_name.h"
 
 BOOL is_initialized = FALSE;
 
@@ -47,14 +46,7 @@ HSTREAM BASSINMEMORYHANDLERDSDDEF(_BASS_DSD_StreamCreateFileUser)(DWORD system, 
 HSTREAM BASSINMEMORYHANDLERDSDDEF(BASS_INMEMORY_HANDLER_DSD_StreamCreateFile)(BOOL mem, const void* file, QWORD offset, QWORD length, DWORD flags) {
 	IM_STREAM* stream;
 	BUFFER* buffer;
-	const char path[MAX_PATH];
-	if (!get_file_name(file, flags, path)) {
-#if _DEBUG
-		printf("Failed to determine file name.\n");
-#endif
-		return 0;
-	}
-	buffer = read_file_buffer(path, offset, length);
+	buffer = read_file_buffer((const wchar_t*)file, offset, length);
 	if (buffer) {
 		stream = inmemory_stream_create(buffer, &_BASS_DSD_StreamCreateFileUser, flags);
 		if (stream) {

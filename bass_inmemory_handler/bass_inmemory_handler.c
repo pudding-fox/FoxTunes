@@ -5,7 +5,6 @@
 #include "bass_inmemory_handler.h"
 #include "inmemory_stream.h"
 #include "reader.h"
-#include "file_name.h"
 
 BOOL is_initialized = FALSE;
 
@@ -41,14 +40,7 @@ BOOL BASSINMEMORYHANDLERDEF(BASS_INMEMORY_HANDLER_Free)() {
 HSTREAM BASSINMEMORYHANDLERDEF(BASS_INMEMORY_HANDLER_StreamCreateFile)(BOOL mem, const void* file, QWORD offset, QWORD length, DWORD flags) {
 	IM_STREAM* stream;
 	BUFFER* buffer;
-	const char path[MAX_PATH];
-	if (!get_file_name(file, flags, path)) {
-#if _DEBUG
-		printf("Failed to determine file name.\n");
-#endif
-		return 0;
-	}
-	buffer = read_file_buffer(path, offset, length);
+	buffer = read_file_buffer((const wchar_t*)file, offset, length);
 	if (buffer) {
 		stream = inmemory_stream_create(buffer, &BASS_StreamCreateFileUser, flags);
 		if (stream) {

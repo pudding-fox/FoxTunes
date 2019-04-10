@@ -90,7 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\bass_inmemory_handler\buffer.c" />
-    <ClCompile Include="..\bass_inmemory_handler\file_name.c" />
     <ClCompile Include="..\bass_inmemory_handler\inmemory_stream.c" />
     <ClCompile Include="..\bass_inmemory_handler\reader.c" />
     <ClCompile Include="bass_inmemory_handler_dsd.c" />
