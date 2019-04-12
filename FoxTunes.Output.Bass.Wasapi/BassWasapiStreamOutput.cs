@@ -84,6 +84,7 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
+            this.ConfigureWASAPI(previous);
             Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
             this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
             if (this.ChannelHandle == 0)
@@ -92,9 +93,23 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
             BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
-            BassWasapiDevice.Init(this.Rate, this.Channels);
             BassUtils.OK(BassWasapiHandler.StreamSet(this.ChannelHandle));
             this.MixerChannelHandles.Add(previous.ChannelHandle);
+        }
+
+        protected virtual void ConfigureWASAPI(IBassStreamComponent previous)
+        {
+            BassWasapiDevice.Init(this.Rate, this.Channels);
+            if (this.Rate != BassWasapiDevice.Info.Rate)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to set the requested rate {0}, falling back to device default {1}.", this.Rate, BassWasapiDevice.Info.Rate);
+                this.Rate = BassWasapiDevice.Info.Rate;
+            }
+            if (this.Channels != BassWasapiDevice.Info.Outputs)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to set the requested channel count {0}, falling back to device default {1}.", this.Channels, BassWasapiDevice.Info.Outputs);
+                this.Channels = BassWasapiDevice.Info.Outputs;
+            }
         }
 
         protected virtual bool StartWASAPI()
