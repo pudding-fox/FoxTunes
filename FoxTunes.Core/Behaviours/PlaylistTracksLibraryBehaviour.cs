@@ -46,7 +46,7 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                PlaylistTracksLibraryBehaviourConfiguration.SECTION,
+                PlaylistBehaviourConfiguration.SECTION,
                 PlaylistTracksLibraryBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
             base.InitializeComponent(core);
