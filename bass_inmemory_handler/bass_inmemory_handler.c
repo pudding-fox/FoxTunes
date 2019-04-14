@@ -42,7 +42,7 @@ HSTREAM BASSINMEMORYHANDLERDEF(BASS_INMEMORY_HANDLER_StreamCreateFile)(BOOL mem,
 	BUFFER* buffer;
 	buffer = read_file_buffer((const wchar_t*)file, offset, length);
 	if (buffer) {
-		stream = inmemory_stream_create(buffer, &BASS_StreamCreateFileUser, flags);
+		stream = inmemory_stream_create((const wchar_t*)file, buffer, &BASS_StreamCreateFileUser, flags);
 		if (stream) {
 			return stream->handle;
 		}
