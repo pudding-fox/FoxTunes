@@ -31,7 +31,7 @@ namespace FoxTunes
 
         public ITransactionSource Transaction { get; private set; }
 
-        public async Task Populate()
+        public async Task Populate(CancellationToken cancellationToken)
         {
             var set = this.Database.Set<LibraryItem>(this.Transaction);
 
@@ -46,6 +46,10 @@ namespace FoxTunes
             var position = 0;
             foreach (var libraryItem in set)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
                 if (this.Predicate(libraryItem))
                 {
                     await this.Task(set, libraryItem);

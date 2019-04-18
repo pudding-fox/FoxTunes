@@ -20,6 +20,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool Cancellable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         protected override async Task OnStarted()
         {
             await this.SetName("Building hierarchies");

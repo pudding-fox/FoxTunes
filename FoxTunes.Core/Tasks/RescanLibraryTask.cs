@@ -24,6 +24,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool Cancellable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         protected override async Task OnStarted()
         {
             await this.SetName("Getting file list");
@@ -60,16 +68,22 @@ namespace FoxTunes
                 libraryItem.Status = LibraryItemStatus.Remove;
                 return set.AddOrUpdateAsync(libraryItem);
             });
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
-                using (var libraryUpdater = new LibraryUpdater(this.Database, predicate, action, this.Visible, transaction))
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    libraryUpdater.InitializeComponent(this.Core);
-                    await this.WithPopulator(libraryUpdater,
-                        async () => await libraryUpdater.Populate()
-                    );
+                    using (var libraryUpdater = new LibraryUpdater(this.Database, predicate, action, this.Visible, transaction))
+                    {
+                        libraryUpdater.InitializeComponent(this.Core);
+                        await this.WithPopulator(libraryUpdater,
+                            async () => await libraryUpdater.Populate(cancellationToken)
+                        );
+                    }
+                    transaction.Commit();
                 }
-                transaction.Commit();
+            }))
+            {
+                await task.Run();
             }
         }
 
@@ -94,6 +108,10 @@ namespace FoxTunes
                 {
                     foreach (var record in reader)
                     {
+                        if (this.IsCancellationRequested)
+                        {
+                            break;
+                        }
                         yield return record.Get<string>(column.Identifier);
                     }
                 }
