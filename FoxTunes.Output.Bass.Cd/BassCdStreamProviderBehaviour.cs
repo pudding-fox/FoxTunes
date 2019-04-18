@@ -259,7 +259,7 @@ namespace FoxTunes
                     {
                         throw new InvalidOperationException("Drive is not ready.");
                     }
-                    using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+                    using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
                         //Always append for now.
                         this.Sequence = await this.PlaylistManager.GetInsertIndex();

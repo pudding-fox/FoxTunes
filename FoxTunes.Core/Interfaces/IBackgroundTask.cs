@@ -9,6 +9,10 @@ namespace FoxTunes.Interfaces
 
         bool Visible { get; }
 
+        bool IsCancellationRequested { get; }
+
+        event EventHandler CancellationRequested;
+
         event AsyncEventHandler Started;
 
         bool IsStarted { get; }

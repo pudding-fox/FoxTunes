@@ -20,8 +20,10 @@ namespace FoxTunes
 
         public static readonly ConcurrentDictionary<string, SingletonReentrantTaskContainer> Instances = new ConcurrentDictionary<string, SingletonReentrantTaskContainer>();
 
-        private SingletonReentrantTask(string id)
+        private SingletonReentrantTask(IBackgroundTask backgroundTask, string id)
         {
+            this.BackgroundTask = backgroundTask;
+            this.BackgroundTask.CancellationRequested += this.OnCancellationRequested;
             this.Instance = Instances.AddOrUpdate(id, new SingletonReentrantTaskContainer(id, this), (key, value) =>
             {
                 if (!value.Instances.Add(this))
@@ -32,17 +34,19 @@ namespace FoxTunes
             });
         }
 
-        public SingletonReentrantTask(string id, byte priority, Func<CancellationToken, Task> factory) : this(id, TIMEOUT, priority, factory)
+        public SingletonReentrantTask(IBackgroundTask backgroundTask, string id, byte priority, Func<CancellationToken, Task> factory) : this(backgroundTask, id, TIMEOUT, priority, factory)
         {
 
         }
 
-        public SingletonReentrantTask(string id, int timeout, byte priority, Func<CancellationToken, Task> factory) : this(id)
+        public SingletonReentrantTask(IBackgroundTask backgroundTask, string id, int timeout, byte priority, Func<CancellationToken, Task> factory) : this(backgroundTask, id)
         {
             this.Timeout = timeout;
             this.Priority = priority;
             this.Factory = factory;
         }
+
+        public IBackgroundTask BackgroundTask { get; private set; }
 
         public SingletonReentrantTaskContainer Instance { get; private set; }
 
@@ -79,6 +83,11 @@ namespace FoxTunes
                 var success = true;
                 try
                 {
+                    if (this.BackgroundTask.IsCancellationRequested)
+                    {
+                        Logger.Write(this, LogLevel.Trace, "Task was cancelled.");
+                        return;
+                    }
                     this.Instance.CancellationToken.Reset();
                     await this.Factory(this.Instance.CancellationToken);
                     if (this.Instance.CancellationToken.IsCancellationRequested)
@@ -109,6 +118,11 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Trace, "Task was executed successfully.");
         }
 
+        protected virtual void OnCancellationRequested(object sender, EventArgs e)
+        {
+            this.Instance.CancellationToken.Cancel();
+        }
+
         public bool IsDisposed { get; private set; }
 
         public void Dispose()
@@ -130,6 +144,10 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             var value = default(SingletonReentrantTaskContainer);
+            if (this.BackgroundTask != null)
+            {
+                this.BackgroundTask.CancellationRequested -= this.OnCancellationRequested;
+            }
             if (!Instances.TryGetValue(this.Instance.Id, out value) || !value.Instances.Remove(this))
             {
                 throw new InvalidOperationException(string.Format("Failed to unregister instance with id: {0}", this.Instance.Id));

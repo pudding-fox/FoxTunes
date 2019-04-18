@@ -52,7 +52,7 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             var position = 0;
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
                 var metaDataSource = this.MetaDataSourceFactory.Create();
                 foreach (var playlistItem in this.PlaylistItems)

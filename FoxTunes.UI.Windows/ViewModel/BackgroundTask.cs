@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -145,6 +146,27 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler IsIndeterminateChanged;
+
+        public ICommand CancelCommand
+        {
+            get
+            {
+                return new Command(this.Cancel, () => this.CanCancel);
+            }
+        }
+
+        public bool CanCancel
+        {
+            get
+            {
+                return this.InnerBackgroundTask.Cancellable;
+            }
+        }
+
+        public void Cancel()
+        {
+            this.InnerBackgroundTask.Cancel();
+        }
 
         protected override void OnDisposing()
         {

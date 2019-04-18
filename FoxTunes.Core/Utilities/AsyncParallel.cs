@@ -16,8 +16,16 @@ namespace FoxTunes
         {
             var exceptions = new List<Exception>();
             var tasks = new List<Task>(options.MaxDegreeOfParallelism);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
             foreach (var element in sequence)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
 #if NET40
                 tasks.Add(TaskEx.Run(async () =>
                 {
@@ -44,10 +52,6 @@ namespace FoxTunes
                 }));
 #endif
                 if (exceptions.Count > 0)
-                {
-                    break;
-                }
-                if (cancellationToken.IsCancellationRequested)
                 {
                     break;
                 }
