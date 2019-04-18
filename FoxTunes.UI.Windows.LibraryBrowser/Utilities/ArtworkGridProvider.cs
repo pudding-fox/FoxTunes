@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using FoxTunes.Interfaces;
 
 namespace FoxTunes
 {
@@ -19,9 +19,12 @@ namespace FoxTunes
 
         public ThemeLoader ThemeLoader { get; private set; }
 
+        public ImageLoader ImageLoader { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
             base.InitializeComponent(core);
         }
 
@@ -31,13 +34,13 @@ namespace FoxTunes
             var fileName = default(string);
             if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
             {
-                return ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
+                return this.ImageLoader.Load(id, fileName, decodePixelWidth, decodePixelHeight);
             }
             using (KeyLock.Lock(id))
             {
                 if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
                 {
-                    return ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
+                    return this.ImageLoader.Load(id, fileName, decodePixelWidth, decodePixelHeight);
                 }
                 return this.CreateImageSourceCore(libraryHierarchyNode, decodePixelWidth, decodePixelHeight);
             }
@@ -62,20 +65,22 @@ namespace FoxTunes
 
         private ImageSource CreateImageSource0(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
+            var id = this.GetImageId(libraryHierarchyNode);
             using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
             {
-                return ImageLoader.Load(stream, decodePixelWidth, decodePixelHeight);
+                return this.ImageLoader.Load(id, stream, decodePixelWidth, decodePixelHeight);
             }
         }
 
         private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
         {
+            var id = this.GetImageId(libraryHierarchyNode) + "1";
             var fileName = libraryHierarchyNode.MetaDatas[0].Value;
             if (!File.Exists(fileName))
             {
                 return this.CreateImageSource0(libraryHierarchyNode, decodePixelWidth, decodePixelHeight);
             }
-            return ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
+            return this.ImageLoader.Load(id, fileName, decodePixelWidth, decodePixelHeight);
         }
 
         private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int decodePixelWidth, int decodePixelHeight)
@@ -116,6 +121,7 @@ namespace FoxTunes
 
         private void DrawImage(LibraryHierarchyNode libraryHierarchyNode, DrawingContext context, int position, int count, int decodePixelWidth, int decodePixelHeight)
         {
+            var id = this.GetImageId(libraryHierarchyNode) + position;
             var fileName = libraryHierarchyNode.MetaDatas[position].Value;
             if (!File.Exists(fileName))
             {
@@ -123,7 +129,7 @@ namespace FoxTunes
             }
             var region = this.GetRegion(context, position, count, decodePixelWidth, decodePixelHeight);
             var decode = (int)Math.Max(region.Width, region.Height);
-            var source = ImageLoader.Load(fileName, decode, decode);
+            var source = this.ImageLoader.Load(id, fileName, decode, decode);
             if (source == null)
             {
                 //Image failed to load, nothing can be done.
@@ -221,14 +227,17 @@ namespace FoxTunes
         private string GetImageId(LibraryHierarchyNode libraryHierarchyNode)
         {
             var hashCode = default(int);
-            do
+            unchecked
             {
-                if (!string.IsNullOrEmpty(libraryHierarchyNode.Value))
+                do
                 {
-                    hashCode += libraryHierarchyNode.Value.GetHashCode();
-                }
-                libraryHierarchyNode = libraryHierarchyNode.Parent;
-            } while (libraryHierarchyNode != null);
+                    if (!string.IsNullOrEmpty(libraryHierarchyNode.Value))
+                    {
+                        hashCode += libraryHierarchyNode.Value.GetHashCode();
+                    }
+                    libraryHierarchyNode = libraryHierarchyNode.Parent;
+                } while (libraryHierarchyNode != null);
+            }
             return hashCode.ToString();
         }
 

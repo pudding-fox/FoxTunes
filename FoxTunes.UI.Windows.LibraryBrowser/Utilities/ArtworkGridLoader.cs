@@ -1,7 +1,6 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FoxTunes.Interfaces;
 
 namespace FoxTunes
 {
@@ -35,8 +34,6 @@ namespace FoxTunes
             });
             base.InitializeComponent(core);
         }
-
-
 
         public Task Load(ArtworkGrid artworkGrid)
         {

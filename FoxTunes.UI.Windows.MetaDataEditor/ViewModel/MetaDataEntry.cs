@@ -19,6 +19,8 @@ namespace FoxTunes.ViewModel
 
         public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
 
+        public static readonly ImageLoader ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
+
         private MetaDataEntry()
         {
             this.PlaylistItems = new List<PlaylistItem>();
@@ -177,22 +179,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ImageSourceChanged;
 
-        public int DecodePixelWidth
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
-        public int DecodePixelHeight
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
         private bool _HasValue { get; set; }
 
         public bool HasValue
@@ -295,7 +281,7 @@ namespace FoxTunes.ViewModel
             }
             else
             {
-                this.ImageSource = ImageLoader.Load((string)this.Value, this.DecodePixelWidth, this.DecodePixelHeight);
+                this.ImageSource = ImageLoader.Load(null, (string)this.Value, 0, 0);
             }
         }
 
