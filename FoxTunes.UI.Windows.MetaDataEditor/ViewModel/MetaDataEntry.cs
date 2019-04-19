@@ -349,7 +349,7 @@ namespace FoxTunes.ViewModel
         public void Browse()
         {
             var dialog = new OpenFileDialog();
-            dialog.Filter = "Images (*.jpg, *.jpeg, *.png, *.bmp, *.bin) | *.jpg; *.jpeg; *.png; *.bmp; *.bin;";
+            dialog.Filter = this.GetFilter();
             var directoryName = this.PlaylistItems.Select(playlistItem => playlistItem.DirectoryName).FirstOrDefault();
             if (string.IsNullOrEmpty(directoryName))
             {
@@ -367,6 +367,18 @@ namespace FoxTunes.ViewModel
                     this.RefreshImageSource();
                     break;
             }
+        }
+
+        protected virtual string GetFilter()
+        {
+            var extensions = ArtworkProvider.EXTENSIONS
+                .Select(extension => string.Format("*{0}", extension))
+                .ToArray();
+            return string.Format(
+                "Images({0}) | {1}",
+                string.Join(", ", extensions),
+                string.Join("; ", extensions)
+            );
         }
 
         public ICommand ClearCommand

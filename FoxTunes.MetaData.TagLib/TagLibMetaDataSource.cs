@@ -29,6 +29,10 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public BooleanConfigurationElement EmbeddedImages { get; private set; }
+
+        public BooleanConfigurationElement LooseImages { get; private set; }
+
         public BooleanConfigurationElement CopyImages { get; private set; }
 
         public IArtworkProvider ArtworkProvider { get; private set; }
@@ -36,6 +40,14 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
+            this.EmbeddedImages = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_EMBEDDED_IMAGES
+            );
+            this.LooseImages = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_LOOSE_IMAGES
+            );
             this.CopyImages = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.COPY_IMAGES_ELEMENT
@@ -67,17 +79,20 @@ namespace FoxTunes
                     {
                         this.AddProperties(metaData, file.Properties);
                     }
-                    if (file.InvariantStartPosition > MAX_TAG_SIZE)
+                    if (this.EmbeddedImages.Value)
                     {
-                        Logger.Write(this, LogLevel.Warn, "Not importing images from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
-                        collect = true;
-                    }
-                    else
-                    {
-                        var pictures = file.Tag.Pictures;
-                        if (pictures != null)
+                        if (file.InvariantStartPosition > MAX_TAG_SIZE)
                         {
-                            images = await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures);
+                            Logger.Write(this, LogLevel.Warn, "Not importing images from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
+                            collect = true;
+                        }
+                        else
+                        {
+                            var pictures = file.Tag.Pictures;
+                            if (pictures != null)
+                            {
+                                images = await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures);
+                            }
                         }
                     }
                 }
@@ -86,7 +101,7 @@ namespace FoxTunes
                     //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
                     GC.Collect();
                 }
-                if (!images)
+                if (this.LooseImages.Value && !images)
                 {
                     await this.AddImages(metaData, fileName);
                 }

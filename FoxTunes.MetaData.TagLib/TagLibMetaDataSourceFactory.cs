@@ -13,14 +13,6 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override bool Enabled
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public override IMetaDataSource Create()
         {
             var source = new TagLibMetaDataSource();

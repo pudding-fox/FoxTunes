@@ -316,7 +316,7 @@ namespace FoxTunes {
         ///(
         ///	SELECT [Id]
         ///	FROM [LibraryItems]
-        ///	WHERE [LibraryItems].[Status] = @status
+        ///	WHERE @status IS NULL OR [LibraryItems].[Status] = @status
         ///);
         ///
         ///DELETE FROM [PlaylistItem_MetaDataItem]
@@ -325,15 +325,13 @@ namespace FoxTunes {
         ///	SELECT [PlaylistItems].[Id]
         ///	FROM [PlaylistItems]
         ///		JOIN [LibraryItems] ON [PlaylistItems].[LibraryItem_Id] = [LibraryItems].[Id]
-        ///	WHERE [LibraryItems].[Status] = @status
+        ///	WHERE @status IS NULL OR [LibraryItems].[Status] = @status
         ///);
         ///
         ///DELETE FROM [PlaylistItems]
         ///WHERE [Id] IN
         ///(
-        ///	SELECT [PlaylistItems].[Id]
-        ///	FROM [PlaylistItems]
-        ///		JO [rest of string was truncated]&quot;;.
+        ///	SELECT [PlaylistIt [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string RemoveLibraryItems {
             get {

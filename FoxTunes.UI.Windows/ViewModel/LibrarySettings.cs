@@ -171,7 +171,7 @@ namespace FoxTunes.ViewModel
         public async Task Clear()
         {
             await this.HierarchyManager.Clear(null);
-            await this.LibraryManager.Clear();
+            await this.LibraryManager.Clear(null);
         }
 
         public ICommand CancelCommand
