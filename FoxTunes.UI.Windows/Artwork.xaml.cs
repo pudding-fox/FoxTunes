@@ -59,7 +59,7 @@ namespace FoxTunes
                 var source = default(ImageSource);
                 using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
                 {
-                    source = ImageLoader.Load(null, stream, 0, 0);
+                    source = ImageLoader.Load(stream);
                 }
                 await Windows.Invoke(() =>
                 {
@@ -72,7 +72,7 @@ namespace FoxTunes
             }
             else
             {
-                var source = ImageLoader.Load(null, metaDataItem.Value, 0, 0);
+                var source = ImageLoader.Load(metaDataItem.Value);
                 await Windows.Invoke(() =>
                 {
                     this.Background = new ImageBrush(source)

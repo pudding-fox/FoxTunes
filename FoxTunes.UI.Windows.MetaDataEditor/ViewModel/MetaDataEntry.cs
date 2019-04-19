@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -275,13 +276,17 @@ namespace FoxTunes.ViewModel
                 //TODO: The <No Value>/<Multiple Values> text is hard to read when we use the placeholder image.
                 //using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
                 //{
-                //    this.ImageSource = ImageLoader.Load(stream, this.DecodePixelWidth, this.DecodePixelHeight);
+                //    this.ImageSource = ImageLoader.Load(stream);
                 //}
                 this.ImageSource = null;
             }
             else
             {
-                this.ImageSource = ImageLoader.Load(null, (string)this.Value, 0, 0);
+                var fileName = (string)this.Value;
+                if (File.Exists(fileName))
+                {
+                    this.ImageSource = ImageLoader.Load(fileName);
+                }
             }
         }
 
