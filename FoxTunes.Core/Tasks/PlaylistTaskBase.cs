@@ -90,7 +90,7 @@ namespace FoxTunes
                 var query = this.Database
                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
                    .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
-                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, this.Visible, transaction))
+                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithPopulator(metaDataPopulator,

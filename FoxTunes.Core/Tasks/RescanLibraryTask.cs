@@ -1,5 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -65,6 +66,7 @@ namespace FoxTunes
             });
             var action = new Func<IDatabaseSet<LibraryItem>, LibraryItem, Task>((set, libraryItem) =>
             {
+                Logger.Write(this, LogLevel.Debug, "Re-scanning file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                 libraryItem.Status = LibraryItemStatus.Remove;
                 return set.AddOrUpdateAsync(libraryItem);
             });
