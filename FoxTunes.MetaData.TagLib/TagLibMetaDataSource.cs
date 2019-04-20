@@ -365,6 +365,10 @@ namespace FoxTunes
 
         private async Task<string> ImportImage(string fileName, string id, bool overwrite)
         {
+            if (FileMetaDataStore.Contains(fileName))
+            {
+                return fileName;
+            }
             var prefix = this.GetType().Name;
             var result = default(string);
             if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))

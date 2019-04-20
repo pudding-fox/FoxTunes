@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -7,13 +9,13 @@ namespace FoxTunes
         public CappedDictionary(int capacity)
         {
             this.Keys = new Queue(capacity);
-            this.Store = new Dictionary<TKey, TValue>(capacity);
+            this.Store = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
             this.Capacity = capacity;
         }
 
         public Queue Keys { get; private set; }
 
-        public IDictionary<TKey, TValue> Store { get; private set; }
+        public ConcurrentDictionary<TKey, TValue> Store { get; private set; }
 
         public int Capacity { get; private set; }
 
@@ -22,7 +24,7 @@ namespace FoxTunes
             this.Store[key] = value;
             if (this.Keys.Count >= this.Capacity)
             {
-                this.Store.Remove(this.Keys.Dequeue());
+                this.Store.TryRemove(this.Keys.Dequeue());
             }
             this.Keys.Enqueue(key);
         }
