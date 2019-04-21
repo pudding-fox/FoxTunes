@@ -8,30 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.SQLite" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.SQLite.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.SQLite" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.SQLite.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.110" />
   </ItemGroup>
 
@@ -100,6 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FoxDb.SQLite" Version="0.2.0"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 

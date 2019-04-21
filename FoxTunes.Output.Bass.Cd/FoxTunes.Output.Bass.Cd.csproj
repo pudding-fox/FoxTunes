@@ -8,12 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
-    </Reference>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.dll</HintPath>
     </Reference>
@@ -26,12 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
-    </Reference>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.dll</HintPath>
     </Reference>

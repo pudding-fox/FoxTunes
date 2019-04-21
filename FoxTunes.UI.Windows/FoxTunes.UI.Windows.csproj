@@ -5,6 +5,7 @@
     <AssemblyName>FoxTunes.UI.Windows</AssemblyName>
     <OutputPath>..\distribution\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
@@ -14,24 +15,6 @@
   <PropertyGroup>
     <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="PresentationCore" />
