@@ -18,7 +18,7 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
+    #line 1 "D:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
     public partial class LibraryHierarchyBuilder : LibraryHierarchyBuilderBase
     {
@@ -36,7 +36,7 @@ AS
 	FROM ""LibraryItems""
 		LEFT JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
 		LEFT JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
-	WHERE @status IS NULL OR ""LibraryItems"".""Status"" = @status
+	WHERE @status IS NULL OR ""LibraryItems"".""Status"" = @status AND ""MetaDataItems"".""Id"" IS NOT NULL
 )
 ,
 ""HorizontalMetaData""
@@ -44,7 +44,7 @@ AS
 (
 ");
             
-            #line 20 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
+            #line 20 "D:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 		this.Database,
 		"VerticalMetaData", 
