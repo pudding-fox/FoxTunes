@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
+        public CdDoorMonitor DoorMonitor { get; private set; }
+
         new public bool IsInitialized { get; private set; }
 
         public bool Enabled
@@ -85,6 +87,8 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
+            this.DoorMonitor = ComponentRegistry.Instance.GetComponent<CdDoorMonitor>();
+            this.DoorMonitor.StateChanged += this.OnStateChanged;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
@@ -128,6 +132,15 @@ namespace FoxTunes
             BassGaplessCd.Disable();
             BassGaplessCd.Free();
             this.IsInitialized = false;
+        }
+
+        protected virtual void OnStateChanged(object sender, EventArgs e)
+        {
+            if (this.Output.IsStarted && this.DoorMonitor.State == CdDoorState.Open)
+            {
+                Logger.Write(this, LogLevel.Debug, "CD door was opened, shutting down the output.");
+                this.Output.Shutdown();
+            }
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
