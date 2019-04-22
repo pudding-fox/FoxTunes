@@ -18,8 +18,9 @@ namespace FoxTunes
         public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {
             var drive = default(int);
+            var id = default(string);
             var track = default(int);
-            if (!BassCdStreamProvider.ParseUrl(fileName, out drive, out track))
+            if (!BassCdStreamProvider.ParseUrl(fileName, out drive, out id, out track))
             {
                 //TODO: Warn.
 #if NET40
