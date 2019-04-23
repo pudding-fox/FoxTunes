@@ -49,6 +49,8 @@ log4net.dll
 ManagedBass.dll
 ManagedBass.Gapless.dll
 ManagedBass.Mix.dll
+msvcp100.dll
+msvcr100.dll
 Noesis.Javascript.dll
 System.Data.SQLite.dll
 System.IO.dll
@@ -64,6 +66,7 @@ Microsoft.Windows.Shell.dll
 
 WINDOWS="
 FoxTunes.Core.Windows.dll
+FoxTunes.Core.Windows.UWP.dll
 "
 
 ASIO="
@@ -200,6 +203,11 @@ do
 
 	for file in $WINDOWS
 	do
+		if [ ! -f "./distribution/$target/$file" ]
+		then
+			echo "SKIPPING $file" 
+			continue
+		fi
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/windows"
 	done

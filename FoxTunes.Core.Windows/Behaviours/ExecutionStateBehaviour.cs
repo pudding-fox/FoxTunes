@@ -40,7 +40,7 @@ namespace FoxTunes
                 {
                     this.Timer = new Timer();
                     this.Timer.Interval = UPDATE_INTERVAL;
-                    this.Timer.Elapsed += (sender, e) => this.SetThreadExecutionState();
+                    this.Timer.Elapsed += this.OnElapsed;
                     this.Timer.Start();
                 }
             }
@@ -49,6 +49,7 @@ namespace FoxTunes
                 if (this.Timer != null)
                 {
                     this.Timer.Stop();
+                    this.Timer.Elapsed -= this.OnElapsed;
                     this.Timer.Dispose();
                     this.Timer = null;
                 }
@@ -64,6 +65,11 @@ namespace FoxTunes
                 ExecutionStateBehaviourConfiguration.SLEEP_ELEMENT
             ).ConnectValue(value => this.ExecutionState = ExecutionStateBehaviourConfiguration.GetExecutionState(value));
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
+        {
+            this.SetThreadExecutionState();
         }
 
         protected virtual void SetThreadExecutionState()
@@ -106,6 +112,7 @@ namespace FoxTunes
             if (this.Timer != null)
             {
                 this.Timer.Stop();
+                this.Timer.Elapsed -= this.OnElapsed;
                 this.Timer.Dispose();
                 this.Timer = null;
             }

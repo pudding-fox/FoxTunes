@@ -89,6 +89,7 @@ namespace FoxTunes
                 return;
             }
             this.Timer.Stop();
+            this.Timer.Elapsed -= this.OnElapsed;
             this.Timer.Dispose();
             this.Timer = null;
             Logger.Write(this, LogLevel.Debug, "Stopped monitoring CD door state.");

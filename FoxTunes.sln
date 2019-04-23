@@ -83,10 +83,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_inmemory_handler", "ba
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_inmemory_handler_dsd", "bass_inmemory_handler_dsd\bass_dsd_inmemory_handler.vcxproj", "{530C8EC7-66B4-4A17-9BF4-001193151FDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core.Windows.UWP", "FoxTunes.Core.Windows.UWP\FoxTunes.Core.Windows.UWP.csproj", "{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -488,12 +487,27 @@ Global
 		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Release|x86.ActiveCfg = Release|Win32
 		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Release|x86.Build.0 = Release|Win32
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|x86.Build.0 = Debug|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9293982D-B2F3-4C86-A307-057EE1CFA115}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
