@@ -25,12 +25,18 @@ namespace FoxTunes
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            this.ScalingFactor.ValueChanged += this.OnValueChanged;
+            if (this.ScalingFactor != null)
+            {
+                this.ScalingFactor.ValueChanged += this.OnValueChanged;
+            }
             this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
             );
-            this.TileSize.ValueChanged += this.OnValueChanged;
+            if (this.TileSize != null)
+            {
+                this.TileSize.ValueChanged += this.OnValueChanged;
+            }
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
@@ -86,6 +92,14 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.ScalingFactor != null)
+            {
+                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.TileSize != null)
+            {
+                this.TileSize.ValueChanged -= this.OnValueChanged;
+            }
             if (this.SignalEmitter != null)
             {
                 this.SignalEmitter.Signal -= this.OnSignal;

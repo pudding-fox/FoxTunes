@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public const string Logger = "4F0E4441-89E9-45A4-9B05-94491ACF0A99";
 
+        public const string Blocked = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
+
         public static readonly IDictionary<string, string> Lookup = new Dictionary<string, string>()
         {
             { "Configuration", Configuration },

@@ -43,13 +43,26 @@ namespace FoxTunes
             return true;
         }
 
-#if NET40
         public override Task<int> CreateStream(PlaylistItem playlistItem)
-#else
-        public override async Task<int> CreateStream(PlaylistItem playlistItem)
-#endif
         {
             var flags = BassFlags.Decode | BassFlags.DSDRaw;
+            return this.CreateStream(playlistItem, flags);
+        }
+
+#if NET40
+        public override Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+#else
+        public override async Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+#endif
+        {
+            if (!flags.HasFlag(BassFlags.DSDRaw))
+            {
+#if NET40
+                return base.CreateStream(playlistItem, flags);
+#else
+                return await base.CreateStream(playlistItem, flags);
+#endif
+            }
 #if NET40
             this.Semaphore.Wait();
 #else

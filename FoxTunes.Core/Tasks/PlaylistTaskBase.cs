@@ -74,7 +74,7 @@ namespace FoxTunes
                 using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, this.Visible, transaction))
                 {
                     playlistPopulator.InitializeComponent(this.Core);
-                    await this.WithPopulator(playlistPopulator,
+                    await this.WithSubTask(playlistPopulator,
                         async () => await playlistPopulator.Populate(paths, cancellationToken)
                     );
                     this.Offset = playlistPopulator.Offset;
@@ -93,7 +93,7 @@ namespace FoxTunes
                 using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
-                    await this.WithPopulator(metaDataPopulator,
+                    await this.WithSubTask(metaDataPopulator,
                         async () => await metaDataPopulator.Populate(query, cancellationToken)
                     );
                 }

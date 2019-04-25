@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Windows;
 
@@ -9,10 +10,7 @@ namespace FoxTunes
         public SystemTheme()
             : base("D4EBB53F-BF59-4D61-99E1-D6D52926AE3F", "System")
         {
-            this.ResourceDictionary = new ResourceDictionary()
-            {
-                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
-            };
+
         }
 
         public ResourceDictionary ResourceDictionary { get; private set; }
@@ -33,6 +31,18 @@ namespace FoxTunes
         public override void Disable()
         {
             Application.Current.Resources.MergedDictionaries.Remove(this.ResourceDictionary);
+        }
+
+        public override void InitializeComponent(ICore core)
+        {
+            if (!(core.Flags.HasFlag(CoreFlags.Headless)))
+            {
+                this.ResourceDictionary = new ResourceDictionary()
+                {
+                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
+                };
+            }
+            base.InitializeComponent(core);
         }
     }
 }

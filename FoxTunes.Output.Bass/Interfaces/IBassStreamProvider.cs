@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ManagedBass;
+using System;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
@@ -10,6 +11,8 @@ namespace FoxTunes.Interfaces
         bool CanCreateStream(PlaylistItem playlistItem);
 
         Task<int> CreateStream(PlaylistItem playlistItem);
+
+        Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags);
 
         void FreeStream(PlaylistItem playlistItem, int channelHandle);
     }
