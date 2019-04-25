@@ -39,7 +39,14 @@ namespace FoxTunes
         ~UIBehaviour()
         {
             Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            this.Dispose(true);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
@@ -9,6 +10,14 @@ namespace FoxTunes
 {
     public class Server : IDisposable
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static readonly string Id = typeof(Server).Assembly.FullName;
 
         public Server()
@@ -93,7 +102,15 @@ namespace FoxTunes
 
         ~Server()
         {
-            this.Dispose(true);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 

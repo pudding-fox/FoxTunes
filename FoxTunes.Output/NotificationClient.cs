@@ -1,4 +1,5 @@
 ﻿#if VISTA
+using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -6,6 +7,14 @@ namespace FoxTunes
 {
     public class NotificationClient : IMMNotificationClient, IDisposable
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public NotificationClient()
         {
             Enumerator.RegisterEndpointNotificationCallback(this);
@@ -116,7 +125,15 @@ namespace FoxTunes
 
         ~NotificationClient()
         {
-            this.Dispose(true);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
 
         public static readonly IMMDeviceEnumerator Enumerator = DeviceEnumeratorFactory.Create();

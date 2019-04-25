@@ -43,6 +43,7 @@ namespace FoxTunes
         private void Add(ConfigurationSection section)
         {
             Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
+            section.Error += this.OnError;
             this.Sections.Add(section);
         }
 
