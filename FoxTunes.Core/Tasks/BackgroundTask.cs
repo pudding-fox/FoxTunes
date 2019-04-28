@@ -25,7 +25,7 @@ namespace FoxTunes
             get
             {
                 return Instances
-                    .Where(instance => instance.IsAlive)
+                    .Where(instance => instance != null && instance.IsAlive)
                     .Select(instance => (IBackgroundTask)instance.Target)
                     .Where(backgroundTask => !(backgroundTask.IsCompleted || backgroundTask.IsFaulted))
                     .ToArray();
@@ -441,7 +441,7 @@ namespace FoxTunes
             var instances = Instances.ToArray();
             foreach (var instance in instances)
             {
-                if (!instance.IsAlive)
+                if (instance == null || !instance.IsAlive)
                 {
                     Instances.Remove(instance);
                 }

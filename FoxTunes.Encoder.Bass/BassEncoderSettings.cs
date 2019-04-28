@@ -1,12 +1,32 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using ManagedBass;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace FoxTunes
 {
-    public abstract class BassEncoderSettings : MarshalByRefObject, IBassEncoderSettings
+    public abstract class BassEncoderSettings : IBassEncoderSettings
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public const int DEPTH_AUTO = 0;
+
+        public const int DEPTH_16 = 16;
+
+        public const int DEPTH_20 = 20;
+
+        public const int DEPTH_24 = 24;
+
+        public const int DEPTH_32 = 32;
+
         public string Executable { get; protected set; }
 
         public virtual string Directory
@@ -17,24 +37,109 @@ namespace FoxTunes
             }
         }
 
-        public IBassEncoderFormat Format
+        public abstract string Extension { get; }
+
+        public abstract IBassEncoderFormat Format { get; }
+
+        public BassEncoderOutputDestination Destination { get; private set; }
+
+        public string Location { get; private set; }
+
+        public bool CopyTags { get; private set; }
+
+        public int Threads { get; private set; }
+
+        public virtual void InitializeComponent(ICore core)
         {
-            get
-            {
-                return new BassEncoderFormat()
-                {
-                    
-                };
-            }
+            core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassEncoderBehaviourConfiguration.SECTION,
+                BassEncoderBehaviourConfiguration.DESTINATION_ELEMENT
+            ).ConnectValue(value => this.Destination = BassEncoderBehaviourConfiguration.GetDestination(value));
+            core.Components.Configuration.GetElement<TextConfigurationElement>(
+                BassEncoderBehaviourConfiguration.SECTION,
+                BassEncoderBehaviourConfiguration.DESTINATION_LOCATION_ELEMENT
+            ).ConnectValue(value => this.Location = value);
+            core.Components.Configuration.GetElement<BooleanConfigurationElement>(
+                BassEncoderBehaviourConfiguration.SECTION,
+                BassEncoderBehaviourConfiguration.COPY_TAGS
+            ).ConnectValue(value => this.CopyTags = value);
+            core.Components.Configuration.GetElement<IntegerConfigurationElement>(
+                BassEncoderBehaviourConfiguration.SECTION,
+                BassEncoderBehaviourConfiguration.THREADS_ELEMENT
+            ).ConnectValue(value => this.Threads = value);
         }
 
-        public abstract string GetArguments(int rate,  int channels, long length);
+        public abstract string GetArguments(EncoderItem encoderItem, IBassStream stream);
 
         public virtual string GetOutput(string fileName)
         {
-            var directory = Path.GetDirectoryName(fileName);
+            var directory = default(string);
             var name = Path.GetFileNameWithoutExtension(fileName);
-            return Path.Combine(directory, string.Format("{0}.flac", name));
+            switch (this.Destination)
+            {
+                default:
+                case BassEncoderOutputDestination.Source:
+                    directory = Path.GetDirectoryName(fileName);
+                    break;
+                case BassEncoderOutputDestination.Specific:
+                    directory = this.Location;
+                    break;
+            }
+            return Path.Combine(directory, string.Format("{0}.{1}", name, this.Extension));
+        }
+
+        public virtual int GetDepth(EncoderItem encoderItem, IBassStream stream)
+        {
+            if (this.Format.AutoDepth)
+            {
+                if (encoderItem.BitsPerSample != 0)
+                {
+                    Logger.Write(this.GetType(), LogLevel.Debug, "Using meta data suggested bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, encoderItem.BitsPerSample);
+                    return encoderItem.BitsPerSample;
+                }
+                var channelInfo = default(ChannelInfo);
+                if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
+                {
+                    throw new NotImplementedException();
+                }
+                if (channelInfo.Flags.HasFlag(BassFlags.Float))
+                {
+                    Logger.Write(this.GetType(), LogLevel.Debug, "Using decoder bit depth for file \"{0}\": 32 bit", encoderItem.InputFileName);
+                    return DEPTH_32;
+                }
+                else
+                {
+                    Logger.Write(this.GetType(), LogLevel.Debug, "Using decoder bit depth for file \"{0}\": 16 bit", encoderItem.InputFileName);
+                    return DEPTH_16;
+                }
+            }
+            Logger.Write(this.GetType(), LogLevel.Debug, "Using user defined bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, this.Format.Depth);
+            return this.Format.Depth;
+        }
+
+        public virtual long GetLength(EncoderItem encoderItem, IBassStream stream)
+        {
+            var source = default(int);
+            var channelInfo = default(ChannelInfo);
+            var inputLength = Bass.ChannelGetLength(stream.ChannelHandle, PositionFlags.Bytes);
+            if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
+            {
+                throw new NotImplementedException();
+            }
+            if (channelInfo.Flags.HasFlag(BassFlags.Float))
+            {
+                source = DEPTH_32;
+            }
+            else
+            {
+                source = DEPTH_16;
+            }
+            var outputLength = (long)(inputLength / (source / (float)this.GetDepth(encoderItem, stream)));
+            if (inputLength != outputLength)
+            {
+                Logger.Write(this.GetType(), LogLevel.Debug, "Conversion requires change of data length: {0} bytes => {1} bytes.", inputLength, outputLength);
+            }
+            return outputLength;
         }
 
         public virtual IEnumerable<ConfigurationElement> GetConfigurationElements()

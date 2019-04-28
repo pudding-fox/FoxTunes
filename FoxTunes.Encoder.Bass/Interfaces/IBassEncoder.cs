@@ -6,6 +6,8 @@ namespace FoxTunes
     {
         AppDomain Domain { get; }
 
-        void Encode(string[] fileNames, IBassEncoderSettings settings);
+        void Encode(EncoderItem[] encoderItems);
+
+        void Cancel();
     }
 }
