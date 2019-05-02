@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public static class AppleLosslessEncoderSettingsConfiguration
     {
-        public const string SECTION = BassEncoderSettingsFactoryConfiguration.SECTION;
+        public const string SECTION = BassEncoderBehaviourConfiguration.SECTION;
 
         public const string DEPTH_ELEMENT = "AAAA6691D-4FCE-427D-A563-159A6A5FCFC5";
 
@@ -12,25 +12,24 @@ namespace FoxTunes
 
         public const string DEPTH_16_OPTION = "DDDD98BF-B80F-4311-A00D-6E1E5E342C30";
 
-        public const string DEPTH_20_OPTION = "EEEE79D1-A4E5-40CD-9CBE-E2CE736C2403";
-
         public const string DEPTH_24_OPTION = "FFFFD77D-63EE-4994-816A-775C142C9B4A";
 
         public const string DEPTH_32_OPTION = "GGGG1FBA-916C-4BEA-943A-BF19E238F1EB";
 
         public const int DEFAULT_DEPTH = 16;
 
-        public static IEnumerable<ConfigurationElement> GetConfigurationElements()
+        public static IEnumerable<ConfigurationSection> GetConfigurationSections(IBassEncoderSettings settings)
         {
-            yield return new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: AppleLosslessEncoderSettings.NAME)
-                .WithOptions(GetDepthOptions());
+            yield return new ConfigurationSection(SECTION, "Converter")
+                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: settings.Name)
+                    .WithOptions(GetDepthOptions())
+            );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetDepthOptions()
         {
             yield return new SelectionConfigurationOption(DEPTH_AUTO_OPTION, "Auto");
             yield return new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit");
-            yield return new SelectionConfigurationOption(DEPTH_20_OPTION, "20bit");
             yield return new SelectionConfigurationOption(DEPTH_24_OPTION, "24bit");
             yield return new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit");
         }
@@ -43,8 +42,6 @@ namespace FoxTunes
                     return BassEncoderSettings.DEPTH_AUTO;
                 case DEPTH_16_OPTION:
                     return BassEncoderSettings.DEPTH_16;
-                case DEPTH_20_OPTION:
-                    return BassEncoderSettings.DEPTH_20;
                 case DEPTH_24_OPTION:
                     return BassEncoderSettings.DEPTH_24;
                 case DEPTH_32_OPTION:

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -260,11 +261,11 @@ namespace FoxTunes
                 new Thread(() =>
                 {
                     this.Try(() => channelReader.CopyTo(resamplerWriter), this.GetErrorHandler(encoderItem));
-                }),
+                }) { IsBackground = true },
                 new Thread(() =>
                 {
                     this.Try(() => resamplerReader.CopyTo(encoderWriter), this.GetErrorHandler(encoderItem));
-                })
+                }) { IsBackground = true }
             };
             Logger.Write(this.GetType(), LogLevel.Debug, "Starting background threads for file \"{0}\".", encoderItem.InputFileName);
             foreach (var thread in threads)
@@ -283,7 +284,7 @@ namespace FoxTunes
         {
             Logger.Write(this.GetType(), LogLevel.Warn, "Cancellation requested, stopping background processes.");
             this.IsCancellationRequested = true;
-            foreach (var process in this.Processes)
+            foreach (var process in this.Processes.ToArray())
             {
                 try
                 {
@@ -327,7 +328,10 @@ namespace FoxTunes
                 CreateNoWindow = true
             };
             var process = Process.Start(processStartInfo);
-            this.Processes.Add(process);
+            lock (SyncRoot)
+            {
+                this.Processes.Add(process);
+            }
             Logger.Write(this.GetType(), LogLevel.Debug, "Created resampler process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
             return process;
         }
@@ -347,7 +351,10 @@ namespace FoxTunes
                 CreateNoWindow = true
             };
             var process = Process.Start(processStartInfo);
-            this.Processes.Add(process);
+            lock (SyncRoot)
+            {
+                this.Processes.Add(process);
+            }
             Logger.Write(this.GetType(), LogLevel.Debug, "Created encoder process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
             return process;
         }

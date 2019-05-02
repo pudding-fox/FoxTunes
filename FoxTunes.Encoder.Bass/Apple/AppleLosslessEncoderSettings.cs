@@ -6,17 +6,22 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [BassEncoder(NAME)]
-    public class AppleLosslessEncoderSettings : BassEncoderSettings
+    public class AppleLosslessEncoderSettings : BassEncoderSettings, IStandardComponent, IConfigurableComponent
     {
-        public const string NAME = "Apple Lossless";
-
         public AppleLosslessEncoderSettings()
         {
             var directory = Path.GetDirectoryName(
                 typeof(AppleLosslessEncoderSettings).Assembly.Location
             );
             this.Executable = Path.Combine(directory, "Encoders\\refalac.exe");
+        }
+
+        public override string Name
+        {
+            get
+            {
+                return "Apple Lossless";
+            }
         }
 
         public override string Extension
@@ -84,9 +89,9 @@ namespace FoxTunes
             return depth;
         }
 
-        public override IEnumerable<ConfigurationElement> GetConfigurationElements()
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            return AppleLosslessEncoderSettingsConfiguration.GetConfigurationElements();
+            return AppleLosslessEncoderSettingsConfiguration.GetConfigurationSections(this);
         }
     }
 }

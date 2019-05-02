@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public static class FlacEncoderSettingsConfiguration
     {
-        public const string SECTION = BassEncoderSettingsFactoryConfiguration.SECTION;
+        public const string SECTION = BassEncoderBehaviourConfiguration.SECTION;
 
         public const string DEPTH_ELEMENT = "AAAA45EA-6B59-43F8-A578-5C1C3640978F";
 
@@ -24,13 +24,15 @@ namespace FoxTunes
 
         public const int DEFAULT_COMPRESSION = 5;
 
-        public static IEnumerable<ConfigurationElement> GetConfigurationElements()
+        public static IEnumerable<ConfigurationSection> GetConfigurationSections(IBassEncoderSettings settings)
         {
-            yield return new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: FlacEncoderSettings.NAME)
-                .WithOptions(GetDepthOptions());
-            yield return new IntegerConfigurationElement(COMPRESSION_ELEMENT, "Compression Level", path: FlacEncoderSettings.NAME)
-                .WithValue(DEFAULT_COMPRESSION)
-                .WithValidationRule(new IntegerValidationRule(MIN_COMPRESSION, MAX_COMPRESSION));
+            yield return new ConfigurationSection(SECTION, "Converter")
+                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: settings.Name)
+                    .WithOptions(GetDepthOptions()))
+                .WithElement(new IntegerConfigurationElement(COMPRESSION_ELEMENT, "Compression Level", path: settings.Name)
+                    .WithValue(DEFAULT_COMPRESSION)
+                    .WithValidationRule(new IntegerValidationRule(MIN_COMPRESSION, MAX_COMPRESSION))
+            );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetDepthOptions()

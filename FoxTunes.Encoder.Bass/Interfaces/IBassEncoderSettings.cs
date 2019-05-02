@@ -1,10 +1,11 @@
 ﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public interface IBassEncoderSettings
     {
+        string Name { get; }
+
         string Executable { get; }
 
         string Directory { get; }
@@ -30,8 +31,6 @@ namespace FoxTunes
         int GetDepth(EncoderItem encoderItem, IBassStream stream);
 
         string GetArguments(EncoderItem encoderItem, IBassStream stream);
-
-        IEnumerable<ConfigurationElement> GetConfigurationElements();
     }
 
     public enum BassEncoderOutputDestination : byte
