@@ -42,6 +42,9 @@
     <None Include="..\lib\Addon\bassmidi.dll" Link="Addon\bassmidi.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\lib\Addon\bassopus.dll" Link="Addon\bassopus.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\lib\Addon\basswma.dll" Link="Addon\basswma.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
