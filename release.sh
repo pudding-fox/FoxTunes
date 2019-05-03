@@ -12,6 +12,7 @@ bass_ape.dll
 bassalac.dll
 bassdsd.dll
 bassflac.dll
+bassopus.dll
 basswv.dll
 bassmidi.dll
 basswma.dll
@@ -127,6 +128,26 @@ METADATAEDITOR="
 FoxTunes.UI.Windows.MetaDataEditor.dll
 "
 
+ENCODER="
+FoxTunes.Encoder.Bass.dll
+"
+
+ENCODERS="
+flac.exe
+flac_license.txt
+lame.exe
+lame_license.txt
+nsutil.dll
+oggenc2.exe
+opusenc.exe
+opusenc_license.txt
+refalac.exe
+sox.exe
+sox_license.txt
+wavpack.exe
+wavpack_license.txt
+"
+
 BUNDLED="
 windows
 asio
@@ -137,6 +158,7 @@ sox
 wasapi
 librarybrowser
 metadataeditor
+encoder
 "
 
 TAG=$(git describe --abbrev=0 --tags)
@@ -169,6 +191,8 @@ do
 	mkdir -p "./release/$target/Plugins/simplemetadata"
 	mkdir -p "./release/$target/Plugins/librarybrowser"
 	mkdir -p "./release/$target/Plugins/metadataeditor"
+	mkdir -p "./release/$target/Plugins/encoder"
+	mkdir -p "./release/$target/Plugins/encoder/encoders"
 
 	echo "Creating main package.."
 
@@ -272,6 +296,18 @@ do
             cp "./distribution/$target/$file" "./release/$target/Plugins/metadataeditor"
     done
 
+	for file in $ENCODER
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/encoder"
+    done
+
+	for file in $ENCODERS
+    do
+            echo $file
+            cp "./distribution/$target/Encoders/$file" "./release/$target/Plugins/encoder/encoders"
+    done
+
 	cd "./release/$target/Plugins"
 
 	"../../../.7z/7za.exe" a "FoxTunes-$TAG-Plugins-$target.zip" "*.*" -r
@@ -286,7 +322,7 @@ do
 	do
 		echo "Installing plugin: $bundled"
 		mkdir -p "./release/$target/Main/$bundled"
-		cp "./release/$target/Plugins/$bundled/"* "./release/$target/Main/$bundled"
+		cp -r "./release/$target/Plugins/$bundled/"* "./release/$target/Main/$bundled"
 	done
 
 	cd "./release/$target/Main"

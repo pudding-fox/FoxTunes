@@ -72,6 +72,10 @@ namespace FoxTunes
 #endif
             if (exceptions.Any())
             {
+                if (exceptions.Count == 1)
+                {
+                    throw exceptions.First();
+                }
                 throw new AggregateException(exceptions);
             }
         }

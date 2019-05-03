@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,12 +12,15 @@ namespace FoxTunes
     {
         public static readonly TimeSpan INTERVAL = TimeSpan.FromSeconds(1);
 
-        public BassEncoderMonitor(IBassEncoder encoder, bool reportProgress) : base(reportProgress)
+        public BassEncoderMonitor(IBassEncoder encoder, bool reportProgress, CancellationToken cancellationToken) : base(reportProgress)
         {
             this.Encoder = encoder;
+            this.CancellationToken = cancellationToken;
         }
 
         public IBassEncoder Encoder { get; private set; }
+
+        public CancellationToken CancellationToken { get; private set; }
 
         public Task Encode(EncoderItem[] encoderItems)
         {
@@ -40,6 +44,13 @@ namespace FoxTunes
             await this.SetName("Converting files");
             while (!task.IsCompleted)
             {
+                if (this.CancellationToken.IsCancellationRequested)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Requesting cancellation from encoder.");
+                    this.Encoder.Cancel();
+                    await this.SetName("Cancelling");
+                    break;
+                }
                 var position = 0;
                 var count = 0;
                 var builder = new StringBuilder();
@@ -56,6 +67,7 @@ namespace FoxTunes
                         builder.Append(Path.GetFileName(encoderItem.InputFileName));
                     }
                 }
+                await this.SetDescription(builder.ToString());
                 await this.SetPosition(position);
                 await this.SetCount(count);
 #if NET40
@@ -78,6 +90,10 @@ namespace FoxTunes
             }
             if (exceptions.Any())
             {
+                if (exceptions.Count == 1)
+                {
+                    throw exceptions.First();
+                }
                 throw new AggregateException(exceptions);
             }
         }
