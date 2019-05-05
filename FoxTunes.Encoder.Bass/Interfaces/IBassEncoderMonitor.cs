@@ -5,6 +5,6 @@ namespace FoxTunes
 {
     public interface IBassEncoderMonitor : IReportsProgress
     {
-        Task Encode(EncoderItem[] encoderItems);
+        Task Encode();
     }
 }

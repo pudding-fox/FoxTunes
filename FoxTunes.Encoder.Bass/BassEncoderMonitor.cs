@@ -25,7 +25,7 @@ namespace FoxTunes
 
         public CancellationToken CancellationToken { get; private set; }
 
-        public Task Encode(EncoderItem[] encoderItems)
+        public Task Encode()
         {
 #if NET40
             var task = TaskEx.Run(() =>
@@ -33,16 +33,16 @@ namespace FoxTunes
             var task = Task.Run(() =>
 #endif
             {
-                this.Encoder.Encode(encoderItems);
+                this.Encoder.Encode();
             });
 #if NET40
-            return TaskEx.WhenAll(task, this.Monitor(encoderItems, task));
+            return TaskEx.WhenAll(task, this.Monitor(task));
 #else
-            return Task.WhenAll(task, this.Monitor(encoderItems, task));
+            return Task.WhenAll(task, this.Monitor(task));
 #endif
         }
 
-        protected virtual async Task Monitor(IEnumerable<EncoderItem> encoderItems, Task task)
+        protected virtual async Task Monitor(Task task)
         {
             await this.SetName("Converting files");
             while (!task.IsCompleted)
@@ -54,11 +54,13 @@ namespace FoxTunes
                     await this.SetName("Cancelling");
                     break;
                 }
+                this.Encoder.Update();
                 var position = 0;
                 var count = 0;
                 var builder = new StringBuilder();
-                foreach (var encoderItem in encoderItems)
+                foreach (var encoderItem in this.Encoder.EncoderItems)
                 {
+                    this.UpdateStatus(encoderItem);
                     position += encoderItem.Progress;
                     count += EncoderItem.PROGRESS_COMPLETE;
                     if (encoderItem.Status == EncoderItemStatus.Processing)
@@ -69,7 +71,6 @@ namespace FoxTunes
                         }
                         builder.Append(Path.GetFileName(encoderItem.InputFileName));
                     }
-                    this.UpdateStatus(encoderItem);
                 }
                 await this.SetDescription(builder.ToString());
                 await this.SetPosition(position);
@@ -80,9 +81,20 @@ namespace FoxTunes
                 await Task.Delay(INTERVAL);
 #endif
             }
-            var exceptions = new List<Exception>();
-            foreach (var encoderItem in encoderItems)
+            while (!task.IsCompleted)
             {
+                Logger.Write(this, LogLevel.Debug, "Waiting for encoder to complete.");
+                this.Encoder.Update();
+#if NET40
+                await TaskEx.Delay(INTERVAL);
+#else
+                await Task.Delay(INTERVAL);
+#endif
+            }
+            var exceptions = new List<Exception>();
+            foreach (var encoderItem in this.Encoder.EncoderItems)
+            {
+                this.UpdateStatus(encoderItem);
                 if (encoderItem.Status != EncoderItemStatus.Failed)
                 {
                     continue;
@@ -111,6 +123,7 @@ namespace FoxTunes
             }
             else if (encoderItem.Status != status)
             {
+                Logger.Write(this, LogLevel.Debug, "Encoder status changed for file \"{0}\": {1}", encoderItem.InputFileName, Enum.GetName(typeof(EncoderItemStatus), encoderItem.Status));
                 this.EncoderItems[encoderItem] = encoderItem.Status;
                 this.OnStatusChanged(encoderItem);
             }

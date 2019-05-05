@@ -1,119 +1,104 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassEncoder : MarshalByRefObject, IBassEncoder
+    public class BassEncoder : BaseComponent, IBassEncoder
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        static BassEncoder()
-        {
-            LoggingBehaviour.FILE_NAME = string.Format(
-                "Log_{0}_{1}.txt",
-                typeof(BassEncoder).Name,
-                DateTime.UtcNow.ToFileTime()
-            );
-            AssemblyResolver.Instance.Enable();
-        }
-
         private BassEncoder()
         {
             this.CancellationToken = new CancellationToken();
         }
 
-        public BassEncoder(AppDomain domain) : this()
+        public BassEncoder(IEnumerable<EncoderItem> encoderItems) : this()
         {
-            this.Domain = domain;
+            this.EncoderItems = encoderItems;
         }
 
         public CancellationToken CancellationToken { get; private set; }
 
-        public AppDomain Domain { get; private set; }
-
-        public void Encode(EncoderItem[] encoderItems)
+        public Process Process
         {
-            using (var core = new Core(CoreFlags.Headless))
+            get
             {
-                core.Load();
-                core.Initialize();
-                Logger.Write(this.GetType(), LogLevel.Debug, "Initializing BASS (NoSound).");
-                Bass.Init(Bass.NoSoundDevice);
-                try
-                {
-                    Logger.Write(this.GetType(), LogLevel.Debug, "Fetching settings.");
-                    var factory = ComponentRegistry.Instance.GetComponent<BassEncoderSettingsFactory>();
-                    var settings = factory.CreateSettings();
-                    this.Encode(core, encoderItems, settings);
-                }
-                finally
-                {
-                    Logger.Write(this.GetType(), LogLevel.Debug, "Releasing BASS (NoSound).");
-                    Bass.Free();
-                }
+                return Process.GetCurrentProcess();
             }
         }
 
-        protected virtual void Encode(ICore core, EncoderItem[] encoderItems, IBassEncoderSettings settings)
+        public IEnumerable<EncoderItem> EncoderItems { get; private set; }
+
+        public void Encode()
+        {
+            Logger.Write(this, LogLevel.Debug, "Initializing BASS (NoSound).");
+            Bass.Init(Bass.NoSoundDevice);
+            try
+            {
+                Logger.Write(this, LogLevel.Debug, "Fetching settings.");
+                var factory = ComponentRegistry.Instance.GetComponent<BassEncoderSettingsFactory>();
+                var settings = factory.CreateSettings();
+                this.Encode(settings);
+            }
+            finally
+            {
+                Logger.Write(this, LogLevel.Debug, "Releasing BASS (NoSound).");
+                Bass.Free();
+            }
+        }
+
+        protected virtual void Encode(IBassEncoderSettings settings)
         {
             if (settings.Threads > 1)
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Beginning parallel encoding with {0} threads.", settings.Threads);
+                Logger.Write(this, LogLevel.Debug, "Beginning parallel encoding with {0} threads.", settings.Threads);
             }
             else
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Beginning single threaded encoding.");
+                Logger.Write(this, LogLevel.Debug, "Beginning single threaded encoding.");
             }
             var parallelOptions = new ParallelOptions()
             {
                 MaxDegreeOfParallelism = settings.Threads
             };
-            Parallel.ForEach(encoderItems, parallelOptions, encoderItem =>
+            Parallel.ForEach(this.EncoderItems, parallelOptions, encoderItem =>
             {
                 if (this.CancellationToken.IsCancellationRequested)
                 {
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Skipping file \"{0}\" due to cancellation.", encoderItem.InputFileName);
+                    Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to cancellation.", encoderItem.InputFileName);
                     encoderItem.Status = EncoderItemStatus.Cancelled;
                     return;
                 }
                 encoderItem.OutputFileName = settings.GetOutput(encoderItem.InputFileName);
-                if (!this.CheckPaths(encoderItem.InputFileName, encoderItem.OutputFileName))
-                {
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" already exists.", encoderItem.InputFileName, encoderItem.OutputFileName);
-                    encoderItem.Status = EncoderItemStatus.Failed;
-                    encoderItem.AddError(string.Format("Output file \"{0}\" already exists.", encoderItem.OutputFileName));
-                    return;
-                }
                 try
                 {
-                    Logger.Write(this.GetType(), LogLevel.Debug, "Beginning encoding file \"{0}\" to output file \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
+                    if (!this.CheckPaths(encoderItem.InputFileName, encoderItem.OutputFileName))
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" already exists.", encoderItem.InputFileName, encoderItem.OutputFileName);
+                        encoderItem.Status = EncoderItemStatus.Failed;
+                        encoderItem.AddError(string.Format("Output file \"{0}\" already exists.", encoderItem.OutputFileName));
+                        return;
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Beginning encoding file \"{0}\" to output file \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
                     encoderItem.Progress = EncoderItem.PROGRESS_NONE;
                     encoderItem.Status = EncoderItemStatus.Processing;
-                    this.Encode(core, encoderItem, settings);
+                    this.Encode(encoderItem, settings);
                     if (encoderItem.Status == EncoderItemStatus.Complete)
                     {
-                        Logger.Write(this.GetType(), LogLevel.Debug, "Encoding file \"{0}\" to output file \"{1}\" completed successfully.", encoderItem.InputFileName, encoderItem.OutputFileName);
+                        Logger.Write(this, LogLevel.Debug, "Encoding file \"{0}\" to output file \"{1}\" completed successfully.", encoderItem.InputFileName, encoderItem.OutputFileName);
                     }
                     else
                     {
-                        Logger.Write(this.GetType(), LogLevel.Warn, "Encoding file \"{0}\" failed: Unknown error.", encoderItem.InputFileName);
+                        Logger.Write(this, LogLevel.Warn, "Encoding file \"{0}\" failed: Unknown error.", encoderItem.InputFileName);
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Encoding file \"{0}\" failed: {1}", encoderItem.InputFileName, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Encoding file \"{0}\" failed: {1}", encoderItem.InputFileName, e.Message);
                     encoderItem.Status = EncoderItemStatus.Failed;
                     encoderItem.AddError(e.Message);
                 }
@@ -122,28 +107,28 @@ namespace FoxTunes
                     encoderItem.Progress = EncoderItem.PROGRESS_COMPLETE;
                 }
             });
-            Logger.Write(this.GetType(), LogLevel.Debug, "Encoding completed successfully.");
+            Logger.Write(this, LogLevel.Debug, "Encoding completed successfully.");
         }
 
-        protected virtual void Encode(ICore core, EncoderItem encoderItem, IBassEncoderSettings settings)
+        protected virtual void Encode(EncoderItem encoderItem, IBassEncoderSettings settings)
         {
             var flags = BassFlags.Decode;
             if (this.ShouldDecodeFloat(encoderItem, settings))
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Decoding file \"{0}\" in high quality mode (32 bit floating point).", encoderItem.InputFileName);
+                Logger.Write(this, LogLevel.Debug, "Decoding file \"{0}\" in high quality mode (32 bit floating point).", encoderItem.InputFileName);
                 flags |= BassFlags.Float;
             }
             else
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Decoding file \"{0}\" in standaed quality mode (16 bit integer).", encoderItem.InputFileName);
+                Logger.Write(this, LogLevel.Debug, "Decoding file \"{0}\" in standaed quality mode (16 bit integer).", encoderItem.InputFileName);
             }
             var stream = this.CreateStream(encoderItem.InputFileName, flags);
             if (stream.IsEmpty)
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Failed to create stream for file \"{0}\": Unknown error.", encoderItem.InputFileName);
+                Logger.Write(this, LogLevel.Debug, "Failed to create stream for file \"{0}\": Unknown error.", encoderItem.InputFileName);
                 return;
             }
-            Logger.Write(this.GetType(), LogLevel.Debug, "Created stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
             try
             {
                 if (flags.HasFlag(BassFlags.Float))
@@ -157,12 +142,17 @@ namespace FoxTunes
             }
             finally
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
                 Bass.StreamFree(stream.ChannelHandle);
             }
             if (this.CancellationToken.IsCancellationRequested)
             {
                 encoderItem.Status = EncoderItemStatus.Cancelled;
+                if (File.Exists(encoderItem.OutputFileName))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Deleting incomplete output \"{0}\": Cancelled.", encoderItem.OutputFileName);
+                    File.Delete(encoderItem.OutputFileName);
+                }
             }
             else
             {
@@ -185,11 +175,22 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void Encode(EncoderItem encoderItem, IBassStream input, Process encoderProcess)
+        protected virtual void Encode(EncoderItem encoderItem, IBassStream stream, Process encoderProcess)
         {
-            var channelReader = new ChannelReader(encoderItem, input);
+            var channelReader = new ChannelReader(encoderItem, stream);
             var encoderWriter = new ProcessWriter(encoderProcess);
-            channelReader.CopyTo(encoderWriter, this.CancellationToken);
+            var thread = new Thread(() =>
+            {
+                this.Try(() => channelReader.CopyTo(encoderWriter, this.CancellationToken), this.GetErrorHandler(encoderItem));
+            })
+            {
+                Name = string.Format("ChannelReader(\"{0}\", {1})", encoderItem.InputFileName, stream.ChannelHandle),
+                IsBackground = true
+            };
+            Logger.Write(this, LogLevel.Debug, "Starting background thread for file \"{0}\".", encoderItem.InputFileName);
+            thread.Start();
+            Logger.Write(this, LogLevel.Debug, "Completing background thread for file \"{0}\".", encoderItem.InputFileName);
+            this.Join(thread);
             encoderWriter.Close();
         }
 
@@ -248,12 +249,12 @@ namespace FoxTunes
                     IsBackground = true
                 }
             };
-            Logger.Write(this.GetType(), LogLevel.Debug, "Starting background threads for file \"{0}\".", encoderItem.InputFileName);
+            Logger.Write(this, LogLevel.Debug, "Starting background threads for file \"{0}\".", encoderItem.InputFileName);
             foreach (var thread in threads)
             {
                 thread.Start();
             }
-            Logger.Write(this.GetType(), LogLevel.Debug, "Completing background threads for file \"{0}\".", encoderItem.InputFileName);
+            Logger.Write(this, LogLevel.Debug, "Completing background threads for file \"{0}\".", encoderItem.InputFileName);
             foreach (var thread in threads)
             {
                 this.Join(thread);
@@ -263,13 +264,18 @@ namespace FoxTunes
             encoderWriter.Close();
         }
 
+        public void Update()
+        {
+            //Nothing to do.
+        }
+
         public void Cancel()
         {
             if (this.CancellationToken.IsCancellationRequested)
             {
                 return;
             }
-            Logger.Write(this.GetType(), LogLevel.Warn, "Cancellation requested, shutting down.");
+            Logger.Write(this, LogLevel.Warn, "Cancellation requested, shutting down.");
             this.CancellationToken.Cancel();
         }
 
@@ -309,7 +315,7 @@ namespace FoxTunes
             {
                 if (stream.Errors == Errors.Already)
                 {
-                    Logger.Write(this.GetType(), LogLevel.Trace, "Failed to create decoder stream for file \"{0}\": Device is already in use.", fileName);
+                    Logger.Write(this, LogLevel.Trace, "Failed to create decoder stream for file \"{0}\": Device is already in use.", fileName);
                     Thread.Sleep(INTERVAL);
                     goto retry;
                 }
@@ -320,59 +326,72 @@ namespace FoxTunes
 
         protected virtual Process CreateResamplerProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
         {
-            Logger.Write(this.GetType(), LogLevel.Debug, "Creating resampler process for file \"{0}\".", encoderItem.InputFileName);
-            var processStartInfo = new ProcessStartInfo()
-            {
-                FileName = settings.Executable,
-                WorkingDirectory = settings.Directory,
-                Arguments = settings.GetArguments(encoderItem, stream),
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            var process = Process.Start(processStartInfo);
-            process.ErrorDataReceived += (sender, e) =>
-            {
-                if (string.IsNullOrEmpty(e.Data))
-                {
-                    return;
-                }
-                Logger.Write(this.GetType(), LogLevel.Trace, "{0}: {1}", settings.Executable, e.Data);
-                encoderItem.AddError(e.Data);
-            };
-            process.BeginErrorReadLine();
-            Logger.Write(this.GetType(), LogLevel.Debug, "Created resampler process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
+            Logger.Write(this, LogLevel.Debug, "Creating resampler process for file \"{0}\".", encoderItem.InputFileName);
+            var arguments = settings.GetArguments(encoderItem, stream);
+            var process = this.CreateProcess(
+                encoderItem,
+                stream,
+                settings.Executable,
+                settings.Directory,
+                arguments,
+                true,
+                true,
+                true
+            );
+            Logger.Write(this, LogLevel.Debug, "Created resampler process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, settings.Executable, arguments);
             return process;
         }
 
         protected virtual Process CreateEncoderProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
         {
-            Logger.Write(this.GetType(), LogLevel.Debug, "Creating encoder process for file \"{0}\".", encoderItem.InputFileName);
+            Logger.Write(this, LogLevel.Debug, "Creating encoder process for file \"{0}\".", encoderItem.InputFileName);
+            var arguments = settings.GetArguments(encoderItem, stream);
+            var process = this.CreateProcess(
+                encoderItem,
+                stream,
+                settings.Executable,
+                settings.Directory,
+                arguments,
+                true,
+                false,
+                true
+            );
+            Logger.Write(this, LogLevel.Debug, "Created encoder process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, settings.Executable, arguments);
+            return process;
+        }
+
+        protected virtual Process CreateProcess(EncoderItem encoderItem, IBassStream stream, string executable, string directory, string arguments, bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError)
+        {
             var processStartInfo = new ProcessStartInfo()
             {
-                FileName = settings.Executable,
-                WorkingDirectory = settings.Directory,
-                Arguments = settings.GetArguments(encoderItem, stream),
-                RedirectStandardInput = true,
-                RedirectStandardOutput = false,
-                RedirectStandardError = true,
+                FileName = executable,
+                WorkingDirectory = directory,
+                Arguments = arguments,
+                RedirectStandardInput = redirectStandardInput,
+                RedirectStandardOutput = redirectStandardOutput,
+                RedirectStandardError = redirectStandardError,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
             var process = Process.Start(processStartInfo);
+            try
+            {
+                process.PriorityClass = ProcessPriorityClass.BelowNormal;
+            }
+            catch
+            {
+                //Nothing can be done, probably access denied.
+            }
             process.ErrorDataReceived += (sender, e) =>
             {
                 if (string.IsNullOrEmpty(e.Data))
                 {
                     return;
                 }
-                Logger.Write(this.GetType(), LogLevel.Trace, "{0}: {1}", settings.Executable, e.Data);
+                Logger.Write(this, LogLevel.Trace, "{0}: {1}", executable, e.Data);
                 encoderItem.AddError(e.Data);
             };
             process.BeginErrorReadLine();
-            Logger.Write(this.GetType(), LogLevel.Debug, "Created encoder process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
             return process;
         }
 
@@ -380,15 +399,15 @@ namespace FoxTunes
         {
             if (encoderItem.BitsPerSample == 1)
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Suggesting high quality mode for file \"{0}\": dsd.", encoderItem.InputFileName);
+                Logger.Write(this, LogLevel.Debug, "Suggesting high quality mode for file \"{0}\": dsd.", encoderItem.InputFileName);
                 return true;
             }
             if (encoderItem.BitsPerSample > 16 || settings.Format.Depth > 16)
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Suggesting high quality mode for file \"{0}\": >16 bit.", encoderItem.InputFileName);
+                Logger.Write(this, LogLevel.Debug, "Suggesting high quality mode for file \"{0}\": >16 bit.", encoderItem.InputFileName);
                 return true;
             }
-            Logger.Write(this.GetType(), LogLevel.Debug, "Suggesting standard quality mode for file \"{0}\": <=16 bit.", encoderItem.InputFileName);
+            Logger.Write(this, LogLevel.Debug, "Suggesting standard quality mode for file \"{0}\": <=16 bit.", encoderItem.InputFileName);
             return false;
         }
 
@@ -396,7 +415,7 @@ namespace FoxTunes
         {
             return e =>
             {
-                Logger.Write(this.GetType(), LogLevel.Warn, "Encoder background thread for file \"{0}\" error: {1}", encoderItem.InputFileName, e.Message);
+                Logger.Write(this, LogLevel.Warn, "Encoder background thread for file \"{0}\" error: {1}", encoderItem.InputFileName, e.Message);
                 encoderItem.AddError(e.Message);
             };
         }
@@ -445,11 +464,40 @@ namespace FoxTunes
             return true;
         }
 
-        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.Infrastructure)]
-        public override object InitializeLifetimeService()
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
         {
-            //Disable the 5 minute lease default.
-            return null;
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            //Nothing to do.
+        }
+
+        ~BassEncoder()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }
