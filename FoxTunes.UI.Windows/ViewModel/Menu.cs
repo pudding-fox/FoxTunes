@@ -146,6 +146,14 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
+            foreach (var item in this.Items)
+            {
+                if (item == null)
+                {
+                    continue;
+                }
+                item.Dispose();
+            }
             this.Items.Clear();
             foreach (var item in this.GetItems().OrderBy(item => item.Invocation.Category).ThenBy(item => item.Invocation.Id))
             {

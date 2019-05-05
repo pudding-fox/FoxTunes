@@ -110,11 +110,13 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        private class EncodePlaylistItemsTask : PlaylistTaskBase
+        private class EncodePlaylistItemsTask : BackgroundTask
         {
+            public const string ID = "0E86B088-F040-444C-859D-90AD426EF33C";
+
             public static readonly IBassEncoderFactory EncoderFactory = ComponentRegistry.Instance.GetComponent<IBassEncoderFactory>();
 
-            private EncodePlaylistItemsTask()
+            private EncodePlaylistItemsTask() : base(ID)
             {
                 this.CancellationToken = new CancellationToken();
             }
@@ -152,6 +154,14 @@ namespace FoxTunes
             public PlaylistItem[] PlaylistItems { get; private set; }
 
             public EncoderItem[] EncoderItems { get; private set; }
+
+            public ICore Core { get; private set; }
+
+            public override void InitializeComponent(ICore core)
+            {
+                this.Core = core;
+                base.InitializeComponent(core);
+            }
 
             protected override async Task OnRun()
             {
