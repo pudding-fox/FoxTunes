@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 
 namespace FoxTunes
 {
@@ -6,7 +7,7 @@ namespace FoxTunes
     {
         private BassStream()
         {
-
+            this.Errors = Errors.OK;
         }
 
         public BassStream(IBassStreamProvider provider, int channelHandle) : this()
@@ -19,12 +20,22 @@ namespace FoxTunes
 
         public int ChannelHandle { get; private set; }
 
+        public Errors Errors { get; private set; }
+
         public bool IsEmpty
         {
             get
             {
                 return this.ChannelHandle == 0;
             }
+        }
+
+        public static IBassStream Error(Errors errors)
+        {
+            return new BassStream()
+            {
+                Errors = errors
+            };
         }
 
         public static IBassStream Empty

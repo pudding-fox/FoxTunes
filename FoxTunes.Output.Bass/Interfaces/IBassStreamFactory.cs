@@ -10,6 +10,8 @@ namespace FoxTunes.Interfaces
 
         void Register(IBassStreamProvider provider);
 
+        IEnumerable<IBassStreamProvider> GetProviders(PlaylistItem playlistItem);
+
         Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate);
 
         Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate, BassFlags flags);

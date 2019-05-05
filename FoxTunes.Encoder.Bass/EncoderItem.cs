@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 
 namespace FoxTunes
 {
@@ -61,6 +62,13 @@ namespace FoxTunes
                 encoderItem.BitsPerSample = Convert.ToInt32(metaData.GetValueOrDefault(CommonProperties.BitsPerSample));
             }
             return encoderItem;
+        }
+
+        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.Infrastructure)]
+        public override object InitializeLifetimeService()
+        {
+            //Disable the 5 minute lease default.
+            return null;
         }
     }
 

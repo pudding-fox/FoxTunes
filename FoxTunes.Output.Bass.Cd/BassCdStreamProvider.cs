@@ -8,6 +8,11 @@ namespace FoxTunes
 {
     public class BassCdStreamProvider : BassStreamProvider
     {
+        static BassCdStreamProvider()
+        {
+            BassCd.FreeOld = false;
+        }
+
         public const string SCHEME = "cda";
 
         public override byte Priority
@@ -15,6 +20,14 @@ namespace FoxTunes
             get
             {
                 return PRIORITY_HIGH;
+            }
+        }
+
+        public override BassStreamProviderFlags Flags
+        {
+            get
+            {
+                return base.Flags | BassStreamProviderFlags.Serial;
             }
         }
 
@@ -104,7 +117,7 @@ namespace FoxTunes
 
         public static string CreateUrl(int drive, string id, int track)
         {
-            return string.Format("{0}://{1}/{2}?{3}", SCHEME, drive, id, track);
+            return string.Format("{0}://{1}/{2}/{3}", SCHEME, id, drive, track);
         }
 
         public static bool ParseUrl(string url, out int drive, out string id, out int track)
@@ -121,10 +134,14 @@ namespace FoxTunes
             {
                 return false;
             }
+            var host = url.GetComponents(UriComponents.Host, UriFormat.Unescaped);
+            var path = url.GetComponents(UriComponents.Path, UriFormat.Unescaped);
+            var parts = path.Split('/');
             return
-                int.TryParse(url.GetComponents(UriComponents.Host, UriFormat.Unescaped), out drive) &&
-                !string.IsNullOrEmpty(id = url.GetComponents(UriComponents.Path, UriFormat.Unescaped)) &&
-                int.TryParse(url.GetComponents(UriComponents.Query, UriFormat.Unescaped), out track);
+                !string.IsNullOrEmpty(id = host) &&
+                parts.Length > 0 && int.TryParse(parts[0], out drive) &&
+                parts.Length > 1 && int.TryParse(parts[1], out track);
+
         }
     }
 }

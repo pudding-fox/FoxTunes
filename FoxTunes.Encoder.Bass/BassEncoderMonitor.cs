@@ -14,9 +14,12 @@ namespace FoxTunes
 
         public BassEncoderMonitor(IBassEncoder encoder, bool reportProgress, CancellationToken cancellationToken) : base(reportProgress)
         {
+            this.EncoderItems = new Dictionary<EncoderItem, EncoderItemStatus>();
             this.Encoder = encoder;
             this.CancellationToken = cancellationToken;
         }
+
+        public IDictionary<EncoderItem, EncoderItemStatus> EncoderItems { get; private set; }
 
         public IBassEncoder Encoder { get; private set; }
 
@@ -66,6 +69,7 @@ namespace FoxTunes
                         }
                         builder.Append(Path.GetFileName(encoderItem.InputFileName));
                     }
+                    this.UpdateStatus(encoderItem);
                 }
                 await this.SetDescription(builder.ToString());
                 await this.SetPosition(position);
@@ -97,5 +101,42 @@ namespace FoxTunes
                 throw new AggregateException(exceptions);
             }
         }
+
+        protected virtual void UpdateStatus(EncoderItem encoderItem)
+        {
+            var status = default(EncoderItemStatus);
+            if (!this.EncoderItems.TryGetValue(encoderItem, out status))
+            {
+                this.EncoderItems.Add(encoderItem, EncoderItemStatus.None);
+            }
+            else if (encoderItem.Status != status)
+            {
+                this.EncoderItems[encoderItem] = encoderItem.Status;
+                this.OnStatusChanged(encoderItem);
+            }
+        }
+
+        protected virtual void OnStatusChanged(EncoderItem encoderItem)
+        {
+            if (this.StatusChanged == null)
+            {
+                return;
+            }
+            this.StatusChanged(this, new BassEncoderMonitorEventArgs(encoderItem));
+        }
+
+        public event BassEncoderMonitorEventHandler StatusChanged;
+    }
+
+    public delegate void BassEncoderMonitorEventHandler(object sender, BassEncoderMonitorEventArgs e);
+
+    public class BassEncoderMonitorEventArgs : EventArgs
+    {
+        public BassEncoderMonitorEventArgs(EncoderItem encoderItem)
+        {
+            this.EncoderItem = encoderItem;
+        }
+
+        public EncoderItem EncoderItem { get; private set; }
     }
 }

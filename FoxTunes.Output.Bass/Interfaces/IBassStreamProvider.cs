@@ -8,6 +8,8 @@ namespace FoxTunes.Interfaces
     {
         byte Priority { get; }
 
+        BassStreamProviderFlags Flags { get; }
+
         bool CanCreateStream(PlaylistItem playlistItem);
 
         Task<int> CreateStream(PlaylistItem playlistItem);
@@ -15,5 +17,12 @@ namespace FoxTunes.Interfaces
         Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags);
 
         void FreeStream(PlaylistItem playlistItem, int channelHandle);
+    }
+
+    [Flags]
+    public enum BassStreamProviderFlags : byte
+    {
+        None = 0,
+        Serial = 1
     }
 }

@@ -35,6 +35,14 @@ namespace FoxTunes
             }
         }
 
+        public virtual BassStreamProviderFlags Flags
+        {
+            get
+            {
+                return BassStreamProviderFlags.None;
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
