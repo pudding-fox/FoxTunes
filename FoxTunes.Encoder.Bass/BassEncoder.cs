@@ -333,7 +333,15 @@ namespace FoxTunes
                 CreateNoWindow = true
             };
             var process = Process.Start(processStartInfo);
-            process.ErrorDataReceived += (sender, e) => encoderItem.AddError(e.Data);
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (string.IsNullOrEmpty(e.Data))
+                {
+                    return;
+                }
+                Logger.Write(this.GetType(), LogLevel.Trace, "{0}: {1}", settings.Executable, e.Data);
+                encoderItem.AddError(e.Data);
+            };
             process.BeginErrorReadLine();
             Logger.Write(this.GetType(), LogLevel.Debug, "Created resampler process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
             return process;
@@ -354,7 +362,15 @@ namespace FoxTunes
                 CreateNoWindow = true
             };
             var process = Process.Start(processStartInfo);
-            process.ErrorDataReceived += (sender, e) => encoderItem.AddError(e.Data);
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (string.IsNullOrEmpty(e.Data))
+                {
+                    return;
+                }
+                Logger.Write(this.GetType(), LogLevel.Trace, "{0}: {1}", settings.Executable, e.Data);
+                encoderItem.AddError(e.Data);
+            };
             process.BeginErrorReadLine();
             Logger.Write(this.GetType(), LogLevel.Debug, "Created encoder process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
             return process;
