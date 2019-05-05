@@ -1,0 +1,213 @@
+﻿using FoxTunes.Interfaces;
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
+
+namespace FoxTunes
+{
+    public static class BassEncoderHost
+    {
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public static string Location
+        {
+            get
+            {
+                return typeof(BassEncoderHost).Assembly.Location;
+            }
+        }
+
+        const int INTERVAL = 1000;
+
+        const int TIMEOUT = 10000;
+
+        public static readonly object ReadSyncRoot = new object();
+
+        public static readonly object WriteSyncRoot = new object();
+
+        public static void Init()
+        {
+            LoggingBehaviour.FILE_NAME = string.Format(
+                "Log_Converter_{0}.txt",
+                DateTime.UtcNow.ToFileTime()
+            );
+            AssemblyResolver.Instance.EnableExecution();
+            AssemblyResolver.Instance.EnableReflectionOnly();
+        }
+
+        public static int Encode()
+        {
+            using (Stream input = Console.OpenStandardInput(), output = Console.OpenStandardOutput(), error = Console.OpenStandardError())
+            {
+                try
+                {
+                    Encode(input, output, error);
+                    return 0;
+                }
+                catch (Exception e)
+                {
+                    new StreamWriter(error).Write(e.Message);
+                    error.Flush();
+                    return -1;
+                }
+            }
+        }
+
+        private static void Encode(Stream input, Stream output, Stream error)
+        {
+            using (var core = new Core(CoreFlags.Headless))
+            {
+                core.Load();
+                core.Initialize();
+                try
+                {
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Begin reading items.");
+                    var encoderItems = ReadInput<EncoderItem[]>(input);
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Read {0} items.", encoderItems.Length);
+                    using (var encoder = new BassEncoder(encoderItems))
+                    {
+                        encoder.InitializeComponent(core);
+                        Encode(encoder, input, output, error);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(typeof(Program), LogLevel.Error, "Failed to encode items: {0}", e.Message);
+                    throw;
+                }
+            }
+        }
+
+        private static void Encode(IBassEncoder encoder, Stream input, Stream output, Stream error)
+        {
+            var thread1 = new Thread(() =>
+            {
+                try
+                {
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Starting encoder main thread.");
+                    encoder.Encode();
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Finished encoder main thread.");
+                    WriteOutput(output, new EncoderStatus(EncoderStatusType.Complete));
+                    error.Flush();
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(typeof(Program), LogLevel.Error, "Error on encoder main thread: {0}", e.Message);
+                    WriteOutput(output, new EncoderStatus(EncoderStatusType.Error));
+                    new StreamWriter(error).Write(e.Message);
+                    error.Flush();
+                }
+            })
+            {
+                IsBackground = true
+            };
+            var thread2 = new Thread(() =>
+            {
+                try
+                {
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Starting encoder output thread.");
+                    while (thread1.IsAlive)
+                    {
+                        ProcessOutput(encoder, output);
+                        Thread.Sleep(INTERVAL);
+                    }
+                    ProcessOutput(encoder, output);
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Finished encoder output thread.");
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(typeof(Program), LogLevel.Error, "Error on encoder output thread: {0}", e.Message);
+                }
+            })
+            {
+                IsBackground = true
+            };
+            var thread3 = new Thread(() =>
+            {
+                try
+                {
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Starting encoder input thread.");
+                    while (thread1.IsAlive)
+                    {
+                        ProcessInput(encoder, input, output);
+                        Thread.Sleep(INTERVAL);
+                    }
+                    ProcessInput(encoder, input, output);
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Finished encoder input thread.");
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(typeof(Program), LogLevel.Error, "Error on encoder input thread: {0}", e.Message);
+                }
+            })
+            {
+                IsBackground = true
+            };
+            thread1.Start();
+            thread2.Start();
+            thread3.Start();
+            thread1.Join();
+            if (!thread2.Join(TIMEOUT))
+            {
+                Logger.Write(typeof(Program), LogLevel.Warn, "Encoder output thread did not complete gracefully, aborting.");
+                thread2.Abort();
+            }
+            if (!thread3.Join(TIMEOUT))
+            {
+                Logger.Write(typeof(Program), LogLevel.Warn, "Encoder input thread did not complete gracefully, aborting.");
+                thread3.Abort();
+            }
+        }
+
+        private static void ProcessInput(IBassEncoder encoder, Stream input, Stream output)
+        {
+            Logger.Write(typeof(Program), LogLevel.Debug, "Begin reading command.");
+            var command = ReadInput<EncoderCommand>(input);
+            Logger.Write(typeof(Program), LogLevel.Debug, "Read command: {0}", Enum.GetName(typeof(EncoderCommandType), command.Type));
+            switch (command.Type)
+            {
+                case EncoderCommandType.Cancel:
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Sending cancellation signal to encoder.");
+                    encoder.Cancel();
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Closing stdin.");
+                    input.Close();
+                    break;
+                case EncoderCommandType.Quit:
+                    Logger.Write(typeof(Program), LogLevel.Debug, "Closing stdin/stdout.");
+                    input.Close();
+                    output.Close();
+                    break;
+            }
+        }
+
+        private static void ProcessOutput(IBassEncoder encoder, Stream output)
+        {
+            WriteOutput(output, encoder.EncoderItems);
+        }
+
+        private static T ReadInput<T>(Stream stream)
+        {
+            lock (ReadSyncRoot)
+            {
+                var input = Serializer.Instance.Read(stream);
+                return (T)input;
+            }
+        }
+
+        private static void WriteOutput(Stream stream, object value)
+        {
+            lock (WriteSyncRoot)
+            {
+                Serializer.Instance.Write(stream, value);
+                stream.Flush();
+            }
+        }
+    }
+}
