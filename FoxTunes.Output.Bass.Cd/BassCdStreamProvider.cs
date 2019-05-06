@@ -8,11 +8,6 @@ namespace FoxTunes
 {
     public class BassCdStreamProvider : BassStreamProvider
     {
-        static BassCdStreamProvider()
-        {
-            BassCd.FreeOld = false;
-        }
-
         public const string SCHEME = "cda";
 
         public override byte Priority
@@ -65,6 +60,11 @@ namespace FoxTunes
             if (this.Output != null && this.Output.PlayFromMemory)
             {
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+            }
+            if (BassCd.FreeOld)
+            {
+                Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
+                BassCd.FreeOld = false;
             }
 #if NET40
             return TaskEx.FromResult(BassCd.CreateStream(drive, track, flags));
