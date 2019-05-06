@@ -18,7 +18,12 @@ bassmidi.dll
 basswma.dll
 "
 
-MAIN="
+LAUNCHER="
+FoxTunes.Launcher.exe
+FoxTunes.Launcher.exe.config
+"
+
+LIB="
 x86/SQLite.Interop.dll
 bass.dll
 bass_gapless.dll
@@ -32,8 +37,6 @@ FoxTunes.Config.dll
 FoxTunes.Core.dll
 FoxTunes.DB.dll
 FoxTunes.DB.SQLite.dll
-FoxTunes.Launcher.exe
-FoxTunes.Launcher.exe.config
 FoxTunes.Logging.dll
 FoxTunes.MetaData.dll
 FoxTunes.MetaData.TagLib.dll
@@ -178,7 +181,8 @@ for target in $TARGET
 do
 
 	mkdir -p "./release/$target/Main"
-	mkdir -p "./release/$target/Main/Addon"
+	mkdir -p "./release/$target/Main/lib"
+	mkdir -p "./release/$target/Main/lib/Addon"
 	mkdir -p "./release/$target/Plugins"
 	mkdir -p "./release/$target/Plugins/windows"
 	mkdir -p "./release/$target/Plugins/asio"
@@ -199,10 +203,16 @@ do
 	for file in $ADDON
 	do
 		echo "$file"
-		cp "./distribution/$target/Addon/$file" "./release/$target/Main/Addon"
+		cp "./distribution/$target/Addon/$file" "./release/$target/Main/lib/Addon"
 	done
 
-	for file in $MAIN
+	for file in $LAUNCHER
+	do
+		echo "$file"
+		cp "./distribution/$target/$file" "./release/$target/Main"
+	done
+
+	for file in $LIB
 	do
 		if [ ! -f "./distribution/$target/$file" ]
 		then
@@ -210,7 +220,7 @@ do
 			continue
 		fi
 		echo "$file"
-		cp "./distribution/$target/$file" "./release/$target/Main"
+		cp "./distribution/$target/$file" "./release/$target/Main/lib"
 	done
 
 	cd "./release/$target/Main"
@@ -321,8 +331,8 @@ do
 	for bundled in $BUNDLED
 	do
 		echo "Installing plugin: $bundled"
-		mkdir -p "./release/$target/Main/$bundled"
-		cp -r "./release/$target/Plugins/$bundled/"* "./release/$target/Main/$bundled"
+		mkdir -p "./release/$target/Main/lib/$bundled"
+		cp -r "./release/$target/Plugins/$bundled/"* "./release/$target/Main/lib/$bundled"
 	done
 
 	cd "./release/$target/Main"
