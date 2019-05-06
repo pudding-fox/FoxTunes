@@ -5,6 +5,8 @@ namespace FoxTunes.Interfaces
 {
     public interface ICore : IDisposable
     {
+        ICoreSetup Setup { get; }
+
         IStandardComponents Components { get; }
 
         IStandardManagers Managers { get; }
@@ -16,14 +18,5 @@ namespace FoxTunes.Interfaces
         void Initialize();
 
         void CreateDefaultData(IDatabase database);
-
-        CoreFlags Flags { get; }
-    }
-
-    [Flags]
-    public enum CoreFlags : byte
-    {
-        None = 0,
-        Headless = 1
     }
 }

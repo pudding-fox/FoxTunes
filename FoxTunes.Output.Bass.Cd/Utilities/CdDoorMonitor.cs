@@ -5,6 +5,7 @@ using System.Timers;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class CdDoorMonitor : StandardComponent, IDisposable
     {
         const int UPDATE_INTERVAL = 1000;

@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ArtworkGridProvider : StandardComponent
     {
         const double DPIX = 96;

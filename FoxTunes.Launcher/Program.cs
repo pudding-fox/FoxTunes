@@ -26,7 +26,7 @@ namespace FoxTunes.Launcher
                     client.Send(Environment.CommandLine).Wait();
                     return;
                 }
-                using (var core = new Core(CoreFlags.None))
+                using (var core = new Core(CoreSetup.Default))
                 {
                     AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
                     {
@@ -72,7 +72,10 @@ namespace FoxTunes.Launcher
                     }
                     try
                     {
-                        core.Components.UserInterface.Show();
+                        if (core.Components.UserInterface != null)
+                        {
+                            core.Components.UserInterface.Show();
+                        }
                         //TODO: Bad .Result
                         if (!BackgroundTask.Shutdown(SHUTDOWN_INTERVAL, SHUTDOWN_TIMEOUT).Result)
                         {
@@ -81,7 +84,10 @@ namespace FoxTunes.Launcher
                     }
                     catch (Exception e)
                     {
-                        core.Components.UserInterface.Fatal(e);
+                        if (core.Components.UserInterface != null)
+                        {
+                            core.Components.UserInterface.Fatal(e);
+                        }
                     }
                 }
             }

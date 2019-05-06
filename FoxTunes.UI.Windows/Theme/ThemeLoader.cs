@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ThemeLoader : StandardComponent
     {
         private ITheme _Theme { get; set; }
@@ -60,14 +61,11 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            if (!(core.Flags.HasFlag(CoreFlags.Headless)))
-            {
-                this.Configuration = core.Components.Configuration;
-                this.Configuration.GetElement<SelectionConfigurationElement>(
-                    WindowsUserInterfaceConfiguration.SECTION,
-                    WindowsUserInterfaceConfiguration.THEME_ELEMENT
-                ).ConnectValue(async value => await this.SetTheme(WindowsUserInterfaceConfiguration.GetTheme(value)));
-            }
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.THEME_ELEMENT
+            ).ConnectValue(async value => await this.SetTheme(WindowsUserInterfaceConfiguration.GetTheme(value)));
             base.InitializeComponent(core);
         }
     }

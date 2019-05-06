@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LayoutManager : StandardComponent, IDisposable
     {
         public static readonly Type PLACEHOLDER = typeof(object);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LibraryActionsBehaviour : StandardBehaviour, IInvocableComponent
     {
         public const string APPEND_PLAYLIST = "AAAB";

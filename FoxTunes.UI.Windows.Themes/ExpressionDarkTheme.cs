@@ -5,11 +5,14 @@ using System.Windows;
 
 namespace FoxTunes
 {
-    [Component("3E9EFE8C-5245-4F8B-97D1-EB47CC70E373", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [Component(ID, ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ExpressionDarkTheme : ThemeBase
     {
+        public const string ID = "3E9EFE8C-5245-4F8B-97D1-EB47CC70E373";
+
         public ExpressionDarkTheme()
-            : base("3E9EFE8C-5245-4F8B-97D1-EB47CC70E373", "ExpressionDark")
+            : base(ID, "ExpressionDark")
         {
 
         }
@@ -36,13 +39,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            if (!(core.Flags.HasFlag(CoreFlags.Headless)))
+            this.ResourceDictionary = new ResourceDictionary()
             {
-                this.ResourceDictionary = new ResourceDictionary()
-                {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
-                };
-            }
+                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
+            };
             base.InitializeComponent(core);
         }
     }

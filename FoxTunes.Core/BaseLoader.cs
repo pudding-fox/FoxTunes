@@ -34,6 +34,23 @@ namespace FoxTunes
 
         protected virtual bool IncludeType(Type type)
         {
+            var dependency = default(ComponentDependencyAttribute);
+            if (type.HasCustomAttribute<ComponentDependencyAttribute>(out dependency))
+            {
+                if (!string.IsNullOrEmpty(dependency.Id))
+                {
+                    throw new NotImplementedException();
+                }
+                if (!string.IsNullOrEmpty(dependency.Slot))
+                {
+                    var id = ComponentResolver.Instance.Get(dependency.Slot);
+                    if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Missing dependency \"{1}\".", type.FullName, id);
+                        return false;
+                    }
+                }
+            }
             var component = default(ComponentAttribute);
             if (!type.HasCustomAttribute<ComponentAttribute>(out component))
             {
@@ -43,8 +60,19 @@ namespace FoxTunes
             {
                 return true;
             }
-            var id = ComponentResolver.Instance.Get(component.Slot);
-            return string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase) || string.Equals(id, component.Id, StringComparison.OrdinalIgnoreCase);
+            {
+                var id = ComponentResolver.Instance.Get(component.Slot);
+                if (string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                if (string.Equals(id, component.Id, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Blocked by configuration.", type.FullName);
+            return false;
         }
 
         public Func<T, byte> ComponentPriority

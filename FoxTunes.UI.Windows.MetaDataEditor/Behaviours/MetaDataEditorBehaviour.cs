@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class MetaDataEditorBehaviour : StandardBehaviour, IInvocableComponent
     {
         public const string EDIT_METADATA = "LLLL";

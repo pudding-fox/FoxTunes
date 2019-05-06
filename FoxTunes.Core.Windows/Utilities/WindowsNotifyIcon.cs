@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class WindowsNotifyIcon : NotifyIcon, IStandardComponent
     {
         public const uint ID = 0x400;

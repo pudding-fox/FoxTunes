@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class OutputStreamQueue : StandardComponent, IOutputStreamQueue
     {
         const int QUEUE_CAPACITY = 3;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LibraryBrowserBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public ArtworkGridProvider ArtworkGridProvider { get; private set; }

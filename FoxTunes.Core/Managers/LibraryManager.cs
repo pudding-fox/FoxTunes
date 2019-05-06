@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class LibraryManager : StandardManager, ILibraryManager
     {
         public LibraryManagerState State

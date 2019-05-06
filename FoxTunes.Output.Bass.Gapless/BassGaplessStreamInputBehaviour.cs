@@ -4,6 +4,7 @@ using System;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassGaplessStreamInputBehaviour : StandardBehaviour, IDisposable
     {
         public IBassOutput Output { get; private set; }

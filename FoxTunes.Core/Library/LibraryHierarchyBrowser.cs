@@ -9,6 +9,7 @@ using System.Text;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class LibraryHierarchyBrowser : StandardComponent, ILibraryHierarchyBrowser
     {
         public ICore Core { get; private set; }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class DataBindingSourceBehaviour : StandardBehaviour
     {
         public IConfiguration Configuration { get; private set; }

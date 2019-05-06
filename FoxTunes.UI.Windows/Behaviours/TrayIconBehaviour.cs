@@ -7,6 +7,7 @@ using System.Windows;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class TrayIconBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         public const string QUIT = "ZZZZ";

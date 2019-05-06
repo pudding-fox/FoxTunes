@@ -62,7 +62,7 @@ namespace FoxTunes
                 return Task.FromResult(channelHandle);
 #endif
             }
-            if (this.Output.PlayFromMemory)
+            if (this.Output != null && this.Output.PlayFromMemory)
             {
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
             }
@@ -85,7 +85,7 @@ namespace FoxTunes
 
         protected virtual bool GetCurrentStream(int drive, int track, out int channelHandle)
         {
-            if (this.Output.IsStarted)
+            if (this.Output != null && this.Output.IsStarted)
             {
                 var enqueuedChannelHandle = default(int);
                 this.PipelineManager.WithPipeline(pipeline =>

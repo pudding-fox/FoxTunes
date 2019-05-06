@@ -10,12 +10,6 @@ namespace FoxTunes
 {
     public static partial class Extensions
     {
-        public static bool HasCustomAttribute<T>(this Type type, bool inherit = false) where T : Attribute
-        {
-            var attribute = default(T);
-            return type.HasCustomAttribute<T>(out attribute);
-        }
-
         public static bool HasCustomAttribute<T>(this Type type, out T attribute) where T : Attribute
         {
             return type.HasCustomAttribute<T>(false, out attribute);

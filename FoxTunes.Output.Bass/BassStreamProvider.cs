@@ -63,7 +63,7 @@ namespace FoxTunes
         public virtual Task<int> CreateStream(PlaylistItem playlistItem)
         {
             var flags = BassFlags.Decode;
-            if (this.Output.Float)
+            if (this.Output != null && this.Output.Float)
             {
                 flags |= BassFlags.Float;
             }
@@ -84,7 +84,7 @@ namespace FoxTunes
             try
             {
                 var channelHandle = default(int);
-                if (this.Output.PlayFromMemory)
+                if (this.Output != null && this.Output.PlayFromMemory)
                 {
                     channelHandle = BassInMemoryHandler.CreateStream(playlistItem.FileName, 0, 0, flags);
                     if (channelHandle == 0)
