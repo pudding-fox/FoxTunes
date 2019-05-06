@@ -3,21 +3,29 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FoxTunes
 {
     public class BassEncoderProxy : BaseComponent, IBassEncoder
     {
+        const int TIMEOUT = 10000;
+
         public static readonly object ReadSyncRoot = new object();
 
         public static readonly object WriteSyncRoot = new object();
 
-        public BassEncoderProxy(Process process, IEnumerable<EncoderItem> encoderItems)
+        private BassEncoderProxy()
+        {
+            this.TerminateCallback = new DelayedCallback(this.Terminate, TimeSpan.FromMilliseconds(TIMEOUT));
+        }
+
+        public BassEncoderProxy(Process process, IEnumerable<EncoderItem> encoderItems) : this()
         {
             this.Process = process;
             this.EncoderItems = encoderItems;
         }
+
+        public DelayedCallback TerminateCallback { get; private set; }
 
         public Process Process { get; private set; }
 
@@ -33,6 +41,7 @@ namespace FoxTunes
             this.Send(this.EncoderItems.ToArray());
             Logger.Write(this, LogLevel.Debug, "Waiting for encoder container process to complete.");
             this.Process.WaitForExit();
+            this.TerminateCallback.Disable();
             if (this.Process.ExitCode != 0)
             {
                 throw new InvalidOperationException("Process does not indicate success.");
@@ -61,6 +70,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Sending cancel command to encoder container process.");
             this.Send(new EncoderCommand(EncoderCommandType.Cancel));
             this.Process.StandardInput.Close();
+            this.TerminateCallback.Enable();
         }
 
         public void Quit()
@@ -68,6 +78,24 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Sending quit command to encoder container process.");
             this.Send(new EncoderCommand(EncoderCommandType.Quit));
             this.Process.StandardInput.Close();
+            this.TerminateCallback.Enable();
+        }
+
+        protected virtual void Terminate()
+        {
+            try
+            {
+                if (this.Process.HasExited)
+                {
+                    return;
+                }
+                Logger.Write(this, LogLevel.Warn, "Encoder container process did not exit after {0}ms, terminating it.", TIMEOUT);
+                this.Process.Kill();
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Failed to terminate encoder container process: {0}", e.Message);
+            }
         }
 
         protected virtual void Send(object value)
