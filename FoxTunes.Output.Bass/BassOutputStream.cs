@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -260,6 +261,11 @@ namespace FoxTunes
                     pipeline.Stop();
                 }
             });
+        }
+
+        public override TimeSpan GetDuration(long position)
+        {
+            return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(this.ChannelHandle, position));
         }
 
         protected override void OnDisposing()

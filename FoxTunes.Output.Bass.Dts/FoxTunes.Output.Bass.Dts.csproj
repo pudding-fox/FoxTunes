@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManagedBass.Dts" Version="0.1.0"></PackageReference>
+    <PackageReference Include="ManagedBass.Dts" Version="0.1.1"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 

@@ -29,6 +29,7 @@ namespace FoxTunes.ViewModel
         protected virtual void OnTick(object sender, EventArgs e)
         {
             this.OnPositionChanged();
+            this.OnDescriptionChanged();
         }
 
         public long Position
@@ -62,6 +63,29 @@ namespace FoxTunes.ViewModel
                 return this.InnerOutputStream.Length;
             }
         }
+
+        public string Description
+        {
+            get
+            {
+                return string.Format(
+                    "{0}/{1}",
+                    this.InnerOutputStream.GetDuration(this.InnerOutputStream.Position).ToString(@"mm\:ss"),
+                    this.InnerOutputStream.GetDuration(this.InnerOutputStream.Length).ToString(@"mm\:ss")
+                );
+            }
+        }
+
+        protected virtual void OnDescriptionChanged()
+        {
+            if (this.DescriptionChanged != null)
+            {
+                this.DescriptionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Description");
+        }
+
+        public event EventHandler DescriptionChanged;
 
         protected override Freezable CreateInstanceCore()
         {

@@ -111,6 +111,8 @@ namespace FoxTunes
             return this.Play();
         }
 
+        public abstract TimeSpan GetDuration(long position);
+
         public string Description
         {
             get
