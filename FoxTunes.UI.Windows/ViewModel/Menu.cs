@@ -94,8 +94,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler CategoryChanged;
 
-        private bool _MenuVisible { get; set; }
-
         public bool MenuVisible
         {
             get
@@ -129,6 +127,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual IEnumerable<MenuItem> GetItems()
         {
+            var items = new List<MenuItem>();
             foreach (var component in this.InvocableComponents)
             {
                 foreach (var invocation in component.Invocations)
@@ -139,8 +138,50 @@ namespace FoxTunes.ViewModel
                     }
                     var item = new MenuItem(component, invocation);
                     item.Core = this.Core;
-                    yield return item;
+                    if (string.IsNullOrEmpty(invocation.Path))
+                    {
+                        items.Add(item);
+                        continue;
+                    }
+                    var path = invocation.Path.Split(global::System.IO.Path.DirectorySeparatorChar, global::System.IO.Path.AltDirectorySeparatorChar);
+                    this.GetItem(items, invocation, path).Children.Add(item);
                 }
+            }
+            return items;
+        }
+
+        protected virtual MenuItem GetItem(IList<MenuItem> items, IInvocationComponent invocation, string[] path)
+        {
+            var item = default(MenuItem);
+            foreach (var segment in path)
+            {
+                item = this.GetItem(items, invocation, segment);
+                items = item.Children;
+            }
+            return item;
+        }
+
+        protected virtual MenuItem GetItem(IList<MenuItem> items, IInvocationComponent invocation, string path)
+        {
+            foreach (var item in items)
+            {
+                if (string.Equals(item.Invocation.Name, path, StringComparison.OrdinalIgnoreCase))
+                {
+                    return item;
+                }
+            }
+            {
+                var item = new MenuItem(
+                    null,
+                    new InvocationComponent(
+                        invocation.Category,
+                        invocation.Id,
+                        name: path,
+                        attributes: (byte)(invocation.Attributes & ~InvocationComponent.ATTRIBUTE_SELECTED)
+                    )
+                );
+                items.Add(item);
+                return item;
             }
         }
 
@@ -175,7 +216,7 @@ namespace FoxTunes.ViewModel
     {
         private MenuItem()
         {
-
+            this.Children = new ObservableCollection<MenuItem>();
         }
 
         public MenuItem(IInvocableComponent component, IInvocationComponent invocation)
@@ -214,6 +255,8 @@ namespace FoxTunes.ViewModel
                 return (this.Invocation.Attributes & InvocationComponent.ATTRIBUTE_SELECTED) == InvocationComponent.ATTRIBUTE_SELECTED;
             }
         }
+
+        public ObservableCollection<MenuItem> Children { get; private set; }
 
         protected virtual Task OnInvoke()
         {

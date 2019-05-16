@@ -27,6 +27,10 @@ namespace FoxTunes.Interfaces
         Task Set(LibraryItemStatus status);
 
         Task Clear(LibraryItemStatus? status);
+
+        Task<bool> GetIsFavorite(LibraryHierarchyNode libraryHierarchyNode);
+
+        Task SetIsFavorite(LibraryHierarchyNode libraryHierarchyNode, bool isFavorite);
     }
 
     [Flags]

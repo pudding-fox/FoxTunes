@@ -10,6 +10,8 @@
 
         string Description { get; }
 
+        string Path { get; }
+
         byte Attributes { get; }
     }
 }

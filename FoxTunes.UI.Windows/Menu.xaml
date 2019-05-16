@@ -38,4 +38,9 @@
             <Setter Property="Template" Value="{DynamicResource ContextMenuTemplate}"></Setter>
         </Style>
     </ContextMenu.Style>
+    <ContextMenu.ItemTemplate>
+        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+            <TextBlock Text="{Binding}"></TextBlock>
+        </HierarchicalDataTemplate>
+    </ContextMenu.ItemTemplate>
 </ContextMenu>

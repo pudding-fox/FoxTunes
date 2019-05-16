@@ -9,6 +9,7 @@ CREATE TABLE [LibraryItems] (
 	DirectoryName nvarchar(260) NOT NULL, 
 	FileName nvarchar(260) NOT NULL, 
 	ImportDate varchar(50) NOT NULL,
+	Favorite bit NOT NULL,
 	Status INTEGER NOT NULL);
 
 CREATE TABLE [PlaylistItems](

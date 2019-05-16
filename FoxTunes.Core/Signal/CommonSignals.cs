@@ -18,4 +18,11 @@
 
         public const string PluginInvocation = "PluginInvocation";
     }
+
+    public static class CommonSignalFlags
+    {
+        public const byte NONE = 0;
+
+        public const byte SOFT = 1;
+    }
 }

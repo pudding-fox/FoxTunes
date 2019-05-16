@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -104,11 +104,12 @@ namespace FoxTunes {
         ///	DirectoryName nvarchar(260) NOT NULL, 
         ///	FileName nvarchar(260) NOT NULL, 
         ///	ImportDate varchar(50) NOT NULL,
+        ///	Favorite bit NOT NULL,
         ///	Status INTEGER NOT NULL);
         ///
         ///CREATE TABLE [PlaylistItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
-        ///	[LibraryItem_Id] INTEGER NULL REFERE [rest of string was truncated]&quot;;.
+        ///	[LibraryItem [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {

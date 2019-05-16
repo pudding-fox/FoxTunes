@@ -112,6 +112,11 @@ namespace FoxTunes
 
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj as LibraryHierarchy);
+        }
+
         public static readonly LibraryHierarchy Empty = new LibraryHierarchy();
     }
 
