@@ -30,29 +30,21 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public Task<ImageSource> CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        public async Task<ImageSource> CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
         {
             var id = this.GetImageId(libraryHierarchyNode, width, height);
             var fileName = default(string);
             if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
             {
-#if NET40
-                return TaskEx.FromResult(this.ImageLoader.Load(fileName));
-#else
-                return Task.FromResult(this.ImageLoader.Load(fileName));
-#endif
+                return this.ImageLoader.Load(fileName);
             }
             using (KeyLock.Lock(id))
             {
                 if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
                 {
-#if NET40
-                    return TaskEx.FromResult(this.ImageLoader.Load(fileName));
-#else
-                    return Task.FromResult(this.ImageLoader.Load(fileName));
-#endif
+                    return this.ImageLoader.Load(fileName);
                 }
-                return this.CreateImageSourceCore(libraryHierarchyNode, width, height);
+                return await this.CreateImageSourceCore(libraryHierarchyNode, width, height);
             }
         }
 
