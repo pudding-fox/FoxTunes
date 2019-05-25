@@ -187,7 +187,14 @@ namespace FoxTunes
             if (this.SelectedHierarchy != null)
             {
                 this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault(libraryHierarchy => libraryHierarchy.Id == this.SelectedHierarchy.Id);
-                Logger.Write(this, LogLevel.Debug, "Refreshed selected hierarchy: {0} => {1}", this.SelectedHierarchy.Id, this.SelectedHierarchy.Name);
+                if (this.SelectedHierarchy != null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Refreshed selected hierarchy: {0} => {1}", this.SelectedHierarchy.Id, this.SelectedHierarchy.Name);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Failed to refresh selected hierarchy, it was removed or disabled.");
+                }
             }
             if (this.SelectedHierarchy == null)
             {
