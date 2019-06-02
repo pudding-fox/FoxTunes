@@ -264,6 +264,11 @@ namespace FoxTunes
             }
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override bool Equals(object obj)
         {
             return this.Equals(obj as LibraryHierarchyNode);
