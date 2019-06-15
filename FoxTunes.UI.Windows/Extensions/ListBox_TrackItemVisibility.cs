@@ -44,7 +44,12 @@ namespace FoxTunes
             }
             else
             {
-                TrackItemVisibilityBehaviours.Remove(listBox);
+                var behaviour = default(TrackItemVisibilityBehaviour);
+                if (TrackItemVisibilityBehaviours.TryGetValue(listBox, out behaviour))
+                {
+                    TrackItemVisibilityBehaviours.Remove(listBox);
+                    behaviour.Dispose();
+                }
             }
         }
 
