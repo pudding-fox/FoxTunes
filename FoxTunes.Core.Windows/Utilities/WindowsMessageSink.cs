@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Runtime.InteropServices;
 
 namespace FoxTunes
@@ -6,6 +7,20 @@ namespace FoxTunes
     public class WindowsMessageSink : MessageSink
     {
         public static readonly string ID = Guid.NewGuid().ToString("d");
+
+        private static readonly int WM_TASKBARCREATED;
+
+        static WindowsMessageSink()
+        {
+            try
+            {
+                WM_TASKBARCREATED = RegisterWindowMessage("TaskbarCreated");
+            }
+            catch
+            {
+                Logger.Write(typeof(WindowsMessageSink), LogLevel.Warn, "Failed to register window message: TaskbarCreated");
+            }
+        }
 
         const int MOUSE_MOVE = 0x200;
 
@@ -46,6 +61,10 @@ namespace FoxTunes
                             this.OnMouseRightButtonUp();
                             break;
                     }
+                }
+                else if (uMsg == WM_TASKBARCREATED)
+                {
+                    this.OnTaskBarCreated();
                 }
                 return DefWindowProc(hwnd, uMsg, wparam, lparam);
             };
@@ -125,5 +144,8 @@ namespace FoxTunes
 
         [DllImport("user32.dll")]
         public static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wparam, IntPtr lparam);
+
+        [DllImport("user32.dll")]
+        public static extern int RegisterWindowMessage(string msg);
     }
 }
