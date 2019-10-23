@@ -30,12 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\lib\bassasio.dll" Link="bass_fx.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 

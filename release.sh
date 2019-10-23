@@ -152,6 +152,10 @@ wavpack.exe
 wavpack_license.txt
 "
 
+EQ="
+FoxTunes.Output.Bass.ParametricEqualizer.dll
+"
+
 BUNDLED="
 windows
 asio
@@ -163,6 +167,7 @@ wasapi
 librarybrowser
 metadataeditor
 encoder
+eq
 "
 
 TAG=$(git describe --abbrev=0 --tags)
@@ -198,6 +203,7 @@ do
 	mkdir -p "./release/$target/Plugins/metadataeditor"
 	mkdir -p "./release/$target/Plugins/encoder"
 	mkdir -p "./release/$target/Plugins/encoder/encoders"
+	mkdir -p "./release/$target/Plugins/eq"
 
 	echo "Creating main package.."
 
@@ -317,6 +323,12 @@ do
     do
             echo $file
             cp "./distribution/$target/Encoders/$file" "./release/$target/Plugins/encoder/encoders"
+    done
+
+    for file in $EQ
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/eq"
     done
 
 	cd "./release/$target/Plugins"
