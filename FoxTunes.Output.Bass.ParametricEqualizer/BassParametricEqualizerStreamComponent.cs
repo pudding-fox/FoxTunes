@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.DirectX8;
-using ManagedBass.Fx;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,10 +88,12 @@ namespace FoxTunes
         {
             if (this.Eq == null)
             {
+                Logger.Write(this, LogLevel.Debug, "Creating DX8 ParamEQ Effect.");
                 this.Eq = new DXParamEQ(this.ChannelHandle);
             }
             if (this.Bands == null)
             {
+                Logger.Write(this, LogLevel.Debug, "Creating DX8 ParamEQ Bands.");
                 this.Bands = BassParametricEqualizerStreamComponentConfiguration.Bands.Select(
                     band => new Band(band.Key, this.Eq.AddBand(band.Value), band.Value)
                 ).ToList();
@@ -111,6 +112,7 @@ namespace FoxTunes
                 {
                     gain = MAX_GAIN;
                 }
+                Logger.Write(this, LogLevel.Debug, "Updating DX8 ParamEQ Band: {0} => {1} => {2}", band.Id, band.Center, gain);
                 this.Eq.UpdateBand(band.Index, gain);
             }
         }
@@ -141,6 +143,10 @@ namespace FoxTunes
             {
                 this.Eq.Dispose();
                 this.Eq = null;
+            }
+            if (this.Bands != null)
+            {
+                this.Bands = null;
             }
         }
 
