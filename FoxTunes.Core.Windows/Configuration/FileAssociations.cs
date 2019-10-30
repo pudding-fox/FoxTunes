@@ -61,15 +61,15 @@ namespace FoxTunes
             AddProgram(this.Create(null));
         }
 
-        public void Enable(IEnumerable<IFileAssociation> associations)
-        {
-            AddAssociations(associations);
-        }
-
         public void Disable()
         {
             RemoveShortcuts(this.Create(null));
             RemoveProgram(this.Create(null));
+        }
+
+        public void Enable(IEnumerable<IFileAssociation> associations)
+        {
+            AddAssociations(associations);
         }
 
         public void Disable(IEnumerable<IFileAssociation> associations)
@@ -105,6 +105,7 @@ namespace FoxTunes
             }
             if (success)
             {
+                Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Sending SHChangeNotify.");
                 SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_FLUSH, IntPtr.Zero, IntPtr.Zero);
             }
         }
@@ -118,29 +119,26 @@ namespace FoxTunes
             }
             if (success)
             {
+                Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Sending SHChangeNotify.");
                 SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_FLUSH, IntPtr.Zero, IntPtr.Zero);
             }
         }
 
-        private static bool AddShortcuts(IFileAssociation association)
+        private static void AddShortcuts(IFileAssociation association)
         {
-            Shell.CreateShortcut(
-                Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.SendTo),
-                    string.Format("{0}.lnk", association.ProgId)
-                ),
-                association.ExecutableFilePath
+            var fileName = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.SendTo),
+                string.Format("{0}.lnk", association.ProgId)
             );
-            return true;
+            if (global::System.IO.File.Exists(fileName))
+            {
+                global::System.IO.File.Delete(fileName);
+            }
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating \"SendTo\" link for program \"{0}\": {1}", association.ProgId, fileName);
+            Shell.CreateShortcut(fileName, association.ExecutableFilePath);
         }
 
-        private static bool AddProgram(IFileAssociation association)
-        {
-            var path = string.Format(@"Software\Classes\{0}\shell\open\command", association.ProgId);
-            return SetKeyValue(path, GetOpenString(association.ExecutableFilePath));
-        }
-
-        private static bool RemoveShortcuts(IFileAssociation association)
+        private static void RemoveShortcuts(IFileAssociation association)
         {
             var fileName = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.SendTo),
@@ -148,27 +146,38 @@ namespace FoxTunes
             );
             if (!global::System.IO.File.Exists(fileName))
             {
-                return false;
+                return;
             }
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing \"SendTo\" link for program \"{0}\".", association.ProgId);
             global::System.IO.File.Delete(fileName);
-            return true;
+        }
+
+        private static bool AddProgram(IFileAssociation association)
+        {
+            var path = string.Format(@"Software\Classes\{0}\shell\open\command", association.ProgId);
+            var command = GetOpenString(association.ExecutableFilePath);
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating shell command for program \"{0}\": {1}", association.ProgId, command);
+            return SetKeyValue(path, command);
         }
 
         private static bool RemoveProgram(IFileAssociation association)
         {
             var path = @"Software\Classes\" + association.ProgId;
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing shell command for program \"{0}\".", association.ProgId);
             return DeleteKey(path);
         }
 
         private static bool AddAssociation(IFileAssociation association)
         {
             var path = @"Software\Classes\" + association.Extension;
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating file association for program \"{0}\": {1}", association.ProgId, association.Extension);
             return SetKeyValue(path, association.ProgId);
         }
 
         private static bool RemoveAssociation(IFileAssociation association)
         {
             var path = @"Software\Classes\" + association.Extension;
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing file association for program \"{0}\": {1}", association.ProgId, association.Extension);
             return DeleteKey(path);
         }
 
@@ -203,6 +212,10 @@ namespace FoxTunes
             using (var key = Registry.CurrentUser.CreateSubKey(path))
             {
                 if (string.Equals(key.GetValue(null) as string, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                if (string.Equals(Convert.ToString(key.GetValue(null)), value, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }

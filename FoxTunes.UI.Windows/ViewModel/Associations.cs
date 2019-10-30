@@ -56,6 +56,10 @@ namespace FoxTunes.ViewModel
             var extensions = fileAssociations.Associations.Select(
                 association => association.Extension.TrimStart('.')
             ).ToArray();
+            foreach (var association in this.FileAssociations)
+            {
+                association.Dispose();
+            }
             this.FileAssociations.Clear();
             this.FileAssociations.AddRange(
                 this.Output.SupportedExtensions.Select(extension => new Association(
@@ -63,32 +67,29 @@ namespace FoxTunes.ViewModel
                     extensions.Contains(extension)
                 ))
             );
-            this.FileAssociations.Add(new Association(
-                null,
-                this.FileAssociations.Count == extensions.Length
-            ));
         }
 
         public ICommand SelectAllCommand
         {
             get
             {
-                return new Command<bool>(selectAll => this.SelectAll(selectAll));
+                return new Command(() => this.SelectAll(true));
             }
         }
 
-        public void SelectAll(bool selectAll)
+        public ICommand SelectNoneCommand
         {
-            if (selectAll)
+            get
             {
-                foreach (var association in this.FileAssociations)
-                {
-                    association.IsSelected = true;
-                }
+                return new Command(() => this.SelectAll(false));
             }
-            else
+        }
+
+        public void SelectAll(bool selected)
+        {
+            foreach (var association in this.FileAssociations)
             {
-                this.Refresh();
+                association.IsSelected = selected;
             }
         }
 
