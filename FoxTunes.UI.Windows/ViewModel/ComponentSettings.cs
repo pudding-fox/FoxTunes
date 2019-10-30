@@ -69,6 +69,36 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedSectionChanged;
 
+        private string _Filter { get; set; }
+
+        public string Filter
+        {
+            get
+            {
+                return this._Filter;
+            }
+            set
+            {
+                if (string.Equals(this._Filter, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+                this._Filter = value;
+                this.OnFilterChanged();
+            }
+        }
+
+        protected virtual void OnFilterChanged()
+        {
+            var task = this.Refresh();
+            if (this.FilterChanged != null)
+            {
+                this.FilterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Filter");
+        }
+
+        public event EventHandler FilterChanged;
 
         public ICommand ResetAllCommand
         {
@@ -123,7 +153,11 @@ namespace FoxTunes.ViewModel
                 this.Sections.Clear();
                 foreach (var section in this.Configuration.Sections.OrderBy(section => section.Id))
                 {
-                    this.Sections.Add(new ConfigurationSection(section));
+                    if (!string.IsNullOrEmpty(this.Filter) && !section.Name.Contains(this.Filter, true) && !section.Elements.Any(element => (!string.IsNullOrEmpty(element.Name) && element.Name.Contains(this.Filter, true)) || (!string.IsNullOrEmpty(element.Path) && element.Path.Contains(this.Filter, true))))
+                    {
+                        continue;
+                    }
+                    this.Sections.Add(new ConfigurationSection(this, section));
                 }
                 this.SelectedSection = this.Sections.FirstOrDefault();
             });
@@ -144,8 +178,9 @@ namespace FoxTunes.ViewModel
             this.IsExpanded = true;
         }
 
-        public ConfigurationSection(global::FoxTunes.ConfigurationSection section, string path = null) : this()
+        public ConfigurationSection(ComponentSettings componentSettings, global::FoxTunes.ConfigurationSection section, string path = null) : this()
         {
+            this.ComponentSettings = componentSettings;
             this.Section = section;
             this.Path = path;
             if (string.IsNullOrEmpty(this.Path))
@@ -156,6 +191,8 @@ namespace FoxTunes.ViewModel
                 }
             }
         }
+
+        public ComponentSettings ComponentSettings { get; private set; }
 
         public ObservableCollection<ConfigurationElement> Elements { get; private set; }
 
@@ -231,6 +268,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void AddElement(ConfigurationElement element)
         {
+            if (!string.IsNullOrEmpty(this.ComponentSettings.Filter) && !(!string.IsNullOrEmpty(element.Name) && element.Name.Contains(this.ComponentSettings.Filter, true)) && (!string.IsNullOrEmpty(element.Path) && !element.Path.Contains(this.ComponentSettings.Filter, true)))
+            {
+                return;
+            }
             if (string.IsNullOrEmpty(element.Path))
             {
                 this.Elements.Add(element);
@@ -260,7 +301,7 @@ namespace FoxTunes.ViewModel
                 }
             }
             {
-                var child = new ConfigurationSection(this.Section, path);
+                var child = new ConfigurationSection(this.ComponentSettings, this.Section, path);
                 section.Children.Add(child);
                 return child;
             }
