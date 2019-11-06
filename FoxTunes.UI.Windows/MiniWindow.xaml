@@ -12,6 +12,7 @@
         Title="Fox Tunes" 
         WindowStyle="None" 
         SizeToContent="WidthAndHeight"
+        ResizeMode="CanMinimize"
         AllowsTransparency="True" 
         Background="Transparent">
     <Window.Resources>
