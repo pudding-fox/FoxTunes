@@ -22,8 +22,6 @@ namespace FoxTunes
 
         const int FACTOR = 4;
 
-        const float BOOST = 0.005f;
-
         const int UPDATE_INTERVAL = 100;
 
         public static readonly IOutput Output = ComponentRegistry.Instance.GetComponent<IOutput>();
@@ -53,17 +51,17 @@ namespace FoxTunes
 
         public static readonly float[] Buffer = new float[SampleCount];
 
-        public double[] Dimentions = new double[2];
+        public int[] Dimentions = new int[2];
 
-        public double Step;
+        public int Step;
 
         public int ElementCount;
 
-        public double[,] Elements;
+        public int[,] Elements;
 
         public int SamplesPerElement;
 
-        public double Weight;
+        public float Weight;
 
         public bool HasData = false;
 
@@ -93,7 +91,10 @@ namespace FoxTunes
             if (Bars != null)
             {
                 Bars.ConnectValue(value =>
-                    this.Configure(SpectrumBehaviourConfiguration.GetBars(value))
+                    this.Configure(
+                        SpectrumBehaviourConfiguration.GetBars(value),
+                        SpectrumBehaviourConfiguration.GetWidth(value)
+                    )
                 );
             }
         }
@@ -102,9 +103,8 @@ namespace FoxTunes
 
         protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.Dimentions[0] = this.ActualWidth;
-            this.Dimentions[1] = this.ActualHeight;
-            this.Step = this.ActualWidth / ElementCount;
+            this.Dimentions[0] = Convert.ToInt32(this.ActualWidth);
+            this.Dimentions[1] = Convert.ToInt32(this.ActualHeight);
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -142,8 +142,8 @@ namespace FoxTunes
                 }
                 else
                 {
+                    Update(this.ElementCount, this.SamplesPerElement, this.Weight, this.Step, this.Dimentions[1], this.Elements);
                     this.HasData = true;
-                    this.Update();
                 }
                 Windows.Invoke(() => this.InvalidateVisual());
             }
@@ -153,26 +153,27 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void Configure(int count)
+        protected virtual void Configure(int count, int width)
         {
+            Windows.Invoke(() => this.Width = width);
             this.ElementCount = count;
-            this.Elements = new double[count, 4];
+            this.Elements = new int[count, 4];
             this.SamplesPerElement = SampleCount / count;
-            this.Weight = (double)16 / this.ElementCount;
-            Windows.Invoke(() => this.Step = this.ActualWidth / ElementCount);
+            this.Weight = (float)16 / this.ElementCount;
+            this.Step = width / ElementCount;
         }
 
-        protected void Update()
+        private static void Update(int count, int samples, float weight, int step, int height, int[,] elements)
         {
-            for (int a = 0, b = 0; a < this.ElementCount; a++)
+            for (int a = 0, b = 0; a < count; a++)
             {
                 var sample = 0f;
-                for (var c = 0; c < this.SamplesPerElement; b++, c++)
+                for (var c = 0; c < samples; b++, c++)
                 {
                     sample += Buffer[b];
                 }
-                sample /= this.SamplesPerElement;
-                var factor = FACTOR + (a * this.Weight);
+                sample /= samples;
+                var factor = FACTOR + (a * weight);
                 var value = Math.Sqrt(sample) * factor;
                 if (value > 1)
                 {
@@ -182,10 +183,10 @@ namespace FoxTunes
                 {
                     value = 0;
                 }
-                this.Elements[a, 0] = a * this.Step;
-                this.Elements[a, 2] = this.Step;
-                this.Elements[a, 3] = value * this.Dimentions[1];
-                this.Elements[a, 1] = this.Dimentions[1] - this.Elements[a, 3];
+                elements[a, 0] = a * step;
+                elements[a, 2] = step;
+                elements[a, 3] = Convert.ToInt32(value * height);
+                elements[a, 1] = height - elements[a, 3];
             }
         }
 
