@@ -67,20 +67,27 @@ namespace FoxTunes
             };
             Parallel.ForEach(this.EncoderItems, parallelOptions, encoderItem =>
             {
-                if (this.CancellationToken.IsCancellationRequested)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to cancellation.", encoderItem.InputFileName);
-                    encoderItem.Status = EncoderItemStatus.Cancelled;
-                    return;
-                }
-                encoderItem.OutputFileName = settings.GetOutput(encoderItem.InputFileName);
                 try
                 {
-                    if (!this.CheckPaths(encoderItem.InputFileName, encoderItem.OutputFileName))
+                    if (this.CancellationToken.IsCancellationRequested)
                     {
-                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" already exists.", encoderItem.InputFileName, encoderItem.OutputFileName);
+                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to cancellation.", encoderItem.InputFileName);
+                        encoderItem.Status = EncoderItemStatus.Cancelled;
+                        return;
+                    }
+                    encoderItem.OutputFileName = settings.GetOutput(encoderItem.InputFileName);
+                    if (!this.CheckInput(encoderItem.InputFileName))
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" does not exist.", encoderItem.InputFileName, encoderItem.OutputFileName);
                         encoderItem.Status = EncoderItemStatus.Failed;
-                        encoderItem.AddError(string.Format("Output file \"{0}\" already exists.", encoderItem.OutputFileName));
+                        encoderItem.AddError(string.Format("Input file \"{0}\" does not exist.", encoderItem.OutputFileName));
+                        return;
+                    }
+                    if (!this.CheckOutput(encoderItem.OutputFileName))
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" already exists or cannot be written.", encoderItem.InputFileName, encoderItem.OutputFileName);
+                        encoderItem.Status = EncoderItemStatus.Failed;
+                        encoderItem.AddError(string.Format("Output file \"{0}\" already exists or cannot be written.", encoderItem.OutputFileName));
                         return;
                     }
                     Logger.Write(this, LogLevel.Debug, "Beginning encoding file \"{0}\" to output file \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
@@ -279,17 +286,42 @@ namespace FoxTunes
             this.CancellationToken.Cancel();
         }
 
-        protected virtual bool CheckPaths(string inputFileName, string outputFileName)
+        protected virtual bool CheckInput(string fileName)
         {
-            if (!string.IsNullOrEmpty(Path.GetPathRoot(inputFileName)) && !File.Exists(inputFileName))
+            if (!string.IsNullOrEmpty(Path.GetPathRoot(fileName)) && !File.Exists(fileName))
             {
                 //TODO: Bad .Result
-                if (!NetworkDrive.IsRemotePath(inputFileName) || !NetworkDrive.ConnectRemotePath(inputFileName).Result)
+                if (!NetworkDrive.IsRemotePath(fileName) || !NetworkDrive.ConnectRemotePath(fileName).Result)
                 {
-                    throw new FileNotFoundException(string.Format("File not found: {0}", inputFileName), inputFileName);
+                    throw new FileNotFoundException(string.Format("File not found: {0}", fileName), fileName);
                 }
             }
-            return !File.Exists(outputFileName);
+            return true;
+        }
+
+        protected virtual bool CheckOutput(string fileName)
+        {
+            var directoryName = Path.GetDirectoryName(fileName);
+            if (!string.IsNullOrEmpty(Path.GetPathRoot(directoryName)) && !Directory.Exists(directoryName))
+            {
+                //TODO: Bad .Result
+                if (!NetworkDrive.IsRemotePath(directoryName) || !NetworkDrive.ConnectRemotePath(directoryName).Result)
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(directoryName);
+                    }
+                    catch
+                    {
+                        throw new DirectoryNotFoundException(string.Format("Directory not found: {0}", directoryName));
+                    }
+                }
+            }
+            if (File.Exists(fileName))
+            {
+                return false;
+            }
+            return true;
         }
 
         protected virtual IBassStream CreateStream(string fileName, BassFlags flags)
@@ -300,7 +332,7 @@ namespace FoxTunes
             {
                 FileName = fileName
             };
-        retry:
+            retry:
             if (this.CancellationToken.IsCancellationRequested)
             {
                 return BassStream.Empty;
