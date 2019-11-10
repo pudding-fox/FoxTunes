@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -42,7 +43,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            var paths = this.GetLibraryDirectories().ToArray();
+            var paths = await this.GetRoots();
             await this.RescanLibrary();
             await this.RemoveHierarchies(LibraryItemStatus.Remove);
             await this.RemoveItems(LibraryItemStatus.Remove);
@@ -56,19 +57,29 @@ namespace FoxTunes
                 var file = new FileInfo(libraryItem.FileName);
                 if (!file.Exists)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Removing dead file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                     return true;
                 }
                 if (file.LastWriteTimeUtc > libraryItem.GetImportDate())
                 {
+                    Logger.Write(this, LogLevel.Debug, "Refreshing modified file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                     return true;
                 }
                 return false;
             });
-            var action = new Func<IDatabaseSet<LibraryItem>, LibraryItem, Task>((set, libraryItem) =>
+            var action = new Func<IDatabaseSet<LibraryItem>, LibraryItem, Task>(async (set, libraryItem) =>
             {
-                Logger.Write(this, LogLevel.Debug, "Re-scanning file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                 libraryItem.Status = LibraryItemStatus.Remove;
-                return set.AddOrUpdateAsync(libraryItem);
+                //TODO: Writing to IDatabaseSet is not thread safe.
+                Monitor.Enter(set);
+                try
+                {
+                    await set.AddOrUpdateAsync(libraryItem);
+                }
+                finally
+                {
+                    Monitor.Exit(set);
+                }
             });
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
@@ -94,30 +105,6 @@ namespace FoxTunes
             await base.OnCompleted();
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
-        }
-
-        protected virtual IEnumerable<string> GetLibraryDirectories()
-        {
-            var table = this.Database.Tables.LibraryItem;
-            var column = table.GetColumn(ColumnConfig.By("DirectoryName", ColumnFlags.None));
-            var query = this.Database.QueryFactory.Build();
-            query.Output.AddColumn(column);
-            query.Source.AddTable(table);
-            query.Aggregate.AddColumn(column);
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                using (var reader = this.Database.ExecuteReader(query, null, transaction))
-                {
-                    foreach (var record in reader)
-                    {
-                        if (this.IsCancellationRequested)
-                        {
-                            break;
-                        }
-                        yield return record.Get<string>(column.Identifier);
-                    }
-                }
-            }
         }
     }
 }

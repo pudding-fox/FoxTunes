@@ -37,6 +37,54 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected virtual async Task<IEnumerable<string>> GetRoots()
+        {
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                using (var sequence = this.Database.Set<LibraryRoot>(transaction).GetAsyncEnumerator())
+                {
+                    var result = new List<string>();
+                    while (await sequence.MoveNextAsync())
+                    {
+                        result.Add(sequence.Current.DirectoryName);
+                    }
+                    return result;
+                }
+            }
+        }
+
+        protected virtual async Task AddRoots(IEnumerable<string> paths)
+        {
+            paths = paths.Except(
+                await this.GetRoots()
+            ).ToArray();
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                var set = this.Database.Set<LibraryRoot>(transaction);
+                foreach (var path in paths)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Adding library root: {0}", path);
+                    await set.AddAsync(
+                        set.Create().With(
+                            libraryRoot => libraryRoot.DirectoryName = path
+                        )
+                    );
+                }
+                transaction.Commit();
+            }
+        }
+
+        protected virtual async Task ClearRoots()
+        {
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                var set = this.Database.Set<LibraryRoot>(transaction);
+                Logger.Write(this, LogLevel.Debug, "Clearing library roots.");
+                await set.ClearAsync();
+                transaction.Commit();
+            }
+        }
+
         protected virtual async Task AddPaths(IEnumerable<string> paths, bool buildHierarchies)
         {
             var complete = true;

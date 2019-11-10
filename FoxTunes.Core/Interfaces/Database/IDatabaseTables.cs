@@ -10,6 +10,8 @@ namespace FoxTunes.Interfaces
 
         ITableConfig PlaylistColumn { get; }
 
+        ITableConfig LibraryRoot { get; }
+
         ITableConfig LibraryItem { get; }
 
         ITableConfig LibraryHierarchy { get; }
