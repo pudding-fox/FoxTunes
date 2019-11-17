@@ -13,7 +13,17 @@ namespace FoxTunes
         {
             get
             {
-                return Environment.OSVersion.Version.Major >= 6;
+                if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1)
+                {
+                    //Windows 7.
+                    return true;
+                }
+                if (Environment.OSVersion.Version.Major > 6)
+                {
+                    //Windows 8 or greater.
+                    return true;
+                }
+                return false;
             }
         }
 
