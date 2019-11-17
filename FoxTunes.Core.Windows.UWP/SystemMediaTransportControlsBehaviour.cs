@@ -38,24 +38,27 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = core.Managers.Playlist;
-            this.PlaybackManager = core.Managers.Playback;
-            this.ArtworkProvider = core.Components.ArtworkProvider;
-            this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                SystemMediaTransportControlsBehaviourConfiguration.SECTION,
-                SystemMediaTransportControlsBehaviourConfiguration.ENABLED_ELEMENT
-            ).ConnectValue(value =>
+            if (SystemMediaTransportControlsBehaviourConfiguration.IsPlatformSupported)
             {
-                if (value)
+                this.PlaylistManager = core.Managers.Playlist;
+                this.PlaybackManager = core.Managers.Playback;
+                this.ArtworkProvider = core.Components.ArtworkProvider;
+                this.Configuration = core.Components.Configuration;
+                this.Configuration.GetElement<BooleanConfigurationElement>(
+                    SystemMediaTransportControlsBehaviourConfiguration.SECTION,
+                    SystemMediaTransportControlsBehaviourConfiguration.ENABLED_ELEMENT
+                ).ConnectValue(value =>
                 {
-                    this.Enable();
-                }
-                else
-                {
-                    this.Disable();
-                }
-            });
+                    if (value)
+                    {
+                        this.Enable();
+                    }
+                    else
+                    {
+                        this.Disable();
+                    }
+                });
+            }
             base.InitializeComponent(core);
         }
 

@@ -61,29 +61,32 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = core.Managers.Playlist;
-            this.PlaybackManager = core.Managers.Playback;
-            this.UserInterface = core.Components.UserInterface;
-            this.UserInterface.WindowCreated += this.OnWindowCreated;
-            this.Configuration = core.Components.Configuration;
-            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                TaskbarButtonsBehaviourConfiguration.SECTION,
-                TaskbarButtonsBehaviourConfiguration.ENABLED_ELEMENT
-            );
-            this.Enabled.ConnectValue(value =>
+            if (TaskbarButtonsBehaviourConfiguration.IsPlatformSupported)
             {
-                if (value)
+                this.PlaylistManager = core.Managers.Playlist;
+                this.PlaybackManager = core.Managers.Playback;
+                this.UserInterface = core.Components.UserInterface;
+                this.UserInterface.WindowCreated += this.OnWindowCreated;
+                this.Configuration = core.Components.Configuration;
+                this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    TaskbarButtonsBehaviourConfiguration.SECTION,
+                    TaskbarButtonsBehaviourConfiguration.ENABLED_ELEMENT
+                );
+                this.Enabled.ConnectValue(value =>
                 {
-                    this.Enable();
-                }
-                else
-                {
-                    this.Disable();
-                }
-                this.UpdateHooks();
-                this.UpdateImages();
-                this.UpdateButtons();
-            });
+                    if (value)
+                    {
+                        this.Enable();
+                    }
+                    else
+                    {
+                        this.Disable();
+                    }
+                    this.UpdateHooks();
+                    this.UpdateImages();
+                    this.UpdateButtons();
+                });
+            }
             base.InitializeComponent(core);
         }
 
