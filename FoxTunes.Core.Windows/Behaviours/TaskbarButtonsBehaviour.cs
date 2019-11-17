@@ -87,6 +87,10 @@ namespace FoxTunes
                     this.UpdateButtons();
                 });
             }
+            else
+            {
+                Logger.Write(this, LogLevel.Warn, "Platform is not supported.");
+            }
             base.InitializeComponent(core);
         }
 
@@ -96,6 +100,7 @@ namespace FoxTunes
             this.Timer.Interval = UPDATE_INTERVAL;
             this.Timer.Elapsed += this.OnElapsed;
             this.Timer.Start();
+            Logger.Write(this, LogLevel.Debug, "Updater enabled.");
         }
 
         public void Disable()
@@ -108,6 +113,7 @@ namespace FoxTunes
             this.Timer.Elapsed -= this.OnElapsed;
             this.Timer.Dispose();
             this.Timer = null;
+            Logger.Write(this, LogLevel.Debug, "Updater disabled.");
         }
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
@@ -143,12 +149,14 @@ namespace FoxTunes
 
         protected virtual void AddHook(IntPtr handle)
         {
+            Logger.Write(this, LogLevel.Debug, "Adding Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
             source.AddHook(this.Callback);
         }
 
         protected virtual void RemoveHook(IntPtr handle)
         {
+            Logger.Write(this, LogLevel.Debug, "Removing Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
             source.RemoveHook(this.Callback);
         }
@@ -191,12 +199,14 @@ namespace FoxTunes
             {
                 return;
             }
+            Logger.Write(this, LogLevel.Debug, "Creating taskbar button image list.");
             var width = WindowsImageList.GetSystemMetrics(
                 WindowsImageList.SystemMetric.SM_CXSMICON
             );
             var height = WindowsImageList.GetSystemMetrics(
                 WindowsImageList.SystemMetric.SM_CYSMICON
             );
+            Logger.Write(this, LogLevel.Debug, "Taskbar buttom image dimentions: {0}x{1}", width, height);
             var imageList = WindowsImageList.ImageList_Create(
                 width,
                 height,
@@ -212,6 +222,7 @@ namespace FoxTunes
                 }
             }
             WindowsTaskbarList.Instance.ThumbBarSetImageList(handle, imageList);
+            Logger.Write(this, LogLevel.Debug, "Taskbar button image list created.");
         }
 
         protected virtual void UpdateImage(IntPtr imageList, Bitmap bitmap, int width, int height)
@@ -259,6 +270,7 @@ namespace FoxTunes
         protected virtual Bitmap GetImage(int index, int width, int height)
         {
             var name = string.Format("FoxTunes.Core.Windows.Images.{0}.png", this.GetImageName(index));
+            Logger.Write(this, LogLevel.Debug, "Creating image: {0}", name);
             using (var stream = typeof(TaskbarButtonsBehaviour).Assembly.GetManifestResourceStream(name))
             {
                 var image = (Bitmap)Bitmap.FromStream(stream);
@@ -336,12 +348,17 @@ namespace FoxTunes
             }
             else if (this.Enabled.Value)
             {
+                Logger.Write(this, LogLevel.Debug, "Creating taskbar buttons.");
                 result = WindowsTaskbarList.Instance.ThumbBarAddButtons(
                     handle,
                     Convert.ToUInt32(buttons.Length),
                     buttons
                 );
                 this.Windows[handle] = true;
+            }
+            if (result != WindowsTaskbarList.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create or update taskbar buttons: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
             }
         }
 
@@ -441,12 +458,14 @@ namespace FoxTunes
 
         protected virtual async Task Previous()
         {
+            Logger.Write(this, LogLevel.Debug, "Previous button was clicked.");
             await this.PlaylistManager.Previous();
             this.UpdateButtons();
         }
 
         protected virtual async Task PlayPause()
         {
+            Logger.Write(this, LogLevel.Debug, "Play/pause button was clicked.");
             var currentStream = this.PlaybackManager.CurrentStream;
             if (currentStream == null)
             {
@@ -468,6 +487,7 @@ namespace FoxTunes
 
         protected virtual async Task Next()
         {
+            Logger.Write(this, LogLevel.Debug, "Next button was clicked.");
             await this.PlaylistManager.Next();
             this.UpdateButtons();
         }
@@ -497,7 +517,8 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-
+            //TODO: Remove the hooks, images and buttons.
+            this.Disable();
         }
 
         ~TaskbarButtonsBehaviour()
