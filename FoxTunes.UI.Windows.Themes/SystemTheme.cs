@@ -9,7 +9,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class SystemTheme : ThemeBase
     {
-        public const string ID = "3E9EFE8C-5245-4F8B-97D1-EB47CC70E373";
+        public const string ID = "392B2FEE-B1E5-4776-AF3A-C28260EE8E81";
 
         public SystemTheme()
             : base(ID, "System")
