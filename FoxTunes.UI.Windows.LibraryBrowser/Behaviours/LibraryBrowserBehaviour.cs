@@ -8,6 +8,8 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LibraryBrowserBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public ThemeLoader ThemeLoader { get; private set; }
+
         public ArtworkGridProvider ArtworkGridProvider { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -20,6 +22,11 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            if (this.ThemeLoader != null)
+            {
+                this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
+            }
             this.ArtworkGridProvider = ComponentRegistry.Instance.GetComponent<ArtworkGridProvider>();
             this.Configuration = core.Components.Configuration;
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
@@ -41,6 +48,19 @@ namespace FoxTunes
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnThemeChanged(object sender, AsyncEventArgs e)
+        {
+            if (this.ArtworkGridProvider == null)
+            {
+                return;
+            }
+#if NET40
+            var task = TaskEx.Run(() => this.ArtworkGridProvider.Clear());
+#else
+            var task = Task.Run(() => this.ArtworkGridProvider.Clear());
+#endif
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -93,6 +113,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.ThemeLoader != null)
+            {
+                this.ThemeLoader.ThemeChanged -= this.OnThemeChanged;
+            }
             if (this.ScalingFactor != null)
             {
                 this.ScalingFactor.ValueChanged -= this.OnValueChanged;
