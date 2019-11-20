@@ -1,9 +1,12 @@
 # FoxTunes
-A modular music player using the BASS framework.
+A modular music player and converter using the BASS framework.
 
 The main release is [FoxTunes-2.0.4-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.0.4/FoxTunes-2.0.4-net461.zip)
 
 ![Main](Media/Screenshots/Main.PNG)
+
+* The following input formats are supported: aac, ac3, aif, ape, dff, dsf, dts, fla, flac, kar, m4a, m4a, m4b, mac, mid, midi, mp1, mp2, mp3, mp4, oga, ogg, ogg, opus, rmi, wav, wma, wv
+* The following output formats are supported: flac, m4a, mp3, ogg, opus, wv
 
 The UI components can be relocated and removed.
 
@@ -27,10 +30,16 @@ Can be used with file associations and the "Send to" explorer action.
 
 A Windows XP compatibile .NET 4.0 build is available, can be configured minimally.
 It needs at least;
-* [KB2468871](http://support.microsoft.com/kb/2468871) - Portable class libraries patch.
+* [KB2468871](https://www.microsoft.com/en-us/download/details.aspx?id=3556) - Portable class libraries patch.
+  * Microsoft keep breaking the link. Google: NDP40-KB2468871
 * [msvcp100.dll and msvcr100.dll](https://github.com/aidan-g/FoxTunes/releases/download/0.8/FoxTunes-0.8-Dependencies.tar.gz) - Microsoft Visual C++ 2010
 
 ![Minimal](Media/Screenshots/Minimal.PNG)
+
+Themable. You can create a theme library with xaml. See the FoxTunes.UI.Windows.Themes project for an example.
+Two are included. I'm no artist;
+* Expression Dark - A style developed by Microsoft. 
+* System - Use the default appearance. Minimal resource usage.
 
 Various optional plugins are available;
 
@@ -39,6 +48,9 @@ Various optional plugins are available;
 * DSD - Required for DSD direct.
 * DTS - Play .dts multi channel format.
 * DirectSound - Use standard windows audio session for output.
+* Encoder - A converter with various output formats. 
+  * Can rip CDs with the CD plugin.
+  * Can up/down sample rate/depth with the Resampler plugin.
 * Javascript - Use JS for scriptable elements.
 * Logging - Use Log4Net logging back-end. Can be configured and disabled.
 * ParametricEqualizer - A ten band parametric equalizer.
