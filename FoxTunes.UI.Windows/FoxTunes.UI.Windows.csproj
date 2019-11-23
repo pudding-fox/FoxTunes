@@ -21,6 +21,8 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
+    <!-- TODO: Use only WPF frameworks. -->
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>

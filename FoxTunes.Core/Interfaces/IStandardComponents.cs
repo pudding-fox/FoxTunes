@@ -21,5 +21,7 @@
         ILibraryHierarchyCache LibraryHierarchyCache { get; }
 
         IArtworkProvider ArtworkProvider { get; }
+
+        IFileSystemBrowser FileSystemBrowser { get; }
     }
 }

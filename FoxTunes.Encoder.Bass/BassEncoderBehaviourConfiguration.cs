@@ -13,9 +13,11 @@ namespace FoxTunes
 
         public const string DESTINATION_ELEMENT = "BBBBBF10-E515-4A99-B49B-4C5821A22945";
 
-        public const string DESTINATION_SOURCE_OPTION = "AAAA2B59-96E2-49F3-A727-1E102D7C9D3F";
+        public const string DESTINATION_BROWSE_OPTION = "AAAA0072-4E23-4735-BF80-8AD72A4AE927";
 
-        public const string DESTINATION_SPECIFIC_OPTION = "BBBB1412-8AAE-4191-A920-8BB042D21F39";
+        public const string DESTINATION_SOURCE_OPTION = "BBBB2B59-96E2-49F3-A727-1E102D7C9D3F";
+
+        public const string DESTINATION_SPECIFIC_OPTION = "CCCC1412-8AAE-4191-A920-8BB042D21F39";
 
         public const string DESTINATION_LOCATION_ELEMENT = "CCCC1639-B91A-44A1-8579-364639C3F52C";
 
@@ -63,6 +65,7 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetDestinationOptions()
         {
+            yield return new SelectionConfigurationOption(DESTINATION_BROWSE_OPTION, "Browse Folder");
             yield return new SelectionConfigurationOption(DESTINATION_SOURCE_OPTION, "Source Folder");
             yield return new SelectionConfigurationOption(DESTINATION_SPECIFIC_OPTION, "Specific Folder");
         }
@@ -72,6 +75,8 @@ namespace FoxTunes
             switch (option.Id)
             {
                 default:
+                case DESTINATION_BROWSE_OPTION:
+                    return BassEncoderOutputDestination.Browse;
                 case DESTINATION_SOURCE_OPTION:
                     return BassEncoderOutputDestination.Source;
                 case DESTINATION_SPECIFIC_OPTION:
@@ -83,6 +88,7 @@ namespace FoxTunes
         {
             switch (option.Id)
             {
+                case DESTINATION_BROWSE_OPTION:
                 case DESTINATION_SOURCE_OPTION:
                     StandardComponents.Instance.Configuration.GetElement(SECTION, DESTINATION_LOCATION_ELEMENT).Hide();
                     break;

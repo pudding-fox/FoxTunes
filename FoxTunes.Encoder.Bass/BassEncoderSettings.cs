@@ -2,11 +2,14 @@
 using ManagedBass;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace FoxTunes
 {
     public abstract class BassEncoderSettings : BaseComponent, IBassEncoderSettings
     {
+        public static readonly object SyncRoot = new object();
+
         public const int DEPTH_AUTO = 0;
 
         public const int DEPTH_16 = 16;
@@ -31,9 +34,38 @@ namespace FoxTunes
 
         public abstract IBassEncoderFormat Format { get; }
 
+        public IFileSystemBrowser FileSystemBrowser { get; private set; }
+
         public BassEncoderOutputDestination Destination { get; private set; }
 
-        public string Location { get; private set; }
+        private string _BrowseFolder { get; set; }
+
+        public string GetBrowseFolder(string fileName)
+        {
+            lock (SyncRoot)
+            {
+                if (string.IsNullOrEmpty(this._BrowseFolder))
+                {
+                    var options = new BrowseOptions(
+                        "Save As",
+                        Path.GetDirectoryName(fileName),
+                        Enumerable.Empty<BrowseFilter>(),
+                        BrowseFlags.Folder
+                    );
+                    var result = this.FileSystemBrowser.Browse(options);
+                    if (!result.Success)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Save As folder browse dialog was cancelled.");
+                        throw new OperationCanceledException();
+                    }
+                    this._BrowseFolder = result.Paths.FirstOrDefault();
+                    Logger.Write(this, LogLevel.Debug, "Browse folder: {0}", this._BrowseFolder);
+                }
+            }
+            return this._BrowseFolder;
+        }
+
+        public string SpecificFolder { get; private set; }
 
         public bool CopyTags { get; private set; }
 
@@ -41,6 +73,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.FileSystemBrowser = core.Components.FileSystemBrowser;
             core.Components.Configuration.GetElement<SelectionConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.DESTINATION_ELEMENT
@@ -48,7 +81,7 @@ namespace FoxTunes
             core.Components.Configuration.GetElement<TextConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.DESTINATION_LOCATION_ELEMENT
-            ).ConnectValue(value => this.Location = value);
+            ).ConnectValue(value => this.SpecificFolder = value);
             core.Components.Configuration.GetElement<BooleanConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.COPY_TAGS
@@ -69,16 +102,19 @@ namespace FoxTunes
             switch (this.Destination)
             {
                 default:
+                case BassEncoderOutputDestination.Browse:
+                    directory = this.GetBrowseFolder(fileName);
+                    break;
                 case BassEncoderOutputDestination.Source:
                     directory = Path.GetDirectoryName(fileName);
-                    if (!this.CanWrite(directory))
-                    {
-                        throw new InvalidOperationException(string.Format("Cannot output to path \"{0}\" please check encoder settings.", directory));
-                    }
                     break;
                 case BassEncoderOutputDestination.Specific:
-                    directory = this.Location;
+                    directory = this.SpecificFolder;
                     break;
+            }
+            if (!this.CanWrite(directory))
+            {
+                throw new InvalidOperationException(string.Format("Cannot output to path \"{0}\" please check encoder settings.", directory));
             }
             return Path.Combine(directory, string.Format("{0}.{1}", name, this.Extension));
         }
