@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxDb.Interfaces;
+﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,11 +11,20 @@ namespace FoxTunes
 {
     public class RescanLibraryTask : LibraryTaskBase
     {
-        public RescanLibraryTask()
-            : base()
+        public RescanLibraryTask() : this(Enumerable.Empty<string>(), Enumerable.Empty<LibraryItem>())
         {
 
         }
+
+        public RescanLibraryTask(IEnumerable<string> roots, IEnumerable<LibraryItem> items) : base()
+        {
+            this.Roots = roots;
+            this.Items = items;
+        }
+
+        public IEnumerable<string> Roots { get; private set; }
+
+        public IEnumerable<LibraryItem> Items { get; private set; }
 
         public override bool Visible
         {
@@ -43,11 +51,19 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            var paths = await this.GetRoots();
+            var roots = default(IEnumerable<string>);
+            if (this.Roots != null && this.Roots.Any())
+            {
+                roots = this.Roots;
+            }
+            else
+            {
+                roots = await this.GetRoots();
+            }
             await this.RescanLibrary();
             await this.RemoveHierarchies(LibraryItemStatus.Remove);
             await this.RemoveItems(LibraryItemStatus.Remove);
-            await this.AddPaths(paths, true);
+            await this.AddPaths(roots, true);
         }
 
         protected virtual async Task RescanLibrary()
@@ -85,14 +101,17 @@ namespace FoxTunes
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    using (var libraryUpdater = new LibraryUpdater(this.Database, predicate, action, this.Visible, transaction))
+                    using (var libraryUpdater = new LibraryUpdater(this.Database, this.Items, predicate, action, this.Visible, transaction))
                     {
                         libraryUpdater.InitializeComponent(this.Core);
                         await this.WithSubTask(libraryUpdater,
                             async () => await libraryUpdater.Populate(cancellationToken)
                         );
                     }
-                    transaction.Commit();
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
                 }
             }))
             {

@@ -250,6 +250,15 @@ namespace FoxTunes
             }
         }
 
+        public async Task Rescan(IEnumerable<string> roots, IEnumerable<LibraryItem> items)
+        {
+            using (var task = new RescanLibraryTask(roots, items))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task);
+                await task.Run();
+            }
+        }
 
         public async Task Set(LibraryItemStatus status)
         {

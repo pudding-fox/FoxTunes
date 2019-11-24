@@ -3,7 +3,9 @@ using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,16 +15,19 @@ namespace FoxTunes
     {
         public const string ID = "00672118-A730-4CD8-8B0A-F3DA42712165";
 
-        public LibraryUpdater(IDatabaseComponent database, Func<LibraryItem, bool> predicate, Func<IDatabaseSet<LibraryItem>, LibraryItem, Task> task, bool reportProgress, ITransactionSource transaction)
+        public LibraryUpdater(IDatabaseComponent database, IEnumerable<LibraryItem> items, Func<LibraryItem, bool> predicate, Func<IDatabaseSet<LibraryItem>, LibraryItem, Task> task, bool reportProgress, ITransactionSource transaction)
             : base(reportProgress)
         {
             this.Database = database;
+            this.Items = items;
             this.Predicate = predicate;
             this.Task = task;
             this.Transaction = transaction;
         }
 
         public IDatabaseComponent Database { get; private set; }
+
+        public IEnumerable<LibraryItem> Items { get; private set; }
 
         public Func<LibraryItem, bool> Predicate { get; private set; }
 
@@ -71,13 +76,29 @@ namespace FoxTunes
             {
                 await this.SetName("Updating library");
                 await this.SetPosition(0);
-                await this.SetCount(set.Count);
+                if (this.Items != null && this.Items.Any())
+                {
+                    await this.SetCount(this.Items.Count());
+                }
+                else
+                {
+                    await this.SetCount(set.Count);
+                }
             }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
 
-            await AsyncParallel.ForEach(set, async libraryItem =>
+            var sequence = default(IEnumerable<LibraryItem>);
+            if (this.Items != null && this.Items.Any())
+            {
+                sequence = this.Items;
+            }
+            else
+            {
+                sequence = set;
+            }
+            await AsyncParallel.ForEach(sequence, async libraryItem =>
             {
                 if (this.Predicate(libraryItem))
                 {
