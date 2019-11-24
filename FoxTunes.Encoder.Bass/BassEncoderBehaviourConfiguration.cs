@@ -38,7 +38,7 @@ namespace FoxTunes
                             ComponentScanner.Instance.Location,
                             "Converter"
                         )
-                    )
+                    ).WithFlags(ConfigurationElementFlags.FolderName)
                 )
                 .WithElement(
                     new BooleanConfigurationElement(COPY_TAGS, "Copy Tags").WithValue(true))
