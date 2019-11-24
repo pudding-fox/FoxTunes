@@ -156,6 +156,10 @@ EQ="
 FoxTunes.Output.Bass.ParametricEqualizer.dll
 "
 
+TOOLS="
+FoxTunes.Tools.dll
+"
+
 BUNDLED="
 windows
 asio
@@ -168,6 +172,7 @@ librarybrowser
 metadataeditor
 encoder
 eq
+tools
 "
 
 TAG=$(git describe --abbrev=0 --tags)
@@ -204,6 +209,7 @@ do
 	mkdir -p "./release/$target/Plugins/encoder"
 	mkdir -p "./release/$target/Plugins/encoder/encoders"
 	mkdir -p "./release/$target/Plugins/eq"
+	mkdir -p "./release/$target/Plugins/tools"
 
 	echo "Creating main package.."
 
@@ -329,6 +335,12 @@ do
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/eq"
+    done
+
+	for file in $TOOLS
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/tools"
     done
 
 	cd "./release/$target/Plugins"
