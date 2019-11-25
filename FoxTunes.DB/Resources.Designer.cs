@@ -156,7 +156,15 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to DELETE FROM &quot;LibraryItem_MetaDataItem&quot;
-        ///WHERE &quot;LibraryItem_Id&quot; = @itemId.
+        ///WHERE &quot;Id&quot; IN
+        ///(
+        ///	SELECT &quot;LibraryItem_MetaDataItem&quot;.&quot;Id&quot;
+        ///	FROM &quot;LibraryItem_MetaDataItem&quot;
+        ///		JOIN &quot;MetaDataItems&quot;
+        ///			ON &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot; = &quot;MetaDataItems&quot;.&quot;Id&quot;
+        ///				AND (@type &amp; &quot;MetaDataItems&quot;.&quot;Type&quot;) =  &quot;MetaDataItems&quot;.&quot;Type&quot;
+        ///	WHERE &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot; = @itemId
+        ///).
         /// </summary>
         internal static string ClearLibraryMetaDataItems {
             get {
@@ -166,7 +174,15 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistItem_MetaDataItem&quot;
-        ///WHERE &quot;PlaylistItem_Id&quot; = @itemId.
+        ///WHERE &quot;Id&quot; IN
+        ///(
+        ///	SELECT &quot;PlaylistItem_MetaDataItem&quot;.&quot;Id&quot;
+        ///	FROM &quot;PlaylistItem_MetaDataItem&quot;
+        ///		JOIN &quot;MetaDataItems&quot;
+        ///			ON &quot;PlaylistItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot; = &quot;MetaDataItems&quot;.&quot;Id&quot;
+        ///				AND (@type &amp; &quot;MetaDataItems&quot;.&quot;Type&quot;) =  &quot;MetaDataItems&quot;.&quot;Type&quot;
+        ///	WHERE &quot;PlaylistItem_MetaDataItem&quot;.&quot;PlaylistItem_Id&quot; = @itemId
+        ///).
         /// </summary>
         internal static string ClearPlaylistMetaDataItems {
             get {
@@ -228,15 +244,17 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;LibraryItems&quot;.*
-        ///FROM &quot;LibraryHierarchyItems&quot;
-        ///	JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; 
-        ///		ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot;
-        ///	JOIN &quot;LibraryItems&quot; 
-        ///		ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot; = &quot;LibraryItems&quot;.&quot;Id&quot;
-        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///	AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) 
-        ///		OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libr [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to SELECT 
+        ///	&quot;LibraryItems&quot;.&quot;Id&quot; AS &quot;LibraryItems_Id&quot;,
+        ///	&quot;LibraryItems&quot;.&quot;DirectoryName&quot; AS &quot;LibraryItems_DirectoryName&quot;,
+        ///	&quot;LibraryItems&quot;.&quot;FileName&quot; AS &quot;LibraryItems_FileName&quot;,
+        ///	&quot;LibraryItems&quot;.&quot;ImportDate&quot; AS &quot;LibraryItems_ImportDate&quot;,
+        ///	&quot;LibraryItems&quot;.&quot;Favorite&quot; AS &quot;LibraryItems_Favorite&quot;,
+        ///	&quot;LibraryItems&quot;.&quot;Status&quot; AS &quot;LibraryItems_Status&quot;,
+        ///	&quot;MetaDataItems&quot;.&quot;Id&quot; AS &quot;MetaDataItems_Id&quot;,
+        ///	&quot;MetaDataItems&quot;.&quot;Name&quot; AS &quot;MetaDataItems_Name&quot;,
+        ///	&quot;MetaDataItems&quot;.&quot;Type&quot; AS &quot;MetaDataItems_Type&quot;,
+        ///	&quot;MetaDataItems&quot;.&quot;Value [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryItems {
             get {
@@ -253,9 +271,10 @@ namespace FoxTunes {
         ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
         ///	FROM &quot;LibraryHierarchyItems&quot;
         ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///		AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
+        ///		AND &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId
         ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;,  [rest of string was truncated]&quot;;.
+        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
+        ///	FROM &quot;LibraryHierarchyI [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryItemsWithFilter {
             get {

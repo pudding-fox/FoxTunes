@@ -106,6 +106,14 @@ namespace FoxTunes
                 }
                 builder.AppendFormat("\"{0}\"", item.FileName);
             }
+            if (builder.Length == 0)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             var process = Process.Start(this.Path.Value, builder.ToString());
             return process.WaitForExitAsync();
         }

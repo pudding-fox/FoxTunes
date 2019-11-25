@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public class WritePlaylistMetaDataTask : BackgroundTask
     {
+        const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Image;
+
         public const string ID = "8DB1257E-5854-4F8F-BAE3-D59A45DEE998";
 
         public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems)
@@ -107,6 +109,7 @@ namespace FoxTunes
                     {
                         case DatabaseParameterPhase.Fetch:
                             parameters["itemId"] = playlistItem.Id;
+                            parameters["type"] = META_DATA_TYPE;
                             break;
                     }
                 }, transaction);
