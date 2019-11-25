@@ -76,7 +76,7 @@ namespace FoxTunes
             }
             //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
             var items = this.LibraryHierarchyBrowser
-                .GetItems(this.LibraryManager.SelectedItem)
+                .GetItems(this.LibraryManager.SelectedItem, false)
                 .ToArray();
             await this.Open(items);
             await this.Refresh(items);

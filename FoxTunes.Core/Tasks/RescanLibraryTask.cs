@@ -124,6 +124,7 @@ namespace FoxTunes
             await base.OnCompleted();
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
     }
 }

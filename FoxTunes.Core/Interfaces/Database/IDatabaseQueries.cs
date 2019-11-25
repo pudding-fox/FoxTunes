@@ -23,6 +23,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetIsFavorite { get; }
 
+        IDatabaseQuery GetLibraryMetaData { get; }
+
         IDatabaseQuery GetLibraryHierarchyMetaData { get; }
 
         IDatabaseQuery GetLibraryHierarchyNodes { get; }

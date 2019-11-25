@@ -264,6 +264,19 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SELECT &quot;MetaDataItems&quot;.*
+        ///FROM &quot;MetaDataItems&quot;
+        ///	JOIN &quot;LibraryItem_MetaDataItem&quot; ON &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot; = &quot;MetaDataItems&quot;.&quot;Id&quot;
+        ///WHERE &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot; = @libraryItemId 
+        ///	AND (@type &amp; &quot;MetaDataItems&quot;.&quot;Type&quot;) =  &quot;MetaDataItems&quot;.&quot;Type&quot;.
+        /// </summary>
+        internal static string GetLibraryMetaData {
+            get {
+                return ResourceManager.GetString("GetLibraryMetaData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
         ///SELECT @name, @type, @value
         ///WHERE NOT EXISTS(

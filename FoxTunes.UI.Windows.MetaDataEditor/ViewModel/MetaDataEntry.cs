@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,10 +21,12 @@ namespace FoxTunes.ViewModel
 
         public static readonly ImageLoader ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
 
+        public static readonly IFileSystemBrowser FileSystemBrowser = ComponentRegistry.Instance.GetComponent<IFileSystemBrowser>();
+
         private MetaDataEntry()
         {
-            this.PlaylistItems = new List<PlaylistItem>();
-            this.MetaDataItems = new Dictionary<PlaylistItem, MetaDataItem>();
+            this.Sources = new List<IFileData>();
+            this.MetaDataItems = new Dictionary<IFileData, MetaDataItem>();
         }
 
         public MetaDataEntry(string name, MetaDataItemType type) : this()
@@ -34,9 +35,9 @@ namespace FoxTunes.ViewModel
             this.Type = type;
         }
 
-        private IList<PlaylistItem> PlaylistItems { get; set; }
+        private IList<IFileData> Sources { get; set; }
 
-        private IDictionary<PlaylistItem, MetaDataItem> MetaDataItems { get; set; }
+        private IDictionary<IFileData, MetaDataItem> MetaDataItems { get; set; }
 
         private string _Name { get; set; }
 
@@ -234,10 +235,10 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            foreach (var playlistItem in this.PlaylistItems)
+            foreach (var key in this.MetaDataItems.Keys)
             {
                 var metaDataItem = default(MetaDataItem);
-                if (!this.MetaDataItems.TryGetValue(playlistItem, out metaDataItem) || metaDataItem == null)
+                if (!this.MetaDataItems.TryGetValue(key, out metaDataItem) || metaDataItem == null)
                 {
                     if (!this.HasValue)
                     {
@@ -290,17 +291,35 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public void AddPlaylistItem(PlaylistItem playlistItem)
+        public IEnumerable<IFileData> GetSources()
         {
-            this.AddPlaylistItem(playlistItem, playlistItem.MetaDatas.FirstOrDefault(metaDataItem => string.Equals(metaDataItem.Name, this.Name, StringComparison.OrdinalIgnoreCase)));
+            return this.Sources;
         }
 
-        public void AddPlaylistItem(PlaylistItem playlistItem, MetaDataItem metaDataItem)
+        public void SetSources(IEnumerable<IFileData> sources)
         {
-            this.PlaylistItems.Add(playlistItem);
+            foreach (var source in sources)
+            {
+                this.AddSource(source);
+            }
+        }
+
+        protected virtual void AddSource(IFileData source)
+        {
+            this.AddSource(
+                source,
+                source.MetaDatas.FirstOrDefault(
+                    metaDataItem => string.Equals(metaDataItem.Name, this.Name, StringComparison.OrdinalIgnoreCase)
+                )
+            );
+        }
+
+        protected virtual void AddSource(IFileData source, MetaDataItem metaDataItem)
+        {
+            this.Sources.Add(source);
             if (metaDataItem != null)
             {
-                this.MetaDataItems.Add(playlistItem, metaDataItem);
+                this.MetaDataItems.Add(source, metaDataItem);
             }
         }
 
@@ -310,14 +329,14 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            foreach (var playlistItem in this.PlaylistItems)
+            foreach (var source in this.Sources)
             {
                 var metaDataItem = default(MetaDataItem);
-                if (!this.MetaDataItems.TryGetValue(playlistItem, out metaDataItem))
+                if (!this.MetaDataItems.TryGetValue(source, out metaDataItem))
                 {
                     metaDataItem = new MetaDataItem(this.Name, this.Type);
-                    playlistItem.MetaDatas.Add(metaDataItem);
-                    this.MetaDataItems.Add(playlistItem, metaDataItem);
+                    source.MetaDatas.Add(metaDataItem);
+                    this.MetaDataItems.Add(source, metaDataItem);
                 }
                 if (this.HasValue)
                 {
@@ -342,43 +361,40 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return this.PlaylistItems.Count > 0;
+                return this.Sources.Count > 0;
             }
         }
 
         public void Browse()
         {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = this.GetFilter();
-            var directoryName = this.PlaylistItems.Select(playlistItem => playlistItem.DirectoryName).FirstOrDefault();
+            var directoryName = this.Sources.Select(
+                playlistItem => playlistItem.DirectoryName
+            ).FirstOrDefault();
             if (string.IsNullOrEmpty(directoryName))
             {
                 directoryName = MyPictures;
             }
-            dialog.InitialDirectory = directoryName;
-            if (dialog.ShowDialog() != true)
+            var options = new BrowseOptions(
+                "Select Artwork",
+                directoryName,
+                new[]
+                {
+                    new BrowseFilter("Images", ArtworkProvider.EXTENSIONS)
+                },
+                BrowseFlags.File
+            );
+            var result = FileSystemBrowser.Browse(options);
+            if (!result.Success)
             {
                 return;
             }
-            this.Value = dialog.FileName;
+            this.Value = result.Paths.FirstOrDefault();
             switch (this.Type)
             {
                 case MetaDataItemType.Image:
                     this.RefreshImageSource();
                     break;
             }
-        }
-
-        protected virtual string GetFilter()
-        {
-            var extensions = ArtworkProvider.EXTENSIONS
-                .Select(extension => string.Format("*{0}", extension))
-                .ToArray();
-            return string.Format(
-                "Images({0}) | {1}",
-                string.Join(", ", extensions),
-                string.Join("; ", extensions)
-            );
         }
 
         public ICommand ClearCommand
@@ -393,7 +409,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return this.PlaylistItems.Count > 0 && this.HasValue;
+                return this.Sources.Count > 0 && this.HasValue;
             }
         }
 

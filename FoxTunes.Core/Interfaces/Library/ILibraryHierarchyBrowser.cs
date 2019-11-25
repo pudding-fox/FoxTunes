@@ -15,6 +15,6 @@ namespace FoxTunes.Interfaces
 
         IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode);
 
-        IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode);
+        IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode, bool loadMetaData);
     }
 }
