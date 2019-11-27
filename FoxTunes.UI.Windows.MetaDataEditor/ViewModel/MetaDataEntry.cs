@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -135,6 +136,17 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ValueChanged;
+
+        public void SetValue(string value)
+        {
+            this.Value = value;
+            switch (this.Type)
+            {
+                case MetaDataItemType.Image:
+                    this.RefreshImageSource();
+                    break;
+            }
+        }
 
         public bool HasChanges
         {
@@ -388,13 +400,94 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.Value = result.Paths.FirstOrDefault();
-            switch (this.Type)
+            this.SetValue(result.Paths.FirstOrDefault());
+        }
+
+        public ICommand DragEnterCommand
+        {
+            get
             {
-                case MetaDataItemType.Image:
-                    this.RefreshImageSource();
-                    break;
+                return new Command<DragEventArgs>(this.OnDragEnter);
             }
+        }
+
+        protected virtual void OnDragEnter(DragEventArgs e)
+        {
+            this.UpdateDragDropEffects(e);
+        }
+
+        public ICommand DragOverCommand
+        {
+            get
+            {
+                return new Command<DragEventArgs>(this.OnDragOver);
+            }
+        }
+
+        protected virtual void OnDragOver(DragEventArgs e)
+        {
+            this.UpdateDragDropEffects(e);
+        }
+
+        protected virtual void UpdateDragDropEffects(DragEventArgs e)
+        {
+            var effects = DragDropEffects.None;
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    effects = DragDropEffects.Copy;
+                }
+#if VISTA
+                if (ShellIDListHelper.GetDataPresent(e.Data))
+                {
+                    effects = DragDropEffects.Copy;
+                }
+#endif
+            }
+            catch (Exception exception)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to query clipboard contents: {0}", exception.Message);
+            }
+            e.Effects = effects;
+        }
+
+        public ICommand DropCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand<DragEventArgs>(
+                    new Func<DragEventArgs, Task>(this.OnDrop)
+                );
+            }
+        }
+
+        protected virtual Task OnDrop(DragEventArgs e)
+        {
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
+                    this.SetValue(paths.FirstOrDefault());
+                }
+#if VISTA
+                if (ShellIDListHelper.GetDataPresent(e.Data))
+                {
+                    var paths = ShellIDListHelper.GetData(e.Data);
+                    this.SetValue(paths.FirstOrDefault());
+                }
+#endif
+            }
+            catch (Exception exception)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public ICommand ClearCommand
