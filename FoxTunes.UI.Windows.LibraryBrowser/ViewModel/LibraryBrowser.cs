@@ -164,9 +164,9 @@ namespace FoxTunes.ViewModel
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
 #if NET40
-            var task = TaskEx.Run(() => this.Refresh());
+            var task = TaskEx.Run(() => this.Reload());
 #else
-            var task = Task.Run(() => this.Refresh());
+            var task = Task.Run(() => this.Reload());
 #endif
         }
 
