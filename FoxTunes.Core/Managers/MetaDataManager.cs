@@ -15,6 +15,26 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public async Task Rescan(IEnumerable<LibraryItem> libraryItems)
+        {
+            using (var task = new RefreshLibraryMetaDataTask(libraryItems))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task);
+                await task.Run();
+            }
+        }
+
+        public async Task Rescan(IEnumerable<PlaylistItem> playlistItems)
+        {
+            using (var task = new RefreshPlaylistMetaDataTask(playlistItems))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task);
+                await task.Run();
+            }
+        }
+
         public async Task Save(IEnumerable<LibraryItem> libraryItems)
         {
             using (var task = new WriteLibraryMetaDataTask(libraryItems))

@@ -69,6 +69,12 @@ namespace FoxTunes
                     await this.SetDescription(new FileInfo(libraryItem.FileName).Name);
                     await this.SetPosition(position);
 
+                    if (!File.Exists(libraryItem.FileName))
+                    {
+                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName);
+                        continue;
+                    }
+
                     await metaDataSource.SetMetaData(libraryItem.FileName, libraryItem.MetaDatas);
 
                     foreach (var metaDataItem in libraryItem.MetaDatas.ToArray())

@@ -1,19 +1,20 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class WritePlaylistMetaDataTask : BackgroundTask
+    public class RefreshPlaylistMetaDataTask : BackgroundTask
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Image;
 
         public const string ID = "8DB1257E-5854-4F8F-BAE3-D59A45DEE998";
 
-        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems)
+        public RefreshPlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems)
             : base(ID)
         {
             this.PlaylistItems = playlistItems;
@@ -53,7 +54,7 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Saving meta data");
+            await this.SetName("Refreshing meta data");
             await this.SetPosition(0);
             await this.SetCount(this.PlaylistItems.Count());
             await base.OnStarted();
@@ -72,20 +73,13 @@ namespace FoxTunes
 
                     if (!File.Exists(playlistItem.FileName))
                     {
-                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot refresh.", playlistItem.FileName);
                         continue;
                     }
 
-                    await metaDataSource.SetMetaData(playlistItem.FileName, playlistItem.MetaDatas);
-
-                    foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
-                    {
-                        if (!string.IsNullOrEmpty(metaDataItem.Value))
-                        {
-                            continue;
-                        }
-                        playlistItem.MetaDatas.Remove(metaDataItem);
-                    }
+                    playlistItem.MetaDatas = new ObservableCollection<MetaDataItem>(
+                        await metaDataSource.GetMetaData(playlistItem.FileName)
+                    );
 
                     if (!playlistItem.LibraryItem_Id.HasValue)
                     {
