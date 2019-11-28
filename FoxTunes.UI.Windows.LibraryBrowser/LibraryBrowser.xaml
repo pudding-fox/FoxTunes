@@ -140,6 +140,7 @@
         <Windows:SearchBox 
             Grid.Row="2" 
             SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"
+            Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}"
             Visibility="{Binding IsSlave, Converter={StaticResource NegavingBooleanToVisibilityConverter}, Source={StaticResource ViewModel}}"/>
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner">
             <Windows:MouseCursorAdorner.Template>

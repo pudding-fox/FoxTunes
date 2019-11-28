@@ -149,7 +149,6 @@ namespace FoxTunes.ViewModel
             LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
-
         }
 
         protected virtual void OnCleared(object sender, EventArgs e)

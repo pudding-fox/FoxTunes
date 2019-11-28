@@ -81,7 +81,10 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Windows:SearchBox Grid.Row="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
+        <Windows:SearchBox 
+            Grid.Row="2" 
+            SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}" 
+            Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}"/>
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner">
             <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>
