@@ -70,7 +70,10 @@ namespace FoxTunes
                         )
                     );
                 }
-                transaction.Commit();
+                if (transaction.HasTransaction)
+                {
+                    transaction.Commit();
+                }
             }
         }
 
@@ -139,6 +142,11 @@ namespace FoxTunes
 
         protected virtual async Task AddLibraryItems(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
+            //We don't know how many files we're about to enumerate.
+            if (!this.IsIndeterminate)
+            {
+                await this.SetIsIndeterminate(true);
+            }
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, this.Visible, transaction))

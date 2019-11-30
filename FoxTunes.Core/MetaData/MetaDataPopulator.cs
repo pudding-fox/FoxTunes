@@ -1,11 +1,11 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
@@ -49,6 +49,10 @@ namespace FoxTunes
             }
         }
 
+        public IFileData Current { get; private set; }
+
+        private volatile int position = 0;
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -69,10 +73,21 @@ namespace FoxTunes
                 await this.SetName("Populating meta data");
                 await this.SetPosition(0);
                 await this.SetCount(fileDatas.Count());
+                if (this.Count <= 100)
+                {
+                    this.Timer.Interval = FAST_INTERVAL;
+                }
+                else if (this.Count < 1000)
+                {
+                    this.Timer.Interval = NORMAL_INTERVAL;
+                }
+                else
+                {
+                    this.Timer.Interval = LONG_INTERVAL;
+                }
+                this.Timer.Start();
             }
 
-            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
-            var position = 0;
             var metaDataSource = this.MetaDataSourceFactory.Create();
 
             await AsyncParallel.ForEach(fileDatas, async fileData =>
@@ -101,26 +116,27 @@ namespace FoxTunes
 
                 if (this.ReportProgress)
                 {
-                    if (position % interval == 0)
-                    {
-#if NET40
-                        this.Semaphore.Wait();
-#else
-                        await this.Semaphore.WaitAsync();
-#endif
-                        try
-                        {
-                            await this.SetDescription(new FileInfo(fileData.FileName).Name);
-                            await this.SetPosition(position);
-                        }
-                        finally
-                        {
-                            this.Semaphore.Release();
-                        }
-                    }
-                    Interlocked.Increment(ref position);
+                    this.Current = fileData;
+                    Interlocked.Increment(ref this.position);
                 }
             }, cancellationToken, this.Threads);
+        }
+
+        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        {
+            var count = this.position - this.Position;
+            if (count != 0)
+            {
+                var remaining = (this.Count - this.Position) / count;
+                var eta = this.GetEta(remaining);
+                await this.SetName(string.Format("Populating meta data: {0} remaining @ {1} items/s", eta, count));
+                if (this.Current != null)
+                {
+                    await this.SetDescription(new FileInfo(this.Current.FileName).Name);
+                }
+                await this.SetPosition(this.position);
+            }
+            base.OnElapsed(sender, e);
         }
 
         protected override void OnDisposing()

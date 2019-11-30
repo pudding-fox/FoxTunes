@@ -8,13 +8,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
     public class LibraryUpdater : PopulatorBase
     {
-        public const string ID = "00672118-A730-4CD8-8B0A-F3DA42712165";
-
         public LibraryUpdater(IDatabaseComponent database, IEnumerable<LibraryItem> items, Func<LibraryItem, bool> predicate, Func<IDatabaseSet<LibraryItem>, LibraryItem, Task> task, bool reportProgress, ITransactionSource transaction)
             : base(reportProgress)
         {
@@ -52,6 +51,10 @@ namespace FoxTunes
             }
         }
 
+        public IFileData Current { get; private set; }
+
+        private volatile int position = 0;
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -84,10 +87,20 @@ namespace FoxTunes
                 {
                     await this.SetCount(set.Count);
                 }
+                if (this.Count <= 100)
+                {
+                    this.Timer.Interval = FAST_INTERVAL;
+                }
+                else if (this.Count < 1000)
+                {
+                    this.Timer.Interval = NORMAL_INTERVAL;
+                }
+                else
+                {
+                    this.Timer.Interval = LONG_INTERVAL;
+                }
+                this.Timer.Start();
             }
-
-            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
-            var position = 0;
 
             var sequence = default(IEnumerable<LibraryItem>);
             if (this.Items != null && this.Items.Any())
@@ -107,26 +120,27 @@ namespace FoxTunes
 
                 if (this.ReportProgress)
                 {
-                    if (position % interval == 0)
-                    {
-#if NET40
-                        this.Semaphore.Wait();
-#else
-                        await this.Semaphore.WaitAsync();
-#endif
-                        try
-                        {
-                            await this.SetDescription(new FileInfo(libraryItem.FileName).Name);
-                            await this.SetPosition(position);
-                        }
-                        finally
-                        {
-                            this.Semaphore.Release();
-                        }
-                    }
-                    Interlocked.Increment(ref position);
+                    this.Current = libraryItem;
+                    Interlocked.Increment(ref this.position);
                 }
             }, cancellationToken, this.Threads);
+        }
+
+        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        {
+            var count = this.position - this.Position;
+            if (count != 0)
+            {
+                var remaining = (this.Count - this.Position) / count;
+                var eta = this.GetEta(remaining);
+                await this.SetName(string.Format("Updating library: {0} remaining @ {1} items/s", eta, count));
+                if (this.Current != null)
+                {
+                    await this.SetDescription(new FileInfo(this.Current.FileName).Name);
+                }
+                await this.SetPosition(this.position);
+            }
+            base.OnElapsed(sender, e);
         }
     }
 }

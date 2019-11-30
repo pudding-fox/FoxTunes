@@ -1,12 +1,20 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
     public abstract class PopulatorBase : BaseComponent, IReportsProgress, IDisposable
     {
+        public const int LONG_INTERVAL = 1000;
+
+        public const int NORMAL_INTERVAL = 100;
+
+        public const int FAST_INTERVAL = 10;
+
         private PopulatorBase()
         {
             this.Semaphore = new SemaphoreSlim(1, 1);
@@ -15,11 +23,28 @@ namespace FoxTunes
         public PopulatorBase(bool reportProgress) : this()
         {
             this.ReportProgress = reportProgress;
+            if (this.ReportProgress)
+            {
+                this.Timer = new global::System.Timers.Timer();
+                this.Timer.Interval = NORMAL_INTERVAL;
+                this.Timer.AutoReset = false;
+                this.Timer.Elapsed += this.OnElapsed;
+                this.Metric = new Metric(10);
+            }
+        }
+
+        protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
+        {
+            this.Timer.Start();
         }
 
         public SemaphoreSlim Semaphore { get; private set; }
 
         public bool ReportProgress { get; private set; }
+
+        public global::System.Timers.Timer Timer { get; private set; }
+
+        public Metric Metric { get; private set; }
 
         private string _Name { get; set; }
 
@@ -189,7 +214,13 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            //Nothing to do.
+            if (this.Timer != null)
+            {
+                this.Timer.Stop();
+                this.Timer.Elapsed -= this.OnElapsed;
+                this.Timer.Dispose();
+                this.Timer = null;
+            }
         }
 
         ~PopulatorBase()
@@ -203,6 +234,25 @@ namespace FoxTunes
             {
                 //Nothing can be done, never throw on GC thread.
             }
+        }
+
+        public string GetEta(int seconds)
+        {
+            var time = TimeSpan.FromSeconds(this.Metric.Average(seconds));
+            var elements = new List<string>();
+            if (time.Hours > 0)
+            {
+                elements.Add(string.Format("{0} hours", time.Hours));
+            }
+            if (time.Minutes > 0)
+            {
+                elements.Add(string.Format("{0} minutes", time.Minutes));
+            }
+            if (time.Seconds > 0)
+            {
+                elements.Add(string.Format("{0} seconds", time.Seconds));
+            }
+            return string.Join(", ", elements);
         }
     }
 }
