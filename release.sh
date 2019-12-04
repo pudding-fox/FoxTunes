@@ -12,10 +12,10 @@ bass_ape.dll
 bassalac.dll
 bassdsd.dll
 bassflac.dll
-bassopus.dll
-basswv.dll
 bassmidi.dll
+bassopus.dll
 basswma.dll
+basswv.dll
 "
 
 LAUNCHER="
@@ -24,48 +24,48 @@ FoxTunes.Launcher.exe.config
 "
 
 LIB="
-x86/SQLite.Interop.dll
-bass.dll
-bass_gapless.dll
-bass_inmemory_handler.dll
-bassmix.dll
 FoxDb.Core.dll
 FoxDb.Linq.dll
 FoxDb.Sql.dll
-FoxDb.SQLite.dll
 FoxTunes.Config.dll
 FoxTunes.Core.dll
 FoxTunes.DB.dll
-FoxTunes.DB.SQLite.dll
 FoxTunes.Logging.dll
 FoxTunes.MetaData.dll
-FoxTunes.MetaData.TagLib.dll
-FoxTunes.Output.Bass.DirectSound.dll
-FoxTunes.Output.Bass.dll
-FoxTunes.Output.Bass.Gapless.dll
 FoxTunes.Output.dll
 FoxTunes.Scripting.dll
-FoxTunes.Scripting.JS.dll
-FoxTunes.UI.dll
-FoxTunes.UI.Windows.dll
 FoxTunes.UI.Windows.Themes.dll
-log4net.dll
-ManagedBass.dll
-ManagedBass.Gapless.dll
-ManagedBass.Mix.dll
-msvcp100.dll
-msvcr100.dll
-Noesis.Javascript.dll
-System.Data.SQLite.dll
+FoxTunes.UI.Windows.dll
+FoxTunes.UI.dll
+Microsoft.Threading.Tasks.Extensions.Desktop.dll
+Microsoft.Threading.Tasks.Extensions.dll
+Microsoft.Threading.Tasks.dll
+Microsoft.Windows.Shell.dll
 System.IO.dll
 System.Runtime.dll
 System.Threading.Tasks.dll
 System.Windows.Interactivity.dll
-taglib-sharp.dll
-Microsoft.Threading.Tasks.dll
-Microsoft.Threading.Tasks.Extensions.Desktop.dll
-Microsoft.Threading.Tasks.Extensions.dll
-Microsoft.Windows.Shell.dll
+log4net.dll
+msvcp100.dll
+msvcr100.dll
+"
+
+BASS="
+FoxTunes.Output.Bass.DirectSound.dll
+FoxTunes.Output.Bass.Gapless.dll
+FoxTunes.Output.Bass.dll
+ManagedBass.Gapless.dll
+ManagedBass.Mix.dll
+ManagedBass.dll
+bass.dll
+bass_gapless.dll
+bass_inmemory_handler.dll
+bassmix.dll
+"
+
+JS="
+FoxTunes.Scripting.JS.dll
+Noesis.Javascript.dll
 "
 
 WINDOWS="
@@ -74,49 +74,61 @@ FoxTunes.Core.Windows.UWP.dll
 "
 
 ASIO="
-bass_asio_handler.dll
-bassasio.dll
 FoxTunes.Output.Bass.Asio.dll
 ManagedBass.Asio.dll
+bass_asio_handler.dll
+bassasio.dll
 "
 
 CD="
-bass_gapless_cd.dll
-basscd.dll
 FoxTunes.Output.Bass.Cd.dll
 ManagedBass.Cd.dll
 ManagedBass.Gapless.Cd.dll
+bass_gapless_cd.dll
+basscd.dll
 "
 
 DSD="
-bass_inmemory_handler_dsd.dll
 FoxTunes.Output.Bass.Dsd.dll
 ManagedBass.Dsd.dll
+bass_inmemory_handler_dsd.dll
 "
 
 DTS="
-bass_dts.dll
 FoxTunes.Output.Bass.Dts.dll
 ManagedBass.Dts.dll
+bass_dts.dll
 "
 
 SOX="
-bass_sox.dll
 FoxTunes.Output.Bass.Resampler.dll
 ManagedBass.Sox.dll
+bass_sox.dll
 "
 
 WASAPI="
-bass_wasapi_handler.dll
-basswasapi.dll
 FoxTunes.Output.Bass.Wasapi.dll
 ManagedBass.Wasapi.dll
+bass_wasapi_handler.dll
+basswasapi.dll
+"
+
+SQLITE="
+FoxDb.SQLite.dll
+FoxTunes.DB.SQLite.dll
+System.Data.SQLite.dll
+x86/SQLite.Interop.dll
 "
 
 SQLSERVER="
-FoxTunes.DB.SqlServer.dll
-FoxDb.SqlServer.dll
 FoxDb.SqlServer.2012.dll
+FoxDb.SqlServer.dll
+FoxTunes.DB.SqlServer.dll
+"
+
+TAGLIBMETADATA="
+FoxTunes.MetaData.TagLib.dll
+taglib-sharp.dll
 "
 
 SIMPLEMETADATA="
@@ -160,19 +172,29 @@ TOOLS="
 FoxTunes.Tools.dll
 "
 
+LOG4NET="
+"
+
+MINIMAL="
+bass
+js
+sqlite
+taglibmetadata
+"
+
 BUNDLED="
-windows
 asio
 cd
 dsd
 dts
-sox
-wasapi
-librarybrowser
-metadataeditor
 encoder
 eq
+librarybrowser
+metadataeditor
+sox
 tools
+wasapi
+windows
 "
 
 TAG=$(git describe --abbrev=0 --tags)
@@ -193,58 +215,27 @@ do
 
 	mkdir -p "./release/$target/Main"
 	mkdir -p "./release/$target/Main/lib"
-	mkdir -p "./release/$target/Main/lib/Addon"
 	mkdir -p "./release/$target/Plugins"
-	mkdir -p "./release/$target/Plugins/windows"
 	mkdir -p "./release/$target/Plugins/asio"
+	mkdir -p "./release/$target/Plugins/bass"
+	mkdir -p "./release/$target/Plugins/bass/addon"
 	mkdir -p "./release/$target/Plugins/cd"
 	mkdir -p "./release/$target/Plugins/dsd"
 	mkdir -p "./release/$target/Plugins/dts"
-	mkdir -p "./release/$target/Plugins/sox"
-	mkdir -p "./release/$target/Plugins/wasapi"
-	mkdir -p "./release/$target/Plugins/sqlserver"
-	mkdir -p "./release/$target/Plugins/simplemetadata"
-	mkdir -p "./release/$target/Plugins/librarybrowser"
-	mkdir -p "./release/$target/Plugins/metadataeditor"
 	mkdir -p "./release/$target/Plugins/encoder"
 	mkdir -p "./release/$target/Plugins/encoder/encoders"
 	mkdir -p "./release/$target/Plugins/eq"
+	mkdir -p "./release/$target/Plugins/js"
+	mkdir -p "./release/$target/Plugins/librarybrowser"
+	mkdir -p "./release/$target/Plugins/metadataeditor"
+	mkdir -p "./release/$target/Plugins/simplemetadata"
+	mkdir -p "./release/$target/Plugins/sox"
+	mkdir -p "./release/$target/Plugins/sqlite"
+	mkdir -p "./release/$target/Plugins/sqlserver"
+	mkdir -p "./release/$target/Plugins/taglibmetadata"
 	mkdir -p "./release/$target/Plugins/tools"
-
-	echo "Creating main package.."
-
-	for file in $ADDON
-	do
-		echo "$file"
-		cp "./distribution/$target/Addon/$file" "./release/$target/Main/lib/Addon"
-	done
-
-	for file in $LAUNCHER
-	do
-		echo "$file"
-		cp "./distribution/$target/$file" "./release/$target/Main"
-	done
-
-	for file in $LIB
-	do
-		if [ ! -f "./distribution/$target/$file" ]
-		then
-			echo "SKIPPING $file" 
-			continue
-		fi
-		echo "$file"
-		cp "./distribution/$target/$file" "./release/$target/Main/lib"
-	done
-
-	cd "./release/$target/Main"
-
-	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target-Minimal.zip" "*.*" -r
-
-	mv "./FoxTunes-$TAG-$target-Minimal.zip" "../../"
-
-	cd ..
-	cd ..
-	cd ..
+	mkdir -p "./release/$target/Plugins/wasapi"
+	mkdir -p "./release/$target/Plugins/windows"
 
 	echo "Creating plugins package.."
 
@@ -342,6 +333,36 @@ do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/tools"
     done
+	
+	for file in $JS
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/js"
+    done
+	
+	for file in $BASS
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/bass"
+    done
+	
+	for file in $ADDON
+	do
+		echo "$file"
+		cp "./distribution/$target/Addon/$file" "./release/$target/Plugins/bass/addon"
+	done
+	
+	for file in $SQLITE
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/sqlite"
+    done
+	
+	for file in $TAGLIBMETADATA
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/taglibmetadata"
+    done
 
 	cd "./release/$target/Plugins"
 
@@ -352,10 +373,46 @@ do
 	cd ..
 	cd ..
 	cd ..
+	
+	echo "Creating main package.."
+
+	for file in $LAUNCHER
+	do
+		echo "$file"
+		cp "./distribution/$target/$file" "./release/$target/Main"
+	done
+
+	for file in $LIB
+	do
+		if [ ! -f "./distribution/$target/$file" ]
+		then
+			echo "SKIPPING $file" 
+			continue
+		fi
+		echo "$file"
+		cp "./distribution/$target/$file" "./release/$target/Main/lib"
+	done
+	
+	for minimal in $MINIMAL
+	do
+		echo "Installing plugin (Minimal): $minimal"
+		mkdir -p "./release/$target/Main/lib/$minimal"
+		cp -r "./release/$target/Plugins/$minimal/"* "./release/$target/Main/lib/$minimal"
+	done
+
+	cd "./release/$target/Main"
+
+	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target-Minimal.zip" "*.*" -r
+
+	mv "./FoxTunes-$TAG-$target-Minimal.zip" "../../"
+
+	cd ..
+	cd ..
+	cd ..
 
 	for bundled in $BUNDLED
 	do
-		echo "Installing plugin: $bundled"
+		echo "Installing plugin (Bundled): $bundled"
 		mkdir -p "./release/$target/Main/lib/$bundled"
 		cp -r "./release/$target/Plugins/$bundled/"* "./release/$target/Main/lib/$bundled"
 	done
