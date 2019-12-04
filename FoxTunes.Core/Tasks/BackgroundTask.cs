@@ -466,6 +466,29 @@ namespace FoxTunes
             }
         }
 
+        public static async Task<bool> Complete(TimeSpan interval, TimeSpan timeout)
+        {
+            do
+            {
+                var instances = Active.ToArray();
+                if (instances.Length == 0)
+                {
+                    break;
+                }
+#if NET40
+                await TaskEx.Delay(interval);
+#else
+                await Task.Delay(interval);
+#endif
+                timeout -= interval;
+                if (timeout <= TimeSpan.Zero)
+                {
+                    return false;
+                }
+            } while (true);
+            return true;
+        }
+
         public static async Task<bool> Shutdown(TimeSpan interval, TimeSpan timeout)
         {
             OnShutdownStarted();

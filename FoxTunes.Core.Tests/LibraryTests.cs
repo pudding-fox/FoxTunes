@@ -93,6 +93,10 @@ namespace FoxTunes
                     var set = database.Set<LibraryHierarchy>(transaction);
                     foreach (var hierarchy in set)
                     {
+                        if (!hierarchy.Enabled)
+                        {
+                            continue;
+                        }
                         var nodes = this.Core.Components.LibraryHierarchyBrowser.GetNodes(hierarchy);
                         this.AssertLibraryHierarchy(hierarchy, nodes, fileNames);
                     }

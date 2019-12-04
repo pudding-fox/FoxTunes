@@ -12,7 +12,7 @@ CREATE TABLE [LibraryItems] (
 	[Id] INTEGER PRIMARY KEY NOT NULL, 
 	[DirectoryName] text NOT NULL COLLATE NOCASE, 
 	[FileName] text NOT NULL COLLATE NOCASE, 
-	[ImportDate] text NOT NULL,
+	[ImportDate] text NOT NULL COLLATE NOCASE,
 	[Favorite] bit NOT NULL,
 	[Status] INTEGER NOT NULL);
 
@@ -27,7 +27,7 @@ CREATE TABLE [PlaylistItems](
 CREATE TABLE [LibraryHierarchies] ( 
 	[Id] INTEGER PRIMARY KEY NOT NULL, 
 	[Sequence] INTEGER NOT NULL, 
-	[Name] TEXT NOT NULL,
+	[Name] TEXT NOT NULL COLLATE NOCASE,
 	[Type] bigint NOT NULL,
 	[Enabled] bit NOT NULL);
 
@@ -35,7 +35,7 @@ CREATE TABLE [LibraryHierarchyLevels] (
 	[Id]	INTEGER PRIMARY KEY NOT NULL,
 	[LibraryHierarchy_Id]  INTEGER NULL REFERENCES LibraryHierarchies([Id]),
 	[Sequence] INTEGER NOT NULL,
-	[Script]	TEXT NOT NULL);
+	[Script]	TEXT NOT NULL COLLATE NOCASE);
 
 CREATE TABLE [LibraryHierarchyItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
@@ -52,8 +52,8 @@ CREATE TABLE [PlaylistItem_MetaDataItem](
 CREATE TABLE [PlaylistColumns] ( 
   [Id] INTEGER PRIMARY KEY NOT NULL, 
   [Sequence] INTEGER NOT NULL, 
-  [Name] text NOT NULL, 
-  [Script] text NOT NULL,
+  [Name] text NOT NULL COLLATE NOCASE, 
+  [Script] text NOT NULL COLLATE NOCASE,
   [IsDynamic] INTEGER NOT NULL, 
   [Width] numeric(53,0) NULL);
 

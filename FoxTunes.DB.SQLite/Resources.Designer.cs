@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -80,17 +80,17 @@ namespace FoxTunes {
         ///	[Type] bigint NOT NULL,
         ///	[Value] text COLLATE NOCASE);
         ///
+        ///CREATE TABLE [LibraryRoots] (
+        ///	[Id] INTEGER PRIMARY KEY NOT NULL, 
+        ///	[DirectoryName] text NOT NULL COLLATE NOCASE);
+        ///
         ///CREATE TABLE [LibraryItems] (
         ///	[Id] INTEGER PRIMARY KEY NOT NULL, 
         ///	[DirectoryName] text NOT NULL COLLATE NOCASE, 
         ///	[FileName] text NOT NULL COLLATE NOCASE, 
-        ///	[ImportDate] text NOT NULL,
+        ///	[ImportDate] text NOT NULL COLLATE NOCASE,
         ///	[Favorite] bit NOT NULL,
-        ///	[Status] INTEGER NOT NULL);
-        ///
-        ///CREATE TABLE [PlaylistItems](
-        ///    [Id] INTEGER PRIMARY KEY NOT NULL, 
-        ///	[LibraryItem_Id] INTEGER NULL REFER [rest of string was truncated]&quot;;.
+        ///	[Sta [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {

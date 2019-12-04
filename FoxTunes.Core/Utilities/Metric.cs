@@ -1,47 +1,70 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FoxTunes
 {
     public class Metric
     {
-        public Metric(int capacity, long? @default = null)
+        private Metric()
+        {
+            this.Values = new LinkedList<int>();
+        }
+
+        public Metric(int capacity) : this()
         {
             this.Capacity = capacity;
-            this.Default = @default;
-            this.Reset();
         }
+
+        public LinkedList<int> Values { get; private set; }
 
         public int Capacity { get; private set; }
 
-        public long? Default { get; private set; }
-
-        private long?[] Measures { get; set; }
-
-        private int Position { get; set; }
-
-        public long Average(int value)
+        public int Average(int value)
         {
-            this.Measures[this.Position++] = value;
-            if (this.Position >= this.Measures.Length)
-            {
-                this.Position = 0;
-            }
+            this.Append(value);
             return this.Average();
         }
 
-        private long Average()
+        private int Average()
         {
-            return Convert.ToInt64(Math.Ceiling(this.Measures.Where(measure => measure.HasValue).Average(measure => measure.Value)));
+            return Convert.ToInt32(Math.Ceiling(this.Values.Average()));
         }
 
-        public void Reset()
+        public int Next(int value)
         {
-            this.Measures = new long?[this.Capacity];
-            for (var a = 0; a < this.Measures.Length; a++)
+            this.Append(value);
+            return this.Next();
+        }
+
+        private int Next()
+        {
+            var values = this.Values.ToArray();
+            switch (values.Length)
             {
-                this.Measures[a] = this.Default;
+                case 0:
+                    return 0;
+                case 1:
+                    return values[0];
             }
+            var difference = default(double);
+            for (var a = 0; a < values.Length - 1; a++)
+            {
+                var b = values[a];
+                var c = values[a + 1];
+                difference += c - b;
+            }
+            difference /= values.Length - 1;
+            return Convert.ToInt32(Math.Ceiling(values[values.Length - 1] + difference));
+        }
+
+        public virtual void Append(int value)
+        {
+            if (this.Values.Count >= this.Capacity)
+            {
+                this.Values.RemoveFirst();
+            }
+            this.Values.AddLast(value);
         }
     }
 }
