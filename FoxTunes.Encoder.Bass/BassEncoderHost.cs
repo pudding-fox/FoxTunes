@@ -33,7 +33,7 @@ namespace FoxTunes
 
         public static void Init()
         {
-            LoggingBehaviour.FILE_NAME = string.Format(
+            LogManager.FileName = string.Format(
                 "Log_Converter_{0}.txt",
                 DateTime.UtcNow.ToFileTime()
             );

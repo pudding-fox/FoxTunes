@@ -67,12 +67,14 @@ namespace FoxTunes
         {
             if (!this.PlaybackManager.IsSupported(fileName))
             {
+                Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
 #if NET40
                 return TaskEx.FromResult(false);
 #else
                 return Task.CompletedTask;
 #endif
             }
+            Logger.Write(this, LogLevel.Trace, "Adding file to library: {0}", fileName);
             var libraryItem = new LibraryItem()
             {
                 DirectoryName = Path.GetDirectoryName(fileName),
