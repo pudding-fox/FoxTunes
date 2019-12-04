@@ -12,8 +12,6 @@
 
         IScriptingRuntime ScriptingRuntime { get; }
 
-        ILogger Logger { get; }
-
         ISignalEmitter SignalEmitter { get; }
 
         ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; }

@@ -30,7 +30,6 @@ FoxDb.Sql.dll
 FoxTunes.Config.dll
 FoxTunes.Core.dll
 FoxTunes.DB.dll
-FoxTunes.Logging.dll
 FoxTunes.MetaData.dll
 FoxTunes.Output.dll
 FoxTunes.Scripting.dll
@@ -45,7 +44,6 @@ System.IO.dll
 System.Runtime.dll
 System.Threading.Tasks.dll
 System.Windows.Interactivity.dll
-log4net.dll
 msvcp100.dll
 msvcr100.dll
 "
@@ -172,7 +170,8 @@ TOOLS="
 FoxTunes.Tools.dll
 "
 
-LOG4NET="
+LOG="
+FoxTunes.Logging.dll
 "
 
 MINIMAL="
@@ -190,6 +189,7 @@ dts
 encoder
 eq
 librarybrowser
+logger
 metadataeditor
 sox
 tools
@@ -227,6 +227,7 @@ do
 	mkdir -p "./release/$target/Plugins/eq"
 	mkdir -p "./release/$target/Plugins/js"
 	mkdir -p "./release/$target/Plugins/librarybrowser"
+	mkdir -p "./release/$target/Plugins/logger"
 	mkdir -p "./release/$target/Plugins/metadataeditor"
 	mkdir -p "./release/$target/Plugins/simplemetadata"
 	mkdir -p "./release/$target/Plugins/sox"
@@ -362,6 +363,12 @@ do
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/taglibmetadata"
+    done
+
+	for file in $LOG
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/logger"
     done
 
 	cd "./release/$target/Plugins"

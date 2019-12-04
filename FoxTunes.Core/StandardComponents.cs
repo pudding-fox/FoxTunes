@@ -49,14 +49,6 @@ namespace FoxTunes
             }
         }
 
-        public ILogger Logger
-        {
-            get
-            {
-                return ComponentRegistry.Instance.GetComponent<ILogger>();
-            }
-        }
-
         public ISignalEmitter SignalEmitter
         {
             get

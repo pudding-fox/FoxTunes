@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -140,6 +141,7 @@ namespace FoxTunes
             this.Write(component.GetType(), level, message, args);
         }
 
+        [DebuggerNonUserCode]
         public void Write(Type type, LogLevel level, string message, params object[] args)
         {
             if (!this.Enabled || !this.Level.HasFlag(level))
@@ -151,19 +153,26 @@ namespace FoxTunes
                 //Failed to open the output file, nothing can be done.
                 return;
             }
-            if (!this.Semaphore.Wait(TIMEOUT))
-            {
-                //Timed out while entering lock, nothing can be done.
-                return;
-            }
             try
             {
-                this.Writer.Value.WriteLine(this.FormatMessage(type, level, message, args));
-                this.Writer.Value.Flush();
+                if (!this.Semaphore.Wait(TIMEOUT))
+                {
+                    //Timed out while entering lock, nothing can be done.
+                    return;
+                }
+                try
+                {
+                    this.Writer.Value.WriteLine(this.FormatMessage(type, level, message, args));
+                    this.Writer.Value.Flush();
+                }
+                finally
+                {
+                    this.Semaphore.Release();
+                }
             }
-            finally
+            catch
             {
-                this.Semaphore.Release();
+                //Nothing can be done, probably shutting down.
             }
         }
 
@@ -172,6 +181,7 @@ namespace FoxTunes
             return this.WriteAsync(component.GetType(), level, message, args);
         }
 
+        [DebuggerNonUserCode]
         public async Task WriteAsync(Type type, LogLevel level, string message, params object[] args)
         {
             if (!this.Enabled || !this.Level.HasFlag(level))
@@ -183,23 +193,30 @@ namespace FoxTunes
                 //Failed to open the output file, nothing can be done.
                 return;
             }
-#if NET40
-            if (!this.Semaphore.Wait(TIMEOUT))
-#else
-            if (!await this.Semaphore.WaitAsync(TIMEOUT))
-#endif
-            {
-                //Timed out while entering lock, nothing can be done.
-                return;
-            }
             try
             {
-                await this.Writer.Value.WriteLineAsync(this.FormatMessage(type, level, message, args));
-                await this.Writer.Value.FlushAsync();
+#if NET40
+                if (!this.Semaphore.Wait(TIMEOUT))
+#else
+                if (!await this.Semaphore.WaitAsync(TIMEOUT))
+#endif
+                {
+                    //Timed out while entering lock, nothing can be done.
+                    return;
+                }
+                try
+                {
+                    await this.Writer.Value.WriteLineAsync(this.FormatMessage(type, level, message, args));
+                    await this.Writer.Value.FlushAsync();
+                }
+                finally
+                {
+                    this.Semaphore.Release();
+                }
             }
-            finally
+            catch
             {
-                this.Semaphore.Release();
+                //Nothing can be done, probably shutting down.
             }
         }
 
