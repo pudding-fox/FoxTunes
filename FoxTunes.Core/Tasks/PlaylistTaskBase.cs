@@ -58,8 +58,8 @@ namespace FoxTunes
                  {
                      await this.AddOrUpdateMetaData(cancellationToken);
                      await this.UpdateVariousArtists();
-                     await this.SequenceItems();
                  }
+                 await this.SequenceItems();
                  await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
              }))
             {
