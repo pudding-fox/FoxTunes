@@ -7,6 +7,7 @@ namespace FoxTunes
     /// Interaction logic for MetaDataEditor.xaml
     /// </summary>
     [UIComponent("3D1B2C8E-DEAF-4689-B0C2-33AB3FD8F061", UIComponentSlots.BOTTOM_RIGHT, "Meta Data")]
+    [UIComponentDependency(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)]
     public partial class MetaDataEditor : UIComponentBase
     {
         public MetaDataEditor()

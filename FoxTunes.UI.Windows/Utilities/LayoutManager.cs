@@ -214,6 +214,43 @@ namespace FoxTunes
             return this.ActiveComponents.Any(component => string.Equals(component.AssemblyQualifiedName, type.AssemblyQualifiedName, StringComparison.OrdinalIgnoreCase));
         }
 
+        public bool IsComponentValid(Type type)
+        {
+            var attributes = default(IEnumerable<UIComponentDependencyAttribute>);
+            if (type.HasCustomAttributes<UIComponentDependencyAttribute>(false, out attributes))
+            {
+                foreach (var attribute in attributes)
+                {
+                    var element = this.Configuration.GetElement<BooleanConfigurationElement>(
+                        attribute.Section,
+                        attribute.Element
+                    );
+                    if (element == null || !element.Value)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public void ConnectComponentValid(UIComponentBase component)
+        {
+            var type = component.GetType();
+            var attributes = default(IEnumerable<UIComponentDependencyAttribute>);
+            if (type.HasCustomAttributes<UIComponentDependencyAttribute>(false, out attributes))
+            {
+                foreach (var attribute in attributes)
+                {
+                    var element = this.Configuration.GetElement<BooleanConfigurationElement>(
+                        attribute.Section,
+                        attribute.Element
+                    );
+                    element.ConnectValue(value => component.IsComponentValid = this.IsComponentValid(type));
+                }
+            }
+        }
+
         private Lazy<IEnumerable<UIComponent>> _Components { get; set; }
 
         public IEnumerable<UIComponent> Components

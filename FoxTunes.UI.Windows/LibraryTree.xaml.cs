@@ -11,6 +11,7 @@ namespace FoxTunes
     /// Interaction logic for LibraryTree.xaml
     /// </summary>
     [UIComponent("86276AD4-3962-4659-A00F-95065CD92117", UIComponentSlots.TOP_LEFT, "Library Tree")]
+    [UIComponentDependency(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)]
     public partial class LibraryTree : UIComponentBase
     {
         const int EXPAND_ALL_LIMIT = 5;
