@@ -34,8 +34,8 @@ namespace FoxTunes
                     this.Timer.AutoReset = false;
                     this.Timer.Elapsed += this.OnElapsed;
                 }
-                this.CountMetric = new Metric(10);
-                this.SecondsMetric = new Metric(10);
+                this.CountMetric = new Metric(1000);
+                this.SecondsMetric = new Metric(1000);
             }
         }
 
@@ -259,21 +259,28 @@ namespace FoxTunes
             var seconds = this.SecondsMetric.Next(
                 (this.Count - this.Position) / this.CountMetric.Average(count)
             );
-            var time = TimeSpan.FromSeconds(seconds);
-            var elements = new List<string>();
-            if (time.Hours > 0)
+            if (seconds > 0)
             {
-                elements.Add(string.Format("{0} hours", time.Hours));
+                var time = TimeSpan.FromSeconds(seconds);
+                var elements = new List<string>();
+                if (time.Hours > 0)
+                {
+                    elements.Add(string.Format("{0} hours", time.Hours));
+                }
+                if (time.Minutes > 0)
+                {
+                    elements.Add(string.Format("{0} minutes", time.Minutes));
+                }
+                if (time.Seconds > 0)
+                {
+                    elements.Add(string.Format("{0} seconds", time.Seconds));
+                }
+                return string.Join(", ", elements);
             }
-            if (time.Minutes > 0)
+            else
             {
-                elements.Add(string.Format("{0} minutes", time.Minutes));
+                return "now";
             }
-            if (time.Seconds > 0)
-            {
-                elements.Add(string.Format("{0} seconds", time.Seconds));
-            }
-            return string.Join(", ", elements);
         }
     }
 }

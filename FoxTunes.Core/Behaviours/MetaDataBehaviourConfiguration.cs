@@ -35,7 +35,7 @@ namespace FoxTunes
                 .WithElement(
                     new TextConfigurationElement(LOOSE_IMAGES_BACK, "Back Cover").WithValue("back"))
                 .WithElement(
-                    new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images").WithValue(false))
+                    new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images").WithValue(true))
                 .WithElement(
                     new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32))
             );
