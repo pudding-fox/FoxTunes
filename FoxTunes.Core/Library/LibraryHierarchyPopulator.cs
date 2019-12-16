@@ -13,8 +13,6 @@ namespace FoxTunes
 {
     public class LibraryHierarchyPopulator : PopulatorBase
     {
-        public readonly object SyncRoot = new object();
-
         public LibraryHierarchyPopulator(IDatabaseComponent database, bool reportProgress, ITransactionSource transaction)
             : base(reportProgress)
         {

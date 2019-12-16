@@ -232,6 +232,14 @@ namespace FoxTunes
 
         public virtual Task LoadMetaDatasAsync(ICollectionLoader<MetaDataItem> collectionLoader)
         {
+            if (this.IsMetaDatasLoaded)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             return collectionLoader.Load(
                 this.GetMetaDatas,
                 metaDatas =>
