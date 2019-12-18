@@ -27,14 +27,11 @@ LIB="
 FoxDb.Core.dll
 FoxDb.Linq.dll
 FoxDb.Sql.dll
-FoxTunes.Config.dll
 FoxTunes.Core.dll
 FoxTunes.DB.dll
 FoxTunes.MetaData.dll
 FoxTunes.Output.dll
 FoxTunes.Scripting.dll
-FoxTunes.UI.Windows.Themes.dll
-FoxTunes.UI.Windows.dll
 FoxTunes.UI.dll
 Microsoft.Threading.Tasks.Extensions.Desktop.dll
 Microsoft.Threading.Tasks.Extensions.dll
@@ -44,6 +41,15 @@ System.IO.dll
 System.Runtime.dll
 System.Threading.Tasks.dll
 System.Windows.Interactivity.dll
+"
+
+CONF="
+FoxTunes.Config.dll
+"
+
+WPF="
+FoxTunes.UI.Windows.Themes.dll
+FoxTunes.UI.Windows.dll
 "
 
 BASS="
@@ -176,9 +182,11 @@ FoxTunes.Logging.dll
 
 MINIMAL="
 bass
+conf
 js
 sqlite
 taglibmetadata
+wpf
 "
 
 BUNDLED="
@@ -220,6 +228,7 @@ do
 	mkdir -p "./release/$target/Plugins/bass"
 	mkdir -p "./release/$target/Plugins/bass/addon"
 	mkdir -p "./release/$target/Plugins/cd"
+	mkdir -p "./release/$target/Plugins/conf"
 	mkdir -p "./release/$target/Plugins/dsd"
 	mkdir -p "./release/$target/Plugins/dts"
 	mkdir -p "./release/$target/Plugins/encoder"
@@ -237,9 +246,12 @@ do
 	mkdir -p "./release/$target/Plugins/tools"
 	mkdir -p "./release/$target/Plugins/wasapi"
 	mkdir -p "./release/$target/Plugins/windows"
+	mkdir -p "./release/$target/Plugins/wpf"
 
 	echo "Creating plugins package.."
+	echo
 
+	echo "Creating plugin: windows"
 	for file in $WINDOWS
 	do
 		if [ ! -f "./distribution/$target/$file" ]
@@ -250,126 +262,183 @@ do
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/windows"
 	done
+	echo
 
+	echo "Creating plugin: asio"
 	for file in $ASIO
 	do
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/asio"
 	done
+	echo
 
+	echo "Creating plugin: cd"
 	for file in $CD
 	do
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/cd"
 	done
+	echo
 
+	echo "Creating plugin: dsd"
 	for file in $DSD
 	do
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/dsd"
 	done
+	echo
 
+	echo "Creating plugin: dts"
 	for file in $DTS
 	do
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/dts"
 	done
+	echo
 
+	echo "Creating plugin: sox"
 	for file in $SOX
 	do
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/sox"
 	done
+	echo
 
+	echo "Creating plugin: wasapi"
 	for file in $WASAPI
 	do
 		echo $file
 		cp "./distribution/$target/$file" "./release/$target/Plugins/wasapi"
 	done
+	echo
 
+	echo "Creating plugin: sqlserver"
 	for file in $SQLSERVER
 	do
 			echo $file
 			cp "./distribution/$target/$file" "./release/$target/Plugins/sqlserver"
 	done
+	echo
 
+	echo "Creating plugin: simplemetadata"
 	for file in $SIMPLEMETADATA
 	do
 			echo $file
 			cp "./distribution/$target/$file" "./release/$target/Plugins/simplemetadata"
 	done
+	echo
 
+	echo "Creating plugin: librarybrowser"
 	for file in $LIBRARYBROWSER
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/librarybrowser"
     done
+	echo
 
+	echo "Creating plugin: metadataeditor"
 	for file in $METADATAEDITOR
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/metadataeditor"
     done
+	echo
 
+	echo "Creating plugin: encoder"
 	for file in $ENCODER
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/encoder"
     done
+	echo
 
+	echo "Installing encoders (bass)"
 	for file in $ENCODERS
     do
             echo $file
             cp "./distribution/$target/Encoders/$file" "./release/$target/Plugins/encoder/encoders"
     done
+	echo
 
+	echo "Creating plugin: eq"
     for file in $EQ
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/eq"
     done
+	echo
 
+	echo "Creating plugin: tools"
 	for file in $TOOLS
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/tools"
     done
+	echo
 	
+	echo "Creating plugin: js"
 	for file in $JS
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/js"
     done
+	echo
 	
+	echo "Creating plugin: bass"
 	for file in $BASS
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/bass"
     done
+	echo
 	
+	echo "Installing addons (bass)"
 	for file in $ADDON
 	do
 		echo "$file"
 		cp "./distribution/$target/Addon/$file" "./release/$target/Plugins/bass/addon"
 	done
+	echo
 	
+	echo "Creating plugin: sqlite"
 	for file in $SQLITE
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/sqlite"
     done
+	echo
 	
+	echo "Creating plugin: taglibmetadata"
 	for file in $TAGLIBMETADATA
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/taglibmetadata"
     done
+	echo
 
+	echo "Creating plugin: logger"
 	for file in $LOG
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/logger"
     done
+	echo
+
+	echo "Creating plugin: conf"
+	for file in $CONF
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/conf"
+    done
+	echo
+
+	echo "Creating plugin: wpf"
+	for file in $WPF
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/wpf"
+    done
+	echo
 
 	cd "./release/$target/Plugins"
 
@@ -441,6 +510,7 @@ do
 	cd ..
 
 done
+echo
 
 echo "All done."
 
