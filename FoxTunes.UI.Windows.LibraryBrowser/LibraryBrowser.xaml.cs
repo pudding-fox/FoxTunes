@@ -50,12 +50,16 @@ namespace FoxTunes
 
         protected virtual void FixFocus()
         {
-            if (!this.IsKeyboardFocusWithin)
+            if (!this.ItemsControl.IsKeyboardFocusWithin)
             {
                 return;
             }
             Keyboard.ClearFocus();
             var container = this.ItemsControl.ItemContainerGenerator.ContainerFromIndex(this.ItemsControl.Items.Count - 1) as ContentPresenter;
+            if (container == null)
+            {
+                return;
+            }
             var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
             this.FixFocus(listBox);
         }
