@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Windows;
 
@@ -11,7 +12,7 @@ namespace FoxTunes
         public const string ID = "392B2FEE-B1E5-4776-AF3A-C28260EE8E81";
 
         public SystemTheme()
-            : base(ID, "System")
+            : base(ID, "System", releaseType: ReleaseType.Minimal)
         {
             this.ResourceDictionary = new Lazy<ResourceDictionary>(() => new ResourceDictionary()
             {

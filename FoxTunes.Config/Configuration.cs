@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -19,6 +20,34 @@ namespace FoxTunes
         public Configuration()
         {
             this.Load();
+        }
+
+        private static readonly Lazy<ReleaseType> _ReleaseType = new Lazy<ReleaseType>(() =>
+        {
+            try
+            {
+                var value = ConfigurationManager.AppSettings.Get("ReleaseType");
+                var result = default(ReleaseType);
+                if (string.IsNullOrEmpty(value) || !Enum.TryParse<ReleaseType>(value, out result))
+                {
+                    Logger.Write(typeof(Configuration), LogLevel.Error, "Failed to parse the release type \"{0}\", falling back to default.", value);
+                    return ReleaseType.Default;
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(Configuration), LogLevel.Error, "Failed to read the release type, falling back to default: {0}", e.Message);
+                return ReleaseType.Default;
+            }
+        });
+
+        public ReleaseType ReleaseType
+        {
+            get
+            {
+                return _ReleaseType.Value;
+            }
         }
 
         public ObservableCollection<ConfigurationSection> Sections { get; private set; }

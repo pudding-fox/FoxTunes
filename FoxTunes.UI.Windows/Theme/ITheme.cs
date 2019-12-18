@@ -11,6 +11,8 @@ namespace FoxTunes
 
         string Description { get; }
 
+        ReleaseType ReleaseType { get; }
+
         Stream ArtworkPlaceholder { get; }
 
         void Enable();
