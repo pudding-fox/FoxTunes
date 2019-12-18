@@ -31,8 +31,6 @@ namespace FoxTunes
 
         public const string EXTEND_GLASS_ELEMENT = "LLLL7881-D4F6-484C-8E4E-E3CD5802F8B5";
 
-        public const string SEARCH_INTERVAL_ELEMENT = "MMMM2482-0BD0-46A9-A110-C9835331F11B";
-
         public const string SHOW_CURSOR_ADORNERS = "NNNN7E23-A1E4-4BB6-9291-B553F4F7AD12";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -61,8 +59,6 @@ namespace FoxTunes
                     new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
                 .WithElement(
                     new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, "Extend Glass").WithValue(false))
-                .WithElement(
-                    new IntegerConfigurationElement(SEARCH_INTERVAL_ELEMENT, "Search Interval", path: "Advanced").WithValue(1000).WithValidationRule(new IntegerValidationRule(100, 1000, 100)))
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS, "Show Cursor Adorners", path: "Advanced").WithValue(releaseType == ReleaseType.Default)
             );

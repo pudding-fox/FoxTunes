@@ -85,12 +85,21 @@ namespace FoxTunes
             searchBox.OnIntervalChanged();
         }
 
+        public static readonly RoutedEvent CommitEvent = EventManager.RegisterRoutedEvent(
+            "Commit",
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(SearchBox)
+        );
+
         public SearchBox()
         {
             InitializeComponent();
         }
 
         private DispatcherTimer Timer { get; set; }
+
+        private bool IsCommitting { get; set; }
 
         public string Text
         {
@@ -151,6 +160,18 @@ namespace FoxTunes
             }
         }
 
+        public event RoutedEventHandler Commit
+        {
+            add
+            {
+                this.AddHandler(CommitEvent, value);
+            }
+            remove
+            {
+                this.RemoveHandler(CommitEvent, value);
+            }
+        }
+
         protected virtual void OnTimerTick(object sender, EventArgs e)
         {
             if (this.Timer != null)
@@ -158,6 +179,11 @@ namespace FoxTunes
                 this.Timer.Stop();
             }
             this.SearchText = this.Text;
+            if (this.IsCommitting)
+            {
+                this.IsCommitting = false;
+                this.OnCommit();
+            }
         }
 
         public ICommand ClearCommand
@@ -176,6 +202,22 @@ namespace FoxTunes
             }
             this.Text = string.Empty;
             this.SearchText = string.Empty;
+        }
+
+        protected virtual void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Return:
+                    this.IsCommitting = true;
+                    this.OnTimerTick(this.Timer, EventArgs.Empty);
+                    break;
+            }
+        }
+
+        protected virtual void OnCommit()
+        {
+            this.RaiseEvent(new RoutedEventArgs(CommitEvent));
         }
     }
 }
