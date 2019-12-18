@@ -24,6 +24,20 @@ namespace FoxTunes
             this.Contexts = new ThreadLocal<IScriptingContext>(true);
 #endif
             this.Writer = new LibraryHierarchyWriter(this.Database, this.Transaction);
+            this.Roots = new Lazy<IEnumerable<string>>(() =>
+            {
+                var roots = this.Database.Set<LibraryRoot>(transaction).Select(
+                    libraryRoot => libraryRoot.DirectoryName
+                ).ToArray();
+                //If there is more than one root then we will create a node for each root.
+                if (roots.Length > 1)
+                {
+                    roots = roots.Select(
+                        root => Path.GetDirectoryName(root)
+                    ).ToArray();
+                }
+                return roots;
+            });
         }
 
         public IDatabaseComponent Database { get; private set; }
@@ -39,6 +53,8 @@ namespace FoxTunes
 #endif
 
         private LibraryHierarchyWriter Writer { get; set; }
+
+        public Lazy<IEnumerable<string>> Roots { get; private set; }
 
         public string Current { get; private set; }
 
@@ -101,8 +117,6 @@ namespace FoxTunes
                     }
                 }, cancellationToken, this.ParallelOptions);
             }
-
-            await this.Cleanup(libraryHierarchies);
         }
 
         private async Task Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel[] libraryHierarchyLevels)
@@ -209,11 +223,13 @@ namespace FoxTunes
 
         private string[] GetPathSegments(IDatabaseReaderRecord record)
         {
-            var fileName = record.Get<string>("FileName");
-            return fileName.Split(
+            var value = record.Get<string>("FileName");
+            var normalized = value.Replace(this.Roots.Value, string.Empty, true, true);
+            var segments = normalized.Split(
                 new[] { Path.DirectorySeparatorChar.ToString() },
                 StringSplitOptions.RemoveEmptyEntries
-            ).Skip(1).ToArray();
+            ).ToArray();
+            return segments;
         }
 
         private IScriptingContext GetOrAddContext()
@@ -223,33 +239,6 @@ namespace FoxTunes
                 return this.Contexts.Value;
             }
             return this.Contexts.Value = this.ScriptingRuntime.CreateContext();
-        }
-
-        private async Task Cleanup(IEnumerable<LibraryHierarchy> libraryHierarchies)
-        {
-            foreach (var libraryHierarchy in libraryHierarchies)
-            {
-                switch (libraryHierarchy.Type)
-                {
-                    case LibraryHierarchyType.FileSystem:
-                        await this.Cleanup(libraryHierarchy);
-                        break;
-                }
-            }
-        }
-
-        private Task Cleanup(LibraryHierarchy libraryHierarchy)
-        {
-            return this.Database.ExecuteAsync(
-                this.Database.Queries.CleanupLibraryHierarchyNodes, (parameters, phase) =>
-                {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["libraryHierarchyId"] = libraryHierarchy.Id;
-                            break;
-                    }
-                }, this.Transaction);
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)

@@ -88,17 +88,6 @@ namespace FoxTunes
 
         public abstract IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
 
-        public IDatabaseQuery CleanupLibraryHierarchyNodes
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.CleanupLibraryHierarchyNodes,
-                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
-
         public IDatabaseQuery ClearLibraryMetaDataItems
         {
             get
