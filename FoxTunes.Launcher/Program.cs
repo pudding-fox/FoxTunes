@@ -11,6 +11,7 @@ namespace FoxTunes.Launcher
 
         static Program()
         {
+            AssemblyResolver.Instance.EnableExecution();
             AssemblyResolver.Instance.EnableReflectionOnly();
         }
 
