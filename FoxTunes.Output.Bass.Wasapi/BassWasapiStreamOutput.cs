@@ -29,7 +29,19 @@ namespace FoxTunes
             : this()
         {
             this.Behaviour = behaviour;
-            this.Rate = behaviour.Output.Rate;
+            if (behaviour.Output.Rate == stream.Rate)
+            {
+                this.Rate = stream.Rate;
+            }
+            else if (!behaviour.Output.EnforceRate && BassWasapiDevice.Info.SupportedRates.Contains(stream.Rate))
+            {
+                this.Rate = stream.Rate;
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "The requested output rate is either enforced or the device does not support the stream's rate: {0} => {1}", stream.Rate, behaviour.Output.Rate);
+                this.Rate = behaviour.Output.Rate;
+            }
             this.Channels = BassWasapiDevice.Info.Outputs;
             //WASAPI requires BASS_SAMPLE_FLOAT so don't bother respecting the output's Float setting.
             this.Flags = BassFlags.Decode | BassFlags.Float;
@@ -85,16 +97,24 @@ namespace FoxTunes
         public override void Connect(IBassStreamComponent previous)
         {
             this.ConfigureWASAPI(previous);
-            Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
-            this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
-            if (this.ChannelHandle == 0)
+            if (this.ShouldCreateMixer(previous))
             {
-                BassUtils.Throw();
+                Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
+                this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
+                if (this.ChannelHandle == 0)
+                {
+                    BassUtils.Throw();
+                }
+                Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
+                BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
+                BassUtils.OK(BassWasapiHandler.StreamSet(this.ChannelHandle));
+                this.MixerChannelHandles.Add(previous.ChannelHandle);
             }
-            Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
-            BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
-            BassUtils.OK(BassWasapiHandler.StreamSet(this.ChannelHandle));
-            this.MixerChannelHandles.Add(previous.ChannelHandle);
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
+                BassUtils.OK(BassWasapiHandler.StreamSet(previous.ChannelHandle));
+            }
         }
 
         protected virtual void ConfigureWASAPI(IBassStreamComponent previous)
@@ -151,6 +171,27 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Stopping WASAPI.");
             BassUtils.OK(BassWasapi.Stop(reset));
             return true;
+        }
+
+        protected virtual bool ShouldCreateMixer(IBassStreamComponent previous)
+        {
+            if (this.Behaviour.Mixer)
+            {
+                //Mixer is forced on, probably so visualizations work.
+                return true;
+            }
+            else if (previous.Rate != this.Rate || previous.Channels != this.Channels)
+            {
+                //Stream rate or channel count differs from device.
+                return true;
+            }
+            else if (!previous.Flags.HasFlag(BassFlags.Float))
+            {
+                //WASAPI is always 32 bit.
+                return true;
+            }
+            //Looks like no mixer is required.
+            return false;
         }
 
         public override bool IsPlaying
