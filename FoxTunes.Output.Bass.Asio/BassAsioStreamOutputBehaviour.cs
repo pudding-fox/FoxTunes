@@ -119,10 +119,15 @@ namespace FoxTunes
                 return;
             }
             BassAsioDevice.Init(this.AsioDevice);
-            if (!BassAsioDevice.Info.SupportedRates.Contains(this.Output.Rate))
+            if (this.Output.EnforceRate && !BassAsioDevice.Info.SupportedRates.Contains(this.Output.Rate))
             {
-                Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device.", this.Output.Rate);
-                throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device.", this.Output.Rate));
+                var supportedRates = string.Join(
+                    ", ",
+                    BassAsioDevice.Info.SupportedRates
+                );
+                Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates);
+                BassAsioDevice.Free();
+                throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates));
             }
         }
 
