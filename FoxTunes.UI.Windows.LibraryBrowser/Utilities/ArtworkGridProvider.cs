@@ -11,6 +11,8 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ArtworkGridProvider : StandardComponent
     {
+        const int TIMEOUT = 1000;
+
         const double DPIX = 96;
 
         const double DPIY = 96;
@@ -38,7 +40,9 @@ namespace FoxTunes
             {
                 return this.ImageLoader.Load(fileName);
             }
-            using (KeyLock.Lock(id))
+            //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
+            //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
+            using (KeyLock.Lock(id, TIMEOUT, false))
             {
                 if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
                 {
