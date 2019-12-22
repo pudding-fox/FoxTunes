@@ -39,34 +39,44 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Save)
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                var command = CommandFactory.Instance.CreateCommand(
+                    new Func<Task>(this.Save)
+                );
+                command.Tag = CommandHints.DISMISS;
+                return command;
             }
         }
 
-        public void Save()
+        public async Task Save()
         {
+            var exception = default(Exception);
             try
             {
                 using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
-                        var playlistColumns = database.Set<PlaylistColumn>(transaction);
-                        playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns.ItemsSource));
-                        playlistColumns.AddOrUpdate(this.PlaylistColumns.ItemsSource);
-                        transaction.Commit();
+                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                        {
+                            var playlistColumns = database.Set<PlaylistColumn>(transaction);
+                            playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns.ItemsSource));
+                            playlistColumns.AddOrUpdate(this.PlaylistColumns.ItemsSource);
+                            transaction.Commit();
+                        }
+                    }))
+                    {
+                        await task.Run();
                     }
                 }
-                this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
+                return;
             }
             catch (Exception e)
             {
-                this.OnError("Save", e);
-                throw;
+                exception = e;
             }
+            await this.OnError("Save", exception);
+            throw exception;
         }
 
         public ICommand CancelCommand
@@ -89,17 +99,29 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Reset);
+                return CommandFactory.Instance.CreateCommand(this.Reset);
             }
         }
 
-        public void Reset()
+        public async Task Reset()
         {
             using (var database = this.DatabaseFactory.Create())
             {
-                PlaylistManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+                using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
+                {
+                    PlaylistManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }))
+                {
+                    await task.Run();
+                }
             }
-            var task = this.Refresh();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
+            await this.Refresh();
         }
 
         public override void InitializeComponent(ICore core)

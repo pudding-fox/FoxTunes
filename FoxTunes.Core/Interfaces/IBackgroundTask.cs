@@ -3,15 +3,11 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IBackgroundTask : IBaseComponent, IReportsProgress, IDisposable
+    public interface IBackgroundTask : IBaseComponent, IReportsProgress, ICancellable, IDisposable
     {
         string Id { get; }
 
         bool Visible { get; }
-
-        bool IsCancellationRequested { get; }
-
-        event EventHandler CancellationRequested;
 
         event AsyncEventHandler Started;
 
