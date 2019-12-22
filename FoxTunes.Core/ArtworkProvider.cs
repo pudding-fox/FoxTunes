@@ -90,7 +90,7 @@ namespace FoxTunes
             {
                 foreach (var name in names)
                 {
-                    foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name), SearchOption.TopDirectoryOnly))
+                    foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name), FileSystemHelper.SearchOption.None))
                     {
                         var info = new FileInfo(fileName);
                         if (!EXTENSIONS.Contains(info.Extension, true))
