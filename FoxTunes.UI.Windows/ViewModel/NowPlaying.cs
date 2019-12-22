@@ -147,9 +147,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ValueChanged;
 
-        private object _IsBuffering { get; set; }
+        private bool _IsBuffering { get; set; }
 
-        public object IsBuffering
+        public bool IsBuffering
         {
             get
             {

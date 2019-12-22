@@ -1,12 +1,19 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
     public abstract class CommandBase : ICommand
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public string Tag { get; set; }
 
         public abstract bool CanExecute(object parameter);
@@ -77,6 +84,7 @@ namespace FoxTunes.ViewModel
     {
         None = 0,
         Before = 1,
-        After = 2
+        After = 2,
+        Error = 4
     }
 }

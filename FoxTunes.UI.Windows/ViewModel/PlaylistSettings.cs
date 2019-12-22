@@ -35,6 +35,32 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("PlaylistColumns");
         }
 
+        private bool _IsSaving { get; set; }
+
+        public bool IsSaving
+        {
+            get
+            {
+                return this._IsSaving;
+            }
+            set
+            {
+                this._IsSaving = value;
+                this.OnIsSavingChanged();
+            }
+        }
+
+        protected virtual void OnIsSavingChanged()
+        {
+            if (this.IsSavingChanged != null)
+            {
+                this.IsSavingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsSaving");
+        }
+
+        public event EventHandler IsSavingChanged;
+
         public ICommand SaveCommand
         {
             get
@@ -52,9 +78,10 @@ namespace FoxTunes.ViewModel
             var exception = default(Exception);
             try
             {
+                await Windows.Invoke(() => this.IsSaving = true);
                 using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                     {
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
@@ -63,6 +90,11 @@ namespace FoxTunes.ViewModel
                             playlistColumns.AddOrUpdate(this.PlaylistColumns.ItemsSource);
                             transaction.Commit();
                         }
+#if NET40
+                        return TaskEx.FromResult(false);
+#else
+                        return Task.CompletedTask;
+#endif
                     }))
                     {
                         await task.Run();
@@ -74,6 +106,10 @@ namespace FoxTunes.ViewModel
             catch (Exception e)
             {
                 exception = e;
+            }
+            finally
+            {
+                await Windows.Invoke(() => this.IsSaving = false);
             }
             await this.OnError("Save", exception);
             throw exception;
@@ -105,23 +141,31 @@ namespace FoxTunes.ViewModel
 
         public async Task Reset()
         {
-            using (var database = this.DatabaseFactory.Create())
+            await Windows.Invoke(() => this.IsSaving = true);
+            try
             {
-                using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    PlaylistManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
+                    {
+                        PlaylistManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
 #if NET40
-                    return TaskEx.FromResult(false);
+                        return TaskEx.FromResult(false);
 #else
-                    return Task.CompletedTask;
+                        return Task.CompletedTask;
 #endif
-                }))
-                {
-                    await task.Run();
+                    }))
+                    {
+                        await task.Run();
+                    }
                 }
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
+                await this.Refresh();
             }
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
-            await this.Refresh();
+            finally
+            {
+                await Windows.Invoke(() => this.IsSaving = false);
+            }
         }
 
         public override void InitializeComponent(ICore core)
