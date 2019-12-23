@@ -13,9 +13,13 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ImageLoader : StandardComponent, IConfigurableComponent
     {
+        const int CACHE_SIZE = 128;
+
         const int TIMEOUT = 1000;
 
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
+
+        private static readonly Cache Store = new Cache(CACHE_SIZE);
 
         public IConfiguration Configuration { get; private set; }
 
@@ -42,6 +46,18 @@ namespace FoxTunes
         }
 
         public ImageSource Load(string prefix, string id, string fileName, int width, int height)
+        {
+            var imageSource = default(Lazy<ImageSource>);
+            if (Store.TryGetValue(prefix, fileName, width, height, out imageSource))
+            {
+                return imageSource.Value;
+            }
+            Store.Add(prefix, fileName, width, height, new Lazy<ImageSource>(() => this.LoadCore(prefix, id, fileName, width, height)));
+            //Second iteration will always hit cache.
+            return this.Load(prefix, id, fileName, width, height);
+        }
+
+        private ImageSource LoadCore(string prefix, string id, string fileName, int width, int height)
         {
             try
             {
@@ -179,6 +195,122 @@ namespace FoxTunes
             using (var image = factory())
             {
                 graphics.DrawImage(image, new Rectangle(0, 0, width, height));
+            }
+        }
+
+        public class Cache
+        {
+            public Cache(int capacity)
+            {
+                this.Store = new CappedDictionary<Key, Lazy<ImageSource>>(capacity);
+            }
+
+            public CappedDictionary<Key, Lazy<ImageSource>> Store { get; private set; }
+
+            public void Add(string prefix, string fileName, int width, int height, Lazy<ImageSource> imageSource)
+            {
+                var key = new Key(prefix, fileName, width, height);
+                this.Store.Add(key, imageSource);
+            }
+
+            public bool TryGetValue(string prefix, string fileName, int width, int height, out Lazy<ImageSource> imageSource)
+            {
+                var key = new Key(prefix, fileName, width, height);
+                return this.Store.TryGetValue(key, out imageSource);
+            }
+
+            public class Key : IEquatable<Key>
+            {
+                public Key(string prefix, string fileName, int width, int height)
+                {
+                    this.Prefix = prefix;
+                    this.FileName = fileName;
+                    this.Width = width;
+                    this.Height = height;
+                }
+
+                public string Prefix { get; private set; }
+
+                public string FileName { get; private set; }
+
+                public int Width { get; private set; }
+
+                public int Height { get; private set; }
+
+                public virtual bool Equals(Key other)
+                {
+                    if (other == null)
+                    {
+                        return false;
+                    }
+                    if (object.ReferenceEquals(this, other))
+                    {
+                        return true;
+                    }
+                    if (!string.Equals(this.Prefix, other.Prefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                    if (!string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                    if (this.Width != other.Width)
+                    {
+                        return false;
+                    }
+                    if (this.Height != other.Height)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+
+                public override bool Equals(object obj)
+                {
+                    return this.Equals(obj as Key);
+                }
+
+                public override int GetHashCode()
+                {
+                    var hashCode = default(int);
+                    unchecked
+                    {
+                        if (!string.IsNullOrEmpty(this.Prefix))
+                        {
+                            hashCode += this.Prefix.ToLower().GetHashCode();
+                        }
+                        if (!string.IsNullOrEmpty(this.FileName))
+                        {
+                            hashCode += this.FileName.ToLower().GetHashCode();
+                        }
+                        hashCode += this.Width.GetHashCode();
+                        hashCode += this.Height.GetHashCode();
+                    }
+                    return hashCode;
+                }
+
+                public static bool operator ==(Key a, Key b)
+                {
+                    if ((object)a == null && (object)b == null)
+                    {
+                        return true;
+                    }
+                    if ((object)a == null || (object)b == null)
+                    {
+                        return false;
+                    }
+                    if (object.ReferenceEquals((object)a, (object)b))
+                    {
+                        return true;
+                    }
+                    return a.Equals(b);
+                }
+
+                public static bool operator !=(Key a, Key b)
+                {
+                    return !(a == b);
+                }
             }
         }
     }

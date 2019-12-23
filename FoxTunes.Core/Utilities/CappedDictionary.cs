@@ -32,7 +32,7 @@ namespace FoxTunes
         public bool TryGetValue(TKey key, out TValue value)
         {
             var result = this.Store.TryGetValue(key, out value);
-            if (result && this.Keys.Count >= this.Capacity)
+            if (result && this.Keys.Count >= (this.Capacity - 1))
             {
                 //When a cache hit occurs, push the key to the back of queue.
                 this.Keys.Remove(key);
@@ -43,6 +43,8 @@ namespace FoxTunes
 
         public class Queue
         {
+            public readonly object SyncRoot = new object();
+
             public Queue(int capacity)
             {
                 this.Values = new List<TKey>(capacity);
@@ -52,19 +54,28 @@ namespace FoxTunes
 
             public void Enqueue(TKey value)
             {
-                this.Values.Add(value);
+                lock (this.SyncRoot)
+                {
+                    this.Values.Add(value);
+                }
             }
 
             public void Remove(TKey value)
             {
-                this.Values.Remove(value);
+                lock (this.SyncRoot)
+                {
+                    this.Values.Remove(value);
+                }
             }
 
             public TKey Dequeue()
             {
-                var value = this.Values[0];
-                this.Values.RemoveAt(0);
-                return value;
+                lock (this.SyncRoot)
+                {
+                    var value = this.Values[0];
+                    this.Values.RemoveAt(0);
+                    return value;
+                }
             }
 
             public int Count

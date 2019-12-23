@@ -247,10 +247,10 @@ namespace FoxTunes
                     }
                     libraryHierarchyNode = libraryHierarchyNode.Parent;
                 } while (libraryHierarchyNode != null);
+                hashCode = (hashCode * 29) + width.GetHashCode();
+                hashCode = (hashCode * 29) + height.GetHashCode();
             }
-            hashCode += width.GetHashCode();
-            hashCode += height.GetHashCode();
-            return hashCode.ToString();
+            return Math.Abs(hashCode).ToString();
         }
 
         public void Clear()
