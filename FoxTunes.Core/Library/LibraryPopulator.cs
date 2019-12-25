@@ -3,6 +3,7 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -25,6 +26,8 @@ namespace FoxTunes
         public ITransactionSource Transaction { get; private set; }
 
         public string Current { get; private set; }
+
+        private volatile int position = 0;
 
         public async Task Populate(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
@@ -52,6 +55,7 @@ namespace FoxTunes
                             if (success && this.ReportProgress)
                             {
                                 this.Current = fileName;
+                                Interlocked.Increment(ref this.position);
                             }
                         }
                     }
@@ -61,6 +65,7 @@ namespace FoxTunes
                         if (success && this.ReportProgress)
                         {
                             this.Current = path;
+                            Interlocked.Increment(ref this.position);
                         }
                     }
                 }
@@ -88,9 +93,16 @@ namespace FoxTunes
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            if (this.Current != null)
+            var position = Interlocked.Exchange(ref this.position, 0);
+            if (position != 0)
             {
-                await this.SetDescription(new FileInfo(this.Current).Name);
+                //Interval is fixed at 100ms.
+                position *= 10;
+                await this.SetName(string.Format("Populating library: {0} items/s", this.CountMetric.Average(position)));
+                if (this.Current != null)
+                {
+                    await this.SetDescription(new FileInfo(this.Current).Name);
+                }
             }
             base.OnElapsed(sender, e);
         }
