@@ -24,26 +24,7 @@ namespace FoxTunes
             this.Contexts = new ThreadLocal<IScriptingContext>(true);
 #endif
             this.Writer = new LibraryHierarchyWriter(this.Database, this.Transaction);
-            this.Roots = new Lazy<IEnumerable<string>>(() =>
-            {
-                var roots = this.Database.Set<LibraryRoot>(transaction).Select(
-                    libraryRoot => libraryRoot.DirectoryName
-                ).ToArray();
-                //If there is more than one root then we will create a node for each root.
-                if (roots.Length > 1)
-                {
-                    roots = roots.Select(root =>
-                    {
-                        var parent = Path.GetDirectoryName(root);
-                        if (!string.IsNullOrEmpty(parent))
-                        {
-                            return parent;
-                        }
-                        return root;
-                    }).Distinct().ToArray();
-                }
-                return roots;
-            });
+            this.Roots = new Lazy<IEnumerable<string>>(() => this.GetRoots());
         }
 
         public IDatabaseComponent Database { get; private set; }
@@ -230,6 +211,7 @@ namespace FoxTunes
         private string[] GetPathSegments(IDatabaseReaderRecord record)
         {
             var value = record.Get<string>("FileName");
+            //This removes any matching library roots from the path.
             var normalized = value.Replace(this.Roots.Value, string.Empty, true, true);
             var segments = normalized.Split(
                 new[] { Path.DirectorySeparatorChar.ToString() },
@@ -261,6 +243,33 @@ namespace FoxTunes
                 await this.SetPosition(position);
             }
             base.OnElapsed(sender, e);
+        }
+
+        protected IEnumerable<string> GetRoots()
+        {
+            var roots = this.Database.Set<LibraryRoot>(this.Transaction).Select(
+                libraryRoot => libraryRoot.DirectoryName
+            ).ToArray();
+            //If a single folder has been added to the library then we create root nodes for each sub folder.
+            //Otherwise we create a root node for each one.
+            if (roots.Length > 1)
+            {
+                //We try to project the parent folder (of the root).
+                //If it's empty then the drive letter will be used.
+                roots = roots.Select(root =>
+                {
+                    var parent = Path.GetDirectoryName(root);
+                    if (!string.IsNullOrEmpty(parent))
+                    {
+                        return parent;
+                    }
+                    return root;
+                    //De-duplicate and sort. Sorting is for performance, it means a match can be made in less iterations (potentially).
+                    //See GetPathSegments.
+                }).Distinct().OrderBy(root => root).ToArray();
+            }
+            //TODO: We don't handle cases where a root exists within another.
+            return roots;
         }
 
         protected override void OnDisposing()
