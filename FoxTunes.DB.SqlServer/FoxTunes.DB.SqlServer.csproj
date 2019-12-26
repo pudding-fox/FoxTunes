@@ -29,19 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Templates\LibraryHierarchyBuilder.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
-      <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
-    </None>
-    <Compile Update="Templates\LibraryHierarchyBuilder.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Templates\PivotViewBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
