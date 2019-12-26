@@ -1,7 +1,7 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +14,14 @@ namespace FoxTunes
         {
             this.LibraryHierarchyNodes = libraryHierarchyNodes;
             this.Clear = clear;
+        }
+
+        public override bool Visible
+        {
+            get
+            {
+                return this.LibraryHierarchyNodes.Count() > 1;
+            }
         }
 
         public IEnumerable<LibraryHierarchyNode> LibraryHierarchyNodes { get; private set; }
@@ -60,6 +68,8 @@ namespace FoxTunes
 
         private async Task AddPlaylistItems()
         {
+            await this.SetName("Creating playlist");
+            await this.SetCount(this.LibraryHierarchyNodes.Count());
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
@@ -73,9 +83,12 @@ namespace FoxTunes
                     {
                         query = this.Database.Queries.AddLibraryHierarchyNodeToPlaylistWithFilter;
                     }
+                    var position = 0;
                     foreach (var libraryHierarchyNode in this.LibraryHierarchyNodes)
                     {
+                        await this.SetDescription(libraryHierarchyNode.Value);
                         await this.AddPlaylistItems(query, libraryHierarchyNode, transaction);
+                        await this.SetPosition(++position);
                     }
                     transaction.Commit();
                 }
