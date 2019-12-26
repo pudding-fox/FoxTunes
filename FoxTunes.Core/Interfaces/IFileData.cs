@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
@@ -8,6 +8,6 @@ namespace FoxTunes.Interfaces
 
         string FileName { get; }
 
-        ObservableCollection<MetaDataItem> MetaDatas { get; set; }
+        IList<MetaDataItem> MetaDatas { get; set; }
     }
 }

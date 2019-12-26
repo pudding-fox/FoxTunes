@@ -2,12 +2,11 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class PlaylistItem : PersistableComponent, IMetaDataSource, IFileData
+    public class PlaylistItem : PersistableComponent, IFileData
     {
         public PlaylistItem()
         {
@@ -25,7 +24,7 @@ namespace FoxTunes
         public PlaylistItemStatus Status { get; set; }
 
         [Relation(Flags = RelationFlags.AutoExpression | RelationFlags.EagerFetch | RelationFlags.ManyToMany)]
-        public ObservableCollection<MetaDataItem> MetaDatas { get; set; }
+        public IList<MetaDataItem> MetaDatas { get; set; }
 
         protected virtual void OnMetaDatasChanged()
         {
@@ -37,25 +36,6 @@ namespace FoxTunes
         }
 
         public event EventHandler MetaDatasChanged;
-
-        public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
-        {
-#if NET40
-            return TaskEx.FromResult<IEnumerable<MetaDataItem>>(this.MetaDatas);
-#else
-            return Task.FromResult<IEnumerable<MetaDataItem>>(this.MetaDatas);
-#endif
-        }
-
-        public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems)
-        {
-            this.MetaDatas = new ObservableCollection<MetaDataItem>(metaDataItems);
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;  
-#endif
-        }
 
         public override bool Equals(IPersistableComponent other)
         {

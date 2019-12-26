@@ -1,1 +1,1 @@
-(extension(item.FileName) || "").toUpperCase();
+(extension(file) || "").toUpperCase();
