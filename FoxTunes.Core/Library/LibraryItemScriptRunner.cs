@@ -48,6 +48,14 @@ namespace FoxTunes
             }
             this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
             this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
+            if (this.LibraryItem != null)
+            {
+                this.ScriptingContext.SetValue("file", this.LibraryItem.FileName);
+            }
+            else
+            {
+                this.ScriptingContext.SetValue("file", null);
+            }
         }
 
         [DebuggerNonUserCode]
