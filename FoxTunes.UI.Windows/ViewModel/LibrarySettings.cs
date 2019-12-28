@@ -83,18 +83,13 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SettingsVisibleChanged;
 
-        private bool _IsSaving { get; set; }
-
         public bool IsSaving
         {
             get
             {
-                return this._IsSaving;
-            }
-            set
-            {
-                this._IsSaving = value;
-                this.OnIsSavingChanged();
+                return global::FoxTunes.BackgroundTask.Active
+                    .OfType<LibraryTaskBase>()
+                    .Any();
             }
         }
 
@@ -126,7 +121,6 @@ namespace FoxTunes.ViewModel
             var exception = default(Exception);
             try
             {
-                await Windows.Invoke(() => this.IsSaving = true);
                 using (var database = this.DatabaseFactory.Create())
                 {
                     using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
@@ -143,16 +137,15 @@ namespace FoxTunes.ViewModel
                         await task.Run();
                     }
                 }
-                await this.Rebuild();
-                return;
+                {
+                    //Deliberately forking so the dialog closes.
+                    var task = this.Rebuild();
+                    return;
+                }
             }
             catch (Exception e)
             {
                 exception = e;
-            }
-            finally
-            {
-                await Windows.Invoke(() => this.IsSaving = false);
             }
             await this.OnError("Save", exception);
             throw exception;
@@ -162,77 +155,47 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var command = CommandFactory.Instance.CreateCommand(
+                return CommandFactory.Instance.CreateCommand(
                     new Func<Task>(this.Rebuild)
                 );
-                command.Tag = CommandHints.DISMISS;
-                return command;
             }
         }
 
         public async Task Rebuild()
         {
-            await Windows.Invoke(() => this.IsSaving = true);
-            try
-            {
-                await this.HierarchyManager.Clear(null);
-                await this.HierarchyManager.Build(null);
-            }
-            finally
-            {
-                await Windows.Invoke(() => this.IsSaving = false);
-            }
+            await this.HierarchyManager.Clear(null);
+            await this.HierarchyManager.Build(null);
         }
 
         public ICommand RescanCommand
         {
             get
             {
-                var command = CommandFactory.Instance.CreateCommand(
+                return CommandFactory.Instance.CreateCommand(
                     new Func<Task>(this.Rescan)
                 );
-                command.Tag = CommandHints.DISMISS;
-                return command;
             }
         }
 
-        public async Task Rescan()
+        public Task Rescan()
         {
-            await Windows.Invoke(() => this.IsSaving = true);
-            try
-            {
-                await this.LibraryManager.Rescan();
-            }
-            finally
-            {
-                await Windows.Invoke(() => this.IsSaving = false);
-            }
+            return this.LibraryManager.Rescan();
         }
 
         public ICommand ClearCommand
         {
             get
             {
-                var command = CommandFactory.Instance.CreateCommand(
+                return CommandFactory.Instance.CreateCommand(
                     new Func<Task>(this.Clear)
                 );
-                command.Tag = CommandHints.DISMISS;
-                return command;
             }
         }
 
         public async Task Clear()
         {
-            await Windows.Invoke(() => this.IsSaving = true);
-            try
-            {
-                await this.HierarchyManager.Clear(null);
-                await this.LibraryManager.Clear(null);
-            }
-            finally
-            {
-                await Windows.Invoke(() => this.IsSaving = false);
-            }
+            await this.HierarchyManager.Clear(null);
+            await this.LibraryManager.Clear(null);
         }
 
         public ICommand CancelCommand
@@ -261,34 +224,27 @@ namespace FoxTunes.ViewModel
 
         public async Task Reset()
         {
-            await Windows.Invoke(() => this.IsSaving = true);
-            try
+            using (var database = this.DatabaseFactory.Create())
             {
-                using (var database = this.DatabaseFactory.Create())
+                using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
-                    {
-                        global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+                    global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
 #if NET40
-                        return TaskEx.FromResult(false);
+                    return TaskEx.FromResult(false);
 #else
-                        return Task.CompletedTask;
+                    return Task.CompletedTask;
 #endif
-                    }))
-                    {
-                        await task.Run();
-                    }
+                }))
+                {
+                    await task.Run();
                 }
-                await this.Refresh();
             }
-            finally
-            {
-                await Windows.Invoke(() => this.IsSaving = false);
-            }
+            await this.Refresh();
         }
 
         public override void InitializeComponent(ICore core)
         {
+            global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.LibraryManager = this.Core.Managers.Library;
             this.HierarchyManager = this.Core.Managers.Hierarchy;
             this.DatabaseFactory = this.Core.Factories.Database;
@@ -337,6 +293,11 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
         }
 
+        protected virtual async void OnActiveChanged(object sender, EventArgs e)
+        {
+            await Windows.Invoke(() => this.OnIsSavingChanged());
+        }
+
         protected virtual void OnSelectedValueChanged(object sender, EventArgs e)
         {
             if (this.LibraryHierarchies.SelectedValue != null)
@@ -367,6 +328,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             if (this.LibraryHierarchies != null)
             {
                 this.LibraryHierarchies.SelectedValueChanged -= this.OnSelectedValueChanged;
