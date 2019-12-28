@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Linq;
 
 namespace FoxTunes.ViewModel
 {
@@ -175,7 +176,7 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask += this.OnBackgroundTask);
+            global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
@@ -197,30 +198,17 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnBackgroundTask(object sender, BackgroundTaskEventArgs e)
+        protected virtual async void OnActiveChanged(object sender, EventArgs e)
         {
-            if (e.BackgroundTask is LoadOutputStreamTask && e.BackgroundTask.Visible)
+            //TODO: Might it be cleaner to expose this logic directly on the IsBuffering getter?
+            var tasks = global::FoxTunes.BackgroundTask.Active
+                .OfType<LoadOutputStreamTask>()
+                .Where(task => task.Visible);
+            if (tasks.Any())
             {
-                using (e.Defer())
-                {
-                    await Windows.Invoke(() => this.IsBuffering = true);
-                }
-                e.BackgroundTask.Completed += this.OnCompleted;
-                e.BackgroundTask.Faulted += this.OnFaulted;
+                await Windows.Invoke(() => this.IsBuffering = true);
             }
-        }
-
-        protected virtual async void OnCompleted(object sender, AsyncEventArgs e)
-        {
-            using (e.Defer())
-            {
-                await Windows.Invoke(() => this.IsBuffering = false);
-            }
-        }
-
-        protected virtual async void OnFaulted(object sender, AsyncEventArgs e)
-        {
-            using (e.Defer())
+            else if (this.IsBuffering)
             {
                 await Windows.Invoke(() => this.IsBuffering = false);
             }
@@ -253,7 +241,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask -= this.OnBackgroundTask);
+            global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             if (this.PlaylistManager != null)
             {
                 this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
