@@ -123,7 +123,7 @@ namespace FoxTunes
                     this.Current = libraryItem;
                     Interlocked.Increment(ref this.position);
                 }
-            }, cancellationToken, this.Threads);
+            }, cancellationToken, this.ParallelOptions);
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)
