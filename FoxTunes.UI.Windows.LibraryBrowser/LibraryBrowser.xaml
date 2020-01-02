@@ -80,6 +80,7 @@
                         </Interactivity:Interaction.Triggers>
                         <ListBox.InputBindings>
                             <KeyBinding Key="Return" Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}"></KeyBinding>
+                            <KeyBinding Key="Return" Modifiers="Ctrl" Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource True}"></KeyBinding>
                             <KeyBinding Key="Backspace" Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource True}"></KeyBinding>
                         </ListBox.InputBindings>
                         <ListBox.ContextMenu>
