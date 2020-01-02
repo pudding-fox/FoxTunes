@@ -50,9 +50,9 @@ namespace FoxTunes
                     break;
                 }
 #if NET40
-                await TaskEx.Delay(TimeSpan.FromSeconds(1));
+                await TaskEx.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 #else
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 #endif
             }
 

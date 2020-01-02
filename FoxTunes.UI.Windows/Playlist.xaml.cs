@@ -39,7 +39,7 @@ namespace FoxTunes
                 {
                     this.ListView.ScrollIntoView(this.ListView.SelectedItem);
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)

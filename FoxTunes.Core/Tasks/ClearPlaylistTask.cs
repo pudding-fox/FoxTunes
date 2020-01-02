@@ -17,8 +17,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
     }
 }

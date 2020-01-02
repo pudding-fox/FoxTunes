@@ -117,7 +117,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.NameChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Name");
         }
@@ -146,7 +146,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.DescriptionChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Description");
         }
@@ -175,10 +175,10 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.PositionChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Position");
-            await this.OnIsIndeterminateChanged();
+            await this.OnIsIndeterminateChanged().ConfigureAwait(false);
         }
 
         public event AsyncEventHandler PositionChanged;
@@ -205,10 +205,10 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.CountChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Count");
-            await this.OnIsIndeterminateChanged();
+            await this.OnIsIndeterminateChanged().ConfigureAwait(false);
         }
 
         public event AsyncEventHandler CountChanged;
@@ -225,14 +225,14 @@ namespace FoxTunes
         {
             if (value)
             {
-                await this.SetPosition(0);
-                await this.SetCount(0);
+                await this.SetPosition(0).ConfigureAwait(false);
+                await this.SetCount(0).ConfigureAwait(false);
             }
             else
             {
                 //Nothing to do.
             }
-            await this.OnIsIndeterminateChanged();
+            await this.OnIsIndeterminateChanged().ConfigureAwait(false);
         }
 
         protected virtual async Task OnIsIndeterminateChanged()
@@ -241,7 +241,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.IsIndeterminateChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("IsIndeterminate");
         }
@@ -258,24 +258,24 @@ namespace FoxTunes
         public virtual async Task Run()
         {
             Logger.Write(this, LogLevel.Debug, "Running background task.");
-            await this.OnStarted();
+            await this.OnStarted().ConfigureAwait(false);
 #if NET40
             Semaphore.Wait();
 #else
-            await Semaphore.WaitAsync();
+            await Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
                 try
                 {
-                    await this.OnRun();
+                    await this.OnRun().ConfigureAwait(false);
                 }
                 finally
                 {
                     this.Semaphore.Release();
                 }
                 Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
-                await this.OnCompleted();
+                await this.OnCompleted().ConfigureAwait(false);
                 return;
             }
             catch (AggregateException e)
@@ -291,7 +291,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
                 this.Exception = e;
             }
-            await this.OnFaulted();
+            await this.OnFaulted().ConfigureAwait(false);
         }
 
         protected abstract Task OnRun();
@@ -394,11 +394,11 @@ namespace FoxTunes
 
         protected virtual async Task WithSubTask(IReportsProgress task, Func<Task> func)
         {
-            var nameChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetName(task.Name); });
-            var descriptionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetDescription(task.Description); });
-            var positionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetPosition(task.Position); });
-            var countChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetCount(task.Count); });
-            var isIndeterminateChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetIsIndeterminate(task.IsIndeterminate); });
+            var nameChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetName(task.Name).ConfigureAwait(false); });
+            var descriptionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetDescription(task.Description).ConfigureAwait(false); });
+            var positionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetPosition(task.Position).ConfigureAwait(false); });
+            var countChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetCount(task.Count).ConfigureAwait(false); });
+            var isIndeterminateChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetIsIndeterminate(task.IsIndeterminate).ConfigureAwait(false); });
             task.NameChanged += nameChanged;
             task.DescriptionChanged += descriptionChanged;
             task.PositionChanged += positionChanged;
@@ -406,7 +406,7 @@ namespace FoxTunes
             task.IsIndeterminateChanged += isIndeterminateChanged;
             try
             {
-                await func();
+                await func().ConfigureAwait(false);
             }
             finally
             {
@@ -476,9 +476,9 @@ namespace FoxTunes
                     break;
                 }
 #if NET40
-                await TaskEx.Delay(interval);
+                await TaskEx.Delay(interval).ConfigureAwait(false);
 #else
-                await Task.Delay(interval);
+                await Task.Delay(interval).ConfigureAwait(false);
 #endif
                 timeout -= interval;
                 if (timeout <= TimeSpan.Zero)
@@ -508,9 +508,9 @@ namespace FoxTunes
                     instance.Cancel();
                 }
 #if NET40
-                await TaskEx.Delay(interval);
+                await TaskEx.Delay(interval).ConfigureAwait(false);
 #else
-                await Task.Delay(interval);
+                await Task.Delay(interval).ConfigureAwait(false);
 #endif
                 timeout -= interval;
                 if (timeout <= TimeSpan.Zero)

@@ -83,7 +83,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.NameChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Name");
         }
@@ -112,7 +112,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.DescriptionChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Description");
         }
@@ -141,7 +141,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.PositionChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Position");
         }
@@ -170,7 +170,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.CountChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Count");
         }
@@ -191,7 +191,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.IsIndeterminateChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("IsIndeterminate");
         }

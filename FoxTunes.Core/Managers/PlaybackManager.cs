@@ -27,7 +27,7 @@ namespace FoxTunes
         {
             using (e.Defer())
             {
-                await this.Unload();
+                await this.Unload().ConfigureAwait(false);
             }
         }
 
@@ -36,7 +36,7 @@ namespace FoxTunes
             using (e.Defer())
             {
                 Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
-                if (!await this.Output.Preempt(e.OutputStream))
+                if (!await this.Output.Preempt(e.OutputStream).ConfigureAwait(false))
                 {
                     Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                 }
@@ -44,7 +44,7 @@ namespace FoxTunes
                 var exception = default(Exception);
                 try
                 {
-                    await this.SetCurrentStream(e.OutputStream);
+                    await this.SetCurrentStream(e.OutputStream).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -52,7 +52,7 @@ namespace FoxTunes
                 }
                 if (exception != null)
                 {
-                    await this.OnError(exception);
+                    await this.OnError(exception).ConfigureAwait(false);
                 }
             }
         }
@@ -84,7 +84,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", currentStream.Id, currentStream.FileName);
                 this.OnCurrentStreamChanging();
                 this._CurrentStream = stream;
-                await this.Unload(currentStream);
+                await this.Unload(currentStream).ConfigureAwait(false);
             }
             else
             {
@@ -96,15 +96,15 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Playing stream: {0} => {1}", stream.Id, stream.FileName);
                 try
                 {
-                    await stream.Play();
+                    await stream.Play().ConfigureAwait(false);
                 }
                 catch
                 {
-                    await this.Unload(stream);
+                    await this.Unload(stream).ConfigureAwait(false);
                     throw;
                 }
             }
-            await this.OnCurrentStreamChanged();
+            await this.OnCurrentStreamChanged().ConfigureAwait(false);
         }
 
 
@@ -128,7 +128,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.CurrentStreamChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("CurrentStream");
         }
@@ -144,8 +144,8 @@ namespace FoxTunes
             using (var task = new LoadOutputStreamTask(playlistItem, immediate))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -167,15 +167,15 @@ namespace FoxTunes
             using (var task = new UnloadOutputStreamTask(outputStream))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
         public async Task Stop()
         {
-            await this.SetCurrentStream(null);
-            await this.Output.Shutdown();
+            await this.SetCurrentStream(null).ConfigureAwait(false);
+            await this.Output.Shutdown().ConfigureAwait(false);
         }
 
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
@@ -197,7 +197,7 @@ namespace FoxTunes
 
         protected override async void OnDisposing()
         {
-            await this.Unload();
+            await this.Unload().ConfigureAwait(false);
             if (this.Output != null)
             {
                 this.Output.IsStartedChanged -= this.OnIsStartedChanged;

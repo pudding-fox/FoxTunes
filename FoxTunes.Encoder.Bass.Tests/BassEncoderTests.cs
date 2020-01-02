@@ -10,7 +10,7 @@ namespace FoxTunes.Encoder.Bass.Tests
         public async Task CanEncodePlaylistItems()
         {
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
-            await behaviour.Encode(TestInfo.PlaylistItems);
+            await behaviour.Encode(TestInfo.PlaylistItems).ConfigureAwait(false);
         }
     }
 }

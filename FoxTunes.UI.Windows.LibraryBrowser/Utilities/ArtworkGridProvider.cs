@@ -74,7 +74,7 @@ namespace FoxTunes
                 {
                     return this.ImageLoader.Load(fileName, true);
                 }
-                return await this.CreateImageSourceCore(libraryHierarchyNode, width, height);
+                return await this.CreateImageSourceCore(libraryHierarchyNode, width, height).ConfigureAwait(false);
             }
         }
 
@@ -82,7 +82,7 @@ namespace FoxTunes
         {
             if (!libraryHierarchyNode.IsMetaDatasLoaded)
             {
-                await libraryHierarchyNode.LoadMetaDatasAsync();
+                await libraryHierarchyNode.LoadMetaDatasAsync().ConfigureAwait(false);
             }
             switch (libraryHierarchyNode.MetaDatas.Count)
             {

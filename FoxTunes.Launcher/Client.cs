@@ -15,9 +15,9 @@ namespace FoxTunes
 #if NET40
                     client.Connect();
 #else
-                    await client.ConnectAsync();
+                    await client.ConnectAsync().ConfigureAwait(false);
 #endif
-                    await writer.WriteLineAsync(message);
+                    await writer.WriteLineAsync(message).ConfigureAwait(false);
                 }
             }
         }

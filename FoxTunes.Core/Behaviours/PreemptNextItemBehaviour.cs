@@ -29,13 +29,13 @@ namespace FoxTunes
         {
             using (e.Defer())
             {
-                await this.PreemptItems();
+                await this.PreemptItems().ConfigureAwait(false);
             }
         }
 
         private async Task PreemptItems()
         {
-            var playlistItem = await this.PlaylistManager.GetNext(false);
+            var playlistItem = await this.PlaylistManager.GetNext(false).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;
@@ -46,7 +46,7 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Current stream is about to end, pre-empting the next stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-            if (!await this.Output.Preempt(outputStream))
+            if (!await this.Output.Preempt(outputStream).ConfigureAwait(false))
             {
                 Logger.Write(this, LogLevel.Debug, "Pre-empt failed for stream: {0} => {1}", outputStream.Id, outputStream.FileName);
             }

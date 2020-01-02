@@ -26,7 +26,7 @@ namespace FoxTunes
             {
                 using (e.Defer())
                 {
-                    await this.OnOpen(e.Sequence);
+                    await this.OnOpen(e.Sequence).ConfigureAwait(false);
                 }
             };
             Windows.MainWindowCreated += (sender, e) => this.OnWindowCreated(Windows.MainWindow.GetHandle());
@@ -130,9 +130,9 @@ namespace FoxTunes
 
         protected virtual async Task OnOpen(IEnumerable<string> paths)
         {
-            var index = await this.Playlist.GetInsertIndex();
-            await this.Playlist.Add(paths, false);
-            await this.Playlist.Play(index);
+            var index = await this.Playlist.GetInsertIndex().ConfigureAwait(false);
+            await this.Playlist.Add(paths, false).ConfigureAwait(false);
+            await this.Playlist.Play(index).ConfigureAwait(false);
         }
 
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

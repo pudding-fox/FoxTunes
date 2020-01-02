@@ -35,9 +35,9 @@ namespace FoxTunes
                     return;
                 }
 #if NET40
-                await TaskEx.Delay(this.Delay);
+                await TaskEx.Delay(this.Delay).ConfigureAwait(false);
 #else
-                await Task.Delay(this.Delay);
+                await Task.Delay(this.Delay).ConfigureAwait(false);
 #endif
                 if (!this.Enabled)
                 {

@@ -77,15 +77,15 @@ namespace FoxTunes
 
             if (this.ReportProgress)
             {
-                await this.SetName("Updating library");
-                await this.SetPosition(0);
+                await this.SetName("Updating library").ConfigureAwait(false);
+                await this.SetPosition(0).ConfigureAwait(false);
                 if (this.Items != null && this.Items.Any())
                 {
-                    await this.SetCount(this.Items.Count());
+                    await this.SetCount(this.Items.Count()).ConfigureAwait(false);
                 }
                 else
                 {
-                    await this.SetCount(set.Count);
+                    await this.SetCount(set.Count).ConfigureAwait(false);
                 }
                 if (this.Count <= 100)
                 {
@@ -115,7 +115,7 @@ namespace FoxTunes
             {
                 if (this.Predicate(libraryItem))
                 {
-                    await this.Task(set, libraryItem);
+                    await this.Task(set, libraryItem).ConfigureAwait(false);
                 }
 
                 if (this.ReportProgress)
@@ -123,7 +123,7 @@ namespace FoxTunes
                     this.Current = libraryItem;
                     Interlocked.Increment(ref this.position);
                 }
-            }, cancellationToken, this.ParallelOptions);
+            }, cancellationToken, this.ParallelOptions).ConfigureAwait(false);
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)
@@ -141,12 +141,12 @@ namespace FoxTunes
                         break;
                 }
                 var eta = this.GetEta(count);
-                await this.SetName(string.Format("Updating library: {0} remaining @ {1} items/s", eta, count));
+                await this.SetName(string.Format("Updating library: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(new FileInfo(this.Current.FileName).Name);
+                    await this.SetDescription(new FileInfo(this.Current.FileName).Name).ConfigureAwait(false);
                 }
-                await this.SetPosition(this.position);
+                await this.SetPosition(this.position).ConfigureAwait(false);
             }
             base.OnElapsed(sender, e);
         }

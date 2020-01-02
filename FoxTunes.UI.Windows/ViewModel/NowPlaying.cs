@@ -112,7 +112,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual async Task OnScriptChanged()
         {
-            await this.Refresh();
+            await this.Refresh().ConfigureAwait(false);
             if (this.ScriptChanged != null)
             {
                 this.ScriptChanged(this, EventArgs.Empty);
@@ -185,7 +185,7 @@ namespace FoxTunes.ViewModel
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
-            ).ConnectValue(async value => await this.SetScript(value));
+            ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
             this.MarqueeInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.MARQUEE_INTERVAL_ELEMENT
@@ -206,11 +206,11 @@ namespace FoxTunes.ViewModel
                 .Where(task => task.Visible);
             if (tasks.Any())
             {
-                await Windows.Invoke(() => this.IsBuffering = true);
+                await Windows.Invoke(() => this.IsBuffering = true).ConfigureAwait(false);
             }
             else if (this.IsBuffering)
             {
-                await Windows.Invoke(() => this.IsBuffering = false);
+                await Windows.Invoke(() => this.IsBuffering = false).ConfigureAwait(false);
             }
         }
 
@@ -218,7 +218,7 @@ namespace FoxTunes.ViewModel
         {
             using (e.Defer())
             {
-                await this.Refresh();
+                await this.Refresh().ConfigureAwait(false);
             }
         }
 

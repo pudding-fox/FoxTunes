@@ -61,12 +61,12 @@ namespace FoxTunes
             await Windows.Invoke(() =>
             {
                 libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
-            });
-            var source = await ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight);
+            }).ConfigureAwait(false);
+            var source = await ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight).ConfigureAwait(false);
             await Windows.Invoke(() => this.Background = new ImageBrush(source)
             {
                 Stretch = Stretch.Uniform
-            });
+            }).ConfigureAwait(false);
         }
     }
 }

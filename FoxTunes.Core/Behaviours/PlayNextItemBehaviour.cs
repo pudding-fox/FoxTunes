@@ -23,7 +23,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
             using (e.Defer())
             {
-                await this.PlaylistManager.Next();
+                await this.PlaylistManager.Next().ConfigureAwait(false);
             }
         }
 

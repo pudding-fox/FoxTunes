@@ -59,7 +59,7 @@ namespace FoxTunes
             {
                 using (var stream = File.Open(fileName, FileMode.Create))
                 {
-                    await stream.WriteAsync(data, 0, data.Length);
+                    await stream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
                 }
             }
             catch (Exception e)
@@ -106,7 +106,7 @@ namespace FoxTunes
             {
                 try
                 {
-                    await stream.CopyToAsync(file);
+                    await stream.CopyToAsync(file).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -120,7 +120,7 @@ namespace FoxTunes
         {
             using (var stream = File.OpenRead(fileName))
             {
-                return await WriteAsync(prefix, id, stream);
+                return await WriteAsync(prefix, id, stream).ConfigureAwait(false);
             }
         }
 

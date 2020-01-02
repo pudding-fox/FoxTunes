@@ -34,7 +34,7 @@ namespace FoxTunes
 
         protected virtual async Task OnScriptChanged()
         {
-            await this.Refresh();
+            await this.Refresh().ConfigureAwait(false);
             if (this.ScriptChanged != null)
             {
                 this.ScriptChanged(this, EventArgs.Empty);
@@ -54,7 +54,7 @@ namespace FoxTunes
             this.Configuration.GetElement<TextConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowTitleBehaviourConfiguration.WINDOW_TITLE_SCRIPT_ELEMENT
-            ).ConnectValue(async value => await this.SetScript(value));
+            ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
             Windows.MainWindowCreated += this.OnWindowCreated;
             Windows.SettingsWindowCreated += this.OnWindowCreated;
             var task = this.Refresh();
@@ -65,7 +65,7 @@ namespace FoxTunes
         {
             using (e.Defer())
             {
-                await this.Refresh();
+                await this.Refresh().ConfigureAwait(false);
             }
         }
 

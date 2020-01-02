@@ -230,13 +230,13 @@ namespace FoxTunes
 #if NET40
             this.Dispatcher.BeginInvoke(new Func<Task>(async () =>
             {
-                await TaskEx.Delay(this.Pause);
+                await TaskEx.Delay(this.Pause).ConfigureAwait(false);
                 this.Timer.Start();
             }));
 #else
             this.Dispatcher.InvokeAsync(async () =>
             {
-                await Task.Delay(this.Pause);
+                await Task.Delay(this.Pause).ConfigureAwait(false);
                 this.Timer.Start();
             });
 #endif
@@ -269,13 +269,13 @@ namespace FoxTunes
 #if NET40
                 this.Dispatcher.BeginInvoke(new Func<Task>(async () =>
                 {
-                    await TaskEx.Delay(this.Pause);
+                    await TaskEx.Delay(this.Pause).ConfigureAwait(false);
                     this.Timer.Start();
                 }));
 #else
                 this.Dispatcher.InvokeAsync(async () =>
                 {
-                    await Task.Delay(this.Pause);
+                    await Task.Delay(this.Pause).ConfigureAwait(false);
                     this.Timer.Start();
                 });
 #endif

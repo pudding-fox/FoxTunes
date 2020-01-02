@@ -22,9 +22,9 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Clearing hierarchies");
-            await this.SetIsIndeterminate(true);
-            await base.OnStarted();
+            await this.SetName("Clearing hierarchies").ConfigureAwait(false);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            await base.OnStarted().ConfigureAwait(false);
         }
 
         protected override Task OnRun()
@@ -34,8 +34,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace FoxTunes
         {
             foreach (var source in this.Sources)
             {
-                await source.Task;
+                await source.Task.ConfigureAwait(false);
             }
         }
     }

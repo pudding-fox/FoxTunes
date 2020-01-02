@@ -53,9 +53,9 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Getting file list");
-            await this.SetIsIndeterminate(true);
-            await base.OnStarted();
+            await this.SetName("Getting file list").ConfigureAwait(false);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            await base.OnStarted().ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
@@ -64,15 +64,15 @@ namespace FoxTunes
             {
                 throw new InvalidOperationException("Cannot add to library, meta data extraction is disabled.");
             }
-            await this.AddRoots(this.Roots);
-            await this.AddPaths(this.Paths, true);
+            await this.AddRoots(this.Roots).ConfigureAwait(false);
+            await this.AddPaths(this.Paths, true).ConfigureAwait(false);
         }
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
         }
     }
 }

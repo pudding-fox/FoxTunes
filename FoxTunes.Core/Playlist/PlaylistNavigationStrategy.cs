@@ -33,7 +33,7 @@ namespace FoxTunes
                     return await database.AsQueryable<PlaylistItem>(transaction)
                         .OrderBy(playlistItem => playlistItem.Sequence)
                         .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
             }
         }
@@ -47,7 +47,7 @@ namespace FoxTunes
                     return await database.AsQueryable<PlaylistItem>(transaction)
                         .OrderByDescending(playlistItem => playlistItem.Sequence)
                         .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
             }
         }
@@ -62,7 +62,7 @@ namespace FoxTunes
                         .Where(playlistItem => playlistItem.Sequence > sequence)
                         .OrderBy(playlistItem => playlistItem.Sequence)
                         .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace FoxTunes
                         .Where(playlistItem => playlistItem.Sequence < sequence)
                         .OrderByDescending(playlistItem => playlistItem.Sequence)
                         .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
             }
         }
@@ -91,16 +91,16 @@ namespace FoxTunes
             if (this.PlaylistManager.CurrentItem == null)
             {
                 Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                playlistItem = await this.GetFirstPlaylistItem();
+                playlistItem = await this.GetFirstPlaylistItem().ConfigureAwait(false);
             }
             else
             {
                 Logger.Write(this, LogLevel.Debug, "Current playlist item is sequence: {0}", this.PlaylistManager.CurrentItem.Sequence);
-                playlistItem = await this.GetNextPlaylistItem(this.PlaylistManager.CurrentItem.Sequence);
+                playlistItem = await this.GetNextPlaylistItem(this.PlaylistManager.CurrentItem.Sequence).ConfigureAwait(false);
                 if (playlistItem == null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
-                    playlistItem = await this.GetFirstPlaylistItem();
+                    playlistItem = await this.GetFirstPlaylistItem().ConfigureAwait(false);
                 }
             }
             if (playlistItem == null)
@@ -116,16 +116,16 @@ namespace FoxTunes
             if (this.PlaylistManager.CurrentItem == null)
             {
                 Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming last item.");
-                playlistItem = await this.GetLastPlaylistItem();
+                playlistItem = await this.GetLastPlaylistItem().ConfigureAwait(false);
             }
             else
             {
                 Logger.Write(this, LogLevel.Debug, "Previous playlist item is sequence: {0}", this.PlaylistManager.CurrentItem.Sequence);
-                playlistItem = await this.GetPreviousPlaylistItem(this.PlaylistManager.CurrentItem.Sequence);
+                playlistItem = await this.GetPreviousPlaylistItem(this.PlaylistManager.CurrentItem.Sequence).ConfigureAwait(false);
                 if (playlistItem == null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
-                    playlistItem = await this.GetLastPlaylistItem();
+                    playlistItem = await this.GetLastPlaylistItem().ConfigureAwait(false);
                 }
             }
             if (playlistItem == null)
@@ -191,7 +191,7 @@ namespace FoxTunes
                         {
                             this.Sequences.Clear();
                             this.Position = 0;
-                            while (await sequence.MoveNextAsync())
+                            while (await sequence.MoveNextAsync().ConfigureAwait(false))
                             {
                                 this.Sequences.Add(sequence.Current.Get<int>(column));
                             }
@@ -211,7 +211,7 @@ namespace FoxTunes
             Monitor.Enter(SyncRoot);
             try
             {
-                var playlistItem = await this.PlaylistManager.Get(this.Sequences[this.Position]);
+                var playlistItem = await this.PlaylistManager.Get(this.Sequences[this.Position]).ConfigureAwait(false);
                 if (navigate)
                 {
                     this.NavigateNext();
@@ -250,7 +250,7 @@ namespace FoxTunes
                     this.NavigatePrevious();
                     this.NavigatePrevious();
                 }
-                var playlistItem = await this.PlaylistManager.Get(this.Sequences[this.Position]);
+                var playlistItem = await this.PlaylistManager.Get(this.Sequences[this.Position]).ConfigureAwait(false);
                 if (navigate)
                 {
                     this.NavigateNext();

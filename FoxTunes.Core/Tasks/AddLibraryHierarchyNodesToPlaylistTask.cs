@@ -49,27 +49,27 @@ namespace FoxTunes
         {
             if (this.Clear)
             {
-                await this.RemoveItems(PlaylistItemStatus.None);
+                await this.RemoveItems(PlaylistItemStatus.None).ConfigureAwait(false);
             }
-            await this.AddPlaylistItems();
+            await this.AddPlaylistItems().ConfigureAwait(false);
             if (!this.Clear)
             {
-                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
             }
-            await this.SequenceItems();
-            await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+            await this.SequenceItems().ConfigureAwait(false);
+            await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
         }
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
 
         private async Task AddPlaylistItems()
         {
-            await this.SetName("Creating playlist");
-            await this.SetCount(this.LibraryHierarchyNodes.Count());
+            await this.SetName("Creating playlist").ConfigureAwait(false);
+            await this.SetCount(this.LibraryHierarchyNodes.Count()).ConfigureAwait(false);
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
@@ -86,15 +86,15 @@ namespace FoxTunes
                     var position = 0;
                     foreach (var libraryHierarchyNode in this.LibraryHierarchyNodes)
                     {
-                        await this.SetDescription(libraryHierarchyNode.Value);
-                        await this.AddPlaylistItems(query, libraryHierarchyNode, transaction);
-                        await this.SetPosition(++position);
+                        await this.SetDescription(libraryHierarchyNode.Value).ConfigureAwait(false);
+                        await this.AddPlaylistItems(query, libraryHierarchyNode, transaction).ConfigureAwait(false);
+                        await this.SetPosition(++position).ConfigureAwait(false);
                     }
                     transaction.Commit();
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -119,7 +119,7 @@ namespace FoxTunes
                         }
                         break;
                 }
-            }, transaction);
+            }, transaction).ConfigureAwait(false);
         }
 
         private string GetFilter()

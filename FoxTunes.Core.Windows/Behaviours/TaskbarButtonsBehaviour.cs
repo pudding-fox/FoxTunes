@@ -459,7 +459,7 @@ namespace FoxTunes
         protected virtual async Task Previous()
         {
             Logger.Write(this, LogLevel.Debug, "Previous button was clicked.");
-            await this.PlaylistManager.Previous();
+            await this.PlaylistManager.Previous().ConfigureAwait(false);
             this.UpdateButtons();
         }
 
@@ -469,17 +469,17 @@ namespace FoxTunes
             var currentStream = this.PlaybackManager.CurrentStream;
             if (currentStream == null)
             {
-                await this.PlaylistManager.Next();
+                await this.PlaylistManager.Next().ConfigureAwait(false);
             }
             else
             {
                 if (currentStream.IsPaused)
                 {
-                    await currentStream.Resume();
+                    await currentStream.Resume().ConfigureAwait(false);
                 }
                 else if (currentStream.IsPlaying)
                 {
-                    await currentStream.Pause();
+                    await currentStream.Pause().ConfigureAwait(false);
                 }
             }
             this.UpdateButtons();
@@ -488,7 +488,7 @@ namespace FoxTunes
         protected virtual async Task Next()
         {
             Logger.Write(this, LogLevel.Debug, "Next button was clicked.");
-            await this.PlaylistManager.Next();
+            await this.PlaylistManager.Next().ConfigureAwait(false);
             this.UpdateButtons();
         }
 

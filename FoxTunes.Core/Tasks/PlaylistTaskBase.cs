@@ -51,18 +51,18 @@ namespace FoxTunes
         {
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
              {
-                 await this.AddPlaylistItems(paths, cancellationToken);
-                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
-                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+                 await this.AddPlaylistItems(paths, cancellationToken).ConfigureAwait(false);
+                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
+                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
                  if (this.MetaDataSourceFactory.Enabled)
                  {
-                     await this.AddOrUpdateMetaData(cancellationToken);
+                     await this.AddOrUpdateMetaData(cancellationToken).ConfigureAwait(false);
                  }
-                 await this.SequenceItems();
-                 await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+                 await this.SequenceItems().ConfigureAwait(false);
+                 await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
              }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -71,7 +71,7 @@ namespace FoxTunes
             //We don't know how many files we're about to enumerate.
             if (!this.IsIndeterminate)
             {
-                await this.SetIsIndeterminate(true);
+                await this.SetIsIndeterminate(true).ConfigureAwait(false);
             }
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
@@ -80,7 +80,7 @@ namespace FoxTunes
                     playlistPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(playlistPopulator,
                         async () => await playlistPopulator.Populate(paths, cancellationToken)
-                    );
+.ConfigureAwait(false)).ConfigureAwait(false);
                     this.Offset = playlistPopulator.Offset;
                 }
                 transaction.Commit();
@@ -96,7 +96,7 @@ namespace FoxTunes
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(metaDataPopulator,
                         async () => await metaDataPopulator.Populate(PlaylistItemStatus.Import, cancellationToken)
-                    );
+.ConfigureAwait(false)).ConfigureAwait(false);
                 }
                 transaction.Commit();
             }
@@ -119,7 +119,7 @@ namespace FoxTunes
                                     parameters["sequence"] = this.Sequence;
                                     break;
                             }
-                        }, transaction);
+                        }, transaction).ConfigureAwait(false);
                         if (playlistItem.Sequence > this.Sequence)
                         {
                             //TODO: If the current sequence is less than the target sequence we don't have to increment the counter.
@@ -131,7 +131,7 @@ namespace FoxTunes
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -146,7 +146,7 @@ namespace FoxTunes
                         playlistItem.Status = PlaylistItemStatus.Remove;
                     }
                     var set = this.Database.Set<PlaylistItem>(transaction);
-                    await set.AddOrUpdateAsync(playlistItems);
+                    await set.AddOrUpdateAsync(playlistItems).ConfigureAwait(false);
                     if (transaction.HasTransaction)
                     {
                         transaction.Commit();
@@ -154,14 +154,14 @@ namespace FoxTunes
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
-            await this.RemoveItems(PlaylistItemStatus.Remove);
+            await this.RemoveItems(PlaylistItemStatus.Remove).ConfigureAwait(false);
         }
 
         protected virtual async Task RemoveItems(PlaylistItemStatus status)
         {
-            await this.SetIsIndeterminate(true);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
             Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
@@ -175,12 +175,12 @@ namespace FoxTunes
                                 parameters["status"] = status;
                                 break;
                         }
-                    }, transaction);
+                    }, transaction).ConfigureAwait(false);
                     transaction.Commit();
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -194,7 +194,7 @@ namespace FoxTunes
                 at,
                 by
             );
-            await this.SetIsIndeterminate(true);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
             var query = this.Database.QueryFactory.Build();
             var sequence = this.Database.Tables.PlaylistItem.Column("Sequence");
             var status = this.Database.Tables.PlaylistItem.Column("Status");
@@ -223,7 +223,7 @@ namespace FoxTunes
                             parameters["offset"] = by;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }
@@ -231,7 +231,7 @@ namespace FoxTunes
         protected virtual async Task SequenceItems()
         {
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
-            await this.SetIsIndeterminate(true);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
@@ -243,7 +243,7 @@ namespace FoxTunes
                             parameters["status"] = PlaylistItemStatus.Import;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }
@@ -251,7 +251,7 @@ namespace FoxTunes
         protected virtual async Task SetPlaylistItemsStatus(PlaylistItemStatus status)
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
-            await this.SetIsIndeterminate(true);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
@@ -265,7 +265,7 @@ namespace FoxTunes
                             parameters["status"] = status;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }

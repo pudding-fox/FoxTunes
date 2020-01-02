@@ -39,7 +39,7 @@ namespace FoxTunes
 #if NET40
             Semaphore.Wait();
 #else
-            await Semaphore.WaitAsync();
+            await Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
@@ -49,15 +49,15 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
-            await this.BeginComplete();
+            await this.BeginComplete().ConfigureAwait(false);
         }
 
         protected async Task BeginComplete()
         {
 #if NET40
-            await TaskEx.Delay(this.Timeout);
+            await TaskEx.Delay(this.Timeout).ConfigureAwait(false);
 #else
-            await Task.Delay(this.Timeout);
+            await Task.Delay(this.Timeout).ConfigureAwait(false);
 #endif
             if (this.Completing)
             {
@@ -67,11 +67,11 @@ namespace FoxTunes
 #if NET40
             Semaphore.Wait();
 #else
-            await Semaphore.WaitAsync();
+            await Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
-                await this.OnComplete();
+                await this.OnComplete().ConfigureAwait(false);
                 this.Queue.Clear();
             }
             finally

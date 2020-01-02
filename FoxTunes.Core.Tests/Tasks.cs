@@ -12,7 +12,7 @@ namespace FoxTunes
             using (var task = new TestTask())
             {
                 task.InitializeComponent(this.Core);
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
                 Assert.IsTrue(task.CompletedA);
                 Assert.IsTrue(task.CompletedB);
             }
@@ -38,7 +38,7 @@ namespace FoxTunes
                 this.CompletedB = false;
                 try
                 {
-                    await base.Run();
+                    await base.Run().ConfigureAwait(false);
                 }
                 finally
                 {
@@ -49,9 +49,9 @@ namespace FoxTunes
             protected override async Task OnRun()
             {
 #if NET40
-                await TaskEx.Delay(100);
+                await TaskEx.Delay(100).ConfigureAwait(false);
 #else
-                await Task.Delay(100);
+                await Task.Delay(100).ConfigureAwait(false);
 #endif
                 this.CompletedA = true;
             }

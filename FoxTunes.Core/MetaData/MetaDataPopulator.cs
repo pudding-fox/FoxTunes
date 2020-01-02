@@ -68,9 +68,9 @@ namespace FoxTunes
 
             if (this.ReportProgress)
             {
-                await this.SetName("Populating meta data");
-                await this.SetPosition(0);
-                await this.SetCount(fileDatas.Count());
+                await this.SetName("Populating meta data").ConfigureAwait(false);
+                await this.SetPosition(0).ConfigureAwait(false);
+                await this.SetCount(fileDatas.Count()).ConfigureAwait(false);
                 if (this.Count <= 100)
                 {
                     this.Timer.Interval = FAST_INTERVAL;
@@ -92,19 +92,19 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Populating meta data for file: {0} => {1}", fileData.Id, fileData.FileName);
 
-                var metaData = await metaDataSource.GetMetaData(fileData.FileName);
+                var metaData = await metaDataSource.GetMetaData(fileData.FileName).ConfigureAwait(false);
 
 #if NET40
                 this.Semaphore.Wait();
 #else
-                await this.Semaphore.WaitAsync();
+                await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
 
                 try
                 {
                     foreach (var metaDataItem in metaData)
                     {
-                        await this.Writer.Write(fileData.Id, metaDataItem);
+                        await this.Writer.Write(fileData.Id, metaDataItem).ConfigureAwait(false);
                     }
                 }
                 finally
@@ -117,7 +117,7 @@ namespace FoxTunes
                     this.Current = fileData;
                     Interlocked.Increment(ref this.position);
                 }
-            }, cancellationToken, this.ParallelOptions);
+            }, cancellationToken, this.ParallelOptions).ConfigureAwait(false);
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)
@@ -135,12 +135,12 @@ namespace FoxTunes
                         break;
                 }
                 var eta = this.GetEta(count);
-                await this.SetName(string.Format("Populating meta data: {0} remaining @ {1} items/s", eta, count));
+                await this.SetName(string.Format("Populating meta data: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(new FileInfo(this.Current.FileName).Name);
+                    await this.SetDescription(new FileInfo(this.Current.FileName).Name).ConfigureAwait(false);
                 }
-                await this.SetPosition(this.position);
+                await this.SetPosition(this.position).ConfigureAwait(false);
             }
             base.OnElapsed(sender, e);
         }

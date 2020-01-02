@@ -95,7 +95,7 @@ namespace FoxTunes
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -176,7 +176,7 @@ namespace FoxTunes
                         {
                             await this.WithSubTask(monitor,
                                 async () => await monitor.Encode()
-                            );
+.ConfigureAwait(false)).ConfigureAwait(false);
                         }
                         finally
                         {
@@ -204,13 +204,13 @@ namespace FoxTunes
                     using (var task = new WriteFileMetaDataTask(encoderItem.OutputFileName, playlistItem.MetaDatas))
                     {
                         task.InitializeComponent(this.Core);
-                        await task.Run();
+                        await task.Run().ConfigureAwait(false);
                     }
                 }
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to copy tags from \"{0}\" to \"{1}\": {2}", encoderItem.InputFileName, encoderItem.OutputFileName, e.Message);
-                    await this.OnError(e);
+                    await this.OnError(e).ConfigureAwait(false);
                 }
             }
 

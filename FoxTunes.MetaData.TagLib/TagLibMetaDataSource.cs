@@ -91,7 +91,7 @@ namespace FoxTunes
                             var pictures = file.Tag.Pictures;
                             if (pictures != null)
                             {
-                                images = await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures);
+                                images = await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures).ConfigureAwait(false);
                             }
                         }
                     }
@@ -103,7 +103,7 @@ namespace FoxTunes
                 }
                 if (this.LooseImages.Value && !images)
                 {
-                    await this.AddImages(metaData, fileName);
+                    await this.AddImages(metaData, fileName).ConfigureAwait(false);
                 }
             }
             catch (UnsupportedFormatException)
@@ -139,7 +139,7 @@ namespace FoxTunes
                                 }
                                 else
                                 {
-                                    await this.SetImage(metaDataItem, file.Tag);
+                                    await this.SetImage(metaDataItem, file.Tag).ConfigureAwait(false);
                                 }
                                 break;
                         }
@@ -303,12 +303,12 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var metaDataItem = await this.ArtworkProvider.Find(fileName, type);
+                var metaDataItem = await this.ArtworkProvider.Find(fileName, type).ConfigureAwait(false);
                 if (metaDataItem != null)
                 {
                     if (this.CopyImages.Value)
                     {
-                        metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false);
+                        metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false).ConfigureAwait(false);
                     }
                     metaData.Add(metaDataItem);
                 }
@@ -339,6 +339,7 @@ namespace FoxTunes
                     metaData.Add(new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
                     {
                         Value = await this.ImportImage(tag, picture, type, false)
+.ConfigureAwait(false)
                     });
                     types.Add(type);
                 }
@@ -352,7 +353,7 @@ namespace FoxTunes
 
         private async Task<string> ImportImage(Tag tag, IPicture picture, ArtworkType type, bool overwrite)
         {
-            return await this.ImportImage(picture, picture.Data.Checksum.ToString(), overwrite);
+            return await this.ImportImage(picture, picture.Data.Checksum.ToString(), overwrite).ConfigureAwait(false);
         }
 
         private async Task<string> ImportImage(IPicture value, string id, bool overwrite)
@@ -364,13 +365,13 @@ namespace FoxTunes
 #if NET40
                 Semaphore.Wait();
 #else
-                await Semaphore.WaitAsync();
+                await Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
                 try
                 {
                     if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
                     {
-                        return await FileMetaDataStore.WriteAsync(prefix, id, value.Data.Data);
+                        return await FileMetaDataStore.WriteAsync(prefix, id, value.Data.Data).ConfigureAwait(false);
                     }
                 }
                 finally
@@ -394,13 +395,13 @@ namespace FoxTunes
 #if NET40
                 Semaphore.Wait();
 #else
-                await Semaphore.WaitAsync();
+                await Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
                 try
                 {
                     if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
                     {
-                        return await FileMetaDataStore.WriteAsync(prefix, id, fileName);
+                        return await FileMetaDataStore.WriteAsync(prefix, id, fileName).ConfigureAwait(false);
                     }
                 }
                 finally
@@ -462,7 +463,7 @@ namespace FoxTunes
             {
                 if (!string.IsNullOrEmpty(metaDataItem.Value))
                 {
-                    await this.ReplaceImage(metaDataItem, tag, pictures, index);
+                    await this.ReplaceImage(metaDataItem, tag, pictures, index).ConfigureAwait(false);
                 }
                 else
                 {
@@ -471,7 +472,7 @@ namespace FoxTunes
             }
             else if (!string.IsNullOrEmpty(metaDataItem.Value))
             {
-                await this.AddImage(metaDataItem, tag, pictures);
+                await this.AddImage(metaDataItem, tag, pictures).ConfigureAwait(false);
             }
             tag.Pictures = pictures.ToArray();
         }
@@ -493,12 +494,19 @@ namespace FoxTunes
 
         private async Task AddImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures)
         {
+
+/* Unmerged change from project 'FoxTunes.MetaData.TagLib(net461)'
+Before:
             pictures.Add(await this.CreateImage(metaDataItem, tag));
+After:
+            pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
+*/
+            pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
         }
 
         private async Task ReplaceImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
         {
-            pictures[index] = await this.CreateImage(metaDataItem, tag);
+            pictures[index] = await this.CreateImage(metaDataItem, tag).ConfigureAwait(false);
         }
 
         private void RemoveImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
@@ -514,7 +522,7 @@ namespace FoxTunes
                 Type = GetPictureType(type),
                 MimeType = MimeMapping.Instance.GetMimeType(metaDataItem.Value)
             };
-            metaDataItem.Value = await this.ImportImage(tag, picture, type, true);
+            metaDataItem.Value = await this.ImportImage(tag, picture, type, true).ConfigureAwait(false);
             return picture;
         }
 

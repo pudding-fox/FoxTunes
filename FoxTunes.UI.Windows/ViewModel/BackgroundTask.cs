@@ -41,7 +41,7 @@ namespace FoxTunes.ViewModel
                         this.NameChanged(sender, e);
                     }
                     this.OnPropertyChanged("Name");
-                });
+                }).ConfigureAwait(false);
             }
         }
 
@@ -66,7 +66,7 @@ namespace FoxTunes.ViewModel
                         this.DescriptionChanged(sender, e);
                     }
                     this.OnPropertyChanged("Description");
-                });
+                }).ConfigureAwait(false);
             }
         }
 
@@ -91,7 +91,7 @@ namespace FoxTunes.ViewModel
                         this.PositionChanged(sender, e);
                     }
                     this.OnPropertyChanged("Position");
-                });
+                }).ConfigureAwait(false);
             }
         }
 
@@ -116,7 +116,7 @@ namespace FoxTunes.ViewModel
                         this.CountChanged(sender, e);
                     }
                     this.OnPropertyChanged("Count");
-                });
+                }).ConfigureAwait(false);
             }
         }
 
@@ -141,7 +141,7 @@ namespace FoxTunes.ViewModel
                         this.IsIndeterminateChanged(sender, e);
                     }
                     this.OnPropertyChanged("IsIndeterminate");
-                });
+                }).ConfigureAwait(false);
             }
         }
 

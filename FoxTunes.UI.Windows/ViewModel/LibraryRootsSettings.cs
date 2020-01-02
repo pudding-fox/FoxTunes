@@ -78,7 +78,7 @@ namespace FoxTunes.ViewModel
             var exception = default(Exception);
             try
             {
-                await Windows.Invoke(() => this.IsSaving = true);
+                await Windows.Invoke(() => this.IsSaving = true).ConfigureAwait(false);
                 using (var database = this.DatabaseFactory.Create())
                 {
                     using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
@@ -97,7 +97,7 @@ namespace FoxTunes.ViewModel
 #endif
                     }))
                     {
-                        await task.Run();
+                        await task.Run().ConfigureAwait(false);
                     }
                 }
                 return;
@@ -108,9 +108,9 @@ namespace FoxTunes.ViewModel
             }
             finally
             {
-                await Windows.Invoke(() => this.IsSaving = false);
+                await Windows.Invoke(() => this.IsSaving = false).ConfigureAwait(false);
             }
-            await this.OnError("Save", exception);
+            await this.OnError("Save", exception).ConfigureAwait(false);
             throw exception;
         }
 

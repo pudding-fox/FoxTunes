@@ -34,25 +34,25 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Getting file list");
-            await this.SetIsIndeterminate(true);
-            await base.OnStarted();
+            await this.SetName("Getting file list").ConfigureAwait(false);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            await base.OnStarted().ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
         {
             if (this.Clear)
             {
-                await this.RemoveItems(PlaylistItemStatus.None);
+                await this.RemoveItems(PlaylistItemStatus.None).ConfigureAwait(false);
             }
-            await this.AddPaths(this.Paths);
+            await this.AddPaths(this.Paths).ConfigureAwait(false);
 
         }
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
     }
 }

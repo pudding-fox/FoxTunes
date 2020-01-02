@@ -52,10 +52,10 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Saving meta data");
-            await this.SetPosition(0);
-            await this.SetCount(this.LibraryItems.Count());
-            await base.OnStarted();
+            await this.SetName("Saving meta data").ConfigureAwait(false);
+            await this.SetPosition(0).ConfigureAwait(false);
+            await this.SetCount(this.LibraryItems.Count()).ConfigureAwait(false);
+            await base.OnStarted().ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
@@ -66,8 +66,8 @@ namespace FoxTunes
                 var metaDataSource = this.MetaDataSourceFactory.Create();
                 foreach (var libraryItem in this.LibraryItems)
                 {
-                    await this.SetDescription(new FileInfo(libraryItem.FileName).Name);
-                    await this.SetPosition(position);
+                    await this.SetDescription(new FileInfo(libraryItem.FileName).Name).ConfigureAwait(false);
+                    await this.SetPosition(position).ConfigureAwait(false);
 
                     if (!File.Exists(libraryItem.FileName))
                     {
@@ -75,7 +75,7 @@ namespace FoxTunes
                         continue;
                     }
 
-                    await metaDataSource.SetMetaData(libraryItem.FileName, libraryItem.MetaDatas);
+                    await metaDataSource.SetMetaData(libraryItem.FileName, libraryItem.MetaDatas).ConfigureAwait(false);
 
                     foreach (var metaDataItem in libraryItem.MetaDatas.ToArray())
                     {
@@ -86,14 +86,14 @@ namespace FoxTunes
                         libraryItem.MetaDatas.Remove(metaDataItem);
                     }
 
-                    await this.WriteLibraryMetaData(libraryItem);
-                    await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import);
+                    await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
+                    await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
 
                     position++;
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -110,11 +110,11 @@ namespace FoxTunes
                             parameters["type"] = META_DATA_TYPE;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
 
                 using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddLibraryMetaDataItem, transaction))
                 {
-                    await writer.Write(libraryItem.Id, libraryItem.MetaDatas);
+                    await writer.Write(libraryItem.Id, libraryItem.MetaDatas).ConfigureAwait(false);
                 }
 
                 if (transaction.HasTransaction)
@@ -126,8 +126,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
 
         protected override void OnDisposing()

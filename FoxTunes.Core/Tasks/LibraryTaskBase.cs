@@ -44,7 +44,7 @@ namespace FoxTunes
                 using (var sequence = this.Database.Set<LibraryRoot>(transaction).GetAsyncEnumerator())
                 {
                     var result = new List<string>();
-                    while (await sequence.MoveNextAsync())
+                    while (await sequence.MoveNextAsync().ConfigureAwait(false))
                     {
                         result.Add(sequence.Current.DirectoryName);
                     }
@@ -57,7 +57,7 @@ namespace FoxTunes
         {
             paths = paths.Except(
                 await this.GetRoots()
-            ).ToArray();
+.ConfigureAwait(false)).ToArray();
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var set = this.Database.Set<LibraryRoot>(transaction);
@@ -68,7 +68,7 @@ namespace FoxTunes
                         set.Create().With(
                             libraryRoot => libraryRoot.DirectoryName = path
                         )
-                    );
+                    ).ConfigureAwait(false);
                 }
                 if (transaction.HasTransaction)
                 {
@@ -83,7 +83,7 @@ namespace FoxTunes
             {
                 var set = this.Database.Set<LibraryRoot>(transaction);
                 Logger.Write(this, LogLevel.Debug, "Clearing library roots.");
-                await set.ClearAsync();
+                await set.ClearAsync().ConfigureAwait(false);
                 transaction.Commit();
             }
         }
@@ -93,15 +93,15 @@ namespace FoxTunes
             var complete = true;
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
              {
-                 await this.AddLibraryItems(paths, cancellationToken);
+                 await this.AddLibraryItems(paths, cancellationToken).ConfigureAwait(false);
                  if (cancellationToken.IsCancellationRequested)
                  {
-                     await this.SetName("Waiting..");
-                     await this.SetDescription(string.Empty);
+                     await this.SetName("Waiting..").ConfigureAwait(false);
+                     await this.SetDescription(string.Empty).ConfigureAwait(false);
                  }
              }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
             if (this.IsCancellationRequested)
             {
@@ -112,15 +112,15 @@ namespace FoxTunes
             }
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
-                await this.AddOrUpdateMetaData(cancellationToken);
+                await this.AddOrUpdateMetaData(cancellationToken).ConfigureAwait(false);
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    await this.SetName("Waiting..");
-                    await this.SetDescription(string.Empty);
+                    await this.SetName("Waiting..").ConfigureAwait(false);
+                    await this.SetDescription(string.Empty).ConfigureAwait(false);
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
             if (this.IsCancellationRequested)
             {
@@ -131,11 +131,11 @@ namespace FoxTunes
             }
             if (buildHierarchies)
             {
-                await this.BuildHierarchies(LibraryItemStatus.Import);
+                await this.BuildHierarchies(LibraryItemStatus.Import).ConfigureAwait(false);
             }
             if (complete)
             {
-                await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None);
+                await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None).ConfigureAwait(false);
             }
         }
 
@@ -144,7 +144,7 @@ namespace FoxTunes
             //We don't know how many files we're about to enumerate.
             if (!this.IsIndeterminate)
             {
-                await this.SetIsIndeterminate(true);
+                await this.SetIsIndeterminate(true).ConfigureAwait(false);
             }
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
@@ -153,7 +153,7 @@ namespace FoxTunes
                     libraryPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(libraryPopulator,
                         async () => await libraryPopulator.Populate(paths, cancellationToken)
-                    );
+.ConfigureAwait(false)).ConfigureAwait(false);
                 }
                 transaction.Commit();
             }
@@ -168,7 +168,7 @@ namespace FoxTunes
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(metaDataPopulator,
                         async () => await metaDataPopulator.Populate(LibraryItemStatus.Import, cancellationToken)
-                    );
+.ConfigureAwait(false)).ConfigureAwait(false);
                 }
                 transaction.Commit();
             }
@@ -180,22 +180,22 @@ namespace FoxTunes
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    await this.AddHiearchies(status, cancellationToken, transaction);
+                    await this.AddHiearchies(status, cancellationToken, transaction).ConfigureAwait(false);
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        await this.SetName("Waiting..");
-                        await this.SetDescription(string.Empty);
+                        await this.SetName("Waiting..").ConfigureAwait(false);
+                        await this.SetDescription(string.Empty).ConfigureAwait(false);
                     }
                     else
                     {
-                        await this.SetDescription("Finalizing");
-                        await this.SetIsIndeterminate(true);
+                        await this.SetDescription("Finalizing").ConfigureAwait(false);
+                        await this.SetIsIndeterminate(true).ConfigureAwait(false);
                     }
                     transaction.Commit();
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -206,7 +206,7 @@ namespace FoxTunes
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
                 await this.WithSubTask(libraryHierarchyPopulator,
                     async () => await libraryHierarchyPopulator.Populate(status, cancellationToken)
-                );
+.ConfigureAwait(false)).ConfigureAwait(false);
             }
         }
 
@@ -222,7 +222,7 @@ namespace FoxTunes
                             parameters["status"] = status;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }
@@ -239,7 +239,7 @@ namespace FoxTunes
                             parameters["status"] = status;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }
@@ -259,7 +259,7 @@ namespace FoxTunes
                             parameters["status"] = status;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }
@@ -281,7 +281,7 @@ namespace FoxTunes
                             parameters["id"] = libraryItemId;
                             break;
                     }
-                }, transaction);
+                }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }

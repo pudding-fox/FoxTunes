@@ -39,21 +39,21 @@ namespace FoxTunes
         {
             if (this.Clear)
             {
-                await this.RemoveItems(PlaylistItemStatus.None);
+                await this.RemoveItems(PlaylistItemStatus.None).ConfigureAwait(false);
             }
-            await this.AddPlaylistItems();
+            await this.AddPlaylistItems().ConfigureAwait(false);
             if (!this.Clear)
             {
-                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
             }
-            await this.SequenceItems();
-            await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+            await this.SequenceItems().ConfigureAwait(false);
+            await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
         }
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
 
         private async Task AddPlaylistItems()
@@ -90,12 +90,12 @@ namespace FoxTunes
                                 }
                                 break;
                         }
-                    }, transaction);
+                    }, transaction).ConfigureAwait(false);
                     transaction.Commit();
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 

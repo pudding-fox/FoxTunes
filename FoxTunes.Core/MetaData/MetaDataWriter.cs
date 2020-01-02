@@ -32,7 +32,7 @@ namespace FoxTunes
         {
             foreach (var metaDataItem in metaDataItems)
             {
-                await this.Write(itemId, metaDataItem);
+                await this.Write(itemId, metaDataItem).ConfigureAwait(false);
             }
         }
 
@@ -48,12 +48,12 @@ namespace FoxTunes
                 this.AddCommand.Parameters["name"] = metaDataItem.Name;
                 this.AddCommand.Parameters["type"] = metaDataItem.Type;
                 this.AddCommand.Parameters["value"] = metaDataItem.Value;
-                metaDataItemId = Convert.ToInt32(await this.AddCommand.ExecuteScalarAsync());
+                metaDataItemId = Convert.ToInt32(await this.AddCommand.ExecuteScalarAsync().ConfigureAwait(false));
                 this.Store.Add(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, metaDataItemId);
             }
             this.UpdateCommand.Parameters["itemId"] = itemId;
             this.UpdateCommand.Parameters["metaDataItemId"] = metaDataItemId;
-            await this.UpdateCommand.ExecuteNonQueryAsync();
+            await this.UpdateCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
 
         private bool HasValue(string value)

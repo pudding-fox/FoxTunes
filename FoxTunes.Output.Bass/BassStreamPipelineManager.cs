@@ -44,7 +44,7 @@ namespace FoxTunes
 #if NET40
             if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
 #else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
 #endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -84,7 +84,7 @@ namespace FoxTunes
 #if NET40
             if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
 #else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
 #endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -117,14 +117,14 @@ namespace FoxTunes
 #if NET40
             if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
 #else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
 #endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
             }
             try
             {
-                await this.WithPipeline(stream, action);
+                await this.WithPipeline(stream, action).ConfigureAwait(false);
             }
             finally
             {
@@ -142,7 +142,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Current pipeline cannot accept stream, shutting it down: {0}", stream.ChannelHandle);
                 this.FreePipelineCore();
-                await this.WithPipeline(stream, action);
+                await this.WithPipeline(stream, action).ConfigureAwait(false);
                 return;
             }
             action(this.Pipeline);
@@ -165,7 +165,7 @@ namespace FoxTunes
 #if NET40
             if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
 #else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
 #endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -207,7 +207,7 @@ namespace FoxTunes
 #if NET40
             if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
 #else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
+            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
 #endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));

@@ -172,14 +172,14 @@ namespace FoxTunes
 #if NET40
             if (!this.Semaphore.Wait(START_STOP_TIMEOUT))
 #else
-            if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT))
+            if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT).ConfigureAwait(false))
 #endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already starting.", this.GetType().Name));
             }
             try
             {
-                await this.OnStart(force);
+                await this.OnStart(force).ConfigureAwait(false);
             }
             finally
             {
@@ -191,7 +191,7 @@ namespace FoxTunes
         {
             if (force || !this.IsStarted)
             {
-                await this.ShutdownCore(false);
+                await this.ShutdownCore(false).ConfigureAwait(false);
                 var exception = default(Exception);
                 for (var a = 1; a <= START_ATTEMPTS; a++)
                 {
@@ -199,7 +199,7 @@ namespace FoxTunes
                     try
                     {
                         this.OnInit();
-                        await this.SetIsStarted(true);
+                        await this.SetIsStarted(true).ConfigureAwait(false);
                         break;
                     }
                     catch (Exception e)
@@ -207,7 +207,7 @@ namespace FoxTunes
                         exception = e;
                         Logger.Write(this, LogLevel.Warn, "Failed to start BASS: {0}", e.Message);
                     }
-                    await this.ShutdownCore(true);
+                    await this.ShutdownCore(true).ConfigureAwait(false);
                     Thread.Sleep(START_ATTEMPT_INTERVAL);
                 }
                 if (this.IsStarted)
@@ -227,14 +227,14 @@ namespace FoxTunes
 #if NET40
             if (!this.Semaphore.Wait(START_STOP_TIMEOUT))
 #else
-            if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT))
+            if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT).ConfigureAwait(false))
 #endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already stopping.", this.GetType().Name));
             }
             try
             {
-                await this.ShutdownCore(false);
+                await this.ShutdownCore(false).ConfigureAwait(false);
             }
             finally
             {
@@ -250,7 +250,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
                 try
                 {
-                    await this.PipelineManager.FreePipeline();
+                    await this.PipelineManager.FreePipeline().ConfigureAwait(false);
                     this.OnFree();
                     Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
                 }
@@ -259,10 +259,10 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Error, "Failed to stop BASS: {0}", e.Message);
                     exception = e;
                 }
-                await this.SetIsStarted(false);
+                await this.SetIsStarted(false).ConfigureAwait(false);
                 if (exception != null)
                 {
-                    await this.OnError(exception);
+                    await this.OnError(exception).ConfigureAwait(false);
                 }
             }
         }
@@ -336,10 +336,10 @@ namespace FoxTunes
         {
             if (!this.IsStarted)
             {
-                await this.Start();
+                await this.Start().ConfigureAwait(false);
             }
             Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            var stream = await this.StreamFactory.CreateStream(playlistItem, immidiate);
+            var stream = await this.StreamFactory.CreateStream(playlistItem, immidiate).ConfigureAwait(false);
             if (stream.IsEmpty)
             {
                 return null;
@@ -414,7 +414,7 @@ namespace FoxTunes
                             }
                         }
                     }
-                });
+                }).ConfigureAwait(false);
             }
             outputStream.Dispose();
         }

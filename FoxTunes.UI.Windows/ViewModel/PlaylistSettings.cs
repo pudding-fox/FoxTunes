@@ -91,17 +91,17 @@ namespace FoxTunes.ViewModel
 #endif
                     }))
                     {
-                        await task.Run();
+                        await task.Run().ConfigureAwait(false);
                     }
                 }
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated)).ConfigureAwait(false);
                 return;
             }
             catch (Exception e)
             {
                 exception = e;
             }
-            await this.OnError("Save", exception);
+            await this.OnError("Save", exception).ConfigureAwait(false);
             throw exception;
         }
 
@@ -143,11 +143,11 @@ namespace FoxTunes.ViewModel
 #endif
                 }))
                 {
-                    await task.Run();
+                    await task.Run().ConfigureAwait(false);
                 }
             }
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
-            await this.Refresh();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated)).ConfigureAwait(false);
+            await this.Refresh().ConfigureAwait(false);
         }
 
         public override void InitializeComponent(ICore core)
@@ -183,7 +183,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual async void OnActiveChanged(object sender, EventArgs e)
         {
-            await Windows.Invoke(() => this.OnIsSavingChanged());
+            await Windows.Invoke(() => this.OnIsSavingChanged()).ConfigureAwait(false);
         }
 
         private Task OnSignal(object sender, ISignal signal)

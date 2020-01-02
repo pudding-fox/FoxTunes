@@ -198,7 +198,7 @@ namespace FoxTunes
 #if NET40
                 if (!this.Semaphore.Wait(TIMEOUT))
 #else
-                if (!await this.Semaphore.WaitAsync(TIMEOUT))
+                if (!await this.Semaphore.WaitAsync(TIMEOUT).ConfigureAwait(false))
 #endif
                 {
                     //Timed out while entering lock, nothing can be done.
@@ -206,8 +206,8 @@ namespace FoxTunes
                 }
                 try
                 {
-                    await this.Writer.Value.WriteLineAsync(this.FormatMessage(type, level, message, args));
-                    await this.Writer.Value.FlushAsync();
+                    await this.Writer.Value.WriteLineAsync(this.FormatMessage(type, level, message, args)).ConfigureAwait(false);
+                    await this.Writer.Value.FlushAsync().ConfigureAwait(false);
                 }
                 finally
                 {

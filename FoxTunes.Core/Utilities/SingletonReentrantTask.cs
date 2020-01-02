@@ -64,7 +64,7 @@ namespace FoxTunes
 #if NET40
                 if (!this.Instance.Semaphore.Wait(this.Timeout))
 #else
-                if (!await this.Instance.Semaphore.WaitAsync(this.Timeout))
+                if (!await this.Instance.Semaphore.WaitAsync(this.Timeout).ConfigureAwait(false))
 #endif
                 {
                     Logger.Write(this, LogLevel.Trace, "Failed to acquire lock after {0}ms", this.Timeout);
@@ -89,7 +89,7 @@ namespace FoxTunes
                         return;
                     }
                     this.Instance.CancellationToken.Reset();
-                    await this.Factory(this.Instance.CancellationToken);
+                    await this.Factory(this.Instance.CancellationToken).ConfigureAwait(false);
                     if (this.Instance.CancellationToken.IsCancellationRequested)
                     {
                         Logger.Write(this, LogLevel.Trace, "Task was cancelled.");
@@ -109,9 +109,9 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Trace, "Retrying in {0}ms", this.Timeout);
 #if NET40
-                    await TaskEx.Delay(this.Timeout);
+                    await TaskEx.Delay(this.Timeout).ConfigureAwait(false);
 #else
-                    await Task.Delay(this.Timeout);
+                    await Task.Delay(this.Timeout).ConfigureAwait(false);
 #endif
                 }
             } while (true);

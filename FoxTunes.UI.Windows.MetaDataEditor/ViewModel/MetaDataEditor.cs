@@ -303,16 +303,16 @@ namespace FoxTunes.ViewModel
             var libraryItems = sources.OfType<LibraryItem>().ToArray();
             if (libraryItems.Any())
             {
-                await this.MetaDataManager.Save(libraryItems);
+                await this.MetaDataManager.Save(libraryItems).ConfigureAwait(false);
             }
             var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             if (playlistItems.Any())
             {
-                await this.MetaDataManager.Save(playlistItems);
+                await this.MetaDataManager.Save(playlistItems).ConfigureAwait(false);
             }
-            await this.HierarchyManager.Clear(LibraryItemStatus.Import);
-            await this.HierarchyManager.Build(LibraryItemStatus.Import);
-            await this.LibraryManager.Set(LibraryItemStatus.None);
+            await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
+            await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+            await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
             this.Cancel();
         }
 

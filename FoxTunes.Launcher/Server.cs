@@ -47,9 +47,9 @@ namespace FoxTunes
 #if NET40
                         server.WaitForConnection();
 #else
-                        await server.WaitForConnectionAsync();
+                        await server.WaitForConnectionAsync().ConfigureAwait(false);
 #endif
-                        await this.OnConnection(server, reader);
+                        await this.OnConnection(server, reader).ConfigureAwait(false);
                     }
                 }
             }
@@ -60,7 +60,7 @@ namespace FoxTunes
             var builder = new StringBuilder();
             while (server.IsConnected)
             {
-                builder.AppendLine(await reader.ReadLineAsync());
+                builder.AppendLine(await reader.ReadLineAsync().ConfigureAwait(false));
             }
             this.OnMessage(builder.ToString());
             server.Disconnect();

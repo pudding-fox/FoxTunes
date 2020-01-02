@@ -48,10 +48,10 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Buffering");
-            await this.SetDescription(this.PlaylistItem.FileName.GetName());
-            await this.SetIsIndeterminate(true);
-            await base.OnStarted();
+            await this.SetName("Buffering").ConfigureAwait(false);
+            await this.SetDescription(this.PlaylistItem.FileName.GetName()).ConfigureAwait(false);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            await base.OnStarted().ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
@@ -62,12 +62,12 @@ namespace FoxTunes
                 if (this.Immediate)
                 {
                     Logger.Write(this, LogLevel.Debug, "Immediate load was requested, de-queuing: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-                    await this.OutputStreamQueue.Dequeue(this.PlaylistItem);
+                    await this.OutputStreamQueue.Dequeue(this.PlaylistItem).ConfigureAwait(false);
                 }
                 return;
             }
-            await this.CheckPath();
-            var outputStream = await this.Output.Load(this.PlaylistItem, this.Immediate);
+            await this.CheckPath().ConfigureAwait(false);
+            var outputStream = await this.Output.Load(this.PlaylistItem, this.Immediate).ConfigureAwait(false);
             if (outputStream == null)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to load play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
@@ -82,7 +82,7 @@ namespace FoxTunes
                 }
             }
             Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-            await this.OutputStreamQueue.Enqueue(outputStream, this.Immediate);
+            await this.OutputStreamQueue.Enqueue(outputStream, this.Immediate).ConfigureAwait(false);
             if (this.Immediate)
             {
                 Logger.Write(this, LogLevel.Debug, "Immediate load was requested, output stream was automatically de-queued: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
@@ -97,7 +97,7 @@ namespace FoxTunes
         {
             if (!string.IsNullOrEmpty(Path.GetPathRoot(this.PlaylistItem.FileName)) && !File.Exists(this.PlaylistItem.FileName))
             {
-                if (!NetworkDrive.IsRemotePath(this.PlaylistItem.FileName) || !await NetworkDrive.ConnectRemotePath(this.PlaylistItem.FileName))
+                if (!NetworkDrive.IsRemotePath(this.PlaylistItem.FileName) || !await NetworkDrive.ConnectRemotePath(this.PlaylistItem.FileName).ConfigureAwait(false))
                 {
                     throw new FileNotFoundException(string.Format("File not found: {0}", this.PlaylistItem.FileName), this.PlaylistItem.FileName);
                 }
@@ -106,8 +106,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded)).ConfigureAwait(false);
         }
     }
 }

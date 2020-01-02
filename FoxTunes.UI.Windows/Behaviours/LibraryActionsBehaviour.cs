@@ -53,7 +53,7 @@ namespace FoxTunes
             {
                 return;
             }
-            await this.PlaylistManager.Add(this.LibraryManager.SelectedItem, clear);
+            await this.PlaylistManager.Add(this.LibraryManager.SelectedItem, clear).ConfigureAwait(false);
         }
     }
 }

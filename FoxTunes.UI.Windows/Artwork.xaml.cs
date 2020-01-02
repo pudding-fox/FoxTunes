@@ -53,7 +53,7 @@ namespace FoxTunes
             var outputStream = PlaybackManager.CurrentStream;
             if (outputStream != null)
             {
-                metaDataItem = await ArtworkProvider.Find(outputStream.PlaylistItem, ArtworkType.FrontCover);
+                metaDataItem = await ArtworkProvider.Find(outputStream.PlaylistItem, ArtworkType.FrontCover).ConfigureAwait(false);
             }
             if (metaDataItem == null || !File.Exists(metaDataItem.Value))
             {
@@ -69,7 +69,7 @@ namespace FoxTunes
                         Stretch = Stretch.Uniform
                     };
                     this.IsComponentEnabled = false;
-                });
+                }).ConfigureAwait(false);
             }
             else
             {
@@ -81,7 +81,7 @@ namespace FoxTunes
                         Stretch = Stretch.Uniform
                     };
                     this.IsComponentEnabled = true;
-                });
+                }).ConfigureAwait(false);
             }
         }
 

@@ -323,7 +323,7 @@ namespace FoxTunes
                     {
                         try
                         {
-                            await func();
+                            await func().ConfigureAwait(false);
                         }
                         finally
                         {

@@ -38,7 +38,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var playlistItem = await this.PlaylistManager.GetNext(false);
+            var playlistItem = await this.PlaylistManager.GetNext(false).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;
@@ -48,7 +48,7 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            await this.PlaybackManager.Load(playlistItem, false);
+            await this.PlaybackManager.Load(playlistItem, false).ConfigureAwait(false);
         }
 
         public bool IsDisposed { get; private set; }

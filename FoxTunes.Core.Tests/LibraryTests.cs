@@ -43,14 +43,14 @@ namespace FoxTunes
         [Test]
         public async Task CanAddFilesToLibrary()
         {
-            await this.Core.Managers.Hierarchy.Clear(null);
-            await this.Core.Managers.Library.Clear(null);
+            await this.Core.Managers.Hierarchy.Clear(null).ConfigureAwait(false);
+            await this.Core.Managers.Library.Clear(null).ConfigureAwait(false);
             await this.Core.Managers.Library.Add(new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
-            });
+            }).ConfigureAwait(false);
             this.AssertLibraryItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
@@ -61,7 +61,7 @@ namespace FoxTunes
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Library.Clear(null);
+            await this.Core.Managers.Library.Clear(null).ConfigureAwait(false);
         }
 
         protected virtual void AssertLibraryItems(params string[] fileNames)

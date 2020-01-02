@@ -31,7 +31,7 @@ namespace FoxTunes
                 {
                     try
                     {
-                        await factory(element);
+                        await factory(element).ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {
@@ -43,7 +43,7 @@ namespace FoxTunes
                 {
                     try
                     {
-                        await factory(element);
+                        await factory(element).ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {
@@ -58,17 +58,17 @@ namespace FoxTunes
                 if (tasks.Count == tasks.Capacity)
                 {
 #if NET40
-                    await TaskEx.WhenAny(tasks);
+                    await TaskEx.WhenAny(tasks).ConfigureAwait(false);
 #else
-                    await Task.WhenAny(tasks);
+                    await Task.WhenAny(tasks).ConfigureAwait(false);
 #endif
                     tasks.RemoveAll(task => task.IsCompleted);
                 }
             }
 #if NET40
-            await TaskEx.WhenAll(tasks);
+            await TaskEx.WhenAll(tasks).ConfigureAwait(false);
 #else
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 #endif
             if (exceptions.Any())
             {

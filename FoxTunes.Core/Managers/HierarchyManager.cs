@@ -46,8 +46,8 @@ namespace FoxTunes
             using (var task = new BuildLibraryHierarchiesTask(status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -60,8 +60,8 @@ namespace FoxTunes
             using (var task = new ClearLibraryHierarchiesTask(status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
