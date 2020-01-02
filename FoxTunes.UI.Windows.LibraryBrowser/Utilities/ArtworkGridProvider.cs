@@ -64,7 +64,7 @@ namespace FoxTunes
             var fileName = default(string);
             if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
             {
-                return this.ImageLoader.Load(fileName);
+                return this.ImageLoader.Load(fileName, true);
             }
             //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
             //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
@@ -72,7 +72,7 @@ namespace FoxTunes
             {
                 if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
                 {
-                    return this.ImageLoader.Load(fileName);
+                    return this.ImageLoader.Load(fileName, true);
                 }
                 return await this.CreateImageSourceCore(libraryHierarchyNode, width, height);
             }
@@ -116,7 +116,7 @@ namespace FoxTunes
             {
                 return this.CreateImageSource0(libraryHierarchyNode, width, height);
             }
-            return this.ImageLoader.Load(PREFIX, id, fileName, width, height);
+            return this.ImageLoader.Load(PREFIX, id, fileName, width, height, true);
         }
 
         private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
@@ -165,7 +165,7 @@ namespace FoxTunes
             }
             var region = this.GetRegion(context, position, count, width, height);
             var size = (int)Math.Max(region.Width, region.Height);
-            var source = this.ImageLoader.Load(PREFIX, id, fileName, size, size);
+            var source = this.ImageLoader.Load(PREFIX, id, fileName, size, size, false);
             if (source == null)
             {
                 //Image failed to load, nothing can be done.

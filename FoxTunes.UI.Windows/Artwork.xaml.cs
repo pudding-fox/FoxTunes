@@ -73,7 +73,7 @@ namespace FoxTunes
             }
             else
             {
-                var source = ImageLoader.Load(metaDataItem.Value);
+                var source = ImageLoader.Load(metaDataItem.Value, true);
                 await Windows.Invoke(() =>
                 {
                     this.Background = new ImageBrush(source)

@@ -298,7 +298,7 @@ namespace FoxTunes.ViewModel
                 var fileName = (string)this.Value;
                 if (File.Exists(fileName))
                 {
-                    this.ImageSource = ImageLoader.Load(fileName);
+                    this.ImageSource = ImageLoader.Load(fileName, true);
                 }
             }
         }

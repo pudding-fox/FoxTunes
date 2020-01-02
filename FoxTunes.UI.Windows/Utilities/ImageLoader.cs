@@ -42,21 +42,25 @@ namespace FoxTunes
             return ImageLoaderConfiguration.GetConfigurationSections();
         }
 
-        public ImageSource Load(string fileName)
+        public ImageSource Load(string fileName, bool cache)
         {
-            return this.Load(null, null, fileName, 0, 0);
+            return this.Load(null, null, fileName, 0, 0, cache);
         }
 
-        public ImageSource Load(string prefix, string id, string fileName, int width, int height)
+        public ImageSource Load(string prefix, string id, string fileName, int width, int height, bool cache)
         {
-            var imageSource = default(Lazy<ImageSource>);
-            if (Store.TryGetValue(prefix, fileName, width, height, out imageSource))
+            if (cache)
             {
-                return imageSource.Value;
+                var imageSource = default(Lazy<ImageSource>);
+                if (Store.TryGetValue(prefix, fileName, width, height, out imageSource))
+                {
+                    return imageSource.Value;
+                }
+                Store.Add(prefix, fileName, width, height, new Lazy<ImageSource>(() => this.LoadCore(prefix, id, fileName, width, height)));
+                //Second iteration will always hit cache.
+                return this.Load(prefix, id, fileName, width, height, cache);
             }
-            Store.Add(prefix, fileName, width, height, new Lazy<ImageSource>(() => this.LoadCore(prefix, id, fileName, width, height)));
-            //Second iteration will always hit cache.
-            return this.Load(prefix, id, fileName, width, height);
+            return this.LoadCore(prefix, id, fileName, width, height);
         }
 
         private ImageSource LoadCore(string prefix, string id, string fileName, int width, int height)
