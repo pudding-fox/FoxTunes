@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -12,26 +11,43 @@ namespace FoxTunes
     /// </summary>
     public partial class ArtworkGrid : UserControl
     {
-        public static Lazy<Size> PixelSize;
-
-        public static readonly DoubleConfigurationElement ScalingFactor;
-
         public static readonly ArtworkGridProvider ArtworkGridProvider = ComponentRegistry.Instance.GetComponent<ArtworkGridProvider>();
+
+        public static int TileWidth { get; private set; }
+
+        public static int TileHeight { get; private set; }
 
         static ArtworkGrid()
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
-            if (configuration != null)
+            if (configuration == null)
             {
-                ScalingFactor = configuration.GetElement<DoubleConfigurationElement>(
-                    WindowsUserInterfaceConfiguration.SECTION,
-                    WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+                return;
+            }
+            var scalingFactor = configuration.GetElement<DoubleConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+            );
+            var tileSize = configuration.GetElement<IntegerConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
+            );
+            if (scalingFactor == null || tileSize == null)
+            {
+                return;
+            }
+            var handler = new EventHandler((sender, e) =>
+            {
+                var size = Windows.ActiveWindow.GetElementPixelSize(
+                    tileSize.Value * scalingFactor.Value,
+                    tileSize.Value * scalingFactor.Value
                 );
-            }
-            if (ArtworkGridProvider != null)
-            {
-                ArtworkGridProvider.Cleared += (sender, e) => PixelSize = null;
-            }
+                TileWidth = Convert.ToInt32(size.Width);
+                TileHeight = Convert.ToInt32(size.Height);
+            });
+            scalingFactor.ValueChanged += handler;
+            tileSize.ValueChanged += handler;
+            handler(typeof(ArtworkGrid), EventArgs.Empty);
         }
 
         public ArtworkGrid()
@@ -39,44 +55,14 @@ namespace FoxTunes
             this.InitializeComponent();
         }
 
-        public int DecodePixelWidth
-        {
-            get
-            {
-                this.EnsurePixelSize();
-                return (int)(PixelSize.Value.Width * ScalingFactor.Value);
-            }
-        }
-
-        public int DecodePixelHeight
-        {
-            get
-            {
-                this.EnsurePixelSize();
-                return (int)(PixelSize.Value.Height * ScalingFactor.Value);
-            }
-        }
-
-        protected virtual void EnsurePixelSize()
-        {
-            if (PixelSize == null)
-            {
-                PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
-            }
-        }
-
         public async Task Refresh()
         {
-            var width = default(int);
-            var height = default(int);
             var libraryHierarchyNode = default(LibraryHierarchyNode);
             await Windows.Invoke(() =>
             {
-                width = this.DecodePixelWidth;
-                height = this.DecodePixelHeight;
                 libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
             });
-            var source = await ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, width, height);
+            var source = await ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight);
             await Windows.Invoke(() => this.Background = new ImageBrush(source)
             {
                 Stretch = Stretch.Uniform

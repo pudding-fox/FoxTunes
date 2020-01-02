@@ -100,7 +100,7 @@ namespace FoxTunes
             return source.EnsureHandle();
         }
 
-        public static Size GetElementPixelSize(this FrameworkElement element)
+        public static Size GetElementPixelSize(this FrameworkElement element, double width, double height)
         {
             var matrix = default(Matrix);
             var presentationSource = PresentationSource.FromVisual(element);
@@ -115,19 +115,7 @@ namespace FoxTunes
                     matrix = hwndSource.CompositionTarget.TransformToDevice;
                 }
             }
-
-            if (element.ActualWidth != 0 && element.ActualHeight != 0)
-            {
-                return (Size)matrix.Transform(new Vector(element.ActualWidth, element.ActualHeight));
-            }
-            else
-            {
-                if (element.DesiredSize.Width == 0 && element.DesiredSize.Height == 0)
-                {
-                    element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                }
-                return (Size)matrix.Transform((Vector)element.DesiredSize);
-            }
+            return (Size)matrix.Transform(new Vector(width, height));
         }
 
         public static void Disconnect(this FrameworkElement element)

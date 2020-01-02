@@ -239,6 +239,10 @@ namespace FoxTunes
             var hashCode = default(int);
             unchecked
             {
+                if (this.ThemeLoader.Theme != null)
+                {
+                    hashCode += this.ThemeLoader.Theme.Id.GetHashCode();
+                }
                 do
                 {
                     if (!string.IsNullOrEmpty(libraryHierarchyNode.Value))
