@@ -129,7 +129,6 @@ namespace FoxTunes
                 this.IsCancellationRequested = false;
                 complete = false;
             }
-            await this.UpdateVariousArtists();
             if (buildHierarchies)
             {
                 await this.BuildHierarchies(LibraryItemStatus.Import);
@@ -164,14 +163,11 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                var query = this.Database
-                    .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
-                    .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
-                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItem, this.Visible, transaction))
+                using (var metaDataPopulator = new LibraryMetaDataPopulator(this.Database, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(metaDataPopulator,
-                        async () => await metaDataPopulator.Populate(query, cancellationToken)
+                        async () => await metaDataPopulator.Populate(LibraryItemStatus.Import, cancellationToken)
                     );
                 }
                 transaction.Commit();
@@ -209,7 +205,7 @@ namespace FoxTunes
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
                 await this.WithSubTask(libraryHierarchyPopulator,
-                    async () => await libraryHierarchyPopulator.Populate(status, cancellationToken, transaction)
+                    async () => await libraryHierarchyPopulator.Populate(status, cancellationToken)
                 );
             }
         }
@@ -283,26 +279,6 @@ namespace FoxTunes
                         case DatabaseParameterPhase.Fetch:
                             parameters["status"] = status;
                             parameters["id"] = libraryItemId;
-                            break;
-                    }
-                }, transaction);
-                transaction.Commit();
-            }
-        }
-
-        protected virtual async Task UpdateVariousArtists()
-        {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                await this.Database.ExecuteAsync(this.Database.Queries.UpdateLibraryVariousArtists, (parameters, phase) =>
-                {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["name"] = CustomMetaData.VariousArtists;
-                            parameters["type"] = MetaDataItemType.Tag;
-                            parameters["value"] = bool.TrueString;
-                            parameters["status"] = LibraryItemStatus.Import;
                             break;
                     }
                 }, transaction);
