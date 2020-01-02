@@ -2247,7 +2247,7 @@
                 <ControlTemplate TargetType="{x:Type TreeView}">
                     <Grid>
                         <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Background="{DynamicResource ControlBackgroundBrush}">
-                            <ScrollViewer Style="{DynamicResource NuclearScrollViewer}" Focusable="False" Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="False" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
+                            <ScrollViewer Style="{DynamicResource NuclearScrollViewer}" Focusable="False" Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
                                 <ItemsPresenter />
                             </ScrollViewer>
                         </Border>
