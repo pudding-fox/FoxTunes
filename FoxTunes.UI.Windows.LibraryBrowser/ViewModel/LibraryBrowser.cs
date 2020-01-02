@@ -253,10 +253,10 @@ namespace FoxTunes.ViewModel
 
         private void Up()
         {
-            this.Up(this.Frames);
+            this.Up(this.Frames, true);
         }
 
-        private void Up(IList<LibraryBrowserFrame> frames)
+        private void Up(IList<LibraryBrowserFrame> frames, bool updateSelection)
         {
             var frame = frames.LastOrDefault();
             if (frame == null)
@@ -264,20 +264,23 @@ namespace FoxTunes.ViewModel
                 return;
             }
             frames.Remove(frame);
-            this.SelectedItem = frame.ItemsSource;
+            if (updateSelection && object.ReferenceEquals(this.Frames, frames))
+            {
+                this.SelectedItem = frame.ItemsSource;
+            }
         }
 
         private void Down()
         {
-            this.Down(this.SelectedItem);
+            this.Down(this.SelectedItem, true);
         }
 
-        private bool Down(LibraryHierarchyNode libraryHierarchyNode)
+        private bool Down(LibraryHierarchyNode libraryHierarchyNode, bool updateSelection)
         {
-            return this.Down(libraryHierarchyNode, this.Frames);
+            return this.Down(libraryHierarchyNode, this.Frames, updateSelection);
         }
 
-        private bool Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames)
+        private bool Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames, bool updateSelection)
         {
             var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode);
             if (!libraryHierarchyNodes.Any())
@@ -290,6 +293,10 @@ namespace FoxTunes.ViewModel
                     new[] { LibraryHierarchyNode.Empty }.Concat(libraryHierarchyNodes)
                 )
             );
+            if (updateSelection && object.ReferenceEquals(this.Frames, frames))
+            {
+                this.SelectedItem = libraryHierarchyNodes.FirstOrDefault();
+            }
             return true;
         }
 
@@ -319,7 +326,7 @@ namespace FoxTunes.ViewModel
                 libraryHierarchyNode = stack.Pop();
                 if (position >= frames.Count)
                 {
-                    if (!this.Down(libraryHierarchyNode, frames))
+                    if (!this.Down(libraryHierarchyNode, frames, false))
                     {
                         break;
                     }
@@ -333,7 +340,7 @@ namespace FoxTunes.ViewModel
                         {
                             frames.RemoveAt(frames.Count - 1);
                         }
-                        if (!this.Down(libraryHierarchyNode, frames))
+                        if (!this.Down(libraryHierarchyNode, frames, false))
                         {
                             break;
                         }
