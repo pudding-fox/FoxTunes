@@ -22,7 +22,7 @@ namespace FoxTunes
         public void Add(TKey key, TValue value)
         {
             this.Store[key] = value;
-            if (this.Keys.Count >= this.Capacity)
+            while (this.Keys.Count >= (this.Capacity - 1))
             {
                 this.Store.TryRemove(this.Keys.Dequeue());
             }
@@ -32,7 +32,7 @@ namespace FoxTunes
         public bool TryGetValue(TKey key, out TValue value)
         {
             var result = this.Store.TryGetValue(key, out value);
-            if (result && this.Keys.Count >= (this.Capacity - 1))
+            if (result)
             {
                 //When a cache hit occurs, push the key to the back of queue.
                 this.Keys.Remove(key);
