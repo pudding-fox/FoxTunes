@@ -3,35 +3,36 @@ using System;
 using System.Linq;
 using System.Windows.Input;
 
-namespace FoxTunes.ViewModel
+namespace FoxTunes
 {
     public static partial class Extensions
     {
-        public static void AddInputHook(this IInputManager inputManager, string phrase, Action action)
+        public static bool AddInputHook(this IInputManager inputManager, string phrase, Action action)
         {
             var modifiers = default(int);
             var keys = default(int);
-            if (!TryGetKey(phrase, out modifiers, out keys))
+            if (!TryGetKeys(phrase, out modifiers, out keys))
             {
-                throw new NotImplementedException();
+                return false;
             }
             inputManager.AddInputHook(modifiers, keys, action);
+            return true;
         }
 
         public static void RemoveInputHook(this IInputManager inputManager, string phrase)
         {
             var modifiers = default(int);
             var keys = default(int);
-            if (!TryGetKey(phrase, out modifiers, out keys))
+            if (!TryGetKeys(phrase, out modifiers, out keys))
             {
                 throw new NotImplementedException();
             }
             inputManager.RemoveInputHook(modifiers, keys);
         }
 
-        private static bool TryGetKey(string phrase, out int modifiers, out int keys)
+        public static bool TryGetKeys(this string phrase, out ModifierKeys modifiers, out Key keys)
         {
-            modifiers = 0;
+            modifiers = ModifierKeys.None;
             if (string.IsNullOrEmpty(phrase))
             {
                 keys = default(int);
@@ -44,7 +45,7 @@ namespace FoxTunes.ViewModel
                 var modifier = default(ModifierKeys);
                 if (Enum.TryParse<ModifierKeys>(element, true, out modifier))
                 {
-                    modifiers |= (int)modifier;
+                    modifiers |= modifier;
                 }
                 else if (Enum.TryParse<Key>(element, true, out key))
                 {
@@ -56,7 +57,22 @@ namespace FoxTunes.ViewModel
                     return false;
                 }
             }
-            keys = KeyInterop.VirtualKeyFromKey(key);
+            keys = key;
+            return true;
+        }
+
+        public static bool TryGetKeys(this string phrase, out int modifiers, out int keys)
+        {
+            var _keys = default(Key);
+            var _modifiers = default(ModifierKeys);
+            if (!phrase.TryGetKeys(out _modifiers, out _keys))
+            {
+                modifiers = 0;
+                keys = 0;
+                return false;
+            }
+            modifiers = (int)_modifiers;
+            keys = KeyInterop.VirtualKeyFromKey(_keys);
             return true;
         }
     }

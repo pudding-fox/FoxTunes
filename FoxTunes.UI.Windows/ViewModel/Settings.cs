@@ -7,6 +7,12 @@ namespace FoxTunes.ViewModel
 {
     public class Settings : ViewModelBase
     {
+        public Settings()
+        {
+            Windows.SettingsWindowCreated += this.OnSettingsWindowCreated;
+            Windows.SettingsWindowClosed += this.OnSettingsWindowClosed;
+        }
+
         public IConfiguration Configuration { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -37,34 +43,29 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged;
 
-        private bool _SettingsVisible { get; set; }
-
         public bool SettingsVisible
         {
             get
             {
-                return this._SettingsVisible;
+                return Windows.IsSettingsWindowCreated;
             }
             set
             {
-                this._SettingsVisible = value;
-                this.OnSettingsVisibleChanged();
+                if (value)
+                {
+                    this.SignalEmitter.Send(new Signal(this, CommonSignals.SettingsUpdated));
+                    Windows.SettingsWindow.DataContext = this.Core;
+                    Windows.SettingsWindow.Show();
+                }
+                else if (Windows.IsSettingsWindowCreated)
+                {
+                    Windows.SettingsWindow.Close();
+                }
             }
         }
 
         protected virtual void OnSettingsVisibleChanged()
         {
-            if (this.SettingsVisible)
-            {
-                this.SignalEmitter.Send(new Signal(this, CommonSignals.SettingsUpdated));
-                Windows.SettingsWindow.DataContext = this.Core;
-                Windows.SettingsWindow.Closed += (sender, e) => this.SettingsVisible = false;
-                Windows.SettingsWindow.Show();
-            }
-            else if (Windows.IsSettingsWindowCreated)
-            {
-                Windows.SettingsWindow.Close();
-            }
             if (this.SettingsVisibleChanged != null)
             {
                 this.SettingsVisibleChanged(this, EventArgs.Empty);
@@ -90,6 +91,14 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public ICommand ToggleCommand
+        {
+            get
+            {
+                return new Command(() => this.SettingsVisible = !this.SettingsVisible);
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;
@@ -99,6 +108,23 @@ namespace FoxTunes.ViewModel
             );
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnSettingsWindowCreated(object sender, EventArgs e)
+        {
+            this.OnSettingsVisibleChanged();
+        }
+
+        protected virtual void OnSettingsWindowClosed(object sender, EventArgs e)
+        {
+            this.OnSettingsVisibleChanged();
+        }
+
+        protected override void OnDisposing()
+        {
+            Windows.SettingsWindowCreated -= this.OnSettingsWindowCreated;
+            Windows.SettingsWindowClosed -= this.OnSettingsWindowClosed;
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -33,32 +34,30 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler EnabledChanged;
-
-        public bool _SaveChanges { get; private set; }
-
-        public bool SaveChanges
+        
+        public ICommand ShowCommand
         {
             get
             {
-                return this._SaveChanges;
-            }
-            set
-            {
-                this._SaveChanges = value;
-                this.OnSaveChangesChanged();
+                return new Command(() => this.Enabled.Value = true);
             }
         }
 
-        protected virtual void OnSaveChangesChanged()
+        public ICommand HideCommand
         {
-            if (this.SaveChangesChanged != null)
+            get
             {
-                this.SaveChangesChanged(this, EventArgs.Empty);
+                return new Command(() => this.Enabled.Value = false);
             }
-            this.OnPropertyChanged("SaveChanges");
         }
 
-        public event EventHandler SaveChangesChanged;
+        public ICommand ToggleCommand
+        {
+            get
+            {
+                return new Command(() => this.Enabled.Value = !this.Enabled.Value);
+            }
+        }
 
         public override void InitializeComponent(ICore core)
         {

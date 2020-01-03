@@ -20,18 +20,18 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION, "Keyboard Shortcuts")
                 .WithElement(
-                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
+                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "Global Hotkeys").WithValue(false))
                 .WithElement(
-                    new TextConfigurationElement(PLAY_ELEMENT, "Play")
+                    new TextConfigurationElement(PLAY_ELEMENT, "Play", path: "Global Hotkeys")
                         .WithValue("MediaPlayPause"))
                 .WithElement(
-                    new TextConfigurationElement(PREVIOUS_ELEMENT, "Previous")
+                    new TextConfigurationElement(PREVIOUS_ELEMENT, "Previous", path: "Global Hotkeys")
                         .WithValue("MediaPreviousTrack"))
                  .WithElement(
-                    new TextConfigurationElement(NEXT_ELEMENT, "Next")
+                    new TextConfigurationElement(NEXT_ELEMENT, "Next", path: "Global Hotkeys")
                         .WithValue("MediaNextTrack"))
-                         .WithElement(
-                    new TextConfigurationElement(STOP_ELEMENT, "Stop")
+                .WithElement(
+                    new TextConfigurationElement(STOP_ELEMENT, "Stop", path: "Global Hotkeys")
                         .WithValue("MediaStop")
             );
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(enabled => UpdateConfiguration(enabled));
