@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public const string MINI_PLAYER_ELEMENT = "FFFFDF70-E0DB-4154-9567-01AE394BA476";
 
+        public const string SEARCH_ELEMENT = "GGGG6849-7DA9-4BA1-9A5A-548E3D9A1E25";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(InputManagerConfiguration.SECTION, "Keyboard Shortcuts")
@@ -36,7 +38,10 @@ namespace FoxTunes
                         .WithValue("Alt+S"))
                 .WithElement(
                     new TextConfigurationElement(MINI_PLAYER_ELEMENT, "Toggle Mini Player")
-                        .WithValue("Alt+M")
+                        .WithValue("Alt+M"))
+                .WithElement(
+                    new TextConfigurationElement(SEARCH_ELEMENT, "Search")
+                        .WithValue("Alt+F")
             );
         }
     }
