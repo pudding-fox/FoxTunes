@@ -58,7 +58,7 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task<ImageSource> CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
         {
             var id = this.GetImageId(libraryHierarchyNode, width, height);
             var fileName = default(string);
@@ -74,17 +74,13 @@ namespace FoxTunes
                 {
                     return this.ImageLoader.Load(fileName, true);
                 }
-                return await this.CreateImageSourceCore(libraryHierarchyNode, width, height).ConfigureAwait(false);
+                return this.CreateImageSourceCore(libraryHierarchyNode, width, height);
             }
         }
 
-        private async Task<ImageSource> CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
         {
-            if (!libraryHierarchyNode.IsMetaDatasLoaded)
-            {
-                await libraryHierarchyNode.LoadMetaDatasAsync().ConfigureAwait(false);
-            }
-            switch (libraryHierarchyNode.MetaDatas.Count)
+            switch (libraryHierarchyNode.MetaDatas.Length)
             {
                 case 0:
                     return this.CreateImageSource0(libraryHierarchyNode, width, height);

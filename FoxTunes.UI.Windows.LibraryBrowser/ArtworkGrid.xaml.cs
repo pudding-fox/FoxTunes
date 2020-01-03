@@ -62,7 +62,7 @@ namespace FoxTunes
             {
                 libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
             }).ConfigureAwait(false);
-            var source = await ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight).ConfigureAwait(false);
+            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight);
             await Windows.Invoke(() => this.Background = new ImageBrush(source)
             {
                 Stretch = Stretch.Uniform

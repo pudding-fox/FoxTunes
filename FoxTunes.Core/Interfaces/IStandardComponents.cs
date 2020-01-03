@@ -21,5 +21,7 @@
         IArtworkProvider ArtworkProvider { get; }
 
         IFileSystemBrowser FileSystemBrowser { get; }
+
+        IMetaDataBrowser MetaDataBrowser { get; }
     }
 }

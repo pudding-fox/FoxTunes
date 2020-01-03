@@ -248,7 +248,6 @@ namespace FoxTunes
                 }
                 if (!node.IsExpanded)
                 {
-                    node.LoadChildren();
                     node.IsExpanded = true;
                 }
                 nodes = node.Children;

@@ -55,8 +55,6 @@ namespace FoxTunes
 
         public async Task Populate(LibraryItemStatus? status, CancellationToken cancellationToken)
         {
-            var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, this.Transaction).ToArray();
-
             var libraryHierarchies = this.GetHierarchies(this.Transaction);
             var libraryHierarchyLevels = this.GetLevels(libraryHierarchies);
             var libraryItems = this.GetItems(status, this.Transaction);

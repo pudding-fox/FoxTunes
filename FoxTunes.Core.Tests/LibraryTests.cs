@@ -113,7 +113,7 @@ namespace FoxTunes
                 {
                     return new[] { node };
                 }
-                node.LoadChildren();
+                node.IsExpanded = true;
                 return node.Children.SelectMany(selector);
             };
             var leaves = nodes.SelectMany(selector);

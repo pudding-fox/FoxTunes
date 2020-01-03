@@ -26,10 +26,6 @@ namespace FoxTunes
             var viewModel = this.FindResource<global::FoxTunes.ViewModel.LibraryTree>("ViewModel");
             if (viewModel != null && viewModel.ShowCursorAdorners)
             {
-                if (!viewModel.SelectedItem.IsMetaDatasLoaded)
-                {
-                    viewModel.SelectedItem.LoadMetaDatas();
-                }
                 this.MouseCursorAdorner.DataContext = viewModel.SelectedItem;
                 this.MouseCursorAdorner.Show();
             }
@@ -60,21 +56,6 @@ namespace FoxTunes
             var task = this.ExpandAll(view.OfType<LibraryHierarchyNode>());
         }
 
-        protected virtual void OnExpanded(object sender, RoutedEventArgs e)
-        {
-            var treeViewItem = sender as TreeViewItem;
-            if (treeViewItem == null)
-            {
-                return;
-            }
-            var libraryHierarchyNode = treeViewItem.DataContext as LibraryHierarchyNode;
-            if (libraryHierarchyNode == null || libraryHierarchyNode.IsChildrenLoaded)
-            {
-                return;
-            }
-            var task = libraryHierarchyNode.LoadChildrenAsync();
-        }
-
         public async Task ExpandAll(IEnumerable<LibraryHierarchyNode> sequence)
         {
             var stack = new Stack<LibraryHierarchyNode>(sequence);
@@ -83,7 +64,6 @@ namespace FoxTunes
                 var node = stack.Pop();
                 if (!node.IsExpanded)
                 {
-                    await node.LoadChildrenAsync().ConfigureAwait(false);
                     await Windows.Invoke(() => node.IsExpanded = true).ConfigureAwait(false);
                 }
                 foreach (var child in node.Children)
