@@ -243,6 +243,7 @@ namespace FoxTunes
             catch (Exception e)
             {
                 this.OnError(e);
+                throw;
             }
         }
 
@@ -261,6 +262,7 @@ namespace FoxTunes
             catch (Exception e)
             {
                 this.OnError(e);
+                throw;
             }
         }
 
@@ -284,6 +286,7 @@ namespace FoxTunes
             catch (Exception e)
             {
                 this.OnError(e);
+                throw;
             }
         }
 
