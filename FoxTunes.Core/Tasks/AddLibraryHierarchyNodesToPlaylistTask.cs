@@ -24,6 +24,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool Cancellable
+        {
+            get
+            {
+                return this.LibraryHierarchyNodes.Count() > 1;
+            }
+        }
+
         public IEnumerable<LibraryHierarchyNode> LibraryHierarchyNodes { get; private set; }
 
         public bool Clear { get; private set; }
@@ -86,6 +94,10 @@ namespace FoxTunes
                     var position = 0;
                     foreach (var libraryHierarchyNode in this.LibraryHierarchyNodes)
                     {
+                        if (this.IsCancellationRequested)
+                        {
+                            break;
+                        }
                         await this.SetDescription(libraryHierarchyNode.Value).ConfigureAwait(false);
                         await this.AddPlaylistItems(query, libraryHierarchyNode, transaction).ConfigureAwait(false);
                         await this.SetPosition(++position).ConfigureAwait(false);
