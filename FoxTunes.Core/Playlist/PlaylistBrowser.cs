@@ -54,10 +54,9 @@ namespace FoxTunes
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var set = database.Set<PlaylistItem>(transaction);
-                    set.Fetch.Sort.Expressions.Clear();
-                    set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
-                    foreach (var element in set)
+                    var sequence = database.AsQueryable<PlaylistItem>(transaction)
+                        .OrderBy(playlistItem => playlistItem.Sequence);
+                    foreach (var element in sequence)
                     {
                         yield return element;
                     }
