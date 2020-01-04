@@ -16,6 +16,10 @@ namespace FoxTunes
 
         protected virtual async void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            if (!this.IsVisible)
+            {
+                return;
+            }
             await Windows.Invoke(() =>
             {
                 if (this.ListBox.SelectedItem != null)
@@ -27,6 +31,10 @@ namespace FoxTunes
 
         protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!this.IsVisible)
+            {
+                return;
+            }
             var listBox = sender as ListBox;
             if (listBox == null || listBox.SelectedItem == null)
             {

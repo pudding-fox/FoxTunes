@@ -23,5 +23,9 @@
         IFileSystemBrowser FileSystemBrowser { get; }
 
         IMetaDataBrowser MetaDataBrowser { get; }
+
+        IPlaylistBrowser PlaylistBrowser { get; }
+
+        IPlaylistCache PlaylistCache { get; }
     }
 }

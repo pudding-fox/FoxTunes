@@ -10,6 +10,8 @@ namespace FoxTunes.ViewModel
 {
     public class Mini : ViewModelBase
     {
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -300,7 +302,7 @@ namespace FoxTunes.ViewModel
 
         private async Task AddToPlaylist(IEnumerable<string> paths)
         {
-            var index = await this.PlaylistManager.GetInsertIndex().ConfigureAwait(false);
+            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
             await this.PlaylistManager.Add(paths, this.ResetPlaylist.Value).ConfigureAwait(false);
             if (this.AutoPlay.Value)
             {
@@ -310,6 +312,7 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
+            this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.Configuration = this.Core.Components.Configuration;
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(

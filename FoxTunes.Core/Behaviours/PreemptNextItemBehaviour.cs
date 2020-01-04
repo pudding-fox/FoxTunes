@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public IOutput Output { get; private set; }
 
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -18,7 +18,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
-            this.PlaylistManager = core.Managers.Playlist;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.Ending += this.OnEnding;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
@@ -35,7 +35,7 @@ namespace FoxTunes
 
         private async Task PreemptItems()
         {
-            var playlistItem = await this.PlaylistManager.GetNext(false).ConfigureAwait(false);
+            var playlistItem = await this.PlaylistBrowser.GetNext(false).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;

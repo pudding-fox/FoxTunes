@@ -97,6 +97,22 @@ namespace FoxTunes
             }
         }
 
+        public IPlaylistBrowser PlaylistBrowser
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IPlaylistBrowser>();
+            }
+        }
+
+        public IPlaylistCache PlaylistCache
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IPlaylistCache>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }
