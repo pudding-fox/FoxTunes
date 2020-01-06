@@ -210,11 +210,10 @@ namespace FoxTunes
             }
             if (playlistItem != null)
             {
-                //TODO: Bad .Result
-                var metaDataItem = await this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover).ConfigureAwait(false);
-                if (metaDataItem != null && File.Exists(metaDataItem.Value))
+                var fileName = this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
+                if (!string.IsNullOrEmpty(fileName) != null && File.Exists(fileName))
                 {
-                    var stream = await this.GetThumbnail(metaDataItem.Value).ConfigureAwait(false);
+                    var stream = await this.GetThumbnail(fileName).ConfigureAwait(false);
                     updater.Thumbnail = RandomAccessStreamReference.CreateFromStream(stream);
                 }
             }

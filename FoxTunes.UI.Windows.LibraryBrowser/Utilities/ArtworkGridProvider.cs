@@ -64,7 +64,7 @@ namespace FoxTunes
             var fileName = default(string);
             if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
             {
-                return this.ImageLoader.Load(fileName, true);
+                return this.ImageLoader.Load(id, fileName, 0, 0, true);
             }
             //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
             //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
@@ -72,7 +72,7 @@ namespace FoxTunes
             {
                 if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
                 {
-                    return this.ImageLoader.Load(fileName, true);
+                    return this.ImageLoader.Load(id, fileName, 0, 0, true);
                 }
                 return this.CreateImageSourceCore(libraryHierarchyNode, width, height);
             }
@@ -98,10 +98,7 @@ namespace FoxTunes
         private ImageSource CreateImageSource0(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
         {
             var id = this.GetImageId(libraryHierarchyNode, width, height);
-            using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
-            {
-                return this.ImageLoader.Load(PREFIX, id, stream, width, height);
-            }
+            return this.ImageLoader.Load(ThemeLoader.Theme.Id, () => ThemeLoader.Theme.ArtworkPlaceholder, true);
         }
 
         private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
@@ -112,7 +109,7 @@ namespace FoxTunes
             {
                 return this.CreateImageSource0(libraryHierarchyNode, width, height);
             }
-            return this.ImageLoader.Load(PREFIX, id, fileName, width, height, true);
+            return this.ImageLoader.Load(id, fileName, width, height, true);
         }
 
         private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
@@ -161,7 +158,7 @@ namespace FoxTunes
             }
             var region = this.GetRegion(context, position, count, width, height);
             var size = (int)Math.Max(region.Width, region.Height);
-            var source = this.ImageLoader.Load(PREFIX, id, fileName, size, size, false);
+            var source = this.ImageLoader.Load(id, fileName, size, size, false);
             if (source == null)
             {
                 //Image failed to load, nothing can be done.

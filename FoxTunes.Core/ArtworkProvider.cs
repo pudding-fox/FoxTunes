@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -61,17 +60,19 @@ namespace FoxTunes
                 .ToArray();
         }
 
-        public async Task<MetaDataItem> Find(string path, ArtworkType type)
+        public string Find(string path, ArtworkType type)
         {
-            var metaDataItem = default(MetaDataItem);
             if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
             {
-                return metaDataItem;
+                return null;
             }
             var directoryName = Path.GetDirectoryName(path);
-            if (this.Store.TryGetValue(directoryName, type, out metaDataItem))
             {
-                return metaDataItem;
+                var fileName = default(string);
+                if (this.Store.TryGetValue(directoryName, type, out fileName))
+                {
+                    return fileName;
+                }
             }
             var names = default(string[]);
             switch (type)
@@ -85,7 +86,6 @@ namespace FoxTunes
                 default:
                     throw new NotImplementedException();
             }
-            var exception = default(Exception);
             try
             {
                 foreach (var name in names)
@@ -99,28 +99,20 @@ namespace FoxTunes
                         }
                         if (info.Length <= MAX_LENGTH)
                         {
-                            metaDataItem = new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
-                            {
-                                Value = fileName
-                            };
-                            this.Store.Add(directoryName, type, metaDataItem);
-                            return metaDataItem;
+                            this.Store.Add(directoryName, type, fileName);
+                            return fileName;
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                exception = e;
+                Logger.Write(this, LogLevel.Warn, "Error locating artwork of type {0} in {1}: {2}", Enum.GetName(typeof(ArtworkType), type), path, e.Message);
             }
-            if (exception != null)
-            {
-                await this.OnError(exception).ConfigureAwait(false);
-            }
-            return metaDataItem;
+            return null;
         }
 
-        public Task<MetaDataItem> Find(PlaylistItem playlistItem, ArtworkType type)
+        public string Find(PlaylistItem playlistItem, ArtworkType type)
         {
             var result = playlistItem.MetaDatas.FirstOrDefault(
                  metaDataItem =>
@@ -128,32 +120,32 @@ namespace FoxTunes
                      string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) &&
                      File.Exists(metaDataItem.Value)
              );
-#if NET40
-            return TaskEx.FromResult(result);
-#else
-            return Task.FromResult(result);
-#endif
+            if (result != null)
+            {
+                return result.Value;
+            }
+            return this.Find(playlistItem.FileName, type);
         }
 
         public class Cache
         {
             public Cache(int capacity)
             {
-                this.Store = new CappedDictionary<Key, MetaDataItem>(capacity);
+                this.Store = new CappedDictionary<Key, string>(capacity);
             }
 
-            public CappedDictionary<Key, MetaDataItem> Store { get; private set; }
+            public CappedDictionary<Key, string> Store { get; private set; }
 
-            public void Add(string path, ArtworkType type, MetaDataItem metaDataItem)
+            public void Add(string path, ArtworkType type, string fileName)
             {
                 var key = new Key(path, type);
-                this.Store.Add(key, metaDataItem);
+                this.Store.Add(key, fileName);
             }
 
-            public bool TryGetValue(string path, ArtworkType type, out MetaDataItem metaDataItem)
+            public bool TryGetValue(string path, ArtworkType type, out string fileName)
             {
                 var key = new Key(path, type);
-                return this.Store.TryGetValue(key, out metaDataItem);
+                return this.Store.TryGetValue(key, out fileName);
             }
 
             public class Key : IEquatable<Key>

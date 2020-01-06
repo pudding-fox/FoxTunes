@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -78,14 +79,19 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    var metaDataItem = await this.ArtworkProvider.Find(fileName, type).ConfigureAwait(false);
-                    if (metaDataItem != null)
+                    var value = this.ArtworkProvider.Find(fileName, type);
+                    if (!string.IsNullOrEmpty(value) && File.Exists(value))
                     {
                         if (this.CopyImages.Value)
                         {
-                            metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false).ConfigureAwait(false);
+                            value = await this.ImportImage(value, value, false).ConfigureAwait(false);
                         }
-                        result.Add(metaDataItem);
+                        result.Add(new MetaDataItem()
+                        {
+                            Name = Enum.GetName(typeof(ArtworkType), type),
+                            Value = value,
+                            Type = MetaDataItemType.Image
+                        });
                     }
                 }
             }

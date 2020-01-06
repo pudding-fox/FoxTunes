@@ -303,14 +303,19 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var metaDataItem = await this.ArtworkProvider.Find(fileName, type).ConfigureAwait(false);
-                if (metaDataItem != null)
+                var value = this.ArtworkProvider.Find(fileName, type);
+                if (!string.IsNullOrEmpty(value) && global::System.IO.File.Exists(value))
                 {
                     if (this.CopyImages.Value)
                     {
-                        metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false).ConfigureAwait(false);
+                        value = await this.ImportImage(value, value, false).ConfigureAwait(false);
                     }
-                    metaData.Add(metaDataItem);
+                    metaData.Add(new MetaDataItem()
+                    {
+                        Name = Enum.GetName(typeof(ArtworkType), type),
+                        Value = value,
+                        Type = MetaDataItemType.Image
+                    });
                 }
             }
         }
@@ -495,12 +500,12 @@ namespace FoxTunes
         private async Task AddImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures)
         {
 
-/* Unmerged change from project 'FoxTunes.MetaData.TagLib(net461)'
-Before:
-            pictures.Add(await this.CreateImage(metaDataItem, tag));
-After:
-            pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
-*/
+            /* Unmerged change from project 'FoxTunes.MetaData.TagLib(net461)'
+            Before:
+                        pictures.Add(await this.CreateImage(metaDataItem, tag));
+            After:
+                        pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
+            */
             pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
         }
 

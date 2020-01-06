@@ -287,18 +287,24 @@ namespace FoxTunes.ViewModel
             if (!this.HasValue || this.HasMultipleValues)
             {
                 //TODO: The <No Value>/<Multiple Values> text is hard to read when we use the placeholder image.
-                //using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
-                //{
-                //    this.ImageSource = ImageLoader.Load(stream);
-                //}
+                //this.ImageSource = ImageLoader.Load(
+                //    ThemeLoader.Theme.Id,
+                //    () => ThemeLoader.Theme.ArtworkPlaceholder,
+                //    true
+                //);
                 this.ImageSource = null;
             }
             else
             {
-                var fileName = (string)this.Value;
-                if (File.Exists(fileName))
+                if (File.Exists(this.Value))
                 {
-                    this.ImageSource = ImageLoader.Load(fileName, true);
+                    this.ImageSource = ImageLoader.Load(
+                        this.Value,
+                        this.Value,
+                        0,
+                        0,
+                        true
+                    );
                 }
             }
         }
