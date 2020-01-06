@@ -16,7 +16,7 @@ namespace FoxTunes
             Semaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
         }
 
-        private static List<WeakReference> Instances { get; set; }
+        private static IList<WeakReference> Instances { get; set; }
 
         private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
 
@@ -24,11 +24,14 @@ namespace FoxTunes
         {
             get
             {
-                return Instances
-                    .Where(instance => instance != null && instance.IsAlive)
-                    .Select(instance => (IBackgroundTask)instance.Target)
-                    .Where(backgroundTask => !(backgroundTask.IsCompleted || backgroundTask.IsFaulted))
-                    .ToArray();
+                lock (Instances)
+                {
+                    return Instances
+                        .Where(instance => instance != null && instance.IsAlive)
+                        .Select(instance => (IBackgroundTask)instance.Target)
+                        .Where(backgroundTask => !(backgroundTask.IsCompleted || backgroundTask.IsFaulted))
+                        .ToArray();
+                }
             }
         }
 
@@ -250,7 +253,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            Instances.Add(new WeakReference(this));
+            lock (Instances)
+            {
+                Instances.Add(new WeakReference(this));
+            }
             OnActiveChanged();
             base.InitializeComponent(core);
         }
@@ -438,16 +444,19 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            var instances = Instances.ToArray();
-            foreach (var instance in instances)
+            lock (Instances)
             {
-                if (instance == null || !instance.IsAlive)
+                for (var a = Instances.Count - 1; a >= 0; a--)
                 {
-                    Instances.Remove(instance);
-                }
-                else if (object.ReferenceEquals(this, instance.Target))
-                {
-                    Instances.Remove(instance);
+                    var instance = Instances[a];
+                    if (instance == null || !instance.IsAlive)
+                    {
+                        Instances.RemoveAt(a);
+                    }
+                    else if (object.ReferenceEquals(this, instance.Target))
+                    {
+                        Instances.RemoveAt(a);
+                    }
                 }
             }
             OnActiveChanged();
