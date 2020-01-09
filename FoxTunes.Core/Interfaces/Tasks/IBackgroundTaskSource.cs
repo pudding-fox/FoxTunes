@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FoxTunes.Interfaces
+﻿namespace FoxTunes.Interfaces
 {
     public interface IBackgroundTaskSource : IBaseComponent
     {
