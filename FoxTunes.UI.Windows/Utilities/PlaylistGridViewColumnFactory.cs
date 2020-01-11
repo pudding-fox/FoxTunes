@@ -1,9 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using FoxTunes.ViewModel;
 using System;
-using System.ComponentModel;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace FoxTunes
 {

@@ -226,12 +226,18 @@ namespace FoxTunes
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
-            SignalEmitter.Signal += this.OnSignal;
+            if (SignalEmitter != null)
+            {
+                SignalEmitter.Signal += this.OnSignal;
+            }
         }
 
         protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            SignalEmitter.Signal -= this.OnSignal;
+            if (SignalEmitter != null)
+            {
+                SignalEmitter.Signal -= this.OnSignal;
+            }
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
