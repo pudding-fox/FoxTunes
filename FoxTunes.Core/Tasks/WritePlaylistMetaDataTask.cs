@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace FoxTunes
             : base(ID)
         {
             this.PlaylistItems = playlistItems;
+            this.Errors = new Dictionary<PlaylistItem, Exception>();
         }
 
         public override bool Visible
@@ -36,6 +38,8 @@ namespace FoxTunes
         }
 
         public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
+
+        public IDictionary<PlaylistItem, Exception> Errors { get; private set; }
 
         public IDatabaseComponent Database { get; private set; }
 
@@ -73,10 +77,21 @@ namespace FoxTunes
                     if (!File.Exists(playlistItem.FileName))
                     {
                         Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
+                        this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName)));
+                        position++;
                         continue;
                     }
 
-                    await metaDataSource.SetMetaData(playlistItem.FileName, playlistItem.MetaDatas).ConfigureAwait(false);
+                    try
+                    {
+                        await metaDataSource.SetMetaData(playlistItem.FileName, playlistItem.MetaDatas).ConfigureAwait(false);
+                    }
+                    catch (Exception e)
+                    {
+                        this.Errors.Add(playlistItem, e);
+                        position++;
+                        continue;
+                    }
 
                     foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
                     {

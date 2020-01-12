@@ -81,7 +81,7 @@ namespace FoxTunes
                 return key =>
                 {
                     var encoderItem = default(EncoderItem);
-                    if (!this.EncoderItems.TryGetValue(key, out encoderItem))
+                    if (!this.EncoderItems.TryGetValue(key, out encoderItem) || !File.Exists(encoderItem.OutputFileName))
                     {
                         return;
                     }

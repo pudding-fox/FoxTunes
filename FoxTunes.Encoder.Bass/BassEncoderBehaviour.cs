@@ -124,10 +124,10 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Report(this, new ReportSourceEventArgs(report));
+            this.Report(this, new ReportEventArgs(report));
         }
 
-        public event ReportSourceEventHandler Report;
+        public event ReportEventHandler Report;
 
         private class EncodePlaylistItemsTask : BackgroundTask
         {

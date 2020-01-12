@@ -21,7 +21,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnReport(object sender, ReportSourceEventArgs e)
+        protected virtual void OnReport(object sender, ReportEventArgs e)
         {
             var task = Windows.Invoke(() =>
             {

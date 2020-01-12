@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace FoxTunes
         public WriteLibraryMetaDataTask(IEnumerable<LibraryItem> libraryItems) : base(ID)
         {
             this.LibraryItems = libraryItems;
+            this.Errors = new Dictionary<LibraryItem, Exception>();
         }
 
         public override bool Visible
@@ -35,6 +37,8 @@ namespace FoxTunes
         }
 
         public IEnumerable<LibraryItem> LibraryItems { get; private set; }
+
+        public IDictionary<LibraryItem, Exception> Errors { get; private set; }
 
         public IDatabaseComponent Database { get; private set; }
 
@@ -72,10 +76,21 @@ namespace FoxTunes
                     if (!File.Exists(libraryItem.FileName))
                     {
                         Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName);
+                        this.Errors.Add(libraryItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName)));
+                        position++;
                         continue;
                     }
 
-                    await metaDataSource.SetMetaData(libraryItem.FileName, libraryItem.MetaDatas).ConfigureAwait(false);
+                    try
+                    {
+                        await metaDataSource.SetMetaData(libraryItem.FileName, libraryItem.MetaDatas).ConfigureAwait(false);
+                    }
+                    catch (Exception e)
+                    {
+                        this.Errors.Add(libraryItem, e);
+                        position++;
+                        continue;
+                    }
 
                     foreach (var metaDataItem in libraryItem.MetaDatas.ToArray())
                     {
