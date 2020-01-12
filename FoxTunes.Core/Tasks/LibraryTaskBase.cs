@@ -2,6 +2,7 @@
 using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,15 +56,15 @@ namespace FoxTunes
 
         protected virtual async Task AddRoots(IEnumerable<string> paths)
         {
-            paths = paths.Except(
-                await this.GetRoots()
-.ConfigureAwait(false)).ToArray();
+            paths = await this.NormalizeRoots(paths).ConfigureAwait(false);
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var set = this.Database.Set<LibraryRoot>(transaction);
+                Logger.Write(this, LogLevel.Debug, "Clearing library roots.");
+                await set.ClearAsync().ConfigureAwait(false);
                 foreach (var path in paths)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Adding library root: {0}", path);
+                    Logger.Write(this, LogLevel.Debug, "Creating library root: {0}", path);
                     await set.AddAsync(
                         set.Create().With(
                             libraryRoot => libraryRoot.DirectoryName = path
@@ -75,6 +76,12 @@ namespace FoxTunes
                     transaction.Commit();
                 }
             }
+        }
+
+        protected virtual async Task<IEnumerable<string>> NormalizeRoots(IEnumerable<string> newPaths)
+        {
+            var currentPaths = await this.GetRoots().ConfigureAwait(false);
+            return LibraryRoot.Normalize(currentPaths, newPaths);
         }
 
         protected virtual async Task ClearRoots()
