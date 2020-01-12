@@ -20,7 +20,7 @@
     <Window.Title>
         <Binding Mode="OneWay" Path="Source.Title" Source="{StaticResource ViewModel}"/>
     </Window.Title>
-    <Grid Background="{DynamicResource NormalBrush}" Margin="5">
+    <Grid Background="{DynamicResource NormalBrush}">
         <Grid.LayoutTransform>
             <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
         </Grid.LayoutTransform>
@@ -30,9 +30,9 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Windows:Titlebar></Windows:Titlebar>
-        <Windows:Report x:Name="Report" Grid.Row="1"></Windows:Report>
+        <Windows:Report x:Name="Report" Grid.Row="1" Padding="3,0,3,0"></Windows:Report>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="70" Height="30" Margin="0,5,0,0" Click="OnClose">Close</Button>
+            <Button Width="70" Height="30" Margin="0,5,3,3" Click="OnClose">Close</Button>
         </StackPanel>
         <Rectangle Grid.RowSpan="3" Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
