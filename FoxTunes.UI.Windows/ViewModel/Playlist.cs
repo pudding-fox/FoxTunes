@@ -423,7 +423,11 @@ namespace FoxTunes.ViewModel
                 {
                     using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        foreach (var column in database.Set<PlaylistColumn>(transaction))
+                        var set = database.Set<PlaylistColumn>(transaction);
+                        set.Fetch.Filter.AddColumn(
+                            set.Table.GetColumn(ColumnConfig.By("Enabled", ColumnFlags.None))
+                        ).With(filter => filter.Right = filter.CreateConstant(1));
+                        foreach (var column in set)
                         {
                             yield return this.GridViewColumnFactory.Create(column);
                         }

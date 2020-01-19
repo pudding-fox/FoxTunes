@@ -72,6 +72,7 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <Label Grid.Column="0" Grid.Row="0">Column Name</Label>
@@ -80,8 +81,10 @@
                     <CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="{Binding IsDynamic}"></CheckBox>
                     <Label Grid.Column="0" Grid.Row="2">Auto Size</Label>
                     <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding Width, Converter={StaticResource ColumnWidthConverter}}"></CheckBox>
-                    <Label Grid.Column="0" Grid.Row="3">Script</Label>
-                    <TextBox Grid.Column="1" Grid.Row="3" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Text="{Binding Script}"></TextBox>
+                    <Label Grid.Column="0" Grid.Row="3">Enabled</Label>
+                    <CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" IsChecked="{Binding Enabled}"></CheckBox>
+                    <Label Grid.Column="0" Grid.Row="4">Script</Label>
+                    <TextBox Grid.Column="1" Grid.Row="4" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Text="{Binding Script}"></TextBox>
                 </Grid>
             </Grid>
         </GroupBox>

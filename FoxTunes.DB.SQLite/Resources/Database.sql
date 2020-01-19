@@ -55,7 +55,8 @@ CREATE TABLE [PlaylistColumns] (
   [Name] text NOT NULL COLLATE NOCASE, 
   [Script] text NOT NULL COLLATE NOCASE,
   [IsDynamic] INTEGER NOT NULL, 
-  [Width] numeric(53,0) NULL);
+  [Width] numeric(53,0) NULL,
+  [Enabled] bit NOT NULL);
 
 CREATE TABLE [LibraryItem_MetaDataItem](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
