@@ -21,5 +21,7 @@
         string Track { get; }
 
         string Year_Album { get; }
+
+        string BPM { get; }
     }
 }

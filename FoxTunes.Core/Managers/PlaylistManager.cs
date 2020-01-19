@@ -481,6 +481,7 @@ namespace FoxTunes
                 set.Add(new PlaylistColumn() { Name = "Title / track artist", Sequence = 3, Script = scripts.Title_Performer, Enabled = true });
                 set.Add(new PlaylistColumn() { Name = "Duration", Sequence = 4, Script = scripts.Duration, Enabled = true });
                 set.Add(new PlaylistColumn() { Name = "Codec", Sequence = 5, Script = scripts.Codec, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "BPM", Sequence = 6, Script = scripts.BPM, Enabled = false });
                 transaction.Commit();
             }
         }
