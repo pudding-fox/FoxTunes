@@ -10,8 +10,6 @@ namespace FoxTunes
 {
     public class TagLibMetaDataSource : BaseComponent, IMetaDataSource
     {
-        public static MetaDataCategory Categories = MetaDataCategory.Standard;
-
         public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
 
         public static SemaphoreSlim Semaphore { get; private set; }
@@ -35,6 +33,12 @@ namespace FoxTunes
 
         public BooleanConfigurationElement CopyImages { get; private set; }
 
+        public BooleanConfigurationElement Extended { get; private set; }
+
+        public BooleanConfigurationElement MusicBrainz { get; private set; }
+
+        public BooleanConfigurationElement Lyrics { get; private set; }
+
         public IArtworkProvider ArtworkProvider { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -51,6 +55,18 @@ namespace FoxTunes
             this.CopyImages = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.COPY_IMAGES_ELEMENT
+            );
+            this.Extended = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_EXTENDED_TAGS
+            );
+            this.MusicBrainz = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_MUSICBRAINZ_TAGS
+            );
+            this.Lyrics = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_LYRICS_TAGS
             );
             this.ArtworkProvider = core.Components.ArtworkProvider;
             base.InitializeComponent(core);
@@ -172,44 +188,40 @@ namespace FoxTunes
 
         private void AddTags(IList<MetaDataItem> metaData, Tag tag)
         {
-            if (Categories.HasFlag(MetaDataCategory.Standard))
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Album, tag.Album), this.ErrorHandler);
+            this.Try(() =>
             {
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Album, tag.Album), this.ErrorHandler);
-                this.Try(() =>
+                if (!string.IsNullOrEmpty(tag.FirstAlbumArtist))
                 {
-                    if (!string.IsNullOrEmpty(tag.FirstAlbumArtist))
-                    {
-                        this.AddTag(metaData, CommonMetaData.Artist, tag.FirstAlbumArtist);
-                    }
-                    else if (!string.IsNullOrEmpty(tag.FirstPerformer))
-                    {
-                        this.AddTag(metaData, CommonMetaData.Artist, tag.FirstPerformer);
-                    }
-                }, this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Composer, tag.FirstComposer), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Conductor, tag.Conductor), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Disc, tag.Disc.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.DiscCount, tag.DiscCount.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Genre, tag.FirstGenre), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Performer, tag.FirstPerformer), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Title, tag.Title), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Track, tag.Track.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.TrackCount, tag.TrackCount.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Year, tag.Year.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute.ToString()), this.ErrorHandler);
-            }
+                    this.AddTag(metaData, CommonMetaData.Artist, tag.FirstAlbumArtist);
+                }
+                else if (!string.IsNullOrEmpty(tag.FirstPerformer))
+                {
+                    this.AddTag(metaData, CommonMetaData.Artist, tag.FirstPerformer);
+                }
+            }, this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Composer, tag.FirstComposer), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Conductor, tag.Conductor), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Disc, tag.Disc.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.DiscCount, tag.DiscCount.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Genre, tag.FirstGenre), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Performer, tag.FirstPerformer), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Title, tag.Title), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Track, tag.Track.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.TrackCount, tag.TrackCount.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.Year, tag.Year.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddTag(metaData, CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute.ToString()), this.ErrorHandler);
 
-            if (Categories.HasFlag(MetaDataCategory.Extended))
+            if (this.Extended.Value)
             {
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicIpId, tag.MusicIpId), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.AmazonId, tag.AmazonId), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.Comment, tag.Comment), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.Copyright, tag.Copyright), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.Grouping, tag.Grouping), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Lyrics, tag.Lyrics), this.ErrorHandler);
             }
 
-            if (Categories.HasFlag(MetaDataCategory.MusicBrainz))
+            if (this.MusicBrainz.Value)
             {
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzArtistId, tag.MusicBrainzArtistId), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzDiscId, tag.MusicBrainzDiscId), this.ErrorHandler);
@@ -219,6 +231,11 @@ namespace FoxTunes
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseStatus, tag.MusicBrainzReleaseStatus), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseType, tag.MusicBrainzReleaseType), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzTrackId, tag.MusicBrainzTrackId), this.ErrorHandler);
+            }
+
+            if (this.Lyrics.Value)
+            {
+                this.Try(() => this.AddTag(metaData, CommonMetaData.Lyrics, tag.Lyrics), this.ErrorHandler);
             }
         }
 
@@ -238,41 +255,29 @@ namespace FoxTunes
 
         private void AddProperties(IList<MetaDataItem> metaData, Properties properties)
         {
-            if (Categories.HasFlag(MetaDataCategory.Standard))
+            this.Try(() => this.AddProperty(metaData, CommonProperties.Duration, properties.Duration.TotalMilliseconds.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddProperty(metaData, CommonProperties.AudioBitrate, properties.AudioBitrate.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddProperty(metaData, CommonProperties.AudioChannels, properties.AudioChannels.ToString()), this.ErrorHandler);
+            this.Try(() => this.AddProperty(metaData, CommonProperties.AudioSampleRate, properties.AudioSampleRate.ToString()), this.ErrorHandler);
+            this.Try(() =>
             {
-                this.Try(() => this.AddProperty(metaData, CommonProperties.Duration, properties.Duration.TotalMilliseconds.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.AudioBitrate, properties.AudioBitrate.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.AudioChannels, properties.AudioChannels.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.AudioSampleRate, properties.AudioSampleRate.ToString()), this.ErrorHandler);
-                this.Try(() =>
+                if (properties.BitsPerSample != 0)
                 {
-                    if (properties.BitsPerSample != 0)
+                    this.AddProperty(metaData, CommonProperties.BitsPerSample, properties.BitsPerSample.ToString());
+                }
+                else
+                {
+                    //This is special case just for MPEG-4.
+                    foreach (var codec in properties.Codecs.OfType<global::TagLib.Mpeg4.IsoAudioSampleEntry>())
                     {
-                        this.AddProperty(metaData, CommonProperties.BitsPerSample, properties.BitsPerSample.ToString());
-                    }
-                    else
-                    {
-                        //This is special case just for MPEG-4.
-                        foreach (var codec in properties.Codecs.OfType<global::TagLib.Mpeg4.IsoAudioSampleEntry>())
+                        if (codec.AudioSampleSize != 0)
                         {
-                            if (codec.AudioSampleSize != 0)
-                            {
-                                this.AddProperty(metaData, CommonProperties.BitsPerSample, codec.AudioSampleSize.ToString());
-                                break;
-                            }
+                            this.AddProperty(metaData, CommonProperties.BitsPerSample, codec.AudioSampleSize.ToString());
+                            break;
                         }
                     }
-                }, this.ErrorHandler);
-            }
-            if (Categories.HasFlag(MetaDataCategory.MultiMedia))
-            {
-                this.Try(() => this.AddProperty(metaData, CommonProperties.Description, properties.Description), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.PhotoHeight, properties.PhotoHeight.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.PhotoQuality, properties.PhotoQuality.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.PhotoWidth, properties.PhotoWidth.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.VideoHeight, properties.VideoHeight.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.VideoWidth, properties.VideoWidth.ToString()), this.ErrorHandler);
-            }
+                }
+            }, this.ErrorHandler);
         }
 
         private void AddProperty(IList<MetaDataItem> metaData, string name, string value)

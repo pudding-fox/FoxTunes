@@ -19,7 +19,13 @@ namespace FoxTunes
 
         public const string COPY_IMAGES_ELEMENT = "FFFFA875-8195-49AF-A1A4-2EAB2294A6D8";
 
-        public const string THREADS_ELEMENT = "GGGG16BD-B4A7-4F9D-B4DA-F81E932F6DD9";
+        public const string READ_EXTENDED_TAGS = "GGGG9A48-2D0A-4FFA-9749-4592BDFFF5DE";
+
+        public const string READ_MUSICBRAINZ_TAGS = "HHHH0261-12E4-4550-B926-67104695F2F7";
+
+        public const string READ_LYRICS_TAGS = "IIII124F-FA35-4D35-B1A9-A2EF8E189A4F";
+
+        public const string THREADS_ELEMENT = "JJJJ16BD-B4A7-4F9D-B4DA-F81E932F6DD9";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -36,6 +42,12 @@ namespace FoxTunes
                     new TextConfigurationElement(LOOSE_IMAGES_BACK, "Back Cover").WithValue("back"))
                 .WithElement(
                     new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images").WithValue(true))
+                .WithElement(
+                    new BooleanConfigurationElement(READ_EXTENDED_TAGS, "Extended Attributes").WithValue(false))
+                .WithElement(
+                    new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, "MusicBrainz Attributes").WithValue(false))
+                .WithElement(
+                    new BooleanConfigurationElement(READ_LYRICS_TAGS, "Lyrics").WithValue(false))
                 .WithElement(
                     new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32))
             );
