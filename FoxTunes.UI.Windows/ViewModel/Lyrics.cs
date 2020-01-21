@@ -13,7 +13,7 @@ namespace FoxTunes.ViewModel
 
         }
 
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public IPlaybackManager PlaybackManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -71,7 +71,7 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = this.Core.Managers.Playlist;
+            this.PlaybackManager = this.Core.Managers.Playback;
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -80,12 +80,12 @@ namespace FoxTunes.ViewModel
             {
                 if (value)
                 {
-                    this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
+                    this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
                     var task = this.Refresh();
                 }
                 else
                 {
-                    this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
+                    this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
                     if (this.HasData)
                     {
                         var task = Windows.Invoke(() =>
@@ -99,20 +99,18 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.Refresh().ConfigureAwait(false);
-            }
+            var task = this.Refresh();
         }
 
         protected virtual Task Refresh()
         {
             var data = default(string);
-            if (this.PlaylistManager.CurrentItem != null)
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream != null)
             {
-                var metaDataItem = this.PlaylistManager.CurrentItem.MetaDatas.FirstOrDefault(
+                var metaDataItem = outputStream.PlaylistItem.MetaDatas.FirstOrDefault(
                     _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Lyrics, StringComparison.OrdinalIgnoreCase)
                 );
                 if (metaDataItem != null)
@@ -142,9 +140,9 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.PlaylistManager != null)
+            if (this.PlaybackManager != null)
             {
-                this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
             }
             base.OnDisposing();
         }

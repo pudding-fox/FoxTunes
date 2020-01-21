@@ -8,7 +8,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class WindowTitleBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public IPlaybackManager PlaybackManager { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
@@ -46,8 +46,8 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = core.Managers.Playlist;
-            this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
+            this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
             this.Configuration = core.Components.Configuration;
@@ -61,12 +61,9 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.Refresh().ConfigureAwait(false);
-            }
+            var task = this.Refresh();
         }
 
         protected virtual void OnWindowCreated(object sender, EventArgs e)
@@ -76,7 +73,12 @@ namespace FoxTunes
 
         protected virtual Task Refresh()
         {
-            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, this.PlaylistManager.CurrentItem, this.Script);
+            var outputStream = this.PlaybackManager.CurrentStream;
+            var runner = new PlaylistItemScriptRunner(
+                this.ScriptingContext,
+                outputStream != null ? outputStream.PlaylistItem : null,
+                this.Script
+            );
             runner.Prepare();
             var value = Convert.ToString(runner.Run());
             return Windows.Invoke(() => this.SetWindowTitle(value));
@@ -119,9 +121,9 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.PlaylistManager != null)
+            if (this.PlaybackManager != null)
             {
-                this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
             }
             if (this.ScriptingContext != null)
             {
