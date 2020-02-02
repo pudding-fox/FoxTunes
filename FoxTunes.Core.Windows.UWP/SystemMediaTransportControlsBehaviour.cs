@@ -12,6 +12,7 @@ using Windows.Storage.Streams;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class SystemMediaTransportControlsBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         const int UPDATE_INTERVAL = 1000;
