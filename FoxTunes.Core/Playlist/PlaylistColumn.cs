@@ -62,6 +62,32 @@ namespace FoxTunes
 
         public event EventHandler NameChanged;
 
+        private PlaylistColumnType _Type { get; set; }
+
+        public PlaylistColumnType Type
+        {
+            get
+            {
+                return this._Type;
+            }
+            set
+            {
+                this._Type = value;
+                this.OnTypeChanged();
+            }
+        }
+
+        protected virtual void OnTypeChanged()
+        {
+            if (this.TypeChanged != null)
+            {
+                this.TypeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Type");
+        }
+
+        public event EventHandler TypeChanged;
+
         private string _Script { get; set; }
 
         public string Script
@@ -87,6 +113,32 @@ namespace FoxTunes
         }
 
         public event EventHandler ScriptChanged;
+
+        private string _Plugin { get; set; }
+
+        public string Plugin
+        {
+            get
+            {
+                return this._Plugin;
+            }
+            set
+            {
+                this._Plugin = value;
+                this.OnPluginChanged();
+            }
+        }
+
+        protected virtual void OnPluginChanged()
+        {
+            if (this.PluginChanged != null)
+            {
+                this.PluginChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Plugin");
+        }
+
+        public event EventHandler PluginChanged;
 
         private bool _IsDynamic { get; set; }
 
@@ -165,5 +217,12 @@ namespace FoxTunes
         }
 
         public event EventHandler EnabledChanged;
+    }
+
+    public enum PlaylistColumnType : byte
+    {
+        None = 0,
+        Script = 1,
+        Plugin = 2
     }
 }

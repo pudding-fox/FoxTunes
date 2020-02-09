@@ -469,19 +469,24 @@ namespace FoxTunes
 #endif
         }
 
-        public static void CreateDefaultData(IDatabase database, ICoreScripts scripts)
+        public void InitializeDatabase(IDatabaseComponent database)
         {
+            var scriptingRuntime = ComponentRegistry.Instance.GetComponent<IScriptingRuntime>();
+            if (scriptingRuntime == null)
+            {
+                return;
+            }
             using (var transaction = database.BeginTransaction())
             {
                 var set = database.Set<PlaylistColumn>(transaction);
                 set.Clear();
-                set.Add(new PlaylistColumn() { Name = "Playing", Sequence = 0, Script = scripts.Playing, IsDynamic = true, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Artist / album", Sequence = 1, Script = scripts.Artist_Album, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Track no", Sequence = 2, Script = scripts.Track, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Title / track artist", Sequence = 3, Script = scripts.Title_Performer, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Duration", Sequence = 4, Script = scripts.Duration, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Codec", Sequence = 5, Script = scripts.Codec, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "BPM", Sequence = 6, Script = scripts.BPM, Enabled = false });
+                set.Add(new PlaylistColumn() { Name = "Playing", Type = PlaylistColumnType.Script, Sequence = 0, Script = scriptingRuntime.CoreScripts.Playing, IsDynamic = true, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Artist / album", Type = PlaylistColumnType.Script, Sequence = 1, Script = scriptingRuntime.CoreScripts.Artist_Album, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Track no", Type = PlaylistColumnType.Script, Sequence = 2, Script = scriptingRuntime.CoreScripts.Track, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Title / track artist", Type = PlaylistColumnType.Script, Sequence = 3, Script = scriptingRuntime.CoreScripts.Title_Performer, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Duration", Type = PlaylistColumnType.Script, Sequence = 4, Script = scriptingRuntime.CoreScripts.Duration, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Codec", Type = PlaylistColumnType.Script, Sequence = 5, Script = scriptingRuntime.CoreScripts.Codec, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "BPM", Type = PlaylistColumnType.Script, Sequence = 6, Script = scriptingRuntime.CoreScripts.BPM, Enabled = false });
                 transaction.Commit();
             }
         }

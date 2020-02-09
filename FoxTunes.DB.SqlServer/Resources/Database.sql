@@ -54,7 +54,9 @@ CREATE TABLE [PlaylistColumns] (
   [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL,
   [Sequence] INTEGER NOT NULL,
   [Name] nvarchar(250) NOT NULL, 
-  [Script] nvarchar(max) NOT NULL, 
+  [Type] bigint NOT NULL,
+  [Script] nvarchar(max) NULL, 
+  [Plugin] nvarchar(250) NULL, 
   [IsDynamic] INTEGER NOT NULL, 
   [Width] numeric(38,0) NULL,
   [Enabled] bit NOT NULL);

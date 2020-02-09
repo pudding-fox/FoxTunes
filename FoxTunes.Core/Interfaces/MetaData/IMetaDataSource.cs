@@ -8,7 +8,7 @@ namespace FoxTunes.Interfaces
     {
         Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName);
 
-        Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems);
+        Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate);
     }
 
     [Flags]

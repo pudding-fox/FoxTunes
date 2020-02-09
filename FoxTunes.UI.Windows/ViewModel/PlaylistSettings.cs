@@ -1,6 +1,7 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,10 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistSettings : ViewModelBase
     {
+        public PlaylistColumnManager PlaylistColumnManager { get; private set; }
+
+        public IPlaylistManager PlaylistManager { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -33,6 +38,26 @@ namespace FoxTunes.ViewModel
         protected virtual void OnPlaylistColumnsChanged()
         {
             this.OnPropertyChanged("PlaylistColumns");
+        }
+
+        private ObservableCollection<UIPlaylistColumnProvider> _PlaylistColumnProviders { get; set; }
+
+        public ObservableCollection<UIPlaylistColumnProvider> PlaylistColumnProviders
+        {
+            get
+            {
+                return this._PlaylistColumnProviders;
+            }
+            set
+            {
+                this._PlaylistColumnProviders = value;
+                this.OnPlaylistColumnProvidersChanged();
+            }
+        }
+
+        protected virtual void OnPlaylistColumnProvidersChanged()
+        {
+            this.OnPropertyChanged("PlaylistColumnProviders");
         }
 
         public bool IsSaving
@@ -135,7 +160,7 @@ namespace FoxTunes.ViewModel
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    PlaylistManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+                    this.PlaylistManager.InitializeDatabase(database);
 #if NET40
                     return TaskEx.FromResult(false);
 #else
@@ -153,6 +178,8 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
+            this.PlaylistColumnManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnManager>();
+            this.PlaylistManager = this.Core.Managers.Playlist;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
@@ -177,6 +204,9 @@ namespace FoxTunes.ViewModel
                     item2.Sequence = temp;
                 }
             };
+            this.PlaylistColumnProviders = new ObservableCollection<UIPlaylistColumnProvider>(
+                this.PlaylistColumnManager.GetProviders()
+            );
             var task = this.Refresh();
             base.InitializeComponent(core);
         }

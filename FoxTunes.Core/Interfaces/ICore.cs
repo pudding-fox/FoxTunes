@@ -1,5 +1,4 @@
-﻿using FoxDb.Interfaces;
-using System;
+﻿using System;
 
 namespace FoxTunes.Interfaces
 {
@@ -17,6 +16,6 @@ namespace FoxTunes.Interfaces
 
         void Initialize();
 
-        void CreateDefaultData(IDatabase database);
+        void InitializeDatabase(IDatabaseComponent database);
     }
 }

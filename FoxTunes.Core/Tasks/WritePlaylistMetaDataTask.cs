@@ -14,10 +14,11 @@ namespace FoxTunes
 
         public const string ID = "8DB1257E-5854-4F8F-BAE3-D59A45DEE998";
 
-        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems)
+        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
             : base(ID)
         {
             this.PlaylistItems = playlistItems;
+            this.Names = names;
             this.Errors = new Dictionary<PlaylistItem, Exception>();
         }
 
@@ -38,6 +39,8 @@ namespace FoxTunes
         }
 
         public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
+
+        public IEnumerable<string> Names { get; private set; }
 
         public IDictionary<PlaylistItem, Exception> Errors { get; private set; }
 
@@ -84,7 +87,11 @@ namespace FoxTunes
 
                     try
                     {
-                        await metaDataSource.SetMetaData(playlistItem.FileName, playlistItem.MetaDatas).ConfigureAwait(false);
+                        await metaDataSource.SetMetaData(
+                            playlistItem.FileName,
+                            playlistItem.MetaDatas,
+                            metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
+                        ).ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {

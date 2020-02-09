@@ -53,7 +53,9 @@ CREATE TABLE [PlaylistColumns] (
   [Id] INTEGER PRIMARY KEY NOT NULL, 
   [Sequence] INTEGER NOT NULL, 
   [Name] text NOT NULL COLLATE NOCASE, 
-  [Script] text NOT NULL COLLATE NOCASE,
+  [Type] bigint NOT NULL,
+  [Script] text NULL COLLATE NOCASE,
+  [Plugin] text NULL COLLATE NOCASE,
   [IsDynamic] INTEGER NOT NULL, 
   [Width] numeric(53,0) NULL,
   [Enabled] bit NOT NULL);

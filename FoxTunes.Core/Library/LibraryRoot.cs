@@ -19,6 +19,11 @@ namespace FoxTunes
                     {
                         continue;
                     }
+                    if (string.Equals(paths[a], paths[b], StringComparison.OrdinalIgnoreCase))
+                    {
+                        paths.RemoveAt(a);
+                        break;
+                    }
                     if (paths[a].Length > paths[b].Length && paths[a].StartsWith(paths[b], StringComparison.OrdinalIgnoreCase))
                     {
                         paths.RemoveAt(a);

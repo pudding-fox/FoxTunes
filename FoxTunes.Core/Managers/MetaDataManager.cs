@@ -39,25 +39,31 @@ namespace FoxTunes
             }
         }
 
-        public async Task Save(IEnumerable<LibraryItem> libraryItems)
+        public async Task Save(IEnumerable<LibraryItem> libraryItems, params string[] names)
         {
-            using (var task = new WriteLibraryMetaDataTask(libraryItems))
+            using (var task = new WriteLibraryMetaDataTask(libraryItems, names))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport(task.LibraryItems, task.Errors);
+                if (task.Errors.Count > 0)
+                {
+                    this.OnReport(task.LibraryItems, task.Errors);
+                }
             }
         }
 
-        public async Task Save(IEnumerable<PlaylistItem> playlistItems)
+        public async Task Save(IEnumerable<PlaylistItem> playlistItems, params string[] names)
         {
-            using (var task = new WritePlaylistMetaDataTask(playlistItems))
+            using (var task = new WritePlaylistMetaDataTask(playlistItems, names))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport(task.PlaylistItems, task.Errors);
+                if (task.Errors.Count > 0)
+                {
+                    this.OnReport(task.PlaylistItems, task.Errors);
+                }
             }
         }
 

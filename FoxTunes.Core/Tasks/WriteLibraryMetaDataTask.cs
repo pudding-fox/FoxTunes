@@ -14,9 +14,10 @@ namespace FoxTunes
 
         public const string ID = "3EDED881-5AFD-46B2-AD53-78290E535F2E";
 
-        public WriteLibraryMetaDataTask(IEnumerable<LibraryItem> libraryItems) : base(ID)
+        public WriteLibraryMetaDataTask(IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names) : base(ID)
         {
             this.LibraryItems = libraryItems;
+            this.Names = names;
             this.Errors = new Dictionary<LibraryItem, Exception>();
         }
 
@@ -37,6 +38,8 @@ namespace FoxTunes
         }
 
         public IEnumerable<LibraryItem> LibraryItems { get; private set; }
+
+        public IEnumerable<string> Names { get; private set; }
 
         public IDictionary<LibraryItem, Exception> Errors { get; private set; }
 
@@ -83,7 +86,11 @@ namespace FoxTunes
 
                     try
                     {
-                        await metaDataSource.SetMetaData(libraryItem.FileName, libraryItem.MetaDatas).ConfigureAwait(false);
+                        await metaDataSource.SetMetaData(
+                            libraryItem.FileName,
+                            libraryItem.MetaDatas,
+                            metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
+                        ).ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {

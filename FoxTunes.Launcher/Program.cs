@@ -53,7 +53,7 @@ namespace FoxTunes.Launcher
                             }
                             using (var database = core.Factories.Database.Create())
                             {
-                                core.CreateDefaultData(database);
+                                core.InitializeDatabase(database);
                             }
                         }
                         core.Initialize();

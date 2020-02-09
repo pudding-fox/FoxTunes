@@ -143,12 +143,12 @@ namespace FoxTunes
             return metaData;
         }
 
-        public async Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaData)
+        public async Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaData, Func<MetaDataItem, bool> predicate)
         {
             var collect = default(bool);
             using (var file = this.Create(fileName))
             {
-                foreach (var metaDataItem in metaData)
+                foreach (var metaDataItem in metaData.Where(predicate))
                 {
                     switch (metaDataItem.Type)
                     {
@@ -599,8 +599,6 @@ namespace FoxTunes
 
         public static class PopularimeterManager
         {
-            const string USER = "ft";
-
             public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, File file)
             {
                 if (file.TagTypes.HasFlag(TagTypes.Id3v2))
@@ -612,85 +610,119 @@ namespace FoxTunes
                     }
                     foreach (var frame in tag.GetFrames<global::TagLib.Id3v2.PopularimeterFrame>())
                     {
-                        if (frame.Rating != 0)
-                        {
-                            source.AddTag(metaData, CommonMetaData.Rating, Format(frame.User, frame.Rating));
-                        }
-                        if (frame.PlayCount != 0)
-                        {
-                            source.AddTag(metaData, CommonMetaData.PlayCount, Format(frame.User, frame.PlayCount));
-                        }
+                        ReadPopularimeterFrame(source, metaData, file, frame);
                     }
                 }
                 else
                 {
-                    var rating = GetCustomTag(CommonMetaData.Rating, file);
+                    var rating = ReadCustomTag(CommonMetaData.Rating, file);
                     if (!string.IsNullOrEmpty(rating))
                     {
-                        source.AddTag(metaData, CommonMetaData.Rating, Format(USER, rating));
+                        source.AddTag(metaData, CommonMetaData.Rating, rating);
                     }
-                    var playCount = GetCustomTag(CommonMetaData.PlayCount, file);
+                    var playCount = ReadCustomTag(CommonMetaData.PlayCount, file);
                     if (!string.IsNullOrEmpty(playCount))
                     {
-                        source.AddTag(metaData, CommonMetaData.Rating, Format(USER, playCount));
+                        source.AddTag(metaData, CommonMetaData.Rating, playCount);
                     }
+                }
+            }
+
+            private static void ReadPopularimeterFrame(TagLibMetaDataSource source, IList<MetaDataItem> metaData, File file, global::TagLib.Id3v2.PopularimeterFrame frame)
+            {
+                const byte RATING_1 = 1;
+                const byte RATING_2 = 64;
+                const byte RATING_3 = 128;
+                const byte RATING_4 = 196;
+                const byte RATING_5 = 255;
+                if (frame.Rating != 0)
+                {
+                    var rating = 0;
+                    switch (frame.Rating)
+                    {
+                        case RATING_1:
+                            rating = 1;
+                            break;
+                        case RATING_2:
+                            rating = 2;
+                            break;
+                        case RATING_3:
+                            rating = 3;
+                            break;
+                        case RATING_4:
+                            rating = 4;
+                            break;
+                        case RATING_5:
+                            rating = 5;
+                            break;
+                    }
+                    source.AddTag(metaData, CommonMetaData.Rating, Convert.ToString(rating));
+                }
+                if (frame.PlayCount != 0)
+                {
+                    source.AddTag(metaData, CommonMetaData.PlayCount, Convert.ToString(frame.PlayCount));
                 }
             }
 
             public static void Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
             {
-                var user = default(string);
-                var value = default(string);
-                if (!Parse(metaDataItem, out user, out value))
-                {
-                    return;
-                }
                 if (file.TagTypes.HasFlag(TagTypes.Id3v2))
                 {
                     var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
-                    foreach (var frame in tag.GetFrames<global::TagLib.Id3v2.PopularimeterFrame>())
+                    var frames = tag.GetFrames<global::TagLib.Id3v2.PopularimeterFrame>();
+                    if (frames != null && frames.Any())
                     {
-                        frame.User = user;
-                        switch (metaDataItem.Name)
+                        foreach (var frame in frames)
                         {
-                            case CommonMetaData.Rating:
-                                frame.Rating = Convert.ToByte(value);
-                                break;
-                            case CommonMetaData.PlayCount:
-                                frame.PlayCount = Convert.ToUInt64(value);
-                                break;
+                            WritePopularimeterFrame(source, metaDataItem, file, frame);
                         }
+                    }
+                    else
+                    {
+                        var frame = new global::TagLib.Id3v2.PopularimeterFrame(string.Empty);
+                        WritePopularimeterFrame(source, metaDataItem, file, frame);
+                        tag.AddFrame(frame);
                     }
                 }
                 else
                 {
-                    SetCustomTag(metaDataItem.Name, metaDataItem.Value, file);
+                    WriteCustomTag(metaDataItem.Name, metaDataItem.Value, file);
                 }
             }
 
-            private static string Format(string user, object value)
+            private static void WritePopularimeterFrame(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file, global::TagLib.Id3v2.PopularimeterFrame frame)
             {
-                return string.Format("{0}:{1}", user, value);
-            }
-
-            private static bool Parse(MetaDataItem metaDataItem, out string user, out string value)
-            {
-                if (string.IsNullOrEmpty(metaDataItem.Value))
+                const byte RATING_1 = 1;
+                const byte RATING_2 = 64;
+                const byte RATING_3 = 128;
+                const byte RATING_4 = 196;
+                const byte RATING_5 = 255;
+                switch (metaDataItem.Name)
                 {
-                    user = default(string);
-                    value = default(string);
-                    return false;
+                    case CommonMetaData.Rating:
+                        switch (Convert.ToByte(metaDataItem.Value))
+                        {
+                            case 1:
+                                frame.Rating = RATING_1;
+                                break;
+                            case 2:
+                                frame.Rating = RATING_2;
+                                break;
+                            case 3:
+                                frame.Rating = RATING_3;
+                                break;
+                            case 4:
+                                frame.Rating = RATING_4;
+                                break;
+                            case 5:
+                                frame.Rating = RATING_5;
+                                break;
+                        }
+                        break;
+                    case CommonMetaData.PlayCount:
+                        frame.PlayCount = Convert.ToUInt64(metaDataItem.Value);
+                        break;
                 }
-                var parts = metaDataItem.Value.Split(':');
-                if (parts.Length != 2)
-                {
-                    user = default(string);
-                    value = default(string);
-                    return false;
-                }
-                user = parts[0];
-                value = parts[1];
-                return true;
             }
 
             private static T GetTag<T>(File file, TagTypes tagTypes) where T : Tag
@@ -698,7 +730,7 @@ namespace FoxTunes
                 return file.GetTag(tagTypes) as T;
             }
 
-            private static string GetCustomTag(string name, File file)
+            private static string ReadCustomTag(string name, File file)
             {
                 var key = default(string);
                 switch (name)
@@ -742,7 +774,7 @@ namespace FoxTunes
                 return null;
             }
 
-            private static void SetCustomTag(string name, string value, File file)
+            private static void WriteCustomTag(string name, string value, File file)
             {
                 var key = default(string);
                 switch (name)
@@ -784,6 +816,7 @@ namespace FoxTunes
                         ape.SetValue(key, value);
                     }
                 }
+                //Not implemented.
             }
         }
     }
