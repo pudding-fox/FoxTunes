@@ -19,8 +19,6 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery ClearPlaylistMetaDataItems { get; }
 
-        IDatabaseQuery GetIsFavorite { get; }
-
         IDatabaseQuery GetLibraryMetaData { get; }
 
         IDatabaseQuery GetLibraryHierarchyMetaData { get; }
@@ -42,8 +40,6 @@ namespace FoxTunes.Interfaces
         IDatabaseQuery RemoveLibraryItems { get; }
 
         IDatabaseQuery RemovePlaylistItems { get; }
-
-        IDatabaseQuery SetIsFavorite { get; }
 
         IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
 

@@ -16,8 +16,6 @@ namespace FoxTunes
 
         public string ImportDate { get; set; }
 
-        public bool Favorite { get; set; }
-
         public LibraryItemStatus Status { get; set; }
 
         [Relation(Flags = RelationFlags.AutoExpression | RelationFlags.EagerFetch | RelationFlags.ManyToMany)]

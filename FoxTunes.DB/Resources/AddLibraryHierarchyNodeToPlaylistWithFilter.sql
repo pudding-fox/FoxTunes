@@ -46,7 +46,6 @@ WHERE
 			)
 		)
 	) 
-	AND (@favorite IS NULL OR "LibraryItems"."Favorite" = @favorite)
 	AND LibraryHierarchyChildren."IsLeaf" = 1;
 
 SELECT COUNT(*)

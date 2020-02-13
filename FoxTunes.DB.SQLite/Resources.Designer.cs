@@ -89,8 +89,9 @@ namespace FoxTunes {
         ///	[DirectoryName] text NOT NULL COLLATE NOCASE, 
         ///	[FileName] text NOT NULL COLLATE NOCASE, 
         ///	[ImportDate] text NOT NULL COLLATE NOCASE,
-        ///	[Favorite] bit NOT NULL,
-        ///	[Sta [rest of string was truncated]&quot;;.
+        ///	[Status] INTEGER NOT NULL);
+        ///
+        ///C [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {

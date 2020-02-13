@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -188,32 +188,12 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT CASE WHEN EXISTS(
-        ///	SELECT *
-        ///	FROM &quot;LibraryItems&quot;
-        ///		JOIN &quot;LibraryHierarchyItem_LibraryItem&quot;
-        ///			ON &quot;LibraryItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot;
-        ///	WHERE &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot; = @libraryHierarchyItemId
-        ///		AND &quot;LibraryItems&quot;.&quot;Favorite&quot; = 0
-        ///) THEN 0 ELSE 1 END.
-        /// </summary>
-        internal static string GetIsFavorite {
-            get {
-                return ResourceManager.GetString("GetIsFavorite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;
         ///FROM &quot;LibraryHierarchyItems&quot;
         ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
         ///	AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) 
         ///		OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
-        ///	AND (@favorite IS NULL OR EXISTS(
-        ///		SELECT * 
-        ///		FROM &quot;LibraryItems&quot; 
-        ///			JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; 
-        ///				ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot; = &quot;LibraryItems&quot; [rest of string was truncated]&quot;;.
+        ///ORDER BY &quot;Value&quot;.
         /// </summary>
         internal static string GetLibraryHierarchyNodes {
             get {
@@ -246,12 +226,12 @@ namespace FoxTunes {
         ///	&quot;LibraryItems&quot;.&quot;DirectoryName&quot; AS &quot;LibraryItems_DirectoryName&quot;,
         ///	&quot;LibraryItems&quot;.&quot;FileName&quot; AS &quot;LibraryItems_FileName&quot;,
         ///	&quot;LibraryItems&quot;.&quot;ImportDate&quot; AS &quot;LibraryItems_ImportDate&quot;,
-        ///	&quot;LibraryItems&quot;.&quot;Favorite&quot; AS &quot;LibraryItems_Favorite&quot;,
         ///	&quot;LibraryItems&quot;.&quot;Status&quot; AS &quot;LibraryItems_Status&quot;,
         ///	&quot;MetaDataItems&quot;.&quot;Id&quot; AS &quot;MetaDataItems_Id&quot;,
         ///	&quot;MetaDataItems&quot;.&quot;Name&quot; AS &quot;MetaDataItems_Name&quot;,
         ///	&quot;MetaDataItems&quot;.&quot;Type&quot; AS &quot;MetaDataItems_Type&quot;,
-        ///	&quot;MetaDataItems&quot;.&quot;Value [rest of string was truncated]&quot;;.
+        ///	&quot;MetaDataItems&quot;.&quot;Value&quot; AS &quot;MetaDataItems_Value&quot;
+        ///FROM &quot;LibraryHierarchyItems&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryItems {
             get {
@@ -415,22 +395,6 @@ namespace FoxTunes {
         internal static string RemovePlaylistItems {
             get {
                 return ResourceManager.GetString("RemovePlaylistItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to UPDATE &quot;LibraryItems&quot;
-        ///SET &quot;Favorite&quot; = @isFavorite
-        ///WHERE &quot;Id&quot; IN
-        ///(
-        ///	SELECT &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot;
-        ///	FROM &quot;LibraryHierarchyItem_LibraryItem&quot;
-        ///	WHERE &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot; = @libraryHierarchyItemId
-        ///).
-        /// </summary>
-        internal static string SetIsFavorite {
-            get {
-                return ResourceManager.GetString("SetIsFavorite", resourceCulture);
             }
         }
         

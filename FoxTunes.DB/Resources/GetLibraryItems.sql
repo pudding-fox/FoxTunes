@@ -3,7 +3,6 @@
 	"LibraryItems"."DirectoryName" AS "LibraryItems_DirectoryName",
 	"LibraryItems"."FileName" AS "LibraryItems_FileName",
 	"LibraryItems"."ImportDate" AS "LibraryItems_ImportDate",
-	"LibraryItems"."Favorite" AS "LibraryItems_Favorite",
 	"LibraryItems"."Status" AS "LibraryItems_Status",
 	"MetaDataItems"."Id" AS "MetaDataItems_Id",
 	"MetaDataItems"."Name" AS "MetaDataItems_Name",
@@ -23,5 +22,4 @@ FROM "LibraryHierarchyItems"
 			AND (@metaDataType & "MetaDataItems"."Type") =  "MetaDataItems"."Type"
 WHERE "LibraryHierarchyItems"."LibraryHierarchy_Id" = @libraryHierarchyId
 	AND "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId
-	AND (@favorite IS NULL OR "LibraryItems"."Favorite" = @favorite)
 ORDER BY "LibraryItems"."FileName"

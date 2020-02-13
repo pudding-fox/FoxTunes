@@ -5,8 +5,7 @@ FROM "LibraryHierarchyItems"
 		ON "LibraryHierarchyItems"."Id" = "LibraryHierarchyItem_LibraryItem"."LibraryHierarchyItem_Id"
 	JOIN "LibraryItems"
 		ON "LibraryItems"."Id" = "LibraryHierarchyItem_LibraryItem"."LibraryItem_Id"
-WHERE "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId
-	AND (@favorite IS NULL OR "LibraryItems"."Favorite" = @favorite);
+WHERE "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId;
 
 SELECT COUNT(*)
 FROM "PlaylistItems"
