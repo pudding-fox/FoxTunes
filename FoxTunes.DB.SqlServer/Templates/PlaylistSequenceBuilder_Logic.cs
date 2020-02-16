@@ -1,30 +1,32 @@
 ﻿using FoxDb.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FoxTunes.Templates
 {
     public partial class PlaylistSequenceBuilder
     {
-        public PlaylistSequenceBuilder(IDatabase database, IEnumerable<string> metaDataNames)
+        public PlaylistSequenceBuilder(IDatabase database)
         {
             this.Database = database;
-            this.MetaDataNames = metaDataNames.ToArray();
+            this.Columns = new[]
+            {
+                CustomMetaData.VariousArtists,
+                CommonMetaData.Artist,
+                CommonMetaData.Year,
+                CommonMetaData.Album,
+                CommonMetaData.Disc,
+                CommonMetaData.Track
+            };
         }
 
         public IDatabase Database { get; private set; }
 
-        public string[] MetaDataNames { get; private set; }
-
-        public bool HasColumn(string name)
-        {
-            return this.MetaDataNames.IndexOf(name, StringComparer.OrdinalIgnoreCase) != -1;
-        }
+        public IEnumerable<string> Columns { get; private set; }
 
         public string GetColumn(string name)
         {
-            var index = this.MetaDataNames.IndexOf(name, StringComparer.OrdinalIgnoreCase);
+            var index = this.Columns.IndexOf(name, StringComparer.OrdinalIgnoreCase);
             if (index == -1)
             {
                 throw new NotImplementedException();

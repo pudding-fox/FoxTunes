@@ -1,7 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System.Collections.Generic;
 using System.Data;
 
 namespace FoxTunes
@@ -191,7 +190,7 @@ namespace FoxTunes
             }
         }
 
-        public abstract IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
+        public abstract IDatabaseQuery SequencePlaylistItems { get; }
 
         public IDatabaseQuery UpdateLibraryHierarchyNode
         {
