@@ -113,6 +113,14 @@ namespace FoxTunes
             }
         }
 
+        public IFilterParser FilterParser
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IFilterParser>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }
