@@ -71,7 +71,9 @@ namespace FoxTunes
 
         protected override IDatabaseQueries CreateQueries()
         {
-            return new SqlServerDatabaseQueries(this);
+            var queries = new SqlServerDatabaseQueries(this);
+            queries.InitializeComponent(this.Core);
+            return queries;
         }
 
         private static IProvider GetProvider()
