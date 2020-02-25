@@ -20,9 +20,9 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryHierarchyNodes.tt"
+    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class GetLibraryHierarchyNodes : GetLibraryHierarchyNodesBase
+    public partial class AddLibraryHierarchyNodeToPlaylist : AddLibraryHierarchyNodeToPlaylistBase
     {
 #line hidden
         /// <summary>
@@ -31,19 +31,22 @@ namespace FoxTunes.Templates
         public virtual string TransformText()
         {
             this.Write(@"
-SELECT ""LibraryHierarchyItems"".""Id"", ""LibraryHierarchy_Id"", ""Value"", ""IsLeaf""
+INSERT INTO ""PlaylistItems"" (""LibraryItem_Id"", ""Sequence"", ""DirectoryName"", ""FileName"", ""Status"") 
+SELECT ""LibraryItems"".""Id"", @sequence, ""LibraryItems"".""DirectoryName"", ""LibraryItems"".""FileName"", @status
 FROM ""LibraryHierarchyItems""
-WHERE ""LibraryHierarchy_Id"" = @libraryHierarchyId
-	AND ((@libraryHierarchyItemId IS NULL AND ""LibraryHierarchyItems"".""Parent_Id"" IS NULL) 
-		OR ""LibraryHierarchyItems"".""Parent_Id"" = @libraryHierarchyItemId)
+	JOIN ""LibraryHierarchyItem_LibraryItem"" 
+		ON ""LibraryHierarchyItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryHierarchyItem_Id""
+	JOIN ""LibraryItems""
+		ON ""LibraryItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id""
+WHERE ""LibraryHierarchyItems"".""Id"" = @libraryHierarchyItemId
 ");
             
-            #line 14 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryHierarchyNodes.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryHierarchyItem).TransformText()));
+            #line 17 "C:\Source\FoxTunes\FoxTunes.DB\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText()));
             
             #line default
             #line hidden
-            this.Write("\r\nORDER BY \"Value\"");
+            this.Write(";\r\n\r\nSELECT COUNT(*)\r\nFROM \"PlaylistItems\"\r\nWHERE \"Status\" = @status");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -55,7 +58,7 @@ WHERE ""LibraryHierarchy_Id"" = @libraryHierarchyId
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class GetLibraryHierarchyNodesBase
+    public class AddLibraryHierarchyNodeToPlaylistBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

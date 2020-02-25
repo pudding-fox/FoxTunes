@@ -19,7 +19,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.FilterParser = core.Components.FilterParser;
+            if (core != null)
+            {
+                this.FilterParser = core.Components.FilterParser;
+            }
             base.InitializeComponent(core);
         }
 
@@ -38,18 +41,22 @@ namespace FoxTunes
             }
         }
 
-        public IDatabaseQuery AddLibraryHierarchyNodeToPlaylist
+        public IDatabaseQuery AddLibraryHierarchyNodeToPlaylist(string filter)
         {
-            get
+            var result = default(IFilterParserResult);
+            if (!string.IsNullOrEmpty(filter) && !this.FilterParser.TryParse(filter, out result))
             {
-                return this.Database.QueryFactory.Create(
-                    Resources.AddLibraryHierarchyNodeToPlaylist,
+                //TODO: Warn, failed to parse filter.
+                result = null;
+            }
+            var template = new AddLibraryHierarchyNodeToPlaylist(this.Database, result);
+            return this.Database.QueryFactory.Create(
+                    template.TransformText(),
                     new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
-            }
         }
 
         public IDatabaseQuery AddLibraryMetaDataItem
@@ -122,26 +129,30 @@ namespace FoxTunes
                 //TODO: Warn, failed to parse filter.
                 result = null;
             }
-            var getLibraryHierarchyNodes = new GetLibraryHierarchyNodes(this.Database, result);
+            var template = new GetLibraryHierarchyNodes(this.Database, result);
             return this.Database.QueryFactory.Create(
-                getLibraryHierarchyNodes.TransformText(),
+                template.TransformText(),
                 new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                 new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
             );
         }
 
-        public IDatabaseQuery GetLibraryItems
+        public IDatabaseQuery GetLibraryItems(string filter)
         {
-            get
+            var result = default(IFilterParserResult);
+            if (!string.IsNullOrEmpty(filter) && !this.FilterParser.TryParse(filter, out result))
             {
-                return this.Database.QueryFactory.Create(
-                    Resources.GetLibraryItems,
-                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("loadMetaData", DbType.Boolean, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("metaDataType", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
+                //TODO: Warn, failed to parse filter.
+                result = null;
             }
+            var template = new GetLibraryItems(this.Database, result);
+            return this.Database.QueryFactory.Create(
+                template.TransformText(),
+                new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                new DatabaseQueryParameter("loadMetaData", DbType.Boolean, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                new DatabaseQueryParameter("metaDataType", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+            );
         }
 
         public IDatabaseQuery GetOrAddMetaDataItem

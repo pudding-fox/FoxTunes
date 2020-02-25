@@ -20,9 +20,9 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryHierarchyNodes.tt"
+    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryItems.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class GetLibraryHierarchyNodes : GetLibraryHierarchyNodesBase
+    public partial class GetLibraryItems : GetLibraryItemsBase
     {
 #line hidden
         /// <summary>
@@ -31,19 +31,38 @@ namespace FoxTunes.Templates
         public virtual string TransformText()
         {
             this.Write(@"
-SELECT ""LibraryHierarchyItems"".""Id"", ""LibraryHierarchy_Id"", ""Value"", ""IsLeaf""
+SELECT 
+	""LibraryItems"".""Id"" AS ""LibraryItems_Id"",
+	""LibraryItems"".""DirectoryName"" AS ""LibraryItems_DirectoryName"",
+	""LibraryItems"".""FileName"" AS ""LibraryItems_FileName"",
+	""LibraryItems"".""ImportDate"" AS ""LibraryItems_ImportDate"",
+	""LibraryItems"".""Status"" AS ""LibraryItems_Status"",
+	""MetaDataItems"".""Id"" AS ""MetaDataItems_Id"",
+	""MetaDataItems"".""Name"" AS ""MetaDataItems_Name"",
+	""MetaDataItems"".""Type"" AS ""MetaDataItems_Type"",
+	""MetaDataItems"".""Value"" AS ""MetaDataItems_Value""
 FROM ""LibraryHierarchyItems""
-WHERE ""LibraryHierarchy_Id"" = @libraryHierarchyId
-	AND ((@libraryHierarchyItemId IS NULL AND ""LibraryHierarchyItems"".""Parent_Id"" IS NULL) 
-		OR ""LibraryHierarchyItems"".""Parent_Id"" = @libraryHierarchyItemId)
+	JOIN ""LibraryHierarchyItem_LibraryItem"" 
+		ON ""LibraryHierarchyItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryHierarchyItem_Id""
+	JOIN ""LibraryItems"" 
+		ON ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id"" = ""LibraryItems"".""Id""
+	LEFT OUTER JOIN ""LibraryItem_MetaDataItem""
+		ON @loadMetaData = 1 
+			AND ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
+	LEFT OUTER JOIN ""MetaDataItems""
+		ON @loadMetaData = 1 
+			AND ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
+			AND (@metaDataType & ""MetaDataItems"".""Type"") =  ""MetaDataItems"".""Type""
+WHERE ""LibraryHierarchyItems"".""LibraryHierarchy_Id"" = @libraryHierarchyId
+	AND ""LibraryHierarchyItems"".""Id"" = @libraryHierarchyItemId
 ");
             
-            #line 14 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryHierarchyNodes.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryHierarchyItem).TransformText()));
+            #line 33 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryItems.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText()));
             
             #line default
             #line hidden
-            this.Write("\r\nORDER BY \"Value\"");
+            this.Write("\r\nORDER BY \"LibraryItems\".\"FileName\"");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -55,7 +74,7 @@ WHERE ""LibraryHierarchy_Id"" = @libraryHierarchyId
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class GetLibraryHierarchyNodesBase
+    public class GetLibraryItemsBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
