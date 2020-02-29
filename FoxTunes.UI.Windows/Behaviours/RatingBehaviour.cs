@@ -52,19 +52,24 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            Rating.RatingChanged += this.OnRatingChanged;
+            global::FoxTunes.ViewModel.Rating.ValueChanged += this.OnRatingChanged;
             this.PlaylistManager = core.Managers.Playlist;
             this.MetaDataManager = core.Managers.MetaData;
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnRatingChanged(object sender, RatingChangedEventArgs e)
+        protected virtual void OnRatingChanged(object sender, global::FoxTunes.ViewModel.RatingChangedEventArgs e)
         {
-            var playlistItems = this.PlaylistManager.SelectedItems;
-            if (playlistItems == null || !playlistItems.Contains(e.PlaylistItem))
+            var playlistItem = e.FileData as PlaylistItem;
+            if (playlistItem == null)
             {
-                this.SetRating(new[] { e.PlaylistItem }, e.Value);
+                return;
+            }
+            var playlistItems = this.PlaylistManager.SelectedItems;
+            if (playlistItems == null || !playlistItems.Contains(playlistItem))
+            {
+                this.SetRating(new[] { playlistItem }, e.Value);
             }
             else
             {
@@ -103,7 +108,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            Rating.RatingChanged -= this.OnRatingChanged;
+            global::FoxTunes.ViewModel.Rating.ValueChanged -= this.OnRatingChanged;
         }
 
         ~RatingBehaviour()

@@ -141,7 +141,11 @@ namespace FoxTunes
 
                 using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddLibraryMetaDataItem, transaction))
                 {
-                    await writer.Write(libraryItem.Id, libraryItem.MetaDatas).ConfigureAwait(false);
+                    await writer.Write(
+                        libraryItem.Id,
+                        libraryItem.MetaDatas,
+                        metaDataItem => META_DATA_TYPE.HasFlag(metaDataItem.Type)
+                    ).ConfigureAwait(false);
                 }
 
                 if (transaction.HasTransaction)
