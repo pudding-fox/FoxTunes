@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -31,6 +32,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, "Meta Data")
                 .WithElement(
                     new BooleanConfigurationElement(ENABLE_ELEMENT, "Enabled").WithValue(true))
@@ -49,9 +51,9 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, "MusicBrainz Attributes").WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_LYRICS_TAGS, "Lyrics").WithValue(false))
+                    new BooleanConfigurationElement(READ_LYRICS_TAGS, "Lyrics").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(false))
+                    new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
                     new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32))
             );
