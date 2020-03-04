@@ -10,7 +10,7 @@ namespace FoxTunes
     public static class FileMetaDataStore
     {
         public static readonly string DataStoreDirectoryName = Path.Combine(
-            ComponentScanner.Instance.Location,
+            Publication.StoragePath,
             "DataStore"
         );
 
