@@ -174,51 +174,69 @@ namespace FoxTunes
 
         protected virtual Task UpdateMusicProperties()
         {
-            var updater = this.TransportControls.DisplayUpdater;
-            var playlistItem = this.PlaylistManager.CurrentItem;
-            updater.ClearAll();
-            updater.Type = MediaPlaybackType.Music;
-            if (playlistItem != null)
+            try
             {
-                var metaData = playlistItem.MetaDatas.ToDictionary(metaDataItem => metaDataItem.Name, metaDataItem => metaDataItem.Value, StringComparer.OrdinalIgnoreCase);
-                updater.MusicProperties.Title = metaData.GetValueOrDefault(CommonMetaData.Title) ?? string.Empty;
-                updater.MusicProperties.Artist = metaData.GetValueOrDefault(CommonMetaData.Performer) ?? string.Empty;
-                updater.MusicProperties.AlbumArtist = metaData.GetValueOrDefault(CommonMetaData.Artist) ?? string.Empty;
-                updater.MusicProperties.AlbumTitle = metaData.GetValueOrDefault(CommonMetaData.Album) ?? string.Empty;
-                updater.MusicProperties.TrackNumber = Convert.ToUInt32(metaData.GetValueOrDefault(CommonMetaData.Track));
-                updater.MusicProperties.AlbumTrackCount = Convert.ToUInt32(metaData.GetValueOrDefault(CommonMetaData.TrackCount));
-                var genre = metaData.GetValueOrDefault(CommonMetaData.Genre);
-                if (!string.IsNullOrEmpty(genre))
+                var updater = this.TransportControls.DisplayUpdater;
+                var playlistItem = this.PlaylistManager.CurrentItem;
+                updater.ClearAll();
+                updater.Type = MediaPlaybackType.Music;
+                if (playlistItem != null)
                 {
-                    updater.MusicProperties.Genres.Add(genre);
+                    var metaData = playlistItem.MetaDatas.ToDictionary(
+                        metaDataItem => metaDataItem.Name,
+                        metaDataItem => metaDataItem.Value,
+                        StringComparer.OrdinalIgnoreCase
+                    );
+                    this.Try(() => updater.MusicProperties.Title = metaData.GetValueOrDefault(CommonMetaData.Title) ?? string.Empty, this.ErrorHandler);
+                    this.Try(() => updater.MusicProperties.Artist = metaData.GetValueOrDefault(CommonMetaData.Performer) ?? string.Empty, this.ErrorHandler);
+                    this.Try(() => updater.MusicProperties.AlbumArtist = metaData.GetValueOrDefault(CommonMetaData.Artist) ?? string.Empty, this.ErrorHandler);
+                    this.Try(() => updater.MusicProperties.AlbumTitle = metaData.GetValueOrDefault(CommonMetaData.Album) ?? string.Empty, this.ErrorHandler);
+                    this.Try(() => updater.MusicProperties.TrackNumber = Convert.ToUInt32(metaData.GetValueOrDefault(CommonMetaData.Track)), this.ErrorHandler);
+                    this.Try(() => updater.MusicProperties.AlbumTrackCount = Convert.ToUInt32(metaData.GetValueOrDefault(CommonMetaData.TrackCount)), this.ErrorHandler);
+                    var genre = metaData.GetValueOrDefault(CommonMetaData.Genre);
+                    if (!string.IsNullOrEmpty(genre))
+                    {
+                        this.Try(() => updater.MusicProperties.Genres.Add(genre), this.ErrorHandler);
+                    }
                 }
+                updater.Update();
             }
-            updater.Update();
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Failed to update music properties: {0}", e.Message);
+            }
             return Task.CompletedTask;
         }
 
         protected virtual async Task UpdateThumbnail()
         {
-            var updater = this.TransportControls.DisplayUpdater;
-            var playlistItem = this.PlaylistManager.CurrentItem;
-            if (updater.Thumbnail != null)
+            try
             {
-                var disposable = updater.Thumbnail.OpenReadAsync() as IDisposable;
-                if (disposable != null)
+                var updater = this.TransportControls.DisplayUpdater;
+                var playlistItem = this.PlaylistManager.CurrentItem;
+                if (updater.Thumbnail != null)
                 {
-                    disposable.Dispose();
+                    var disposable = updater.Thumbnail.OpenReadAsync() as IDisposable;
+                    if (disposable != null)
+                    {
+                        disposable.Dispose();
+                    }
                 }
+                if (playlistItem != null)
+                {
+                    var fileName = this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
+                    if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
+                    {
+                        var stream = await this.GetThumbnail(fileName).ConfigureAwait(false);
+                        updater.Thumbnail = RandomAccessStreamReference.CreateFromStream(stream);
+                    }
+                }
+                updater.Update();
             }
-            if (playlistItem != null)
+            catch (Exception e)
             {
-                var fileName = this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
-                if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
-                {
-                    var stream = await this.GetThumbnail(fileName).ConfigureAwait(false);
-                    updater.Thumbnail = RandomAccessStreamReference.CreateFromStream(stream);
-                }
+                Logger.Write(this, LogLevel.Error, "Failed to update music thumbnail: {0}", e.Message);
             }
-            updater.Update();
         }
 
         protected virtual async Task<IRandomAccessStream> GetThumbnail(string fileName)
@@ -385,6 +403,11 @@ namespace FoxTunes
         protected virtual Task Stop()
         {
             return this.PlaybackManager.Stop();
+        }
+
+        private void ErrorHandler(Exception e)
+        {
+            Logger.Write(this, LogLevel.Error, "Failed to set music properties: {0}", e.Message);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
