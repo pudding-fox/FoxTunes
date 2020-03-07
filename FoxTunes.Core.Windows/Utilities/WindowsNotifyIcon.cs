@@ -64,7 +64,7 @@ namespace FoxTunes
                     {
                         Logger.Write(this, LogLevel.Debug, "Successfully created notify icon.");
                         this.IsVisible = true;
-                        break;
+                        return;
                     }
                     else
                     {
