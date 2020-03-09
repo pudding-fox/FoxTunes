@@ -36,7 +36,7 @@
               <uap:FileType ContentType="audio/mpeg">.mp3</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Enqueue" MultiSelectModel="Document">Enqueue</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
@@ -47,7 +47,7 @@
               <uap:FileType ContentType="audio/mp4">.m4a</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Enqueue" MultiSelectModel="Document">Enqueue</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
@@ -59,7 +59,7 @@
               <uap:FileType>.oga</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Enqueue" MultiSelectModel="Document">Enqueue</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
@@ -70,7 +70,7 @@
               <uap:FileType ContentType="audio/x-wavpack">.wv</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Enqueue" MultiSelectModel="Document">Enqueue</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
@@ -82,7 +82,7 @@
               <uap:FileType ContentType="audio/flac">.fla</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Enqueue" MultiSelectModel="Document">Enqueue</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
@@ -93,7 +93,7 @@
               <uap:FileType ContentType="audio/x-ms-wma">.wma</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Enqueue" MultiSelectModel="Document">Enqueue</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
@@ -104,7 +104,7 @@
               <uap:FileType ContentType="audio/aac">.aac</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Enqueue" MultiSelectModel="Document">Enqueue</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
