@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public static class FilterParserConfiguration
     {
-        public const string SECTION = "99797338-186F-4F4E-A6A1-C39546D2C047";
+        public const string SECTION = SearchBehaviourConfiguration.SECTION;
 
         public const string SEARCH_NAMES = "82518DC0-AA38-4EEC-8F50-575DE34B1182";
 
