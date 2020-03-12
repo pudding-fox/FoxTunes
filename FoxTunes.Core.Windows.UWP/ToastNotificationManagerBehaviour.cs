@@ -7,6 +7,7 @@ using Windows.UI.Notifications;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security;
+using Windows.Storage;
 
 namespace FoxTunes
 {
@@ -86,7 +87,17 @@ namespace FoxTunes
             }
             ToastNotificationHelper.Install();
             ToastNotificationHelper.Invoke(new Action(
-                () => this.ToastNotifier = ToastNotificationManager.CreateToastNotifier(ToastNotificationHelper.ID)
+                () =>
+                {
+                    if (Publication.IsPortable)
+                    {
+                        this.ToastNotifier = ToastNotificationManager.CreateToastNotifier(ToastNotificationHelper.ID);
+                    }
+                    else
+                    {
+                        this.ToastNotifier = ToastNotificationManager.CreateToastNotifier();
+                    }
+                }
             ), null);
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
         }
@@ -210,7 +221,7 @@ namespace FoxTunes
             <image
                 placement=""appLogoOverride""
                 hint-crop=""circle""
-                src = """ + SecurityElement.Escape(new Uri(fileName).AbsoluteUri) + @""" />
+                src=""" + SecurityElement.Escape(this.GetFileUri(fileName)) + @""" />
         </binding>
     </visual>
 </toast>
@@ -231,11 +242,26 @@ namespace FoxTunes
             (!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
             <image
                 placement=""inline""
-                src = """ + SecurityElement.Escape(new Uri(fileName).AbsoluteUri) + @""" />
+                src=""" + SecurityElement.Escape(this.GetFileUri(fileName)) + @""" />
         </binding>
     </visual>
 </toast>
 ";
+        }
+
+        protected virtual string GetFileUri(string fileName)
+        {
+            if (!Publication.IsPortable)
+            {
+                //This is ridiculous and there *has* to be a way to provide a ms-appdata:///localcache uri.
+                //I can't find any examples of toasts containing images from %APPDATA%.
+                fileName = fileName.Replace(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    //Why do I need to add Local???
+                    Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, "Local")
+                );
+            }
+            return new Uri(fileName).AbsoluteUri;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

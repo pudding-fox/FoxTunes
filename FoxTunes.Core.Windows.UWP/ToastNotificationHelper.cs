@@ -46,7 +46,12 @@ namespace FoxTunes
 
         public static void Install()
         {
-            InstallShortcut();
+            if (Publication.IsPortable)
+            {
+                //We require a special start menu shortcut for toasts to work.
+                //https://docs.microsoft.com/en-us/windows/win32/shell/enable-desktop-toast-with-appusermodelid
+                InstallShortcut();
+            }
             InstallServer();
             NotificationActivator.Enable();
         }
