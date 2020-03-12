@@ -164,18 +164,25 @@ namespace FoxTunes
 
             public void Activate(string appUserModelId, string invokedArgs, NotificationUserInputData[] data, uint dataCount)
             {
-                var userInterface = UserInterface.Value;
-                if (userInterface == null)
+                try
                 {
-                    return;
+                    var userInterface = UserInterface.Value;
+                    if (userInterface == null)
+                    {
+                        return;
+                    }
+                    if (!string.IsNullOrEmpty(invokedArgs))
+                    {
+                        userInterface.Run(invokedArgs);
+                    }
+                    else
+                    {
+                        userInterface.Activate();
+                    }
                 }
-                if (!string.IsNullOrEmpty(invokedArgs))
+                catch
                 {
-                    userInterface.Run(invokedArgs);
-                }
-                else
-                {
-                    userInterface.Activate();
+                    //Nothing can be done, we don't even have a logger here in this COM instance.
                 }
             }
 
