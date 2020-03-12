@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -86,6 +85,21 @@ namespace FoxTunes
                 Windows.MainWindow.DataContext = this.Core;
                 this.Application.Run(Windows.MainWindow);
             }
+        }
+
+        public override void Activate()
+        {
+            Windows.Invoke(() =>
+            {
+                if (Windows.ActiveWindow != null)
+                {
+                    if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
+                    {
+                        Windows.ActiveWindow.WindowState = WindowState.Normal;
+                    }
+                    Windows.ActiveWindow.Activate();
+                }
+            });
         }
 
         public override void Run(string message)

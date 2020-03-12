@@ -7,6 +7,8 @@ namespace FoxTunes
     {
         public abstract void Show();
 
+        public abstract void Activate();
+
         public abstract void Run(string message);
 
         public abstract void Warn(string message);

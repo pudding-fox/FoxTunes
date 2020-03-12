@@ -6,6 +6,8 @@ namespace FoxTunes.Interfaces
     {
         void Show();
 
+        void Activate();
+
         void Run(string message);
 
         void Warn(string message);
