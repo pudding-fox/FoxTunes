@@ -50,17 +50,33 @@ namespace FoxTunes
 
         public SelectionConfigurationElement WithOptions(IEnumerable<SelectionConfigurationOption> options)
         {
+            return this.WithOptions(options, false);
+        }
+
+        public SelectionConfigurationElement WithOptions(IEnumerable<SelectionConfigurationOption> options, bool clear)
+        {
+            var value = this.Value;
+            if (clear)
+            {
+                this.Options.Clear();
+            }
             foreach (var option in options)
             {
                 this.Options.Add(option);
-                if (option.IsDefault && this.Value == null)
-                {
-                    this.Value = option;
-                }
             }
-            if (this.Value == null)
+            //If nothing is selected or the selection is no longer valid we try to select something.
+            if (this.Value == null || !this.Contains(this.Value.Id))
             {
-                this.Value = options.FirstOrDefault();
+                if (value != null && this.Contains(value.Id))
+                {
+                    //The previous selection is valid, restore it.
+                    this.Value = value;
+                }
+                else
+                {
+                    //Either no previous selection or it's invalid, select the first "default" option or just the first option if none are "default".
+                    this.Value = this.Options.FirstOrDefault(option => option.IsDefault) ?? this.Options.FirstOrDefault();
+                }
             }
             return this;
         }
@@ -107,7 +123,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    this.Value = this.Options.FirstOrDefault(option => option.IsDefault);
+                    this.Value = this.Options.FirstOrDefault(option => option.IsDefault) ?? this.Options.FirstOrDefault();
                 }
             }
         }
