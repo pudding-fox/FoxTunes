@@ -244,6 +244,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Adding Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return;
+            }
             source.AddHook(this.Callback);
             this.Windows[handle] |= TaskbarButtonsWindowFlags.Registered;
         }
@@ -252,6 +257,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Removing Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return;
+            }
             source.RemoveHook(this.Callback);
             this.Windows[handle] &= ~TaskbarButtonsWindowFlags.Registered;
         }
@@ -260,6 +270,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Creating taskbar button image list.");
             var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
             var width = WindowsImageList.GetSystemMetrics(
                 WindowsImageList.SystemMetric.SM_CXSMICON
             );
@@ -464,6 +479,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Creating taskbar buttons.");
             var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
             var buttons = this.Buttons.ToArray();
             var result = default(WindowsTaskbarList.HResult);
             await this.Invoke(
@@ -503,6 +523,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Trace, "Updating taskbar buttons.");
             var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
             var buttons = this.Buttons.ToArray();
             var result = default(WindowsTaskbarList.HResult);
             await this.Invoke(
