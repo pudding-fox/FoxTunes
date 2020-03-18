@@ -11,7 +11,18 @@ namespace FoxTunes
 
         public static readonly string Product = "FoxTunes";
 
-        public static readonly string Version = "2.1.1";
+        public static readonly string Version = GetVersion();
+
+        private static string GetVersion()
+        {
+            var version = typeof(Publication).Assembly.GetName().Version;
+            return string.Format(
+                "{0}.{1}.{2}",
+                version.Major,
+                version.Minor,
+                version.Build
+            );
+        }
 
         public static Lazy<bool> _IsPortable = new Lazy<bool>(() =>
         {
