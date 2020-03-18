@@ -62,6 +62,30 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
+        ///    var parts = [];
+        ///    if (tag.artist) {
+        ///        parts.push(tag.artist);
+        ///    }
+        ///    if (tag.year) {
+        ///        parts.push(tag.year);
+        ///    }
+        ///    if (tag.album) {
+        ///        parts.push(tag.album);
+        ///    }
+        ///    else {
+        ///        parts.push(directoryname(file));
+        ///    }
+        ///    return parts.join(&quot; - &quot;);
+        ///})().
+        /// </summary>
+        internal static string Grouping {
+            get {
+                return ResourceManager.GetString("Grouping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
         ///    if (!file) {
         ///        return version();
         ///    }
@@ -122,8 +146,9 @@ namespace FoxTunes {
         ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
         ///    xmlns:Core=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.Core&quot; 
         ///    xmlns:Windows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows&quot;
+        ///    xmlns:ViewModel=&quot;clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows&quot;
         ///    DataType=&quot;{x:Type Core:PlaylistItem}&quot;&gt;
-        ///    &lt;Windows:Rating Height=&quot;16&quot;&gt;&lt;/Windows:Rating&gt;
+        ///    &lt;Windows:Rating Height=&quot;15&quot;&gt;&lt;/Windows:Rating&gt;
         ///&lt;/DataTemplate&gt;.
         /// </summary>
         internal static string Rating {

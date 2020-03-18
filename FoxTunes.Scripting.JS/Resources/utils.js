@@ -50,6 +50,19 @@ function ucfirst(value) {
     return words.join(" ");
 }
 
+function directoryname(value) {
+    if (!value) {
+        return value;
+    }
+    var parts = value.split('\\');
+    if (parts.length > 1) {
+        return parts[parts.length - 2];
+    }
+    else {
+        return value;
+    }
+}
+
 function filename(value) {
     if (!value) {
         return value;
