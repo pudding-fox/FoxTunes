@@ -5,6 +5,8 @@
     <AssemblyName>FoxTunes.Output.Bass.Dts</AssemblyName>
     <OutputPath>..\distribution\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+    <AssemblyVersion>2.1.1.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
