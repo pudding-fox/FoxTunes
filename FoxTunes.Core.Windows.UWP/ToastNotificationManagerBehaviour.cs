@@ -193,23 +193,23 @@ namespace FoxTunes
             {
                 if (this.LargeArtwork)
                 {
-                    xml = this.CreateNotificationXml_3(metaData, fileName);
+                    xml = this.CreateNotificationXml_3(outputStream, metaData, fileName);
                 }
                 else
                 {
-                    xml = this.CreateNotificationXml_2(metaData, fileName);
+                    xml = this.CreateNotificationXml_2(outputStream, metaData, fileName);
                 }
             }
             else
             {
-                xml = this.CreateNotificationXml_1(metaData);
+                xml = this.CreateNotificationXml_1(outputStream, metaData);
             }
             var document = new XmlDocument();
             document.LoadXml(xml);
             return document;
         }
 
-        protected virtual string CreateNotificationXml_1(IDictionary<string, string> metaData)
+        protected virtual string CreateNotificationXml_1(IOutputStream outputStream, IDictionary<string, string> metaData)
         {
             var title = default(string);
             var album = default(string);
@@ -221,7 +221,7 @@ namespace FoxTunes
 <toast>
     <visual>
         <binding template=""ToastGeneric"">" +
-(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>No Title</text>") +
+(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>" + SecurityElement.Escape(Path.GetFileNameWithoutExtension(outputStream.FileName)) + "/text>") +
 (!string.IsNullOrEmpty(album) ? "<text>" + SecurityElement.Escape(album) + "</text>" : string.Empty) +
 (!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
         </binding>
@@ -230,7 +230,7 @@ namespace FoxTunes
 ";
         }
 
-        protected virtual string CreateNotificationXml_2(IDictionary<string, string> metaData, string fileName)
+        protected virtual string CreateNotificationXml_2(IOutputStream outputStream, IDictionary<string, string> metaData, string fileName)
         {
             var title = default(string);
             var album = default(string);
@@ -242,7 +242,7 @@ namespace FoxTunes
 <toast>
     <visual>
         <binding template=""ToastGeneric"">" +
-(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>No Title</text>") +
+(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>" + SecurityElement.Escape(Path.GetFileNameWithoutExtension(outputStream.FileName)) + "</text>") +
 (!string.IsNullOrEmpty(album) ? "<text>" + SecurityElement.Escape(album) + "</text>" : string.Empty) +
 (!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
             <image
@@ -255,7 +255,7 @@ namespace FoxTunes
 ";
         }
 
-        protected virtual string CreateNotificationXml_3(IDictionary<string, string> metaData, string fileName)
+        protected virtual string CreateNotificationXml_3(IOutputStream outputStream, IDictionary<string, string> metaData, string fileName)
         {
             var title = default(string);
             var album = default(string);
@@ -267,7 +267,7 @@ namespace FoxTunes
 <toast>
     <visual>
         <binding template=""ToastGeneric"">" +
-            (!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>No Title</text>") +
+            (!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>" + SecurityElement.Escape(Path.GetFileNameWithoutExtension(outputStream.FileName)) + "</text>") +
             (!string.IsNullOrEmpty(album) ? "<text>" + SecurityElement.Escape(album) + "</text>" : string.Empty) +
             (!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
             <image
