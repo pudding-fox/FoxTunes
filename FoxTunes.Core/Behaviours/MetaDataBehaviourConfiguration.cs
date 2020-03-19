@@ -82,6 +82,10 @@ namespace FoxTunes
                     StandardComponents.Instance.Configuration.GetElement(SECTION, COPY_IMAGES_ELEMENT).Hide();
                 }
                 StandardComponents.Instance.Configuration.GetElement(SECTION, THREADS_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_EXTENDED_TAGS).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_MUSICBRAINZ_TAGS).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LYRICS_TAGS).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_POPULARIMETER_TAGS).Show();
             }
             else
             {
@@ -91,6 +95,10 @@ namespace FoxTunes
                 StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_BACK).Hide();
                 StandardComponents.Instance.Configuration.GetElement(SECTION, COPY_IMAGES_ELEMENT).Hide();
                 StandardComponents.Instance.Configuration.GetElement(SECTION, THREADS_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_EXTENDED_TAGS).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_MUSICBRAINZ_TAGS).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LYRICS_TAGS).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_POPULARIMETER_TAGS).Hide();
             }
         }
     }
