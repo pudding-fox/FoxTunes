@@ -40,7 +40,6 @@ namespace FoxTunes
             {
                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
             }
-            await this.SequenceItems().ConfigureAwait(false);
             await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
         }
 

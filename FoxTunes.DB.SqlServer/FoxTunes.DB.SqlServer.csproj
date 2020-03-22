@@ -12,7 +12,7 @@
   <ItemGroup>
     <Reference Include="System.Configuration" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
@@ -27,6 +27,19 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\AddLibraryHierarchyNodeToPlaylist.tt">
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>AddLibraryHierarchyNodeToPlaylist.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
+    <Compile Update="Templates\AddLibraryHierarchyNodeToPlaylist.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AddLibraryHierarchyNodeToPlaylist.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -55,7 +68,7 @@
       <DependentUpon>PlaylistSequenceBuilder.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
@@ -74,6 +87,6 @@
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
- <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
 </Project>
