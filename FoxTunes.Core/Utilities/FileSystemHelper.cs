@@ -49,27 +49,28 @@ namespace FoxTunes
 
         private static IEnumerable<string> EnumerateFilesCore(string path, string searchPattern, SearchOption searchOption)
         {
-            var stack = new Stack<string>();
-            stack.Push(path);
-            while (stack.Count > 0)
+            var queue = new Queue<string>();
+            queue.Enqueue(path);
+            while (queue.Count > 0)
             {
-                path = stack.Pop();
+                path = queue.Dequeue();
                 if (searchOption.HasFlag(SearchOption.Recursive))
                 {
                     try
                     {
+                        var directoryNames = Directory.EnumerateDirectories(path, "*", global::System.IO.SearchOption.TopDirectoryOnly);
                         if (searchOption.HasFlag(SearchOption.UseSystemExclusions))
                         {
-                            stack.PushRange(
-                                Directory.EnumerateDirectories(path, "*", global::System.IO.SearchOption.TopDirectoryOnly).Except(IgnoredDirectories, StringComparer.OrdinalIgnoreCase)
-                            );
+                            directoryNames = directoryNames.Except(IgnoredDirectories, StringComparer.OrdinalIgnoreCase);
                         }
-                        else
+                        if (searchOption.HasFlag(SearchOption.Sort))
                         {
-                            stack.PushRange(
-                                Directory.EnumerateDirectories(path, "*", global::System.IO.SearchOption.TopDirectoryOnly)
-                            );
+                            //The results are already sorted (if using NTFS)
+                            //The underlying API is https://docs.microsoft.com/en-gb/windows/win32/api/fileapi/nf-fileapi-findnextfilea
+                            //.NET doesn't specify any order though so here we are..
+                            directoryNames = directoryNames.OrderBy();
                         }
+                        queue.EnqueueRange(directoryNames);
                     }
                     catch
                     {
@@ -82,6 +83,13 @@ namespace FoxTunes
                     fileNames.AddRange(
                         Directory.EnumerateFiles(path, searchPattern, global::System.IO.SearchOption.TopDirectoryOnly)
                     );
+                    if (searchOption.HasFlag(SearchOption.Sort))
+                    {
+                        //The results are already sorted (if using NTFS)
+                        //The underlying API is https://docs.microsoft.com/en-gb/windows/win32/api/fileapi/nf-fileapi-findnextfilea
+                        //.NET doesn't specify any order though so here we are..
+                        fileNames.Sort();
+                    }
                 }
                 catch
                 {
@@ -208,7 +216,8 @@ namespace FoxTunes
             None = 0,
             Recursive = 1,
             UseSystemExclusions = 2,
-            UseSystemCache = 4
+            UseSystemCache = 4,
+            Sort = 8
         }
     }
 }

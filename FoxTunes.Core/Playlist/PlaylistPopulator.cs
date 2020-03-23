@@ -41,7 +41,7 @@ namespace FoxTunes
 
             using (var writer = new PlaylistWriter(this.Database, this.Transaction))
             {
-                foreach (var path in paths)
+                foreach (var path in paths.OrderBy())
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
@@ -49,7 +49,12 @@ namespace FoxTunes
                     }
                     if (Directory.Exists(path))
                     {
-                        foreach (var fileName in FileSystemHelper.EnumerateFiles(path, "*.*", FileSystemHelper.SearchOption.Recursive))
+                        var fileNames = FileSystemHelper.EnumerateFiles(
+                            path,
+                            "*.*",
+                            FileSystemHelper.SearchOption.Recursive | FileSystemHelper.SearchOption.Sort
+                        );
+                        foreach (var fileName in fileNames)
                         {
                             if (cancellationToken.IsCancellationRequested)
                             {
