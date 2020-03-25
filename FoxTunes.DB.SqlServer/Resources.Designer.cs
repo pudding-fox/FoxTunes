@@ -61,38 +61,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH 
-        ///&quot;MetaDataItems_Lookup&quot; AS
-        ///(
-        ///	SELECT *
-        ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
-        ///)
-        ///
-        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
-        ///SELECT @name, @type, @value
-        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems_Lookup&quot;);
-        ///
-        ///WITH 
-        ///&quot;MetaDataItems_Lookup&quot; AS
-        ///(
-        ///	SELECT *
-        ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
-        ///),
-        ///
-        ///&quot;LibraryItem_MetaDataItem_Lookup&quot; AS 
-        ///(
-        ///	SELECT &quot;LibraryItem_MetaDataItem&quot;.*
-        ///	FROM &quot; [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string AddLibraryMetaDataItems {
-            get {
-                return ResourceManager.GetString("AddLibraryMetaDataItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to CREATE TABLE [MetaDataItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///    [Name] nvarchar(250) NOT NULL, 
