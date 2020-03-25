@@ -44,6 +44,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\GetLibraryHierarchyMetaData.tt">
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>GetLibraryHierarchyMetaData.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
+    <Compile Update="Templates\GetLibraryHierarchyMetaData.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GetLibraryHierarchyMetaData.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Templates\PivotViewBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>

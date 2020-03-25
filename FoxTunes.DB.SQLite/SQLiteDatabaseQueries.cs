@@ -43,16 +43,20 @@ namespace FoxTunes
             }
         }
 
-        public override IDatabaseQuery GetLibraryHierarchyMetaData
+        public override IDatabaseQuery GetLibraryHierarchyMetaData(string filter)
         {
-            get
+            var result = default(IFilterParserResult);
+            if (!string.IsNullOrEmpty(filter) && !this.FilterParser.TryParse(filter, out result))
             {
-                return this.Database.QueryFactory.Create(
-                    Resources.GetLibraryHierarchyMetaData,
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
+                //TODO: Warn, failed to parse filter.
+                result = null;
             }
+            var template = new GetLibraryHierarchyMetaData(this.Database, result);
+            return this.Database.QueryFactory.Create(
+                template.TransformText(),
+                new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+            );
         }
     }
 }

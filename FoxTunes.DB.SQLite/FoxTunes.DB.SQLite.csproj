@@ -31,6 +31,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\GetLibraryHierarchyMetaData.tt">
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>GetLibraryHierarchyMetaData.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
+    <Compile Update="Templates\GetLibraryHierarchyMetaData.cs">
+      <DependentUpon>GetLibraryHierarchyMetaData.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Templates\AddLibraryHierarchyNodeToPlaylist.tt">
       <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
       <LastGenOutput>AddLibraryHierarchyNodeToPlaylist.cs</LastGenOutput>

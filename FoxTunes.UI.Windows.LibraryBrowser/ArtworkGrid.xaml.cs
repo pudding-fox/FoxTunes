@@ -62,6 +62,11 @@ namespace FoxTunes
             {
                 libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
             }).ConfigureAwait(false);
+            if (libraryHierarchyNode == null)
+            {
+                //Very rare.
+                return;
+            }
             var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight);
             var brush = new ImageBrush(source)
             {
