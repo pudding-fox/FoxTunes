@@ -11,6 +11,8 @@ namespace FoxTunes
     /// </summary>
     public partial class ArtworkGrid : UserControl
     {
+        public static readonly ILibraryHierarchyBrowser LibraryHierarchyBrowser = ComponentRegistry.Instance.GetComponent<ILibraryHierarchyBrowser>();
+
         public static readonly ArtworkGridProvider ArtworkGridProvider = ComponentRegistry.Instance.GetComponent<ArtworkGridProvider>();
 
         public static int TileWidth { get; private set; }
@@ -67,7 +69,8 @@ namespace FoxTunes
                 //Very rare.
                 return;
             }
-            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight);
+            var cache = libraryHierarchyNode.IsLeaf || string.IsNullOrEmpty(LibraryHierarchyBrowser.Filter);
+            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight, cache);
             var brush = new ImageBrush(source)
             {
                 Stretch = Stretch.Uniform
