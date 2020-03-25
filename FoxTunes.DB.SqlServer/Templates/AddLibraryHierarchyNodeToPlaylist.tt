@@ -38,7 +38,19 @@ AS
 )
 
 INSERT INTO "PlaylistItems" ("LibraryItem_Id", "Sequence", "DirectoryName", "FileName", "Status") 
-SELECT "LibraryItems"."Id", @sequence, "LibraryItems"."DirectoryName", "LibraryItems"."FileName", @status
+SELECT "LibraryItems"."Id", @sequence + ROW_NUMBER() OVER
+(
+	ORDER BY
+		CASE 
+				WHEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CustomMetaData.VariousArtists)) #> IS NOT NULL THEN <#= this.Database.QueryFactory.Dialect.String("1") #>
+				ELSE <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Artist)) #> 
+		END, 
+		<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Year)) #>, 
+		<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Album)) #>, 
+		CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Disc)) #> AS int), 
+		CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Track)) #> AS int), 
+		"HorizontalMetaData"."FileName"
+) - 1, "LibraryItems"."DirectoryName", "LibraryItems"."FileName", @status
 FROM "LibraryHierarchyItems"
 	JOIN "LibraryHierarchyItem_LibraryItem" 
 		ON "LibraryHierarchyItems"."Id" = "LibraryHierarchyItem_LibraryItem"."LibraryHierarchyItem_Id"
@@ -47,17 +59,7 @@ FROM "LibraryHierarchyItems"
 	JOIN "HorizontalMetaData"
 		ON "HorizontalMetaData"."Id" = "LibraryItems"."Id"
 WHERE "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId
-<#= new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText() #>
-ORDER BY
-	CASE 
-		WHEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CustomMetaData.VariousArtists)) #> IS NOT NULL THEN <#= this.Database.QueryFactory.Dialect.String("1") #>
-		ELSE <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Artist)) #> 
-	END, 
-	<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Year)) #>, 
-	<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Album)) #>, 
-	CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Disc)) #> AS int), 
-	CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Track)) #> AS int), 
-	"HorizontalMetaData"."FileName";
+<#= new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText() #>;
 
 SELECT COUNT(*)
 FROM "PlaylistItems"
