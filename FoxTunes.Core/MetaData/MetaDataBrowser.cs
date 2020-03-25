@@ -1,5 +1,4 @@
 ﻿#pragma warning disable 612, 618
-using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
@@ -8,37 +7,25 @@ namespace FoxTunes
 {
     public class MetaDataBrowser : StandardComponent, IMetaDataBrowser
     {
+        public IMetaDataCache MetaDataCache { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.MetaDataCache = core.Components.MetaDataCache;
             this.DatabaseFactory = core.Factories.Database;
             base.InitializeComponent(core);
         }
 
-        public IEnumerable<string> GetMetaDataNames()
+        public IEnumerable<MetaDataItem> GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType)
         {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                var query = database.QueryFactory.Build();
-                var name = database.Tables.MetaDataItem.Column("Name");
-                query.Output.AddColumn(name);
-                query.Source.AddTable(database.Tables.MetaDataItem);
-                query.Aggregate.AddColumn(name);
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    using (var reader = database.ExecuteReader(query, null, transaction))
-                    {
-                        foreach (var record in reader)
-                        {
-                            yield return record.Get<string>(name.Identifier);
-                        }
-                    }
-                }
-            }
+            var key = new MetaDataCacheKey(libraryHierarchyNode, metaDataItemType);
+            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCore(libraryHierarchyNode, metaDataItemType));
         }
 
-        public IEnumerable<MetaDataItem> GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType)
+
+        private IEnumerable<MetaDataItem> GetMetaDatasCore(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType)
         {
             using (var database = this.DatabaseFactory.Create())
             {
