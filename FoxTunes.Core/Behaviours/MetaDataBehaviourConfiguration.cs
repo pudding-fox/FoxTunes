@@ -14,9 +14,15 @@ namespace FoxTunes
 
         public const string READ_LOOSE_IMAGES = "CCCCB0DB-9D21-4066-96E4-E677E5DDE2FA";
 
+        public const string IMAGES_PREFERENCE = "CCDD1A78-01E3-4262-B845-91E090E51180";
+
         public const string LOOSE_IMAGES_FRONT = "DDDDADD6-BCB5-4E5D-830E-242B8557E5CB";
 
         public const string LOOSE_IMAGES_BACK = "EEEEADD6-BCB5-4E5D-830E-242B8557E5CB";
+
+        public const string IMAGES_PREFERENCE_EMBEDDED = "AAAA9180-7C4E-4038-8BA8-60D3516E64E8";
+
+        public const string IMAGES_PREFERENCE_LOOSE = "BBBB2170-3E86-4255-9BC6-EF31D870741E";
 
         public const string COPY_IMAGES_ELEMENT = "FFFFA875-8195-49AF-A1A4-2EAB2294A6D8";
 
@@ -41,34 +47,46 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(READ_LOOSE_IMAGES, "File Images").WithValue(true))
                 .WithElement(
-                    new TextConfigurationElement(LOOSE_IMAGES_FRONT, "Front Cover").WithValue("front, cover, folder"))
+                    new TextConfigurationElement(LOOSE_IMAGES_FRONT, "Front Cover", path: "Advanced").WithValue("front, cover, folder"))
                 .WithElement(
-                    new TextConfigurationElement(LOOSE_IMAGES_BACK, "Back Cover").WithValue("back"))
+                    new TextConfigurationElement(LOOSE_IMAGES_BACK, "Back Cover", path: "Advanced").WithValue("back"))
                 .WithElement(
-                    new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images").WithValue(true))
+                    new SelectionConfigurationElement(IMAGES_PREFERENCE, "Images Preference", path: "Advanced").WithOptions(GetImagesPreferenceOptions()))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_EXTENDED_TAGS, "Extended Attributes").WithValue(false))
+                    new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images", path: "Advanced").WithValue(true))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, "MusicBrainz Attributes").WithValue(false))
+                    new BooleanConfigurationElement(READ_EXTENDED_TAGS, "Extended Attributes", path: "Advanced").WithValue(false))
+                .WithElement(
+                    new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, "MusicBrainz Attributes", path: "Advanced").WithValue(false))
                 .WithElement(
                     new BooleanConfigurationElement(READ_LYRICS_TAGS, "Lyrics").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
                     new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
-                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32))
+                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32))
             );
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLE_ELEMENT).ConnectValue(value => UpdateConfiguration());
+            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_EMBEDDED_IMAGES).ConnectValue(value => UpdateConfiguration());
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_LOOSE_IMAGES).ConnectValue(value => UpdateConfiguration());
         }
 
         private static void UpdateConfiguration()
         {
             var enabled = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLE_ELEMENT).Value;
+            var embeddedImages = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_EMBEDDED_IMAGES).Value;
             var looseImages = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_LOOSE_IMAGES).Value;
             if (enabled)
             {
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_EMBEDDED_IMAGES).Show();
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LOOSE_IMAGES).Show();
+                if (embeddedImages && looseImages)
+                {
+                    StandardComponents.Instance.Configuration.GetElement(SECTION, IMAGES_PREFERENCE).Show();
+                }
+                else
+                {
+                    StandardComponents.Instance.Configuration.GetElement(SECTION, IMAGES_PREFERENCE).Hide();
+                }
                 if (looseImages)
                 {
                     StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_FRONT).Show();
@@ -101,5 +119,49 @@ namespace FoxTunes
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_POPULARIMETER_TAGS).Hide();
             }
         }
+
+        private static IEnumerable<SelectionConfigurationOption> GetImagesPreferenceOptions()
+        {
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
+            {
+                var option = new SelectionConfigurationOption(IMAGES_PREFERENCE_EMBEDDED, "Embedded");
+                if (releaseType == ReleaseType.Default)
+                {
+                    option.Default();
+                }
+                yield return option;
+            }
+            {
+                var option = new SelectionConfigurationOption(IMAGES_PREFERENCE_LOOSE, "Loose");
+                if (releaseType == ReleaseType.Minimal)
+                {
+                    option.Default();
+                }
+                yield return option;
+            }
+        }
+
+        public static ImagePreference GetImagesPreference(SelectionConfigurationOption value)
+        {
+            if (value != null)
+            {
+                switch (value.Id)
+                {
+                    default:
+                    case IMAGES_PREFERENCE_EMBEDDED:
+                        return ImagePreference.Embedded;
+                    case IMAGES_PREFERENCE_LOOSE:
+                        return ImagePreference.Loose;
+                }
+            }
+            return ImagePreference.Embedded;
+        }
+    }
+
+    public enum ImagePreference : byte
+    {
+        None,
+        Embedded,
+        Loose
     }
 }
