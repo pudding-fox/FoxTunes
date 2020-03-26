@@ -74,21 +74,29 @@ namespace FoxTunes
 
         protected virtual async Task<bool> AddLibraryItem(LibraryWriter writer, string fileName)
         {
-            if (!this.PlaybackManager.IsSupported(fileName))
+            try
             {
-                Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
+                if (!this.PlaybackManager.IsSupported(fileName))
+                {
+                    Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
+                    return false;
+                }
+                Logger.Write(this, LogLevel.Trace, "Adding file to library: {0}", fileName);
+                var libraryItem = new LibraryItem()
+                {
+                    DirectoryName = Path.GetDirectoryName(fileName),
+                    FileName = fileName,
+                    Status = LibraryItemStatus.Import
+                };
+                libraryItem.SetImportDate(DateTime.UtcNow);
+                await writer.Write(libraryItem).ConfigureAwait(false);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Debug, "Failed to add file \"{0}\" to library: {0}", fileName, e.Message);
                 return false;
             }
-            Logger.Write(this, LogLevel.Trace, "Adding file to library: {0}", fileName);
-            var libraryItem = new LibraryItem()
-            {
-                DirectoryName = Path.GetDirectoryName(fileName),
-                FileName = fileName,
-                Status = LibraryItemStatus.Import
-            };
-            libraryItem.SetImportDate(DateTime.UtcNow);
-            await writer.Write(libraryItem).ConfigureAwait(false);
-            return true;
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)
