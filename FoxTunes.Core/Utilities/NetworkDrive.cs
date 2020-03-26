@@ -10,7 +10,7 @@ namespace FoxTunes
         public static bool IsRemotePath(string path)
         {
             var letter = Path.GetPathRoot(path);
-            if (string.IsNullOrEmpty(letter))
+            if (string.IsNullOrEmpty(letter) || letter.Length > 3)
             {
                 return false;
             }
