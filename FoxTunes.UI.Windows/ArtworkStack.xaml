@@ -3,10 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:LibraryHierarchyNode}, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <ViewModel:ImageConverter x:Key="ImageConverter"></ViewModel:ImageConverter>
+    </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding MetaDatas}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
@@ -18,7 +23,14 @@
                 <Border Background="{DynamicResource NormalBrush}" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" CornerRadius="5" Padding="5">
                     <Grid Width="100" Height="100">
                         <Grid.Background>
-                            <ImageBrush ImageSource="{Binding Value}" Stretch="Uniform"/>
+                            <Binding Path="Value" Converter="{StaticResource ImageConverter}" IsAsync="True">
+                                <Binding.ConverterParameter>
+                                    <x:Array Type="{x:Type System:Int32}">
+                                        <System:Int32>100</System:Int32>
+                                        <System:Int32>100</System:Int32>
+                                    </x:Array>
+                                </Binding.ConverterParameter>
+                            </Binding>
                         </Grid.Background>
                     </Grid>
                 </Border>

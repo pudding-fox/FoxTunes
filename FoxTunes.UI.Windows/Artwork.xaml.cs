@@ -93,12 +93,14 @@ namespace FoxTunes
                     0,
                     true
                 );
+                var brush = new ImageBrush(source)
+                {
+                    Stretch = Stretch.Uniform
+                };
+                brush.Freeze();
                 await Windows.Invoke(() =>
                 {
-                    this.Background = new ImageBrush(source)
-                    {
-                        Stretch = Stretch.Uniform
-                    };
+                    this.Background = brush;
                     this.IsComponentEnabled = true;
                 }).ConfigureAwait(false);
             }
