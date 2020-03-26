@@ -89,7 +89,6 @@ namespace FoxTunes
             {
                 var source = ImageLoader.Load(
                     fileName,
-                    fileName,
                     0,
                     0,
                     true

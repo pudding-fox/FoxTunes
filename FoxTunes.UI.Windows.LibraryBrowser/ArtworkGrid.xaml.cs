@@ -69,8 +69,7 @@ namespace FoxTunes
                 //Very rare.
                 return;
             }
-            var cache = libraryHierarchyNode.IsLeaf || string.IsNullOrEmpty(LibraryHierarchyBrowser.Filter);
-            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight, cache);
+            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight, true);
             var brush = new ImageBrush(source)
             {
                 Stretch = Stretch.Uniform

@@ -16,7 +16,7 @@ namespace FoxTunes
 
         public bool HighQualityResizer { get; private set; }
 
-        public CappedDictionary<string, Lazy<ImageSource>> Store { get; private set; }
+        public Cache Store { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -29,7 +29,7 @@ namespace FoxTunes
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 ImageLoaderConfiguration.SECTION,
                 ImageLoaderConfiguration.CACHE_SIZE
-            ).ConnectValue(value => this.Store = new CappedDictionary<string, Lazy<ImageSource>>(value));
+            ).ConnectValue(value => this.Store = new Cache(value));
             base.InitializeComponent(core);
         }
 
@@ -38,30 +38,30 @@ namespace FoxTunes
             return ImageLoaderConfiguration.GetConfigurationSections();
         }
 
-        public ImageSource Load(string id, string fileName, int width, int height, bool cache)
+        public ImageSource Load(string fileName, int width, int height, bool cache)
         {
             if (cache)
             {
                 var imageSource = default(Lazy<ImageSource>);
-                if (Store.TryGetValue(id, out imageSource))
+                if (Store.TryGetValue(fileName, width, height, out imageSource))
                 {
                     return imageSource.Value;
                 }
-                Store.Add(id, new Lazy<ImageSource>(() => this.LoadCore(id, fileName, width, height)));
+                Store.Add(fileName, width, height, new Lazy<ImageSource>(() => this.LoadCore(fileName, width, height)));
                 //Second iteration will always hit cache.
-                return this.Load(id, fileName, width, height, cache);
+                return this.Load(fileName, width, height, cache);
             }
-            return this.LoadCore(id, fileName, width, height);
+            return this.LoadCore(fileName, width, height);
         }
 
-        private ImageSource LoadCore(string id, string fileName, int width, int height)
+        private ImageSource LoadCore(string fileName, int width, int height)
         {
             try
             {
                 var decode = false;
                 if (width != 0 && height != 0 && this.HighQualityResizer)
                 {
-                    fileName = ImageResizer.Resize(id, fileName, width, height);
+                    fileName = ImageResizer.Resize(fileName, width, height);
                 }
                 else
                 {
@@ -98,11 +98,11 @@ namespace FoxTunes
             if (cache)
             {
                 var imageSource = default(Lazy<ImageSource>);
-                if (Store.TryGetValue(id, out imageSource))
+                if (Store.TryGetValue(id, 0, 0, out imageSource))
                 {
                     return imageSource.Value;
                 }
-                Store.Add(id, new Lazy<ImageSource>(() => this.LoadCore(id, factory)));
+                Store.Add(id, 0, 0, new Lazy<ImageSource>(() => this.LoadCore(id, factory)));
                 //Second iteration will always hit cache.
                 return this.Load(id, factory, cache);
             }
@@ -128,6 +128,111 @@ namespace FoxTunes
             {
                 Logger.Write(typeof(ImageLoader), LogLevel.Warn, "Failed to load image: {0}", e.Message);
                 return null;
+            }
+        }
+
+        public class Cache
+        {
+            public Cache(int capacity)
+            {
+                this.Store = new CappedDictionary<Key, Lazy<ImageSource>>(capacity);
+            }
+
+            public CappedDictionary<Key, Lazy<ImageSource>> Store { get; private set; }
+
+            public void Add(string fileName, int width, int height, Lazy<ImageSource> imageSource)
+            {
+                var key = new Key(fileName, width, height);
+                this.Store.Add(key, imageSource);
+            }
+
+            public bool TryGetValue(string fileName, int width, int height, out Lazy<ImageSource> imageSource)
+            {
+                var key = new Key(fileName, width, height);
+                return this.Store.TryGetValue(key, out imageSource);
+            }
+
+            public class Key : IEquatable<Key>
+            {
+                public Key(string fileName, int width, int height)
+                {
+                    this.FileName = fileName;
+                    this.Width = width;
+                    this.Height = height;
+                }
+
+                public string FileName { get; private set; }
+
+                public int Width { get; private set; }
+
+                public int Height { get; private set; }
+
+                public virtual bool Equals(Key other)
+                {
+                    if (other == null)
+                    {
+                        return false;
+                    }
+                    if (object.ReferenceEquals(this, other))
+                    {
+                        return true;
+                    }
+                    if (!string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                    if (this.Width != other.Width)
+                    {
+                        return false;
+                    }
+                    if (this.Height != other.Height)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+
+                public override bool Equals(object obj)
+                {
+                    return this.Equals(obj as Key);
+                }
+
+                public override int GetHashCode()
+                {
+                    var hashCode = default(int);
+                    unchecked
+                    {
+                        if (!string.IsNullOrEmpty(this.FileName))
+                        {
+                            hashCode += this.FileName.ToLower().GetHashCode();
+                        }
+                        hashCode += this.Width.GetHashCode();
+                        hashCode += this.Height.GetHashCode();
+                    }
+                    return hashCode;
+                }
+
+                public static bool operator ==(Key a, Key b)
+                {
+                    if ((object)a == null && (object)b == null)
+                    {
+                        return true;
+                    }
+                    if ((object)a == null || (object)b == null)
+                    {
+                        return false;
+                    }
+                    if (object.ReferenceEquals((object)a, (object)b))
+                    {
+                        return true;
+                    }
+                    return a.Equals(b);
+                }
+
+                public static bool operator !=(Key a, Key b)
+                {
+                    return !(a == b);
+                }
             }
         }
     }

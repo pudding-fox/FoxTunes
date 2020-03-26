@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -60,13 +61,17 @@ namespace FoxTunes
 
         public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
+            if (cache)
+            {
+                cache = this.IsRendered(libraryHierarchyNode);
+            }
             var id = this.GetImageId(libraryHierarchyNode, width, height);
             if (cache)
             {
                 var fileName = default(string);
                 if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
                 {
-                    return this.ImageLoader.Load(id, fileName, 0, 0, true);
+                    return this.ImageLoader.Load(fileName, 0, 0, true);
                 }
             }
             //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
@@ -78,11 +83,16 @@ namespace FoxTunes
                     var fileName = default(string);
                     if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
                     {
-                        return this.ImageLoader.Load(id, fileName, 0, 0, true);
+                        return this.ImageLoader.Load(fileName, 0, 0, true);
                     }
                 }
                 return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
             }
+        }
+
+        private bool IsRendered(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            return libraryHierarchyNode.MetaDatas.Length > 1;
         }
 
         private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
@@ -90,7 +100,7 @@ namespace FoxTunes
             switch (libraryHierarchyNode.MetaDatas.Length)
             {
                 case 0:
-                    return this.CreateImageSource0(libraryHierarchyNode, width, height);
+                    return this.CreateImageSource0();
                 case 1:
                     return this.CreateImageSource1(libraryHierarchyNode, width, height);
                 case 2:
@@ -102,21 +112,19 @@ namespace FoxTunes
             }
         }
 
-        private ImageSource CreateImageSource0(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private ImageSource CreateImageSource0()
         {
-            var id = this.GetImageId(libraryHierarchyNode, width, height);
             return this.ImageLoader.Load(ThemeLoader.Theme.Id, () => ThemeLoader.Theme.ArtworkPlaceholder, true);
         }
 
         private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
         {
-            var id = this.GetImageId(libraryHierarchyNode, width, height);
             var fileName = libraryHierarchyNode.MetaDatas[0].Value;
             if (!File.Exists(fileName))
             {
-                return this.CreateImageSource0(libraryHierarchyNode, width, height);
+                return this.CreateImageSource0();
             }
-            return this.ImageLoader.Load(id, fileName, width, height, true);
+            return this.ImageLoader.Load(fileName, width, height, true);
         }
 
         private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
@@ -157,7 +165,6 @@ namespace FoxTunes
 
         private void DrawImage(LibraryHierarchyNode libraryHierarchyNode, DrawingContext context, int position, int count, int width, int height)
         {
-            var id = this.GetImageId(libraryHierarchyNode, width, height) + position;
             var fileName = libraryHierarchyNode.MetaDatas[position].Value;
             if (!File.Exists(fileName))
             {
@@ -165,7 +172,7 @@ namespace FoxTunes
             }
             var region = this.GetRegion(context, position, count, width, height);
             var size = (int)Math.Max(region.Width, region.Height);
-            var source = this.ImageLoader.Load(id, fileName, size, size, false);
+            var source = this.ImageLoader.Load(fileName, size, size, false);
             if (source == null)
             {
                 //Image failed to load, nothing can be done.
@@ -272,14 +279,14 @@ namespace FoxTunes
                 {
                     hashCode += this.ThemeLoader.Theme.Id.GetHashCode();
                 }
-                do
+                foreach (var metaDataItem in libraryHierarchyNode.MetaDatas.Take(4))
                 {
-                    if (!string.IsNullOrEmpty(libraryHierarchyNode.Value))
+                    if (string.IsNullOrEmpty(metaDataItem.Value))
                     {
-                        hashCode += libraryHierarchyNode.Value.GetHashCode();
+                        continue;
                     }
-                    libraryHierarchyNode = libraryHierarchyNode.Parent;
-                } while (libraryHierarchyNode != null);
+                    hashCode += metaDataItem.Value.ToLower().GetHashCode();
+                }
                 hashCode = (hashCode * 29) + width.GetHashCode();
                 hashCode = (hashCode * 29) + height.GetHashCode();
             }

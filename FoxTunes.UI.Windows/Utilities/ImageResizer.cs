@@ -48,14 +48,10 @@ namespace FoxTunes
 #endif
         }
 
-        public string Resize(string id, string fileName, int width, int height)
+        public string Resize(string fileName, int width, int height)
         {
+            var id = this.GetImageId(fileName, width, height);
             return this.Resize(id, () => Bitmap.FromFile(fileName), width, height);
-        }
-
-        public Stream Resize(string id, Stream stream, int width, int height)
-        {
-            return File.OpenRead(this.Resize(id, () => Bitmap.FromStream(stream), width, height));
         }
 
         protected virtual string Resize(string id, Func<Image> factory, int width, int height)
@@ -98,6 +94,21 @@ namespace FoxTunes
             {
                 graphics.DrawImage(image, new Rectangle(0, 0, width, height));
             }
+        }
+
+        private string GetImageId(string fileName, int width, int height)
+        {
+            var hashCode = default(int);
+            unchecked
+            {
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    hashCode += fileName.GetHashCode();
+                }
+                hashCode = (hashCode * 29) + width.GetHashCode();
+                hashCode = (hashCode * 29) + height.GetHashCode();
+            }
+            return Math.Abs(hashCode).ToString();
         }
 
         public void Clear()

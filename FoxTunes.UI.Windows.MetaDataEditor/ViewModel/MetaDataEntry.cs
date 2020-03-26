@@ -300,7 +300,6 @@ namespace FoxTunes.ViewModel
                 {
                     this.ImageSource = ImageLoader.Load(
                         this.Value,
-                        this.Value,
                         0,
                         0,
                         true
