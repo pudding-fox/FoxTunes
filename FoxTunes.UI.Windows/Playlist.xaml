@@ -27,7 +27,7 @@
     <Grid>
         <ListView 
                   Name="ListView"
-                  ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
+                  ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}"
                   Windows:ListViewExtensions.SelectedItems="{Binding SelectedItems, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DropInsert="True"
                   Windows:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"

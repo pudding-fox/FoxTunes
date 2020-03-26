@@ -277,6 +277,13 @@ namespace FoxTunes.ViewModel
 
         private async Task<bool> Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames, bool updateSelection)
         {
+            if (frames.Count > 0)
+            {
+                if (!frames.LastOrDefault().Items.Contains(libraryHierarchyNode))
+                {
+                    return false;
+                }
+            }
             var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode);
             if (!libraryHierarchyNodes.Any())
             {
@@ -314,8 +321,7 @@ namespace FoxTunes.ViewModel
                 libraryHierarchyNode = libraryHierarchyNode.Parent;
                 stack.Push(libraryHierarchyNode);
             }
-            stack.Push(LibraryHierarchyNode.Empty);
-            var position = 0;
+            var position = 1;
             while (stack.Count > 0)
             {
                 libraryHierarchyNode = stack.Pop();

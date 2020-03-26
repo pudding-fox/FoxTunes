@@ -40,7 +40,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ComboBox 
-            ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}}" 
+            ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}, IsAsync=True}" 
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
             DisplayMemberPath="Name">
             <ComboBox.Visibility>
