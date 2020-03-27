@@ -191,7 +191,7 @@ namespace FoxTunes.ViewModel
 
         public async Task EditLibrary()
         {
-            await this.Cancel();
+            await this.Cancel().ConfigureAwait(false);
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
                 return;
@@ -208,12 +208,12 @@ namespace FoxTunes.ViewModel
             await this.SetItems(
                 this.GetItems(libraryItems),
                 libraryItems.Length
-            );
+            ).ConfigureAwait(false);
         }
 
         public async Task EditPlaylist()
         {
-            await this.Cancel();
+            await this.Cancel().ConfigureAwait(false);
             if (this.PlaylistManager == null || this.PlaylistManager.SelectedItems == null)
             {
                 return;
@@ -230,7 +230,7 @@ namespace FoxTunes.ViewModel
             await this.SetItems(
                 this.GetItems(playlistItems),
                 playlistItems.Length
-            );
+            ).ConfigureAwait(false);
         }
 
         protected IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> GetItems(IEnumerable<IFileData> sources)
@@ -307,7 +307,7 @@ namespace FoxTunes.ViewModel
             await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
-            await this.Cancel();
+            await this.Cancel().ConfigureAwait(false);
         }
 
         public ICommand CancelCommand

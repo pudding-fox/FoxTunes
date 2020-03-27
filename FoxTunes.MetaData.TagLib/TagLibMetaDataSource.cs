@@ -110,7 +110,7 @@ namespace FoxTunes
                     {
                         this.Try(() => PopularimeterManager.Read(this, metaData, file), this.ErrorHandler);
                     }
-                    await ImageManager.Read(this, metaData, file);
+                    await ImageManager.Read(this, metaData, file).ConfigureAwait(false);
                 }
             }
             catch (UnsupportedFormatException)
@@ -608,18 +608,18 @@ namespace FoxTunes
                     {
                         default:
                         case ImagePreference.Embedded:
-                            return await ReadEmbedded(source, metaDatas, file) || await ReadLoose(source, metaDatas, file);
+                            return await ReadEmbedded(source, metaDatas, file).ConfigureAwait(false) || await ReadLoose(source, metaDatas, file).ConfigureAwait(false);
                         case ImagePreference.Loose:
-                            return await ReadLoose(source, metaDatas, file) || await ReadEmbedded(source, metaDatas, file);
+                            return await ReadLoose(source, metaDatas, file).ConfigureAwait(false) || await ReadEmbedded(source, metaDatas, file).ConfigureAwait(false);
                     }
                 }
                 else if (embedded)
                 {
-                    return await ReadEmbedded(source, metaDatas, file);
+                    return await ReadEmbedded(source, metaDatas, file).ConfigureAwait(false);
                 }
                 else if (loose)
                 {
-                    return await ReadLoose(source, metaDatas, file);
+                    return await ReadLoose(source, metaDatas, file).ConfigureAwait(false);
                 }
                 return false;
             }
