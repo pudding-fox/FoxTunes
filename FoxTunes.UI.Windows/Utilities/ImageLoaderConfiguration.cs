@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FoxTunes.Interfaces;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -12,9 +13,20 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
+            var cacheSize = default(int);
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
+            switch (releaseType)
+            {
+                case ReleaseType.Minimal:
+                    cacheSize = 128;
+                    break;
+                default:
+                    cacheSize = 1024;
+                    break;
+            }
             yield return new ConfigurationSection(SECTION, "Images")
                 .WithElement(new BooleanConfigurationElement(HIGH_QUALITY_RESIZER, "High Quality Resizer").WithValue(true))
-                .WithElement(new IntegerConfigurationElement(CACHE_SIZE, "Cache Size").WithValue(128).WithValidationRule(new IntegerValidationRule(64, 1280))
+                .WithElement(new IntegerConfigurationElement(CACHE_SIZE, "Cache Size").WithValue(cacheSize).WithValidationRule(new IntegerValidationRule(64, 2048))
             );
         }
     }
