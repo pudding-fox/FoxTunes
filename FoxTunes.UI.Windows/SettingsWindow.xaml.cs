@@ -23,8 +23,11 @@ namespace FoxTunes
             });
             if (!global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.IsEmpty())
             {
-                this.Left = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Left;
-                this.Top = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Top;
+                if (ScreenHelper.WindowBoundsVisible(global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds))
+                {
+                    this.Left = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Left;
+                    this.Top = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Top;
+                }
                 this.Width = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Width;
                 this.Height = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Height;
             }
