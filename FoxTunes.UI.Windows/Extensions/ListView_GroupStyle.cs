@@ -130,6 +130,12 @@ namespace FoxTunes
             {
                 this.ListView = listView;
                 this.ScriptingContext = ScriptingRuntime.CreateContext();
+                BindingHelper.AddHandler(
+                    this.ListView,
+                    ItemsControl.ItemsSourceProperty,
+                    typeof(ListView),
+                    this.OnItemsSourceChanged
+                );
             }
 
             public ListView ListView { get; private set; }
@@ -162,7 +168,7 @@ namespace FoxTunes
 
             public virtual void Enable()
             {
-                if (string.IsNullOrEmpty(this.Script) || this.HeaderTemplate == null)
+                if (string.IsNullOrEmpty(this.Script) || this.HeaderTemplate == null || this.CollectionView == null)
                 {
                     return;
                 }
@@ -178,24 +184,15 @@ namespace FoxTunes
                         HeaderTemplate = this.HeaderTemplate
                     }
                 );
-                BindingHelper.AddHandler(
-                    this.ListView,
-                    ItemsControl.ItemsSourceProperty,
-                    typeof(ListView),
-                    this.OnItemsSourceChanged
-                );
             }
 
             public virtual void Disable()
             {
                 this.ListView.GroupStyle.Clear();
-                this.CollectionView.GroupDescriptions.Clear();
-                BindingHelper.RemoveHandler(
-                    this.ListView,
-                    ItemsControl.ItemsSourceProperty,
-                    typeof(ListView),
-                    this.OnItemsSourceChanged
-                );
+                if (this.CollectionView != null)
+                {
+                    this.CollectionView.GroupDescriptions.Clear();
+                }
             }
 
             public void Refresh()
@@ -211,6 +208,15 @@ namespace FoxTunes
 
             protected override void Dispose(bool disposing)
             {
+                if (this.ListView != null)
+                {
+                    BindingHelper.RemoveHandler(
+                        this.ListView,
+                        ItemsControl.ItemsSourceProperty,
+                        typeof(ListView),
+                        this.OnItemsSourceChanged
+                    );
+                }
                 if (this.ScriptingContext != null)
                 {
                     this.ScriptingContext.Dispose();
