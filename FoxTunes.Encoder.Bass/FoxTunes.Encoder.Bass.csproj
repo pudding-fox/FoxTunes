@@ -9,7 +9,7 @@
     <Platforms>x86</Platforms>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
-    <AssemblyVersion>2.1.2.0</AssemblyVersion>
+    <AssemblyVersion>2.1.3.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
