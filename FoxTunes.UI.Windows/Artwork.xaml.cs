@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -51,7 +52,7 @@ namespace FoxTunes
             var task = this.Refresh();
         }
 
-        protected virtual void OnThemeChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnThemeChanged(object sender, EventArgs e)
         {
             var task = this.Refresh();
         }

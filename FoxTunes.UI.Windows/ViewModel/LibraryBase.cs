@@ -416,7 +416,7 @@ namespace FoxTunes.ViewModel
             this.OnSelectedItemChanged();
         }
 
-        protected virtual void OnCanNavigateChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCanNavigateChanged(object sender, EventArgs e)
         {
             var task = this.RefreshStatus();
         }
