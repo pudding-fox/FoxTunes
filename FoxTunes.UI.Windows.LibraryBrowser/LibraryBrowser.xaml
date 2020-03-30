@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Interfaces="clr-namespace:FoxTunes.Interfaces;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
              xmlns:LocalWindows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
@@ -18,6 +19,7 @@
         <ViewModel:NegavingBooleanToVisibilityConverter x:Key="NegavingBooleanToVisibilityConverter"></ViewModel:NegavingBooleanToVisibilityConverter>
         <ViewModel:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter"></ViewModel:IntegerToVisibilityConverter>
         <ViewModel:MultiVisibilityConverter x:Key="MultiVisibilityConverter"></ViewModel:MultiVisibilityConverter>
+        <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
         <System:Boolean x:Key="False">False</System:Boolean>
@@ -130,12 +132,12 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to collection by dropping files here." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
+        <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding StatusMessage, Mode=OneWay, Source={StaticResource ViewModel}}" IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"></Setter>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Managers.Library.CanNavigate, Mode=OneWay}" Value="False">
+                        <DataTrigger Binding="{Binding HasStatusMessage, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
                             <Setter Property="Visibility" Value="Visible"></Setter>
                         </DataTrigger>
                     </Style.Triggers>

@@ -5,7 +5,6 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace FoxTunes
 {
@@ -53,6 +52,32 @@ namespace FoxTunes
         }
 
         public event EventHandler FilterChanged;
+
+        private LibraryHierarchyBrowserState _State { get; set; }
+
+        public LibraryHierarchyBrowserState State
+        {
+            get
+            {
+                return this._State;
+            }
+            set
+            {
+                this._State = value;
+                this.OnStateChanged();
+            }
+        }
+
+        protected virtual void OnStateChanged()
+        {
+            if (this.StateChanged != null)
+            {
+                this.StateChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("State");
+        }
+
+        public event EventHandler StateChanged;
 
         public override void InitializeComponent(ICore core)
         {
@@ -122,26 +147,38 @@ namespace FoxTunes
 
         protected virtual IEnumerable<LibraryHierarchyNode> GetNodes(int libraryHierarchyId, int? libraryHierarchyItemId = null)
         {
-            using (var database = this.DatabaseFactory.Create())
+            if (!libraryHierarchyItemId.HasValue)
             {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                //We're loading the root items so signal loading.
+                this.State |= LibraryHierarchyBrowserState.Loading;
+            }
+            try
+            {
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes(this.Filter), (parameters, phase) =>
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        switch (phase)
+                        var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes(this.Filter), (parameters, phase) =>
                         {
-                            case DatabaseParameterPhase.Fetch:
-                                parameters["libraryHierarchyId"] = libraryHierarchyId;
-                                parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
-                                break;
+                            switch (phase)
+                            {
+                                case DatabaseParameterPhase.Fetch:
+                                    parameters["libraryHierarchyId"] = libraryHierarchyId;
+                                    parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
+                                    break;
+                            }
+                        }, transaction);
+                        foreach (var node in nodes)
+                        {
+                            node.InitializeComponent(this.Core);
+                            yield return node;
                         }
-                    }, transaction);
-                    foreach (var node in nodes)
-                    {
-                        node.InitializeComponent(this.Core);
-                        yield return node;
                     }
                 }
+            }
+            finally
+            {
+                this.State &= ~LibraryHierarchyBrowserState.Loading;
             }
         }
 
