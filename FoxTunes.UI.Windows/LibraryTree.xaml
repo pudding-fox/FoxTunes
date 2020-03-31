@@ -13,7 +13,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}" SearchCompleted="OnSearchCompleted"></ViewModel:LibraryTree>
+        <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryTree>
         <ViewModel:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter"></ViewModel:IntegerToVisibilityConverter>
         <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
@@ -48,6 +48,7 @@
                   Windows:TreeViewExtensions.RightButtonSelect="True"
                   Windows:TreeViewExtensions.DragSource="True"
                   Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized"
+                  Windows:TreeViewExtensions.AutoExpand="True"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   IsTextSearchEnabled="True"
                   TextSearch.TextPath="Value">

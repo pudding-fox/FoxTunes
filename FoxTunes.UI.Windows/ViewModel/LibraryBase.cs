@@ -372,27 +372,12 @@ namespace FoxTunes.ViewModel
         protected virtual void OnFilterChanged(object sender, EventArgs e)
         {
             var task = this.Refresh();
-            if (!string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter))
-            {
-                this.OnSearchCompleted();
-            }
         }
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
         {
             var task = this.RefreshStatus();
         }
-
-        protected virtual void OnSearchCompleted()
-        {
-            if (this.SearchCompleted == null)
-            {
-                return;
-            }
-            this.SearchCompleted(this, EventArgs.Empty);
-        }
-
-        public event EventHandler SearchCompleted;
 
         protected virtual void OnSelectedHierarchyChanged(object sender, EventArgs e)
         {
