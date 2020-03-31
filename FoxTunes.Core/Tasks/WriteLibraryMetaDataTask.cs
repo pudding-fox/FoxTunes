@@ -47,13 +47,10 @@ namespace FoxTunes
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
-            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
@@ -153,12 +150,6 @@ namespace FoxTunes
                     transaction.Commit();
                 }
             }
-        }
-
-        protected override async Task OnCompleted()
-        {
-            await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
 
         protected override void OnDisposing()

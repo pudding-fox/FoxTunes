@@ -145,6 +145,8 @@ namespace FoxTunes.ViewModel
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
+        public IPlaylistCache PlaylistCache { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -154,6 +156,7 @@ namespace FoxTunes.ViewModel
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.PlaylistCache = core.Components.PlaylistCache;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
@@ -295,14 +298,28 @@ namespace FoxTunes.ViewModel
                 }
             }
             var libraryItems = sources.OfType<LibraryItem>().ToArray();
+            var refreshPlaylist = default(bool);
             if (libraryItems.Any())
             {
                 await this.MetaDataManager.Save(libraryItems).ConfigureAwait(false);
+                foreach (var libraryItem in libraryItems)
+                {
+                    refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);
+                    if (refreshPlaylist)
+                    {
+                        break;
+                    }
+                }
             }
             var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             if (playlistItems.Any())
             {
                 await this.MetaDataManager.Save(playlistItems).ConfigureAwait(false);
+                refreshPlaylist = true;
+            }
+            if (refreshPlaylist)
+            {
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
             }
             await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);

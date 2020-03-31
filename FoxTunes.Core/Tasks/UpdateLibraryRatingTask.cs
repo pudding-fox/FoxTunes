@@ -21,20 +21,24 @@ namespace FoxTunes
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
+        public IPlaylistCache PlaylistCache { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.PlaylistCache = core.Components.PlaylistCache;
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
             var libraryItems = this.LibraryHierarchyBrowser.GetItems(
                 this.LibraryHierarchyNode,
                 true
             ).ToArray();
+            var refreshPlaylist = default(bool);
             foreach (var libraryItem in libraryItems)
             {
                 var metaDataItem = libraryItem.MetaDatas.FirstOrDefault(
@@ -46,16 +50,16 @@ namespace FoxTunes
                     libraryItem.MetaDatas.Add(metaDataItem);
                 }
                 metaDataItem.Value = Convert.ToString(this.Rating);
+                if (!refreshPlaylist)
+                {
+                    refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);
+                }
             }
-            return this.MetaDataManager.Save(libraryItems, CommonMetaData.Rating);
-        }
-
-        protected override async Task OnCompleted()
-        {
-            await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated)).ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
+            await this.MetaDataManager.Save(libraryItems, CommonMetaData.Rating);
+            if (refreshPlaylist)
+            {
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
+            }
         }
     }
 }

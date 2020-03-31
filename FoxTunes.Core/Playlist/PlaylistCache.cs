@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -45,6 +46,15 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public bool Contains(Func<PlaylistItem, bool> predicate)
+        {
+            if (this.Items == null || !this.Items.IsValueCreated)
+            {
+                return false;
+            }
+            return this.Items.Value.Any(predicate);
         }
 
         public IEnumerable<PlaylistItem> GetItems(Func<IEnumerable<PlaylistItem>> factory)
