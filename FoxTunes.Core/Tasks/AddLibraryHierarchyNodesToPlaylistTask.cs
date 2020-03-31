@@ -99,7 +99,7 @@ namespace FoxTunes
 
         private async Task AddPlaylistItems(IDatabaseQuery query, LibraryHierarchyNode libraryHierarchyNode, ITransactionSource transaction)
         {
-            this.Offset += await this.Database.ExecuteScalarAsync<int>(query, (parameters, phase) =>
+            var count = await this.Database.ExecuteScalarAsync<int>(query, (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -111,6 +111,8 @@ namespace FoxTunes
                         break;
                 }
             }, transaction).ConfigureAwait(false);
+            this.Sequence += count;
+            this.Offset += count;
         }
     }
 }
