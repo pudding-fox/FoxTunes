@@ -16,10 +16,6 @@ namespace FoxTunes.Interfaces
 
         event EventHandler SelectedItemChanged;
 
-        bool CanNavigate { get; }
-
-        event EventHandler CanNavigateChanged;
-
         Task Add(IEnumerable<string> paths);
 
         Task Rescan();

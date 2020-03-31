@@ -39,26 +39,23 @@ namespace FoxTunes
             {
                 return this._CanNavigate;
             }
+            set
+            {
+                this._CanNavigate = value;
+                this.OnCanNavigateChanged();
+            }
         }
 
-        protected Task SetCanNavigate(bool value)
-        {
-            this._CanNavigate = value;
-            return this.OnCanNavigateChanged();
-        }
-
-        protected virtual async Task OnCanNavigateChanged()
+        protected virtual void OnCanNavigateChanged()
         {
             if (this.CanNavigateChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.CanNavigateChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.CanNavigateChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("CanNavigate");
         }
 
-        public event AsyncEventHandler CanNavigateChanged;
+        public event EventHandler CanNavigateChanged;
 
         public override void InitializeComponent(ICore core)
         {
@@ -122,7 +119,7 @@ namespace FoxTunes
         public async Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            await this.SetCanNavigate(this.DatabaseFactory != null && await this.HasItems().ConfigureAwait(false)).ConfigureAwait(false);
+            this.CanNavigate = this.DatabaseFactory != null && await this.HasItems().ConfigureAwait(false);
             if (this.CanNavigate)
             {
                 Logger.Write(this, LogLevel.Debug, "Navigation is possible.");

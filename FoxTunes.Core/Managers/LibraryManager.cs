@@ -108,32 +108,6 @@ namespace FoxTunes
 
         public event EventHandler SelectedItemChanged;
 
-        private bool _CanNavigate { get; set; }
-
-        public bool CanNavigate
-        {
-            get
-            {
-                return this._CanNavigate;
-            }
-            set
-            {
-                this._CanNavigate = value;
-                this.OnCanNavigateChanged();
-            }
-        }
-
-        protected virtual void OnCanNavigateChanged()
-        {
-            if (this.CanNavigateChanged != null)
-            {
-                this.CanNavigateChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("CanNavigate");
-        }
-
-        public event EventHandler CanNavigateChanged;
-
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -141,8 +115,7 @@ namespace FoxTunes
             this.DatabaseFactory = core.Factories.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            //TODO: Bad .Wait().
-            this.Refresh().Wait();
+            this.Refresh();
             base.InitializeComponent(core);
         }
 
@@ -152,7 +125,8 @@ namespace FoxTunes
             {
                 case CommonSignals.LibraryUpdated:
                 case CommonSignals.HierarchiesUpdated:
-                    return this.Refresh();
+                    this.Refresh();
+                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -161,38 +135,7 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task<bool> HasItems()
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    return await database.ExecuteScalarAsync<bool>(database.QueryFactory.Build().With(query1 =>
-                    {
-                        query1.Output.AddCase(
-                            query1.Output.CreateCaseCondition(
-                                query1.Output.CreateFunction(
-                                    QueryFunction.Exists,
-                                    query1.Output.CreateSubQuery(
-                                        database.QueryFactory.Build().With(query2 =>
-                                        {
-                                            query2.Output.AddOperator(QueryOperator.Star);
-                                            query2.Source.AddTable(database.Tables.LibraryItem);
-                                        })
-                                    )
-                                ),
-                                query1.Output.CreateConstant(1)
-                            ),
-                            query1.Output.CreateCaseCondition(
-                                query1.Output.CreateConstant(0)
-                            )
-                        );
-                    }), transaction).ConfigureAwait(false);
-                }
-            }
-        }
-
-        public async Task Refresh()
+        public void Refresh()
         {
             if (this.SelectedHierarchy != null)
             {
@@ -217,16 +160,6 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Debug, "Selected first hierarchy: {0} => {1}", this.SelectedHierarchy.Id, this.SelectedHierarchy.Name);
                 }
-            }
-            Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.DatabaseFactory != null && await this.HasItems().ConfigureAwait(false);
-            if (this.CanNavigate)
-            {
-                Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
-            }
-            else
-            {
-                Logger.Write(this, LogLevel.Debug, "Navigation is not possible, library is empty.");
             }
         }
 
@@ -312,6 +245,11 @@ namespace FoxTunes
 
         protected virtual void OnReport()
         {
+            if (this.State.HasFlag(LibraryManagerState.Updating))
+            {
+                //Another task was queued.
+                return;
+            }
             var report = new LibraryManagerReport(this.DatabaseFactory);
             report.InitializeComponent(this.Core);
             this.OnReport(report);
