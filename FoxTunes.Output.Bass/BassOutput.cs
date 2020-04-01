@@ -315,7 +315,15 @@ namespace FoxTunes
             ).ConnectValue(value => this.BufferLength = value);
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
+            this.PipelineManager.Error += this.OnPipelineManagerError;
             base.InitializeComponent(core);
+        }
+
+        protected virtual Task OnPipelineManagerError(object sender, ComponentErrorEventArgs e)
+        {
+            //This usually means that the device buffer was lost.
+            //Nothing can be done.
+            return this.ShutdownCore(true);
         }
 
         public override IEnumerable<string> SupportedExtensions
