@@ -47,12 +47,15 @@ namespace FoxTunes
             {
                 shellLinkW.SetPath(target);
 
-                foreach (var key in properties.Keys)
+                if (properties != null)
                 {
-                    var value = properties[key];
-                    var property = new PropertyVariant();
-                    property.SetValue(value);
-                    propertyStore.SetValue(key, property);
+                    foreach (var key in properties.Keys)
+                    {
+                        var value = properties[key];
+                        var property = new PropertyVariant();
+                        property.SetValue(value);
+                        propertyStore.SetValue(key, property);
+                    }
                 }
 
                 persistFile.Save(location, true);
