@@ -107,6 +107,29 @@ namespace FoxTunes.ViewModel
             return Windows.Invoke(() => this.SelectedItem = this.PlaylistManager.CurrentItem);
         }
 
+        public override string StatusMessage
+        {
+            get
+            {
+                if (this.PlaylistBrowser != null)
+                {
+                    switch (this.PlaylistBrowser.State)
+                    {
+                        case PlaylistBrowserState.Loading:
+                            return "Loading...";
+                    }
+                }
+                if (this.PlaylistManager != null)
+                {
+                    if (!this.PlaylistManager.CanNavigate)
+                    {
+                        return "Drop files anywhere.";
+                    }
+                }
+                return null;
+            }
+        }
+
         public ICommand PlaySelectedItemCommand
         {
             get
