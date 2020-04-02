@@ -11,12 +11,17 @@ namespace FoxTunes
 
         public ArtworkGridLoader()
         {
-            this.Queue = new List<ArtworkGrid>();
+            this.ForegroundQueue = new List<ArtworkGrid>();
+            this.BackgroundQueue = new List<ArtworkGrid>();
         }
 
-        public TaskFactory Factory { get; private set; }
+        public IList<ArtworkGrid> ForegroundQueue { get; private set; }
 
-        public IList<ArtworkGrid> Queue { get; private set; }
+        public TaskFactory ForegroundFactory { get; private set; }
+
+        public IList<ArtworkGrid> BackgroundQueue { get; private set; }
+
+        public TaskFactory BackgroundFactory { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -28,25 +33,31 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.THREADS_ELEMENT
             ).ConnectValue(value =>
             {
-                this.Factory = new TaskFactory(new TaskScheduler(new ParallelOptions()
+                this.ForegroundFactory = new TaskFactory(new TaskScheduler(new ParallelOptions()
                 {
                     MaxDegreeOfParallelism = value
+                }));
+                this.BackgroundFactory = new TaskFactory(new TaskScheduler(new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = 1
                 }));
             });
             base.InitializeComponent(core);
         }
 
-        public Task Load(ArtworkGrid artworkGrid)
+        public Task Load(ArtworkGrid artworkGrid, ArtworkGridLoaderPriority priority)
         {
+            var queue = this.GetQueue(priority);
+            var factory = this.GetFactory(priority);
             lock (SyncRoot)
             {
-                this.Queue.Add(artworkGrid);
+                queue.Add(artworkGrid);
             }
-            return this.Factory.StartNew(() =>
+            return factory.StartNew(() =>
             {
                 lock (SyncRoot)
                 {
-                    if (!this.Queue.Contains(artworkGrid))
+                    if (!queue.Contains(artworkGrid))
                     {
 #if NET40
                         return TaskEx.FromResult(false);
@@ -54,6 +65,7 @@ namespace FoxTunes
                         return Task.CompletedTask;
 #endif
                     }
+                    queue.Remove(artworkGrid);
                 }
                 return artworkGrid.Refresh();
             });
@@ -63,8 +75,50 @@ namespace FoxTunes
         {
             lock (SyncRoot)
             {
-                this.Queue.Remove(artworkGrid);
+                this.BackgroundQueue.Remove(artworkGrid);
+                this.ForegroundQueue.Remove(artworkGrid);
+            }
+        }
+
+        public void Cancel(ArtworkGrid artworkGrid, ArtworkGridLoaderPriority priority)
+        {
+            var queue = this.GetQueue(priority);
+            lock (SyncRoot)
+            {
+                queue.Remove(artworkGrid);
+            }
+        }
+
+        protected virtual IList<ArtworkGrid> GetQueue(ArtworkGridLoaderPriority priority)
+        {
+            switch (priority)
+            {
+                case ArtworkGridLoaderPriority.Low:
+                    return this.BackgroundQueue;
+                default:
+                case ArtworkGridLoaderPriority.High:
+                    return this.ForegroundQueue;
+            }
+        }
+
+        protected virtual TaskFactory GetFactory(ArtworkGridLoaderPriority priority)
+        {
+            switch (priority)
+            {
+                case ArtworkGridLoaderPriority.Low:
+                    return this.BackgroundFactory;
+                default:
+                case ArtworkGridLoaderPriority.High:
+                    return this.ForegroundFactory;
             }
         }
     }
+
+    public enum ArtworkGridLoaderPriority : byte
+    {
+        None,
+        Low,
+        High
+    }
+
 }

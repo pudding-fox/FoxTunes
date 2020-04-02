@@ -121,11 +121,33 @@ namespace FoxTunes
             }
             if (e.IsItemVisible && artworkGrid.Background == null)
             {
-                ArtworkGridLoader.Load(artworkGrid);
+                ArtworkGridLoader.Load(artworkGrid, ArtworkGridLoaderPriority.High);
             }
             else
             {
-                ArtworkGridLoader.Cancel(artworkGrid);
+                ArtworkGridLoader.Cancel(artworkGrid, ArtworkGridLoaderPriority.High);
+            }
+        }
+
+        protected virtual void OnItemLoaded(object sender, RoutedEventArgs e)
+        {
+            var element = e.OriginalSource as FrameworkElement;
+            if (element == null)
+            {
+                return;
+            }
+            var artworkGrid = element.GetVisualChild<ArtworkGrid>();
+            if (artworkGrid == null)
+            {
+                return;
+            }
+            if (artworkGrid.Background == null)
+            {
+                ArtworkGridLoader.Load(artworkGrid, ArtworkGridLoaderPriority.Low);
+            }
+            else
+            {
+                ArtworkGridLoader.Cancel(artworkGrid, ArtworkGridLoaderPriority.Low);
             }
         }
     }

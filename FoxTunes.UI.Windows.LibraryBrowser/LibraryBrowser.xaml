@@ -120,7 +120,7 @@
                                 </Windows:LibraryBrowserTemplateSelector.UpTemplate>
                                 <Windows:LibraryBrowserTemplateSelector.DefaultTemplate>
                                     <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                                        <StackPanel Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
+                                        <StackPanel Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0" Loaded="OnItemLoaded">
                                             <LocalWindows:ArtworkGrid Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Height="{Binding TileSize.Value, Source={StaticResource ViewModel}}"></LocalWindows:ArtworkGrid>
                                             <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                         </StackPanel>
