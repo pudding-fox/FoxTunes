@@ -152,7 +152,7 @@ namespace FoxTunes
                             }
                             else
                             {
-                                await this.SetImage(metaDataItem, file.Tag).ConfigureAwait(false);
+                                await this.SetImage(metaDataItem, file, file.Tag).ConfigureAwait(false);
                             }
                             break;
                     }
@@ -339,7 +339,7 @@ namespace FoxTunes
                     }
                     metaData.Add(new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
                     {
-                        Value = await this.ImportImage(tag, picture, type, false).ConfigureAwait(false)
+                        Value = await this.ImportImage(file, tag, picture, type, false).ConfigureAwait(false)
                     });
                     if (ArtworkTypes.HasFlag(types |= type))
                     {
@@ -355,9 +355,9 @@ namespace FoxTunes
             return types != ArtworkType.None;
         }
 
-        private async Task<string> ImportImage(Tag tag, IPicture picture, ArtworkType type, bool overwrite)
+        private async Task<string> ImportImage(File file, Tag tag, IPicture picture, ArtworkType type, bool overwrite)
         {
-            var id = this.GetPictureId(tag, type);
+            var id = this.GetPictureId(file, tag, type);
             return await this.ImportImage(picture, id, overwrite).ConfigureAwait(false);
         }
 
@@ -450,7 +450,7 @@ namespace FoxTunes
             }
         }
 
-        private async Task SetImage(MetaDataItem metaDataItem, Tag tag)
+        private async Task SetImage(MetaDataItem metaDataItem, File file, Tag tag)
         {
             var index = default(int);
             var pictures = new List<IPicture>(tag.Pictures);
@@ -458,7 +458,7 @@ namespace FoxTunes
             {
                 if (!string.IsNullOrEmpty(metaDataItem.Value))
                 {
-                    await this.ReplaceImage(metaDataItem, tag, pictures, index).ConfigureAwait(false);
+                    await this.ReplaceImage(metaDataItem, file, tag, pictures, index).ConfigureAwait(false);
                 }
                 else
                 {
@@ -467,7 +467,7 @@ namespace FoxTunes
             }
             else if (!string.IsNullOrEmpty(metaDataItem.Value))
             {
-                await this.AddImage(metaDataItem, tag, pictures).ConfigureAwait(false);
+                await this.AddImage(metaDataItem, file, tag, pictures).ConfigureAwait(false);
             }
             tag.Pictures = pictures.ToArray();
         }
@@ -487,14 +487,14 @@ namespace FoxTunes
             return false;
         }
 
-        private async Task AddImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures)
+        private async Task AddImage(MetaDataItem metaDataItem, File file, Tag tag, IList<IPicture> pictures)
         {
-            pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
+            pictures.Add(await this.CreateImage(metaDataItem, file, tag).ConfigureAwait(false));
         }
 
-        private async Task ReplaceImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
+        private async Task ReplaceImage(MetaDataItem metaDataItem, File file, Tag tag, IList<IPicture> pictures, int index)
         {
-            pictures[index] = await this.CreateImage(metaDataItem, tag).ConfigureAwait(false);
+            pictures[index] = await this.CreateImage(metaDataItem, file, tag).ConfigureAwait(false);
         }
 
         private void RemoveImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
@@ -502,7 +502,7 @@ namespace FoxTunes
             pictures.RemoveAt(index);
         }
 
-        private async Task<IPicture> CreateImage(MetaDataItem metaDataItem, Tag tag)
+        private async Task<IPicture> CreateImage(MetaDataItem metaDataItem, File file, Tag tag)
         {
             var type = GetArtworkType(metaDataItem.Name);
             var picture = new Picture(metaDataItem.Value)
@@ -510,7 +510,7 @@ namespace FoxTunes
                 Type = GetPictureType(type),
                 MimeType = MimeMapping.Instance.GetMimeType(metaDataItem.Value)
             };
-            metaDataItem.Value = await this.ImportImage(tag, picture, type, true).ConfigureAwait(false);
+            metaDataItem.Value = await this.ImportImage(file, tag, picture, type, true).ConfigureAwait(false);
             return picture;
         }
 
@@ -519,25 +519,25 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Error, "Failed to read meta data: {0}", e.Message);
         }
 
-        private string GetPictureId(Tag tag, ArtworkType type)
+        private string GetPictureId(File file, Tag tag, ArtworkType type)
         {
-            //(FirstAlbumArtist | FirstPerformer) + Year + Album.
+            //Year + (Album | Directory) + Type
             var hashCode = default(int);
             unchecked
             {
-                if (!string.IsNullOrEmpty(tag.FirstAlbumArtist))
+                if (tag.Year != 0)
                 {
-                    hashCode += tag.FirstAlbumArtist.GetHashCode();
+                    hashCode = (hashCode * 29) + tag.Year.GetHashCode();
                 }
-                else if (!string.IsNullOrEmpty(tag.FirstPerformer))
-                {
-                    hashCode += tag.FirstPerformer.GetHashCode();
-                }
-                hashCode += tag.Year.GetHashCode();
                 if (!string.IsNullOrEmpty(tag.Album))
                 {
-                    hashCode += tag.Album.GetHashCode();
+                    hashCode += tag.Album.ToLower().GetHashCode();
                 }
+                else
+                {
+                    hashCode += global::System.IO.Path.GetDirectoryName(file.Name).ToLower().GetHashCode();
+                }
+                hashCode = (hashCode * 29) + type.GetHashCode();
             }
             return Math.Abs(hashCode).ToString();
         }
