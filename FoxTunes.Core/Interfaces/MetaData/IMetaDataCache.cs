@@ -18,43 +18,42 @@ namespace FoxTunes.Interfaces
 
     public class MetaDataCacheKey : IEquatable<MetaDataCacheKey>
     {
-        public MetaDataCacheKey(params object[] state)
+        public MetaDataCacheKey(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName, string filter)
         {
-            this.State = state;
+            this.LibraryHierarchyNode = libraryHierarchyNode;
+            this.MetaDataItemType = metaDataItemType;
+            this.MetaDataItemName = metaDataItemName;
+            this.Filter = filter;
         }
 
-        public object[] State { get; private set; }
+        public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
 
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-            foreach (var state in this.State)
-            {
-                if (state == null)
-                {
-                    continue;
-                }
-                if (builder.Length > 0)
-                {
-                    builder.Append(", ");
-                }
-                builder.AppendFormat("{0} = {1}", state.GetType().Name, state);
-            }
-            return builder.ToString();
-        }
+        public MetaDataItemType? MetaDataItemType { get; private set; }
+
+        public string MetaDataItemName { get; private set; }
+
+        public string Filter { get; private set; }
 
         public override int GetHashCode()
         {
             var hashCode = default(int);
             unchecked
             {
-                foreach (var state in this.State)
+                if (this.LibraryHierarchyNode != null)
                 {
-                    if (state == null)
-                    {
-                        continue;
-                    }
-                    hashCode += state.GetHashCode();
+                    hashCode += this.LibraryHierarchyNode.GetHashCode();
+                }
+                if (this.MetaDataItemType.HasValue)
+                {
+                    hashCode += this.MetaDataItemType.Value.GetHashCode();
+                }
+                if (!string.IsNullOrEmpty(this.MetaDataItemName))
+                {
+                    hashCode += this.MetaDataItemName.ToLower().GetHashCode();
+                }
+                if (!string.IsNullOrEmpty(this.Filter))
+                {
+                    hashCode += this.Filter.ToLower().GetHashCode();
                 }
             }
             return hashCode;
@@ -75,7 +74,23 @@ namespace FoxTunes.Interfaces
             {
                 return true;
             }
-            return Enumerable.SequenceEqual(this.State, other.State);
+            if (!object.Equals(this.LibraryHierarchyNode, other.LibraryHierarchyNode))
+            {
+                return false;
+            }
+            if (!object.Equals(this.MetaDataItemType, other.MetaDataItemType))
+            {
+                return false;
+            }
+            if (!string.Equals(this.MetaDataItemName, other.MetaDataItemName, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            if (!string.Equals(this.Filter, other.Filter, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
         }
 
         public static bool operator ==(MetaDataCacheKey a, MetaDataCacheKey b)

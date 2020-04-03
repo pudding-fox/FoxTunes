@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxTunes;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -224,6 +225,12 @@ namespace FoxTunes.ViewModel
         {
             this.Component = component;
             this.Invocation = invocation;
+            this.Invocation.AttributesChanged += this.OnAttributesChanged;
+        }
+
+        protected virtual void OnAttributesChanged(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(new Action(this.OnSelectedChanged));
         }
 
         public IInvocableComponent Component { get; private set; }
@@ -256,6 +263,17 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        protected virtual void OnSelectedChanged()
+        {
+            if (this.SelectedChanged != null)
+            {
+                this.SelectedChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Selected");
+        }
+
+        public event EventHandler SelectedChanged;
+
         public ObservableCollection<MenuItem> Children { get; private set; }
 
         protected virtual Task OnInvoke()
@@ -265,7 +283,14 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            this.Children.ForEach(child => child.Dispose());
+            if (this.Invocation != null)
+            {
+                this.Invocation.AttributesChanged -= this.OnAttributesChanged;
+            }
+            if (this.Children != null)
+            {
+                this.Children.ForEach(child => child.Dispose());
+            }
             base.OnDisposing();
         }
 

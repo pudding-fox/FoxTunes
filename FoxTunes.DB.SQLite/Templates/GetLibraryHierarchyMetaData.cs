@@ -20,7 +20,7 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\personal\FoxTunes\FoxTunes.DB.SQLite\Templates\GetLibraryHierarchyMetaData.tt"
+    #line 1 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\GetLibraryHierarchyMetaData.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class GetLibraryHierarchyMetaData : GetLibraryHierarchyMetaDataBase
     {
@@ -37,10 +37,11 @@ FROM ""LibraryHierarchyItems""
 	JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
 	JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
 WHERE ""LibraryHierarchyItems"".""Id"" = @libraryHierarchyItemId 
-	AND (@type & ""MetaDataItems"".""Type"") =  ""MetaDataItems"".""Type""
+	AND (@type IS NULL OR (@type & ""MetaDataItems"".""Type"") = ""MetaDataItems"".""Type"")
+	AND (@name IS NULL OR ""MetaDataItems"".""Name"" = @name)
 ");
             
-            #line 16 "C:\personal\FoxTunes\FoxTunes.DB.SQLite\Templates\GetLibraryHierarchyMetaData.tt"
+            #line 17 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\GetLibraryHierarchyMetaData.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText()));
             
             #line default
