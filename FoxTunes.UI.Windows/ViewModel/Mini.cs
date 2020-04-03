@@ -83,57 +83,31 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowPlaylistChanged;
 
-        private BooleanConfigurationElement _ResetPlaylist { get; set; }
+        private SelectionConfigurationElement _DropCommit { get; set; }
 
-        public BooleanConfigurationElement ResetPlaylist
+        public SelectionConfigurationElement DropCommit
         {
             get
             {
-                return this._ResetPlaylist;
+                return this._DropCommit;
             }
             set
             {
-                this._ResetPlaylist = value;
-                this.OnResetPlaylistChanged();
+                this._DropCommit = value;
+                this.OnDropCommitChanged();
             }
         }
 
-        protected virtual void OnResetPlaylistChanged()
+        protected virtual void OnDropCommitChanged()
         {
-            if (this.ResetPlaylistChanged != null)
+            if (this.DropCommitChanged != null)
             {
-                this.ResetPlaylistChanged(this, EventArgs.Empty);
+                this.DropCommitChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("ResetPlaylist");
+            this.OnPropertyChanged("DropCommit");
         }
 
-        public event EventHandler ResetPlaylistChanged;
-
-        private BooleanConfigurationElement _AutoPlay { get; set; }
-
-        public BooleanConfigurationElement AutoPlay
-        {
-            get
-            {
-                return this._AutoPlay;
-            }
-            set
-            {
-                this._AutoPlay = value;
-                this.OnAutoPlayChanged();
-            }
-        }
-
-        protected virtual void OnAutoPlayChanged()
-        {
-            if (this.AutoPlayChanged != null)
-            {
-                this.AutoPlayChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("AutoPlay");
-        }
-
-        public event EventHandler AutoPlayChanged;
+        public event EventHandler DropCommitChanged;
 
         private BooleanConfigurationElement _ShowNotifyIcon { get; set; }
 
@@ -302,9 +276,30 @@ namespace FoxTunes.ViewModel
 
         private async Task AddToPlaylist(IEnumerable<string> paths)
         {
+            var clear = default(bool);
+            var play = default(bool);
+            switch (MiniPlayerBehaviourConfiguration.GetDropBehaviour(this.DropCommit.Value))
+            {
+                case MiniPlayerDropBehaviour.Append:
+                    clear = false;
+                    play = false;
+                    break;
+                case MiniPlayerDropBehaviour.AppendAndPlay:
+                    clear = false;
+                    play = true;
+                    break;
+                case MiniPlayerDropBehaviour.Replace:
+                    clear = true;
+                    play = false;
+                    break;
+                case MiniPlayerDropBehaviour.ReplaceAndPlay:
+                    clear = true;
+                    play = true;
+                    break;
+            }
             var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-            await this.PlaylistManager.Add(paths, this.ResetPlaylist.Value).ConfigureAwait(false);
-            if (this.AutoPlay.Value)
+            await this.PlaylistManager.Add(paths, clear).ConfigureAwait(false);
+            if (play)
             {
                 await this.PlaylistManager.Play(index).ConfigureAwait(false);
             }
@@ -323,13 +318,9 @@ namespace FoxTunes.ViewModel
               MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.SHOW_PLAYLIST_ELEMENT
             );
-            this.ResetPlaylist = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.DropCommit = this.Configuration.GetElement<SelectionConfigurationElement>(
               MiniPlayerBehaviourConfiguration.SECTION,
-              MiniPlayerBehaviourConfiguration.RESET_PLAYLIST_ELEMENT
-            );
-            this.AutoPlay = this.Configuration.GetElement<BooleanConfigurationElement>(
-              MiniPlayerBehaviourConfiguration.SECTION,
-              MiniPlayerBehaviourConfiguration.AUTO_PLAY_ELEMENT
+              MiniPlayerBehaviourConfiguration.DROP_COMMIT_ELEMENT
             );
             this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
               NotifyIconConfiguration.SECTION,

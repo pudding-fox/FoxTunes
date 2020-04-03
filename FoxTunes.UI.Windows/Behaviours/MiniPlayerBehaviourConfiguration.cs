@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -12,15 +13,13 @@ namespace FoxTunes
 
         public const string TOPMOST_ELEMENT = "CCCC7F71-A506-48DF-9420-E6926465FFDC";
 
-        public const string RESET_PLAYLIST_ELEMENT = "DDDDC813-182A-42E1-A905-F2A809AC5EE3";
-
-        public const string AUTO_PLAY_ELEMENT = "EEEEEF66-531B-44D3-8F8D-FD9AA5A49605";
-
         public const string SHOW_ARTWORK_ELEMENT = "FFFFB3A4-E59D-46CE-B80A-86EAB9427108";
 
         public const string SHOW_PLAYLIST_ELEMENT = "GGGG60A9-B108-49DD-9D9D-EA608BBDB0E7";
 
         public const string PLAYLIST_SCRIPT_ELEMENT = "HHHHD917-2172-421D-9E22-F549B17CE0C8";
+
+        public const string DROP_COMMIT_ELEMENT = "IIIIF490-CE3D-481A-8924-B698BD443D88";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -34,14 +33,51 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(TOPMOST_ELEMENT, "Always On Top").WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(RESET_PLAYLIST_ELEMENT, "Reset Playlist").WithValue(true))
-                .WithElement(
-                    new BooleanConfigurationElement(AUTO_PLAY_ELEMENT, "Auto Play").WithValue(true))
-                .WithElement(
                     new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_PLAYLIST_ELEMENT, "Show Playlist").WithValue(false)
+                    new BooleanConfigurationElement(SHOW_PLAYLIST_ELEMENT, "Show Playlist").WithValue(false))
+                .WithElement(
+                    new SelectionConfigurationElement(DROP_COMMIT_ELEMENT, "Drop Behaviour").WithOptions(GetDropBehaviourOptions())
             );
         }
+
+        private static IEnumerable<SelectionConfigurationOption> GetDropBehaviourOptions()
+        {
+            yield return new SelectionConfigurationOption(
+                Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.Append),
+                "Append"
+            );
+            yield return new SelectionConfigurationOption(
+                Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.AppendAndPlay),
+                "Append & Play"
+            );
+            yield return new SelectionConfigurationOption(
+                Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.Replace),
+                "Replace"
+            );
+            yield return new SelectionConfigurationOption(
+                Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.ReplaceAndPlay),
+                "Replace & Play"
+            ).Default();
+        }
+
+        public static MiniPlayerDropBehaviour GetDropBehaviour(SelectionConfigurationOption option)
+        {
+            var result = default(MiniPlayerDropBehaviour);
+            if (Enum.TryParse<MiniPlayerDropBehaviour>(option.Id, out result))
+            {
+                return result;
+            }
+            return MiniPlayerDropBehaviour.Replace;
+        }
+    }
+
+    public enum MiniPlayerDropBehaviour : byte
+    {
+        None = 0,
+        Append = 1,
+        AppendAndPlay = 2,
+        Replace = 3,
+        ReplaceAndPlay = 4
     }
 }
