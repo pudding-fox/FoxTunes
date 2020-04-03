@@ -13,6 +13,11 @@ namespace FoxTunes
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Image;
 
+        public LibraryHierarchyBrowser()
+        {
+            this.Filter = string.Empty;
+        }
+
         public ICore Core { get; private set; }
 
         public ILibraryManager LibraryManager { get; private set; }
