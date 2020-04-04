@@ -102,21 +102,45 @@ AND EXISTS
 					break;
 				}
 			}
+			var numeric = default(int);
+			var isNumeric = int.TryParse(entry.Value, out numeric);
 
             
             #line default
             #line hidden
             this.Write("(\"MetaDataItems\".\"Name\" = ");
             
-            #line 54 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 56 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(entry.Name)));
             
             #line default
             #line hidden
-            this.Write(" AND \"MetaDataItems\".\"Value\"");
+            this.Write(" AND ");
             
-            #line 54 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 56 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 
+			if (isNumeric)
+			{
+
+            
+            #line default
+            #line hidden
+            this.Write("CAST(\"MetaDataItems\".\"Value\" AS int)");
+            
+            #line 59 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+			}
+			else
+			{
+
+            
+            #line default
+            #line hidden
+            this.Write("\"MetaDataItems\".\"Value\"");
+            
+            #line 63 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+			}
 			switch (entry.Operator)
 			{
 				default:
@@ -127,7 +151,7 @@ AND EXISTS
             #line hidden
             this.Write(" = ");
             
-            #line 59 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 69 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 
 					break;
 				case FilterParserEntryOperator.Greater:
@@ -137,7 +161,7 @@ AND EXISTS
             #line hidden
             this.Write(" > ");
             
-            #line 62 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 72 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.GreaterEqual:
@@ -147,7 +171,7 @@ AND EXISTS
             #line hidden
             this.Write(" >= ");
             
-            #line 65 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 75 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.Less:
@@ -157,7 +181,7 @@ AND EXISTS
             #line hidden
             this.Write(" < ");
             
-            #line 68 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 78 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.LessEqual:
@@ -167,7 +191,7 @@ AND EXISTS
             #line hidden
             this.Write(" <= ");
             
-            #line 71 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 81 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.Match:
@@ -177,7 +201,7 @@ AND EXISTS
             #line hidden
             this.Write(" LIKE ");
             
-            #line 74 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 84 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 					
 					break;
 			}
@@ -186,14 +210,47 @@ AND EXISTS
             #line default
             #line hidden
             
-            #line 78 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 88 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+ 
+			if (isNumeric)
+			{
+
+            
+            #line default
+            #line hidden
+            
+            #line 91 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(numeric));
+            
+            #line default
+            #line hidden
+            
+            #line 91 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+			}
+			else
+			{
+
+            
+            #line default
+            #line hidden
+            
+            #line 95 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.WILDCARD, "%"))));
             
             #line default
             #line hidden
-            this.Write("\r\n)");
             
-            #line 79 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 95 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+			}
+
+            
+            #line default
+            #line hidden
+            this.Write(")");
+            
+            #line 98 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 
 		}
 
@@ -202,7 +259,7 @@ AND EXISTS
             #line hidden
             this.Write("))");
             
-            #line 81 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 100 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 		
 	}
 	switch (this.Source)
@@ -214,7 +271,7 @@ AND EXISTS
             #line hidden
             this.Write(")");
             
-            #line 86 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            #line 105 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
 		
 			break;
 	}
