@@ -106,6 +106,12 @@ namespace FoxTunes
         {
             if (currentStream != null)
             {
+                if (!MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                {
+                    //If we're not writing tags to files we can do this the easy way.
+                    return this.IncrementPlayCount(currentStream.PlaylistItem);
+                }
+                //Else we need to wait for the file to become available.
                 this.Queue.Enqueue(currentStream.PlaylistItem);
                 if (this.Queue.Count > 1)
                 {
@@ -142,17 +148,21 @@ namespace FoxTunes
                         continue;
                     }
                 }
-                try
-                {
-                    await this.PlaylistManager.IncrementPlayCount(playlistItem).ConfigureAwait(false);
-                }
-                catch (Exception e)
-                {
-                    Logger.Write(this, LogLevel.Error, "Failed to update play count for file \"{0}\": {1}", playlistItem.FileName, e.Message);
-                }
+                await this.IncrementPlayCount(playlistItem).ConfigureAwait(false);
             }
         }
 
+        protected virtual async Task IncrementPlayCount(PlaylistItem playlistItem)
+        {
+            try
+            {
+                await this.PlaylistManager.IncrementPlayCount(playlistItem).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Failed to update play count for file \"{0}\": {1}", playlistItem.FileName, e.Message);
+            }
+        }
 
         public bool IsDisposed { get; private set; }
 
