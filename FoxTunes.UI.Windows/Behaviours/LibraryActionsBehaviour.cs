@@ -42,6 +42,10 @@ namespace FoxTunes
         {
             get
             {
+                if (this.LibraryManager.SelectedItem == null)
+                {
+                    yield break;
+                }
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
                 if (this.Popularimeter.Value)
@@ -59,6 +63,7 @@ namespace FoxTunes
                         invocationComponents.Add((byte)a, invocationComponent);
                         yield return invocationComponent;
                     }
+                    //Don't block the menu from opening while we fetch ratings.
 #if NET40
                     var task = TaskEx.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
 #else
@@ -99,11 +104,11 @@ namespace FoxTunes
             return this.PlaylistManager.Add(this.LibraryManager.SelectedItem, clear);
         }
 
-        protected virtual void GetRating(LibraryHierarchyNode libraryHierarchyNode, Dictionary<byte, InvocationComponent> invocationComponents)
+        protected virtual async Task GetRating(LibraryHierarchyNode libraryHierarchyNode, Dictionary<byte, InvocationComponent> invocationComponents)
         {
             Logger.Write(this, LogLevel.Debug, "Determining rating for library hierarchy node: {0}", libraryHierarchyNode.Id);
             var rating = default(byte);
-            var ratings = this.MetaDataBrowser.GetMetaDatas(libraryHierarchyNode, MetaDataItemType.Tag, CommonMetaData.Rating).ToArray();
+            var ratings = await this.MetaDataBrowser.GetMetaDatasAsync(libraryHierarchyNode, MetaDataItemType.Tag, CommonMetaData.Rating).ConfigureAwait(false);
             switch (ratings.Length)
             {
                 case 0:

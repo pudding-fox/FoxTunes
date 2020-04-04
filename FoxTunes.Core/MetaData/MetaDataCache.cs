@@ -10,6 +10,10 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class MetaDataCache : StandardComponent, IMetaDataCache, IDisposable
     {
+        const int TIMEOUT = 1000;
+
+        public static readonly KeyLock<MetaDataCacheKey> KeyLock = new KeyLock<MetaDataCacheKey>();
+
         public IEnumerable<MetaDataCacheKey> Keys
         {
             get
@@ -18,7 +22,7 @@ namespace FoxTunes
             }
         }
 
-        public ConcurrentDictionary<MetaDataCacheKey, Lazy<IList<MetaDataItem>>> Values { get; private set; }
+        public ConcurrentDictionary<MetaDataCacheKey, Lazy<MetaDataItem[]>> Values { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -52,7 +56,6 @@ namespace FoxTunes
                         );
                         foreach (var key in keys)
                         {
-                            Logger.Write(this, LogLevel.Debug, "Meta data \"{0}\" was updated, evicting.", key.MetaDataItemName);
                             this.Evict(key);
                         }
                     }
@@ -76,14 +79,37 @@ namespace FoxTunes
 #endif
         }
 
-        public IEnumerable<MetaDataItem> GetMetaDatas(MetaDataCacheKey key, Func<IEnumerable<MetaDataItem>> factory)
+        public MetaDataItem[] GetMetaDatas(MetaDataCacheKey key, Func<IEnumerable<MetaDataItem>> factory)
         {
-            return this.Values.GetOrAdd(key, _key => new Lazy<IList<MetaDataItem>>(() => new List<MetaDataItem>(factory()))).Value;
+            return this.Values.GetOrAdd(
+                key,
+                _key => new Lazy<MetaDataItem[]>(() => factory().ToArray())
+            ).Value;
+        }
+
+        public async Task<MetaDataItem[]> GetMetaDatas(MetaDataCacheKey key, Func<Task<IEnumerable<MetaDataItem>>> factory)
+        {
+            var value = default(Lazy<MetaDataItem[]>);
+            if (this.Values.TryGetValue(key, out value))
+            {
+                return value.Value;
+            }
+            //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
+            //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
+            using (KeyLock.Lock(key, TIMEOUT, false))
+            {
+                if (this.Values.TryGetValue(key, out value))
+                {
+                    return value.Value;
+                }
+                var metaDataItems = await factory().ConfigureAwait(false);
+                return this.Values.GetOrAdd(key, _key => new Lazy<MetaDataItem[]>(() => metaDataItems.ToArray())).Value;
+            }
         }
 
         public void Reset()
         {
-            this.Values = new ConcurrentDictionary<MetaDataCacheKey, Lazy<IList<MetaDataItem>>>();
+            this.Values = new ConcurrentDictionary<MetaDataCacheKey, Lazy<MetaDataItem[]>>();
         }
 
         public void Evict(MetaDataCacheKey key)

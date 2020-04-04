@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -9,7 +10,9 @@ namespace FoxTunes.Interfaces
     {
         IEnumerable<MetaDataCacheKey> Keys { get; }
 
-        IEnumerable<MetaDataItem> GetMetaDatas(MetaDataCacheKey key, Func<IEnumerable<MetaDataItem>> factory);
+        MetaDataItem[] GetMetaDatas(MetaDataCacheKey key, Func<IEnumerable<MetaDataItem>> factory);
+
+        Task<MetaDataItem[]> GetMetaDatas(MetaDataCacheKey key, Func<Task<IEnumerable<MetaDataItem>>> factory);
 
         void Evict(MetaDataCacheKey key);
 
