@@ -55,7 +55,7 @@ namespace FoxTunes
                     refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);
                 }
             }
-            await this.MetaDataManager.Save(libraryItems, CommonMetaData.Rating).ConfigureAwait(false);
+            await this.MetaDataManager.Save(libraryItems, true, CommonMetaData.Rating).ConfigureAwait(false);
             if (refreshPlaylist)
             {
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);

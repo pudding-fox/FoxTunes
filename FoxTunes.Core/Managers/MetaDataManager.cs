@@ -39,9 +39,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task Save(IEnumerable<LibraryItem> libraryItems, params string[] names)
+        public async Task Save(IEnumerable<LibraryItem> libraryItems, bool write, params string[] names)
         {
-            using (var task = new WriteLibraryMetaDataTask(libraryItems, names))
+            using (var task = new WriteLibraryMetaDataTask(libraryItems, write, names))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
@@ -53,9 +53,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task Save(IEnumerable<PlaylistItem> playlistItems, params string[] names)
+        public async Task Save(IEnumerable<PlaylistItem> playlistItems, bool write, params string[] names)
         {
-            using (var task = new WritePlaylistMetaDataTask(playlistItems, names))
+            using (var task = new WritePlaylistMetaDataTask(playlistItems, names, write))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
