@@ -36,6 +36,8 @@ namespace FoxTunes
 
         public const string THREADS_ELEMENT = "KKKK16BD-B4A7-4F9D-B4DA-F81E932F6DD9";
 
+        public const string WRITE_ELEMENT = "LLLLEBD5-2675-42E4-8C9A-6E851DAA4D86";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
@@ -63,7 +65,9 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
-                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32))
+                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32)))
+                .WithElement(
+                    new BooleanConfigurationElement(WRITE_ELEMENT, "Write Changes", path: "Advanced").WithValue(true)
             );
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLE_ELEMENT).ConnectValue(value => UpdateConfiguration());
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_EMBEDDED_IMAGES).ConnectValue(value => UpdateConfiguration());
@@ -104,6 +108,7 @@ namespace FoxTunes
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_MUSICBRAINZ_TAGS).Show();
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LYRICS_TAGS).Show();
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_POPULARIMETER_TAGS).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, WRITE_ELEMENT).Show();
             }
             else
             {
@@ -117,6 +122,7 @@ namespace FoxTunes
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_MUSICBRAINZ_TAGS).Hide();
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LYRICS_TAGS).Hide();
                 StandardComponents.Instance.Configuration.GetElement(SECTION, READ_POPULARIMETER_TAGS).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, WRITE_ELEMENT).Hide();
             }
         }
 

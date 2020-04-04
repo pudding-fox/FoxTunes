@@ -48,10 +48,19 @@ namespace FoxTunes
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement Write { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            this.Configuration = core.Components.Configuration;
+            this.Write = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.WRITE_ELEMENT
+            );
             base.InitializeComponent(core);
         }
 
@@ -76,19 +85,53 @@ namespace FoxTunes
                         break;
                     }
 
-                    await this.SetDescription(new FileInfo(playlistItem.FileName).Name).ConfigureAwait(false);
+                    await this.SetDescription(Path.GetFileName(playlistItem.FileName)).ConfigureAwait(false);
                     await this.SetPosition(position).ConfigureAwait(false);
-
-                    if (!File.Exists(playlistItem.FileName))
-                    {
-                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
-                        this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName)));
-                        position++;
-                        continue;
-                    }
 
                     try
                     {
+                        foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
+                        {
+                            if (!string.IsNullOrEmpty(metaDataItem.Value))
+                            {
+                                continue;
+                            }
+                            playlistItem.MetaDatas.Remove(metaDataItem);
+                        }
+
+                        if (!playlistItem.LibraryItem_Id.HasValue)
+                        {
+                            await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
+                            await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
+                        }
+
+                        if (!this.Write.Value)
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", playlistItem.FileName);
+                            position++;
+                            continue;
+                        }
+
+                        if (!FileSystemHelper.IsLocalFile(playlistItem.FileName))
+                        {
+                            Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName);
+                            this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName)));
+                            position++;
+                            continue;
+                        }
+
+                        if (!File.Exists(playlistItem.FileName))
+                        {
+                            Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
+                            this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName)));
+                            position++;
+                            continue;
+                        }
+
                         await metaDataSource.SetMetaData(
                             playlistItem.FileName,
                             playlistItem.MetaDatas,
@@ -100,25 +143,6 @@ namespace FoxTunes
                         this.Errors.Add(playlistItem, e);
                         position++;
                         continue;
-                    }
-
-                    foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
-                    {
-                        if (!string.IsNullOrEmpty(metaDataItem.Value))
-                        {
-                            continue;
-                        }
-                        playlistItem.MetaDatas.Remove(metaDataItem);
-                    }
-
-                    if (!playlistItem.LibraryItem_Id.HasValue)
-                    {
-                        await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
-                        await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
                     }
 
                     position++;

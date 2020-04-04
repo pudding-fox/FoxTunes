@@ -1,4 +1,5 @@
 ﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,14 @@ namespace FoxTunes
     public static class FileSystemHelper
     {
         const int CACHE_SIZE = 128;
+
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
 
         public static HashSet<string> IgnoredDirectories = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -99,6 +108,26 @@ namespace FoxTunes
                 {
                     yield return fileName;
                 }
+            }
+        }
+
+        public static bool IsLocalFile(string fileName)
+        {
+            try
+            {
+                var uri = new Uri(fileName);
+                if (string.Equals(uri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    //Normal file.
+                    return true;
+                }
+                //Some kind of abstraction.
+                return false;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(FileSystemHelper), LogLevel.Warn, "Failed to determine whether \"{0}\" is a local file: {1}", fileName, e.Message);
+                return false;
             }
         }
 

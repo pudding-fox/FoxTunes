@@ -23,7 +23,7 @@ namespace FoxTunes
                     _Logger = ComponentRegistry.Instance.GetComponent<ILogger>();
                     if (_Logger == null)
                     {
-                        return NullLogger.Instance;
+                        _Logger = NullLogger.Instance;
                     }
                 }
                 return _Logger;

@@ -39,6 +39,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Popularimeter { get; private set; }
 
+        public BooleanConfigurationElement Write { get; private set; }
+
         public IArtworkProvider ArtworkProvider { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -75,6 +77,10 @@ namespace FoxTunes
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
+            );
+            this.Write = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.WRITE_ELEMENT
             );
             this.ArtworkProvider = core.Components.ArtworkProvider;
             base.InitializeComponent(core);
@@ -134,6 +140,16 @@ namespace FoxTunes
 
         public async Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaData, Func<MetaDataItem, bool> predicate)
         {
+            if (!this.Write.Value)
+            {
+                Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", fileName);
+                return;
+            }
+            if (!this.IsSupported(fileName))
+            {
+                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+                return;
+            }
             var collect = default(bool);
             using (var file = this.Create(fileName))
             {
@@ -690,6 +706,7 @@ namespace FoxTunes
 
             private static void ReadPopularimeterFrame(TagLibMetaDataSource source, IList<MetaDataItem> metaData, File file, global::TagLib.Id3v2.PopularimeterFrame frame)
             {
+                const byte RATING_0 = 0;
                 const byte RATING_1 = 1;
                 const byte RATING_2 = 64;
                 const byte RATING_3 = 128;
@@ -700,6 +717,9 @@ namespace FoxTunes
                     var rating = 0;
                     switch (frame.Rating)
                     {
+                        case RATING_0:
+                            rating = 0;
+                            break;
                         case RATING_1:
                             rating = 1;
                             break;
@@ -752,6 +772,7 @@ namespace FoxTunes
 
             private static void WritePopularimeterFrame(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file, global::TagLib.Id3v2.PopularimeterFrame frame)
             {
+                const byte RATING_0 = 0;
                 const byte RATING_1 = 1;
                 const byte RATING_2 = 64;
                 const byte RATING_3 = 128;
@@ -762,6 +783,9 @@ namespace FoxTunes
                     case CommonMetaData.Rating:
                         switch (Convert.ToByte(metaDataItem.Value))
                         {
+                            case 0:
+                                frame.Rating = RATING_0;
+                                break;
                             case 1:
                                 frame.Rating = RATING_1;
                                 break;
