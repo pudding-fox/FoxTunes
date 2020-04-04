@@ -103,7 +103,7 @@ AND EXISTS
 				}
 			}
 			var numeric = default(int);
-			var isNumeric = int.TryParse(entry.Value, out numeric);
+			var isNumeric = NumericOperators.Contains(entry.Operator) && int.TryParse(entry.Value, out numeric);
 
             
             #line default
