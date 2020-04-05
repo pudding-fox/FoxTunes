@@ -59,8 +59,14 @@ namespace FoxTunes
             {
                 if (this.Enabled.Value)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, PICARD, "Picard", path: "Tools");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, PICARD, "Picard", path: "Tools");
+                    if (this.LibraryManager.SelectedItem != null)
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, PICARD, "Picard", path: "Tools");
+                    }
+                    if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, PICARD, "Picard", path: "Tools");
+                    }
                 }
             }
         }

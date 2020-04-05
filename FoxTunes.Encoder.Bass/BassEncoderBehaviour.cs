@@ -52,7 +52,10 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, "Convert");
+                if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, "Convert");
+                }
             }
         }
 
@@ -77,6 +80,14 @@ namespace FoxTunes
 
         public Task Encode()
         {
+            if (this.PlaylistManager.SelectedItems == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             var playlistItems = this.PlaylistManager.SelectedItems.ToArray();
             if (!playlistItems.Any())
             {

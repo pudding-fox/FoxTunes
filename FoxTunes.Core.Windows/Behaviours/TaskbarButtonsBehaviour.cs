@@ -521,7 +521,6 @@ namespace FoxTunes
 
         protected virtual async Task<bool> UpdateButtons(IntPtr handle)
         {
-            Logger.Write(this, LogLevel.Trace, "Updating taskbar buttons.");
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {

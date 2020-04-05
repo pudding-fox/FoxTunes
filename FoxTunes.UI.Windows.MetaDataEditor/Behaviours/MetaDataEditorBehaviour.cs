@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -8,6 +9,10 @@ namespace FoxTunes
     public class MetaDataEditorBehaviour : StandardBehaviour, IInvocableComponent
     {
         public const string EDIT_METADATA = "LLLL";
+
+        public ILibraryManager LibraryManager { get; private set; }
+
+        public IPlaylistManager PlaylistManager { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -21,6 +26,8 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.LibraryManager = core.Managers.Library;
+            this.PlaylistManager = core.Managers.Playlist;
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
@@ -31,8 +38,14 @@ namespace FoxTunes
             {
                 if (this.Enabled)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, EDIT_METADATA, "Tag");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
+                    if (this.LibraryManager.SelectedItem != null)
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, EDIT_METADATA, "Tag");
+                    }
+                    if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
+                    }
                 }
             }
         }
