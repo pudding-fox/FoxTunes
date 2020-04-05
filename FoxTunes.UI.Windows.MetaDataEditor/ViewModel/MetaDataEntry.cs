@@ -323,11 +323,16 @@ namespace FoxTunes.ViewModel
 
         protected virtual void AddSource(IFileData source)
         {
+            var metaDataItem = default(MetaDataItem);
+            lock (source.MetaDatas)
+            {
+                metaDataItem = source.MetaDatas.FirstOrDefault(
+                    element => string.Equals(element.Name, this.Name, StringComparison.OrdinalIgnoreCase)
+                );
+            }
             this.AddSource(
                 source,
-                source.MetaDatas.FirstOrDefault(
-                    metaDataItem => string.Equals(metaDataItem.Name, this.Name, StringComparison.OrdinalIgnoreCase)
-                )
+                metaDataItem
             );
         }
 
@@ -352,7 +357,10 @@ namespace FoxTunes.ViewModel
                 if (!this.MetaDataItems.TryGetValue(source, out metaDataItem))
                 {
                     metaDataItem = new MetaDataItem(this.Name, this.Type);
-                    source.MetaDatas.Add(metaDataItem);
+                    lock (source.MetaDatas)
+                    {
+                        source.MetaDatas.Add(metaDataItem);
+                    }
                     this.MetaDataItems.Add(source, metaDataItem);
                 }
                 if (this.HasValue)

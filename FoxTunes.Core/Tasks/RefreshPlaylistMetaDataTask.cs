@@ -78,8 +78,8 @@ namespace FoxTunes
                     }
 
                     playlistItem.MetaDatas = new ObservableCollection<MetaDataItem>(
-                        await metaDataSource.GetMetaData(playlistItem.FileName)
-.ConfigureAwait(false));
+                        await metaDataSource.GetMetaData(playlistItem.FileName).ConfigureAwait(false)
+                    );
 
                     if (!playlistItem.LibraryItem_Id.HasValue)
                     {

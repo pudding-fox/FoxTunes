@@ -74,8 +74,8 @@ namespace FoxTunes
                     }
 
                     libraryItem.MetaDatas = new ObservableCollection<MetaDataItem>(
-                        await metaDataSource.GetMetaData(libraryItem.FileName)
-.ConfigureAwait(false));
+                        await metaDataSource.GetMetaData(libraryItem.FileName).ConfigureAwait(false)
+                    );
 
                     await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
                     await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);

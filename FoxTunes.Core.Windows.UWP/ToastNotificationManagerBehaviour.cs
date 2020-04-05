@@ -178,11 +178,15 @@ namespace FoxTunes
 
         protected virtual XmlDocument CreateNotificationDocument(IOutputStream outputStream)
         {
-            var metaData = outputStream.PlaylistItem.MetaDatas.ToDictionary(
-                metaDataItem => metaDataItem.Name,
-                metaDataItem => metaDataItem.Value,
-                StringComparer.OrdinalIgnoreCase
-            );
+            var metaData = default(IDictionary<string, string>);
+            lock (outputStream.PlaylistItem.MetaDatas)
+            {
+                metaData = outputStream.PlaylistItem.MetaDatas.ToDictionary(
+                    metaDataItem => metaDataItem.Name,
+                    metaDataItem => metaDataItem.Value,
+                    StringComparer.OrdinalIgnoreCase
+                );
+            }
             var fileName = this.ArtworkProvider.Find(
                 outputStream.PlaylistItem,
                 ArtworkType.FrontCover

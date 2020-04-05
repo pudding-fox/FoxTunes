@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class PlaylistManager : StandardManager, IPlaylistManager, IDisposable
+    public class PlaylistManager : StandardManager, IPlaylistManager
     {
         public const string CLEAR_PLAYLIST = "ZZZZ";
 

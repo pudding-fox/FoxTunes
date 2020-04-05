@@ -115,9 +115,13 @@ namespace FoxTunes.ViewModel
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream != null)
             {
-                var metaDataItem = outputStream.PlaylistItem.MetaDatas.FirstOrDefault(
-                    _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Lyrics, StringComparison.OrdinalIgnoreCase)
-                );
+                var metaDataItem = default(MetaDataItem);
+                lock (outputStream.PlaylistItem.MetaDatas)
+                {
+                    metaDataItem = outputStream.PlaylistItem.MetaDatas.FirstOrDefault(
+                        element => string.Equals(element.Name, CommonMetaData.Lyrics, StringComparison.OrdinalIgnoreCase)
+                    );
+                }
                 if (metaDataItem != null)
                 {
                     data = metaDataItem.Value;

@@ -436,7 +436,14 @@ namespace FoxTunes.ViewModel
             if (outputStream != null)
             {
                 fileName = outputStream.FileName;
-                metaData = outputStream.PlaylistItem.MetaDatas.ToDictionary(metaDataItem => metaDataItem.Name, metaDataItem => metaDataItem.Value, StringComparer.OrdinalIgnoreCase);
+                lock (outputStream.PlaylistItem.MetaDatas)
+                {
+                    metaData = outputStream.PlaylistItem.MetaDatas.ToDictionary(
+                        metaDataItem => metaDataItem.Name,
+                        metaDataItem => metaDataItem.Value,
+                        StringComparer.OrdinalIgnoreCase
+                    );
+                }
             }
             return Windows.Invoke(() =>
             {

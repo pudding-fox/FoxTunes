@@ -102,13 +102,16 @@ namespace FoxTunes
 
                     try
                     {
-                        foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
+                        lock (playlistItem.MetaDatas)
                         {
-                            if (!string.IsNullOrEmpty(metaDataItem.Value))
+                            foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
                             {
-                                continue;
+                                if (!string.IsNullOrEmpty(metaDataItem.Value))
+                                {
+                                    continue;
+                                }
+                                playlistItem.MetaDatas.Remove(metaDataItem);
                             }
-                            playlistItem.MetaDatas.Remove(metaDataItem);
                         }
 
                         if (!playlistItem.LibraryItem_Id.HasValue)

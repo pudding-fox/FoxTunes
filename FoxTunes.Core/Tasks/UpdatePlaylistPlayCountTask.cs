@@ -33,22 +33,25 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            var metaDataItem = this.PlaylistItem.MetaDatas.FirstOrDefault(
-                _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.PlayCount, StringComparison.OrdinalIgnoreCase)
-            );
-            if (metaDataItem == null)
+            lock (this.PlaylistItem.MetaDatas)
             {
-                metaDataItem = new MetaDataItem(CommonMetaData.PlayCount, MetaDataItemType.Tag);
-                this.PlaylistItem.MetaDatas.Add(metaDataItem);
-            }
-            var playCount = default(int);
-            if (!string.IsNullOrEmpty(metaDataItem.Value) && int.TryParse(metaDataItem.Value, out playCount))
-            {
-                metaDataItem.Value = (playCount + 1).ToString();
-            }
-            else
-            {
-                metaDataItem.Value = "1";
+                var metaDataItem = this.PlaylistItem.MetaDatas.FirstOrDefault(
+                    _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.PlayCount, StringComparison.OrdinalIgnoreCase)
+                );
+                if (metaDataItem == null)
+                {
+                    metaDataItem = new MetaDataItem(CommonMetaData.PlayCount, MetaDataItemType.Tag);
+                    this.PlaylistItem.MetaDatas.Add(metaDataItem);
+                }
+                var playCount = default(int);
+                if (!string.IsNullOrEmpty(metaDataItem.Value) && int.TryParse(metaDataItem.Value, out playCount))
+                {
+                    metaDataItem.Value = (playCount + 1).ToString();
+                }
+                else
+                {
+                    metaDataItem.Value = "1";
+                }
             }
             var write = MetaDataBehaviourConfiguration.GetWriteBehaviour(
                 this.Write.Value

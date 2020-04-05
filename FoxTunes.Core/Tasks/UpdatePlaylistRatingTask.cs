@@ -30,15 +30,18 @@ namespace FoxTunes
         {
             foreach (var playlistItem in this.PlaylistItems)
             {
-                var metaDataItem = playlistItem.MetaDatas.FirstOrDefault(
-                    _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
-                );
-                if (metaDataItem == null)
+                lock (playlistItem.MetaDatas)
                 {
-                    metaDataItem = new MetaDataItem(CommonMetaData.Rating, MetaDataItemType.Tag);
-                    playlistItem.MetaDatas.Add(metaDataItem);
+                    var metaDataItem = playlistItem.MetaDatas.FirstOrDefault(
+                        _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
+                    );
+                    if (metaDataItem == null)
+                    {
+                        metaDataItem = new MetaDataItem(CommonMetaData.Rating, MetaDataItemType.Tag);
+                        playlistItem.MetaDatas.Add(metaDataItem);
+                    }
+                    metaDataItem.Value = Convert.ToString(this.Rating);
                 }
-                metaDataItem.Value = Convert.ToString(this.Rating);
             }
             //Send a soft playlist update so the list refreshes, this makes the task seem more responsive.
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);

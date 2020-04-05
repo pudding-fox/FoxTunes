@@ -101,13 +101,16 @@ namespace FoxTunes
 
                     try
                     {
-                        foreach (var metaDataItem in libraryItem.MetaDatas.ToArray())
+                        lock (libraryItem.MetaDatas)
                         {
-                            if (!string.IsNullOrEmpty(metaDataItem.Value))
+                            foreach (var metaDataItem in libraryItem.MetaDatas.ToArray())
                             {
-                                continue;
+                                if (!string.IsNullOrEmpty(metaDataItem.Value))
+                                {
+                                    continue;
+                                }
+                                libraryItem.MetaDatas.Remove(metaDataItem);
                             }
-                            libraryItem.MetaDatas.Remove(metaDataItem);
                         }
 
                         await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
