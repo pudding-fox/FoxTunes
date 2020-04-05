@@ -8,6 +8,8 @@ namespace FoxTunes.Interfaces
         void Register(IFilterParserProvider provider);
 
         bool TryParse(string filter, out IFilterParserResult result);
+
+        bool AppliesTo(string filter, IEnumerable<string> names);
     }
 
     public interface IFilterParserResult : IEquatable<IFilterParserResult>
