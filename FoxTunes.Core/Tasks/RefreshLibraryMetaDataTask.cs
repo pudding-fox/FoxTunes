@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -111,6 +112,9 @@ namespace FoxTunes
                         metaDataItem => META_DATA_TYPE.HasFlag(metaDataItem.Type)
                     ).ConfigureAwait(false);
                 }
+
+                //Update the import date otherwise the file might be re-scanned and changes lost.
+                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow, transaction);
 
                 if (transaction.HasTransaction)
                 {
