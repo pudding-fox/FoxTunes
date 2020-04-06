@@ -1,15 +1,17 @@
-﻿using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 
 namespace FoxTunes
 {
     public class Core : BaseComponent, ICore
     {
+        public static bool IsShuttingDown { get; set; }
+
         private Core()
         {
             ComponentRegistry.Instance.Clear();
             ComponentResolver.Slots.Clear();
+            IsShuttingDown = false;
         }
 
         public Core(ICoreSetup setup) : this()
