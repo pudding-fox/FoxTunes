@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TagLib;
 
@@ -853,7 +854,27 @@ namespace FoxTunes
             private static string ReadCustomTag(string name, File file)
             {
                 var key = GetCustomTagName(name);
-                if (file.TagTypes.HasFlag(TagTypes.Apple))
+                if (file.TagTypes.HasFlag(TagTypes.Id3v2))
+                {
+                    var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
+                    if (tag != null)
+                    {
+                        var frame = global::TagLib.Id3v2.PrivateFrame.Get(tag, key, false);
+                        if (frame != null && frame.PrivateData != null && frame.PrivateData.Count > 0)
+                        {
+                            try
+                            {
+                                //We're sort of sure that it's UTF-16.
+                                return Encoding.Unicode.GetString(frame.PrivateData.Data);
+                            }
+                            catch
+                            {
+                                //Nothing can be done, wasn't in the expected format.
+                            }
+                        }
+                    }
+                }
+                else if (file.TagTypes.HasFlag(TagTypes.Apple))
                 {
                     var tag = GetTag<global::TagLib.Mpeg4.AppleTag>(file, TagTypes.Apple);
                     if (tag != null)
@@ -888,7 +909,17 @@ namespace FoxTunes
             private static void WriteCustomTag(string name, string value, File file)
             {
                 var key = GetCustomTagName(name);
-                if (file.TagTypes.HasFlag(TagTypes.Apple))
+                if (file.TagTypes.HasFlag(TagTypes.Id3v2))
+                {
+                    var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
+                    if (tag != null)
+                    {
+                        var frame = global::TagLib.Id3v2.PrivateFrame.Get(tag, key, true);
+                        //We're sort of sure that it's UTF-16.
+                        frame.PrivateData = Encoding.Unicode.GetBytes(value);
+                    }
+                }
+                else if (file.TagTypes.HasFlag(TagTypes.Apple))
                 {
                     const string PREFIX = "\0\0\0\0";
                     const string MEAN = "com.apple.iTunes";
