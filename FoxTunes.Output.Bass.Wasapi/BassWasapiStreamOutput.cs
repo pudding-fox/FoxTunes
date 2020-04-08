@@ -89,6 +89,42 @@ namespace FoxTunes
 
         public HashSet<int> MixerChannelHandles { get; protected set; }
 
+        public override bool CanControlVolume
+        {
+            get
+            {
+                //Volume cannot be controlled in exclusive mode.
+                if (BassWasapiDevice.Exclusive)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        public override float Volume
+        {
+            get
+            {
+                if (this.ChannelHandle == 0)
+                {
+                    return 0;
+                }
+                return BassWasapi.GetVolume(WasapiVolumeTypes.Session);
+            }
+            set
+            {
+                if (this.ChannelHandle == 0)
+                {
+                    return;
+                }
+                if (!BassWasapi.SetVolume(WasapiVolumeTypes.Session, value))
+                {
+                    //TODO: Warn.
+                }
+            }
+        }
+
         public override bool CheckFormat(int rate, int channels)
         {
             return BassWasapiDevice.Info.SupportedRates.Contains(rate) && channels <= BassWasapiDevice.Info.Outputs;

@@ -32,6 +32,27 @@ namespace FoxTunes
             }
         }
 
+
+        public virtual bool CanControlVolume
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public virtual float Volume
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public abstract bool CheckFormat(int rate, int channels);
 
         public abstract void Connect(IBassStreamComponent previous);

@@ -67,6 +67,42 @@ namespace FoxTunes
 
         public HashSet<int> MixerChannelHandles { get; protected set; }
 
+        public override bool CanControlVolume
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override float Volume
+        {
+            get
+            {
+                if (this.ChannelHandle == 0)
+                {
+                    return 0;
+                }
+                var value = default(float);
+                if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.Volume, out value))
+                {
+                    return 0;
+                }
+                return value;
+            }
+            set
+            {
+                if (this.ChannelHandle == 0)
+                {
+                    return;
+                }
+                if (!Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Volume, value))
+                {
+                    //TODO: Warn.
+                }
+            }
+        }
+
         public override bool CheckFormat(int rate, int channels)
         {
             return true;

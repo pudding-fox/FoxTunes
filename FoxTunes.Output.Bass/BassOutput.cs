@@ -313,6 +313,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.BUFFER_LENGTH_ELEMENT
             ).ConnectValue(value => this.BufferLength = value);
+            this.Configuration.GetElement<DoubleConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.VOLUME_ELEMENT
+            ).ConnectValue(value => this.Volume = Convert.ToSingle(value));
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             this.PipelineManager.Error += this.OnPipelineManagerError;
@@ -438,6 +442,36 @@ namespace FoxTunes
                 }
             });
             return result;
+        }
+
+        private float _Volume { get; set; }
+
+        public override float Volume
+        {
+            get
+            {
+                return this._Volume;
+            }
+            set
+            {
+                this._Volume = value;
+                this.OnVolumeChanged();
+            }
+        }
+
+        protected override void OnVolumeChanged()
+        {
+            if (this.PipelineManager != null)
+            {
+                this.PipelineManager.WithPipeline(pipeline =>
+                {
+                    if (pipeline != null && pipeline.Output.CanControlVolume)
+                    {
+                        pipeline.Output.Volume = this.Volume;
+                    }
+                });
+            }
+            base.OnVolumeChanged();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

@@ -63,6 +63,10 @@ namespace FoxTunes
                         );
                     }
                 }
+                if (pipeline.Output.CanControlVolume)
+                {
+                    pipeline.Output.Volume = stream.Output.Volume;
+                }
             }
             catch (Exception e)
             {
