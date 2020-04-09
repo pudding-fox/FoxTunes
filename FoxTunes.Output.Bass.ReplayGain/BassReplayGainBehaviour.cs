@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass;
 using ManagedBass.Fx;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Runtime.CompilerServices;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassReplayGainBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         //Make sure bass_fx.dll is loaded.
@@ -20,7 +20,11 @@ namespace FoxTunes
 
         public ConditionalWeakTable<BassOutputStream, VolumeEffect> Effects { get; private set; }
 
-        public IOutput Output { get; private set; }
+        public ICore Core { get; private set; }
+
+        public IBassOutput Output { get; private set; }
+
+        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -28,7 +32,9 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Output = core.Components.Output;
+            this.Core = core;
+            this.Output = ComponentRegistry.Instance.GetComponent<IBassOutput>();
+            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -58,6 +64,10 @@ namespace FoxTunes
                 this.Output.Loaded += this.OnLoaded;
                 this.Output.Unloaded += this.OnUnloaded;
             }
+            if (BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
         }
 
         public void Disable()
@@ -66,6 +76,10 @@ namespace FoxTunes
             {
                 this.Output.Loaded -= this.OnLoaded;
                 this.Output.Unloaded -= this.OnUnloaded;
+            }
+            if (BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
             }
         }
 
@@ -85,19 +99,30 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void Add(BassOutputStream stream)
+        protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
-            var replayGain = default(float);
-            if (!this.TryGetReplayGain(stream.PlaylistItem, out replayGain))
+            if (BassUtils.GetChannelDsdRaw(e.Stream.ChannelHandle))
             {
                 return;
             }
-            var effect = new VolumeEffect()
+            var component = new BassReplayGainStreamComponent(this, e.Stream);
+            component.InitializeComponent(this.Core);
+            e.Components.Add(component);
+        }
+
+        protected virtual void Add(BassOutputStream stream)
+        {
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
-                Channel = 0,
-                Volume = this.GetVolume(replayGain)
-            };
-            effect.Activate(stream.ChannelHandle);
+                return;
+            }
+            var replayGain = default(float);
+            var mode = default(ReplayGainMode);
+            if (!this.TryGetReplayGain(stream.PlaylistItem, out replayGain, out mode))
+            {
+                return;
+            }
+            var effect = new VolumeEffect(stream, replayGain, mode);
             this.Effects.Add(stream, effect);
         }
 
@@ -111,7 +136,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual bool TryGetReplayGain(PlaylistItem playlistItem, out float replayGain)
+        protected virtual bool TryGetReplayGain(PlaylistItem playlistItem, out float replayGain, out ReplayGainMode mode)
         {
             var albumGain = default(float);
             var trackGain = default(float);
@@ -131,6 +156,7 @@ namespace FoxTunes
                             if (this.Mode == ReplayGainMode.Album)
                             {
                                 Logger.Write(this, LogLevel.Debug, "Found preferred replay gain data for album:  \"{0}\" => {1}", playlistItem.FileName, albumGain);
+                                mode = ReplayGainMode.Album;
                                 replayGain = albumGain;
                                 return true;
                             }
@@ -148,6 +174,7 @@ namespace FoxTunes
                             if (this.Mode == ReplayGainMode.Track)
                             {
                                 Logger.Write(this, LogLevel.Debug, "Found preferred replay gain data for track:  \"{0}\" => {1}", playlistItem.FileName, trackGain);
+                                mode = ReplayGainMode.Track;
                                 replayGain = trackGain;
                                 return true;
                             }
@@ -158,16 +185,19 @@ namespace FoxTunes
             if (this.IsValidReplayGain(albumGain))
             {
                 Logger.Write(this, LogLevel.Debug, "Using album replay gain data: \"{0}\" => {1}", playlistItem.FileName, albumGain);
+                mode = ReplayGainMode.Album;
                 replayGain = albumGain;
                 return true;
             }
             if (this.IsValidReplayGain(trackGain))
             {
                 Logger.Write(this, LogLevel.Debug, "Using track replay gain data: \"{0}\" => {1}", playlistItem.FileName, trackGain);
+                mode = ReplayGainMode.Track;
                 replayGain = trackGain;
                 return true;
             }
             Logger.Write(this, LogLevel.Debug, "No replay gain data: \"{0}\".", playlistItem.FileName);
+            mode = ReplayGainMode.None;
             replayGain = 0;
             return false;
         }
@@ -176,11 +206,6 @@ namespace FoxTunes
         {
             //TODO: I'm sure there is a valid range of values.
             return replayGain != 0 && !float.IsNaN(replayGain);
-        }
-
-        protected virtual float GetVolume(float replayGain)
-        {
-            return Convert.ToSingle(Math.Pow(10, replayGain / 20));
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

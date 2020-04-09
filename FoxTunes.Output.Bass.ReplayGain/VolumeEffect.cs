@@ -6,20 +6,30 @@ namespace FoxTunes
 {
     public class VolumeEffect : BaseComponent, IDisposable
     {
-        public VolumeEffect()
+        private VolumeEffect()
         {
             this.Parameters = new VolumeParameters();
         }
 
-        public int ChannelHandle { get; private set; }
+        public VolumeEffect(BassOutputStream stream, float replayGain, ReplayGainMode mode) : this()
+        {
+            this.Stream = stream;
+            this.ReplayGain = replayGain;
+            this.Mode = mode;
+            this.Activate();
+        }
 
         public int EffectHandle { get; private set; }
-
-        public int Priority { get; private set; }
 
         public bool IsActive { get; private set; }
 
         public VolumeParameters Parameters { get; private set; }
+
+        public BassOutputStream Stream { get; private set; }
+
+        public float ReplayGain { get; private set; }
+
+        public ReplayGainMode Mode { get; private set; }
 
         public int Channel
         {
@@ -47,15 +57,15 @@ namespace FoxTunes
             }
         }
 
-        public void Activate(int channelHandle, int priority = 0)
+        public void Activate()
         {
-            this.ChannelHandle = channelHandle;
-            this.Priority = priority;
-            this.EffectHandle = Bass.ChannelSetFX(this.ChannelHandle, this.Parameters.FXType, this.Priority);
+            this.EffectHandle = Bass.ChannelSetFX(this.Stream.ChannelHandle, this.Parameters.FXType, 0);
             if (this.EffectHandle == 0)
             {
                 BassUtils.Throw();
             }
+            this.Channel = 0;
+            this.Volume = GetVolume(this.ReplayGain);
             if (!Bass.FXSetParameters(this.EffectHandle, this.Parameters))
             {
                 BassUtils.Throw();
@@ -70,10 +80,8 @@ namespace FoxTunes
                 return;
             }
             //Ignoring result on purpose.
-            Bass.ChannelRemoveFX(this.ChannelHandle, this.EffectHandle);
-            this.ChannelHandle = 0;
+            Bass.ChannelRemoveFX(this.Stream.ChannelHandle, this.EffectHandle);
             this.EffectHandle = 0;
-            this.Priority = 0;
             this.IsActive = false;
         }
 
@@ -111,6 +119,11 @@ namespace FoxTunes
             {
                 //Nothing can be done, never throw on GC thread.
             }
+        }
+
+        public static float GetVolume(float replayGain)
+        {
+            return Convert.ToSingle(Math.Pow(10, replayGain / 20));
         }
     }
 }

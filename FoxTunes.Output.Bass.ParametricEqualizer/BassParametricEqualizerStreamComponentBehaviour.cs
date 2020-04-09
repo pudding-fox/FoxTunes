@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassParametricEqualizerStreamComponentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public ICore Core { get; private set; }

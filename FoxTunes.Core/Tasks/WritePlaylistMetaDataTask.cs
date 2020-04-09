@@ -167,7 +167,7 @@ namespace FoxTunes
                             {
                                 Id = playlistItem.LibraryItem_Id.Value
                             };
-                            await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow);
+                            await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow).ConfigureAwait(false);
                         }
                     }
                     catch (Exception e)

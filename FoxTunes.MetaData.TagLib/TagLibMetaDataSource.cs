@@ -353,7 +353,7 @@ namespace FoxTunes
         {
             try
             {
-                metaData.AddRange(await metaDataSource.GetMetaData(file.Name));
+                metaData.AddRange(await metaDataSource.GetMetaData(file.Name).ConfigureAwait(false));
             }
             catch (Exception e)
             {
