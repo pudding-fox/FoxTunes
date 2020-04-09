@@ -97,6 +97,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.DB.Tests", "FoxTun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.MetaData.TagLib.Tests", "FoxTunes.MetaData.TagLib.Tests\FoxTunes.MetaData.TagLib.Tests.csproj", "{53A2FC66-4CB5-4813-8EC2-14C8F34A0C7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass.ReplayGain", "FoxTunes.Output.Bass.ReplayGain\FoxTunes.Output.Bass.ReplayGain.csproj", "{2331F558-B253-444F-9EA8-041AE077541E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -579,6 +581,18 @@ Global
 		{53A2FC66-4CB5-4813-8EC2-14C8F34A0C7A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{53A2FC66-4CB5-4813-8EC2-14C8F34A0C7A}.Release|x86.ActiveCfg = Release|Any CPU
 		{53A2FC66-4CB5-4813-8EC2-14C8F34A0C7A}.Release|x86.Build.0 = Release|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Debug|x86.Build.0 = Debug|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Release|x86.ActiveCfg = Release|Any CPU
+		{2331F558-B253-444F-9EA8-041AE077541E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

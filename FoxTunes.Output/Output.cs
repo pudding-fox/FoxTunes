@@ -52,7 +52,27 @@ namespace FoxTunes
 
         public abstract Task<bool> Preempt(IOutputStream stream);
 
+        protected virtual void OnLoaded(IOutputStream stream)
+        {
+            if (this.Loaded != null)
+            {
+                this.Loaded(this, new OutputStreamEventArgs(stream));
+            }
+        }
+
+        public event OutputStreamEventHandler Loaded;
+
         public abstract Task Unload(IOutputStream stream);
+
+        protected virtual void OnUnloaded(IOutputStream stream)
+        {
+            if (this.Loaded != null)
+            {
+                this.Unloaded(this, new OutputStreamEventArgs(stream));
+            }
+        }
+
+        public event OutputStreamEventHandler Unloaded;
 
         public abstract Task Shutdown();
 
