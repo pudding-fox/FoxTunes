@@ -52,7 +52,10 @@ namespace FoxTunes
 
         protected virtual void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Logger.Write(this, LogLevel.Debug, "Exception (Fatal): {0} => {1}", (e.ExceptionObject as Exception).Message, (e.ExceptionObject as Exception).StackTrace);
+            if (e.ExceptionObject is Exception exception)
+            {
+                Logger.Write(this, LogLevel.Debug, "Exception (Fatal): {0} => {1}", exception.Message, exception.StackTrace);
+            }
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

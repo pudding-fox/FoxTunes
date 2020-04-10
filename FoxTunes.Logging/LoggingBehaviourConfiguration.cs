@@ -25,9 +25,14 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
+#if DEBUG
+            var enabled = true;
+#else
+            var enabled = false;
+#endif
             yield return new ConfigurationSection(SECTION, "Logging")
                 .WithElement(
-                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled (Log.txt)").WithValue(false)
+                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled (Log.txt)").WithValue(enabled)
                 )
                 .WithElement(
                     new SelectionConfigurationElement(LEVEL_ELEMENT, "Level").WithOptions(GetLevelOptions())
@@ -38,11 +43,19 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetLevelOptions()
         {
             yield return new SelectionConfigurationOption(FATAL_OPTION, "Fatal");
+#if DEBUG
+            yield return new SelectionConfigurationOption(ERROR_OPTION, "Error");
+#else
             yield return new SelectionConfigurationOption(ERROR_OPTION, "Error").Default();
+#endif
             yield return new SelectionConfigurationOption(WARN_OPTION, "Warn");
             yield return new SelectionConfigurationOption(INFO_OPTION, "Info");
             yield return new SelectionConfigurationOption(DEBUG_OPTION, "Debug");
+#if DEBUG
+            yield return new SelectionConfigurationOption(TRACE_OPTION, "Trace").Default();
+#else
             yield return new SelectionConfigurationOption(TRACE_OPTION, "Trace");
+#endif
         }
 
         public static LogLevel GetLogLevel(SelectionConfigurationOption option)
