@@ -19,6 +19,8 @@ namespace FoxTunes
 
         public const string MIXER_ELEMENT = "FFFF34F9-BB72-4DB6-BDD0-F5C9BFD2F9EE";
 
+        public const string BUFFER_ELEMENT = "FFGGCB2C-0C9B-420A-8C74-862E9D9052B5";
+
         public const string ELEMENT_REFRESH = "GGGG5945-E6DA-48FD-B89C-F1F35C4822FB";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -32,6 +34,7 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EVENT, "Event", path: "WASAPI").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_DITHER, "Dither", path: "WASAPI").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(MIXER_ELEMENT, "Mixer", path: "WASAPI").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(BUFFER_ELEMENT, "Double Buffer", path: "WASAPI").WithValue(true))
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "WASAPI")
             );
             StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
@@ -75,7 +78,7 @@ namespace FoxTunes
             {
                 var deviceInfo = default(WasapiDeviceInfo);
                 BassUtils.OK(BassWasapi.GetDeviceInfo(a, out deviceInfo));
-                if (deviceInfo.IsInput || deviceInfo.IsDisabled || deviceInfo.IsLoopback || deviceInfo.IsUnplugged)
+                if (deviceInfo.IsInput || !deviceInfo.IsEnabled || deviceInfo.IsDisabled || deviceInfo.IsLoopback || deviceInfo.IsUnplugged)
                 {
                     continue;
                 }

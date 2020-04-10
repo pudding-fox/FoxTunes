@@ -1,9 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using ManagedBass.Wasapi;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -65,6 +63,31 @@ namespace FoxTunes
             {
                 this._Exclusive = value;
                 Logger.Write(this, LogLevel.Debug, "Exclusive = {0}", this.Exclusive);
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
+            }
+        }
+
+        public bool AutoFormat
+        {
+            get
+            {
+                return !this.Output.EnforceRate;
+            }
+        }
+
+        private bool _Buffer { get; set; }
+
+        public bool Buffer
+        {
+            get
+            {
+                return this._Buffer;
+            }
+            private set
+            {
+                this._Buffer = value;
+                Logger.Write(this, LogLevel.Debug, "Buffer = {0}", this.Buffer);
                 //TODO: Bad .Wait().
                 this.Output.Shutdown().Wait();
             }
@@ -151,6 +174,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassWasapiStreamOutputConfiguration.MIXER_ELEMENT
             ).ConnectValue(value => this.Mixer = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+            BassOutputConfiguration.SECTION,
+            BassWasapiStreamOutputConfiguration.BUFFER_ELEMENT
+        ).ConnectValue(value => this.Buffer = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
@@ -169,33 +196,13 @@ namespace FoxTunes
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
+            //Always detect device for now.
+            //if (BassWasapiDevice.Info != null && BassWasapiDevice.Info.Device != this.WasapiDevice)
+            {
+                BassWasapiDevice.Detect(this.WasapiDevice, this.Exclusive, this.AutoFormat, this.Buffer, this.EventDriven, this.Dither);
+            }
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
-        }
-
-        protected virtual void OnInitDevice()
-        {
-            if (BassWasapiDevice.IsInitialized)
-            {
-                return;
-            }
-            BassWasapiDevice.Init(this.WasapiDevice, this.Exclusive, this.EventDriven, this.Dither);
-            if (this.Output.EnforceRate && !BassWasapiDevice.Info.SupportedRates.Contains(this.Output.Rate))
-            {
-                var supportedRates = string.Join(
-                    ", ",
-                    BassWasapiDevice.Info.SupportedRates.Select(
-                        supportedRate => string.Format(
-                            "{0}@{1}",
-                            Enum.GetName(typeof(WasapiFormat), BassWasapiDevice.Info.SupportedFormats[supportedRate]),
-                            supportedRate
-                        )
-                    )
-                );
-                Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates);
-                BassWasapiDevice.Free();
-                throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates));
-            }
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -225,7 +232,6 @@ namespace FoxTunes
             {
                 return;
             }
-            this.OnInitDevice();
             e.OutputRates = BassWasapiDevice.Info.SupportedRates;
             e.OutputChannels = BassWasapiDevice.Info.Outputs;
         }
@@ -236,7 +242,6 @@ namespace FoxTunes
             {
                 return;
             }
-            this.OnInitDevice();
             e.Output = new BassWasapiStreamOutput(this, e.Stream);
         }
 

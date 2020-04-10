@@ -5,20 +5,11 @@ using ManagedBass.Wasapi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace FoxTunes
 {
     public class BassWasapiStreamOutput : BassStreamOutput
     {
-        const int CONNECT_ATTEMPTS = 5;
-
-        const int CONNECT_ATTEMPT_INTERVAL = 400;
-
-        const int START_ATTEMPTS = 5;
-
-        const int START_ATTEMPT_INTERVAL = 400;
-
         private BassWasapiStreamOutput()
         {
             this.Flags = BassFlags.Default;
@@ -29,19 +20,7 @@ namespace FoxTunes
             : this()
         {
             this.Behaviour = behaviour;
-            if (behaviour.Output.Rate == stream.Rate)
-            {
-                this.Rate = stream.Rate;
-            }
-            else if (!behaviour.Output.EnforceRate && BassWasapiDevice.Info.SupportedRates.Contains(stream.Rate))
-            {
-                this.Rate = stream.Rate;
-            }
-            else
-            {
-                Logger.Write(this, LogLevel.Debug, "The requested output rate is either enforced or the device does not support the stream's rate: {0} => {1}", stream.Rate, behaviour.Output.Rate);
-                this.Rate = behaviour.Output.Rate;
-            }
+            this.Rate = behaviour.Output.Rate;
             this.Channels = BassWasapiDevice.Info.Outputs;
             //WASAPI requires BASS_SAMPLE_FLOAT so don't bother respecting the output's Float setting.
             this.Flags = BassFlags.Decode | BassFlags.Float;
@@ -71,14 +50,6 @@ namespace FoxTunes
 
         public BassWasapiStreamOutputBehaviour Behaviour { get; private set; }
 
-        public int Device
-        {
-            get
-            {
-                return BassWasapiDevice.Device;
-            }
-        }
-
         public override int Rate { get; protected set; }
 
         public override int Channels { get; protected set; }
@@ -94,7 +65,7 @@ namespace FoxTunes
             get
             {
                 //Volume cannot be controlled in exclusive mode.
-                if (BassWasapiDevice.Exclusive)
+                if (this.Behaviour.Exclusive)
                 {
                     return false;
                 }
@@ -155,46 +126,56 @@ namespace FoxTunes
 
         protected virtual void ConfigureWASAPI(IBassStreamComponent previous)
         {
-            BassWasapiDevice.Init(this.Rate, this.Channels);
-            if (this.Rate != BassWasapiDevice.Info.Rate)
+            if (this.Behaviour.Output.EnforceRate)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to set the requested rate {0}, falling back to device default {1}.", this.Rate, BassWasapiDevice.Info.Rate);
-                this.Rate = BassWasapiDevice.Info.Rate;
+                if (!BassWasapiDevice.Info.SupportedRates.Contains(this.Rate))
+                {
+                    var nearestRate = BassWasapiDevice.Info.GetNearestRate(this.Rate);
+                    Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
+                    this.Rate = nearestRate;
+                }
+                else
+                {
+                    //Enfoced rate is supported by the device, nothing to do.
+                }
             }
-            if (this.Channels != BassWasapiDevice.Info.Outputs)
+            else
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to set the requested channel count {0}, falling back to device default {1}.", this.Channels, BassWasapiDevice.Info.Outputs);
-                this.Channels = BassWasapiDevice.Info.Outputs;
+                if (!BassWasapiDevice.Info.SupportedRates.Contains(previous.Rate))
+                {
+                    var nearestRate = BassWasapiDevice.Info.GetNearestRate(previous.Rate);
+                    Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
+                    this.Rate = nearestRate;
+                }
+                else
+                {
+                    //Stream rate is supported by the device, nothing to do.
+                    this.Rate = previous.Rate;
+                }
             }
+            BassWasapiDevice.Init(
+                this.Behaviour.WasapiDevice,
+                this.Behaviour.Exclusive,
+                this.Behaviour.AutoFormat,
+                this.Behaviour.Buffer,
+                this.Behaviour.EventDriven,
+                this.Behaviour.Dither,
+                this.Rate,
+                this.Channels,
+                this.Flags
+            );
         }
 
         protected virtual bool StartWASAPI()
         {
-            for (var a = 1; a <= START_ATTEMPTS; a++)
+            if (BassWasapi.IsStarted)
             {
-                Logger.Write(this, LogLevel.Debug, "Starting WASAPI, attempt: {0}", a);
-                try
-                {
-                    var success = BassWasapi.Start();
-                    if (success)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Successfully started WASAPI.");
-                        return true;
-                    }
-                    else
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Failed to start WASAPI: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
-                    }
-                }
-                catch (Exception e)
-                {
-                    //Nothing can be done.
-                    Logger.Write(this, LogLevel.Warn, "Failed to start WASAPI: {0}", e.Message);
-                }
-                Thread.Sleep(START_ATTEMPT_INTERVAL);
+                Logger.Write(this, LogLevel.Debug, "WASAPI has already been started.");
+                return false;
             }
-            Logger.Write(this, LogLevel.Warn, "Failed to start WASAPI after {0} attempts.", START_ATTEMPTS);
-            return false;
+            Logger.Write(this, LogLevel.Debug, "Starting WASAPI.");
+            BassUtils.OK(BassWasapi.Start());
+            return true;
         }
 
         protected virtual bool StopWASAPI(bool reset)
@@ -313,7 +294,6 @@ namespace FoxTunes
             {
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Stopping WASAPI.");
             try
             {
                 BassUtils.OK(this.StopWASAPI(true));
@@ -352,10 +332,8 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (BassWasapi.IsStarted)
-            {
-                BassUtils.OK(this.StopWASAPI(true));
-            }
+            this.Stop();
+            BassWasapiDevice.Free();
         }
     }
 }

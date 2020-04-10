@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FoxTunes
 {
