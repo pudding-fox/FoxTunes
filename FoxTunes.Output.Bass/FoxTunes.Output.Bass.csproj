@@ -17,11 +17,23 @@
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\ManagedBass.Fx.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\ManagedBass.Mix.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\ManagedBass.Fx.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\ManagedBass.Mix.dll</HintPath>
     </Reference>
   </ItemGroup>
   
@@ -62,6 +74,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\lib\bass.dll" Link="bass.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\bassmix.dll" Link="bassmix.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\bass_fx.dll" Link="bass_fx.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\lib\bass_inmemory_handler.dll" Link="bass_inmemory_handler.dll">

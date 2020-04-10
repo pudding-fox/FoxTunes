@@ -58,8 +58,10 @@ FoxTunes.Output.Bass.Gapless.dll
 FoxTunes.Output.Bass.dll
 ManagedBass.Gapless.dll
 ManagedBass.Mix.dll
+ManagedBass.Fx.dll
 ManagedBass.dll
 bass.dll
+bass_fx.dll
 bass_gapless.dll
 bass_inmemory_handler.dll
 bassmix.dll
@@ -182,7 +184,6 @@ FoxTunes.Logging.dll
 
 REPLAYGAIN="
 FoxTunes.Output.Bass.ReplayGain.dll
-bass_fx.dll
 "
 
 MINIMAL="
@@ -211,7 +212,8 @@ wasapi
 windows
 "
 
-TAG=$(git describe --abbrev=0 --tags)
+#TAG=$(git describe --abbrev=0 --tags)
+TAG="$(date +%F)-nightly"
 
 echo "Current version is $TAG.."
 sleep 1
@@ -514,7 +516,7 @@ do
 	cd "./release/$target/Main"
 
 	echo "Setting the release type to default..";
-	sed -i 's/"ReleaseType"\s\+value=".*"/key="ReleaseType" value="Default"/' "FoxTunes.Launcher.exe.config"
+	sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Default"/' "FoxTunes.Launcher.exe.config"
 
 	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target.zip" "*.*" -r
 

@@ -5,6 +5,7 @@
     <AssemblyName>FoxTunes.MetaData.TagLib.Tests</AssemblyName>
     <OutputPath>..\distribution\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+    <Configurations>Debug</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

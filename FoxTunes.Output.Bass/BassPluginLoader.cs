@@ -1,4 +1,7 @@
 ﻿using ManagedBass;
+using ManagedBass.Fx;
+using ManagedBass.Mix;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -9,6 +12,21 @@ namespace FoxTunes
         public const string DIRECTORY_NAME_ADDON = "Addon";
 
         public const string FILE_NAME_MASK = "bass*.dll";
+
+        public static readonly Version FxVersion;
+
+        public static readonly Version MixVersion;
+
+        static BassPluginLoader()
+        {
+            FxVersion = BassFx.Version;
+#if NET40
+            MixVersion = BassMix.Version;
+#else
+            //TODO: Why is BassMix.Version not available?
+            MixVersion = default(Version);
+#endif
+        }
 
         public static string Location
         {

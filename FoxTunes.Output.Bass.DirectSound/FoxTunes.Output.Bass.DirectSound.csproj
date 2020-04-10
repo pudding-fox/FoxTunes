@@ -36,12 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\lib\bassmix.dll" Link="bassmix.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 
