@@ -430,7 +430,7 @@ namespace FoxTunes
 
         private async Task<string> ImportImage(File file, Tag tag, IPicture picture, ArtworkType type, bool overwrite)
         {
-            var id = this.GetPictureId(file, tag, type);
+            var id = this.GetPictureId(file, tag, picture, type);
             return await this.ImportImage(picture, id, overwrite).ConfigureAwait(false);
         }
 
@@ -609,10 +609,10 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Error, "Failed to read meta data: {0}", e.Message);
         }
 
-        private string GetPictureId(File file, Tag tag, ArtworkType type)
+        private string GetPictureId(File file, Tag tag, IPicture picture, ArtworkType type)
         {
-            //Year + (Album | Directory) + Type
-            var hashCode = default(int);
+            //Year + (Album | Checksum) + Type
+            var hashCode = default(long);
             unchecked
             {
                 if (tag.Year != 0)
@@ -625,7 +625,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    hashCode += global::System.IO.Path.GetDirectoryName(file.Name).ToLower().GetHashCode();
+                    hashCode += picture.Data.Checksum;
                 }
                 hashCode = (hashCode * 29) + type.GetHashCode();
             }
