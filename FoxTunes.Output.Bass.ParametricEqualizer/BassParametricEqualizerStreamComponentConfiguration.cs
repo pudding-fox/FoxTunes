@@ -47,12 +47,13 @@ namespace FoxTunes
                     new BooleanConfigurationElement(ENABLED, "Enabled", path: "Parametric Equalizer")
                         .WithValue(false))
                 .WithElement(
-                    new IntegerConfigurationElement(BANDWIDTH, "Bandwidth", path: "Parametric Equalizer")
-                        .WithValue(18)
+                    new DoubleConfigurationElement(BANDWIDTH, "Bandwidth", path: "Parametric Equalizer")
+                        .WithValue(2.5)
                         .WithValidationRule(
-                            new IntegerValidationRule(
+                            new DoubleValidationRule(
                                 BassParametricEqualizerStreamComponent.MIN_BANDWIDTH,
-                                BassParametricEqualizerStreamComponent.MAX_BANDWIDTH
+                                BassParametricEqualizerStreamComponent.MAX_BANDWIDTH,
+                                0.1
                             )
                         )
                     );
@@ -60,7 +61,7 @@ namespace FoxTunes
             foreach (var band in Bands)
             {
                 section.WithElement(
-                    new IntegerConfigurationElement(band.Key, BassParametricEqualizerStreamComponent.Band.GetBandName(band.Value), path: "Parametric Equalizer")
+                    new IntegerConfigurationElement(band.Key, PeakEQEffect.GetBandName(band.Value), path: "Parametric Equalizer")
                         .WithValue(0)
                         .WithValidationRule(
                             new IntegerValidationRule(

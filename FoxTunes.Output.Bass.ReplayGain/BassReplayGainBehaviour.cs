@@ -11,10 +11,10 @@ namespace FoxTunes
     {
         public BassReplayGainBehaviour()
         {
-            this.Effects = new ConditionalWeakTable<BassOutputStream, VolumeEffect>();
+            this.Effects = new ConditionalWeakTable<BassOutputStream, ReplayGainEffect>();
         }
 
-        public ConditionalWeakTable<BassOutputStream, VolumeEffect> Effects { get; private set; }
+        public ConditionalWeakTable<BassOutputStream, ReplayGainEffect> Effects { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -118,13 +118,14 @@ namespace FoxTunes
             {
                 return;
             }
-            var effect = new VolumeEffect(stream, replayGain, mode);
+            var effect = new ReplayGainEffect(stream.ChannelHandle, replayGain, mode);
+            effect.Activate();
             this.Effects.Add(stream, effect);
         }
 
         protected virtual void Remove(BassOutputStream stream)
         {
-            var effect = default(VolumeEffect);
+            var effect = default(ReplayGainEffect);
             if (this.Effects.TryGetValue(stream, out effect))
             {
                 this.Effects.Remove(stream);

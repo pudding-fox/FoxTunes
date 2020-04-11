@@ -35,7 +35,7 @@ namespace FoxTunes
                 {
                     return string.Format("{0} (none)", this.Name);
                 }
-                var effect = default(VolumeEffect);
+                var effect = default(ReplayGainEffect);
                 if (!this.Behaviour.Effects.TryGetValue(currentStream, out effect))
                 {
                     return string.Format("{0} (none)", this.Name);
@@ -71,6 +71,8 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
+            this.Rate = previous.Rate;
+            this.Channels = previous.Channels;
             this.ChannelHandle = previous.ChannelHandle;
         }
 
