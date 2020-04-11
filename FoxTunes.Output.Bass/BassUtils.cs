@@ -159,33 +159,10 @@ namespace FoxTunes
 
         public Errors Error { get; private set; }
 
-        private static string GetMessage(Errors errors)
+        private static string GetMessage(Errors error)
         {
-            var builder = new StringBuilder();
-            foreach (var error in Enum.GetValues(typeof(Errors)).Cast<Errors>())
-            {
-                if (!errors.HasFlag(error))
-                {
-                    continue;
-                }
-                switch (error)
-                {
-                    case Errors.OK:
-                    case Errors.Init:
-                    case Errors.Start:
-                        continue;
-                }
-                if (builder.Length > 0)
-                {
-                    builder.Append(", ");
-                }
-                builder.Append(Enum.GetName(typeof(Errors), error));
-            }
-            if (builder.Length == 0)
-            {
-                return Enum.GetName(typeof(Errors), Errors.Unknown);
-            }
-            return builder.ToString();
+            //TODO: Create a message based on the error code.
+            return Enum.GetName(typeof(Errors), error);
         }
     }
 }

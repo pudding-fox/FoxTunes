@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const string MODE_ASIO_OPTION = "CCCC87DA-EE55-467A-B2F5-61480F2F12F6";
 
+        public const string MIXER_ELEMENT = "CCDDCD1A-32F6-44B0-81E5-C9CEF0652E69";
+
         public const string ELEMENT_REFRESH = "DDDDC8BE-2909-42C1-AC82-790EAEE2FB07";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -25,6 +27,7 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device", path: "ASIO")
                     .WithOptions(GetASIODevices()))
                 .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(MIXER_ELEMENT, "Mixer", path: "ASIO").WithValue(false))
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "ASIO")
             );
             StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(

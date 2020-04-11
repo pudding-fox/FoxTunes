@@ -2,7 +2,6 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -72,6 +71,23 @@ namespace FoxTunes
             }
         }
 
+        private bool _Mixer { get; set; }
+
+        public bool Mixer
+        {
+            get
+            {
+                return this._Mixer;
+            }
+            private set
+            {
+                this._Mixer = value;
+                Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
@@ -90,6 +106,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassAsioStreamOutputConfiguration.DSD_RAW_ELEMENT
             ).ConnectValue(value => this.DsdDirect = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassAsioStreamOutputConfiguration.MIXER_ELEMENT
+            ).ConnectValue(value => this.Mixer = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
@@ -108,27 +128,13 @@ namespace FoxTunes
             BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
             BassAsioUtils.OK(Bass.Init(Bass.NoSoundDevice));
+            //Always detect device for now.
+            //if (BassAsioDevice.Info != null && BassAsioDevice.Info.Device != this.AsioDevice)
+            {
+                BassAsioDevice.Detect(this.AsioDevice);
+            }
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
-        }
-
-        protected virtual void OnInitDevice()
-        {
-            if (BassAsioDevice.IsInitialized)
-            {
-                return;
-            }
-            BassAsioDevice.Init(this.AsioDevice);
-            if (this.Output.EnforceRate && !BassAsioDevice.Info.SupportedRates.Contains(this.Output.Rate))
-            {
-                var supportedRates = string.Join(
-                    ", ",
-                    BassAsioDevice.Info.SupportedRates
-                );
-                Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates);
-                BassAsioDevice.Free();
-                throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates));
-            }
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -158,7 +164,6 @@ namespace FoxTunes
             {
                 return;
             }
-            this.OnInitDevice();
             if (this.DsdDirect)
             {
                 e.OutputCapabilities |= BassCapability.DSD_RAW;
@@ -173,7 +178,6 @@ namespace FoxTunes
             {
                 return;
             }
-            this.OnInitDevice();
             e.Output = new BassAsioStreamOutput(this, e.Stream);
         }
 

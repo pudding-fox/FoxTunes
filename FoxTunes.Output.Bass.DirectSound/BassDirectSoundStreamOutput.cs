@@ -49,14 +49,6 @@ namespace FoxTunes
 
         public BassDirectSoundStreamOutputBehaviour Behaviour { get; private set; }
 
-        public int Device
-        {
-            get
-            {
-                return BassDirectSoundDevice.Device;
-            }
-        }
-
         public override int Rate { get; protected set; }
 
         public override int Channels { get; protected set; }

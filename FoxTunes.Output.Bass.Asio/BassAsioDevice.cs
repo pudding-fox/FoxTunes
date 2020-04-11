@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using ManagedBass.Asio;
 using System;
 using System.Collections.Generic;
@@ -8,49 +9,150 @@ namespace FoxTunes
 {
     public static class BassAsioDevice
     {
+        public const int MASTER_CHANNEL = -1;
+
         public const int PRIMARY_CHANNEL = 0;
 
-        public const int SECONDARY_CHANNEL = 1;
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
 
         static BassAsioDevice()
         {
-            Devices = new Dictionary<int, BassAsioDeviceInfo>();
+            //Perhaps we shouldn't Reset each time the output is started.
+            //But what if the system config changes and the current device id isn't what we think it is?
+            //var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            //configuration.GetElement<SelectionConfigurationElement>(
+            //    BassOutputConfiguration.SECTION,
+            //    BassAsioStreamOutputConfiguration.ELEMENT_ASIO_DEVICE
+            //).ConnectValue(value => Reset());
+            //configuration.GetElement<CommandConfigurationElement>(
+            //    BassOutputConfiguration.SECTION,
+            //    BassAsioStreamOutputConfiguration.ELEMENT_REFRESH
+            //).Invoked += (sender, e) => Reset();
         }
-
-        private static IDictionary<int, BassAsioDeviceInfo> Devices { get; set; }
-
-        public static int Device { get; private set; }
 
         public static bool IsInitialized { get; private set; }
 
-        public static void Init()
+        public static void Init(int device, int rate, int channels, BassFlags flags)
         {
-            Init(Device);
+            if (IsInitialized)
+            {
+                throw new InvalidOperationException("Device is already initialized.");
+            }
+
+            IsInitialized = true;
+
+            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Initializing BASS ASIO.");
+
+            try
+            {
+                BassAsioUtils.OK(BassAsio.Init(device, AsioInitFlags.Thread));
+                BassAsioUtils.OK(BassAsioHandler.Init());
+                BassAsioUtils.OK(BassAsioHandler.ChannelEnable(false, PRIMARY_CHANNEL));
+                for (var channel = 1; channel < channels; channel++)
+                {
+                    Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Joining channel: {0} => {1}", channel, PRIMARY_CHANNEL);
+                    BassAsioUtils.OK(BassAsio.ChannelJoin(false, channel, PRIMARY_CHANNEL));
+                }
+
+                if (flags.HasFlag(BassFlags.DSDRaw))
+                {
+                    InitDSD(device, rate, channels, flags);
+                }
+                else
+                {
+                    InitPCM(device, rate, channels, flags);
+                }
+
+                BassAsio.Rate = rate;
+
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Initialized BASS ASIO.");
+            }
+            catch
+            {
+                Free();
+                throw;
+            }
         }
 
-        public static void Init(int device)
+        private static void InitPCM(int device, int rate, int channels, BassFlags flags)
         {
-            if (device == BassAsioStreamOutputConfiguration.ASIO_NO_DEVICE)
+            BassAsioUtils.OK(BassAsio.SetDSD(false));
+            BassAsioUtils.OK(BassAsio.ChannelSetRate(false, BassAsioDevice.PRIMARY_CHANNEL, rate));
+            var format = default(AsioSampleFormat);
+            if (flags.HasFlag(BassFlags.Float))
             {
-                throw new InvalidOperationException("A valid device must be provided.");
+                format = AsioSampleFormat.Float;
             }
-            LogManager.Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Initializing BASS ASIO.");
-            BassAsioUtils.OK(BassAsio.Init(device, AsioInitFlags.Thread));
-            BassAsioUtils.OK(BassAsioHandler.Init());
+            else
+            {
+                format = AsioSampleFormat.Bit16;
+            }
+            BassAsioUtils.OK(BassAsio.ChannelSetFormat(false, BassAsioDevice.PRIMARY_CHANNEL, format));
+        }
+
+        private static void InitDSD(int device, int rate, int channels, BassFlags flags)
+        {
+            BassAsioUtils.OK(BassAsio.SetDSD(true));
+            //It looks like BASS DSD always outputs 8 bit/MSB data so we don't need to determine the format.
+            //var format = default(AsioSampleFormat);
+            //switch (this.Depth)
+            //{
+            //    case BassAttribute.DSDFormat_LSB:
+            //        format = AsioSampleFormat.DSD_LSB;
+            //        break;
+            //    case BassAttribute.DSDFormat_None:
+            //    case BassAttribute.DSDFormat_MSB:
+            //        format = AsioSampleFormat.DSD_MSB;
+            //        break;
+            //    default:
+            //        throw new NotImplementedException();
+            //}
+            BassAsioUtils.OK(BassAsio.ChannelSetFormat(false, BassAsioDevice.PRIMARY_CHANNEL, AsioSampleFormat.DSD_MSB));
+        }
+
+        public static void Detect(int device)
+        {
+            if (IsInitialized)
+            {
+                throw new InvalidOperationException("Device is already initialized.");
+            }
+
             IsInitialized = true;
-            var info = default(AsioChannelInfo);
-            BassAsioUtils.OK(BassAsio.ChannelGetInfo(false, PRIMARY_CHANNEL, out info));
-            Device = device;
-            Devices[device] = new BassAsioDeviceInfo(
-                info.Name,
-                Convert.ToInt32(BassAsio.Rate),
-                BassAsio.Info.Inputs,
-                BassAsio.Info.Outputs,
-                GetSupportedRates(),
-                info.Format
-            );
-            LogManager.Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Name => {1}, Inputs => {2}, Outputs = {3}, Rate = {4}, Format = {5}", Device, Info.Name, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(AsioSampleFormat), Info.Format));
-            LogManager.Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Rates => {1}", Device, string.Join(", ", Info.SupportedRates));
+
+            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detecting ASIO device.");
+
+            try
+            {
+                BassAsioUtils.OK(BassAsio.Init(device, AsioInitFlags.Thread));
+                BassAsioUtils.OK(BassAsioHandler.Init());
+                var info = default(AsioChannelInfo);
+                BassAsioUtils.OK(BassAsio.ChannelGetInfo(false, PRIMARY_CHANNEL, out info));
+                Info = new BassAsioDeviceInfo(
+                    device,
+                    Convert.ToInt32(BassAsio.Rate),
+                    BassAsio.Info.Inputs,
+                    BassAsio.Info.Outputs,
+                    GetSupportedRates(),
+                    info.Format
+                );
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", device, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(AsioSampleFormat), Info.Format));
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Rates => {1}", device, string.Join(", ", Info.SupportedRates));
+            }
+            finally
+            {
+                Free();
+            }
+        }
+
+        public static void Reset()
+        {
+            Info = null;
         }
 
         private static IEnumerable<int> GetSupportedRates()
@@ -68,29 +170,72 @@ namespace FoxTunes
             {
                 return;
             }
-            LogManager.Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Releasing BASS ASIO.");
+
+            var flags =
+                AsioChannelResetFlags.Enable |
+                AsioChannelResetFlags.Join |
+                AsioChannelResetFlags.Format |
+                AsioChannelResetFlags.Rate;
+            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Resetting BASS ASIO channel attributes.");
+            for (var channel = 0; channel < Info.Outputs; channel++)
+            {
+                BassAsio.ChannelReset(false, channel, flags);
+            }
+
+            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Releasing BASS ASIO.");
             BassAsio.Free();
             BassAsioHandler.Free();
             IsInitialized = false;
         }
 
-        public static BassAsioDeviceInfo Info
+        public static bool CanControlVolume
         {
             get
             {
-                if (!Devices.ContainsKey(Device))
+                var volume = BassAsio.ChannelGetVolume(false, MASTER_CHANNEL);
+                if (volume == -1)
                 {
-                    return null;
+                    //Device (or driver) does not support this.
+                    return false;
                 }
-                return Devices[Device];
+                else
+                {
+                    return true;
+                }
             }
         }
 
+        public static float Volume
+        {
+            get
+            {
+                var volume = BassAsio.ChannelGetVolume(false, MASTER_CHANNEL);
+                if (volume == -1)
+                {
+                    //100% I suppose.
+                    return 1;
+                }
+                else
+                {
+                    return Convert.ToSingle(volume);
+                }
+            }
+            set
+            {
+                if (!BassAsio.ChannelSetVolume(false, MASTER_CHANNEL, value))
+                {
+                    Logger.Write(typeof(BassAsioDevice), LogLevel.Warn, "Cannot set volume, the device or driver probably doesn't support it.");
+                }
+            }
+        }
+
+        public static BassAsioDeviceInfo Info { get; private set; }
+
         public class BassAsioDeviceInfo
         {
-            public BassAsioDeviceInfo(string name, int rate, int inputs, int outputs, IEnumerable<int> supportedRates, AsioSampleFormat format)
+            public BassAsioDeviceInfo(int device, int rate, int inputs, int outputs, IEnumerable<int> supportedRates, AsioSampleFormat format)
             {
-                this.Name = name;
+                this.Device = device;
                 this.Rate = rate;
                 this.Inputs = inputs;
                 this.Outputs = outputs;
@@ -98,7 +243,7 @@ namespace FoxTunes
                 this.Format = format;
             }
 
-            public string Name { get; private set; }
+            public int Device { get; private set; }
 
             public int Rate { get; private set; }
 
@@ -113,6 +258,20 @@ namespace FoxTunes
             public bool ControlPanel()
             {
                 return BassAsio.ControlPanel();
+            }
+
+            public int GetNearestRate(int rate)
+            {
+                //Find the closest supported rate.
+                foreach (var supportedRate in this.SupportedRates)
+                {
+                    if (supportedRate >= rate)
+                    {
+                        return supportedRate;
+                    }
+                }
+                //Ah. The minimum supported rate is not enough.
+                return this.SupportedRates.LastOrDefault();
             }
         }
     }
