@@ -375,7 +375,7 @@ namespace FoxTunes
                 {
                     if (pipeline != null)
                     {
-                        if (pipeline.Input.CheckFormat(outputStream.Rate, outputStream.Channels))
+                        if (pipeline.Input.CheckFormat(outputStream.ChannelHandle))
                         {
                             if (pipeline.Input.Add(outputStream.ChannelHandle))
                             {

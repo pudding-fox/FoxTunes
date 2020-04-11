@@ -88,8 +88,20 @@ namespace FoxTunes
             }
         }
 
-        public override bool CheckFormat(int rate, int channels)
+        public override bool CheckFormat(int channelHandle)
         {
+            var rate = default(int);
+            var channels = default(int);
+            if (BassUtils.GetChannelDsdRaw(channelHandle))
+            {
+                rate = BassUtils.GetChannelDsdRate(channelHandle);
+                channels = BassUtils.GetChannelCount(channelHandle);
+            }
+            else
+            {
+                rate = BassUtils.GetChannelPcmRate(channelHandle);
+                channels = BassUtils.GetChannelCount(channelHandle);
+            }
             return this.Rate == rate && this.Channels == channels;
         }
 

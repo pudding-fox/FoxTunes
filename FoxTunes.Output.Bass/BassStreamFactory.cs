@@ -9,10 +9,6 @@ namespace FoxTunes
 {
     public class BassStreamFactory : StandardComponent, IBassStreamFactory
     {
-        const int CREATE_ATTEMPTS = 5;
-
-        const int CREATE_ATTEMPT_INTERVAL = 400;
-
         public BassStreamFactory()
         {
             this.Semaphore = new SemaphoreSlim(1, 1);
@@ -66,25 +62,21 @@ namespace FoxTunes
                 foreach (var provider in this.GetProviders(playlistItem))
                 {
                     Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
-                    for (var attempt = 0; attempt < CREATE_ATTEMPTS; attempt++)
+                    var channelHandle = await provider.CreateStream(playlistItem).ConfigureAwait(false);
+                    if (channelHandle != 0)
                     {
-                        var channelHandle = await provider.CreateStream(playlistItem).ConfigureAwait(false);
-                        if (channelHandle != 0)
+                        Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
+                        return new BassStream(provider, channelHandle);
+                    }
+                    else
+                    {
+                        if (Bass.LastError == Errors.Already)
                         {
-                            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
-                            return new BassStream(provider, channelHandle);
-                        }
-                        else
-                        {
-                            if (Bass.LastError == Errors.Already)
+                            if (!immidiate || !this.FreeActiveStreams())
                             {
-                                if (!immidiate || !this.FreeActiveStreams())
-                                {
-                                    return BassStream.Empty;
-                                }
+                                return BassStream.Empty;
                             }
                         }
-                        Thread.Sleep(CREATE_ATTEMPT_INTERVAL);
                     }
                     Logger.Write(this, LogLevel.Warn, "The bass stream provider failed.");
                 }
