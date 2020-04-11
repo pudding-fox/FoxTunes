@@ -35,7 +35,7 @@ namespace FoxTunes
                 .WithElement(
                     new TextConfigurationElement(DESTINATION_LOCATION_ELEMENT, "Location").WithValue(
                         Path.Combine(
-                            ComponentScanner.Instance.Location,
+                            Publication.StoragePath,
                             "Converter"
                         )
                     ).WithFlags(ConfigurationElementFlags.FolderName)
