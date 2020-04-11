@@ -2,18 +2,16 @@
 using ManagedBass;
 using ManagedBass.Sox;
 using System;
+using System.Linq;
 
 namespace FoxTunes
 {
     public class BassResamplerStreamComponent : BassStreamComponent, IBassStreamControllable
     {
-        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, BassOutputStream stream)
+        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
         {
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                throw new InvalidOperationException("Cannot resample DSD streams.");
-            }
             this.Behaviour = behaviour;
+            this.Query = query;
             this.Rate = behaviour.Output.Rate;
             this.Channels = stream.Channels;
             this.Flags = BassFlags.Decode;
@@ -46,6 +44,8 @@ namespace FoxTunes
         }
 
         public BassResamplerStreamComponentBehaviour Behaviour { get; private set; }
+
+        public IBassStreamPipelineQueryResult Query { get; private set; }
 
         public int InputRate { get; protected set; }
 
@@ -212,8 +212,18 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            Logger.Write(this, LogLevel.Debug, "Creating BASS SOX stream with rate {0} => {1} and {2} channels.", previous.Rate, this.Rate, this.Channels);
             this.InputRate = previous.Rate;
+            if (this.Behaviour.Output.EnforceRate)
+            {
+                //Rate is enforced.
+                this.Rate = this.Behaviour.Output.Rate;
+            }
+            else
+            {
+                //We already established that the output does not support the stream rate so use the closest one.
+                this.Rate = this.Query.GetNearestRate(previous.Rate);
+            }
+            Logger.Write(this, LogLevel.Debug, "Creating BASS SOX stream with rate {0} => {1} and {2} channels.", previous.Rate, this.Rate, this.Channels);
             this.ChannelHandle = BassSox.StreamCreate(this.Rate, this.Flags, previous.ChannelHandle);
             if (this.ChannelHandle == 0)
             {
@@ -294,6 +304,27 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS SOX stream: {0}", this.ChannelHandle);
                 BassUtils.OK(BassSox.StreamFree(this.ChannelHandle));
             }
+        }
+
+        public static bool ShouldCreateResampler(BassResamplerStreamComponentBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
+        {
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
+            {
+                //Cannot resample DSD.
+                return false;
+            }
+            if (behaviour.Output.EnforceRate && behaviour.Output.Rate != stream.Rate)
+            {
+                //Rate is enforced and not equal to the stream rate.
+                return true;
+            }
+            if (!query.OutputRates.Contains(stream.Rate))
+            {
+                //Output does not support the stream rate.
+                return true;
+            }
+            //Something else.
+            return false;
         }
     }
 }
