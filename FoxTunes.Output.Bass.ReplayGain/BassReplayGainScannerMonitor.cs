@@ -43,7 +43,7 @@ namespace FoxTunes
 
         protected virtual async Task Monitor(Task task)
         {
-            await this.SetName("Converting files").ConfigureAwait(false);
+            await this.SetName("Scanning files").ConfigureAwait(false);
             while (!task.IsCompleted)
             {
                 if (this.CancellationToken.IsCancellationRequested)
@@ -59,7 +59,7 @@ namespace FoxTunes
                 var builder = new StringBuilder();
                 foreach (var scannerItem in this.Scanner.ScannerItems)
                 {
-                    this.UpdateStatus(scannerItem);
+                    this.ScannerItems[scannerItem.Id] = scannerItem;
                     position += scannerItem.Progress;
                     count += ScannerItem.PROGRESS_COMPLETE;
                     if (scannerItem.Status == ScannerItemStatus.Processing)
@@ -98,28 +98,6 @@ namespace FoxTunes
 #endif
             }
         }
-
-        protected virtual void UpdateStatus(ScannerItem scannerItem)
-        {
-            var currentScannerItem = default(ScannerItem);
-            if (this.ScannerItems.TryGetValue(scannerItem.Id, out currentScannerItem) && currentScannerItem.Status != scannerItem.Status)
-            {
-                Logger.Write(this, LogLevel.Debug, "Scanner status changed for file \"{0}\": {1}", scannerItem.FileName, Enum.GetName(typeof(ScannerItemStatus), scannerItem.Status));
-                this.OnStatusChanged(scannerItem);
-            }
-            this.ScannerItems[scannerItem.Id] = scannerItem;
-        }
-
-        protected virtual void OnStatusChanged(ScannerItem scannerItem)
-        {
-            if (this.StatusChanged == null)
-            {
-                return;
-            }
-            this.StatusChanged(this, new BassScannerMonitorEventArgs(scannerItem));
-        }
-
-        public event BassScannerMonitorEventHandler StatusChanged;
     }
 
     public delegate void BassScannerMonitorEventHandler(object sender, BassScannerMonitorEventArgs e);

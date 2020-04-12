@@ -19,6 +19,9 @@
     <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.Fx.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.ReplayGain" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\ManagedBass.ReplayGain.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -28,10 +31,19 @@
     <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.Fx.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.ReplayGain" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\ManagedBass.ReplayGain.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\lib\bass_replay_gain.dll" Link="bass_replay_gain.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

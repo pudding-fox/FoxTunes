@@ -6,18 +6,40 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassReplayGainScannerBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent
+    public class BassReplayGainScannerBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
     {
-        public const string SCAN = "HHHH";
+        public const string SCAN_TRACKS = "HHHH";
+
+        public const string SCAN_ALBUMS = "IIII";
+
+        public const string CLEAR = "JJJJ";
 
         public ICore Core { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IMetaDataManager MetaDataManager { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement Enabled { get; private set; }
+
+        public BooleanConfigurationElement WriteTags { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
+            this.MetaDataManager = core.Managers.MetaData;
+            this.Configuration = core.Components.Configuration;
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassReplayGainBehaviourConfiguration.ENABLED
+            );
+            this.WriteTags = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassReplayGainScannerBehaviourConfiguration.WRITE_TAGS
+            );
             base.InitializeComponent(core);
         }
 
@@ -25,9 +47,14 @@ namespace FoxTunes
         {
             get
             {
-                if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                if (this.Enabled.Value)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SCAN, "Scan", path: "Replay Gain");
+                    if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SCAN_TRACKS, "Scan Tracks", path: "Replay Gain");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SCAN_ALBUMS, "Scan Albums", path: "Replay Gain");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR, "Clear Data", path: "Replay Gain");
+                    }
                 }
             }
         }
@@ -36,8 +63,12 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case SCAN:
-                    return this.Scan();
+                case SCAN_TRACKS:
+                    return this.Scan(ReplayGainMode.Track);
+                case SCAN_ALBUMS:
+                    return this.Scan(ReplayGainMode.Album);
+                case CLEAR:
+                    return this.Clear();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -46,7 +77,12 @@ namespace FoxTunes
 #endif
         }
 
-        public Task Scan()
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return BassReplayGainScannerBehaviourConfiguration.GetConfigurationSections();
+        }
+
+        public Task Scan(ReplayGainMode mode)
         {
             if (this.PlaylistManager.SelectedItems == null)
             {
@@ -65,18 +101,45 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Scan(playlistItems);
+            return this.Scan(playlistItems, mode);
         }
 
-        public async Task Scan(PlaylistItem[] playlistItems)
+        public async Task Scan(PlaylistItem[] playlistItems, ReplayGainMode mode)
         {
-            using (var task = new ScanPlaylistItemsTask(this, playlistItems))
+            using (var task = new ScanPlaylistItemsTask(this, playlistItems, mode))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport(task.ScannerItems);
+                this.OnReport(playlistItems, task.ScannerItems);
             }
+        }
+
+        public Task Clear()
+        {
+            if (this.PlaylistManager.SelectedItems == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            var playlistItems = this.PlaylistManager.SelectedItems.ToArray();
+            if (!playlistItems.Any())
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            return this.Clear(playlistItems);
+        }
+
+        public async Task Clear(PlaylistItem[] playlistItems)
+        {
+            throw new NotImplementedException();
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
@@ -90,9 +153,9 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        protected virtual void OnReport(ScannerItem[] scannerItems)
+        protected virtual void OnReport(PlaylistItem[] playlistItems, ScannerItem[] scannerItems)
         {
-            var report = new BassReplayGainScannerReport(scannerItems);
+            var report = new BassReplayGainScannerReport(playlistItems, scannerItems);
             report.InitializeComponent(this.Core);
             this.OnReport(report);
         }
@@ -119,13 +182,13 @@ namespace FoxTunes
                 this.CancellationToken = new CancellationToken();
             }
 
-            public ScanPlaylistItemsTask(BassReplayGainScannerBehaviour behaviour, PlaylistItem[] playlistItems) : this()
+            public ScanPlaylistItemsTask(BassReplayGainScannerBehaviour behaviour, PlaylistItem[] playlistItems, ReplayGainMode mode) : this()
             {
                 this.Behaviour = behaviour;
                 this.PlaylistItems = playlistItems;
                 this.ScannerItems = playlistItems
                     .OrderBy(playlistItem => playlistItem.FileName)
-                    .Select(playlistItem => ScannerItem.FromPlaylistItem(playlistItem))
+                    .Select(playlistItem => ScannerItem.FromPlaylistItem(playlistItem, mode))
                     .ToArray();
             }
 
@@ -169,34 +232,91 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Starting scanner.");
                     using (var monitor = new BassReplayGainScannerMonitor(scanner, this.Visible, this.CancellationToken))
                     {
-                        monitor.StatusChanged += this.OnStatusChanged;
-                        try
-                        {
-                            await this.WithSubTask(monitor,
-                                async () => await monitor.Scan().ConfigureAwait(false)
-                            ).ConfigureAwait(false);
-                        }
-                        finally
-                        {
-                            monitor.StatusChanged -= this.OnStatusChanged;
-                        }
+                        await this.WithSubTask(monitor,
+                            async () => await monitor.Scan().ConfigureAwait(false)
+                        ).ConfigureAwait(false);
                         this.ScannerItems = monitor.ScannerItems.Values.ToArray();
+
                     }
                 }
                 Logger.Write(this, LogLevel.Debug, "Scanner completed successfully.");
             }
 
-            protected virtual void OnStatusChanged(object sender, BassScannerMonitorEventArgs e)
+            protected override async Task OnCompleted()
             {
-                if (e.ScannerItem.Status == ScannerItemStatus.Complete)
-                {
-                    var task = this.CopyTags(e.ScannerItem);
-                }
+                await base.OnCompleted().ConfigureAwait(false);
+                await this.WriteTags().ConfigureAwait(false);
             }
 
-            protected virtual async Task CopyTags(ScannerItem scannerItem)
+            protected virtual async Task WriteTags()
             {
-                throw new NotImplementedException();
+                var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var scannerItem in this.ScannerItems)
+                {
+                    if (scannerItem.Status != ScannerItemStatus.Complete)
+                    {
+                        continue;
+                    }
+                    var playlistItem = this.GetPlaylistItem(scannerItem);
+                    lock (playlistItem.MetaDatas)
+                    {
+                        var metaDatas = playlistItem.MetaDatas.ToDictionary(
+                            element => element.Name,
+                            StringComparer.OrdinalIgnoreCase
+                        );
+                        var metaDataItem = default(MetaDataItem);
+                        if (scannerItem.GroupGain != 0)
+                        {
+                            if (!metaDatas.TryGetValue(CommonMetaData.ReplayGainAlbumGain, out metaDataItem))
+                            {
+                                metaDataItem = new MetaDataItem(CommonMetaData.ReplayGainAlbumGain, MetaDataItemType.Tag);
+                                playlistItem.MetaDatas.Add(metaDataItem);
+                            }
+                            metaDataItem.Value = Convert.ToString(scannerItem.GroupGain);
+                            names.Add(CommonMetaData.ReplayGainAlbumGain);
+                        }
+                        if (scannerItem.GroupPeak != 0)
+                        {
+                            if (!metaDatas.TryGetValue(CommonMetaData.ReplayGainAlbumPeak, out metaDataItem))
+                            {
+                                metaDataItem = new MetaDataItem(CommonMetaData.ReplayGainAlbumPeak, MetaDataItemType.Tag);
+                                playlistItem.MetaDatas.Add(metaDataItem);
+                            }
+                            metaDataItem.Value = Convert.ToString(scannerItem.ItemPeak);
+                            names.Add(CommonMetaData.ReplayGainAlbumPeak);
+                        }
+                        if (scannerItem.ItemGain != 0)
+                        {
+                            if (!metaDatas.TryGetValue(CommonMetaData.ReplayGainTrackGain, out metaDataItem))
+                            {
+                                metaDataItem = new MetaDataItem(CommonMetaData.ReplayGainTrackGain, MetaDataItemType.Tag);
+                                playlistItem.MetaDatas.Add(metaDataItem);
+                            }
+                            metaDataItem.Value = Convert.ToString(scannerItem.ItemGain);
+                            names.Add(CommonMetaData.ReplayGainTrackGain);
+                        }
+                        if (scannerItem.ItemPeak != 0)
+                        {
+                            if (!metaDatas.TryGetValue(CommonMetaData.ReplayGainTrackPeak, out metaDataItem))
+                            {
+                                metaDataItem = new MetaDataItem(CommonMetaData.ReplayGainTrackPeak, MetaDataItemType.Tag);
+                                playlistItem.MetaDatas.Add(metaDataItem);
+                            }
+                            metaDataItem.Value = Convert.ToString(scannerItem.ItemPeak);
+                            names.Add(CommonMetaData.ReplayGainTrackPeak);
+                        }
+                    }
+                }
+                if (!names.Any())
+                {
+                    //Nothing changed. Probably all tracks failed.
+                    return;
+                }
+                await this.Behaviour.MetaDataManager.Save(
+                    this.PlaylistItems,
+                    this.Behaviour.WriteTags.Value,
+                    names.ToArray()
+                ).ConfigureAwait(false);
             }
 
             protected virtual PlaylistItem GetPlaylistItem(ScannerItem scannerItem)

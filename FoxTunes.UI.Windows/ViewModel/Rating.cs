@@ -194,7 +194,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnMetaDataItemValueChanged(object sender, EventArgs e)
         {
-            var task = Windows.Invoke(this.Refresh);
+            var task = Windows.Invoke(new Action(this.Refresh));
         }
 
         public IFileData FileData

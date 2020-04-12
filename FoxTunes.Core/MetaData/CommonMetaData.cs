@@ -34,7 +34,9 @@ namespace FoxTunes
         public const string PlayCount = "PlayCount";
         public const string Rating = "Rating";
         public const string ReplayGainAlbumGain = "ReplayGainAlbumGain";
+        public const string ReplayGainAlbumPeak = "ReplayGainAlbumPeak";
         public const string ReplayGainTrackGain = "ReplayGainTrackGain";
+        public const string ReplayGainTrackPeak = "ReplayGainTrackPeak";
         public const string Title = "Title";
         public const string Track = "Track";
         public const string TrackCount = "TrackCount";

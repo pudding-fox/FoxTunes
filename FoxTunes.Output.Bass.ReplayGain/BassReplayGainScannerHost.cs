@@ -88,18 +88,18 @@ namespace FoxTunes
                     using (var scanner = new BassReplayGainScanner(scannerItems))
                     {
                         scanner.InitializeComponent(core);
-                        Encode(scanner, input, output, error);
+                        Scan(scanner, input, output, error);
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Failed to encode items: {0}", e.Message);
+                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Failed to scan items: {0}", e.Message);
                     throw;
                 }
             }
         }
 
-        private static void Encode(IBassReplayGainScanner scanner, Stream input, Stream output, Stream error)
+        private static void Scan(IBassReplayGainScanner scanner, Stream input, Stream output, Stream error)
         {
             var thread1 = new Thread(() =>
             {
