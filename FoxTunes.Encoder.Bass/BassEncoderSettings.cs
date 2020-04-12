@@ -67,8 +67,6 @@ namespace FoxTunes
 
         public string SpecificFolder { get; private set; }
 
-        public bool CopyTags { get; private set; }
-
         public int Threads { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -82,10 +80,6 @@ namespace FoxTunes
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.DESTINATION_LOCATION_ELEMENT
             ).ConnectValue(value => this.SpecificFolder = value);
-            core.Components.Configuration.GetElement<BooleanConfigurationElement>(
-                BassEncoderBehaviourConfiguration.SECTION,
-                BassEncoderBehaviourConfiguration.COPY_TAGS
-            ).ConnectValue(value => this.CopyTags = value);
             core.Components.Configuration.GetElement<IntegerConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.THREADS_ELEMENT

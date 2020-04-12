@@ -222,7 +222,10 @@ namespace FoxTunes
             {
                 if (e.EncoderItem.Status == EncoderItemStatus.Complete)
                 {
-                    var task = this.CopyTags(e.EncoderItem);
+                    if (this.Behaviour.CopyTags.Value)
+                    {
+                        var task = this.CopyTags(e.EncoderItem);
+                    }
                 }
             }
 
