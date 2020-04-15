@@ -137,9 +137,35 @@ namespace FoxTunes
             return this.Clear(playlistItems);
         }
 
-        public async Task Clear(PlaylistItem[] playlistItems)
+        public Task Clear(PlaylistItem[] playlistItems)
         {
-            throw new NotImplementedException();
+            var names = new[]
+            {
+                CommonMetaData.ReplayGainAlbumGain,
+                CommonMetaData.ReplayGainAlbumPeak,
+                CommonMetaData.ReplayGainTrackGain,
+                CommonMetaData.ReplayGainTrackPeak
+            };
+            foreach (var playlistItem in playlistItems)
+            {
+                lock (playlistItem.MetaDatas)
+                {
+                    foreach (var metaDataItem in playlistItem.MetaDatas)
+                    {
+                        if (!names.Contains(metaDataItem.Name, true))
+                        {
+                            continue;
+                        }
+                        //This will be converted to NaN when written.
+                        metaDataItem.Value = string.Empty;
+                    }
+                }
+            }
+            return this.MetaDataManager.Save(
+               playlistItems,
+               this.WriteTags.Value,
+               names.ToArray()
+            );
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
