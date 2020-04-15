@@ -11,6 +11,11 @@ namespace FoxTunes
 {
     public class BassEncoder : BaseComponent, IBassEncoder
     {
+        static BassEncoder()
+        {
+            BassPluginLoader.Instance.Load();
+        }
+
         private BassEncoder()
         {
             this.CancellationToken = new CancellationToken();
