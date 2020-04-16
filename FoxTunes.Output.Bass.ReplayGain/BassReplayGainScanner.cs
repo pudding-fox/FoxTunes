@@ -173,6 +173,8 @@ namespace FoxTunes
             }
             else
             {
+                Logger.Write(this, LogLevel.Warn, "Scanning file \"{0}\" failed: The format is likely not supported.", scannerItem.FileName);
+                scannerItem.AddError("The format is likely not supported.");
                 scannerItem.Status = ScannerItemStatus.Failed;
             }
         }
@@ -279,7 +281,8 @@ namespace FoxTunes
                     }
                     else
                     {
-                        Logger.Write(this, LogLevel.Warn, "Scanning file \"{0}\" failed: Unknown error.", scannerItem.FileName);
+                        Logger.Write(this, LogLevel.Warn, "Scanning file \"{0}\" failed: The format is likely not supported.", scannerItem.FileName);
+                        scannerItem.AddError("The format is likely not supported.");
                         scannerItem.Status = ScannerItemStatus.Failed;
                     }
                 }
