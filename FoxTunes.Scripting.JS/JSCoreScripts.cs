@@ -92,6 +92,39 @@ namespace FoxTunes
             }
         }
 
+
+        public string ReplayGainAlbumGain
+        {
+            get
+            {
+                return Resources.ReplayGainAlbumGain;
+            }
+        }
+
+        public string ReplayGainAlbumPeak
+        {
+            get
+            {
+                return Resources.ReplayGainAlbumPeak;
+            }
+        }
+
+        public string ReplayGainTrackGain
+        {
+            get
+            {
+                return Resources.ReplayGainTrackGain;
+            }
+        }
+
+        public string ReplayGainTrackPeak
+        {
+            get
+            {
+                return Resources.ReplayGainTrackPeak;
+            }
+        }
+
         public static ICoreScripts Instance = new JSCoreScripts();
     }
 }
