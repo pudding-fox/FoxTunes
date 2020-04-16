@@ -28,11 +28,18 @@ namespace FoxTunes
 
         new public bool IsInitialized { get; private set; }
 
+        private bool _Enabled { get; set; }
+
         public bool Enabled
         {
             get
             {
-                return this.CdDrive != BassCdStreamProviderBehaviourConfiguration.CD_NO_DRIVE;
+                return this._Enabled;
+            }
+            set
+            {
+                this._Enabled = value;
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
             }
         }
 
@@ -48,8 +55,6 @@ namespace FoxTunes
             {
                 this._CdDrive = value;
                 Logger.Write(this, LogLevel.Debug, "CD Drive = {0}", this.CdDrive);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
             }
         }
 
@@ -92,6 +97,10 @@ namespace FoxTunes
             this.DoorMonitor = ComponentRegistry.Instance.GetComponent<CdDoorMonitor>();
             this.DoorMonitor.StateChanged += this.OnStateChanged;
             this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassCdStreamProviderBehaviourConfiguration.SECTION,
+                BassCdStreamProviderBehaviourConfiguration.ENABLED_ELEMENT
+            ).ConnectValue(value => this.Enabled = value);
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.DRIVE_ELEMENT
@@ -109,7 +118,7 @@ namespace FoxTunes
 
         protected virtual void OnInit(object sender, EventArgs e)
         {
-            if (!this.Enabled)
+            if (!this.Enabled || this.CdDrive == BassCdStreamProviderBehaviourConfiguration.CD_NO_DRIVE)
             {
                 return;
             }
@@ -155,7 +164,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled)
+                if (this.Enabled && this.CdDrive != BassCdStreamProviderBehaviourConfiguration.CD_NO_DRIVE)
                 {
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, "Open CD");
                 }
