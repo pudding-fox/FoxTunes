@@ -303,10 +303,6 @@ namespace FoxTunes
             }
             foreach (var scannerItem in group.Keys)
             {
-                if (scannerItem.Status != ScannerItemStatus.Processing)
-                {
-                    continue;
-                }
                 var stream = group[scannerItem];
                 foreach (var item in info.items)
                 {
