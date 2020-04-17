@@ -105,6 +105,14 @@ namespace FoxTunes
             }
         }
 
+        public IMetaDataSynchronizer MetaDataSynchronizer
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IMetaDataSynchronizer>();
+            }
+        }
+
         public IPlaylistBrowser PlaylistBrowser
         {
             get

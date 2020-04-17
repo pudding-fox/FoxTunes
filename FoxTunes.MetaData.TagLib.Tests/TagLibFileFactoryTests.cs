@@ -63,8 +63,8 @@ namespace FoxTunes.MetaData.TagLib.Tests
                     Value = rating
                 }
             };
-            await metaDataSource.SetMetaData(fileName, metaData, null);
-            await CanReadXtraBox(fileName, rating);
+            await metaDataSource.SetMetaData(fileName, metaData, null).ConfigureAwait(false);
+            await this.CanReadXtraBox(fileName, rating).ConfigureAwait(false);
         }
 
         [Test]

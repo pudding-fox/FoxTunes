@@ -22,6 +22,8 @@ namespace FoxTunes.Interfaces
 
         bool IsSupported(string fileName);
 
+        bool IsLoaded(string fileName);
+
         Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate);
 
         event OutputStreamEventHandler Loaded;

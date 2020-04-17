@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class UpdatePlaylistRatingTask : PlaylistTaskBase
+    public class UpdatePlaylistRatingTask : BackgroundTask
     {
-        public UpdatePlaylistRatingTask(IEnumerable<PlaylistItem> playlistItems, byte rating)
+        public const string ID = "7713A9E4-99DF-43A3-A66A-642B6F5C2761";
+
+        public UpdatePlaylistRatingTask(IEnumerable<PlaylistItem> playlistItems, byte rating) : base(ID)
         {
             this.PlaylistItems = playlistItems;
             this.Rating = rating;
@@ -20,9 +22,12 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
@@ -51,7 +56,7 @@ namespace FoxTunes
                 //Send a soft playlist update so the list refreshes, this makes the task seem more responsive.
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
             }
-            await this.MetaDataManager.Save(this.PlaylistItems, true, CommonMetaData.Rating).ConfigureAwait(false);
+            await this.MetaDataManager.Save(this.PlaylistItems, true, false, CommonMetaData.Rating).ConfigureAwait(false);
         }
     }
 }

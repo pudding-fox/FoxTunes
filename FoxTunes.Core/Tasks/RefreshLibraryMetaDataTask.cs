@@ -114,7 +114,7 @@ namespace FoxTunes
                 }
 
                 //Update the import date otherwise the file might be re-scanned and changes lost.
-                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow, transaction);
+                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow, transaction).ConfigureAwait(false);
 
                 if (transaction.HasTransaction)
                 {
@@ -125,7 +125,10 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            this.Database.Dispose();
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
             base.OnDisposing();
         }
     }

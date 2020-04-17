@@ -26,6 +26,8 @@
 
         IMetaDataCache MetaDataCache { get; }
 
+        IMetaDataSynchronizer MetaDataSynchronizer { get; }
+
         IPlaylistBrowser PlaylistBrowser { get; }
 
         IPlaylistCache PlaylistCache { get; }

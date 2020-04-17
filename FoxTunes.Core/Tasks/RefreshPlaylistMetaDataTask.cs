@@ -160,7 +160,7 @@ namespace FoxTunes
                 {
                     Id = playlistItem.LibraryItem_Id.Value
                 };
-                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow, transaction);
+                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow, transaction).ConfigureAwait(false);
 
                 if (transaction.HasTransaction)
                 {
@@ -177,7 +177,10 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            this.Database.Dispose();
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
             base.OnDisposing();
         }
     }

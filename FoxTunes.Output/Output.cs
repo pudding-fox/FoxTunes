@@ -46,6 +46,8 @@ namespace FoxTunes
 
         public abstract bool IsSupported(string fileName);
 
+        public abstract bool IsLoaded(string fileName);
+
         public abstract Task Start();
 
         public abstract Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate);

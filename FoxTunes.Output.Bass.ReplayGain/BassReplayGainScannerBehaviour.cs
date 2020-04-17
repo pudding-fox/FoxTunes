@@ -167,8 +167,9 @@ namespace FoxTunes
             await this.MetaDataManager.Save(
                playlistItems,
                this.WriteTags.Value,
+               false,
                names.ToArray()
-            );
+            ).ConfigureAwait(false);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
         }
 
@@ -348,6 +349,7 @@ namespace FoxTunes
                 await this.Behaviour.MetaDataManager.Save(
                     this.PlaylistItems,
                     this.Behaviour.WriteTags.Value,
+                    false,
                     names.ToArray()
                 ).ConfigureAwait(false);
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);

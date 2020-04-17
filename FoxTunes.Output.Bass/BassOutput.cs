@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -346,6 +347,11 @@ namespace FoxTunes
         {
             var extension = fileName.GetExtension();
             return BassUtils.IsSupported(extension);
+        }
+
+        public override bool IsLoaded(string fileName)
+        {
+            return this.IsStarted && BassOutputStream.IsActive(fileName);
         }
 
         public override async Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate)

@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class UpdatePlaylistPlayCountTask : PlaylistTaskBase
+    public class UpdatePlaylistPlayCountTask : BackgroundTask
     {
+        public const string ID = "3489F57E-0C2D-48EC-AD28-A5C1F9167778";
+
         public const string DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
-        public UpdatePlaylistPlayCountTask(PlaylistItem playlistItem)
+        public UpdatePlaylistPlayCountTask(PlaylistItem playlistItem) : base(ID)
         {
             this.PlaylistItem = playlistItem;
         }
@@ -52,6 +54,7 @@ namespace FoxTunes
             await this.MetaDataManager.Save(
                 new[] { this.PlaylistItem },
                 write,
+                false,
                 CommonMetaData.PlayCount,
                 CommonMetaData.LastPlayed
             ).ConfigureAwait(false);

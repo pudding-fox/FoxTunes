@@ -12,10 +12,16 @@ namespace FoxTunes
 
         static BassOutputStream()
         {
-            ActiveStreams = new ConcurrentDictionary<PlaylistItem, BassOutputStream>();
+            ActiveStreams = new ConcurrentDictionary<string, BassOutputStream>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public static ConcurrentDictionary<PlaylistItem, BassOutputStream> ActiveStreams { get; private set; }
+        public static ConcurrentDictionary<string, BassOutputStream> ActiveStreams { get; private set; }
+
+        public static bool IsActive(string fileName)
+        {
+            var stream = default(BassOutputStream);
+            return ActiveStreams.TryGetValue(fileName, out stream);
+        }
 
         public BassOutputStream(IBassOutput output, IBassStreamPipelineManager manager, IBassStreamProvider provider, PlaylistItem playlistItem, int channelHandle)
             : base(playlistItem)
@@ -24,7 +30,7 @@ namespace FoxTunes
             this.Manager = manager;
             this.Provider = provider;
             this.ChannelHandle = channelHandle;
-            if (!ActiveStreams.TryAdd(playlistItem, this))
+            if (!ActiveStreams.TryAdd(playlistItem.FileName, this))
             {
                 //TODO: Warn.
             }
@@ -281,7 +287,7 @@ namespace FoxTunes
             }
             finally
             {
-                if (!ActiveStreams.TryRemove(this.PlaylistItem))
+                if (!ActiveStreams.TryRemove(this.PlaylistItem.FileName))
                 {
                     //TODO: Warn.
                 }
