@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes.Encoder.Bass.Tests
 {
@@ -9,8 +10,14 @@ namespace FoxTunes.Encoder.Bass.Tests
         [Test]
         public async Task CanEncodePlaylistItems()
         {
+            var profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>().Select(
+                settings => settings.Name
+            ).ToArray();
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
-            await behaviour.Encode(TestInfo.PlaylistItems).ConfigureAwait(false);
+            foreach (var profile in profiles)
+            {
+                await behaviour.Encode(TestInfo.PlaylistItems, profile).ConfigureAwait(false);
+            }
         }
     }
 }

@@ -46,10 +46,11 @@ namespace FoxTunes
             Bass.Init(Bass.NoSoundDevice);
             try
             {
-                Logger.Write(this, LogLevel.Debug, "Fetching settings.");
-                var factory = ComponentRegistry.Instance.GetComponent<BassEncoderSettingsFactory>();
-                var settings = factory.CreateSettings();
-                this.Encode(settings);
+                var threads = ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<IntegerConfigurationElement>(
+                    BassEncoderBehaviourConfiguration.SECTION,
+                    BassEncoderBehaviourConfiguration.THREADS_ELEMENT
+                );
+                this.Encode(threads.Value);
             }
             finally
             {
@@ -58,11 +59,11 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void Encode(IBassEncoderSettings settings)
+        protected virtual void Encode(int threads)
         {
-            if (settings.Threads > 1)
+            if (threads > 1)
             {
-                Logger.Write(this, LogLevel.Debug, "Beginning parallel encoding with {0} threads.", settings.Threads);
+                Logger.Write(this, LogLevel.Debug, "Beginning parallel encoding with {0} threads.", threads);
             }
             else
             {
@@ -70,12 +71,13 @@ namespace FoxTunes
             }
             var parallelOptions = new ParallelOptions()
             {
-                MaxDegreeOfParallelism = settings.Threads
+                MaxDegreeOfParallelism = threads
             };
             Parallel.ForEach(this.EncoderItems, parallelOptions, encoderItem =>
             {
                 try
                 {
+                    var settings = ComponentRegistry.Instance.GetComponent<BassEncoderSettingsFactory>().CreateSettings(encoderItem.Profile);
                     if (this.CancellationToken.IsCancellationRequested)
                     {
                         Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to cancellation.", encoderItem.InputFileName);

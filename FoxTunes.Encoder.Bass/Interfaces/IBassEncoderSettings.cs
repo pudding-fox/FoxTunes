@@ -14,8 +14,6 @@ namespace FoxTunes
 
         IBassEncoderFormat Format { get; }
 
-        int Threads { get; }
-
         void InitializeComponent(ICore core);
 
         bool TryGetOutput(string inputFileName, out string outputFileName);

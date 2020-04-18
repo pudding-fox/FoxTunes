@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public IEnumerable<string> Profiles { get; private set; }
+
         public BooleanConfigurationElement Enabled { get; private set; }
 
         public BooleanConfigurationElement CopyTags { get; private set; }
@@ -24,6 +26,9 @@ namespace FoxTunes
         {
             this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
+            this.Profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>().Select(
+                settings => settings.Name
+            ).ToArray();
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
@@ -44,7 +49,10 @@ namespace FoxTunes
                 {
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, "Convert");
+                        foreach (var profile in this.Profiles)
+                        {
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, profile, path: "Convert");
+                        }
                     }
                 }
             }
@@ -55,7 +63,7 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case ENCODE:
-                    return this.Encode();
+                    return this.Encode(component.Name);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -69,7 +77,7 @@ namespace FoxTunes
             return BassEncoderBehaviourConfiguration.GetConfigurationSections();
         }
 
-        public Task Encode()
+        public Task Encode(string profile)
         {
             if (this.PlaylistManager.SelectedItems == null)
             {
@@ -88,12 +96,12 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Encode(playlistItems);
+            return this.Encode(playlistItems, profile);
         }
 
-        public async Task Encode(PlaylistItem[] playlistItems)
+        public async Task Encode(PlaylistItem[] playlistItems, string profile)
         {
-            using (var task = new EncodePlaylistItemsTask(this, playlistItems))
+            using (var task = new EncodePlaylistItemsTask(this, playlistItems, profile))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -142,13 +150,13 @@ namespace FoxTunes
                 this.CancellationToken = new CancellationToken();
             }
 
-            public EncodePlaylistItemsTask(BassEncoderBehaviour behaviour, PlaylistItem[] playlistItems) : this()
+            public EncodePlaylistItemsTask(BassEncoderBehaviour behaviour, PlaylistItem[] playlistItems, string profile) : this()
             {
                 this.Behaviour = behaviour;
                 this.PlaylistItems = playlistItems;
                 this.EncoderItems = playlistItems
                     .OrderBy(playlistItem => playlistItem.FileName)
-                    .Select(playlistItem => EncoderItem.FromPlaylistItem(playlistItem))
+                    .Select(playlistItem => EncoderItem.FromPlaylistItem(playlistItem, profile))
                     .ToArray();
             }
 
