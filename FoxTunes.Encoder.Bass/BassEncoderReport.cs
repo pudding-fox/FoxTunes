@@ -40,7 +40,11 @@ namespace FoxTunes
         protected virtual string GetDescription(EncoderItem encoderItem)
         {
             var builder = new StringBuilder();
-            builder.AppendFormat("{0} -> {1}", encoderItem.InputFileName, encoderItem.OutputFileName);
+            builder.AppendFormat(
+                "{0} -> {1}",
+                encoderItem.InputFileName,
+                !string.IsNullOrEmpty(encoderItem.OutputFileName) ? encoderItem.OutputFileName : "<Cancelled>"
+            );
             if (encoderItem.Status != EncoderItemStatus.Complete && encoderItem.Errors.Any())
             {
                 builder.Append(Environment.NewLine);
@@ -114,14 +118,24 @@ namespace FoxTunes
             {
                 get
                 {
-                    return new[]
+                    if (!string.IsNullOrEmpty(this.EncoderItem.OutputFileName))
                     {
-                        this.EncoderItem.OutputFileName,
-                        !string.IsNullOrEmpty(this.EncoderItem.OutputFileName) ?
-                            Path.GetExtension(this.EncoderItem.OutputFileName).TrimStart('.').ToUpper() :
-                            string.Empty,
-                        Enum.GetName(typeof(EncoderItemStatus), this.EncoderItem.Status)
-                    };
+                        return new[]
+                        {
+                            this.EncoderItem.OutputFileName,
+                            Path.GetExtension(this.EncoderItem.OutputFileName).TrimStart('.').ToUpper(),
+                            Enum.GetName(typeof(EncoderItemStatus), this.EncoderItem.Status)
+                        };
+                    }
+                    else
+                    {
+                        return new[]
+                        {
+                            this.EncoderItem.InputFileName,
+                            Path.GetExtension(this.EncoderItem.InputFileName).TrimStart('.').ToUpper(),
+                            Enum.GetName(typeof(EncoderItemStatus), this.EncoderItem.Status)
+                        };
+                    }
                 }
             }
         }
