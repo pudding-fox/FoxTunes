@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -58,19 +59,19 @@ namespace FoxTunes
             }
         }
 
-        public static ScannerItem FromPlaylistItem(PlaylistItem playlistItem, ReplayGainMode mode)
+        public static ScannerItem FromFileData(IFileData fileData, ReplayGainMode mode)
         {
             var scannerItem = new ScannerItem()
             {
-                FileName = playlistItem.FileName,
+                FileName = fileData.FileName,
                 Mode = mode
             };
             if (mode == ReplayGainMode.Album)
             {
                 var parts = new List<string>();
-                lock (playlistItem.MetaDatas)
+                lock (fileData.MetaDatas)
                 {
-                    var metaDatas = playlistItem.MetaDatas.ToDictionary(
+                    var metaDatas = fileData.MetaDatas.ToDictionary(
                         element => element.Name,
                         StringComparer.OrdinalIgnoreCase
                     );

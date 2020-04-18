@@ -9,13 +9,13 @@ namespace FoxTunes
 {
     public class BassReplayGainScannerReport : BaseComponent, IReport
     {
-        public BassReplayGainScannerReport(IEnumerable<PlaylistItem> playlistItems, IEnumerable<ScannerItem> scannerItems)
+        public BassReplayGainScannerReport(IEnumerable<IFileData> fileDatas, IEnumerable<ScannerItem> scannerItems)
         {
-            this.PlaylistItems = playlistItems.ToDictionary(playlistItem => playlistItem.FileName, StringComparer.OrdinalIgnoreCase);
+            this.FileDatas = fileDatas.ToDictionary(fileData => fileData.FileName, StringComparer.OrdinalIgnoreCase);
             this.ScannerItems = scannerItems.ToDictionary(scannerItem => Guid.NewGuid());
         }
 
-        public Dictionary<string, PlaylistItem> PlaylistItems { get; private set; }
+        public Dictionary<string, IFileData> FileDatas { get; private set; }
 
         public Dictionary<Guid, ScannerItem> ScannerItems { get; private set; }
 
@@ -79,7 +79,7 @@ namespace FoxTunes
             {
                 return this.ScannerItems.Select(element =>
                 {
-                    return new ReportRow(element.Key, this.PlaylistItems[element.Value.FileName], element.Value);
+                    return new ReportRow(element.Key, this.FileDatas[element.Value.FileName], element.Value);
                 });
             }
         }
@@ -110,16 +110,16 @@ namespace FoxTunes
 
         public class ReportRow : IReportRow
         {
-            public ReportRow(Guid id, PlaylistItem playlistItem, ScannerItem scannerItem)
+            public ReportRow(Guid id, IFileData fileData, ScannerItem scannerItem)
             {
                 this.Id = id;
-                this.PlaylistItem = playlistItem;
+                this.FileData = fileData;
                 this.ScannerItem = scannerItem;
             }
 
             public Guid Id { get; private set; }
 
-            public PlaylistItem PlaylistItem { get; private set; }
+            public IFileData FileData { get; private set; }
 
             public ScannerItem ScannerItem { get; private set; }
 
@@ -135,9 +135,9 @@ namespace FoxTunes
                     var trackGain = default(string);
                     var trackPeak = default(string);
                     var status = Enum.GetName(typeof(ScannerItemStatus), this.ScannerItem.Status);
-                    lock (this.PlaylistItem.MetaDatas)
+                    lock (this.FileData.MetaDatas)
                     {
-                        var metaDatas = this.PlaylistItem.MetaDatas.ToDictionary(
+                        var metaDatas = this.FileData.MetaDatas.ToDictionary(
                             element => element.Name,
                             StringComparer.OrdinalIgnoreCase
                         );
