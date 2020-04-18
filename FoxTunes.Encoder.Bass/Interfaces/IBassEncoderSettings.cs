@@ -16,8 +16,6 @@ namespace FoxTunes
 
         void InitializeComponent(ICore core);
 
-        bool TryGetOutput(string inputFileName, out string outputFileName);
-
         long GetLength(EncoderItem encoderItem, IBassStream stream);
 
         int GetDepth(EncoderItem encoderItem, IBassStream stream);

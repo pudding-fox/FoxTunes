@@ -23,7 +23,7 @@ namespace FoxTunes
 
         public string InputFileName { get; private set; }
 
-        public string OutputFileName { get; set; }
+        public string OutputFileName { get; private set; }
 
         public string Profile { get; private set; }
 
@@ -58,19 +58,20 @@ namespace FoxTunes
             }
         }
 
-        public static EncoderItem FromPlaylistItem(PlaylistItem playlistItem, string profile)
+        public static EncoderItem Create(string inputFileName, string outputFileName, IList<MetaDataItem> metaDatas, string profile)
         {
             var encoderItem = new EncoderItem()
             {
-                InputFileName = playlistItem.FileName,
+                InputFileName = inputFileName,
+                OutputFileName = outputFileName,
                 Profile = profile
             };
-            if (playlistItem.MetaDatas != null)
+            if (metaDatas != null)
             {
                 var metaData = default(IDictionary<string, string>);
-                lock (playlistItem.MetaDatas)
+                lock (metaDatas)
                 {
-                    metaData = playlistItem.MetaDatas.ToDictionary(
+                    metaData = metaDatas.ToDictionary(
                         metaDataItem => metaDataItem.Name,
                         metaDataItem => metaDataItem.Value,
                         StringComparer.OrdinalIgnoreCase

@@ -10,6 +10,7 @@ using System.Windows;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class WindowsFileSystemBrowser : StandardComponent, IFileSystemBrowser
     {
         public void Select(string fileName)
@@ -32,7 +33,8 @@ namespace FoxTunes
 
         protected virtual BrowseResult BrowseFile(BrowseOptions options)
         {
-            return this.WithApartmentState(ApartmentState.STA, () =>
+            var result = default(BrowseResult);
+            Windows.Invoke(() =>
              {
                  var dialog = new OpenFileDialog()
                  {
@@ -49,15 +51,18 @@ namespace FoxTunes
                  {
                      dialog.InitialDirectory = options.Path;
                  }
-                 var window = this.GetActiveWindow();
+                 var window = Windows.ActiveWindow;
                  var success = dialog.ShowDialog(window);
-                 return new BrowseResult(dialog.FileNames, success.GetValueOrDefault());
-             });
+                 result = new BrowseResult(dialog.FileNames, success.GetValueOrDefault());
+                 //TODO: Bad .Wait().
+             }).Wait();
+            return result;
         }
 
         protected virtual BrowseResult BrowseFolder(BrowseOptions options)
         {
-            return this.WithApartmentState(ApartmentState.STA, () =>
+            var result = default(BrowseResult);
+            Windows.Invoke(() =>
             {
                 //TODO: Use only WPF frameworks.
                 using (var dialog = new global::System.Windows.Forms.FolderBrowserDialog())
@@ -67,7 +72,7 @@ namespace FoxTunes
                     {
                         dialog.SelectedPath = options.Path;
                     }
-                    var window = this.GetActiveWindow();
+                    var window = Windows.ActiveWindow;
                     var success = default(bool);
                     switch (dialog.ShowDialog(new Win32Window(window.GetHandle())))
                     {
@@ -75,45 +80,11 @@ namespace FoxTunes
                             success = true;
                             break;
                     }
-                    return new BrowseResult(new[] { dialog.SelectedPath }, success);
+                    result = new BrowseResult(new[] { dialog.SelectedPath }, success);
                 }
-            });
-        }
-
-        protected virtual T WithApartmentState<T>(ApartmentState apartmentState, Func<T> func)
-        {
-            if (Thread.CurrentThread.GetApartmentState() == apartmentState)
-            {
-                return func();
-            }
-            Logger.Write(this, LogLevel.Debug, "Current thread does not have the required apartment state \"{0}\", creating a new one.", Enum.GetName(typeof(ApartmentState), apartmentState));
-            var result = default(T);
-            var thread = new Thread(() => result = func());
-            thread.IsBackground = true;
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            //TODO: No timeout, could deadlock.
-            thread.Join();
+                //TODO: Bad .Wait().
+            }).Wait();
             return result;
-        }
-
-        protected virtual Window GetActiveWindow()
-        {
-            if (Windows.IsSettingsWindowCreated && Windows.SettingsWindow.IsVisible)
-            {
-                return Windows.SettingsWindow;
-            }
-            if (Windows.ActiveWindow != null)
-            {
-                return Windows.ActiveWindow;
-            }
-            //TODO: Hack: This temporary topmost window ensures that the dialog is focused and visible.
-            Logger.Write(this, LogLevel.Debug, "Creating temporary window to host windows browse dialog.");
-            var window = new Window()
-            {
-                Topmost = true
-            };
-            return window;
         }
 
         private static string GetFilter(IEnumerable<BrowseFilter> filters)
