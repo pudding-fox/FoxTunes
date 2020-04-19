@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using Noesis.Javascript;
+using System;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace FoxTunes
 {
@@ -16,6 +18,18 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Context.Run(Resources.utils);
+            //TODO: We need to update the runtime to support Date.toLocaleDateString().
+            this.Context.SetParameter("toLocaleDateString", new Func<string, string>(
+                value =>
+                {
+                    var date = default(DateTime);
+                    if (!DateTime.TryParseExact(value, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                    {
+                        return null;
+                    }
+                    return date.ToShortDateString() + " " + date.ToShortTimeString();
+                }
+            ));
             base.InitializeComponent(core);
         }
 

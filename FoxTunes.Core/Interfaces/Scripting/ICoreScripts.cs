@@ -31,5 +31,9 @@
         string ReplayGainTrackGain { get; }
 
         string ReplayGainTrackPeak { get; }
+
+        string PlayCount { get; }
+
+        string LastPlayed { get; }
     }
 }
