@@ -118,8 +118,8 @@ namespace FoxTunes
                     {
                         libraryUpdater.InitializeComponent(this.Core);
                         await this.WithSubTask(libraryUpdater,
-                            async () => await libraryUpdater.Populate(cancellationToken)
-.ConfigureAwait(false)).ConfigureAwait(false);
+                            () => libraryUpdater.Populate(cancellationToken)
+                        ).ConfigureAwait(false);
                     }
                     if (transaction.HasTransaction)
                     {
@@ -137,7 +137,6 @@ namespace FoxTunes
             await base.OnCompleted().ConfigureAwait(false);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated)).ConfigureAwait(false);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
     }
 }

@@ -269,11 +269,6 @@ namespace FoxTunes
                false,
                names.ToArray()
             ).ConfigureAwait(false);
-            var refreshPlaylist = libraryItems.Any(libraryItem => this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id));
-            if (refreshPlaylist)
-            {
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
-            }
         }
 
 
@@ -307,7 +302,6 @@ namespace FoxTunes
                false,
                names.ToArray()
             ).ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
@@ -543,11 +537,6 @@ namespace FoxTunes
                         false,
                         names.ToArray()
                     ).ConfigureAwait(false);
-                    var refreshPlaylist = libraryItems.Any(libraryItem => this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id));
-                    if (refreshPlaylist)
-                    {
-                        await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
-                    }
                 }
                 return names;
             }
@@ -592,7 +581,6 @@ namespace FoxTunes
                         false,
                         names.ToArray()
                     ).ConfigureAwait(false);
-                    await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
                 }
                 return names;
             }

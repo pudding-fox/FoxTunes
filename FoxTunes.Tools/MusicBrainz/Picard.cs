@@ -24,8 +24,6 @@ namespace FoxTunes
 
         public IPlaylistCache PlaylistCache { get; private set; }
 
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Enabled { get; private set; }
@@ -40,7 +38,6 @@ namespace FoxTunes
             this.HierarchyManager = core.Managers.Hierarchy;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistCache = core.Components.PlaylistCache;
-            this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 PicardConfiguration.SECTION,
@@ -102,25 +99,12 @@ namespace FoxTunes
             var libraryItems = this.LibraryHierarchyBrowser
                 .GetItems(this.LibraryManager.SelectedItem, false)
                 .ToArray();
-            var refreshPlaylist = default(bool);
             if (!libraryItems.Any())
             {
                 return;
             }
-            foreach (var libraryItem in libraryItems)
-            {
-                refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);
-                if (refreshPlaylist)
-                {
-                    break;
-                }
-            }
             await this.Open(libraryItems).ConfigureAwait(false);
             await this.MetaDataManager.Rescan(libraryItems).ConfigureAwait(false);
-            if (refreshPlaylist)
-            {
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
-            }
             await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
@@ -143,7 +127,6 @@ namespace FoxTunes
             }
             await this.Open(playlistItems).ConfigureAwait(false);
             await this.MetaDataManager.Rescan(playlistItems).ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
 
         protected virtual Task Open(IEnumerable<IFileData> items)

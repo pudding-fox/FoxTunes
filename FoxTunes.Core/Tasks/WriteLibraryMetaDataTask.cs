@@ -50,12 +50,15 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
+        public IPlaylistCache PlaylistCache { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataManager = core.Managers.MetaData;
+            this.PlaylistCache = core.Components.PlaylistCache;
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
@@ -92,6 +95,8 @@ namespace FoxTunes
                     await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
                     await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
 
+                    this.UpdatePlaylistCache(libraryItem);
+
                     if (this.WriteToFiles)
                     {
                         if (!await this.MetaDataManager.Synchronize(new[] { libraryItem }, this.Names.ToArray()).ConfigureAwait(false))
@@ -105,6 +110,25 @@ namespace FoxTunes
             }))
             {
                 await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        protected virtual void UpdatePlaylistCache(LibraryItem libraryItem)
+        {
+            var playlistItems = default(IEnumerable<PlaylistItem>);
+            if (this.PlaylistCache.TryGetItemsByLibraryId(libraryItem.Id, out playlistItems))
+            {
+                foreach (var playlistItem in playlistItems)
+                {
+                    lock (libraryItem.MetaDatas)
+                    {
+                        lock (playlistItem.MetaDatas)
+                        {
+                            playlistItem.MetaDatas.Clear();
+                            playlistItem.MetaDatas.AddRange(libraryItem.MetaDatas);
+                        }
+                    }
+                }
             }
         }
 

@@ -181,9 +181,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler InsertOffsetChanged;
 
-        private ObservableCollection<GridViewColumn> _GridColumns { get; set; }
+        private ObservableCollection<PlaylistGridViewColumn> _GridColumns { get; set; }
 
-        public ObservableCollection<GridViewColumn> GridColumns
+        public ObservableCollection<PlaylistGridViewColumn> GridColumns
         {
             get
             {
@@ -235,9 +235,9 @@ namespace FoxTunes.ViewModel
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
-            var task = TaskEx.Run(() => this.RefreshColumns());
+            var task = TaskEx.Run(() => this.RefreshColumns(false));
 #else
-            var task = Task.Run(() => this.RefreshColumns());
+            var task = Task.Run(() => this.RefreshColumns(false));
 #endif
         }
 
@@ -263,10 +263,13 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    await this.RefreshColumns().ConfigureAwait(false);
+                    await this.RefreshColumns(false).ConfigureAwait(false);
                     break;
                 case CommonSignals.PlaylistColumnsUpdated:
                     await this.ReloadColumns().ConfigureAwait(false);
+                    break;
+                case CommonSignals.MetaDataUpdated:
+                    await this.RefreshColumns(true).ConfigureAwait(false);
                     break;
             }
         }
@@ -484,7 +487,7 @@ namespace FoxTunes.ViewModel
             return true;
         }
 
-        protected virtual IEnumerable<GridViewColumn> GetGridColumns()
+        protected virtual IEnumerable<PlaylistGridViewColumn> GetGridColumns()
         {
             if (this.DatabaseFactory != null && this.GridViewColumnFactory != null)
             {
@@ -509,7 +512,7 @@ namespace FoxTunes.ViewModel
         {
             await this.RefreshItems().ConfigureAwait(false);
             await this.RefreshSelectedItems().ConfigureAwait(false);
-            await this.RefreshColumns().ConfigureAwait(false);
+            await this.RefreshColumns(false).ConfigureAwait(false);
         }
 
         protected override Task RefreshItems()
@@ -527,7 +530,7 @@ namespace FoxTunes.ViewModel
             return Windows.Invoke(new Action(this.OnSelectedItemsChanged));
         }
 
-        public virtual async Task RefreshColumns()
+        public virtual async Task RefreshColumns(bool all)
         {
             if (this.GridColumns == null || this.GridColumns.Count == 0)
             {
@@ -537,12 +540,15 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var column in this.GridColumns)
                 {
-                    await this.RefreshColumn(column).ConfigureAwait(false);
+                    if (all || column.PlaylistColumn.IsDynamic)
+                    {
+                        await this.RefreshColumn(column).ConfigureAwait(false);
+                    }
                 }
             }
         }
 
-        protected virtual Task RefreshColumn(GridViewColumn column)
+        protected virtual Task RefreshColumn(PlaylistGridViewColumn column)
         {
             return Windows.Invoke(() => this.GridViewColumnFactory.Refresh(column));
         }
@@ -550,7 +556,7 @@ namespace FoxTunes.ViewModel
         protected virtual Task ReloadColumns()
         {
             var columns = this.GetGridColumns();
-            return Windows.Invoke(() => this.GridColumns = new ObservableCollection<GridViewColumn>(columns));
+            return Windows.Invoke(() => this.GridColumns = new ObservableCollection<PlaylistGridViewColumn>(columns));
         }
 
         protected override void OnDisposing()

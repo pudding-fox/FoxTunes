@@ -55,12 +55,21 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                foreach (char c in this.Value)
+                for (var position = 0; position < this.Value.Length; position++)
                 {
-                    if (c < '0' || c > '9')
+                    if (this.Value[position] >= '0' && this.Value[position] <= '9')
                     {
-                        return false;
+                        continue;
                     }
+                    if (position == 0 && this.Value[position] == '-')
+                    {
+                        continue;
+                    }
+                    if (position > 0 && position < this.Value.Length - 1 && this.Value[position] == '.')
+                    {
+                        continue;
+                    }
+                    return false;
                 }
                 return true;
             }

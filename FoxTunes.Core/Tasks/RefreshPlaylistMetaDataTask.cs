@@ -172,7 +172,7 @@ namespace FoxTunes
         protected override async Task OnCompleted()
         {
             await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated)).ConfigureAwait(false);
         }
 
         protected override void OnDisposing()
