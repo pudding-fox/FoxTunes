@@ -176,16 +176,16 @@ namespace FoxTunes
         {
             try
             {
+                var outputStream = this.PlaybackManager.CurrentStream;
                 var updater = this.TransportControls.DisplayUpdater;
-                var playlistItem = this.PlaylistManager.CurrentItem;
                 updater.ClearAll();
                 updater.Type = MediaPlaybackType.Music;
-                if (playlistItem != null)
+                if (outputStream != null)
                 {
                     var metaData = default(IDictionary<string, string>);
-                    lock (playlistItem.MetaDatas)
+                    lock (outputStream.PlaylistItem.MetaDatas)
                     {
-                        metaData = playlistItem.MetaDatas.ToDictionary(
+                        metaData = outputStream.PlaylistItem.MetaDatas.ToDictionary(
                             metaDataItem => metaDataItem.Name,
                             metaDataItem => metaDataItem.Value,
                             StringComparer.OrdinalIgnoreCase
@@ -216,8 +216,8 @@ namespace FoxTunes
         {
             try
             {
+                var outputStream = this.PlaybackManager.CurrentStream;
                 var updater = this.TransportControls.DisplayUpdater;
-                var playlistItem = this.PlaylistManager.CurrentItem;
                 if (updater.Thumbnail != null)
                 {
                     var disposable = updater.Thumbnail.OpenReadAsync() as IDisposable;
@@ -226,9 +226,9 @@ namespace FoxTunes
                         disposable.Dispose();
                     }
                 }
-                if (playlistItem != null)
+                if (outputStream != null)
                 {
-                    var fileName = this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
+                    var fileName = this.ArtworkProvider.Find(outputStream.PlaylistItem, ArtworkType.FrontCover);
                     if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
                     {
                         var stream = await this.GetThumbnail(fileName).ConfigureAwait(false);

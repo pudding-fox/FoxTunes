@@ -96,7 +96,7 @@ namespace FoxTunes.ViewModel
 
         public virtual Task RefreshSelectedItem()
         {
-            if (this.PlaylistManager == null)
+            if (this.PlaybackManager == null)
             {
 #if NET40
                 return TaskEx.FromResult(false);
@@ -104,7 +104,18 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             }
-            return Windows.Invoke(() => this.SelectedItem = this.PlaylistManager.CurrentItem);
+            var outputStream = this.PlaybackManager.CurrentStream;
+            return Windows.Invoke(() =>
+            {
+                if (outputStream != null)
+                {
+                    this.SelectedItem = outputStream.PlaylistItem;
+                }
+                else
+                {
+                    this.SelectedItem = null;
+                }
+            });
         }
 
         public override string StatusMessage
