@@ -6,6 +6,8 @@ namespace FoxTunes
     {
         public const string ENABLED = "AAAA1379-60E3-426D-9CF0-61F11343A627";
 
+        public const string ON_DEMAND = "AABB8343-832C-4B99-A34C-8D9475D56722";
+
         public const string MODE = "BBBB9149-D485-45F3-A505-750774C06D0D";
 
         public const string MODE_ALBUM = "AAAAF2BB-3753-48A2-A73F-EA46EAA0E91E";
@@ -16,7 +18,8 @@ namespace FoxTunes
         {
             var section = new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new BooleanConfigurationElement(ENABLED, "Enabled", path: "Replay Gain").WithValue(false))
-                .WithElement(new SelectionConfigurationElement(MODE, "Mode", path: "Replay Gain").WithOptions(GetModeOptions())
+                .WithElement(new SelectionConfigurationElement(MODE, "Mode", path: "Replay Gain").WithOptions(GetModeOptions()))
+                .WithElement(new BooleanConfigurationElement(ON_DEMAND, "On Demand", path: "Replay Gain").WithValue(false)
             );
             yield return section;
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(
