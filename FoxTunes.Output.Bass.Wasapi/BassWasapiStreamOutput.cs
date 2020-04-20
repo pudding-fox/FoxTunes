@@ -60,42 +60,6 @@ namespace FoxTunes
 
         public HashSet<int> MixerChannelHandles { get; protected set; }
 
-        public override bool CanControlVolume
-        {
-            get
-            {
-                //Volume cannot be controlled in exclusive mode.
-                if (this.Behaviour.Exclusive)
-                {
-                    return false;
-                }
-                return true;
-            }
-        }
-
-        public override float Volume
-        {
-            get
-            {
-                if (this.ChannelHandle == 0)
-                {
-                    return 0;
-                }
-                return BassWasapi.GetVolume(WasapiVolumeTypes.Session);
-            }
-            set
-            {
-                if (this.ChannelHandle == 0)
-                {
-                    return;
-                }
-                if (!BassWasapi.SetVolume(WasapiVolumeTypes.Session, value))
-                {
-                    //TODO: Warn.
-                }
-            }
-        }
-
         public override bool CheckFormat(int rate, int channels)
         {
             return BassWasapiDevice.Info.SupportedRates.Contains(rate) && channels <= BassWasapiDevice.Info.Outputs;
@@ -328,6 +292,35 @@ namespace FoxTunes
                 return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
             }
             return 0;
+        }
+
+        protected override float GetVolume()
+        {
+            if (this.ChannelHandle == 0)
+            {
+                return 0;
+            }
+            if (this.Behaviour.Exclusive)
+            {
+                return 1;
+            }
+            return BassWasapi.GetVolume(WasapiVolumeTypes.Session);
+        }
+
+        protected override void SetVolume(float volume)
+        {
+            if (this.ChannelHandle == 0)
+            {
+                return;
+            }
+            if (this.Behaviour.Exclusive)
+            {
+                return;
+            }
+            if (!BassWasapi.SetVolume(WasapiVolumeTypes.Session, volume))
+            {
+                //TODO: Warn.
+            }
         }
 
         protected override void OnDisposing()

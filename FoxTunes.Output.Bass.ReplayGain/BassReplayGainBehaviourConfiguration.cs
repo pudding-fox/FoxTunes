@@ -33,10 +33,12 @@ namespace FoxTunes
             if (enabled)
             {
                 StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, MODE).Show();
+                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, ON_DEMAND).Show();
             }
             else
             {
                 StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, MODE).Hide();
+                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, ON_DEMAND).Hide();
             }
         }
 

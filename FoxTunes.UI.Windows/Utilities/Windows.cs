@@ -195,6 +195,60 @@ namespace FoxTunes
 
         public static event EventHandler SettingsWindowClosed;
 
+        private static Lazy<Window> _EqualizerWindow { get; set; }
+
+        public static bool IsEqualizerWindowCreated
+        {
+            get
+            {
+                return _EqualizerWindow.IsValueCreated;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public static Window EqualizerWindow
+        {
+            get
+            {
+                var raiseEvent = !IsEqualizerWindowCreated;
+                try
+                {
+                    return _EqualizerWindow.Value;
+                }
+                finally
+                {
+                    if (IsEqualizerWindowCreated && raiseEvent)
+                    {
+                        OnEqualizerWindowCreated();
+                    }
+                }
+            }
+        }
+
+        private static void OnEqualizerWindowCreated()
+        {
+            EqualizerWindow.Closed += OnEqualizerWindowClosed;
+            if (EqualizerWindowCreated == null)
+            {
+                return;
+            }
+            EqualizerWindowCreated(EqualizerWindow, EventArgs.Empty);
+        }
+
+        public static event EventHandler EqualizerWindowCreated;
+
+        private static void OnEqualizerWindowClosed(object sender, EventArgs e)
+        {
+            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow());
+            if (EqualizerWindowClosed == null)
+            {
+                return;
+            }
+            EqualizerWindowClosed(typeof(EqualizerWindow), EventArgs.Empty);
+        }
+
+        public static event EventHandler EqualizerWindowClosed;
+
         private static Window _ActiveWindow { get; set; }
 
         public static Window ActiveWindow
@@ -275,6 +329,10 @@ namespace FoxTunes
                         {
                             SettingsWindow.Close();
                         }
+                        if (IsEqualizerWindowCreated)
+                        {
+                            EqualizerWindow.Close();
+                        }
                         Reset();
                     })
                 );
@@ -286,6 +344,7 @@ namespace FoxTunes
             _MainWindow = new Lazy<Window>(() => new MainWindow());
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
             _SettingsWindow = new Lazy<Window>(() => new SettingsWindow());
+            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow());
         }
 
         public static Task Invoke(Action action)

@@ -7,15 +7,46 @@ namespace FoxTunes.ViewModel
 {
     public class Volume : ViewModelBase
     {
+        public bool Available
+        {
+            get
+            {
+                if (this.Effects == null || this.Effects.Volume == null || !this.Effects.Volume.Available)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        protected virtual void OnAvailableChanged()
+        {
+            if (this.AvailableChanged != null)
+            {
+                this.AvailableChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Available");
+        }
+
+        public event EventHandler AvailableChanged;
+
         public bool Enabled
         {
             get
             {
-                if (this.Output == null)
+                if (this.Effects == null || this.Effects.Volume == null)
                 {
                     return false;
                 }
-                return this.Output.CanControlVolume;
+                return this.Effects.Volume.Enabled;
+            }
+            set
+            {
+                if (this.Effects == null || this.Effects.Volume == null)
+                {
+                    return;
+                }
+                this.Effects.Volume.Enabled = value;
             }
         }
 
@@ -34,20 +65,19 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Output == null)
+                if (this.Effects == null || this.Effects.Volume == null)
                 {
                     return 0;
                 }
-                return this.Output.Volume;
+                return this.Effects.Volume.Value;
             }
             set
             {
-                if (this.Output == null)
+                if (this.Effects == null || this.Effects.Volume == null)
                 {
                     return;
                 }
-                this.Output.Volume = value;
-                this.OnValueChanged();
+                this.Effects.Volume.Value = value;
             }
         }
 
@@ -62,24 +92,33 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ValueChanged;
 
-        public IOutput Output { get; private set; }
+        public IOutputEffects Effects { get; private set; }
 
         protected override void OnCoreChanged()
         {
-            this.Output = this.Core.Components.Output;
-            this.Output.CanControlVolumeChanged += this.CanControlVolumeChanged;
-            this.Output.VolumeChanged += this.OnVolumeChanged;
+            this.Effects = this.Core.Components.OutputEffects;
+            if (this.Effects.Volume != null)
+            {
+                this.Effects.Volume.AvailableChanged += this.OnAvailableChanged;
+                this.Effects.Volume.EnabledChanged += this.OnEnabledChanged;
+                this.Effects.Volume.ValueChanged += this.OnValueChanged;
+            }
             //TODO: Bad .Wait().
             this.Refresh().Wait();
             base.OnCoreChanged();
         }
 
-        protected virtual void CanControlVolumeChanged(object sender, EventArgs e)
+        protected virtual void OnAvailableChanged(object sender, EventArgs e)
         {
             var task = this.Refresh();
         }
 
-        protected virtual void OnVolumeChanged(object sender, EventArgs e)
+        protected virtual void OnEnabledChanged(object sender, EventArgs e)
+        {
+            var task = this.Refresh();
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
         {
             var task = this.Refresh();
         }
@@ -88,6 +127,7 @@ namespace FoxTunes.ViewModel
         {
             return Windows.Invoke(() =>
             {
+                this.OnAvailableChanged();
                 this.OnEnabledChanged();
                 this.OnValueChanged();
             });
@@ -95,10 +135,11 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.Output != null)
+            if (this.Effects != null && this.Effects.Volume != null)
             {
-                this.Output.CanControlVolumeChanged -= this.CanControlVolumeChanged;
-                this.Output.VolumeChanged -= this.OnVolumeChanged;
+                this.Effects.Volume.AvailableChanged -= this.OnAvailableChanged;
+                this.Effects.Volume.EnabledChanged -= this.OnEnabledChanged;
+                this.Effects.Volume.ValueChanged -= this.OnValueChanged;
             }
             base.OnDisposing();
         }

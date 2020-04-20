@@ -102,18 +102,6 @@ namespace FoxTunes
             }
         }
 
-        public string Description
-        {
-            get
-            {
-                return string.Format(
-                    "{0}/{1}dB",
-                    GetBandName(Convert.ToInt32(this.Center)),
-                    this.Gain > 0 ? "+" + this.Gain.ToString() : this.Gain.ToString()
-                );
-            }
-        }
-
         public void Activate()
         {
             if (!this.IsActive)
@@ -176,18 +164,6 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
-            }
-        }
-
-        public static string GetBandName(int value)
-        {
-            if (value < 1000)
-            {
-                return string.Format("{0}Hz", value);
-            }
-            else
-            {
-                return string.Format("{0}kHz", value / 1000);
             }
         }
     }

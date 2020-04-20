@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -79,31 +78,5 @@ namespace FoxTunes
         public abstract Task Shutdown();
 
         public abstract int GetData(float[] buffer);
-
-        public abstract bool CanControlVolume { get; protected set; }
-
-        protected virtual void OnCanControlVolumeChanged()
-        {
-            if (this.CanControlVolumeChanged != null)
-            {
-                this.CanControlVolumeChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("CanControlVolume");
-        }
-
-        public event EventHandler CanControlVolumeChanged;
-
-        public abstract float Volume { get; set; }
-
-        protected virtual void OnVolumeChanged()
-        {
-            if (this.VolumeChanged != null)
-            {
-                this.VolumeChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Volume");
-        }
-
-        public event EventHandler VolumeChanged;
     }
 }

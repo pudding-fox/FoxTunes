@@ -13,6 +13,7 @@ namespace FoxTunes
     {
         public BassReplayGainBehaviour()
         {
+            BassReplayGain.Init();
             this.Effects = new ConditionalWeakTable<BassOutputStream, ReplayGainEffect>();
         }
 
@@ -36,6 +37,21 @@ namespace FoxTunes
 
         public bool WriteTags { get; private set; }
 
+        private bool _Enabled { get; set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this._Enabled;
+            }
+            set
+            {
+                this._Enabled = value;
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -47,17 +63,7 @@ namespace FoxTunes
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassReplayGainBehaviourConfiguration.ENABLED
-            ).ConnectValue(value =>
-            {
-                if (value)
-                {
-                    this.Enable();
-                }
-                else
-                {
-                    this.Disable();
-                }
-            });
+            ).ConnectValue(value => this.Enabled = value);
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassReplayGainBehaviourConfiguration.MODE
@@ -70,12 +76,6 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassReplayGainScannerBehaviourConfiguration.WRITE_TAGS
             ).ConnectValue(value => this.WriteTags = value);
-            base.InitializeComponent(core);
-        }
-
-        public void Enable()
-        {
-            BassReplayGain.Init();
             if (this.Output != null)
             {
                 this.Output.Loaded += this.OnLoaded;
@@ -85,24 +85,15 @@ namespace FoxTunes
             {
                 this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             }
-        }
-
-        public void Disable()
-        {
-            if (this.Output != null)
-            {
-                this.Output.Loaded -= this.OnLoaded;
-                this.Output.Unloaded -= this.OnUnloaded;
-            }
-            if (BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
-            }
-            BassReplayGain.Free();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnLoaded(object sender, OutputStreamEventArgs e)
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             if (e.Stream is BassOutputStream stream)
             {
                 this.Add(stream);
@@ -367,7 +358,16 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            this.Disable();
+            if (this.Output != null)
+            {
+                this.Output.Loaded -= this.OnLoaded;
+                this.Output.Unloaded -= this.OnUnloaded;
+            }
+            if (BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
+            }
+            BassReplayGain.Free();
         }
 
         ~BassReplayGainBehaviour()

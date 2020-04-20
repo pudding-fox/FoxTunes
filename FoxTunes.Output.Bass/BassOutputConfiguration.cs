@@ -75,8 +75,19 @@ namespace FoxTunes
 
         public static IEnumerable<SelectionConfigurationOption> GetDepthOptions()
         {
-            yield return new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit");
-            yield return new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point");
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
+            var i16 = new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit");
+            var f32 = new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point");
+            if (releaseType == ReleaseType.Minimal)
+            {
+                i16.Default();
+            }
+            else
+            {
+                f32.Default();
+            }
+            yield return i16;
+            yield return f32;
         }
 
         public static bool GetFloat(SelectionConfigurationOption option)

@@ -59,42 +59,6 @@ namespace FoxTunes
 
         public HashSet<int> MixerChannelHandles { get; protected set; }
 
-        public override bool CanControlVolume
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override float Volume
-        {
-            get
-            {
-                if (this.ChannelHandle == 0)
-                {
-                    return 0;
-                }
-                var value = default(float);
-                if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.Volume, out value))
-                {
-                    return 0;
-                }
-                return value;
-            }
-            set
-            {
-                if (this.ChannelHandle == 0)
-                {
-                    return;
-                }
-                if (!Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Volume, value))
-                {
-                    //TODO: Warn.
-                }
-            }
-        }
-
         public override bool CheckFormat(int rate, int channels)
         {
             return true;
@@ -111,6 +75,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
             BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
             this.MixerChannelHandles.Add(previous.ChannelHandle);
+            this.UpdateVolume();
         }
 
 
@@ -254,8 +219,40 @@ namespace FoxTunes
             return 0;
         }
 
+        protected override float GetVolume()
+        {
+            if (this.ChannelHandle == 0)
+            {
+                return 0;
+            }
+            var volume = default(float);
+            if (!Bass.ChannelGetAttribute(this.ChannelHandle, ChannelAttribute.Volume, out volume))
+            {
+                //TODO: Warn.
+                return 0;
+            }
+            return volume;
+        }
+
+        protected override void SetVolume(float volume)
+        {
+            if (this.ChannelHandle == 0)
+            {
+                return;
+            }
+            if (!Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Volume, volume))
+            {
+                //TODO: Warn.
+            }
+        }
+
         protected override void OnDisposing()
         {
+            if (this.Volume != null)
+            {
+                this.Volume.EnabledChanged += this.OnVolumeEnabledChanged;
+                this.Volume.ValueChanged += this.OnVolumeValueChanged;
+            }
             if (this.ChannelHandle != 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);

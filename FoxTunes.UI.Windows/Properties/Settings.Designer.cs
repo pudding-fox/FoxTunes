@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FoxTunes.Properties {
+namespace FoxTunes {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -92,6 +92,18 @@ namespace FoxTunes.Properties {
             }
             set {
                 this["ColumnHeight_6F3FDC8521DA"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,0,0,0")]
+        public global::System.Windows.Rect EqualizerWindowBounds {
+            get {
+                return ((global::System.Windows.Rect)(this["EqualizerWindowBounds"]));
+            }
+            set {
+                this["EqualizerWindowBounds"] = value;
             }
         }
     }

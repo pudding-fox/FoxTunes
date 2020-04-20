@@ -61,6 +61,20 @@ namespace FoxTunes
 
         public override int ChannelHandle { get; protected set; }
 
+        public override bool IsActive
+        {
+            get
+            {
+                var currentStream = this.PlaybackManager.CurrentStream as BassOutputStream;
+                if (currentStream == null)
+                {
+                    return false;
+                }
+                var effect = default(ReplayGainEffect);
+                return this.Behaviour.Effects.TryGetValue(currentStream, out effect);
+            }
+        }
+
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public override void InitializeComponent(ICore core)

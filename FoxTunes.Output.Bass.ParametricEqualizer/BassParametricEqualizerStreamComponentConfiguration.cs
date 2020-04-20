@@ -51,22 +51,24 @@ namespace FoxTunes
                         .WithValue(2.5)
                         .WithValidationRule(
                             new DoubleValidationRule(
-                                BassParametricEqualizerStreamComponent.MIN_BANDWIDTH,
-                                BassParametricEqualizerStreamComponent.MAX_BANDWIDTH,
+                                PeakEQ.MIN_BANDWIDTH,
+                                PeakEQ.MAX_BANDWIDTH,
                                 0.1
                             )
-                        )
-                    );
+                        ));
 
             foreach (var band in Bands)
             {
                 section.WithElement(
-                    new IntegerConfigurationElement(band.Key, PeakEQEffect.GetBandName(band.Value), path: "Parametric Equalizer")
+                    new DoubleConfigurationElement(
+                            band.Key,
+                            band.Value < 1000 ? band.Value.ToString() + "Hz" : band.Value.ToString() + "kHz",
+                            path: "Parametric Equalizer")
                         .WithValue(0)
                         .WithValidationRule(
-                            new IntegerValidationRule(
-                                BassParametricEqualizerStreamComponent.MIN_GAIN,
-                                BassParametricEqualizerStreamComponent.MAX_GAIN
+                            new DoubleValidationRule(
+                                PeakEQ.MIN_GAIN,
+                                PeakEQ.MAX_GAIN
                             )
                         )
                 );
@@ -128,6 +130,22 @@ namespace FoxTunes
             {
                 StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BANDWIDTH).Hide();
                 StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, PRESET).Hide();
+            }
+        }
+
+        public static void LoadPreset(string name)
+        {
+            var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                PRESET
+            );
+            foreach (var option in element.Options)
+            {
+                if (string.Equals(option.Name, name, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    LoadPreset(option);
+                    return;
+                }
             }
         }
 
@@ -214,7 +232,7 @@ namespace FoxTunes
             }
             foreach (var band in Bands)
             {
-                var element = StandardComponents.Instance.Configuration.GetElement<IntegerConfigurationElement>(
+                var element = StandardComponents.Instance.Configuration.GetElement<DoubleConfigurationElement>(
                     BassOutputConfiguration.SECTION,
                     band.Key
                 );
@@ -240,6 +258,18 @@ namespace FoxTunes
                 yield return new KeyValuePair<string, int>(BAND_4000, 4000);
                 yield return new KeyValuePair<string, int>(BAND_8000, 8000);
                 yield return new KeyValuePair<string, int>(BAND_16000, 16000);
+            }
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> Presets
+        {
+            get
+            {
+                yield return new KeyValuePair<string, string>(PRESET_NONE, "None");
+                yield return new KeyValuePair<string, string>(PRESET_BASS, "Bass");
+                yield return new KeyValuePair<string, string>(PRESET_FLAT, "Flat");
+                yield return new KeyValuePair<string, string>(PRESET_POP, "Pop");
+                yield return new KeyValuePair<string, string>(PRESET_ROCK, "Rock");
             }
         }
     }
