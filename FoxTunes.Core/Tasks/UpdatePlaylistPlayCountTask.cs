@@ -88,7 +88,7 @@ namespace FoxTunes
             //TODO: I can't work out what the standard is for this value.
             //TODO: I've seen DateTime.ToFileTime() but that seems a little too windows-ish.
             //TODO: Using yyyy/MM/dd HH:mm:ss for now.
-            metaDataItem.Value = DateTime.UtcNow.ToString(Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
+            metaDataItem.Value = DateTimeHelper.ToString(DateTime.UtcNow);
         }
     }
 }

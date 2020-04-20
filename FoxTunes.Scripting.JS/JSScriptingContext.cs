@@ -2,7 +2,6 @@
 using Noesis.Javascript;
 using System;
 using System.Diagnostics;
-using System.Globalization;
 
 namespace FoxTunes
 {
@@ -22,8 +21,8 @@ namespace FoxTunes
             this.Context.SetParameter("toLocaleDateString", new Func<string, string>(
                 value =>
                 {
-                    var date = default(DateTime);
-                    if (!DateTime.TryParseExact(value, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                    var date = DateTimeHelper.FromString(value);
+                    if (date == default(DateTime))
                     {
                         return null;
                     }

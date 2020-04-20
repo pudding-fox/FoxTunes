@@ -32,16 +32,12 @@ namespace FoxTunes
 
         public DateTime GetImportDate()
         {
-            if (string.IsNullOrEmpty(this.ImportDate))
-            {
-                return default(DateTime);
-            }
-            return DateTime.ParseExact(this.ImportDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
+            return DateTimeHelper.FromString(this.ImportDate);
         }
 
         public void SetImportDate(DateTime value)
         {
-            this.ImportDate = value.ToString(Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
+            this.ImportDate = DateTimeHelper.ToString(value);
         }
 
         public override bool Equals(IPersistableComponent other)
