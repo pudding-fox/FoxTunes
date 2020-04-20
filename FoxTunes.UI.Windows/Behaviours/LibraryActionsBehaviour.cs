@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const string SET_RATING = "AAAD";
 
+        public const string RESCAN = "ZZAA";
+
         public ILibraryManager LibraryManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -42,34 +44,34 @@ namespace FoxTunes
         {
             get
             {
-                if (this.LibraryManager.SelectedItem == null)
+                if (this.LibraryManager.SelectedItem != null)
                 {
-                    yield break;
-                }
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
-                if (this.Popularimeter.Value)
-                {
-                    var invocationComponents = new Dictionary<byte, InvocationComponent>();
-                    for (var a = 0; a <= 5; a++)
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
+                    if (this.Popularimeter.Value)
                     {
-                        var invocationComponent = new InvocationComponent(
-                            InvocationComponent.CATEGORY_LIBRARY,
-                            SET_RATING,
-                            a == 0 ? "None" : string.Format("{0} Stars", a),
-                            path: "Set Rating",
-                            attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
-                        );
-                        invocationComponents.Add((byte)a, invocationComponent);
-                        yield return invocationComponent;
-                    }
-                    //Don't block the menu from opening while we fetch ratings.
+                        var invocationComponents = new Dictionary<byte, InvocationComponent>();
+                        for (var a = 0; a <= 5; a++)
+                        {
+                            var invocationComponent = new InvocationComponent(
+                                InvocationComponent.CATEGORY_LIBRARY,
+                                SET_RATING,
+                                a == 0 ? "None" : string.Format("{0} Stars", a),
+                                path: "Set Rating",
+                                attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
+                            );
+                            invocationComponents.Add((byte)a, invocationComponent);
+                            yield return invocationComponent;
+                        }
+                        //Don't block the menu from opening while we fetch ratings.
 #if NET40
-                    var task = TaskEx.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
+                        var task = TaskEx.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
 #else
-                    var task = Task.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
+                        var task = Task.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
 #endif
+                    }
                 }
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, RESCAN, "Rescan Files", path: "Library");
             }
         }
 
@@ -83,6 +85,8 @@ namespace FoxTunes
                     return this.AddToPlaylist(true);
                 case SET_RATING:
                     return this.SetRating(component.Name);
+                case RESCAN:
+                    return this.Rescan();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -137,7 +141,7 @@ namespace FoxTunes
             }
         }
 
-        private Task SetRating(string name)
+        protected virtual Task SetRating(string name)
         {
             var rating = default(byte);
             if (string.Equals(name, "None", StringComparison.OrdinalIgnoreCase))
@@ -153,6 +157,11 @@ namespace FoxTunes
 #endif
             }
             return this.LibraryManager.SetRating(this.LibraryManager.SelectedItem, rating);
+        }
+
+        protected virtual Task Rescan()
+        {
+            return this.LibraryManager.Rescan();
         }
     }
 }
