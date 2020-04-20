@@ -398,7 +398,7 @@ namespace FoxTunes
                     using (var monitor = new BassReplayGainScannerMonitor(scanner, this.Visible, this.CancellationToken))
                     {
                         await this.WithSubTask(monitor,
-                            async () => await monitor.Scan().ConfigureAwait(false)
+                            () => monitor.Scan()
                         ).ConfigureAwait(false);
                         this.ScannerItems = monitor.ScannerItems.Values.ToArray();
                     }

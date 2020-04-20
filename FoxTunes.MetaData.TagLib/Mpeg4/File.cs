@@ -23,6 +23,11 @@ namespace FoxTunes.Mpeg4
 
         }
 
+        public IEnumerable<string> GetWarnings(string fileName)
+        {
+            return Enumerable.Empty<string>();
+        }
+
         public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {
             var box = this.GetXtraBox();

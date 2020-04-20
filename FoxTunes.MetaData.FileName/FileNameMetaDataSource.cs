@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,6 +47,11 @@ namespace FoxTunes
             );
             this.ArtworkProvider = core.Components.ArtworkProvider;
             base.InitializeComponent(core);
+        }
+
+        public IEnumerable<string> GetWarnings(string fileName)
+        {
+            return Enumerable.Empty<string>();
         }
 
         public async Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)

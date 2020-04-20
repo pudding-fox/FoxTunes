@@ -43,16 +43,19 @@ namespace FoxTunes
             builder.AppendFormat(
                 "{0} -> {1}",
                 encoderItem.InputFileName,
-                !string.IsNullOrEmpty(encoderItem.OutputFileName) ? encoderItem.OutputFileName : "<Cancelled>"
+                encoderItem.OutputFileName
             );
             if (encoderItem.Status != EncoderItemStatus.Complete && encoderItem.Errors.Any())
             {
-                builder.Append(Environment.NewLine);
+                builder.AppendLine(" -> Error");
                 foreach (var error in encoderItem.Errors)
                 {
-                    builder.Append("\t");
-                    builder.Append(error);
+                    builder.AppendLine('\t' + error);
                 }
+            }
+            else
+            {
+                builder.AppendLine(" -> OK");
             }
             return builder.ToString();
         }

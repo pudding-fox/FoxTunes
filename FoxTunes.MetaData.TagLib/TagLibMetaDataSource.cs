@@ -1,6 +1,7 @@
 ﻿using FoxTunes;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,28 @@ namespace FoxTunes
 
         //2MB
         public static int MAX_IMAGE_SIZE = 2048000;
+
+        public TagLibMetaDataSource()
+        {
+            this.Warnings = new ConcurrentDictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        public ConcurrentDictionary<string, IList<string>> Warnings { get; private set; }
+
+        public IEnumerable<string> GetWarnings(string fileName)
+        {
+            var warnings = default(IList<string>);
+            if (!this.Warnings.TryGetValue(fileName, out warnings))
+            {
+                return Enumerable.Empty<string>();
+            }
+            return warnings;
+        }
+
+        public void AddWarnings(string fileName, IEnumerable<string> warnings)
+        {
+            this.Warnings.GetOrAdd(fileName, key => new List<string>()).AddRange(warnings);
+        }
 
         public TagLibFileFactory FileFactory { get; private set; }
 
@@ -111,6 +134,10 @@ namespace FoxTunes
             {
                 using (var file = this.FileFactory.Create(fileName))
                 {
+                    if (file.PossiblyCorrupt)
+                    {
+                        this.AddWarnings(fileName, file.CorruptionReasons);
+                    }
                     if (file.InvariantStartPosition > MAX_TAG_SIZE)
                     {
                         collect = true;
@@ -189,6 +216,10 @@ namespace FoxTunes
             var collect = default(bool);
             using (var file = this.FileFactory.Create(fileName))
             {
+                if (file.PossiblyCorrupt)
+                {
+                    this.AddWarnings(fileName, file.CorruptionReasons);
+                }
                 foreach (var metaDataItem in metaDataItems)
                 {
                     switch (metaDataItem.Type)

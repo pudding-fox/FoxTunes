@@ -15,6 +15,11 @@ namespace FoxTunes
 
         public IBassCdMetaDataSourceStrategy Strategy { get; private set; }
 
+        public IEnumerable<string> GetWarnings(string fileName)
+        {
+            return Enumerable.Empty<string>();
+        }
+
         public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {
             var drive = default(int);

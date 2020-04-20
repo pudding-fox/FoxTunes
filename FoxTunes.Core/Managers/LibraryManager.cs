@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -170,7 +171,7 @@ namespace FoxTunes
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport();
+                this.OnReport(task.Warnings);
             }
         }
 
@@ -191,7 +192,7 @@ namespace FoxTunes
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport();
+                this.OnReport(task.Warnings);
             }
         }
 
@@ -202,7 +203,7 @@ namespace FoxTunes
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport();
+                this.OnReport(task.Warnings);
             }
         }
 
@@ -243,14 +244,14 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        protected virtual void OnReport()
+        protected virtual void OnReport(IDictionary<LibraryItem, IList<string>> warnings)
         {
             if (this.State.HasFlag(LibraryManagerState.Updating))
             {
                 //Another task was queued.
                 return;
             }
-            var report = new LibraryManagerReport(this.DatabaseFactory);
+            var report = new LibraryManagerReport(warnings);
             report.InitializeComponent(this.Core);
             this.OnReport(report);
         }
@@ -274,12 +275,20 @@ namespace FoxTunes
 
         public class LibraryManagerReport : BaseComponent, IReport
         {
-            public LibraryManagerReport(IDatabaseFactory databaseFactory)
+            public LibraryManagerReport(IDictionary<LibraryItem, IList<string>> warnings)
             {
-                this.DatabaseFactory = databaseFactory;
+                this.Warnings = warnings;
             }
 
+            public IDictionary<LibraryItem, IList<string>> Warnings { get; private set; }
+
             public IDatabaseFactory DatabaseFactory { get; private set; }
+
+            public override void InitializeComponent(ICore core)
+            {
+                this.DatabaseFactory = core.Factories.Database;
+                base.InitializeComponent(core);
+            }
 
             public string Title
             {
@@ -293,7 +302,18 @@ namespace FoxTunes
             {
                 get
                 {
-                    return string.Empty;
+                    var builder = new StringBuilder();
+                    foreach (var libraryItem in this.Warnings.Keys)
+                    {
+                        var warnings = this.Warnings[libraryItem];
+                        builder.Append(libraryItem.FileName);
+                        builder.AppendLine(" -> Warning");
+                        foreach (var warning in warnings)
+                        {
+                            builder.AppendLine('\t' + warning);
+                        }
+                    }
+                    return builder.ToString();
                 }
             }
 
