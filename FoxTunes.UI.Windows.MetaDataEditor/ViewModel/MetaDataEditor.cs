@@ -194,7 +194,6 @@ namespace FoxTunes.ViewModel
 
         public async Task EditLibrary()
         {
-            await this.Cancel().ConfigureAwait(false);
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
                 return;
@@ -206,6 +205,7 @@ namespace FoxTunes.ViewModel
             ).ToArray();
             if (!libraryItems.Any())
             {
+                await this.Cancel().ConfigureAwait(false);
                 return;
             }
             await this.SetItems(
@@ -216,7 +216,6 @@ namespace FoxTunes.ViewModel
 
         public async Task EditPlaylist()
         {
-            await this.Cancel().ConfigureAwait(false);
             if (this.PlaylistManager == null || this.PlaylistManager.SelectedItems == null)
             {
                 return;
@@ -228,6 +227,7 @@ namespace FoxTunes.ViewModel
                 .ToArray();
             if (!playlistItems.Any())
             {
+                await this.Cancel().ConfigureAwait(false);
                 return;
             }
             await this.SetItems(
@@ -307,9 +307,12 @@ namespace FoxTunes.ViewModel
             {
                 await this.MetaDataManager.Save(playlistItems, true, true).ConfigureAwait(false);
             }
-            await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
-            await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-            await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+            if (libraryItems.Any() || playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
+            {
+                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
+                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+                await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+            }
             await this.Cancel().ConfigureAwait(false);
         }
 

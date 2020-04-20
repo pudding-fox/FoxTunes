@@ -163,7 +163,7 @@ namespace FoxTunes.ViewModel
 
         public async Task Rebuild()
         {
-            await this.HierarchyManager.Clear(null).ConfigureAwait(false);
+            await this.HierarchyManager.Clear(null, true).ConfigureAwait(false);
             await this.HierarchyManager.Build(null).ConfigureAwait(false);
         }
 
@@ -194,7 +194,7 @@ namespace FoxTunes.ViewModel
 
         public async Task Clear()
         {
-            await this.HierarchyManager.Clear(null).ConfigureAwait(false);
+            await this.HierarchyManager.Clear(null, true).ConfigureAwait(false);
             await this.LibraryManager.Clear(null).ConfigureAwait(false);
         }
 

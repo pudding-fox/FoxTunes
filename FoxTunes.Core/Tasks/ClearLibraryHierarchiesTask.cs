@@ -4,13 +4,16 @@ namespace FoxTunes
 {
     public class ClearLibraryHierarchiesTask : LibraryTaskBase
     {
-        public ClearLibraryHierarchiesTask(LibraryItemStatus? status)
+        public ClearLibraryHierarchiesTask(LibraryItemStatus? status, bool signal)
             : base()
         {
             this.Status = status;
+            this.Signal = signal;
         }
 
         public LibraryItemStatus? Status { get; private set; }
+
+        public bool Signal { get; private set; }
 
         public override bool Visible
         {
@@ -35,7 +38,10 @@ namespace FoxTunes
         protected override async Task OnCompleted()
         {
             await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
+            if (this.Signal)
+            {
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
+            }
         }
     }
 }

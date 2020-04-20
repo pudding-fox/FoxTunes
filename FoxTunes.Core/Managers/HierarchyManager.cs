@@ -146,13 +146,13 @@ namespace FoxTunes
             }
         }
 
-        public async Task Clear(LibraryItemStatus? status)
+        public async Task Clear(LibraryItemStatus? status, bool signal)
         {
             if (this.LibraryManager.State.HasFlag(LibraryManagerState.Updating))
             {
                 return;
             }
-            using (var task = new ClearLibraryHierarchiesTask(status))
+            using (var task = new ClearLibraryHierarchiesTask(status, signal))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
