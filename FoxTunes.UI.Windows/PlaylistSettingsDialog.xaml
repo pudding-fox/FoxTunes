@@ -43,21 +43,8 @@
                     Windows:ListBoxExtensions.DragDropReorderCommand="{Binding PlaylistColumns.ExchangeCommand, Source={StaticResource ViewModel}}">
                 </ListBox>
                 <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <StackPanel.Resources>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                            <Setter Property="Width" Value="60"></Setter>
-                            <Setter Property="Height" Value="30"></Setter>
-                            <Setter Property="Margin" Value="7,7,0,0"></Setter>
-                            <!-- System -->
-                            <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
-                            <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                            <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
-                        </Style>
-                    </StackPanel.Resources>
-                    <Button Command="{Binding PlaylistColumns.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                    <Button Command="{Binding PlaylistColumns.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                    <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding PlaylistColumns.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                    <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding PlaylistColumns.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                 </StackPanel>
                 <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding PlaylistColumns.SelectedValue, Source={StaticResource ViewModel}}" Grid.IsSharedSizeScope="True">
                     <Grid.Style>
@@ -84,18 +71,15 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Label Grid.Column="0" Grid.Row="0">Name</Label>
                         <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,0,0,5"></TextBox>
                         <Label Grid.Column="0" Grid.Row="1">Type</Label>
                         <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Type}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource PlaylistColumnTypes}}" Margin="0,0,0,5"></ComboBox>
-                        <Label Grid.Column="0" Grid.Row="2">Dynamic</Label>
-                        <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding IsDynamic}"></CheckBox>
-                        <Label Grid.Column="0" Grid.Row="3">Auto Size</Label>
-                        <CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" IsChecked="{Binding Width, Converter={StaticResource ColumnWidthConverter}}"></CheckBox>
-                        <Label Grid.Column="0" Grid.Row="4">Enabled</Label>
-                        <CheckBox Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" IsChecked="{Binding Enabled}"></CheckBox>
+                        <Label Grid.Column="0" Grid.Row="2">Auto Size</Label>
+                        <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding Width, Converter={StaticResource ColumnWidthConverter}}"></CheckBox>
+                        <Label Grid.Column="0" Grid.Row="3">Enabled</Label>
+                        <CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" IsChecked="{Binding Enabled}"></CheckBox>
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.Style>

@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -210,9 +209,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
-            //TODO: This is a hack in order to make the playlist's "is playing" field update.
-            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-            this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
+            this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.ScriptingRuntime);
             this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
             this.Configuration = core.Components.Configuration;
@@ -229,16 +226,6 @@ namespace FoxTunes.ViewModel
             ).ConnectValue(value => this.GroupingScript = value);
 #endif
             var task = this.Refresh();
-        }
-
-        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
-        {
-            //Critical: Don't block in this event handler, it causes a deadlock.
-#if NET40
-            var task = TaskEx.Run(() => this.RefreshColumns(false));
-#else
-            var task = Task.Run(() => this.RefreshColumns(false));
-#endif
         }
 
         protected virtual void OnColumnChanged(object sender, PlaylistColumn e)
@@ -262,14 +249,11 @@ namespace FoxTunes.ViewModel
             await base.OnSignal(sender, signal).ConfigureAwait(false);
             switch (signal.Name)
             {
-                case CommonSignals.PlaylistUpdated:
-                    await this.RefreshColumns(false).ConfigureAwait(false);
-                    break;
                 case CommonSignals.PlaylistColumnsUpdated:
                     await this.ReloadColumns().ConfigureAwait(false);
                     break;
                 case CommonSignals.MetaDataUpdated:
-                    await this.RefreshColumns(true).ConfigureAwait(false);
+                    await this.RefreshColumns().ConfigureAwait(false);
                     break;
             }
         }
@@ -512,7 +496,7 @@ namespace FoxTunes.ViewModel
         {
             await this.RefreshItems().ConfigureAwait(false);
             await this.RefreshSelectedItems().ConfigureAwait(false);
-            await this.RefreshColumns(false).ConfigureAwait(false);
+            await this.RefreshColumns().ConfigureAwait(false);
         }
 
         protected override Task RefreshItems()
@@ -530,7 +514,7 @@ namespace FoxTunes.ViewModel
             return Windows.Invoke(new Action(this.OnSelectedItemsChanged));
         }
 
-        public virtual async Task RefreshColumns(bool all)
+        public virtual async Task RefreshColumns()
         {
             if (this.GridColumns == null || this.GridColumns.Count == 0)
             {
@@ -540,10 +524,7 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var column in this.GridColumns)
                 {
-                    if (all || column.PlaylistColumn.IsDynamic)
-                    {
-                        await this.RefreshColumn(column).ConfigureAwait(false);
-                    }
+                    await this.RefreshColumn(column).ConfigureAwait(false);
                 }
             }
         }
@@ -561,10 +542,6 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.PlaybackManager != null)
-            {
-                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
-            }
             if (this.GridViewColumnFactory != null)
             {
                 this.GridViewColumnFactory.PositionChanged -= this.OnColumnChanged;

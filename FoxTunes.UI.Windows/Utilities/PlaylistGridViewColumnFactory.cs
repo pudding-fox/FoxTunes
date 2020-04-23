@@ -17,15 +17,12 @@ namespace FoxTunes
 
         public static PlaylistColumnManager PlaylistColumnManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnManager>();
 
-        public PlaylistGridViewColumnFactory(IPlaybackManager playbackManager, IScriptingRuntime scriptingRuntime)
+        public PlaylistGridViewColumnFactory(IScriptingRuntime scriptingRuntime)
         {
-            this.PlaybackManager = playbackManager;
             this.ScriptingRuntime = scriptingRuntime;
         }
 
         public bool Suspended { get; private set; }
-
-        public IPlaybackManager PlaybackManager { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
@@ -40,7 +37,6 @@ namespace FoxTunes
                 case PlaylistColumnType.Script:
                     gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding()
                     {
-                        PlaybackManager = this.PlaybackManager,
                         ScriptingContext = this.ScriptingContext,
                         Script = column.Script
                     };

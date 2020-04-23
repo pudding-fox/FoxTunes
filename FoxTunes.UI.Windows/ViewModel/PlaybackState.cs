@@ -1,24 +1,12 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace FoxTunes.ViewModel
 {
     public class PlaybackState : ViewModelBase
     {
-        private static readonly TimeSpan UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
-
         public static readonly IPlaybackManager PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
-
-        public static readonly DispatcherTimer Timer;
-
-        static PlaybackState()
-        {
-            Timer = new DispatcherTimer(DispatcherPriority.Background);
-            Timer.Interval = UPDATE_INTERVAL;
-            Timer.Start();
-        }
 
         public static readonly DependencyProperty PlaylistItemProperty = DependencyProperty.Register(
             "PlaylistItem",
@@ -49,10 +37,7 @@ namespace FoxTunes.ViewModel
 
         public PlaybackState()
         {
-            if (Timer != null)
-            {
-                Timer.Tick += this.OnTick;
-            }
+            PlaybackStateNotifier.Notify += this.OnNotify;
         }
 
         public PlaylistItem PlaylistItem
@@ -69,6 +54,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnPlaylistItemChanged()
         {
+            this.Refresh();
             if (this.PlaylistItemChanged != null)
             {
                 this.PlaylistItemChanged(this, EventArgs.Empty);
@@ -157,7 +143,12 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler CaptionChanged;
 
-        protected virtual void OnTick(object sender, EventArgs e)
+        protected virtual void OnNotify(object sender, EventArgs e)
+        {
+            this.Refresh();
+        }
+
+        protected virtual void Refresh()
         {
             var isPlaying = default(bool);
             var isPaused = default(bool);
@@ -192,10 +183,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (Timer != null)
-            {
-                Timer.Tick -= this.OnTick;
-            }
+            PlaybackStateNotifier.Notify -= this.OnNotify;
             base.OnDisposing();
         }
 
