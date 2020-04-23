@@ -67,10 +67,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="Resources\PlaybackState.xaml" />
     <Page Remove="Resources\Rating.xaml" />
   </ItemGroup>
 
   <ItemGroup>
+    <UpToDateCheckInput Remove="Resources\PlaybackState.xaml" />
     <UpToDateCheckInput Remove="Resources\Rating.xaml" />
   </ItemGroup>
 
@@ -105,6 +107,9 @@
       <CustomToolNamespace>FoxTunes.Properties</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Resources\PlaybackState.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </None>
     <None Update="Resources\Rating.xaml">
       <Generator>MSBuild:Compile</Generator>
