@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes.Launcher
 {
@@ -52,7 +53,7 @@ namespace FoxTunes.Launcher
                             }
                             using (var database = core.Factories.Database.Create())
                             {
-                                core.InitializeDatabase(database);
+                                core.InitializeDatabase(database, DatabaseInitializeType.All);
                             }
                         }
                         core.Initialize();

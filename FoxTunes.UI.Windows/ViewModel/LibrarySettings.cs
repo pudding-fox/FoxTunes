@@ -212,7 +212,7 @@ namespace FoxTunes.ViewModel
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    this.HierarchyManager.InitializeDatabase(database);
+                    this.Core.InitializeDatabase(database, DatabaseInitializeType.Library);
 #if NET40
                     return TaskEx.FromResult(false);
 #else

@@ -135,13 +135,13 @@ namespace FoxTunes
             });
         }
 
-        public void InitializeDatabase(IDatabaseComponent database)
+        public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
         {
             ComponentRegistry.Instance.ForEach<IDatabaseInitializer>(component =>
             {
                 try
                 {
-                    component.InitializeDatabase(database);
+                    component.InitializeDatabase(database, type);
                 }
                 catch (Exception e)
                 {

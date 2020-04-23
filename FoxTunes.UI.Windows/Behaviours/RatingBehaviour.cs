@@ -33,8 +33,12 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        public void InitializeDatabase(IDatabaseComponent database)
+        public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
         {
+            if (!type.HasFlag(DatabaseInitializeType.Playlist))
+            {
+                return;
+            }
             using (var transaction = database.BeginTransaction())
             {
                 var set = database.Set<PlaylistColumn>(transaction);

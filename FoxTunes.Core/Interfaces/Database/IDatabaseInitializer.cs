@@ -1,7 +1,18 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System;
+
+namespace FoxTunes.Interfaces
 {
     public interface IDatabaseInitializer
     {
-        void InitializeDatabase(IDatabaseComponent database);
+        void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type);
+    }
+
+    [Flags]
+    public enum DatabaseInitializeType : byte
+    {
+        None = 0,
+        Library = 1,
+        Playlist = 2,
+        All = Library | Playlist
     }
 }

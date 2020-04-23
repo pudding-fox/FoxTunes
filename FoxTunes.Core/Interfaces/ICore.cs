@@ -16,6 +16,6 @@ namespace FoxTunes.Interfaces
 
         void Initialize();
 
-        void InitializeDatabase(IDatabaseComponent database);
+        void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type);
     }
 }
