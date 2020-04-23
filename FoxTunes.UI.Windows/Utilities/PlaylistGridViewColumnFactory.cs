@@ -93,10 +93,14 @@ namespace FoxTunes
 
         public void Refresh(PlaylistGridViewColumn column)
         {
+            column.Refresh();
+        }
+
+        public void Resize(PlaylistGridViewColumn column)
+        {
             this.Suspended = true;
             try
             {
-                column.Refresh();
                 if (double.IsNaN(column.Width))
                 {
                     column.Width = column.ActualWidth;

@@ -5,6 +5,10 @@ namespace FoxTunes
 {
     public class PlaylistColumn : PersistableComponent, ISequenceableComponent
     {
+        public const double WIDTH_SMALL = 100;
+
+        public const double WIDTH_LARGE = 300;
+
         public PlaylistColumn()
         {
 
@@ -139,7 +143,7 @@ namespace FoxTunes
         }
 
         public event EventHandler PluginChanged;
-        
+
         private double? _Width { get; set; }
 
         public double? Width
