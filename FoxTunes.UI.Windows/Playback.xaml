@@ -10,15 +10,15 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Playback x:Key="ViewModel" Core="{Binding}"></ViewModel:Playback>
+        <ViewModel:PlaybackCaptionConverter x:Key="PlaybackCaptionConverter"></ViewModel:PlaybackCaptionConverter>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYBACK}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <StackPanel Orientation="Horizontal">
-        <Button Command="{Binding StopOutputCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0">&lt;</Button>
-        <Button Command="{Binding PlayCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0">4</Button>
-        <Button Command="{Binding PauseCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0">;</Button>
-        <Button Command="{Binding PreviousCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0">9</Button>
-        <Button Command="{Binding NextCommand, IsAsync=True, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" >:</Button>
+        <Button Command="{Binding StopOutputCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0" Content="&lt;"></Button>
+        <Button Command="{Binding PlayCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0" Content="{Binding IsPlaying, Converter={StaticResource PlaybackCaptionConverter}, Mode=OneWay, Source={StaticResource ViewModel}}"></Button>
+        <Button Command="{Binding PreviousCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0" Content="9"></Button>
+        <Button Command="{Binding NextCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Content=":"></Button>
     </StackPanel>
 </UserControl>

@@ -87,6 +87,15 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler DescriptionChanged;
 
+        protected override void OnDisposing()
+        {
+            if (this.Timer != null)
+            {
+                this.Timer.Stop();
+            }
+            base.OnDisposing();
+        }
+
         protected override Freezable CreateInstanceCore()
         {
             return new OutputStream(null);

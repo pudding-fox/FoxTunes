@@ -1,27 +1,66 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace FoxTunes.ViewModel
 {
     public class Playback : ViewModelBase
     {
-        public Playback()
+        private static readonly TimeSpan UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
+
+        public Playback(bool monitor)
+        {
+            if (monitor)
+            {
+                this.Timer = new DispatcherTimer(DispatcherPriority.Background);
+                this.Timer.Interval = UPDATE_INTERVAL;
+                this.Timer.Tick += this.OnTick;
+                this.Timer.Start();
+            }
+        }
+
+        public Playback() : this(true)
         {
 
         }
 
-        public Playback(bool togglePlayback) : this()
-        {
-            this.TogglePlayback = togglePlayback;
-        }
+        public DispatcherTimer Timer { get; private set; }
 
-        public bool TogglePlayback { get; private set; }
+        public IOutputStream OutputStream { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
+
+        public bool IsPlaying
+        {
+            get
+            {
+                if (this.PlaybackManager == null)
+                {
+                    return false;
+                }
+                if (this.PlaybackManager.CurrentStream == null)
+                {
+                    return false;
+                }
+                return this.PlaybackManager.CurrentStream.IsPlaying;
+            }
+        }
+
+        protected virtual void OnIsPlayingChanged()
+        {
+            if (this.IsPlayingChanged != null)
+            {
+                this.IsPlayingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsPlaying");
+        }
+
+        public event EventHandler IsPlayingChanged;
 
         public ICommand PlayCommand
         {
@@ -42,37 +81,9 @@ namespace FoxTunes.ViewModel
                         {
                             return this.PlaybackManager.CurrentStream.Play();
                         }
-                        else if (this.TogglePlayback)
+                        else
                         {
                             return this.PlaybackManager.CurrentStream.Pause();
-                        }
-#if NET40
-                        return TaskEx.FromResult(false);
-#else
-                        return Task.CompletedTask;
-#endif
-                    }
-                );
-            }
-        }
-
-        public ICommand PauseCommand
-        {
-            get
-            {
-                return CommandFactory.Instance.CreateCommand(
-                    () =>
-                    {
-                        if (this.PlaybackManager.CurrentStream != null)
-                        {
-                            if (this.PlaybackManager.CurrentStream.IsPaused)
-                            {
-                                return this.PlaybackManager.CurrentStream.Resume();
-                            }
-                            else if (this.PlaybackManager.CurrentStream.IsPlaying)
-                            {
-                                return this.PlaybackManager.CurrentStream.Pause();
-                            }
                         }
 #if NET40
                         return TaskEx.FromResult(false);
@@ -135,11 +146,32 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        private bool _isPlaying = default(bool);
+
+        protected virtual void OnTick(object sender, EventArgs e)
+        {
+            if (this.IsPlaying == this._isPlaying)
+            {
+                return;
+            }
+            this._isPlaying = this.IsPlaying;
+            this.OnIsPlayingChanged();
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             base.InitializeComponent(core);
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.Timer != null)
+            {
+                this.Timer.Stop();
+            }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()
