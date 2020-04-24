@@ -72,12 +72,15 @@ namespace FoxTunes
                 await this.SetCount(this.LibraryItems.Count()).ConfigureAwait(false);
             }
             await base.OnStarted().ConfigureAwait(false);
+            //We don't need a lock for this so not waiting for OnRun().
+            this.UpdatePlaylistCache();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
         {
             var position = 0;
-            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 foreach (var libraryItem in this.LibraryItems)
                 {
@@ -95,8 +98,6 @@ namespace FoxTunes
                     await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
                     await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
 
-                    this.UpdatePlaylistCache(libraryItem);
-
                     if (this.WriteToFiles)
                     {
                         if (!await this.MetaDataManager.Synchronize(new[] { libraryItem }, this.Names.ToArray()).ConfigureAwait(false))
@@ -113,29 +114,16 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdatePlaylistCache(LibraryItem libraryItem)
+        protected virtual void UpdatePlaylistCache()
         {
-            var playlistItems = default(IEnumerable<PlaylistItem>);
-            if (this.PlaylistCache.TryGetItemsByLibraryId(libraryItem.Id, out playlistItems))
+            foreach (var libraryItem in this.LibraryItems)
             {
-                foreach (var playlistItem in playlistItems)
+                var playlistItems = default(IEnumerable<PlaylistItem>);
+                if (this.PlaylistCache.TryGetItemsByLibraryId(libraryItem.Id, out playlistItems))
                 {
-                    lock (libraryItem.MetaDatas)
-                    {
-                        lock (playlistItem.MetaDatas)
-                        {
-                            playlistItem.MetaDatas.Clear();
-                            playlistItem.MetaDatas.AddRange(libraryItem.MetaDatas);
-                        }
-                    }
+                    MetaDataItem.Update(libraryItem, playlistItems);
                 }
             }
-        }
-
-        protected override async Task OnCompleted()
-        {
-            await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 
         private async Task WriteLibraryMetaData(LibraryItem libraryItem)

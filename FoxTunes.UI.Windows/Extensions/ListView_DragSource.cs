@@ -166,14 +166,6 @@ namespace FoxTunes
                     this.ListView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItems));
                 }
             }
-
-            protected override void OnDisposing()
-            {
-                this.ListView.PreviewMouseDown -= this.OnMouseDown;
-                this.ListView.PreviewMouseUp -= this.OnMouseUp;
-                this.ListView.MouseMove -= this.OnMouseMove;
-                base.OnDisposing();
-            }
         }
     }
 }

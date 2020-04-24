@@ -5,5 +5,5 @@
     xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows"
     xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
     DataType="{x:Type Core:PlaylistItem}">
-    <Windows:Rating Height="15"></Windows:Rating>
+    <Windows:Rating Height="15" FileData="{Binding}"  Windows:RatingExtensions.UpdatePlaylistItems="True"></Windows:Rating>
 </DataTemplate>

@@ -142,15 +142,21 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void SetValue(byte value)
+        protected virtual void OnValueChanged(byte value)
         {
-            if (ValueChanged != null)
+            if (this.ValueChanged == null)
             {
-                ValueChanged(this, new RatingChangedEventArgs(this.FileData, value));
+                return;
             }
+            this.ValueChanged(this, new RatingEventArgs(this.FileData, value));
         }
 
-        public static event RatingChangedEventHandler ValueChanged;
+        public event RatingEventHandler ValueChanged;
+
+        protected virtual void SetValue(byte value)
+        {
+            this.OnValueChanged(value);
+        }
 
         private MetaDataItem _MetaDataItem { get; set; }
 
@@ -211,19 +217,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFileDataChanged()
         {
-            if (this.FileData == null)
-            {
-                this.MetaDataItem = null;
-            }
-            else
-            {
-                lock (this.FileData.MetaDatas)
-                {
-                    this.MetaDataItem = this.FileData.MetaDatas.FirstOrDefault(
-                        metaDataItem => string.Equals(metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
-                    );
-                }
-            }
+            this.Bind();
             if (this.FileDataChanged != null)
             {
                 this.FileDataChanged(this, EventArgs.Empty);
@@ -232,6 +226,29 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler FileDataChanged;
+
+        protected virtual void Bind()
+        {
+            if (this.FileData == null)
+            {
+                this.MetaDataItem = null;
+            }
+            else
+            {
+                lock (this.FileData.MetaDatas)
+                {
+                    var metaDataItem = this.FileData.MetaDatas.FirstOrDefault(
+                        _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
+                    );
+                    if (metaDataItem == null)
+                    {
+                        metaDataItem = new MetaDataItem(CommonMetaData.Rating, MetaDataItemType.Tag);
+                        this.FileData.MetaDatas.Add(metaDataItem);
+                    }
+                    this.MetaDataItem = metaDataItem;
+                }
+            }
+        }
 
         protected virtual void Refresh()
         {
@@ -245,20 +262,5 @@ namespace FoxTunes.ViewModel
         {
             return new Rating();
         }
-    }
-
-    public delegate void RatingChangedEventHandler(object sender, RatingChangedEventArgs e);
-
-    public class RatingChangedEventArgs : EventArgs
-    {
-        public RatingChangedEventArgs(IFileData fileData, byte value)
-        {
-            this.FileData = fileData;
-            this.Value = value;
-        }
-
-        public IFileData FileData { get; private set; }
-
-        public byte Value { get; private set; }
     }
 }

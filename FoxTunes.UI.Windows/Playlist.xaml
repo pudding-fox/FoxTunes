@@ -40,6 +40,7 @@
                   Windows:ListViewExtensions.GroupStyle="{Binding GroupingEnabled, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.GroupScript="{Binding GroupingScript, Source={StaticResource ViewModel}}"
                   VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
                   SelectionChanged="OnSelectionChanged">
             <ListView.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding RemovePlaylistItemsCommand, Source={StaticResource ViewModel}}"></KeyBinding>

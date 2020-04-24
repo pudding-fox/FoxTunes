@@ -250,10 +250,10 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    await this.ResizeColumns();
+                    await this.ResizeColumns().ConfigureAwait(false);
                     break;
                 case CommonSignals.PlaylistColumnsUpdated:
-                    await this.RefreshColumns(null).ConfigureAwait(false);
+                    await this.ReloadColumns().ConfigureAwait(false);
                     break;
                 case CommonSignals.MetaDataUpdated:
                     var names = signal.State as IEnumerable<string>;
@@ -529,7 +529,7 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var column in this.GridColumns)
                 {
-                    if (!this.ShouldRefreshColumn(column, names))
+                    if (!this.GridViewColumnFactory.ShouldRefreshColumn(column, names))
                     {
                         continue;
                     }
@@ -541,19 +541,6 @@ namespace FoxTunes.ViewModel
         protected virtual Task RefreshColumn(PlaylistGridViewColumn column)
         {
             return Windows.Invoke(() => this.GridViewColumnFactory.Refresh(column));
-        }
-
-        protected virtual bool ShouldRefreshColumn(PlaylistGridViewColumn column, IEnumerable<string> names)
-        {
-            if (column.PlaylistColumn.Type != PlaylistColumnType.Script)
-            {
-                return false;
-            }
-            if (names == null || !names.Any())
-            {
-                return true;
-            }
-            return names.Any(name => column.PlaylistColumn.Script.Contains(name, true));
         }
 
         protected virtual async Task ResizeColumns()

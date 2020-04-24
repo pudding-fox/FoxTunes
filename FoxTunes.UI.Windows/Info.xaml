@@ -6,6 +6,7 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core"
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Info x:Key="ViewModel" Core="{Binding}"></ViewModel:Info>
@@ -14,7 +15,7 @@
         <Binding Path="HasData" Source="{StaticResource ViewModel}"/>
     </Windows:UIComponentBase.IsComponentEnabled>
     <GroupBox Header="Now Playing">
-        <Grid>
+        <Grid Margin="4">
             <Grid.Resources>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}"></Setter>
@@ -26,8 +27,19 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Windows:Artwork Grid.Column="0" Margin="0,3,0,0"></Windows:Artwork>
-            <Grid Grid.Column="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Windows:Artwork Grid.Column="0" Grid.Row="0"></Windows:Artwork>
+            <Windows:Rating Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" Height="20" FileData="{Binding FileData, Source={StaticResource ViewModel}}">
+                <Interactivity:Interaction.Triggers>
+                    <Interactivity:EventTrigger EventName="ValueChanged">
+                        <ViewModel:InvokeParameterizedCommandAction Command="{Binding UpdateRatingCommand, Source={StaticResource ViewModel}}" />
+                    </Interactivity:EventTrigger>
+                </Interactivity:Interaction.Triggers>
+            </Windows:Rating>
+            <Grid Grid.Column="1" Grid.RowSpan="2" Margin="4,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>

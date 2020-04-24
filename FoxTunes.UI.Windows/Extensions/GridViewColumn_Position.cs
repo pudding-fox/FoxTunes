@@ -119,12 +119,6 @@ namespace FoxTunes
                 }
                 SetPosition(this.GridViewColumn, position);
             }
-
-            protected override void OnDisposing()
-            {
-                InheritanceContextHelper.RemoveEventHandler(this.GridViewColumn, this.OnInheritanceContextChanged);
-                base.OnDisposing();
-            }
         }
     }
 }

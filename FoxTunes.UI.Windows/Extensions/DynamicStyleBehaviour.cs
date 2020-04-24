@@ -58,14 +58,5 @@ namespace FoxTunes
         {
             this.Apply();
         }
-
-        protected override void OnDisposing()
-        {
-            if (ThemeLoader != null)
-            {
-                ThemeLoader.ThemeChanged -= this.OnThemeChanged;
-            }
-            base.OnDisposing();
-        }
     }
 }

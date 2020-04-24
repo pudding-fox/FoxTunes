@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -170,14 +169,6 @@ namespace FoxTunes
                     this.DragStartPosition = default(Point);
                     this.ListBox.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
                 }
-            }
-
-            protected override void OnDisposing()
-            {
-                this.ListBox.PreviewMouseDown -= this.OnMouseDown;
-                this.ListBox.PreviewMouseUp -= this.OnMouseUp;
-                this.ListBox.MouseMove -= this.OnMouseMove;
-                base.OnDisposing();
             }
         }
     }

@@ -1,7 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using FoxTunes.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -15,7 +17,7 @@ namespace FoxTunes
             }
         }
 
-        public static PlaylistColumnManager PlaylistColumnManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnManager>();
+        public static PlaylistColumnProviderManager PlaylistColumnProviderManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnProviderManager>();
 
         public PlaylistGridViewColumnFactory(IScriptingRuntime scriptingRuntime)
         {
@@ -35,17 +37,23 @@ namespace FoxTunes
             switch (column.Type)
             {
                 case PlaylistColumnType.Script:
-                    gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding()
+                    if (!string.IsNullOrEmpty(column.Script))
                     {
-                        ScriptingContext = this.ScriptingContext,
-                        Script = column.Script
-                    };
+                        gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding()
+                        {
+                            ScriptingContext = this.ScriptingContext,
+                            Script = column.Script
+                        };
+                    }
                     break;
                 case PlaylistColumnType.Plugin:
-                    var provider = PlaylistColumnManager.GetProvider(column.Plugin);
-                    if (provider != null)
+                    if (!string.IsNullOrEmpty(column.Plugin))
                     {
-                        gridViewColumn.CellTemplate = provider.CellTemplate;
+                        var provider = PlaylistColumnProviderManager.GetProvider(column.Plugin);
+                        if (provider != null)
+                        {
+                            gridViewColumn.CellTemplate = provider.CellTemplate;
+                        }
                     }
                     break;
             }
@@ -94,6 +102,27 @@ namespace FoxTunes
         public void Refresh(PlaylistGridViewColumn column)
         {
             column.Refresh();
+        }
+
+        public bool ShouldRefreshColumn(PlaylistGridViewColumn column, IEnumerable<string> names)
+        {
+            if (names == null || !names.Any())
+            {
+                return true;
+            }
+            switch (column.PlaylistColumn.Type)
+            {
+                case PlaylistColumnType.Script:
+                    return names.Any(name => column.PlaylistColumn.Script.Contains(name, true));
+                case PlaylistColumnType.Plugin:
+                    var provider = PlaylistColumnProviderManager.GetProvider(column.PlaylistColumn.Plugin);
+                    if (provider != null)
+                    {
+                        return names.Any(name => provider.MetaData.Contains(name, true));
+                    }
+                    break;
+            }
+            return true;
         }
 
         public void Resize(PlaylistGridViewColumn column)
