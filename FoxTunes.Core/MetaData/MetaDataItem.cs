@@ -137,7 +137,7 @@ namespace FoxTunes
                         {
                             if (!sourceMetaData.ContainsKey(pair.Key))
                             {
-                                destination.MetaDatas.Remove(pair.Value);
+                                pair.Value.Value = string.Empty;
                             }
                         }
                     }

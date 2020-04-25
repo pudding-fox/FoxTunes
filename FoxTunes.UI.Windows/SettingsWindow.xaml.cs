@@ -36,6 +36,10 @@ namespace FoxTunes
                 this.Width = 800;
                 this.Height = 600;
             }
+            if (double.IsNaN(this.Left) || double.IsNaN(this.Top))
+            {
+                this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
             this.InitializeComponent();
         }
 
