@@ -33,6 +33,34 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        private bool _ShowRating { get; set; }
+
+        public bool ShowRating
+        {
+            get
+            {
+                return this._ShowRating;
+            }
+            set
+            {
+                this._ShowRating = value;
+                this.OnShowRatingChanged();
+            }
+        }
+
+        protected virtual void OnShowRatingChanged()
+        {
+            if (this.ShowRatingChanged != null)
+            {
+                this.ShowRatingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowRating");
+        }
+
+        public event EventHandler ShowRatingChanged;
+
         private bool _HasData { get; set; }
 
         public bool HasData
@@ -448,6 +476,11 @@ namespace FoxTunes.ViewModel
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
+            ).ConnectValue(value => this.ShowRating = value);
             var task = this.Refresh();
             base.InitializeComponent(core);
         }

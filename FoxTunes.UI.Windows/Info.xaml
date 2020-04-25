@@ -10,6 +10,7 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Info x:Key="ViewModel" Core="{Binding}"></ViewModel:Info>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Windows:UIComponentBase.IsComponentEnabled>
         <Binding Path="HasData" Source="{StaticResource ViewModel}"/>
@@ -32,7 +33,7 @@
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <Windows:Artwork Grid.Column="0" Grid.Row="0"></Windows:Artwork>
-            <Windows:Rating Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" Height="20" FileData="{Binding FileData, Source={StaticResource ViewModel}}">
+            <Windows:Rating Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" Height="20" FileData="{Binding FileData, Source={StaticResource ViewModel}}" Visibility="{Binding ShowRating, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
                 <Interactivity:Interaction.Triggers>
                     <Interactivity:EventTrigger EventName="ValueChanged">
                         <ViewModel:InvokeParameterizedCommandAction Command="{Binding UpdateRatingCommand, Source={StaticResource ViewModel}}" />
