@@ -6,48 +6,48 @@ using System.Windows.Controls;
 
 namespace FoxTunes
 {
-    public static partial class ListBoxExtensions
+    public static partial class ItemsControlExtensions
     {
-        private static readonly ConditionalWeakTable<ListBox, TrackItemVisibilityBehaviour> TrackItemVisibilityBehaviours = new ConditionalWeakTable<ListBox, TrackItemVisibilityBehaviour>();
+        private static readonly ConditionalWeakTable<ItemsControl, TrackItemVisibilityBehaviour> TrackItemVisibilityBehaviours = new ConditionalWeakTable<ItemsControl, TrackItemVisibilityBehaviour>();
 
         public static readonly DependencyProperty TrackItemVisibilityProperty = DependencyProperty.RegisterAttached(
             "TrackItemVisibility",
             typeof(bool),
-            typeof(ListBoxExtensions),
+            typeof(ItemsControlExtensions),
             new FrameworkPropertyMetadata(false, new PropertyChangedCallback(OnTrackItemVisibilityPropertyChanged))
         );
 
-        public static bool GetTrackItemVisibility(ListBox source)
+        public static bool GetTrackItemVisibility(ItemsControl source)
         {
             return (bool)source.GetValue(TrackItemVisibilityProperty);
         }
 
-        public static void SetTrackItemVisibility(ListBox source, bool value)
+        public static void SetTrackItemVisibility(ItemsControl source, bool value)
         {
             source.SetValue(TrackItemVisibilityProperty, value);
         }
 
         private static void OnTrackItemVisibilityPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var listBox = sender as ListBox;
-            if (listBox == null)
+            var itemsControl = sender as ItemsControl;
+            if (itemsControl == null)
             {
                 return;
             }
-            if (GetTrackItemVisibility(listBox))
+            if (GetTrackItemVisibility(itemsControl))
             {
                 var behaviour = default(TrackItemVisibilityBehaviour);
-                if (!TrackItemVisibilityBehaviours.TryGetValue(listBox, out behaviour))
+                if (!TrackItemVisibilityBehaviours.TryGetValue(itemsControl, out behaviour))
                 {
-                    TrackItemVisibilityBehaviours.Add(listBox, new TrackItemVisibilityBehaviour(listBox));
+                    TrackItemVisibilityBehaviours.Add(itemsControl, new TrackItemVisibilityBehaviour(itemsControl));
                 }
             }
             else
             {
                 var behaviour = default(TrackItemVisibilityBehaviour);
-                if (TrackItemVisibilityBehaviours.TryGetValue(listBox, out behaviour))
+                if (TrackItemVisibilityBehaviours.TryGetValue(itemsControl, out behaviour))
                 {
-                    TrackItemVisibilityBehaviours.Remove(listBox);
+                    TrackItemVisibilityBehaviours.Remove(itemsControl);
                     behaviour.Dispose();
                 }
             }
@@ -57,7 +57,7 @@ namespace FoxTunes
             "IsItemVisibleChanged",
             RoutingStrategy.Bubble,
             typeof(IsItemVisibleChangedEventHandler),
-            typeof(ListBoxExtensions)
+            typeof(ItemsControlExtensions)
         );
 
         public static void AddIsItemVisibleChangedHandler(DependencyObject source, IsItemVisibleChangedEventHandler handler)
@@ -109,23 +109,23 @@ namespace FoxTunes
                 this.Visibility = new Dictionary<FrameworkElement, bool>();
             }
 
-            public TrackItemVisibilityBehaviour(ListBox listBox) : this()
+            public TrackItemVisibilityBehaviour(ItemsControl itemsControl) : this()
             {
-                this.ListBox = listBox;
-                this.ListBox.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(this.OnScrollChanged));
+                this.ItemsControl = itemsControl;
+                this.ItemsControl.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(this.OnScrollChanged));
             }
 
-            public ListBox ListBox { get; private set; }
+            public ItemsControl ItemsControl { get; private set; }
 
             public IDictionary<FrameworkElement, bool> Visibility { get; private set; }
 
             protected virtual void OnScrollChanged(object sender, ScrollChangedEventArgs e)
             {
                 var elements = new List<FrameworkElement>();
-                var containerBounds = new Rect(0.0, 0.0, this.ListBox.ActualWidth, this.ListBox.ActualHeight);
-                foreach (var item in this.ListBox.Items)
+                var containerBounds = new Rect(0.0, 0.0, this.ItemsControl.ActualWidth, this.ItemsControl.ActualHeight);
+                foreach (var item in this.ItemsControl.Items)
                 {
-                    var element = this.ListBox.ItemContainerGenerator.ContainerFromItem(item) as FrameworkElement;
+                    var element = this.ItemsControl.ItemContainerGenerator.ContainerFromItem(item) as FrameworkElement;
                     if (element != null)
                     {
                         elements.Add(element);
@@ -157,7 +157,7 @@ namespace FoxTunes
                     return false;
                 }
                 var elementBounds = element
-                    .TransformToAncestor(this.ListBox)
+                    .TransformToAncestor(this.ItemsControl)
                     .TransformBounds(new Rect(0.0, 0.0, element.ActualWidth, element.ActualHeight));
                 return containerBounds.Contains(elementBounds.TopLeft) || containerBounds.Contains(elementBounds.BottomRight);
             }

@@ -51,9 +51,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler FramesChanged;
 
-        private DoubleConfigurationElement _ScalingFactor { get; set; }
+        private double _ScalingFactor { get; set; }
 
-        public DoubleConfigurationElement ScalingFactor
+        public double ScalingFactor
         {
             get
             {
@@ -68,6 +68,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnScalingFactorChanged()
         {
+            if (this.IsInitialized)
+            {
+                var task = this.Reload();
+            }
             if (this.ScalingFactorChanged != null)
             {
                 this.ScalingFactorChanged(this, EventArgs.Empty);
@@ -77,9 +81,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged;
 
-        private IntegerConfigurationElement _TileSize { get; set; }
+        private int _TileSize { get; set; }
 
-        public IntegerConfigurationElement TileSize
+        public int TileSize
         {
             get
             {
@@ -94,6 +98,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnTileSizeChanged()
         {
+            if (this.IsInitialized)
+            {
+                var task = this.Reload();
+            }
             if (this.TileSizeChanged != null)
             {
                 this.TileSizeChanged(this, EventArgs.Empty);
@@ -102,6 +110,32 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler TileSizeChanged;
+
+        private LibraryBrowserViewMode _ViewMode { get; set; }
+
+        public LibraryBrowserViewMode ViewMode
+        {
+            get
+            {
+                return this._ViewMode;
+            }
+            set
+            {
+                this._ViewMode = value;
+                this.OnViewModeChanged();
+            }
+        }
+
+        protected virtual void OnViewModeChanged()
+        {
+            if (this.ViewModeChanged != null)
+            {
+                this.ViewModeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ViewMode");
+        }
+
+        public event EventHandler ViewModeChanged;
 
         public bool IsSlave
         {
@@ -130,22 +164,18 @@ namespace FoxTunes.ViewModel
                 this.ArtworkGridProvider.Cleared += this.OnCleared;
             }
             this.Configuration = core.Components.Configuration;
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
+            this.Configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged += this.OnValueChanged;
-            }
-            this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
+            ).ConnectValue(value => this.ScalingFactor = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
-            );
-            if (this.TileSize != null)
-            {
-                this.TileSize.ValueChanged += this.OnValueChanged;
-            }
+            ).ConnectValue(value => this.TileSize = value);
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_VIEW
+            ).ConnectValue(option => this.ViewMode = LibraryBrowserBehaviourConfiguration.GetLibraryView(option));
             LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
@@ -154,11 +184,6 @@ namespace FoxTunes.ViewModel
         protected virtual void OnCleared(object sender, EventArgs e)
         {
             var task = this.Refresh();
-        }
-
-        protected virtual void OnValueChanged(object sender, EventArgs e)
-        {
-            var task = this.Reload();
         }
 
         public bool IsRefreshing { get; private set; }
@@ -365,14 +390,6 @@ namespace FoxTunes.ViewModel
             if (this.ArtworkGridProvider != null)
             {
                 this.ArtworkGridProvider.Cleared -= this.OnCleared;
-            }
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.TileSize != null)
-            {
-                this.TileSize.ValueChanged -= this.OnValueChanged;
             }
             LayoutManager.Instance.ActiveComponentsChanged -= this.OnActiveComponentsChanged;
             base.OnDisposing();
