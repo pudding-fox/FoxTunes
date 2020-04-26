@@ -13,11 +13,11 @@ namespace FoxTunes.Interfaces
 
         event EventHandler StateChanged;
 
-        IEnumerable<LibraryHierarchy> GetHierarchies();
+        LibraryHierarchy[] GetHierarchies();
 
-        IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy);
+        LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy);
 
-        IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode);
+        LibraryHierarchyNode[] GetNodes(LibraryHierarchyNode libraryHierarchyNode);
 
         IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode, bool loadMetaData);
     }

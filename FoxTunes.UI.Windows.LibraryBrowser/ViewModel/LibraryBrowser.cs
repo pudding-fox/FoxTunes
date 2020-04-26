@@ -223,11 +223,11 @@ namespace FoxTunes.ViewModel
             this.IsRefreshing = true;
             try
             {
+                await base.Refresh().ConfigureAwait(false);
                 await this.Synchronize(new List<LibraryBrowserFrame>()
                 {
                     new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
                 }).ConfigureAwait(false);
-                this.OnItemsChanged();
             }
             finally
             {
@@ -242,11 +242,11 @@ namespace FoxTunes.ViewModel
             this.IsReloading = true;
             try
             {
+                await base.Reload().ConfigureAwait(false);
                 await this.Synchronize(new List<LibraryBrowserFrame>()
                 {
                     new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
                 }).ConfigureAwait(false);
-                await base.Reload().ConfigureAwait(false);
             }
             finally
             {

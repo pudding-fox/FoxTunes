@@ -9,7 +9,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class PlaylistCache : StandardComponent, IPlaylistCache, IDisposable
     {
-        public Lazy<IList<PlaylistItem>> Items { get; private set; }
+        public Lazy<PlaylistItem[]> Items { get; private set; }
 
         public Lazy<IDictionary<int, PlaylistItem>> ItemsById { get; private set; }
 
@@ -95,11 +95,11 @@ namespace FoxTunes
             return false;
         }
 
-        public IEnumerable<PlaylistItem> GetItems(Func<IEnumerable<PlaylistItem>> factory)
+        public PlaylistItem[] GetItems(Func<IEnumerable<PlaylistItem>> factory)
         {
             if (this.Items == null)
             {
-                this.Items = new Lazy<IList<PlaylistItem>>(() => new List<PlaylistItem>(factory()));
+                this.Items = new Lazy<PlaylistItem[]>(() => factory().ToArray());
             }
             return this.Items.Value;
         }

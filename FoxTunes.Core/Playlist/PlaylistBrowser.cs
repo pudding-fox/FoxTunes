@@ -70,7 +70,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public IEnumerable<PlaylistItem> GetItems()
+        public PlaylistItem[] GetItems()
         {
             return this.PlaylistCache.GetItems(this.GetItemsCore);
         }

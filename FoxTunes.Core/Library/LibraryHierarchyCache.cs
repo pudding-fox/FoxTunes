@@ -20,9 +20,9 @@ namespace FoxTunes
             }
         }
 
-        public Lazy<IList<LibraryHierarchy>> Hierarchies { get; private set; }
+        public Lazy<LibraryHierarchy[]> Hierarchies { get; private set; }
 
-        public ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<IList<LibraryHierarchyNode>>> Nodes { get; private set; }
+        public ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<LibraryHierarchyNode[]>> Nodes { get; private set; }
 
         public IFilterParser FilterParser { get; private set; }
 
@@ -87,24 +87,24 @@ namespace FoxTunes
 #endif
         }
 
-        public IEnumerable<LibraryHierarchy> GetHierarchies(Func<IEnumerable<LibraryHierarchy>> factory)
+        public LibraryHierarchy[] GetHierarchies(Func<IEnumerable<LibraryHierarchy>> factory)
         {
             if (this.Hierarchies == null)
             {
-                this.Hierarchies = new Lazy<IList<LibraryHierarchy>>(() => new List<LibraryHierarchy>(factory()));
+                this.Hierarchies = new Lazy<LibraryHierarchy[]>(() => factory().ToArray());
             }
             return this.Hierarchies.Value;
         }
 
-        public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory)
+        public LibraryHierarchyNode[] GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory)
         {
-            return this.Nodes.GetOrAdd(key, _key => new Lazy<IList<LibraryHierarchyNode>>(() => new List<LibraryHierarchyNode>(factory()))).Value;
+            return this.Nodes.GetOrAdd(key, _key => new Lazy<LibraryHierarchyNode[]>(() => factory().ToArray())).Value;
         }
 
         public void Reset()
         {
             this.Hierarchies = null;
-            this.Nodes = new ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<IList<LibraryHierarchyNode>>>();
+            this.Nodes = new ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<LibraryHierarchyNode[]>>();
         }
 
         public void Evict(LibraryHierarchyCacheKey key)
