@@ -7,19 +7,19 @@ using System.Windows.Media;
 namespace FoxTunes
 {
     /// <summary>
-    /// Interaction logic for ArtworkGrid.xaml
+    /// Interaction logic for LibraryBrowserTile.xaml
     /// </summary>
-    public partial class ArtworkGrid : UserControl
+    public partial class LibraryBrowserTile : UserControl
     {
         public static readonly ILibraryHierarchyBrowser LibraryHierarchyBrowser = ComponentRegistry.Instance.GetComponent<ILibraryHierarchyBrowser>();
 
-        public static readonly ArtworkGridProvider ArtworkGridProvider = ComponentRegistry.Instance.GetComponent<ArtworkGridProvider>();
+        public static readonly LibraryBrowserTileProvider LibraryBrowserTileProvider = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileProvider>();
 
         public static int TileWidth { get; private set; }
 
         public static int TileHeight { get; private set; }
 
-        static ArtworkGrid()
+        static LibraryBrowserTile()
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
             if (configuration == null)
@@ -49,10 +49,10 @@ namespace FoxTunes
             });
             scalingFactor.ValueChanged += handler;
             tileSize.ValueChanged += handler;
-            handler(typeof(ArtworkGrid), EventArgs.Empty);
+            handler(typeof(LibraryBrowserTile), EventArgs.Empty);
         }
 
-        public ArtworkGrid()
+        public LibraryBrowserTile()
         {
             this.InitializeComponent();
         }
@@ -80,7 +80,7 @@ namespace FoxTunes
                 //Very rare.
                 return;
             }
-            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight, true);
+            var source = LibraryBrowserTileProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight, true);
             var brush = new ImageBrush(source)
             {
                 Stretch = Stretch.Uniform

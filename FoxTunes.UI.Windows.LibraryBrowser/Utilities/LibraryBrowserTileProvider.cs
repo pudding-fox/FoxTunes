@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class ArtworkGridProvider : StandardComponent, IDisposable
+    public class LibraryBrowserTileProvider : StandardComponent, IDisposable
     {
         const int TIMEOUT = 1000;
 
@@ -18,7 +18,7 @@ namespace FoxTunes
 
         const double DPIY = 96;
 
-        private static readonly string PREFIX = typeof(ArtworkGridProvider).Name;
+        private static readonly string PREFIX = typeof(LibraryBrowserTileProvider).Name;
 
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
 
@@ -28,12 +28,28 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public LibraryBrowserImageMode ImageMode { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
+            ).ConnectValue(option =>
+            {
+                this.ImageMode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(option);
+                if (this.IsInitialized)
+                {
+                    this.OnCleared();
+                }
+            });
             base.InitializeComponent(core);
         }
 
@@ -92,23 +108,43 @@ namespace FoxTunes
 
         private bool IsRendered(LibraryHierarchyNode libraryHierarchyNode)
         {
-            return libraryHierarchyNode.MetaDatas.Length > 1;
+            switch (this.ImageMode)
+            {
+                case LibraryBrowserImageMode.First:
+                    return false;
+                default:
+                case LibraryBrowserImageMode.Compound:
+                    return libraryHierarchyNode.MetaDatas.Length > 1;
+            }
         }
 
         private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
-            switch (libraryHierarchyNode.MetaDatas.Length)
+            switch (this.ImageMode)
             {
-                case 0:
-                    return this.CreateImageSource0();
-                case 1:
-                    return this.CreateImageSource1(libraryHierarchyNode, width, height);
-                case 2:
-                    return this.CreateImageSource2(libraryHierarchyNode, width, height, cache);
-                case 3:
-                    return this.CreateImageSource3(libraryHierarchyNode, width, height, cache);
+                case LibraryBrowserImageMode.First:
+                    switch (libraryHierarchyNode.MetaDatas.Length)
+                    {
+                        case 0:
+                            return this.CreateImageSource0();
+                        default:
+                            return this.CreateImageSource1(libraryHierarchyNode, width, height);
+                    }
                 default:
-                    return this.CreateImageSource4(libraryHierarchyNode, width, height, cache);
+                case LibraryBrowserImageMode.Compound:
+                    switch (libraryHierarchyNode.MetaDatas.Length)
+                    {
+                        case 0:
+                            return this.CreateImageSource0();
+                        case 1:
+                            return this.CreateImageSource1(libraryHierarchyNode, width, height);
+                        case 2:
+                            return this.CreateImageSource2(libraryHierarchyNode, width, height, cache);
+                        case 3:
+                            return this.CreateImageSource3(libraryHierarchyNode, width, height, cache);
+                        default:
+                            return this.CreateImageSource4(libraryHierarchyNode, width, height, cache);
+                    }
             }
         }
 
@@ -279,7 +315,18 @@ namespace FoxTunes
                 {
                     hashCode += this.ThemeLoader.Theme.Id.GetHashCode();
                 }
-                foreach (var metaDataItem in libraryHierarchyNode.MetaDatas.Take(4))
+                var take = default(int);
+                switch (this.ImageMode)
+                {
+                    default:
+                    case LibraryBrowserImageMode.Compound:
+                        take = 4;
+                        break;
+                    case LibraryBrowserImageMode.First:
+                        take = 1;
+                        break;
+                }
+                foreach (var metaDataItem in libraryHierarchyNode.MetaDatas.Take(take))
                 {
                     if (string.IsNullOrEmpty(metaDataItem.Value))
                     {
@@ -345,7 +392,7 @@ namespace FoxTunes
             }
         }
 
-        ~ArtworkGridProvider()
+        ~LibraryBrowserTileProvider()
         {
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try

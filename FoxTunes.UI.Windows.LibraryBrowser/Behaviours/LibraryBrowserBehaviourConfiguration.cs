@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace FoxTunes
 {
@@ -18,11 +19,19 @@ namespace FoxTunes
 
         public const string LIBRARY_BROWSER_TILE_SIZE = "HHHH0E5E-FB67-43D3-AE30-BF7571A1A8B1";
 
+        public const string LIBRARY_BROWSER_TILE_IMAGE = "IIIIFCBE-2AA0-4B99-9C6E-E3F196540807";
+
+        public const string LIBRARY_BROWSER_TILE_IMAGE_FIRST = "AAAA9419-8D7E-4150-8FB8-999D2C019941";
+
+        public const string LIBRARY_BROWSER_TILE_IMAGE_COMPOUND = "BBBB32EB-B876-4F72-BA33-88D84817EE30";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(WindowsUserInterfaceConfiguration.SECTION, "Appearance")
                 .WithElement(
                     new SelectionConfigurationElement(LIBRARY_BROWSER_VIEW, "Library View").WithOptions(GetLibraryViewOptions()))
+                .WithElement(
+                    new SelectionConfigurationElement(LIBRARY_BROWSER_TILE_IMAGE, "Library Image").WithOptions(GetLibraryImageOptions()))
                 .WithElement(
                     new IntegerConfigurationElement(LIBRARY_BROWSER_TILE_SIZE, "Library Tile Size", path: "Advanced").WithValue(DEFAULT_GRID_TILE_SIZE).WithValidationRule(new IntegerValidationRule(60, 300, 4))
             );
@@ -48,6 +57,24 @@ namespace FoxTunes
                     return LibraryBrowserViewMode.Grid;
                 case LIBRARY_BROWSER_VIEW_LIST:
                     return LibraryBrowserViewMode.List;
+            }
+        }
+
+        private static IEnumerable<SelectionConfigurationOption> GetLibraryImageOptions()
+        {
+            yield return new SelectionConfigurationOption(LIBRARY_BROWSER_TILE_IMAGE_FIRST, "First");
+            yield return new SelectionConfigurationOption(LIBRARY_BROWSER_TILE_IMAGE_COMPOUND, "Compound").Default();
+        }
+
+        public static LibraryBrowserImageMode GetLibraryImage(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
+            {
+                case LIBRARY_BROWSER_TILE_IMAGE_FIRST:
+                    return LibraryBrowserImageMode.First;
+                default:
+                case LIBRARY_BROWSER_TILE_IMAGE_COMPOUND:
+                    return LibraryBrowserImageMode.Compound;
             }
         }
 
@@ -79,5 +106,12 @@ namespace FoxTunes
         None,
         Grid,
         List
+    }
+
+    public enum LibraryBrowserImageMode : byte
+    {
+        None,
+        First,
+        Compound
     }
 }
