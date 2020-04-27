@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -19,7 +20,7 @@ namespace FoxTunes
 
         public const string LIBRARY_BROWSER_TILE_SIZE = "HHHH0E5E-FB67-43D3-AE30-BF7571A1A8B1";
 
-        public const string LIBRARY_BROWSER_TILE_IMAGE = "IIIIFCBE-2AA0-4B99-9C6E-E3F196540807";
+        public const string LIBRARY_BROWSER_TILE_IMAGE = "HHIIFCBE-2AA0-4B99-9C6E-E3F196540807";
 
         public const string LIBRARY_BROWSER_TILE_IMAGE_FIRST = "AAAA9419-8D7E-4150-8FB8-999D2C019941";
 
@@ -31,7 +32,7 @@ namespace FoxTunes
                 .WithElement(
                     new SelectionConfigurationElement(LIBRARY_BROWSER_VIEW, "Library View").WithOptions(GetLibraryViewOptions()))
                 .WithElement(
-                    new SelectionConfigurationElement(LIBRARY_BROWSER_TILE_IMAGE, "Library Image").WithOptions(GetLibraryImageOptions()))
+                    new SelectionConfigurationElement(LIBRARY_BROWSER_TILE_IMAGE, "Library Tile Image", path: "Advanced").WithOptions(GetLibraryImageOptions()))
                 .WithElement(
                     new IntegerConfigurationElement(LIBRARY_BROWSER_TILE_SIZE, "Library Tile Size", path: "Advanced").WithValue(DEFAULT_GRID_TILE_SIZE).WithValidationRule(new IntegerValidationRule(60, 300, 4))
             );
@@ -84,6 +85,10 @@ namespace FoxTunes
                 WindowsUserInterfaceConfiguration.SECTION,
                 LIBRARY_BROWSER_VIEW
             );
+            var image = ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                LIBRARY_BROWSER_TILE_IMAGE
+            );
             var size = ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LIBRARY_BROWSER_TILE_SIZE
@@ -92,9 +97,15 @@ namespace FoxTunes
             {
                 default:
                 case LibraryBrowserViewMode.Grid:
+                    image.Value = image.Value = image.Options.FirstOrDefault(
+                        option => string.Equals(option.Id, LIBRARY_BROWSER_TILE_IMAGE_COMPOUND, StringComparison.OrdinalIgnoreCase)
+                    );
                     size.Value = DEFAULT_GRID_TILE_SIZE;
                     break;
                 case LibraryBrowserViewMode.List:
+                    image.Value = image.Value = image.Options.FirstOrDefault(
+                        option => string.Equals(option.Id, LIBRARY_BROWSER_TILE_IMAGE_FIRST, StringComparison.OrdinalIgnoreCase)
+                    );
                     size.Value = DEFAULT_LIST_TILE_SIZE;
                     break;
             }
