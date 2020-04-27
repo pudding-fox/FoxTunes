@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
@@ -21,15 +19,26 @@ namespace FoxTunes.Interfaces
 
     public class MetaDataCacheKey : IEquatable<MetaDataCacheKey>
     {
-        public MetaDataCacheKey(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName, string filter)
+        private MetaDataCacheKey(MetaDataItemType? metaDataItemType, string metaDataItemName, string filter)
         {
-            this.LibraryHierarchyNode = libraryHierarchyNode;
             this.MetaDataItemType = metaDataItemType;
             this.MetaDataItemName = metaDataItemName;
             this.Filter = filter;
         }
 
+        public MetaDataCacheKey(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName, string filter) : this(metaDataItemType, metaDataItemName, filter)
+        {
+            this.LibraryHierarchyNode = libraryHierarchyNode;
+        }
+
+        public MetaDataCacheKey(PlaylistItem[] playlistItems, MetaDataItemType? metaDataItemType, string metaDataItemName, string filter) : this(metaDataItemType, metaDataItemName, filter)
+        {
+            this.PlaylistItems = playlistItems;
+        }
+
         public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
+
+        public PlaylistItem[] PlaylistItems { get; private set; }
 
         public MetaDataItemType? MetaDataItemType { get; private set; }
 
@@ -45,6 +54,13 @@ namespace FoxTunes.Interfaces
                 if (this.LibraryHierarchyNode != null)
                 {
                     hashCode += this.LibraryHierarchyNode.GetHashCode();
+                }
+                if (this.PlaylistItems != null)
+                {
+                    foreach (var playlistItem in this.PlaylistItems)
+                    {
+                        hashCode += playlistItem.GetHashCode();
+                    }
                 }
                 if (this.MetaDataItemType.HasValue)
                 {

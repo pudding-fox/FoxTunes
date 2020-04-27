@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,6 +8,8 @@ namespace FoxTunes
 {
     public static partial class ListViewExtensions
     {
+        public const int MAX_SELECTED_ITEMS = 750;
+
         private static readonly ConditionalWeakTable<ListView, SelectedItemsBehaviour> SelectedItemsBehaviours = new ConditionalWeakTable<ListView, SelectedItemsBehaviour>();
 
         public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.RegisterAttached(
@@ -38,16 +41,22 @@ namespace FoxTunes
             {
                 SelectedItemsBehaviours.Add(listView, new SelectedItemsBehaviour(listView));
             }
-            var items = (e.NewValue as IList);
-            if (items == null || object.ReferenceEquals(items, listView.SelectedItems))
-            {
-                return;
-            }
-            listView.SelectedItems.Clear();
-            foreach (var item in items)
-            {
-                listView.SelectedItems.Add(item);
-            }
+            //We only need this if we need two way binding (it's sketchy and causes weird recursive 
+            //calls to this handler anyway so let's just not).
+            //var items = (e.NewValue as IList);
+            //if (items == null)
+            //{
+            //    return;
+            //}
+            //if (Enumerable.SequenceEqual(listView.SelectedItems.Cast<object>(), items.Cast<object>()))
+            //{
+            //    return;
+            //}
+            //listView.SelectedItems.Clear();
+            //foreach (var item in items)
+            //{
+            //    listView.SelectedItems.Add(item);
+            //}
         }
 
         private class SelectedItemsBehaviour : UIBehaviour
