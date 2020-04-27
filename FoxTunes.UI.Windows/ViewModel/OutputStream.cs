@@ -32,15 +32,28 @@ namespace FoxTunes.ViewModel
             this.OnDescriptionChanged();
         }
 
+        private long _Position { get; set; }
+
         public long Position
         {
             get
             {
+                if (this.IsSeeking)
+                {
+                    return this._Position;
+                }
                 return this.InnerOutputStream.Position;
             }
             set
             {
-                this.InnerOutputStream.Position = value;
+                if (this.IsSeeking)
+                {
+                    this._Position = value;
+                }
+                else
+                {
+                    this.InnerOutputStream.Position = value;
+                }
                 this.OnPositionChanged();
             }
         }
@@ -86,6 +99,48 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler DescriptionChanged;
+
+        private bool _IsSeeking { get; set; }
+
+        public bool IsSeeking
+        {
+            get
+            {
+                return this._IsSeeking;
+            }
+            set
+            {
+                this._IsSeeking = value;
+                this.OnIsSeekingChanged();
+            }
+        }
+
+        protected virtual void OnIsSeekingChanged()
+        {
+            if (this.IsSeekingChanged != null)
+            {
+                this.IsSeekingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsSeeking");
+        }
+
+        public event EventHandler IsSeekingChanged;
+
+        public void BeginSeek()
+        {
+            var position = this.Position;
+            this.IsSeeking = true;
+            this.Position = position;
+            this.InnerOutputStream.BeginSeek();
+        }
+
+        public void EndSeek()
+        {
+            var position = this.Position;
+            this.IsSeeking = false;
+            this.Position = position;
+            this.InnerOutputStream.EndSeek();
+        }
 
         protected override void OnDisposing()
         {

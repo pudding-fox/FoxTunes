@@ -40,9 +40,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand<IPlaybackManager>(
-                    playback => playback.CurrentStream.BeginSeek(),
-                    playback => playback != null && playback.CurrentStream != null
+                return CommandFactory.Instance.CreateCommand(
+                    () => this.CurrentStream.BeginSeek(),
+                    () => this.CurrentStream != null
                 );
             }
         }
@@ -51,9 +51,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand<IPlaybackManager>(
-                    playback => playback.CurrentStream.EndSeek(),
-                    playback => playback != null && playback.CurrentStream != null
+                return CommandFactory.Instance.CreateCommand(
+                    () => this.CurrentStream.EndSeek(),
+                    () => this.CurrentStream != null
                 );
             }
         }
