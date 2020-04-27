@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,6 +7,12 @@ namespace FoxTunes.ViewModel
 {
     public abstract class PlaylistBase : ViewModelBase
     {
+        const string LOADING = "Loading...";
+
+        const string UPDATING = "Updating...";
+
+        const string EMPTY = "Add to playlist by dropping files here.";
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
@@ -50,20 +55,28 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.PlaylistBrowser != null)
+                if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null)
                 {
-                    switch (this.PlaylistBrowser.State)
+                    return LOADING;
+                }
+                if (!this.PlaylistManager.CanNavigate)
+                {
+                    var isUpdating = global::FoxTunes.BackgroundTask.Active
+                        .OfType<PlaylistTaskBase>()
+                        .Any();
+                    if (isUpdating)
                     {
-                        case PlaylistBrowserState.Loading:
-                            return "Loading...";
+                        return UPDATING;
+                    }
+                    else
+                    {
+                        return EMPTY;
                     }
                 }
-                if (this.PlaylistManager != null)
+                switch (this.PlaylistBrowser.State)
                 {
-                    if (!this.PlaylistManager.CanNavigate)
-                    {
-                        return "Add to playlist by dropping files here.";
-                    }
+                    case PlaylistBrowserState.Loading:
+                        return LOADING;
                 }
                 return null;
             }
@@ -84,24 +97,18 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Items != null && this.Items.Count > 0)
+                if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null || this.Items.Count == 0)
                 {
-                    return false;
+                    return true;
                 }
-                if (this.PlaylistBrowser != null)
+                switch (this.PlaylistBrowser.State)
                 {
-                    switch (this.PlaylistBrowser.State)
-                    {
-                        case PlaylistBrowserState.Loading:
-                            return true;
-                    }
-                }
-                if (this.PlaylistManager != null)
-                {
-                    if (!this.PlaylistManager.CanNavigate)
-                    {
+                    case PlaylistBrowserState.Loading:
                         return true;
-                    }
+                }
+                if (!this.PlaylistManager.CanNavigate)
+                {
+                    return true;
                 }
                 return false;
             }
@@ -129,6 +136,7 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
+            global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
@@ -136,11 +144,15 @@ namespace FoxTunes.ViewModel
             this.PlaylistBrowser.StateChanged += this.OnStateChanged;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaylistManager.CanNavigateChanged += this.OnCanNavigateChanged;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: Bad .Wait().
             this.RefreshStatus().Wait();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnActiveChanged(object sender, EventArgs e)
+        {
+            var task = this.RefreshStatus();
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
@@ -162,26 +174,27 @@ namespace FoxTunes.ViewModel
             var task = this.RefreshStatus();
         }
 
-        protected virtual void OnCanNavigateChanged(object sender, EventArgs e)
-        {
-            var task = this.RefreshStatus();
-        }
-
-        protected virtual Task RefreshItems()
+        protected virtual async Task RefreshItems()
         {
             var items = this.PlaylistBrowser.GetItems();
             if (this.Items == null)
             {
-                return Windows.Invoke(() => this.Items = new PlaylistItemCollection(items));
+                await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);
             }
             else
             {
-                return Windows.Invoke(this.Items.Update(items));
+                await Windows.Invoke(this.Items.Update(items)).ConfigureAwait(false);
             }
+            await this.RefreshStatus().ConfigureAwait(false);
         }
 
         protected override void OnDisposing()
         {
+            global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
+            if (this.PlaylistBrowser != null)
+            {
+                this.PlaylistBrowser.StateChanged += this.OnStateChanged;
+            }
             if (this.SignalEmitter != null)
             {
                 this.SignalEmitter.Signal -= this.OnSignal;
