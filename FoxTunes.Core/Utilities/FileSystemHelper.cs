@@ -111,14 +111,14 @@ namespace FoxTunes
             }
         }
 
-        public static bool IsLocalFile(string fileName)
+        public static bool IsLocalPath(string fileName)
         {
             try
             {
                 var uri = new Uri(fileName);
                 if (string.Equals(uri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
                 {
-                    //Normal file.
+                    //Normal path.
                     return true;
                 }
                 //Some kind of abstraction.
@@ -126,7 +126,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(typeof(FileSystemHelper), LogLevel.Warn, "Failed to determine whether \"{0}\" is a local file: {1}", fileName, e.Message);
+                Logger.Write(typeof(FileSystemHelper), LogLevel.Warn, "Failed to determine whether \"{0}\" is a local path: {1}", fileName, e.Message);
                 return false;
             }
         }

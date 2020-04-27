@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -61,24 +62,37 @@ namespace FoxTunes
             {
                 foreach (var provider in this.GetProviders(playlistItem))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
-                    var channelHandle = await provider.CreateStream(playlistItem).ConfigureAwait(false);
-                    if (channelHandle != 0)
+                    //We will try twice if we get BASS_ERROR_ALREADY.
+                    for (var a = 0; a < 2; a++)
                     {
-                        Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
-                        return new BassStream(provider, channelHandle);
-                    }
-                    else
-                    {
+                        Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
+                        var channelHandle = await provider.CreateStream(playlistItem).ConfigureAwait(false);
+                        if (channelHandle != 0)
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
+                            return new BassStream(provider, channelHandle);
+                        }
                         if (Bass.LastError == Errors.Already)
                         {
-                            if (!immidiate || !this.FreeActiveStreams())
+                            //This will happen when using a CD player.
+                            //If immidiate playback was requested we need to free any active streams and try again. 
+                            if (immidiate)
                             {
-                                return BassStream.Empty;
+                                Logger.Write(this, LogLevel.Debug, "Device is in use (probably a CD player), releasing active streams.");
+                                if (this.FreeActiveStreams())
+                                {
+                                    Logger.Write(this, LogLevel.Debug, "Active streams were released, retrying.");
+                                    continue;
+                                }
+                                else
+                                {
+                                    Logger.Write(this, LogLevel.Debug, "Failed to release active streams.");
+                                }
                             }
                         }
+                        Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), Bass.LastError));
+                        break;
                     }
-                    Logger.Write(this, LogLevel.Warn, "The bass stream provider failed.");
                 }
             }
             finally

@@ -84,7 +84,7 @@ namespace FoxTunes
 
         protected virtual async Task Synchronize(PlaylistItem playlistItem)
         {
-            if (!FileSystemHelper.IsLocalFile(playlistItem.FileName))
+            if (!FileSystemHelper.IsLocalPath(playlistItem.FileName))
             {
                 Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName);
                 return;
