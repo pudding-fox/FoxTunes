@@ -100,11 +100,7 @@ namespace FoxTunes
                 }
                 if (this.IsInitialized)
                 {
-#if NET40
-                    await TaskEx.Run(() => this.Configuration.Save()).ConfigureAwait(false);
-#else
-                    await Task.Run(() => this.Configuration.Save()).ConfigureAwait(false);
-#endif
+                    this.Configuration.Save();
                 }
             });
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -156,25 +152,16 @@ namespace FoxTunes
             {
                 case TOPMOST:
                     this.Topmost.Toggle();
-#if NET40
-                    return TaskEx.Run(() => this.Configuration.Save());
-#else
-                    return Task.Run(() => this.Configuration.Save());
-#endif
+                    this.Configuration.Save();
+                    break;
                 case SHOW_ARTWORK:
                     this.ShowArtwork.Toggle();
-#if NET40
-                    return TaskEx.Run(() => this.Configuration.Save());
-#else
-                    return Task.Run(() => this.Configuration.Save());
-#endif
+                    this.Configuration.Save();
+                    break;
                 case SHOW_PLAYLIST:
                     this.ShowPlaylist.Toggle();
-#if NET40
-                    return TaskEx.Run(() => this.Configuration.Save());
-#else
-                    return Task.Run(() => this.Configuration.Save());
-#endif
+                    this.Configuration.Save();
+                    break;
                 case QUIT:
                     Windows.Shutdown();
                     break;

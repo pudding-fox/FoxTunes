@@ -115,7 +115,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(
+                return new Command(
                     () => this.SelectedSection.Reset(),
                     () => this.Configuration != null && this.SelectedSection != null
                 );
@@ -126,12 +126,8 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var command = CommandFactory.Instance.CreateCommand(
-#if NET40
-                    () => TaskEx.Run(() => this.Configuration.Save()),
-#else
-                    () => Task.Run(() => this.Configuration.Save()),
-#endif
+                var command = new Command(
+                    () => this.Configuration.Save(),
                     () => this.Configuration != null
                 );
                 command.Tag = CommandHints.DISMISS;
