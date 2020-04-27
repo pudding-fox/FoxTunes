@@ -79,6 +79,8 @@
 
     <SolidColorBrush x:Key="MouseOverBrush" Color="#FF3E3E40"/>
 
+    <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
+    
     <Style x:Key="NuclearButtonFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
