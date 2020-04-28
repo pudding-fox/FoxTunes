@@ -246,6 +246,10 @@ namespace FoxTunes.ViewModel
                 {
                     return LOADING;
                 }
+                if (this.Items.Count > 0)
+                {
+                    return null;
+                }
                 if (!this.HierarchyManager.CanNavigate)
                 {
                     var isUpdating = global::FoxTunes.BackgroundTask.Active
@@ -284,9 +288,13 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.LibraryHierarchyBrowser == null || this.HierarchyManager == null || this.Items == null || this.Items.Count == 0)
+                if (this.LibraryHierarchyBrowser == null || this.HierarchyManager == null || this.Items == null)
                 {
                     return true;
+                }
+                if (this.Items.Count > 0)
+                {
+                    return false;
                 }
                 switch (this.LibraryHierarchyBrowser.State)
                 {

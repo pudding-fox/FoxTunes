@@ -59,6 +59,10 @@ namespace FoxTunes.ViewModel
                 {
                     return LOADING;
                 }
+                if (this.Items.Count > 0)
+                {
+                    return null;
+                }
                 if (!this.PlaylistManager.CanNavigate)
                 {
                     var isUpdating = global::FoxTunes.BackgroundTask.Active
@@ -97,9 +101,13 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null || this.Items.Count == 0)
+                if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null)
                 {
                     return true;
+                }
+                if (this.Items.Count > 0)
+                {
+                    return false;
                 }
                 switch (this.PlaylistBrowser.State)
                 {

@@ -86,7 +86,7 @@ namespace FoxTunes.ViewModel
                 {
                     return;
                 }
-                this.PlaylistManager.SelectedItems = new ObservableCollection<PlaylistItem>(value.OfType<PlaylistItem>());
+                this.PlaylistManager.SelectedItems = value.OfType<PlaylistItem>().ToArray();
                 this.OnSelectedItemsChanged();
             }
         }
