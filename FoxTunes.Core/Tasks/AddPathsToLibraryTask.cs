@@ -53,8 +53,8 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Getting file list").ConfigureAwait(false);
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.Name = "Getting file list";
+            this.IsIndeterminate = true;
             await base.OnStarted().ConfigureAwait(false);
         }
 

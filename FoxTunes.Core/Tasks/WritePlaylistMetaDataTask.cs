@@ -1,6 +1,5 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -68,9 +67,9 @@ namespace FoxTunes
         {
             if (this.Visible)
             {
-                await this.SetName("Saving meta data").ConfigureAwait(false);
-                await this.SetPosition(0).ConfigureAwait(false);
-                await this.SetCount(this.PlaylistItems.Count()).ConfigureAwait(false);
+                this.Name = "Saving meta data";
+                this.Position = 0;
+                this.Count = this.PlaylistItems.Count();
             }
             await base.OnStarted().ConfigureAwait(false);
             //We don't need a lock for this so not waiting for OnRun().
@@ -92,8 +91,8 @@ namespace FoxTunes
 
                     if (this.Visible)
                     {
-                        await this.SetDescription(Path.GetFileName(playlistItem.FileName)).ConfigureAwait(false);
-                        await this.SetPosition(position).ConfigureAwait(false);
+                        this.Description = Path.GetFileName(playlistItem.FileName);
+                        this.Position = position;
                     }
 
                     if (!playlistItem.LibraryItem_Id.HasValue)

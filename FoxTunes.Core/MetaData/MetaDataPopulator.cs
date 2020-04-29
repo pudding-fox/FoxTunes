@@ -73,9 +73,9 @@ namespace FoxTunes
 
             if (this.ReportProgress)
             {
-                await this.SetName("Populating meta data").ConfigureAwait(false);
-                await this.SetPosition(0).ConfigureAwait(false);
-                await this.SetCount(fileDatas.Count()).ConfigureAwait(false);
+                this.Name = "Populating meta data";
+                this.Position = 0;
+                this.Count = fileDatas.Count();
                 if (this.Count <= 100)
                 {
                     this.Timer.Interval = FAST_INTERVAL;
@@ -130,7 +130,7 @@ namespace FoxTunes
             }, cancellationToken, this.ParallelOptions).ConfigureAwait(false);
         }
 
-        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
             var count = this.position - this.Position;
             if (count != 0)
@@ -148,12 +148,12 @@ namespace FoxTunes
                     }
                 }
                 var eta = this.GetEta(count);
-                await this.SetName(string.Format("Populating meta data: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
+                this.Name = string.Format("Populating meta data: {0} remaining @ {1} items/s", eta, count);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(Path.GetFileName(this.Current.FileName)).ConfigureAwait(false);
+                    this.Description = Path.GetFileName(this.Current.FileName);
                 }
-                await this.SetPosition(this.position).ConfigureAwait(false);
+                this.Position = this.position;
             }
             base.OnElapsed(sender, e);
         }

@@ -9,11 +9,11 @@ namespace FoxTunes.Interfaces
 
         bool Visible { get; }
 
-        event AsyncEventHandler Started;
+        event EventHandler Started;
 
         bool IsStarted { get; }
 
-        event AsyncEventHandler Completed;
+        event EventHandler Completed;
 
         bool IsCompleted { get; }
 
@@ -21,7 +21,7 @@ namespace FoxTunes.Interfaces
 
         event EventHandler ExceptionChanged;
 
-        event AsyncEventHandler Faulted;
+        event EventHandler Faulted;
 
         bool IsFaulted { get; }
 

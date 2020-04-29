@@ -73,11 +73,9 @@ namespace FoxTunes
 
         protected virtual async Task AddPlaylistItems(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
-            //We don't know how many files we're about to enumerate.
-            if (!this.IsIndeterminate)
-            {
-                await this.SetIsIndeterminate(true).ConfigureAwait(false);
-            }
+            //We don't know how many files we're about to enumerate.            
+            this.IsIndeterminate = true;
+
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, this.Visible, transaction))
@@ -174,7 +172,7 @@ namespace FoxTunes
 
         protected virtual async Task RemoveItems(PlaylistItemStatus status)
         {
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
@@ -207,7 +205,7 @@ namespace FoxTunes
                 at,
                 by
             );
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             var sequence = this.Database.Tables.PlaylistItem.Column("Sequence");
             var status = this.Database.Tables.PlaylistItem.Column("Status");
@@ -244,7 +242,7 @@ namespace FoxTunes
         protected virtual async Task SequenceItems()
         {
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.IsIndeterminate = true;
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 await this.Database.ExecuteAsync(this.Database.Queries.SequencePlaylistItems, (parameters, phase) =>
@@ -263,7 +261,7 @@ namespace FoxTunes
         protected virtual async Task SetPlaylistItemsStatus(PlaylistItemStatus status)
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));

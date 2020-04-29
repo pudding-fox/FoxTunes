@@ -51,9 +51,9 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Refreshing meta data").ConfigureAwait(false);
-            await this.SetPosition(0).ConfigureAwait(false);
-            await this.SetCount(this.LibraryItems.Count()).ConfigureAwait(false);
+            this.Name = "Refreshing meta data";
+            this.Position = 0;
+            this.Count = this.LibraryItems.Count();
             await base.OnStarted().ConfigureAwait(false);
         }
 
@@ -65,8 +65,8 @@ namespace FoxTunes
                 var metaDataSource = this.MetaDataSourceFactory.Create();
                 foreach (var libraryItem in this.LibraryItems)
                 {
-                    await this.SetDescription(Path.GetFileName(libraryItem.FileName)).ConfigureAwait(false);
-                    await this.SetPosition(position).ConfigureAwait(false);
+                    this.Description = Path.GetFileName(libraryItem.FileName);
+                    this.Position = position;
 
                     if (!File.Exists(libraryItem.FileName))
                     {

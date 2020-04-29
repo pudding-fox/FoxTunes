@@ -68,9 +68,9 @@ namespace FoxTunes
 
             if (this.ReportProgress)
             {
-                await this.SetName("Populating library hierarchies").ConfigureAwait(false);
-                await this.SetPosition(0).ConfigureAwait(false);
-                await this.SetCount(libraryItems.Count()).ConfigureAwait(false);
+                this.Name = "Populating library hierarchies";
+                this.Position = 0;
+                this.Count = libraryItems.Count();
                 if (this.Count <= 100)
                 {
                     this.Timer.Interval = FAST_INTERVAL;
@@ -198,7 +198,7 @@ namespace FoxTunes
             return this.Contexts.Value = this.ScriptingRuntime.CreateContext();
         }
 
-        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
             var count = this.position - this.Position;
             if (count != 0)
@@ -216,12 +216,12 @@ namespace FoxTunes
                     }
                 }
                 var eta = this.GetEta(count);
-                await this.SetName(string.Format("Populating library hierarchies: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
+                this.Name = string.Format("Populating library hierarchies: {0} remaining @ {1} items/s", eta, count);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(Path.GetFileName(this.Current)).ConfigureAwait(false);
+                    this.Description = Path.GetFileName(this.Current);
                 }
-                await this.SetPosition(position).ConfigureAwait(false);
+                this.Position = position;
             }
             base.OnElapsed(sender, e);
         }

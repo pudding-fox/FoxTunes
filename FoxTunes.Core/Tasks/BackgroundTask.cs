@@ -106,26 +106,23 @@ namespace FoxTunes
             {
                 return this._Name;
             }
+            protected set
+            {
+                this._Name = value;
+                this.OnNameChanged();
+            }
         }
 
-        protected Task SetName(string value)
-        {
-            this._Name = value;
-            return this.OnNameChanged();
-        }
-
-        protected virtual async Task OnNameChanged()
+        protected virtual void OnNameChanged()
         {
             if (this.NameChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.NameChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.NameChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("Name");
         }
 
-        public event AsyncEventHandler NameChanged;
+        public event EventHandler NameChanged;
 
         private string _Description { get; set; }
 
@@ -135,26 +132,23 @@ namespace FoxTunes
             {
                 return this._Description;
             }
+            protected set
+            {
+                this._Description = value;
+                this.OnDescriptionChanged();
+            }
         }
 
-        protected Task SetDescription(string value)
-        {
-            this._Description = value;
-            return this.OnDescriptionChanged();
-        }
-
-        protected virtual async Task OnDescriptionChanged()
+        protected virtual void OnDescriptionChanged()
         {
             if (this.DescriptionChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.DescriptionChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.DescriptionChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("Description");
         }
 
-        public event AsyncEventHandler DescriptionChanged;
+        public event EventHandler DescriptionChanged;
 
         private int _Position { get; set; }
 
@@ -164,27 +158,23 @@ namespace FoxTunes
             {
                 return this._Position;
             }
+            protected set
+            {
+                this._Position = value;
+                this.OnPositionChanged();
+            }
         }
 
-        protected Task SetPosition(int value)
-        {
-            this._Position = value;
-            return this.OnPositionChanged();
-        }
-
-        protected virtual async Task OnPositionChanged()
+        protected virtual void OnPositionChanged()
         {
             if (this.PositionChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.PositionChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.PositionChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("Position");
-            await this.OnIsIndeterminateChanged().ConfigureAwait(false);
         }
 
-        public event AsyncEventHandler PositionChanged;
+        public event EventHandler PositionChanged;
 
         private int _Count { get; set; }
 
@@ -194,62 +184,49 @@ namespace FoxTunes
             {
                 return this._Count;
             }
+            protected set
+            {
+                this._Count = value;
+                this.OnCountChanged();
+            }
         }
 
-        protected Task SetCount(int value)
-        {
-            this._Count = value;
-            return this.OnCountChanged();
-        }
-
-        protected virtual async Task OnCountChanged()
+        protected virtual void OnCountChanged()
         {
             if (this.CountChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.CountChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.CountChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("Count");
-            await this.OnIsIndeterminateChanged().ConfigureAwait(false);
         }
 
-        public event AsyncEventHandler CountChanged;
+        public event EventHandler CountChanged;
+
+        protected bool _IsIndeterminate { get; set; }
 
         public bool IsIndeterminate
         {
             get
             {
-                return this.Position == 0 && this.Count == 0;
+                return this._IsIndeterminate;
+            }
+            protected set
+            {
+                this._IsIndeterminate = value;
+                this.OnIsIndeterminateChanged();
             }
         }
 
-        protected async Task SetIsIndeterminate(bool value)
-        {
-            if (value)
-            {
-                await this.SetPosition(0).ConfigureAwait(false);
-                await this.SetCount(0).ConfigureAwait(false);
-            }
-            else
-            {
-                //Nothing to do.
-            }
-            await this.OnIsIndeterminateChanged().ConfigureAwait(false);
-        }
-
-        protected virtual async Task OnIsIndeterminateChanged()
+        protected virtual void OnIsIndeterminateChanged()
         {
             if (this.IsIndeterminateChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.IsIndeterminateChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.IsIndeterminateChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("IsIndeterminate");
         }
 
-        public event AsyncEventHandler IsIndeterminateChanged;
+        public event EventHandler IsIndeterminateChanged;
 
         public override void InitializeComponent(ICore core)
         {
@@ -305,40 +282,36 @@ namespace FoxTunes
         protected virtual Task OnStarted()
         {
             this.IsStarted = true;
-            if (this.Started == null)
+            if (this.Started != null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                this.Started(this, EventArgs.Empty);
             }
-            var e = new AsyncEventArgs();
-            this.Started(this, e);
-            return e.Complete();
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
-        public event AsyncEventHandler Started;
+        public event EventHandler Started;
 
         public bool IsStarted { get; private set; }
 
         protected virtual Task OnCompleted()
         {
             this.IsCompleted = true;
-            if (this.Completed == null)
+            if (this.Completed != null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                this.Completed(this, EventArgs.Empty);
             }
-            var e = new AsyncEventArgs();
-            this.Completed(this, e);
-            return e.Complete();
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
-        public event AsyncEventHandler Completed;
+        public event EventHandler Completed;
 
         public bool IsCompleted { get; private set; }
 
@@ -371,20 +344,18 @@ namespace FoxTunes
         protected virtual Task OnFaulted()
         {
             this.IsFaulted = true;
-            if (this.Faulted == null)
+            if (this.Faulted != null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                this.Faulted(this, EventArgs.Empty);
             }
-            var e = new AsyncEventArgs();
-            this.Faulted(this, e);
-            return e.Complete();
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
-        public event AsyncEventHandler Faulted;
+        public event EventHandler Faulted;
 
         public bool IsFaulted { get; private set; }
 
@@ -400,11 +371,11 @@ namespace FoxTunes
 
         protected virtual async Task WithSubTask(IReportsProgress task, Func<Task> func)
         {
-            var nameChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetName(task.Name).ConfigureAwait(false); });
-            var descriptionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetDescription(task.Description).ConfigureAwait(false); });
-            var positionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetPosition(task.Position).ConfigureAwait(false); });
-            var countChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetCount(task.Count).ConfigureAwait(false); });
-            var isIndeterminateChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetIsIndeterminate(task.IsIndeterminate).ConfigureAwait(false); });
+            var nameChanged = new EventHandler((sender, e) => this.Name = task.Name);
+            var descriptionChanged = new EventHandler((sender, e) => this.Description = task.Description);
+            var positionChanged = new EventHandler((sender, e) => this.Position = task.Position);
+            var countChanged = new EventHandler((sender, e) => this.Count = task.Count);
+            var isIndeterminateChanged = new EventHandler((sender, e) => this.IsIndeterminate = task.IsIndeterminate);
             task.NameChanged += nameChanged;
             task.DescriptionChanged += descriptionChanged;
             task.PositionChanged += positionChanged;

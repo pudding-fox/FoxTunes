@@ -30,9 +30,9 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Building hierarchies").ConfigureAwait(false);
-            await this.SetDescription("Preparing").ConfigureAwait(false);
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.Name = "Building hierarchies";
+            this.Description = "Preparing";
+            this.IsIndeterminate = true;
             await base.OnStarted().ConfigureAwait(false);
         }
 

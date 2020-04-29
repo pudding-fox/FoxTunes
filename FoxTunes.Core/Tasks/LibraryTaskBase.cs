@@ -4,9 +4,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -107,8 +105,8 @@ namespace FoxTunes
                  await this.AddLibraryItems(paths, cancellationToken).ConfigureAwait(false);
                  if (cancellationToken.IsCancellationRequested)
                  {
-                     await this.SetName("Waiting..").ConfigureAwait(false);
-                     await this.SetDescription(string.Empty).ConfigureAwait(false);
+                     this.Name = "Waiting..";
+                     this.Description = string.Empty;
                  }
              }))
             {
@@ -126,8 +124,8 @@ namespace FoxTunes
                 await this.AddOrUpdateMetaData(cancellationToken).ConfigureAwait(false);
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    await this.SetName("Waiting..").ConfigureAwait(false);
-                    await this.SetDescription(string.Empty).ConfigureAwait(false);
+                    this.Name = "Waiting..";
+                    this.Description = string.Empty;
                 }
             }))
             {
@@ -153,10 +151,8 @@ namespace FoxTunes
         protected virtual async Task AddLibraryItems(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
             //We don't know how many files we're about to enumerate.
-            if (!this.IsIndeterminate)
-            {
-                await this.SetIsIndeterminate(true).ConfigureAwait(false);
-            }
+            this.IsIndeterminate = true;
+
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, this.Visible, transaction))
@@ -201,13 +197,13 @@ namespace FoxTunes
                     await this.AddHiearchies(status, cancellationToken, transaction).ConfigureAwait(false);
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        await this.SetName("Waiting..").ConfigureAwait(false);
-                        await this.SetDescription(string.Empty).ConfigureAwait(false);
+                        this.Name = "Waiting..";
+                        this.Description = string.Empty;
                     }
                     else
                     {
-                        await this.SetDescription("Finalizing").ConfigureAwait(false);
-                        await this.SetIsIndeterminate(true).ConfigureAwait(false);
+                        this.Name = "Finalizing";
+                        this.IsIndeterminate = true;
                     }
                     transaction.Commit();
                 }
