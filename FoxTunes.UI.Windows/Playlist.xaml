@@ -34,7 +34,6 @@
                   Windows:ListViewExtensions.DropInsert="True"
                   Windows:ListViewExtensions.DropInsertActive="{Binding InsertActive, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DropInsertValue="{Binding InsertItem, Source={StaticResource ViewModel}}"
-                  Windows:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DragSource="True"
                   Windows:ListViewExtensions.DragSourceInitialized="DragSourceInitialized"
                   Windows:ListViewExtensions.GroupStyle="{Binding GroupingEnabled, Source={StaticResource ViewModel}}"
