@@ -59,6 +59,8 @@ namespace FoxTunes
 
         public int[,] Elements;
 
+        public int[,] Peaks;
+
         public int SamplesPerElement;
 
         public float Weight;
@@ -126,6 +128,16 @@ namespace FoxTunes
                             this.Elements[a, 3]
                         )
                     );
+                    drawingContext.DrawRectangle(
+                        brush,
+                        pen,
+                        new Rect(
+                            this.Peaks[a, 0],
+                            this.Peaks[a, 1],
+                            this.Peaks[a, 2],
+                            this.Peaks[a, 3]
+                        )
+                    );
                 }
             }
             this.Timer.Start();
@@ -142,7 +154,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    Update(this.ElementCount, this.SamplesPerElement, this.Weight, this.Step, this.Dimentions[1], this.Elements);
+                    Update(this.ElementCount, this.SamplesPerElement, this.Weight, this.Step, this.Dimentions[1], this.Elements, this.Peaks);
                     this.HasData = true;
                 }
                 Windows.Invoke(() => this.InvalidateVisual());
@@ -158,12 +170,13 @@ namespace FoxTunes
             Windows.Invoke(() => this.Width = width);
             this.ElementCount = count;
             this.Elements = new int[count, 4];
+            this.Peaks = new int[count, 4];
             this.SamplesPerElement = SampleCount / count;
             this.Weight = (float)16 / this.ElementCount;
             this.Step = width / ElementCount;
         }
 
-        private static void Update(int count, int samples, float weight, int step, int height, int[,] elements)
+        private static void Update(int count, int samples, float weight, int step, int height, int[,] elements, int[,] peaks)
         {
             for (int a = 0, b = 0; a < count; a++)
             {
@@ -187,6 +200,17 @@ namespace FoxTunes
                 elements[a, 2] = step;
                 elements[a, 3] = Convert.ToInt32(value * height);
                 elements[a, 1] = height - elements[a, 3];
+                if (elements[a, 1] < peaks[a, 1])
+                {
+                    peaks[a, 0] = a * step;
+                    peaks[a, 2] = step;
+                    peaks[a, 3] = 1;
+                    peaks[a, 1] = elements[a, 1];
+                }
+                else if (peaks[a, 1] < height)
+                {
+                    peaks[a, 1]++;
+                }
             }
         }
 
