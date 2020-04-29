@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
 
@@ -166,7 +167,20 @@ namespace FoxTunes
             {
                 return false;
             }
-            return element.IsAncestorOf(result.VisualHit);
+            if (element == result.VisualHit || element.IsAncestorOf(result.VisualHit))
+            {
+                return true;
+            }
+            if (result.VisualHit is Adorner adorner)
+            {
+                //For some reason adorners return hit tests even when IsHitTestVisible = False.
+                //Looks like a bug to me.
+                if (element == adorner.AdornedElement)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
