@@ -77,9 +77,9 @@ namespace FoxTunes
 
         public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
-            if (cache)
+            if (!this.IsRendered(libraryHierarchyNode))
             {
-                cache = this.IsRendered(libraryHierarchyNode);
+                return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
             }
             var id = this.GetImageId(libraryHierarchyNode, width, height);
             if (cache)
