@@ -128,7 +128,9 @@ namespace FoxTunes
                             this.Elements[a, 3]
                         )
                     );
-                    drawingContext.DrawRectangle(
+                    if (this.Elements[a, 1] > this.Peaks[a, 1])
+                    {
+                        drawingContext.DrawRectangle(
                         brush,
                         pen,
                         new Rect(
@@ -138,6 +140,7 @@ namespace FoxTunes
                             this.Peaks[a, 3]
                         )
                     );
+                    }
                 }
             }
             this.Timer.Start();
