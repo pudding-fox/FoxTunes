@@ -27,9 +27,13 @@ namespace FoxTunes.ViewModel
 
         const int CHANNELS = 2;
 
+        public ILibraryManager LibraryManager { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
+
+        public ILibraryBrowser LibraryBrowser { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -471,9 +475,11 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
+            this.LibraryManager = this.Core.Managers.Library;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            this.LibraryBrowser = this.Core.Components.LibraryBrowser;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = this.Core.Components.Configuration;
@@ -544,10 +550,17 @@ namespace FoxTunes.ViewModel
             if (outputStream != null)
             {
                 fileName = outputStream.FileName;
-                fileData = outputStream.PlaylistItem;
-                lock (outputStream.PlaylistItem.MetaDatas)
+                if (outputStream.PlaylistItem.LibraryItem_Id.HasValue)
                 {
-                    metaData = outputStream.PlaylistItem.MetaDatas.ToDictionary(
+                    fileData = this.LibraryBrowser.Get(outputStream.PlaylistItem.LibraryItem_Id.Value);
+                }
+                else
+                {
+                    fileData = outputStream.PlaylistItem;
+                }
+                lock (fileData.MetaDatas)
+                {
+                    metaData = fileData.MetaDatas.ToDictionary(
                         metaDataItem => metaDataItem.Name,
                         metaDataItem => metaDataItem.Value,
                         StringComparer.OrdinalIgnoreCase
@@ -601,7 +614,11 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task OnUpdateRating(RatingEventArgs e)
         {
-            if (e.FileData is PlaylistItem playlistItem)
+            if (e.FileData is LibraryItem libraryItem)
+            {
+                return this.LibraryManager.SetRating(new[] { libraryItem }, e.Value);
+            }
+            else if (e.FileData is PlaylistItem playlistItem)
             {
                 return this.PlaylistManager.SetRating(new[] { playlistItem }, e.Value);
             }

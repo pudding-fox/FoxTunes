@@ -51,6 +51,8 @@ namespace FoxTunes
 
         public IPlaylistCache PlaylistCache { get; private set; }
 
+        public ILibraryCache LibraryCache { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -58,6 +60,7 @@ namespace FoxTunes
             this.Database = core.Factories.Database.Create();
             this.MetaDataManager = core.Managers.MetaData;
             this.PlaylistCache = core.Components.PlaylistCache;
+            this.LibraryCache = core.Components.LibraryCache;
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
@@ -72,6 +75,7 @@ namespace FoxTunes
             }
             await base.OnStarted().ConfigureAwait(false);
             //We don't need a lock for this so not waiting for OnRun().
+            this.UpdateLibraryCache();
             this.UpdatePlaylistCache();
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
@@ -110,6 +114,21 @@ namespace FoxTunes
             }))
             {
                 await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        protected virtual void UpdateLibraryCache()
+        {
+            foreach (var libraryItem in this.LibraryItems)
+            {
+                var cachedLibraryItem = default(LibraryItem);
+                if (this.LibraryCache.TryGetItem(libraryItem.Id, out cachedLibraryItem))
+                {
+                    if (!object.ReferenceEquals(libraryItem, cachedLibraryItem))
+                    {
+                        MetaDataItem.Update(libraryItem, cachedLibraryItem);
+                    }
+                }
             }
         }
 
