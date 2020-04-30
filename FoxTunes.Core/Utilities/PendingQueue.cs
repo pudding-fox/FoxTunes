@@ -52,9 +52,16 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            lock (SyncRoot)
+            try
             {
-                this.OnComplete();
+                lock (SyncRoot)
+                {
+                    this.OnComplete();
+                }
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
             }
         }
 

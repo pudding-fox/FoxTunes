@@ -123,7 +123,14 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            this.UpdateState(true);
+            try
+            {
+                this.UpdateState(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
 
         protected virtual bool GetDrive(out int drive)

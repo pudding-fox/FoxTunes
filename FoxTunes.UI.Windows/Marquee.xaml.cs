@@ -291,7 +291,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnTick(object sender, EventArgs e)
+        protected virtual void Update()
         {
             var maximum = this.ActualWidth - this.TextBlock.ActualWidth;
             if (maximum >= 0)
@@ -321,6 +321,18 @@ namespace FoxTunes
                         this.Reverse();
                     }
                     break;
+            }
+        }
+
+        protected virtual void OnTick(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Update();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
             }
         }
     }

@@ -114,38 +114,51 @@ namespace FoxTunes
 
         public void Enable()
         {
-            this.Timer = new Timer();
-            this.Timer.Interval = UPDATE_INTERVAL;
-            this.Timer.Elapsed += this.OnElapsed;
-            this.Timer.AutoReset = false;
-            this.Timer.Start();
-            Logger.Write(this, LogLevel.Debug, "Updater enabled.");
+            lock (SyncRoot)
+            {
+                if (this.Timer == null)
+                {
+                    this.Timer = new Timer();
+                    this.Timer.Interval = UPDATE_INTERVAL;
+                    this.Timer.Elapsed += this.OnElapsed;
+                    this.Timer.AutoReset = false;
+                    this.Timer.Start();
+                    Logger.Write(this, LogLevel.Debug, "Updater enabled.");
+                }
+            }
         }
 
         public void Disable()
         {
-            if (this.Timer == null)
+            lock (SyncRoot)
             {
-                return;
+                if (this.Timer != null)
+                {
+                    this.Timer.Stop();
+                    this.Timer.Elapsed -= this.OnElapsed;
+                    this.Timer.Dispose();
+                    this.Timer = null;
+                    Logger.Write(this, LogLevel.Debug, "Updater disabled.");
+                }
             }
-            this.Timer.Stop();
-            this.Timer.Elapsed -= this.OnElapsed;
-            this.Timer.Dispose();
-            this.Timer = null;
-            Logger.Write(this, LogLevel.Debug, "Updater disabled.");
         }
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            this.Update();
-            var timer = this.Timer;
             try
             {
-                this.Timer.Start();
+                this.Update();
+                lock (SyncRoot)
+                {
+                    if (this.Timer != null)
+                    {
+                        this.Timer.Start();
+                    }
+                }
             }
             catch
             {
-                //Nothing can be done, timer was probably disposed.
+                //Nothing can be done, never throw on background thread.
             }
         }
 

@@ -349,8 +349,15 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            this.RefreshState();
-            this.RefreshPosition();
+            try
+            {
+                this.RefreshState();
+                this.RefreshPosition();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
 
         protected virtual Task Play()

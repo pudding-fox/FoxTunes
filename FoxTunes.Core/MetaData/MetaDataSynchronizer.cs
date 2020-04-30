@@ -64,14 +64,21 @@ namespace FoxTunes
 
         protected virtual async void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            await this.MetaDataManager.Synchronize().ConfigureAwait(false);
-            lock (SyncRoot)
+            try
             {
-                if (this.Timer == null)
+                await this.MetaDataManager.Synchronize().ConfigureAwait(false);
+                lock (SyncRoot)
                 {
-                    return;
+                    if (this.Timer == null)
+                    {
+                        return;
+                    }
+                    this.Timer.Start();
                 }
-                this.Timer.Start();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
             }
         }
 

@@ -70,7 +70,14 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            this.SetThreadExecutionState();
+            try
+            {
+                this.SetThreadExecutionState();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
 
         protected virtual void SetThreadExecutionState()

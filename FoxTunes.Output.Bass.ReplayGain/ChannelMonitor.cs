@@ -70,14 +70,21 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            this.Update();
-            lock (SyncRoot)
+            try
             {
-                if (this.Timer == null)
+                this.Update();
+                lock (SyncRoot)
                 {
-                    return;
+                    if (this.Timer == null)
+                    {
+                        return;
+                    }
+                    this.Timer.Start();
                 }
-                this.Timer.Start();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
             }
         }
 

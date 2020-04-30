@@ -38,7 +38,14 @@ namespace FoxTunes
 
         private static void OnTick(object sender, EventArgs e)
         {
-            OnNotify();
+            try
+            {
+                OnNotify();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
 
         private static void OnNotify()
