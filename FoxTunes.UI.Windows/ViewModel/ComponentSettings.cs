@@ -90,7 +90,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFilterChanged()
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
             if (this.FilterChanged != null)
             {
                 this.FilterChanged(this, EventArgs.Empty);
@@ -138,7 +138,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 

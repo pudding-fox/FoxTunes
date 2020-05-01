@@ -135,7 +135,7 @@ namespace FoxTunes.ViewModel
                 }
                 {
                     //Deliberately forking so the dialog closes.
-                    var task = this.Rebuild();
+                    this.Dispatch(this.Refresh);
                     return;
                 }
             }
@@ -195,7 +195,7 @@ namespace FoxTunes.ViewModel
 
         public void Cancel()
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         public ICommand ResetCommand
@@ -274,7 +274,7 @@ namespace FoxTunes.ViewModel
                 }
             };
             this.LibraryHierarchies.SelectedValueChanged += this.OnSelectedValueChanged;
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 

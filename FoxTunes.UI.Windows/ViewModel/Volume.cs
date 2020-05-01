@@ -110,17 +110,17 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnAvailableChanged(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnEnabledChanged(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual Task Refresh()

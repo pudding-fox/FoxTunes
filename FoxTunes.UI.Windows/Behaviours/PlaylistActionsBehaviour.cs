@@ -90,11 +90,7 @@ namespace FoxTunes
                             yield return invocationComponent;
                         }
                         //Don't block the menu from opening while we fetch ratings.
-#if NET40
-                        var task = TaskEx.Run(() => this.GetRating(this.PlaylistManager.SelectedItems, invocationComponents));
-#else
-                        var task = Task.Run(() => this.GetRating(this.PlaylistManager.SelectedItems, invocationComponents));
-#endif
+                        this.Dispatch(() => this.GetRating(this.PlaylistManager.SelectedItems, invocationComponents));
                     }
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOCATE_PLAYLIST_ITEMS, "Locate");
                 }

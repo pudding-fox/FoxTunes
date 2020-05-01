@@ -160,7 +160,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
-            var task = this.RefreshStatus();
+            this.Dispatch(this.RefreshStatus);
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
@@ -179,7 +179,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
         {
-            var task = this.RefreshStatus();
+            this.Dispatch(this.RefreshStatus);
         }
 
         protected virtual async Task RefreshItems()

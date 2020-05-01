@@ -55,7 +55,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         public Task Refresh()

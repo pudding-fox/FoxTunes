@@ -127,7 +127,7 @@ namespace FoxTunes.ViewModel
 
         public void Cancel()
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         public override void InitializeComponent(ICore core)
@@ -136,7 +136,7 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.LibraryRoots = new CollectionManager<LibraryRoot>();
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 
