@@ -6,5 +6,5 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:LibraryHierarchyNode}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:LibraryHierarchyNode}, IsDesignTimeCreatable=False}" Loaded="OnLoaded" Unloaded="OnUnloaded">
 </UserControl>

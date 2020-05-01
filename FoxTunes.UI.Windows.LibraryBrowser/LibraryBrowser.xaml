@@ -56,7 +56,7 @@
             <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                     <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
-                        <LocalWindows:LibraryBrowserTile Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Loaded="OnItemLoaded_Low"></LocalWindows:LibraryBrowserTile>
+                        <LocalWindows:LibraryBrowserTile Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}"></LocalWindows:LibraryBrowserTile>
                         <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
@@ -89,7 +89,7 @@
             <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                     <StackPanel Orientation="Horizontal">
-                        <LocalWindows:LibraryBrowserTile Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Margin="0,0,5,0" Loaded="OnItemLoaded_High"></LocalWindows:LibraryBrowserTile>
+                        <LocalWindows:LibraryBrowserTile Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Margin="0,0,5,0"></LocalWindows:LibraryBrowserTile>
                         <TextBlock VerticalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>

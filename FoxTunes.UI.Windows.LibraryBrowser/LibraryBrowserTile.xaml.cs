@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -55,6 +56,20 @@ namespace FoxTunes
         public LibraryBrowserTile()
         {
             this.InitializeComponent();
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+#if NET40
+            var task = TaskEx.Run(this.Refresh);
+#else
+            var task = Task.Run(this.Refresh);
+#endif
+        }
+
+        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            this.Background = null;
         }
 
         public async Task Refresh()
