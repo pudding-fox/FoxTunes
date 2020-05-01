@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -181,6 +182,15 @@ namespace FoxTunes
                 }
             }
             return false;
+        }
+
+        public static void Dispatch(this UIComponentBase component, Func<Task> function)
+        {
+#if NET40
+            var task = TaskEx.Run(function);
+#else
+            var task = Task.Run(function);
+#endif
         }
     }
 }
