@@ -70,20 +70,24 @@ namespace FoxTunes
                 var source = new BitmapImage();
                 source.BeginInit();
                 source.CacheOption = BitmapCacheOption.OnLoad;
-                source.UriSource = new Uri(fileName);
-                if (decode)
+                //TODO: This is much faster than using UriSource.
+                //TODO: See: https://referencesource.microsoft.com/#PresentationCore/Core/CSharp/System/Windows/Media/Imaging/BitmapDecoder.cs,cd1c67c55a73f984
+                using (source.StreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    if (width != 0)
+                    if (decode)
                     {
-                        source.DecodePixelWidth = width;
+                        if (width != 0)
+                        {
+                            source.DecodePixelWidth = width;
+                        }
+                        else if (height != 0)
+                        {
+                            source.DecodePixelHeight = height;
+                        }
                     }
-                    else if (height != 0)
-                    {
-                        source.DecodePixelHeight = height;
-                    }
+                    source.EndInit();
+                    source.Freeze();
                 }
-                source.EndInit();
-                source.Freeze();
                 return source;
             }
             catch (Exception e)

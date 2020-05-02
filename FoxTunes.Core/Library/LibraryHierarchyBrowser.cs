@@ -156,12 +156,7 @@ namespace FoxTunes
         public LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy)
         {
             var key = new LibraryHierarchyCacheKey(libraryHierarchy, null, this.Filter);
-            var nodes = this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchy));
-            if (this.LibraryManager.SelectedItem != null)
-            {
-                this.ApplySelection(nodes);
-            }
-            return nodes;
+            return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchy));
         }
 
         private IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchy libraryHierarchy)
@@ -245,39 +240,6 @@ namespace FoxTunes
                         yield return item;
                     }
                 }
-            }
-        }
-
-        private void ApplySelection(IEnumerable<LibraryHierarchyNode> nodes)
-        {
-            var libraryHierarchyNode = this.LibraryManager.SelectedItem;
-            var stack = new Stack<LibraryHierarchyNode>(new[] { libraryHierarchyNode });
-            while (libraryHierarchyNode.Parent != null)
-            {
-                libraryHierarchyNode = libraryHierarchyNode.Parent;
-                stack.Push(libraryHierarchyNode);
-            }
-            while (stack.Count > 0)
-            {
-                var node = this.FindNode(nodes, stack.Pop().Value);
-                if (node == null)
-                {
-                    break;
-                }
-                libraryHierarchyNode = node;
-                if (stack.Count == 0 || libraryHierarchyNode.IsLeaf)
-                {
-                    break;
-                }
-                if (!node.IsExpanded)
-                {
-                    node.IsExpanded = true;
-                }
-                nodes = node.Children;
-            }
-            if (libraryHierarchyNode != null)
-            {
-                libraryHierarchyNode.IsSelected = true;
             }
         }
 

@@ -45,6 +45,7 @@
         <TreeView x:Name="TreeView" Grid.Row="1" Margin="0,2,0,2"
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
+                  Windows:TreeViewExtensions.EnsureSelectedItemVisible="True"
                   Windows:TreeViewExtensions.RightButtonSelect="True"
                   Windows:TreeViewExtensions.DragSource="True"
                   Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized"

@@ -9,42 +9,52 @@ namespace FoxTunes
 {
     public static partial class TreeViewExtensions
     {
-        private static readonly ConditionalWeakTable<TreeView, SelectedItemBehaviour> SelectedItemBehaviours = new ConditionalWeakTable<TreeView, SelectedItemBehaviour>();
+        private static readonly ConditionalWeakTable<TreeView, EnsureSelectedItemVisibleBehaviour> EnsureSelectedItemVisibleBehaviours = new ConditionalWeakTable<TreeView, EnsureSelectedItemVisibleBehaviour>();
 
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.RegisterAttached(
-            "SelectedItem",
-            typeof(object),
+        public static readonly DependencyProperty EnsureSelectedItemVisibleProperty = DependencyProperty.RegisterAttached(
+            "EnsureSelectedItemVisible",
+            typeof(bool),
             typeof(TreeViewExtensions),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnSelectedItemPropertyChanged))
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnEnsureSelectedItemVisiblePropertyChanged))
         );
 
-        public static object GetSelectedItem(TreeView source)
+        public static bool GetEnsureSelectedItemVisible(TreeView source)
         {
-            return source.GetValue(SelectedItemProperty);
+            return (bool)source.GetValue(EnsureSelectedItemVisibleProperty);
         }
 
-        public static void SetSelectedItem(TreeView source, object value)
+        public static void SetEnsureSelectedItemVisible(TreeView source, bool value)
         {
-            source.SetValue(SelectedItemProperty, value);
+            source.SetValue(EnsureSelectedItemVisibleProperty, value);
         }
 
-        private static void OnSelectedItemPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static void OnEnsureSelectedItemVisiblePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var treeView = sender as TreeView;
             if (treeView == null)
             {
                 return;
             }
-            var behaviour = default(SelectedItemBehaviour);
-            if (!SelectedItemBehaviours.TryGetValue(treeView, out behaviour))
+            if (GetEnsureSelectedItemVisible(treeView))
             {
-                behaviour = new SelectedItemBehaviour(treeView);
-                SelectedItemBehaviours.Add(treeView, behaviour);
+                var behaviour = default(EnsureSelectedItemVisibleBehaviour);
+                if (!EnsureSelectedItemVisibleBehaviours.TryGetValue(treeView, out behaviour))
+                {
+                    EnsureSelectedItemVisibleBehaviours.Add(treeView, new EnsureSelectedItemVisibleBehaviour(treeView));
+                }
             }
-            behaviour.SelectedItem = e.NewValue;
+            else
+            {
+                var behaviour = default(EnsureSelectedItemVisibleBehaviour);
+                if (EnsureSelectedItemVisibleBehaviours.TryGetValue(treeView, out behaviour))
+                {
+                    EnsureSelectedItemVisibleBehaviours.Remove(treeView);
+                    behaviour.Dispose();
+                }
+            }
         }
 
-        private class SelectedItemBehaviour : UIBehaviour
+        private class EnsureSelectedItemVisibleBehaviour : UIBehaviour
         {
             private static readonly PropertyInfo ItemsHost = typeof(ItemsControl).GetProperty(
                 "ItemsHost",
@@ -65,7 +75,7 @@ namespace FoxTunes
 
 #endif
 
-            public SelectedItemBehaviour(TreeView treeView)
+            public EnsureSelectedItemVisibleBehaviour(TreeView treeView)
             {
                 this.TreeView = treeView;
                 this.TreeView.SelectedItemChanged += this.OnSelectedItemChanged;
@@ -73,26 +83,7 @@ namespace FoxTunes
 
             public TreeView TreeView { get; private set; }
 
-            public object SelectedItem
-            {
-                get
-                {
-                    return this.TreeView.SelectedItem;
-                }
-                set
-                {
-                    if (object.ReferenceEquals(this.TreeView.SelectedItem, value))
-                    {
-                        return;
-                    }
-                    if (value is IHierarchical hierarchical)
-                    {
-                        this.Select(hierarchical);
-                    }
-                }
-            }
-
-            protected virtual void Select(IHierarchical value)
+            protected virtual void EnsureVisible(IHierarchical value)
             {
                 //Construct the path to the value.
                 var stack = new Stack<IHierarchical>();
@@ -110,10 +101,10 @@ namespace FoxTunes
                     return;
                 }
                 //We have at least one value in the path.
-                this.Select(stack);
+                this.EnsureVisible(stack);
             }
 
-            protected virtual void Select(Stack<IHierarchical> stack)
+            protected virtual void EnsureVisible(Stack<IHierarchical> stack)
             {
                 var items = default(ItemsControl);
                 var item = default(TreeViewItem);
@@ -186,8 +177,8 @@ namespace FoxTunes
 
                 if (item != null)
                 {
-                    //Found the item, select it.
-                    item.IsSelected = true;
+                    //Found the item, ensure it's visible.
+                    item.BringIntoView();
                 }
                 else
                 {
@@ -201,7 +192,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                SetSelectedItem(this.TreeView, this.TreeView.SelectedItem);
+                this.EnsureVisible(this.TreeView.SelectedItem as IHierarchical);
             }
         }
     }

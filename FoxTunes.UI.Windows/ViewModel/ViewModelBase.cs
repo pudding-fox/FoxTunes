@@ -77,6 +77,15 @@ namespace FoxTunes.ViewModel
             this.IsInitialized = true;
         }
 
+        protected virtual void Dispatch(Action action)
+        {
+#if NET40
+            var task = TaskEx.Run(action);
+#else
+            var task = Task.Run(action);
+#endif
+        }
+
         protected virtual void Dispatch(Func<Task> function)
         {
 #if NET40

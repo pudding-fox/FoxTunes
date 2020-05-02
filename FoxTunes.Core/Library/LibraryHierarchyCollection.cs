@@ -12,6 +12,8 @@ namespace FoxTunes
 
         private const string INDEXER = "Item[]";
 
+        public readonly object SyncRoot = new object();
+
         public LibraryHierarchyCollection(IEnumerable<LibraryHierarchy> libraryHierarchies) : base(libraryHierarchies)
         {
 
@@ -21,15 +23,18 @@ namespace FoxTunes
 
         public Action Update(LibraryHierarchy[] libraryHierarchies)
         {
-            this.IsSuspended = true;
-            try
+            lock (this.SyncRoot)
             {
-                this.Clear();
-                this.AddRange(libraryHierarchies);
-            }
-            finally
-            {
-                this.IsSuspended = false;
+                this.IsSuspended = true;
+                try
+                {
+                    this.Clear();
+                    this.AddRange(libraryHierarchies);
+                }
+                finally
+                {
+                    this.IsSuspended = false;
+                }
             }
             return () =>
             {
