@@ -6,6 +6,14 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryTree : LibraryBase
     {
+        public override string UIComponent
+        {
+            get
+            {
+                return global::FoxTunes.LibraryTree.ID;
+            }
+        }
+
         protected override void OnSelectedItemChanged(object sender, EventArgs e)
         {
             if (!this.IsNavigating)

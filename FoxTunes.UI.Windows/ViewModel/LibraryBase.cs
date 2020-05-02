@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -15,6 +16,8 @@ namespace FoxTunes.ViewModel
         const string UPDATING = "Updating...";
 
         const string EMPTY = "Add to collection by dropping files here.";
+
+        public abstract string UIComponent { get; }
 
         public bool IsNavigating { get; private set; }
 
@@ -159,6 +162,32 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler SelectedItemChanged;
+
+        private bool _IsPrimaryView { get; set; }
+
+        public bool IsPrimaryView
+        {
+            get
+            {
+                return this._IsPrimaryView;
+            }
+            set
+            {
+                this._IsPrimaryView = value;
+                this.OnIsPrimaryViewChanged();
+            }
+        }
+
+        protected virtual void OnIsPrimaryViewChanged()
+        {
+            if (this.IsPrimaryViewChanged != null)
+            {
+                this.IsPrimaryViewChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsPrimaryView");
+        }
+
+        public event EventHandler IsPrimaryViewChanged;
 
         private int _SearchInterval { get; set; }
 
@@ -390,6 +419,10 @@ namespace FoxTunes.ViewModel
             this.HierarchyManager = this.Core.Managers.Hierarchy;
             this.HierarchyManager.CanNavigateChanged += this.OnCanNavigateChanged;
             this.Configuration = this.Core.Components.Configuration;
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.PRIMARY_LIBRARY_VIEW
+            ).ConnectValue(option => this.IsPrimaryView = WindowsUserInterfaceConfiguration.GetIsPrimaryView(option, this.UIComponent));
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 SearchBehaviourConfiguration.SECTION,
                 SearchBehaviourConfiguration.SEARCH_INTERVAL_ELEMENT

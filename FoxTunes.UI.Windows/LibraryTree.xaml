@@ -15,6 +15,7 @@
     <UserControl.Resources>
         <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryTree>
         <ViewModel:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter"></ViewModel:IntegerToVisibilityConverter>
+        <ViewModel:MultiVisibilityConverter x:Key="MultiVisibilityConverter"></ViewModel:MultiVisibilityConverter>
         <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
@@ -40,8 +41,14 @@
         <ComboBox 
             ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}, IsAsync=True}" 
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
-            DisplayMemberPath="Name"
-            Visibility="{Binding Hierarchies.Count, ConverterParameter=1, Converter={StaticResource IntegerToVisibilityConverter}, Mode=OneWay, Source={StaticResource ViewModel}}"/>
+            DisplayMemberPath="Name">
+            <ComboBox.Visibility>
+                <MultiBinding Converter="{StaticResource MultiVisibilityConverter}">
+                    <Binding Path="IsPrimaryView" Source="{StaticResource ViewModel}" Converter="{StaticResource BooleanToVisibilityConverter}" Mode="OneWay"></Binding>
+                    <Binding Path="Hierarchies.Count" Source="{StaticResource ViewModel}" Converter="{StaticResource IntegerToVisibilityConverter}" ConverterParameter="1" Mode="OneWay"></Binding>
+                </MultiBinding>
+            </ComboBox.Visibility>
+        </ComboBox>
         <TreeView x:Name="TreeView" Grid.Row="1" Margin="0,2,0,2"
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
@@ -92,7 +99,8 @@
         <Windows:SearchBox 
             Grid.Row="2" 
             SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}" 
-            Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}">
+            Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}"
+            Visibility="{Binding IsPrimaryView, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="Commit">
                     <ViewModel:InvokeParameterizedCommandAction Command="{Binding SearchCommitCommand, Source={StaticResource ViewModel}}" />

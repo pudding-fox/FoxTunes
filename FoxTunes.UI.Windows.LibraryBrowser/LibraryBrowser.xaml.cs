@@ -7,10 +7,12 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for LibraryBrowser.xaml
     /// </summary>
-    [UIComponent("FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3", UIComponentSlots.TOP_CENTER, "Library Browser")]
+    [UIComponent(ID, UIComponentSlots.TOP_CENTER, "Library Browser", role: UIComponentRole.LibraryView)]
     [UIComponentDependency(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)]
     public partial class LibraryBrowser : UIComponentBase
     {
+        public const string ID = "FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3";
+
         public LibraryBrowser()
         {
             this.InitializeComponent();
@@ -56,7 +58,7 @@ namespace FoxTunes
         {
             this.FixFocus();
         }
-        
+
         protected virtual void FixFocus()
         {
             if (!this.ItemsControl.IsKeyboardFocusWithin)

@@ -10,8 +10,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class MetaDataCache : StandardComponent, IMetaDataCache, IDisposable
     {
-        const int TIMEOUT = 1000;
-
         public static readonly KeyLock<MetaDataCacheKey> KeyLock = new KeyLock<MetaDataCacheKey>();
 
         public IEnumerable<MetaDataCacheKey> Keys
@@ -94,9 +92,7 @@ namespace FoxTunes
             {
                 return value.Value;
             }
-            //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
-            //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
-            using (KeyLock.Lock(key, TIMEOUT, false))
+            using (KeyLock.Lock(key))
             {
                 if (this.Values.TryGetValue(key, out value))
                 {

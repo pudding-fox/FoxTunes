@@ -59,17 +59,9 @@ namespace FoxTunes
             }
         }
 
-        public IDisposable Lock(T key, int timeout, bool throwOnTimeout = true)
+        public IDisposable Lock(T key)
         {
-            if (!this.CreateOrIncrement(key).Wait(timeout))
-            {
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to establish lock after {0}ms.", timeout);
-                if (throwOnTimeout)
-                {
-                    throw new TimeoutException(string.Format("Failed to establish lock after {0}ms.", timeout));
-                }
-                return new NoOp();
-            }
+            this.CreateOrIncrement(key).Wait();
             return new Releaser(this, key);
         }
 

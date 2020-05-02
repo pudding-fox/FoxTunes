@@ -90,9 +90,7 @@ namespace FoxTunes
                     return this.ImageLoader.Load(fileName, 0, 0, true);
                 }
             }
-            //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
-            //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
-            using (KeyLock.Lock(id, TIMEOUT, false))
+            using (KeyLock.Lock(id))
             {
                 if (cache)
                 {

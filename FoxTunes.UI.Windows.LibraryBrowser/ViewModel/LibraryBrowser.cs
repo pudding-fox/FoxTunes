@@ -17,6 +17,16 @@ namespace FoxTunes.ViewModel
             this.Semaphore = new SemaphoreSlim(1, 1);
         }
 
+        public override string UIComponent
+        {
+            get
+            {
+#pragma warning disable CS0436
+                return global::FoxTunes.LibraryBrowser.ID;
+#pragma warning restore CS0436
+            }
+        }
+
         public SemaphoreSlim Semaphore { get; private set; }
 
         public LibraryBrowserTileProvider LibraryBrowserTileProvider { get; private set; }
@@ -171,25 +181,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ImageModeChanged;
 
-        public bool IsSlave
-        {
-            get
-            {
-                return LayoutManager.Instance.IsComponentActive(typeof(global::FoxTunes.LibraryTree));
-            }
-        }
-
-        protected virtual void OnIsSlaveChanged()
-        {
-            if (this.IsSlaveChanged != null)
-            {
-                this.IsSlaveChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsSlave");
-        }
-
-        public event EventHandler IsSlaveChanged;
-
         public override void InitializeComponent(ICore core)
         {
             this.LibraryBrowserTileProvider = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileProvider>();
@@ -214,8 +205,6 @@ namespace FoxTunes.ViewModel
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
             ).ConnectValue(option => this.ImageMode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(option));
-            LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
-            this.OnIsSlaveChanged();
             base.InitializeComponent(core);
         }
 
@@ -260,11 +249,6 @@ namespace FoxTunes.ViewModel
             {
                 this.IsReloading = false;
             }
-        }
-
-        protected virtual void OnActiveComponentsChanged(object sender, EventArgs e)
-        {
-            this.OnIsSlaveChanged();
         }
 
         protected override void OnSelectedItemChanged(object sender, EventArgs e)
@@ -449,7 +433,6 @@ namespace FoxTunes.ViewModel
             {
                 this.LibraryBrowserTileProvider.Cleared -= this.OnCleared;
             }
-            LayoutManager.Instance.ActiveComponentsChanged -= this.OnActiveComponentsChanged;
             base.OnDisposing();
         }
 
