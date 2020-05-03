@@ -74,7 +74,7 @@
                                         <ImageBrush ImageSource="{Binding ImageSource, IsAsync=True}" Stretch="Uniform"/>
                                     </Grid.Background>
                                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasMultipleValues, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.MultipleValues}" Foreground="{DynamicResource TextBrush}"></TextBlock>
-                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasValue, Converter={StaticResource NegavingBooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.NoValue}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasValue, Converter={StaticResource NegatingBooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.NoValue}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                 </Grid>
                                 <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                             </StackPanel>
