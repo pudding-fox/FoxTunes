@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -57,14 +58,15 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.HierarchiesUpdated:
-                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
+                case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
+                    if (names == null || !names.Any())
                     {
-#if NET40
-                        var task = TaskEx.Run(() => this.Clear());
-#else
-                        var task = Task.Run(() => this.Clear());
-#endif
+                        this.Dispatch(this.Clear);
+                    }
+                    else if (names.Contains(CommonImageTypes.FrontCover, true))
+                    {
+                        this.Dispatch(this.Clear);
                     }
                     break;
             }
