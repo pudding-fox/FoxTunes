@@ -6,6 +6,8 @@ namespace FoxTunes
 {
     public class CappedDictionary<TKey, TValue>
     {
+        public readonly object SyncRoot = new object();
+
         public CappedDictionary(int capacity)
         {
             this.Keys = new Queue(capacity);
@@ -39,6 +41,15 @@ namespace FoxTunes
                 this.Keys.Enqueue(key);
             }
             return result;
+        }
+
+        public void Clear()
+        {
+            lock (SyncRoot)
+            {
+                this.Store.Clear();
+                this.Keys.Clear();
+            }
         }
 
         public class Queue
@@ -79,6 +90,14 @@ namespace FoxTunes
                         return value;
                     }
                     return default(TKey);
+                }
+            }
+
+            public void Clear()
+            {
+                lock (SyncRoot)
+                {
+                    this.Values.Clear();
                 }
             }
 
