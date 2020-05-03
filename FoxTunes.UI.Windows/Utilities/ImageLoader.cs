@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -12,6 +13,8 @@ namespace FoxTunes
     {
         public ImageResizer ImageResizer { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public bool HighQualityResizer { get; private set; }
@@ -21,16 +24,38 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.ImageResizer = ComponentRegistry.Instance.GetComponent<ImageResizer>();
+            this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                ImageLoaderConfiguration.SECTION,
+                ImageBehaviourConfiguration.SECTION,
                 ImageLoaderConfiguration.HIGH_QUALITY_RESIZER
             ).ConnectValue(value => this.HighQualityResizer = value);
             this.Configuration.GetElement<IntegerConfigurationElement>(
-                ImageLoaderConfiguration.SECTION,
+                ImageBehaviourConfiguration.SECTION,
                 ImageLoaderConfiguration.CACHE_SIZE
             ).ConnectValue(value => this.Store = new Cache(value));
             base.InitializeComponent(core);
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.PluginInvocation:
+                    switch (signal.State as string)
+                    {
+                        case ImageBehaviour.REFRESH_IMAGES:
+                            this.Store.Clear();
+                            break;
+                    }
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -154,6 +179,11 @@ namespace FoxTunes
             {
                 var key = new Key(fileName, width, height);
                 return this.Store.TryGetValue(key, out imageSource);
+            }
+
+            public void Clear()
+            {
+                this.Store.Clear();
             }
 
             public class Key : IEquatable<Key>

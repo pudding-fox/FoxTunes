@@ -524,7 +524,8 @@ namespace FoxTunes.ViewModel
                     CommonMetaData.Title,
                     CommonMetaData.Genre,
                     CommonMetaData.Year,
-                    CommonMetaData.Rating
+                    CommonMetaData.Rating,
+                    CommonImageTypes.FrontCover
                 }).Any())
                 {
 #if NET40

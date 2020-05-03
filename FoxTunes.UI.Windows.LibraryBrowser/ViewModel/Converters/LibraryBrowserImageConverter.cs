@@ -1,8 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -31,7 +29,7 @@ namespace FoxTunes.ViewModel
                 return;
             }
             configuration.GetElement<IntegerConfigurationElement>(
-                ImageLoaderConfiguration.SECTION,
+                ImageBehaviourConfiguration.SECTION,
                 ImageLoaderConfiguration.CACHE_SIZE
             ).ConnectValue(value => Store = new CappedDictionary<LibraryHierarchyNode, Lazy<ImageBrush>>(value));
             var scalingFactor = configuration.GetElement<DoubleConfigurationElement>(
@@ -62,22 +60,19 @@ namespace FoxTunes.ViewModel
             {
                 switch (signal.Name)
                 {
-                    case CommonSignals.MetaDataUpdated:
-                        var names = signal.State as IEnumerable<string>;
-                        if (names == null || !names.Any())
+                    case CommonSignals.PluginInvocation:
+                        switch (signal.State as string)
                         {
-                            Store.Clear();
-                        }
-                        else if (names.Contains(CommonImageTypes.FrontCover, true))
-                        {
-                            Store.Clear();
+                            case ImageBehaviour.REFRESH_IMAGES:
+                                Store.Clear();
+                                break;
                         }
                         break;
                 }
 #if NET40
                 return TaskEx.FromResult(false);
 #else
-            return Task.CompletedTask;
+                return Task.CompletedTask;
 #endif
             };
         }

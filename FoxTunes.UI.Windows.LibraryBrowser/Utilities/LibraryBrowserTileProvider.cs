@@ -1,8 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -56,15 +54,12 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    if (names == null || !names.Any())
+                case CommonSignals.PluginInvocation:
+                    switch (signal.State as string)
                     {
-                        this.Dispatch(this.Clear);
-                    }
-                    else if (names.Contains(CommonImageTypes.FrontCover, true))
-                    {
-                        this.Dispatch(this.Clear);
+                        case ImageBehaviour.REFRESH_IMAGES:
+                            this.Clear();
+                            break;
                     }
                     break;
             }
@@ -77,10 +72,6 @@ namespace FoxTunes
 
         public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
-            if (!this.IsRendered(libraryHierarchyNode))
-            {
-                return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
-            }
             var id = this.GetImageId(libraryHierarchyNode, width, height);
             if (cache)
             {
@@ -101,18 +92,6 @@ namespace FoxTunes
                     }
                 }
                 return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
-            }
-        }
-
-        private bool IsRendered(LibraryHierarchyNode libraryHierarchyNode)
-        {
-            switch (this.ImageMode)
-            {
-                case LibraryBrowserImageMode.First:
-                    return false;
-                default:
-                case LibraryBrowserImageMode.Compound:
-                    return libraryHierarchyNode.MetaDatas.Length > 1;
             }
         }
 
@@ -313,25 +292,7 @@ namespace FoxTunes
                 {
                     hashCode += this.ThemeLoader.Theme.Id.GetHashCode();
                 }
-                var take = default(int);
-                switch (this.ImageMode)
-                {
-                    default:
-                    case LibraryBrowserImageMode.Compound:
-                        take = 4;
-                        break;
-                    case LibraryBrowserImageMode.First:
-                        take = 1;
-                        break;
-                }
-                foreach (var metaDataItem in libraryHierarchyNode.MetaDatas.Take(take))
-                {
-                    if (string.IsNullOrEmpty(metaDataItem.Value))
-                    {
-                        continue;
-                    }
-                    hashCode += metaDataItem.Value.ToLower().GetHashCode();
-                }
+                hashCode = (hashCode * 29) + libraryHierarchyNode.Id.GetHashCode();
                 hashCode = (hashCode * 29) + width.GetHashCode();
                 hashCode = (hashCode * 29) + height.GetHashCode();
             }
