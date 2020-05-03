@@ -19,7 +19,9 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement Enabled { get; private set; }
+        public BooleanConfigurationElement MetaDataEnabled { get; private set; }
+
+        public BooleanConfigurationElement PlaybackStatisticsEnabled { get; private set; }
 
         public SelectionConfigurationElement Write { get; private set; }
 
@@ -28,26 +30,33 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.Configuration = core.Components.Configuration;
-            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.MetaDataEnabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
+            );
+            this.MetaDataEnabled.ValueChanged += this.OnValueChanged;
+            this.PlaybackStatisticsEnabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 PlaybackStatisticsBehaviourConfiguration.SECTION,
                 PlaybackStatisticsBehaviourConfiguration.ENABLED
             );
-            this.Enabled.ConnectValue(value =>
-            {
-                if (value)
-                {
-                    this.Enable();
-                }
-                else
-                {
-                    this.Disable();
-                }
-            });
+            this.PlaybackStatisticsEnabled.ValueChanged += this.OnValueChanged;
             this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.WRITE_ELEMENT
             );
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+            if (this.MetaDataEnabled.Value && this.PlaybackStatisticsEnabled.Value)
+            {
+                this.Enable();
+            }
+            else
+            {
+                this.Disable();
+            }
         }
 
         public void Enable()
@@ -126,6 +135,14 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.MetaDataEnabled != null)
+            {
+                this.MetaDataEnabled.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.PlaybackStatisticsEnabled != null)
+            {
+                this.PlaybackStatisticsEnabled.ValueChanged -= this.OnValueChanged;
+            }
             this.Disable();
         }
 
