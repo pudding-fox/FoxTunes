@@ -30,6 +30,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery MovePlaylistItem { get; }
 
+        IDatabaseQuery RemoveCancelledLibraryItems { get; }
+
         IDatabaseQuery RemoveLibraryHierarchyItems { get; }
 
         IDatabaseQuery RemoveLibraryItems { get; }

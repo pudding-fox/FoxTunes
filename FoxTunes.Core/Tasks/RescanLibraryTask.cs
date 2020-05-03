@@ -64,7 +64,7 @@ namespace FoxTunes
             await this.RescanLibrary().ConfigureAwait(false);
             await this.RemoveHierarchies(LibraryItemStatus.Remove).ConfigureAwait(false);
             await this.RemoveItems(LibraryItemStatus.Remove).ConfigureAwait(false);
-            await this.AddPaths(roots, true).ConfigureAwait(false);
+            await this.AddPaths(roots).ConfigureAwait(false);
         }
 
         protected virtual async Task CheckPaths(IEnumerable<string> paths)

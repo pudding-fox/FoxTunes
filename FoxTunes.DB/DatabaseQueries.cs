@@ -183,6 +183,16 @@ namespace FoxTunes
             }
         }
 
+        public IDatabaseQuery RemoveCancelledLibraryItems
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.RemoveCancelledLibraryItems
+                );
+            }
+        }
+
         public IDatabaseQuery RemoveLibraryHierarchyItems
         {
             get
