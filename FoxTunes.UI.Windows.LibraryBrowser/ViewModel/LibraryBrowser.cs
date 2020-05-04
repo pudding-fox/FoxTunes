@@ -29,8 +29,6 @@ namespace FoxTunes.ViewModel
 
         public SemaphoreSlim Semaphore { get; private set; }
 
-        public LibraryBrowserTileProvider LibraryBrowserTileProvider { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         private ObservableCollection<LibraryBrowserFrame> _Frames { get; set; }
@@ -183,11 +181,6 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.LibraryBrowserTileProvider = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileProvider>();
-            if (this.LibraryBrowserTileProvider != null)
-            {
-                this.LibraryBrowserTileProvider.Cleared += this.OnCleared;
-            }
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -208,9 +201,20 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCleared(object sender, EventArgs e)
+        protected override async Task OnSignal(object sender, ISignal signal)
         {
-            this.Dispatch(this.Refresh);
+            await base.OnSignal(sender, signal).ConfigureAwait(false);
+            switch (signal.Name)
+            {
+                case CommonSignals.PluginInvocation:
+                    switch (signal.State as string)
+                    {
+                        case ImageBehaviour.REFRESH_IMAGES:
+                            await this.Refresh().ConfigureAwait(false);
+                            break;
+                    }
+                    break;
+            }
         }
 
         public bool IsRefreshing { get; private set; }
@@ -428,10 +432,6 @@ namespace FoxTunes.ViewModel
             if (this.Semaphore != null)
             {
                 this.Semaphore.Dispose();
-            }
-            if (this.LibraryBrowserTileProvider != null)
-            {
-                this.LibraryBrowserTileProvider.Cleared -= this.OnCleared;
             }
             base.OnDisposing();
         }
