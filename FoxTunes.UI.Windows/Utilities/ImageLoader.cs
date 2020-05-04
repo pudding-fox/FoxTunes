@@ -122,23 +122,23 @@ namespace FoxTunes
             }
         }
 
-        public ImageSource Load(string id, Func<Stream> factory, bool cache)
+        public ImageSource Load(string id, Func<Stream> factory, int width, int height, bool cache)
         {
             if (cache)
             {
                 var imageSource = default(Lazy<ImageSource>);
-                if (Store.TryGetValue(id, 0, 0, out imageSource))
+                if (Store.TryGetValue(id, width, height, out imageSource))
                 {
                     return imageSource.Value;
                 }
-                Store.Add(id, 0, 0, new Lazy<ImageSource>(() => this.LoadCore(id, factory)));
+                Store.Add(id, width, height, new Lazy<ImageSource>(() => this.LoadCore(factory, width, height)));
                 //Second iteration will always hit cache.
-                return this.Load(id, factory, cache);
+                return this.Load(id, factory, width, height, cache);
             }
-            return this.LoadCore(id, factory);
+            return this.LoadCore(factory, width, height);
         }
 
-        public ImageSource LoadCore(string id, Func<Stream> factory)
+        public ImageSource LoadCore(Func<Stream> factory, int width, int height)
         {
             try
             {
@@ -148,6 +148,14 @@ namespace FoxTunes
                 using (var stream = factory())
                 {
                     source.StreamSource = stream;
+                    if (width != 0)
+                    {
+                        source.DecodePixelWidth = width;
+                    }
+                    else if (height != 0)
+                    {
+                        source.DecodePixelHeight = height;
+                    }
                     source.EndInit();
                     source.Freeze();
                 }

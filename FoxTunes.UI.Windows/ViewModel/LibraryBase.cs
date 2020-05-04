@@ -458,13 +458,13 @@ namespace FoxTunes.ViewModel
 
         protected virtual async void OnSelectedHierarchyChanged(object sender, EventArgs e)
         {
-            await Windows.Invoke(this.OnSelectedHierarchyChanged).ConfigureAwait(false);
+            await Windows.Invoke(new Action(this.OnSelectedHierarchyChanged)).ConfigureAwait(false);
             this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
         {
-            var task = Windows.Invoke(this.OnSelectedItemChanged);
+            var task = Windows.Invoke(new Action(this.OnSelectedItemChanged));
         }
 
         protected virtual void OnCanNavigateChanged(object sender, EventArgs e)

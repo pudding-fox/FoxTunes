@@ -19,8 +19,6 @@ namespace FoxTunes
 
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
 
-        public ThemeLoader ThemeLoader { get; private set; }
-
         public ImageLoader ImageLoader { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -31,7 +29,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
@@ -103,7 +100,7 @@ namespace FoxTunes
                     switch (libraryHierarchyNode.MetaDatas.Length)
                     {
                         case 0:
-                            return this.CreateImageSource0();
+                            return null;
                         default:
                             return this.CreateImageSource1(libraryHierarchyNode, width, height);
                     }
@@ -112,7 +109,7 @@ namespace FoxTunes
                     switch (libraryHierarchyNode.MetaDatas.Length)
                     {
                         case 0:
-                            return this.CreateImageSource0();
+                            return null;
                         case 1:
                             return this.CreateImageSource1(libraryHierarchyNode, width, height);
                         case 2:
@@ -125,17 +122,12 @@ namespace FoxTunes
             }
         }
 
-        private ImageSource CreateImageSource0()
-        {
-            return this.ImageLoader.Load(ThemeLoader.Theme.Id, () => ThemeLoader.Theme.ArtworkPlaceholder, true);
-        }
-
         private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
         {
             var fileName = libraryHierarchyNode.MetaDatas[0].Value;
             if (!File.Exists(fileName))
             {
-                return this.CreateImageSource0();
+                return null;
             }
             return this.ImageLoader.Load(fileName, width, height, true);
         }
@@ -288,10 +280,6 @@ namespace FoxTunes
             var hashCode = default(int);
             unchecked
             {
-                if (this.ThemeLoader.Theme != null)
-                {
-                    hashCode += this.ThemeLoader.Theme.Id.GetHashCode();
-                }
                 hashCode = (hashCode * 29) + libraryHierarchyNode.Id.GetHashCode();
                 hashCode = (hashCode * 29) + width.GetHashCode();
                 hashCode = (hashCode * 29) + height.GetHashCode();
