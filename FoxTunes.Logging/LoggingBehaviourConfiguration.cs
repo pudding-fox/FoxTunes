@@ -35,9 +35,8 @@ namespace FoxTunes
                     new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled (Log.txt)").WithValue(enabled)
                 )
                 .WithElement(
-                    new SelectionConfigurationElement(LEVEL_ELEMENT, "Level").WithOptions(GetLevelOptions())
+                    new SelectionConfigurationElement(LEVEL_ELEMENT, "Level").WithOptions(GetLevelOptions()).DependsOn(SECTION, ENABLED_ELEMENT)
                 );
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(value => UpdateConfiguration(value));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetLevelOptions()
@@ -75,18 +74,6 @@ namespace FoxTunes
                     return LogLevel.Debug;
                 case TRACE_OPTION:
                     return LogLevel.Trace;
-            }
-        }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LEVEL_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LEVEL_ELEMENT).Hide();
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FoxTunes
@@ -127,6 +128,21 @@ namespace FoxTunes
             return this;
         }
 
+        [NonSerialized]
+        private IDictionary<string, ISet<string>> _Dependencies;
+
+        public IDictionary<string, ISet<string>> Dependencies
+        {
+            get
+            {
+                return this._Dependencies;
+            }
+            private set
+            {
+                this._Dependencies = value;
+            }
+        }
+
         public void Update(ConfigurationElement element)
         {
             if (!this.GetType().IsAssignableFrom(element.GetType()))
@@ -140,6 +156,7 @@ namespace FoxTunes
             this.IsHidden = element.IsHidden;
             this.ValidationRules = element.ValidationRules;
             this.Flags = element.Flags;
+            this.Dependencies = element.Dependencies;
             this.OnUpdate(element);
         }
 
@@ -157,6 +174,16 @@ namespace FoxTunes
         public ConfigurationElement Show()
         {
             this.IsHidden = false;
+            return this;
+        }
+
+        public ConfigurationElement DependsOn(string sectionId, string elementId)
+        {
+            if (this.Dependencies == null)
+            {
+                this.Dependencies = new Dictionary<string, ISet<string>>(StringComparer.OrdinalIgnoreCase);
+            }
+            this.Dependencies.GetOrAdd(sectionId, _sectionId => new HashSet<string>()).Add(elementId);
             return this;
         }
 

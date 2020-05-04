@@ -20,21 +20,8 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(GROUP_ENABLED_ELEMENT, "Grouping").WithValue(false))
                 .WithElement(
-                    new TextConfigurationElement(GROUP_SCRIPT_ELEMENT, "Group Script", path: "Advanced").WithValue(Resources.Grouping).WithFlags(ConfigurationElementFlags.MultiLine)
+                    new TextConfigurationElement(GROUP_SCRIPT_ELEMENT, "Group Script", path: "Advanced").WithValue(Resources.Grouping).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(PlaylistBehaviourConfiguration.SECTION, GROUP_ENABLED_ELEMENT)
             );
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(PlaylistBehaviourConfiguration.SECTION, GROUP_ENABLED_ELEMENT).ConnectValue(value => UpdateConfiguration(value));
-        }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(PlaylistBehaviourConfiguration.SECTION, GROUP_SCRIPT_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(PlaylistBehaviourConfiguration.SECTION, GROUP_SCRIPT_ELEMENT).Hide();
-            }
         }
     }
 }

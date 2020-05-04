@@ -23,36 +23,17 @@ namespace FoxTunes
                     new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "Global Hotkeys").WithValue(false))
                 .WithElement(
                     new TextConfigurationElement(PLAY_ELEMENT, "Play", path: "Global Hotkeys")
-                        .WithValue("MediaPlayPause"))
+                        .WithValue("MediaPlayPause").DependsOn(SECTION, ENABLED_ELEMENT))
                 .WithElement(
                     new TextConfigurationElement(PREVIOUS_ELEMENT, "Previous", path: "Global Hotkeys")
-                        .WithValue("MediaPreviousTrack"))
+                        .WithValue("MediaPreviousTrack").DependsOn(SECTION, ENABLED_ELEMENT))
                  .WithElement(
                     new TextConfigurationElement(NEXT_ELEMENT, "Next", path: "Global Hotkeys")
-                        .WithValue("MediaNextTrack"))
+                        .WithValue("MediaNextTrack").DependsOn(SECTION, ENABLED_ELEMENT))
                 .WithElement(
                     new TextConfigurationElement(STOP_ELEMENT, "Stop", path: "Global Hotkeys")
-                        .WithValue("MediaStop")
+                        .WithValue("MediaStop").DependsOn(SECTION, ENABLED_ELEMENT)
             );
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(enabled => UpdateConfiguration(enabled));
-        }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, PLAY_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, PREVIOUS_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, NEXT_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, STOP_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, PLAY_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, PREVIOUS_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, NEXT_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, STOP_ELEMENT).Hide();
-            }
         }
     }
 }

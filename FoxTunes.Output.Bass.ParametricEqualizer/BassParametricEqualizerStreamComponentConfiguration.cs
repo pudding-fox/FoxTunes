@@ -49,6 +49,7 @@ namespace FoxTunes
                 .WithElement(
                     new DoubleConfigurationElement(BANDWIDTH, "Bandwidth", path: "Parametric Equalizer")
                         .WithValue(2.5)
+                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
                         .WithValidationRule(
                             new DoubleValidationRule(
                                 PeakEQ.MIN_BANDWIDTH,
@@ -65,6 +66,7 @@ namespace FoxTunes
                             band.Value < 1000 ? band.Value.ToString() + "Hz" : band.Value.ToString() + "kHz",
                             path: "Parametric Equalizer")
                         .WithValue(0)
+                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
                         .WithValidationRule(
                             new DoubleValidationRule(
                                 PeakEQ.MIN_GAIN,
@@ -77,14 +79,11 @@ namespace FoxTunes
             section.WithElement(
                 new SelectionConfigurationElement(PRESET, "Preset", path: "Parametric Equalizer")
                     .WithOptions(GetPresetOptions())
+                    .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
             );
 
             yield return section;
 
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                ENABLED
-            ).ConnectValue(value => UpdateConfiguration(value));
             StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 PRESET
@@ -99,40 +98,7 @@ namespace FoxTunes
             yield return new SelectionConfigurationOption(PRESET_POP, "Pop");
             yield return new SelectionConfigurationOption(PRESET_ROCK, "Rock");
         }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            foreach (var band in Bands)
-            {
-                var element = StandardComponents.Instance.Configuration.GetElement(
-                    BassOutputConfiguration.SECTION,
-                    band.Key
-                );
-                if (element == null)
-                {
-                    continue;
-                }
-                if (enabled)
-                {
-                    element.Show();
-                }
-                else
-                {
-                    element.Hide();
-                }
-            }
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BANDWIDTH).Show();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, PRESET).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BANDWIDTH).Hide();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, PRESET).Hide();
-            }
-        }
-
+        
         public static void LoadPreset(string name)
         {
             var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(

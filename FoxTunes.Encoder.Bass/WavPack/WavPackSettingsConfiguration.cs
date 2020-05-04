@@ -20,9 +20,9 @@ namespace FoxTunes
 
         public const string PROCESSING_ELEMENT = "GGGG7D83-BA6A-4FA6-A3F5-786435C8146B";
 
-        public const string BITRATE_ELEMENT = "HHHH00E7-2F19-46E4-A31E-8CBCFD50372A";
+        public const string HYBRID_ELEMENT = "HHHH6694-AEE2-4623-8B4B-5928B37FB1B2";
 
-        public const string HYBRID_ELEMENT = "IIII6694-AEE2-4623-8B4B-5928B37FB1B2";
+        public const string BITRATE_ELEMENT = "IIII00E7-2F19-46E4-A31E-8CBCFD50372A";
 
         public const string CORRECTION_ELEMENT = "JJJJ78CE-A87C-4AC3-886D-3BBE6178BFEB";
 
@@ -60,12 +60,11 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(HYBRID_ELEMENT, "Hybrid Lossy", path: settings.Name)
                     .WithValue(false))
                 .WithElement(new BooleanConfigurationElement(CORRECTION_ELEMENT, "Correction File", path: settings.Name)
-                    .WithValue(false))
+                    .WithValue(false).DependsOn(SECTION, HYBRID_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(BITRATE_ELEMENT, "Bitrate", path: settings.Name)
-                    .WithValue(DEFAULT_BITRATE)
+                    .WithValue(DEFAULT_BITRATE).DependsOn(SECTION, HYBRID_ELEMENT)
                     .WithValidationRule(new IntegerValidationRule(MIN_BITRATE, MAX_BITRATE))
                 );
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, HYBRID_ELEMENT).ConnectValue(option => UpdateConfiguration(option));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetDepthOptions()
@@ -90,20 +89,6 @@ namespace FoxTunes
                     return BassEncoderSettings.DEPTH_32;
                 default:
                     return DEFAULT_DEPTH;
-            }
-        }
-
-        private static void UpdateConfiguration(bool hybrid)
-        {
-            if (hybrid)
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, CORRECTION_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, BITRATE_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, CORRECTION_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, BITRATE_ELEMENT).Hide();
             }
         }
     }

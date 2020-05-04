@@ -49,7 +49,7 @@ namespace FoxTunes
                 {
                     this.Add(element);
                 }
-            }
+            }            
         }
 
         private bool Contains(string id)

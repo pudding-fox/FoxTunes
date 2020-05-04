@@ -18,28 +18,10 @@ namespace FoxTunes
         {
             var section = new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new BooleanConfigurationElement(ENABLED, "Enabled", path: "Replay Gain").WithValue(false))
-                .WithElement(new SelectionConfigurationElement(MODE, "Mode", path: "Replay Gain").WithOptions(GetModeOptions()))
-                .WithElement(new BooleanConfigurationElement(ON_DEMAND, "On Demand", path: "Replay Gain").WithValue(false)
+                .WithElement(new SelectionConfigurationElement(MODE, "Mode", path: "Replay Gain").WithOptions(GetModeOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED))
+                .WithElement(new BooleanConfigurationElement(ON_DEMAND, "On Demand", path: "Replay Gain").WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED)
             );
             yield return section;
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                ENABLED
-            ).ConnectValue(value => UpdateConfiguration(value));
-        }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, MODE).Show();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, ON_DEMAND).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, MODE).Hide();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, ON_DEMAND).Hide();
-            }
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetModeOptions()

@@ -17,21 +17,8 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION, "Tools")
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "MusicBrainz Picard").WithValue(File.Exists(PATH)))
-                .WithElement(new TextConfigurationElement(PATH_ELEMENT, "Path", path: "MusicBrainz Picard").WithValue(PATH).WithFlags(ConfigurationElementFlags.FileName)
+                .WithElement(new TextConfigurationElement(PATH_ELEMENT, "Path", path: "MusicBrainz Picard").WithValue(PATH).WithFlags(ConfigurationElementFlags.FileName).DependsOn(SECTION, ENABLED_ELEMENT)
             );
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(value => UpdateConfiguration(value));
-        }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, PATH_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, PATH_ELEMENT).Hide();
-            }
         }
     }
 }

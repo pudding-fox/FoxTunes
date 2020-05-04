@@ -16,6 +16,8 @@ namespace FoxTunes.Interfaces
 
         void Reset();
 
+        void ConnectDependencies();
+
         ConfigurationSection GetSection(string sectionId);
 
         ConfigurationElement GetElement(string sectionId, string elementId);

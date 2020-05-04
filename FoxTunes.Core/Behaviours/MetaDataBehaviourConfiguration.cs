@@ -53,87 +53,32 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(ENABLE_ELEMENT, "Enabled").WithValue(true))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_EMBEDDED_IMAGES, "Embedded Images").WithValue(true))
+                    new BooleanConfigurationElement(READ_EMBEDDED_IMAGES, "Embedded Images").WithValue(true).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_LOOSE_IMAGES, "File Images").WithValue(true))
+                    new BooleanConfigurationElement(READ_LOOSE_IMAGES, "File Images").WithValue(true).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new TextConfigurationElement(LOOSE_IMAGES_FRONT, "Front Cover", path: "Advanced").WithValue("front, cover, folder"))
+                    new TextConfigurationElement(LOOSE_IMAGES_FRONT, "Front Cover", path: "Advanced").WithValue("front, cover, folder").DependsOn(SECTION, ENABLE_ELEMENT).DependsOn(SECTION, READ_LOOSE_IMAGES))
                 .WithElement(
-                    new TextConfigurationElement(LOOSE_IMAGES_BACK, "Back Cover", path: "Advanced").WithValue("back"))
+                    new TextConfigurationElement(LOOSE_IMAGES_BACK, "Back Cover", path: "Advanced").WithValue("back").DependsOn(SECTION, ENABLE_ELEMENT).DependsOn(SECTION, READ_LOOSE_IMAGES))
                 .WithElement(
-                    new SelectionConfigurationElement(IMAGES_PREFERENCE, "Images Preference", path: "Advanced").WithOptions(GetImagesPreferenceOptions()))
+                    new SelectionConfigurationElement(IMAGES_PREFERENCE, "Images Preference", path: "Advanced").WithOptions(GetImagesPreferenceOptions()).DependsOn(SECTION, ENABLE_ELEMENT).DependsOn(SECTION, READ_EMBEDDED_IMAGES).DependsOn(SECTION, READ_LOOSE_IMAGES))
                 .WithElement(
-                    new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images", path: "Advanced").WithValue(true))
+                    new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images", path: "Advanced").WithValue(true).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_EXTENDED_TAGS, "Extended Attributes", path: "Advanced").WithValue(false))
+                    new BooleanConfigurationElement(READ_EXTENDED_TAGS, "Extended Attributes", path: "Advanced").WithValue(false).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, "MusicBrainz Attributes", path: "Advanced").WithValue(false))
+                    new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, "MusicBrainz Attributes", path: "Advanced").WithValue(false).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_LYRICS_TAGS, "Lyrics").WithValue(releaseType == ReleaseType.Default))
+                    new BooleanConfigurationElement(READ_LYRICS_TAGS, "Lyrics").WithValue(releaseType == ReleaseType.Default).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_REPLAY_GAIN_TAGS, "Replay Gain").WithValue(releaseType == ReleaseType.Default))
+                    new BooleanConfigurationElement(READ_REPLAY_GAIN_TAGS, "Replay Gain").WithValue(releaseType == ReleaseType.Default).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(releaseType == ReleaseType.Default))
+                    new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(releaseType == ReleaseType.Default).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32)))
+                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32)).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new SelectionConfigurationElement(WRITE_ELEMENT, "Write Behaviour", path: "Advanced").WithOptions(GetWriteBehaviourOptions())
+                    new SelectionConfigurationElement(WRITE_ELEMENT, "Write Behaviour", path: "Advanced").WithOptions(GetWriteBehaviourOptions()).DependsOn(SECTION, ENABLE_ELEMENT)
             );
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLE_ELEMENT).ConnectValue(value => UpdateConfiguration());
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_EMBEDDED_IMAGES).ConnectValue(value => UpdateConfiguration());
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_LOOSE_IMAGES).ConnectValue(value => UpdateConfiguration());
-        }
-
-        private static void UpdateConfiguration()
-        {
-            var enabled = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLE_ELEMENT).Value;
-            var embeddedImages = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_EMBEDDED_IMAGES).Value;
-            var looseImages = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_LOOSE_IMAGES).Value;
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_EMBEDDED_IMAGES).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LOOSE_IMAGES).Show();
-                if (embeddedImages && looseImages)
-                {
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, IMAGES_PREFERENCE).Show();
-                }
-                else
-                {
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, IMAGES_PREFERENCE).Hide();
-                }
-                if (looseImages)
-                {
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_FRONT).Show();
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_BACK).Show();
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, COPY_IMAGES_ELEMENT).Show();
-                }
-                else
-                {
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_FRONT).Hide();
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_BACK).Hide();
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, COPY_IMAGES_ELEMENT).Hide();
-                }
-                StandardComponents.Instance.Configuration.GetElement(SECTION, THREADS_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_EXTENDED_TAGS).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_MUSICBRAINZ_TAGS).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LYRICS_TAGS).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_POPULARIMETER_TAGS).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, WRITE_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_EMBEDDED_IMAGES).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LOOSE_IMAGES).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_FRONT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LOOSE_IMAGES_BACK).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, COPY_IMAGES_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, THREADS_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_EXTENDED_TAGS).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_MUSICBRAINZ_TAGS).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_LYRICS_TAGS).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, READ_POPULARIMETER_TAGS).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, WRITE_ELEMENT).Hide();
-            }
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetImagesPreferenceOptions()
