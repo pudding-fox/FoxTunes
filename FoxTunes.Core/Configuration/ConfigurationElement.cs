@@ -214,6 +214,10 @@ namespace FoxTunes
                 {
                     this.DefaultValue = value;
                 }
+                if (object.Equals(this.Value, value))
+                {
+                    return;
+                }
                 this._Value = value;
                 this.OnValueChanged();
             }
