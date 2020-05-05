@@ -551,7 +551,7 @@ namespace FoxTunes
             }
             else if (string.Equals(metaDataItem.Name, CommonMetaData.LastPlayed, StringComparison.OrdinalIgnoreCase))
             {
-                if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                if (this.Popularimeter.Value && MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
                 {
                     this.Try(() => PopularimeterManager.Write(this, metaDataItem, file), this.ErrorHandler);
                 }
@@ -562,14 +562,17 @@ namespace FoxTunes
             }
             else if (string.Equals(metaDataItem.Name, CommonMetaData.PlayCount, StringComparison.OrdinalIgnoreCase))
             {
-                if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                if (this.Popularimeter.Value && MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
                 {
                     this.Try(() => PopularimeterManager.Write(this, metaDataItem, file), this.ErrorHandler);
                 }
             }
             else if (string.Equals(metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase))
             {
-                this.Try(() => PopularimeterManager.Write(this, metaDataItem, file), this.ErrorHandler);
+                if (this.Popularimeter.Value)
+                {
+                    this.Try(() => PopularimeterManager.Write(this, metaDataItem, file), this.ErrorHandler);
+                }
             }
             else if (string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainAlbumGain, StringComparison.OrdinalIgnoreCase) || string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainAlbumPeak, StringComparison.OrdinalIgnoreCase) || string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainTrackGain, StringComparison.OrdinalIgnoreCase) || string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainTrackPeak, StringComparison.OrdinalIgnoreCase))
             {
@@ -922,6 +925,10 @@ namespace FoxTunes
                     {
                         result.Add(CommonMetaData.Rating, Convert.ToString(GetRatingStars(rating)));
                     }
+                    else
+                    {
+                        result.Add(CommonMetaData.Rating, string.Empty);
+                    }
                 }
                 //If we didn't find a popularimeter frame then attempt to read the play count from a custom tag.
                 if (!result.ContainsKey(CommonMetaData.PlayCount))
@@ -931,6 +938,10 @@ namespace FoxTunes
                     {
                         result.Add(CommonMetaData.PlayCount, playCount);
                     }
+                    else
+                    {
+                        result.Add(CommonMetaData.PlayCount, "0");
+                    }
                 }
                 //Popularimeter frame does not support last played, attempt to read the play count from a custom tag.
                 //if (!result.ContainsKey(CommonMetaData.LastPlayed))
@@ -939,6 +950,10 @@ namespace FoxTunes
                     if (!string.IsNullOrEmpty(lastPlayed))
                     {
                         result.Add(CommonMetaData.LastPlayed, lastPlayed);
+                    }
+                    else
+                    {
+                        result.Add(CommonMetaData.LastPlayed, string.Empty);
                     }
                 }
                 //Copy our informations back to the meta data collection.
