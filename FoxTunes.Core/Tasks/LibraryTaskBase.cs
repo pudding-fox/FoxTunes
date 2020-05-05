@@ -172,7 +172,7 @@ namespace FoxTunes
                     {
                         if (pair.Key is LibraryItem libraryItem)
                         {
-                            this.Warnings.Add(libraryItem, pair.Value);
+                            this.Warnings.GetOrAdd(libraryItem, _libraryItem => new List<string>()).AddRange(pair.Value);
                         }
                     }
                 }
