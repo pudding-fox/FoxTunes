@@ -44,10 +44,16 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.WRITE_ELEMENT
             );
+            this.Refresh();
             base.InitializeComponent(core);
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+            this.Refresh();
+        }
+
+        protected virtual void Refresh()
         {
             if (this.MetaDataEnabled.Value && this.PlaybackStatisticsEnabled.Value)
             {
