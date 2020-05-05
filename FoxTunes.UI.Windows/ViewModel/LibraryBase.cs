@@ -615,7 +615,10 @@ namespace FoxTunes.ViewModel
                     clear = false;
                     break;
             }
-            return this.PlaylistManager.Add(this.Items, clear);
+            return this.PlaylistManager.Add(
+                this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy), 
+                clear
+            );
         }
 
         protected override void Dispose(bool disposing)
