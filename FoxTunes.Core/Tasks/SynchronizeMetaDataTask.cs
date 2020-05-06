@@ -40,7 +40,8 @@ namespace FoxTunes
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
                     var queryable = this.Database.AsQueryable<LibraryItem>(transaction);
-                    libraryItems = queryable.Where(libraryItem => libraryItem.Status == LibraryItemStatus.Export).ToArray();
+                    //TODO: Add Enum.HasFlag support to FoxDb.
+                    libraryItems = queryable.Where(libraryItem => libraryItem.Flags == LibraryItemFlags.Export).ToArray();
                 }
 #if NET40
                 return TaskEx.FromResult(false);
@@ -66,7 +67,8 @@ namespace FoxTunes
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
                     var queryable = this.Database.AsQueryable<PlaylistItem>(transaction);
-                    playlistItems = queryable.Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Export).ToArray();
+                    //TODO: Add Enum.HasFlag support to FoxDb.
+                    playlistItems = queryable.Where(playlistItem => playlistItem.Flags == PlaylistItemFlags.Export).ToArray();
                 }
 #if NET40
                 return TaskEx.FromResult(false);

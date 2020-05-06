@@ -342,7 +342,8 @@ namespace FoxTunes
                             {
                                 DirectoryName = directoryName,
                                 FileName = fileName,
-                                Sequence = this.Sequence + a
+                                Sequence = this.Sequence + a,
+                                Status = PlaylistItemStatus.Import
                             };
                             await writer.Write(playlistItem).ConfigureAwait(false);
                             this.Offset++;

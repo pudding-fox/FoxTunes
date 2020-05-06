@@ -87,7 +87,9 @@ namespace FoxTunes
                     MetaDataItem.Update(metaDatas, libraryItem.MetaDatas, null);
 
                     await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
-                    await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
+
+                    libraryItem.Status = LibraryItemStatus.Import;
+                    await LibraryTaskBase.UpdateLibraryItem(this.Database, libraryItem).ConfigureAwait(false);
 
                     position++;
                 }
@@ -131,8 +133,8 @@ namespace FoxTunes
                     ).ConfigureAwait(false);
                 }
 
-                //Update the import date otherwise the file might be re-scanned and changes lost.
-                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow, transaction).ConfigureAwait(false);
+                libraryItem.ImportDate = DateTimeHelper.ToString(DateTime.UtcNow.AddSeconds(30));
+                await LibraryTaskBase.UpdateLibraryItem(this.Database, libraryItem, transaction).ConfigureAwait(false);
 
                 if (transaction.HasTransaction)
                 {

@@ -13,7 +13,8 @@ CREATE TABLE [LibraryItems] (
 	DirectoryName nvarchar(260) NOT NULL, 
 	FileName nvarchar(260) NOT NULL, 
 	ImportDate varchar(50) NOT NULL,
-	Status INTEGER NOT NULL);
+	Status INTEGER NOT NULL,
+	Flags INTEGER NOT NULL);
 
 CREATE TABLE [PlaylistItems](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
@@ -21,7 +22,8 @@ CREATE TABLE [PlaylistItems](
     [Sequence] INTEGER NOT NULL, 
     [DirectoryName] nvarchar(260) NOT NULL, 
     [FileName] nvarchar(260) NOT NULL, 
-    [Status] INTEGER NOT NULL);
+    [Status] INTEGER NOT NULL,
+	[Flags] INTEGER NOT NULL);
 
 CREATE TABLE [LibraryHierarchies] ( 
   [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 

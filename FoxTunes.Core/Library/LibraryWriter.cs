@@ -22,6 +22,7 @@ namespace FoxTunes
             this.Command.Parameters["fileName"] = libraryItem.FileName;
             this.Command.Parameters["importDate"] = libraryItem.ImportDate;
             this.Command.Parameters["status"] = libraryItem.Status;
+            this.Command.Parameters["flags"] = libraryItem.Flags;
             return this.Command.ExecuteNonQueryAsync();
         }
 
@@ -38,11 +39,13 @@ namespace FoxTunes
             query.Add.AddColumn(database.Tables.LibraryItem.Column("FileName"));
             query.Add.AddColumn(database.Tables.LibraryItem.Column("ImportDate"));
             query.Add.AddColumn(database.Tables.LibraryItem.Column("Status"));
+            query.Add.AddColumn(database.Tables.LibraryItem.Column("Flags"));
             query.Add.SetTable(database.Tables.LibraryItem);
             query.Output.AddParameter("DirectoryName", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             query.Output.AddParameter("FileName", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             query.Output.AddParameter("ImportDate", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             query.Output.AddParameter("Status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
+            query.Output.AddParameter("Flags", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             query.Filter.Expressions.Add(
                 query.Filter.CreateUnary(
                     QueryOperator.Not,

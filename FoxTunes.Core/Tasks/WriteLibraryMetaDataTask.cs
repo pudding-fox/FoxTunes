@@ -101,7 +101,9 @@ namespace FoxTunes
                     }
 
                     await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
-                    await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
+
+                    libraryItem.Status = LibraryItemStatus.Import;
+                    await LibraryTaskBase.UpdateLibraryItem(this.Database, libraryItem).ConfigureAwait(false);
 
                     if (this.WriteToFiles)
                     {

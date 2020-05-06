@@ -13,7 +13,8 @@ CREATE TABLE [LibraryItems] (
 	[DirectoryName] text NOT NULL COLLATE NOCASE, 
 	[FileName] text NOT NULL COLLATE NOCASE, 
 	[ImportDate] text NOT NULL COLLATE NOCASE,
-	[Status] INTEGER NOT NULL);
+	[Status] INTEGER NOT NULL,
+	[Flags] INTEGER NOT NULL);
 
 CREATE TABLE [PlaylistItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
@@ -21,7 +22,8 @@ CREATE TABLE [PlaylistItems](
     [Sequence] bigint NOT NULL, 
     [DirectoryName] text NOT NULL COLLATE NOCASE, 
     [FileName] text NOT NULL COLLATE NOCASE, 
-    [Status] bigint NOT NULL);
+    [Status] bigint NOT NULL,
+	[Flags] INTEGER NOT NULL);
 
 CREATE TABLE [LibraryHierarchies] ( 
 	[Id] INTEGER PRIMARY KEY NOT NULL, 

@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public LibraryItemStatus Status { get; set; }
 
+        public LibraryItemFlags Flags { get; set; }
+
         [Relation(Flags = RelationFlags.AutoExpression | RelationFlags.EagerFetch | RelationFlags.ManyToMany)]
         public IList<MetaDataItem> MetaDatas { get; set; }
 
@@ -55,7 +57,12 @@ namespace FoxTunes
         None = 0,
         Import = 1,
         Update = 2,
-        Remove = 3,
-        Export = 4
+        Remove = 3
+    }
+
+    public enum LibraryItemFlags : byte
+    {
+        None = 0,
+        Export = 1
     }
 }

@@ -26,7 +26,8 @@ namespace FoxTunes
             {
                 foreach (var libraryItem in this.LibraryItems)
                 {
-                    await SetLibraryItemStatus(this.Database, libraryItem.Id, this.Status).ConfigureAwait(false);
+                    libraryItem.Status = this.Status;
+                    await UpdateLibraryItem(this.Database, libraryItem).ConfigureAwait(false); ;
                 }
             }
             else

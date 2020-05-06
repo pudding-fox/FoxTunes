@@ -21,7 +21,8 @@ namespace FoxTunes
             this.Command.Parameters["directoryName"] = playlistItem.DirectoryName;
             this.Command.Parameters["fileName"] = playlistItem.FileName;
             this.Command.Parameters["sequence"] = playlistItem.Sequence;
-            this.Command.Parameters["status"] = PlaylistItemStatus.Import;
+            this.Command.Parameters["status"] = playlistItem.Status;
+            this.Command.Parameters["flags"] = playlistItem.Flags;
             return this.Command.ExecuteNonQueryAsync();
         }
 

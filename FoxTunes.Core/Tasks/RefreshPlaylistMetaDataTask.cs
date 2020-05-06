@@ -87,14 +87,18 @@ namespace FoxTunes
                     var metaDatas = await metaDataSource.GetMetaData(playlistItem.FileName).ConfigureAwait(false);
                     MetaDataItem.Update(metaDatas, playlistItem.MetaDatas, null);
 
-                    if (!playlistItem.LibraryItem_Id.HasValue)
+                    if (playlistItem.LibraryItem_Id.HasValue)
                     {
-                        await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
+                        await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
+                        await LibraryTaskBase.UpdateLibraryItem(
+                            this.Database,
+                            playlistItem.LibraryItem_Id.Value,
+                            libraryItem => libraryItem.Status = LibraryItemStatus.Import
+                        ).ConfigureAwait(false);
                     }
                     else
                     {
-                        await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
-                        await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
+                        await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
                     }
 
                     position++;
@@ -170,12 +174,12 @@ namespace FoxTunes
                     ).ConfigureAwait(false);
                 }
 
-                //Update the import date otherwise the file might be re-scanned and changes lost.
-                var libraryItem = new LibraryItem()
-                {
-                    Id = playlistItem.LibraryItem_Id.Value
-                };
-                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow, transaction).ConfigureAwait(false);
+                await LibraryTaskBase.UpdateLibraryItem(
+                    this.Database,
+                    playlistItem.LibraryItem_Id.Value,
+                    libraryItem => libraryItem.ImportDate = DateTimeHelper.ToString(DateTime.UtcNow.AddSeconds(30)),
+                    transaction
+                ).ConfigureAwait(false);
 
                 if (transaction.HasTransaction)
                 {
