@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -9,11 +11,28 @@ namespace FoxTunes
             this.Status = status;
         }
 
+        public UpdateLibraryTask(IEnumerable<LibraryItem> libraryItems, LibraryItemStatus status) : this(status)
+        {
+            this.LibraryItems = libraryItems;
+        }
+
+        public IEnumerable<LibraryItem> LibraryItems { get; private set; }
+
         public LibraryItemStatus Status { get; private set; }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
-            return SetLibraryItemsStatus(this.Database, this.Status);
+            if (this.LibraryItems != null && this.LibraryItems.Any())
+            {
+                foreach (var libraryItem in this.LibraryItems)
+                {
+                    await SetLibraryItemStatus(this.Database, libraryItem.Id, this.Status).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                await SetLibraryItemsStatus(this.Database, this.Status).ConfigureAwait(false);
+            }
         }
     }
 }

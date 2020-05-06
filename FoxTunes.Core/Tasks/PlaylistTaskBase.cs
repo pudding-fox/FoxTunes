@@ -280,6 +280,41 @@ namespace FoxTunes
             }
         }
 
+        public static IEnumerable<string> UpdateLibraryCache(ILibraryCache libraryCache, IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
+        {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var playlistItem in playlistItems)
+            {
+                if (!playlistItem.LibraryItem_Id.HasValue)
+                {
+                    continue;
+                }
+                var libraryItem = default(LibraryItem);
+                if (libraryCache.TryGetItem(playlistItem.LibraryItem_Id.Value, out libraryItem))
+                {
+                    result.AddRange(MetaDataItem.Update(playlistItem, libraryItem, names));
+                }
+            }
+            return result;
+        }
+
+        public static IEnumerable<string> UpdatePlaylistCache(IPlaylistCache playlistCache, IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
+        {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var playlistItem in playlistItems)
+            {
+                var cachedPlaylistItem = default(PlaylistItem);
+                if (playlistCache.TryGetItemById(playlistItem.Id, out cachedPlaylistItem))
+                {
+                    if (!object.ReferenceEquals(playlistItem, cachedPlaylistItem))
+                    {
+                        result.AddRange(MetaDataItem.Update(playlistItem, cachedPlaylistItem, names));
+                    }
+                }
+            }
+            return result;
+        }
+
         public static async Task SetPlaylistItemStatus(IDatabaseComponent database, int playlistItemId, PlaylistItemStatus status)
         {
             var builder = database.QueryFactory.Build();
