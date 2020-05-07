@@ -389,9 +389,15 @@ namespace FoxTunes.ViewModel
             await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
         }
 
-        protected virtual Task SavePlaylist(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
+        protected virtual async Task SavePlaylist(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
         {
-            return this.MetaDataManager.Save(playlistItems, true, true, names.ToArray());
+            await this.MetaDataManager.Save(playlistItems, true, true, names.ToArray()).ConfigureAwait(false);
+            if (playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
+            {
+                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
+                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+                await this.LibraryManager.SetStatus(LibraryItemStatus.None).ConfigureAwait(false);
+            }
         }
 
         public ICommand CancelCommand
