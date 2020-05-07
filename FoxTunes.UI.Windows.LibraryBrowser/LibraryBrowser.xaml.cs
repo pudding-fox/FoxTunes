@@ -13,12 +13,6 @@ namespace FoxTunes
     {
         public const string ID = "FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3";
 
-        static LibraryBrowser()
-        {
-            //TODO: This is a hack so the image converter processes REFRESH_IMAGES before the view model.
-            global::FoxTunes.ViewModel.LibraryBrowserImageConverter.InitializeComponent();
-        }
-
         public LibraryBrowser()
         {
             this.InitializeComponent();
