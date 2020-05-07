@@ -10,7 +10,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:LibraryHierarchyNode}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <ViewModel:ImageConverter x:Key="ImageConverter"></ViewModel:ImageConverter>
+        <ViewModel:ArtworkStackImageConverter x:Key="ArtworkStackImageConverter"></ViewModel:ArtworkStackImageConverter>
+        <SolidColorBrush x:Key="Transparent" Color="Transparent"></SolidColorBrush>
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding MetaDatas}">
         <ItemsControl.ItemsPanel>
@@ -21,18 +22,7 @@
         <ItemsControl.ItemTemplate>
             <DataTemplate>
                 <Border Background="{DynamicResource NormalBrush}" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" CornerRadius="5" Padding="5">
-                    <Grid Width="100" Height="100">
-                        <Grid.Background>
-                            <Binding Path="Value" Converter="{StaticResource ImageConverter}" IsAsync="True">
-                                <Binding.ConverterParameter>
-                                    <x:Array Type="{x:Type System:Int32}">
-                                        <System:Int32>100</System:Int32>
-                                        <System:Int32>100</System:Int32>
-                                    </x:Array>
-                                </Binding.ConverterParameter>
-                            </Binding>
-                        </Grid.Background>
-                    </Grid>
+                    <Rectangle DataContext="{Binding Value, Converter={StaticResource ArtworkStackImageConverter}}" Width="100" Height="100" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}"></Rectangle>
                 </Border>
             </DataTemplate>
         </ItemsControl.ItemTemplate>

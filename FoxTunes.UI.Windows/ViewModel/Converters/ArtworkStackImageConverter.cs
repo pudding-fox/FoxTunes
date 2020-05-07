@@ -5,9 +5,9 @@ using System.Windows.Data;
 
 namespace FoxTunes.ViewModel
 {
-    public class ImageConverter : IValueConverter
+    public class ArtworkStackImageConverter : IValueConverter
     {
-        public static readonly ImageBrushFactory Factory = ComponentRegistry.Instance.GetComponent<ImageBrushFactory>();
+        public static readonly ArtworkStackBrushFactory Factory = ComponentRegistry.Instance.GetComponent<ArtworkStackBrushFactory>();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -16,15 +16,7 @@ namespace FoxTunes.ViewModel
             {
                 return value;
             }
-            var width = 0;
-            var height = 0;
-            var size = parameter as int[];
-            if (size != null && size.Length == 2)
-            {
-                width = size[0];
-                height = size[1];
-            }
-            return Factory.Create(fileName, width, height);
+            return Factory.Create(fileName);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
