@@ -137,10 +137,6 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.Output.IsStarted)
-                {
-                    throw BassOutputStreamException.StaleStream;
-                }
                 var result = default(bool);
                 this.Manager.WithPipeline(pipeline =>
                 {
@@ -157,10 +153,6 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.Output.IsStarted)
-                {
-                    throw BassOutputStreamException.StaleStream;
-                }
                 var result = default(bool);
                 this.Manager.WithPipeline(pipeline =>
                 {
@@ -177,10 +169,6 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.Output.IsStarted)
-                {
-                    throw BassOutputStreamException.StaleStream;
-                }
                 var result = default(bool);
                 this.Manager.WithPipeline(pipeline =>
                 {
@@ -195,10 +183,6 @@ namespace FoxTunes
 
         public override Task Play()
         {
-            if (!this.Output.IsStarted)
-            {
-                throw BassOutputStreamException.StaleStream;
-            }
             return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
@@ -210,10 +194,6 @@ namespace FoxTunes
 
         public override Task Pause()
         {
-            if (!this.Output.IsStarted)
-            {
-                throw BassOutputStreamException.StaleStream;
-            }
             return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
@@ -225,10 +205,6 @@ namespace FoxTunes
 
         public override Task Resume()
         {
-            if (!this.Output.IsStarted)
-            {
-                throw BassOutputStreamException.StaleStream;
-            }
             return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
@@ -240,10 +216,6 @@ namespace FoxTunes
 
         public override Task Stop()
         {
-            if (!this.Output.IsStarted)
-            {
-                throw BassOutputStreamException.StaleStream;
-            }
             return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
@@ -278,16 +250,5 @@ namespace FoxTunes
             }
             this.ChannelHandle = 0;
         }
-    }
-
-    public class BassOutputStreamException : OutputStreamException
-    {
-        private BassOutputStreamException(string message)
-            : base(message)
-        {
-
-        }
-
-        public static readonly BassOutputStreamException StaleStream = new BassOutputStreamException("Output was shut down since the stream was created, it should have been disposed.");
     }
 }

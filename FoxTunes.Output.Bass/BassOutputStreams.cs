@@ -33,6 +33,19 @@ namespace FoxTunes
             return Streams.TryGetValue(fileName, out reference);
         }
 
+        public static bool Get(string fileName, out BassOutputStream stream)
+        {
+            Prune();
+            var reference = default(WeakReference<BassOutputStream>);
+            if (Streams.TryGetValue(fileName, out reference))
+            {
+                stream = reference.Target;
+                return true;
+            }
+            stream = null;
+            return false;
+        }
+
         public static bool Add(BassOutputStream stream)
         {
             Prune();

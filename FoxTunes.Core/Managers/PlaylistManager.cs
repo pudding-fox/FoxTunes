@@ -329,6 +329,12 @@ namespace FoxTunes
 
         public async Task Play(PlaylistItem playlistItem)
         {
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream != null && outputStream.PlaylistItem == playlistItem)
+            {
+                outputStream.Position = 0;
+                return;
+            }
             var exception = default(Exception);
             try
             {

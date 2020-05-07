@@ -17,7 +17,11 @@ namespace FoxTunes
 
         public abstract Task<PlaylistItem> GetNext(bool navigate);
 
+        public abstract Task<PlaylistItem> GetNext(PlaylistItem playlistItem);
+
         public abstract Task<PlaylistItem> GetPrevious(bool navigate);
+
+        public abstract Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem);
 
         public override void InitializeComponent(ICore core)
         {
@@ -113,6 +117,17 @@ namespace FoxTunes
             return playlistItem;
         }
 
+        public override async Task<PlaylistItem> GetNext(PlaylistItem playlistItem)
+        {
+            playlistItem = await this.GetNextPlaylistItem(playlistItem.Sequence).ConfigureAwait(false);
+            if (playlistItem == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
+                playlistItem = await this.GetFirstPlaylistItem().ConfigureAwait(false);
+            }
+            return playlistItem;
+        }
+
         public override async Task<PlaylistItem> GetPrevious(bool navigate)
         {
             var playlistItem = default(PlaylistItem);
@@ -134,6 +149,17 @@ namespace FoxTunes
             if (playlistItem == null)
             {
                 Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
+            }
+            return playlistItem;
+        }
+
+        public override async Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem)
+        {
+            playlistItem = await this.GetPreviousPlaylistItem(playlistItem.Sequence).ConfigureAwait(false);
+            if (playlistItem == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
+                playlistItem = await this.GetLastPlaylistItem().ConfigureAwait(false);
             }
             return playlistItem;
         }
@@ -179,47 +205,85 @@ namespace FoxTunes
 
         public async Task Refresh()
         {
-            using (var database = this.DatabaseFactory.Create())
+            Monitor.Enter(SyncRoot);
+            try
             {
-                var table = database.Tables.PlaylistItem;
-                var query = database.QueryFactory.Build();
-                var column = table.GetColumn(ColumnConfig.By("Sequence"));
-                query.Output.AddColumn(column);
-                query.Source.AddTable(table);
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                this.Position = 0;
+                this.Sequences.Clear();
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var reader = database.ExecuteReader(query, transaction))
+                    var table = database.Tables.PlaylistItem;
+                    var query = database.QueryFactory.Build();
+                    var column = table.GetColumn(ColumnConfig.By("Sequence"));
+                    query.Output.AddColumn(column);
+                    query.Source.AddTable(table);
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        using (var sequence = reader.GetAsyncEnumerator())
+                        using (var reader = database.ExecuteReader(query, transaction))
                         {
-                            this.Sequences.Clear();
-                            this.Position = 0;
-                            while (await sequence.MoveNextAsync().ConfigureAwait(false))
+                            using (var sequence = reader.GetAsyncEnumerator())
                             {
-                                this.Sequences.Add(sequence.Current.Get<int>(column));
+                                while (await sequence.MoveNextAsync().ConfigureAwait(false))
+                                {
+                                    this.Sequences.Add(sequence.Current.Get<int>(column));
+                                }
+                                this.Sequences.Shuffle();
                             }
-                            this.Sequences.Shuffle();
                         }
                     }
                 }
+            }
+            finally
+            {
+                Monitor.Exit(SyncRoot);
             }
         }
 
         public override async Task<PlaylistItem> GetNext(bool navigate)
         {
-            if (this.Sequences.Count == 0)
-            {
-                return default(PlaylistItem);
-            }
             Monitor.Enter(SyncRoot);
             try
             {
+                if (this.Sequences.Count == 0)
+                {
+                    return default(PlaylistItem);
+                }
                 var playlistItem = await this.PlaylistBrowser.Get(this.Sequences[this.Position]).ConfigureAwait(false);
                 if (navigate)
                 {
                     this.NavigateNext();
                 }
                 return playlistItem;
+            }
+            finally
+            {
+                Monitor.Exit(SyncRoot);
+            }
+        }
+
+        public override Task<PlaylistItem> GetNext(PlaylistItem playlistItem)
+        {
+            Monitor.Enter(SyncRoot);
+            try
+            {
+                var position = this.Sequences.IndexOf(playlistItem.Sequence);
+                if (position < 0)
+                {
+#if NET40
+                    return TaskEx.FromResult(default(PlaylistItem));
+#else
+                    return Task.FromResult(default(PlaylistItem));
+#endif
+                }
+                if (position >= this.Sequences.Count - 1)
+                {
+                    position = 0;
+                }
+                else
+                {
+                    position++;
+                }
+                return this.PlaylistBrowser.Get(this.Sequences[position]);
             }
             finally
             {
@@ -241,13 +305,13 @@ namespace FoxTunes
 
         public override async Task<PlaylistItem> GetPrevious(bool navigate)
         {
-            if (this.Sequences.Count == 0)
-            {
-                return default(PlaylistItem);
-            }
             Monitor.Enter(SyncRoot);
             try
             {
+                if (this.Sequences.Count == 0)
+                {
+                    return default(PlaylistItem);
+                }
                 if (navigate)
                 {
                     this.NavigatePrevious();
@@ -259,6 +323,36 @@ namespace FoxTunes
                     this.NavigateNext();
                 }
                 return playlistItem;
+            }
+            finally
+            {
+                Monitor.Exit(SyncRoot);
+            }
+        }
+
+        public override Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem)
+        {
+            Monitor.Enter(SyncRoot);
+            try
+            {
+                var position = this.Sequences.IndexOf(playlistItem.Sequence);
+                if (position < 0)
+                {
+#if NET40
+                    return TaskEx.FromResult(default(PlaylistItem));
+#else
+                    return Task.FromResult(default(PlaylistItem));
+#endif
+                }
+                if (position > 0)
+                {
+                    position = this.Sequences.Count - 1;
+                }
+                else
+                {
+                    position--;
+                }
+                return this.PlaylistBrowser.Get(this.Sequences[position]);
             }
             finally
             {

@@ -1,17 +1,31 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class EnqueueNextItemBehaviour : StandardBehaviour, IDisposable
+    public class EnqueueNextItemsBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        const int TIMEOUT = 1000;
+
+        public EnqueueNextItemsBehaviour()
+        {
+            this.Debouncer = new Debouncer(TIMEOUT);
+        }
+
+        public Debouncer Debouncer { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
+
+        public IntegerConfigurationElement Count { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -19,36 +33,59 @@ namespace FoxTunes
             this.PlaybackManager = core.Managers.Playback;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            this.Configuration = core.Components.Configuration;
+            this.Count = this.Configuration.GetElement<IntegerConfigurationElement>(
+                PlaybackBehaviourConfiguration.SECTION,
+                EnqueueNextItemBehaviourConfiguration.COUNT
+            );
             base.InitializeComponent(core);
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
+            this.Debouncer.Exec(() =>
+            {
 #if NET40
-            var task = TaskEx.Run(() => this.EnqueueItems());
+                var task = TaskEx.Run(() => this.EnqueueItems());
 #else
-            var task = Task.Run(() => this.EnqueueItems());
+                var task = Task.Run(() => this.EnqueueItems());
 #endif
+            });
         }
 
         private async Task EnqueueItems()
         {
-            if (this.PlaybackManager.CurrentStream == null)
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream == null)
             {
                 return;
             }
-            var playlistItem = await this.PlaylistBrowser.GetNext(false).ConfigureAwait(false);
-            if (playlistItem == null)
+            var playlistItem = outputStream.PlaylistItem;
+            for (var position = 0; position < this.Count.Value; position++)
             {
-                return;
+                playlistItem = await this.PlaylistBrowser.GetNext(playlistItem).ConfigureAwait(false);
+                if (playlistItem == null)
+                {
+                    return;
+                }
+                if (this.OutputStreamQueue.Requeue(playlistItem))
+                {
+#if NET40
+                    await TaskEx.Delay(1).ConfigureAwait(false);
+#else
+                    await Task.Delay(1).ConfigureAwait(false);
+#endif
+                    continue;
+                }
+                Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+                await this.PlaybackManager.Load(playlistItem, false).ConfigureAwait(false);
             }
-            if (this.OutputStreamQueue.IsQueued(playlistItem))
-            {
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            await this.PlaybackManager.Load(playlistItem, false).ConfigureAwait(false);
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return EnqueueNextItemBehaviourConfiguration.GetConfigurationSections();
         }
 
         public bool IsDisposed { get; private set; }
@@ -77,7 +114,7 @@ namespace FoxTunes
             }
         }
 
-        ~EnqueueNextItemBehaviour()
+        ~EnqueueNextItemsBehaviour()
         {
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
