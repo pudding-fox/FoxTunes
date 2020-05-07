@@ -95,37 +95,52 @@ namespace FoxTunes
 
             await AsyncParallel.ForEach(fileDatas, async fileData =>
             {
-                Logger.Write(this, LogLevel.Debug, "Populating meta data for file: {0} => {1}", fileData.Id, fileData.FileName);
-
-                var metaData = await metaDataSource.GetMetaData(fileData.FileName).ConfigureAwait(false);
-
-                foreach (var warning in metaDataSource.GetWarnings(fileData.FileName))
-                {
-                    this.AddWarning(fileData, warning);
-                }
-
-#if NET40
-                this.Semaphore.Wait();
-#else
-                await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-
+                Logger.Write(this, LogLevel.Debug, "Reading meta data from file \"{0}\".", fileData.FileName);
                 try
                 {
-                    foreach (var metaDataItem in metaData)
+                    var metaData = await metaDataSource.GetMetaData(fileData.FileName).ConfigureAwait(false);
+
+                    foreach (var warning in metaDataSource.GetWarnings(fileData.FileName))
                     {
-                        await this.Writer.Write(fileData.Id, metaDataItem).ConfigureAwait(false);
+                        this.AddWarning(fileData, warning);
+                    }
+
+#if NET40
+                    this.Semaphore.Wait();
+#else
+                    await this.Semaphore.WaitAsync().ConfigureAwait(false);
+#endif
+
+                    try
+                    {
+                        foreach (var metaDataItem in metaData)
+                        {
+                            try
+                            {
+                                await this.Writer.Write(fileData.Id, metaDataItem).ConfigureAwait(false);
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Write(this, LogLevel.Debug, "Failed to write meta data entry from file \"{0}\" with name \"{1}\": {2}", fileData.FileName, metaDataItem.Name, e.Message);
+                                this.AddWarning(fileData, e.Message);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        this.Semaphore.Release();
+                    }
+
+                    if (this.ReportProgress)
+                    {
+                        this.Current = fileData;
+                        Interlocked.Increment(ref this.position);
                     }
                 }
-                finally
+                catch (Exception e)
                 {
-                    this.Semaphore.Release();
-                }
-
-                if (this.ReportProgress)
-                {
-                    this.Current = fileData;
-                    Interlocked.Increment(ref this.position);
+                    Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileData.FileName, e.Message);
+                    this.AddWarning(fileData, e.Message);
                 }
             }, cancellationToken, this.ParallelOptions).ConfigureAwait(false);
         }
