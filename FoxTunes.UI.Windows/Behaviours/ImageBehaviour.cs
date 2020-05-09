@@ -8,7 +8,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ImageBehaviour : StandardBehaviour, IInvocableComponent
     {
-        public const string REFRESH_IMAGES = "ZAAA";
+        const string REFRESH_IMAGES = "ZAAA";
 
         public ThemeLoader ThemeLoader { get; private set; }
 
@@ -25,7 +25,13 @@ namespace FoxTunes
             this.Configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            ).ConnectValue(value => this.Dispatch(this.RefreshImages));
+            ).ConnectValue(value =>
+            {
+                if (this.IsInitialized)
+                {
+                    this.Dispatch(this.RefreshImages);
+                }
+            });
             base.InitializeComponent(core);
         }
 
@@ -58,7 +64,7 @@ namespace FoxTunes
 
         private Task RefreshImages()
         {
-            return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, REFRESH_IMAGES));
+            return this.SignalEmitter.Send(new Signal(this, CommonSignals.ImagesUpdated));
         }
 
         public bool IsDisposed { get; private set; }

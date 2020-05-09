@@ -88,13 +88,8 @@ namespace FoxTunes.ViewModel
                 case CommonSignals.MetaDataUpdated:
                     var names = signal.State as IEnumerable<string>;
                     return this.Refresh(names);
-                case CommonSignals.PluginInvocation:
-                    switch (signal.State as string)
-                    {
-                        case ImageBehaviour.REFRESH_IMAGES:
-                            return this.Refresh();
-                    }
-                    break;
+                case CommonSignals.ImagesUpdated:
+                    return this.Refresh();
             }
 #if NET40
             return TaskEx.FromResult(false);

@@ -329,6 +329,11 @@ namespace FoxTunes.ViewModel
                 metaDataItem = source.MetaDatas.FirstOrDefault(
                     element => string.Equals(element.Name, this.Name, StringComparison.OrdinalIgnoreCase)
                 );
+                if (metaDataItem == null)
+                {
+                    metaDataItem = new MetaDataItem(this.Name, MetaDataItemType.Tag);
+                    source.MetaDatas.Add(metaDataItem);
+                }
             }
             this.AddSource(
                 source,
@@ -339,10 +344,7 @@ namespace FoxTunes.ViewModel
         protected virtual void AddSource(IFileData source, MetaDataItem metaDataItem)
         {
             this.Sources.Add(source);
-            if (metaDataItem != null)
-            {
-                this.MetaDataItems.Add(source, metaDataItem);
-            }
+            this.MetaDataItems.Add(source, metaDataItem);
         }
 
         public void Save()

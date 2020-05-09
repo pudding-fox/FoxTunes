@@ -206,13 +206,8 @@ namespace FoxTunes.ViewModel
             await base.OnSignal(sender, signal).ConfigureAwait(false);
             switch (signal.Name)
             {
-                case CommonSignals.PluginInvocation:
-                    switch (signal.State as string)
-                    {
-                        case ImageBehaviour.REFRESH_IMAGES:
-                            await this.Refresh().ConfigureAwait(false);
-                            break;
-                    }
+                case CommonSignals.ImagesUpdated:
+                    await this.Refresh().ConfigureAwait(false);
                     break;
             }
         }
