@@ -331,7 +331,7 @@ namespace FoxTunes.ViewModel
                 );
                 if (metaDataItem == null)
                 {
-                    metaDataItem = new MetaDataItem(this.Name, MetaDataItemType.Tag);
+                    metaDataItem = new MetaDataItem(this.Name, this.Type);
                     source.MetaDatas.Add(metaDataItem);
                 }
             }
