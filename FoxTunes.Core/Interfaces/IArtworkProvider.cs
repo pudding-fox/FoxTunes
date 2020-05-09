@@ -4,6 +4,6 @@
     {
         string Find(string path, ArtworkType type);
 
-        string Find(PlaylistItem playlistItem, ArtworkType type);
+        string Find(IFileData fileData, ArtworkType type);
     }
 }

@@ -7,7 +7,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [Table(Name = "LibraryHierarchyItems")]
-    public class LibraryHierarchyNode : PersistableComponent, ISelectable, IExpandable, IHierarchical
+    public class LibraryHierarchyNode : PersistableComponent, IFileData, ISelectable, IExpandable, IHierarchical
     {
         public LibraryHierarchyNode()
         {
@@ -148,6 +148,38 @@ namespace FoxTunes
         }
 
         public event EventHandler IsSelectedChanged;
+
+        #region IFileData
+
+        string IFileData.DirectoryName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        string IFileData.FileName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        IList<MetaDataItem> IFileData.MetaDatas
+        {
+            get
+            {
+                return this.MetaDatas;
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
 
         #region IHierarchical
 

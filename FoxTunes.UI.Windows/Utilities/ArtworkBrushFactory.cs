@@ -1,14 +1,17 @@
 ﻿using FoxTunes.Interfaces;
 using FoxTunes.ViewModel;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public class LibraryBrowserTileBrushFactory : StandardFactory
+    public class ArtworkBrushFactory : BaseComponent
     {
-        public LibraryBrowserTileBrushFactory()
+        public ArtworkBrushFactory()
         {
             this.FallbackValue = new ResettableLazy<ImageBrush>(() =>
             {
@@ -28,13 +31,9 @@ namespace FoxTunes
             });
         }
 
-        public LibraryBrowserTileProvider LibraryBrowserTileProvider { get; private set; }
-
         public ThemeLoader ThemeLoader { get; private set; }
 
         public ImageLoader ImageLoader { get; private set; }
-
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -42,11 +41,9 @@ namespace FoxTunes
 
         public DoubleConfigurationElement ScalingFactor { get; private set; }
 
-        public IntegerConfigurationElement TileSize { get; private set; }
+        public CappedDictionary<string, ImageBrush> Store { get; private set; }
 
         public TaskFactory Factory { get; private set; }
-
-        public CappedDictionary<LibraryHierarchyNode, ImageBrush> Store { get; private set; }
 
         public int Width { get; private set; }
 
@@ -60,20 +57,14 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.LibraryBrowserTileProvider = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileProvider>();
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
-            this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
             );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 ImageBehaviourConfiguration.SECTION,
@@ -90,6 +81,9 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
+                case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
+                    return this.Reset(names);
                 case CommonSignals.PluginInvocation:
                     switch (signal.State as string)
                     {
@@ -105,43 +99,36 @@ namespace FoxTunes
 #endif
         }
 
-        public AsyncResult<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)
+        public AsyncResult<ImageBrush> Create(string fileName, int width, int height)
         {
-            var cache = string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter);
-            if (cache)
+            var brush = default(ImageBrush);
+            if (this.Store.TryGetValue(fileName, out brush))
             {
-                var brush = default(ImageBrush);
-                if (this.Store.TryGetValue(libraryHierarchyNode, out brush))
-                {
-                    return AsyncResult<ImageBrush>.FromValue(brush);
-                }
+                return AsyncResult<ImageBrush>.FromValue(brush);
             }
-            if (this.Width != this.TileSize.Value || this.Height != this.TileSize.Value)
+            if (this.Width != width || this.Height != height)
             {
-                this.CalculateTileSize(this.TileSize.Value, this.TileSize.Value);
+                this.CalculateTileSize(width, height);
             }
             return new AsyncResult<ImageBrush>(this.FallbackValue.Value, this.Factory.StartNew(() =>
             {
-                if (cache)
+                if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
                 {
-                    return this.Store.GetOrAdd(
-                        libraryHierarchyNode,
-                        () => this.Create(libraryHierarchyNode, true)
-                    );
+                    return this.FallbackValue.Value;
                 }
-                else
-                {
-                    return this.Create(libraryHierarchyNode, false);
-                }
+                return this.Store.GetOrAdd(
+                    fileName,
+                    () => this.Create(fileName, true)
+                );
             }));
         }
 
-        protected virtual ImageBrush Create(LibraryHierarchyNode libraryHierarchyNode, bool cache)
+        protected virtual ImageBrush Create(string fileName, bool cache)
         {
-            var source = this.LibraryBrowserTileProvider.CreateImageSource(
-                libraryHierarchyNode,
+            var source = ImageLoader.Load(
+                fileName,
                 this.PixelWidth,
-                this.PixelWidth,
+                this.PixelHeight,
                 cache
             );
             if (source == null)
@@ -166,7 +153,7 @@ namespace FoxTunes
 
         protected virtual void CreateCache(int capacity)
         {
-            this.Store = new CappedDictionary<LibraryHierarchyNode, ImageBrush>(capacity);
+            this.Store = new CappedDictionary<string, ImageBrush>(capacity, StringComparer.OrdinalIgnoreCase);
         }
 
         protected virtual void CalculateTileSize(int width, int height)
@@ -191,18 +178,25 @@ namespace FoxTunes
             this.FallbackValue.Reset();
         }
 
+        protected virtual Task Reset(IEnumerable<string> names)
+        {
+            if (names != null && names.Any())
+            {
+                if (!names.Contains(CommonImageTypes.FrontCover, true))
+                {
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }
+            }
+            return this.Reset();
+        }
+
         protected virtual Task Reset()
         {
             return Windows.Invoke(() => this.CalculateTileSize(this.Width, this.Height));
-        }
-
-        protected override void OnDisposing()
-        {
-            if (this.SignalEmitter != null)
-            {
-                this.SignalEmitter.Signal -= this.OnSignal;
-            }
-            base.OnDisposing();
         }
     }
 }

@@ -36,9 +36,23 @@ namespace FoxTunes
             adorner.OnTemplatePropertyChanged();
         }
 
+        public MouseCursorAdorner()
+        {
+            this.DataContextChanged += this.OnDataContextChanged;
+        }
+
+        protected virtual void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.Adorner != null)
+            {
+                this.Adorner.ContentControl.Content = this.DataContext;
+            }
+        }
+
         protected virtual void OnTemplatePropertyChanged()
         {
             this.Adorner = new InternalMouseCursorAdorner(this, GetTemplate(this));
+            this.Adorner.ContentControl.Content = this.DataContext;
         }
 
         private InternalMouseCursorAdorner Adorner { get; set; }
@@ -65,7 +79,6 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Adorner.ContentControl.Content = this.DataContext;
             AdornerLayer.GetAdornerLayer(this).Add(this.Adorner);
         }
 
@@ -76,7 +89,6 @@ namespace FoxTunes
                 return;
             }
             AdornerLayer.GetAdornerLayer(this).Remove(this.Adorner);
-            this.Adorner.ContentControl.Content = null;
         }
 
         private class InternalMouseCursorAdorner : Adorner

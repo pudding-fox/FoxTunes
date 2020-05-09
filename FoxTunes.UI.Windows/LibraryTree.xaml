@@ -110,7 +110,7 @@
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner" Visibility="{Binding ShowCursorAdorners, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
             <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>
-                    <Windows:ArtworkStack></Windows:ArtworkStack>
+                    <Windows:ArtworkStack FileData="{Binding SelectedItem, Source={StaticResource ViewModel}}"></Windows:ArtworkStack>
                 </DataTemplate>
             </Windows:MouseCursorAdorner.Template>
         </Windows:MouseCursorAdorner>

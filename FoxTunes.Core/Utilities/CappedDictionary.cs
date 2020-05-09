@@ -15,6 +15,13 @@ namespace FoxTunes
             this.Capacity = capacity;
         }
 
+        public CappedDictionary(int capacity, IEqualityComparer<TKey> comparer)
+        {
+            this.Keys = new Queue(capacity);
+            this.Store = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparer);
+            this.Capacity = capacity;
+        }
+
         public Queue Keys { get; private set; }
 
         public ConcurrentDictionary<TKey, TValue> Store { get; private set; }
