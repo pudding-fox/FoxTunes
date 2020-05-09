@@ -145,7 +145,14 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnNotify(object sender, EventArgs e)
         {
-            this.Refresh();
+            try
+            {
+                this.Refresh();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
 
         protected virtual void Refresh()

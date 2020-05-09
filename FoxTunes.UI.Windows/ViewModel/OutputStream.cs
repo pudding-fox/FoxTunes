@@ -1,20 +1,14 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace FoxTunes.ViewModel
 {
     public class OutputStream : ViewModelBase
     {
-        private static readonly TimeSpan UPDATE_INTERVAL = TimeSpan.FromSeconds(1);
-
         private OutputStream()
         {
-            this.Timer = new DispatcherTimer(DispatcherPriority.Background);
-            this.Timer.Interval = UPDATE_INTERVAL;
-            this.Timer.Tick += this.OnTick;
-            this.Timer.Start();
+            PlaybackStateNotifier.Notify += this.OnNotify;
         }
 
         public OutputStream(IOutputStream outputStream) : this()
@@ -22,11 +16,9 @@ namespace FoxTunes.ViewModel
             this.InnerOutputStream = outputStream;
         }
 
-        public DispatcherTimer Timer { get; private set; }
-
         public IOutputStream InnerOutputStream { get; private set; }
 
-        protected virtual void OnTick(object sender, EventArgs e)
+        protected virtual void OnNotify(object sender, EventArgs e)
         {
             try
             {
@@ -151,10 +143,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.Timer != null)
-            {
-                this.Timer.Stop();
-            }
+            PlaybackStateNotifier.Notify -= this.OnNotify;
             base.OnDisposing();
         }
 
