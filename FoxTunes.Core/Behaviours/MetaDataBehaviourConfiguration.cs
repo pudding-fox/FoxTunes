@@ -79,7 +79,7 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(releaseType == ReleaseType.Default).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
-                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32)).DependsOn(SECTION, ENABLE_ELEMENT))
+                    new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Math.Max(Environment.ProcessorCount, 4)).WithValidationRule(new IntegerValidationRule(1, 32)).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
                     new SelectionConfigurationElement(WRITE_ELEMENT, "Write Behaviour", path: "Advanced").WithOptions(GetWriteBehaviourOptions()).DependsOn(SECTION, ENABLE_ELEMENT)
             );
