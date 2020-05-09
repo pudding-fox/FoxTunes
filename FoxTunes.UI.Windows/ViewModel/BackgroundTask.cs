@@ -16,7 +16,6 @@ namespace FoxTunes.ViewModel
                 this.InnerBackgroundTask.DescriptionChanged += this.OnDescriptionChanged;
                 this.InnerBackgroundTask.PositionChanged += this.OnPositionChanged;
                 this.InnerBackgroundTask.CountChanged += this.OnCountChanged;
-                this.InnerBackgroundTask.IsIndeterminateChanged += this.OnIsIndeterminateChanged;
             }
         }
 
@@ -100,6 +99,7 @@ namespace FoxTunes.ViewModel
         {
             await Windows.Invoke(() =>
             {
+                this.OnIsIndeterminateChanged(sender, e);
                 if (this.CountChanged != null)
                 {
                     this.CountChanged(sender, e);
@@ -114,7 +114,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return this.InnerBackgroundTask.IsIndeterminate;
+                return this.Count == 0;
             }
         }
 
@@ -159,7 +159,6 @@ namespace FoxTunes.ViewModel
             this.InnerBackgroundTask.DescriptionChanged -= this.OnDescriptionChanged;
             this.InnerBackgroundTask.PositionChanged -= this.OnPositionChanged;
             this.InnerBackgroundTask.CountChanged -= this.OnCountChanged;
-            this.InnerBackgroundTask.IsIndeterminateChanged -= this.OnIsIndeterminateChanged;
             base.OnDisposing();
         }
 

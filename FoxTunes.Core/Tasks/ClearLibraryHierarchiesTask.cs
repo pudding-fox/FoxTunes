@@ -26,7 +26,6 @@ namespace FoxTunes
         protected override async Task OnStarted()
         {
             this.Name = "Clearing hierarchies";
-            this.IsIndeterminate = true;
             await base.OnStarted().ConfigureAwait(false);
         }
 

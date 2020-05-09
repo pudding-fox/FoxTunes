@@ -50,7 +50,6 @@ namespace FoxTunes
         {
             this.Name = "Buffering";
             this.Description = this.PlaylistItem.FileName.GetName();
-            this.IsIndeterminate = true;
             await base.OnStarted().ConfigureAwait(false);
         }
 

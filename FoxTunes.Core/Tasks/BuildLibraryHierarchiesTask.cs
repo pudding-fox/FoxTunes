@@ -32,7 +32,6 @@ namespace FoxTunes
         {
             this.Name = "Building hierarchies";
             this.Description = "Preparing";
-            this.IsIndeterminate = true;
             await base.OnStarted().ConfigureAwait(false);
         }
 

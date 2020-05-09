@@ -288,7 +288,6 @@ namespace FoxTunes
                     throw new InvalidOperationException("A valid drive must be provided.");
                 }
                 this.Name = "Opening CD";
-                this.IsIndeterminate = true;
                 try
                 {
                     if (!BassCd.IsReady(this.Drive))
@@ -319,7 +318,6 @@ namespace FoxTunes
             private async Task AddPlaylistItems()
             {
                 this.Name = "Getting track list";
-                this.IsIndeterminate = true;
                 var info = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
                 var id = BassCd.GetID(this.Drive, CDID.CDPlayer);
