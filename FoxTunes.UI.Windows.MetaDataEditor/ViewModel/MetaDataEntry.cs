@@ -347,12 +347,13 @@ namespace FoxTunes.ViewModel
             this.MetaDataItems.Add(source, metaDataItem);
         }
 
-        public void Save()
+        public IEnumerable<IFileData> Save()
         {
             if (!this.HasChanges || this.HasMultipleValues)
             {
-                return;
+                Enumerable.Empty<IFileData>();
             }
+            var fileDatas = new List<IFileData>();
             foreach (var source in this.Sources)
             {
                 var metaDataItem = default(MetaDataItem);
@@ -367,13 +368,22 @@ namespace FoxTunes.ViewModel
                 }
                 if (this.HasValue)
                 {
-                    metaDataItem.Value = this.Value;
+                    if (!string.Equals(metaDataItem.Value, this.Value))
+                    {
+                        metaDataItem.Value = this.Value;
+                        fileDatas.Add(source);
+                    }
                 }
                 else
                 {
-                    metaDataItem.Value = null;
+                    if (!string.IsNullOrEmpty(metaDataItem.Value))
+                    {
+                        metaDataItem.Value = null;
+                        fileDatas.Add(source);
+                    }
                 }
             }
+            return fileDatas;
         }
 
         public ICommand BrowseCommand

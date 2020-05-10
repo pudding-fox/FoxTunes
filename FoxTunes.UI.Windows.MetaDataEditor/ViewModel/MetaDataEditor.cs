@@ -342,8 +342,7 @@ namespace FoxTunes.ViewModel
                 {
                     if (tag.HasChanges)
                     {
-                        tag.Save();
-                        sources.AddRange(tag.GetSources());
+                        sources.AddRange(tag.Save());
                         names.Add(tag.Name);
                     }
                 }
@@ -354,8 +353,7 @@ namespace FoxTunes.ViewModel
                 {
                     if (image.HasChanges)
                     {
-                        image.Save();
-                        sources.AddRange(image.GetSources());
+                        sources.AddRange(image.Save());
                         names.Add(image.Name);
                     }
                 }
