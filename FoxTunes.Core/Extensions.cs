@@ -377,5 +377,24 @@ namespace FoxTunes
         {
             return sequence.OrderBy(element => element, comparer);
         }
+
+        public static string GetQueryParameter(this Uri uri, string name)
+        {
+            var parameters = uri.Query.TrimStart('?').Split('&');
+            foreach (var parameter in parameters)
+            {
+                var parts = parameter.Split(new[] { '=' }, 2);
+                if (parts.Length != 2)
+                {
+                    continue;
+                }
+                if (!string.Equals(parts[0], name, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                return parts[1];
+            }
+            return null;
+        }
     }
 }

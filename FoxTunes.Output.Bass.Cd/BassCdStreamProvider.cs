@@ -34,7 +34,11 @@ namespace FoxTunes
             return ParseUrl(playlistItem.FileName, out drive, out id, out track);
         }
 
+#if NET40
         public override Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+#else
+        public override async Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+#endif
         {
             var drive = default(int);
             var id = default(string);
@@ -44,33 +48,46 @@ namespace FoxTunes
 #if NET40
                 return TaskEx.FromResult(0);
 #else
-                return Task.FromResult(0);
+                return 0;
 #endif
             }
             this.AssertDiscId(drive, id);
             var channelHandle = default(int);
-            if (this.GetCurrentStream(drive, track, out channelHandle))
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+#endif
+            try
             {
+                if (this.GetCurrentStream(drive, track, out channelHandle))
+                {
+#if NET40
+                    return TaskEx.FromResult(channelHandle);
+#else
+                    return channelHandle;
+#endif
+                }
+                if (this.Output != null && this.Output.PlayFromMemory)
+                {
+                    Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+                }
+                if (BassCd.FreeOld)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
+                    BassCd.FreeOld = false;
+                }
+                channelHandle = BassCd.CreateStream(drive, track, flags);
 #if NET40
                 return TaskEx.FromResult(channelHandle);
 #else
-                return Task.FromResult(channelHandle);
+                return channelHandle;
 #endif
             }
-            if (this.Output != null && this.Output.PlayFromMemory)
+            finally
             {
-                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+                this.Semaphore.Release();
             }
-            if (BassCd.FreeOld)
-            {
-                Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
-                BassCd.FreeOld = false;
-            }
-#if NET40
-            return TaskEx.FromResult(BassCd.CreateStream(drive, track, flags));
-#else
-            return Task.FromResult(BassCd.CreateStream(drive, track, flags));
-#endif
         }
 
         protected virtual void AssertDiscId(int drive, string expected)
@@ -141,7 +158,6 @@ namespace FoxTunes
                 !string.IsNullOrEmpty(id = host) &&
                 parts.Length > 0 && int.TryParse(parts[0], out drive) &&
                 parts.Length > 1 && int.TryParse(parts[1], out track);
-
         }
     }
 }

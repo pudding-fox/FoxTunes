@@ -76,12 +76,13 @@ function extension(value) {
         return value;
     }
     {
-        var parts = value.split(".");
-        value = parts[parts.length - 1];
+        var parts = value.split("://");
+        if (parts.length > 1) {
+            return parts[0];
+        }
     }
     {
-        var parts = value.split("://");
-        value = parts[0];
+        var parts = value.split(".");
+        return parts[parts.length - 1];
     }
-    return value;
 }
