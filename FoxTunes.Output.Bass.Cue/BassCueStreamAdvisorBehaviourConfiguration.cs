@@ -2,7 +2,7 @@
 
 namespace FoxTunes
 {
-    public static class BassCueStreamProviderBehaviourConfiguration
+    public static class BassCueStreamAdvisorBehaviourConfiguration
     {
         public const string SECTION = "220C5CC78-A495-4498-815B-0B415BD685A2";
 

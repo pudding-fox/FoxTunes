@@ -2,6 +2,7 @@
 using ManagedBass;
 using ManagedBass.Cd;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -35,9 +36,9 @@ namespace FoxTunes
         }
 
 #if NET40
-        public override Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
 #else
-        public override async Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+        public override async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
 #endif
         {
             var drive = default(int);
@@ -46,9 +47,9 @@ namespace FoxTunes
             if (!ParseUrl(playlistItem.FileName, out drive, out id, out track))
             {
 #if NET40
-                return TaskEx.FromResult(0);
+                return TaskEx.FromResult(BassStream.Empty);
 #else
-                return 0;
+                return BassStream.Empty;
 #endif
             }
             this.AssertDiscId(drive, id);
@@ -63,9 +64,9 @@ namespace FoxTunes
                 if (this.GetCurrentStream(drive, track, out channelHandle))
                 {
 #if NET40
-                    return TaskEx.FromResult(channelHandle);
+                    return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
 #else
-                    return channelHandle;
+                    return this.CreateStream(channelHandle, advice);
 #endif
                 }
                 if (this.Output != null && this.Output.PlayFromMemory)
@@ -79,9 +80,9 @@ namespace FoxTunes
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
 #if NET40
-                return TaskEx.FromResult(channelHandle);
+                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
 #else
-                return channelHandle;
+                return this.CreateStream(channelHandle, advice);
 #endif
             }
             finally

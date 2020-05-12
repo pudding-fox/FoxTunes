@@ -66,7 +66,7 @@ namespace FoxTunes
         {
             var source = default(int);
             var channelInfo = default(ChannelInfo);
-            var inputLength = Bass.ChannelGetLength(stream.ChannelHandle, PositionFlags.Bytes);
+            var inputLength = stream.Length;
             if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
             {
                 throw new NotImplementedException();

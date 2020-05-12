@@ -20,46 +20,6 @@ namespace FoxTunes
 
         public CueSheetTag[] Tags { get; private set; }
 
-        public CueSheetTrack[] Tracks
-        {
-            get
-            {
-                return this.Files
-                    .SelectMany(file => file.Tracks)
-                    .OrderBy(track => track.Number)
-                    .ToArray();
-            }
-        }
-
-        public CueSheetFile GetFile(CueSheetTrack track)
-        {
-            return this.Files.FirstOrDefault(file => file.Tracks.Contains(track));
-        }
-
-        public static CueSheetTrack[,] GetTrackPairs(CueSheetTrack[] tracks)
-        {
-            var trackPairs = new CueSheetTrack[tracks.Length, 2];
-            if (tracks.Length == 0)
-            {
-                return trackPairs;
-            }
-            if (tracks.Length < 2)
-            {
-                trackPairs[0, 0] = tracks[0];
-                trackPairs[0, 1] = null;
-                return trackPairs;
-            }
-            for (var a = 0; a < tracks.Length; a++)
-            {
-                trackPairs[a, 0] = tracks[a];
-                if (a + 1 < tracks.Length)
-                {
-                    trackPairs[a, 1] = tracks[a + 1];
-                }
-            }
-            return trackPairs;
-        }
-
         public static string GetTrackLength(CueSheetTrack currentTrack, CueSheetTrack nextTrack)
         {
             var currentTrackPosition = CueSheetIndex.ToTimeSpan(currentTrack.Index.Time);
@@ -142,6 +102,10 @@ namespace FoxTunes
 
         public static TimeSpan ToTimeSpan(string time)
         {
+            if (string.IsNullOrEmpty(time))
+            {
+                return TimeSpan.Zero;
+            }
             var minutes = default(int);
             var seconds = default(int);
             var milliseconds = default(int);

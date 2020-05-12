@@ -8,6 +8,12 @@ namespace FoxTunes.Interfaces
 
         int ChannelHandle { get; }
 
+        long Offset { get; }
+
+        long Length { get; }
+
+        long Position { get; set; }
+
         bool IsEmpty { get; }
 
         Errors Errors { get; }

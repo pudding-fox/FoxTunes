@@ -2,6 +2,7 @@
 using ManagedBass;
 using ManagedBass.Dsd;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -45,24 +46,24 @@ namespace FoxTunes
             return true;
         }
 
-        public override Task<int> CreateStream(PlaylistItem playlistItem)
+        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)
         {
             var flags = BassFlags.Decode | BassFlags.DSDRaw;
-            return this.CreateStream(playlistItem, flags);
+            return this.CreateStream(playlistItem, flags, advice);
         }
 
 #if NET40
-        public override Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
 #else
-        public override async Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+        public override async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
 #endif
         {
             if (!flags.HasFlag(BassFlags.DSDRaw))
             {
 #if NET40
-                return base.CreateStream(playlistItem, flags);
+                return base.CreateStream(playlistItem, flags, advice);
 #else
-                return await base.CreateStream(playlistItem, flags).ConfigureAwait(false);
+                return await base.CreateStream(playlistItem, flags, advice).ConfigureAwait(false);
 #endif
             }
 #if NET40
@@ -98,9 +99,9 @@ namespace FoxTunes
                     }
                 }
 #if NET40
-                return TaskEx.FromResult(channelHandle);
+                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
 #else
-                return channelHandle;
+                return this.CreateStream(channelHandle, advice);
 #endif
             }
             finally

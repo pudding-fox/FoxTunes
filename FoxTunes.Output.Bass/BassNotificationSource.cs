@@ -20,7 +20,15 @@ namespace FoxTunes
         {
             get
             {
-                return this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, ENDING_THRESHOLD);
+                return this.OutputStream.Offset + this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, ENDING_THRESHOLD);
+            }
+        }
+
+        public long EndPosition
+        {
+            get
+            {
+                return this.OutputStream.Offset + this.OutputStream.Length;
             }
         }
 
@@ -32,13 +40,35 @@ namespace FoxTunes
                 this.EndingPosition,
                 this.OnEnding
             ));
-            BassUtils.OK(Bass.ChannelSetSync(
-                this.OutputStream.ChannelHandle,
-                SyncFlags.End,
-                0,
-                this.OnEnded
-            ));
+            var length = Bass.ChannelGetLength(this.OutputStream.ChannelHandle, PositionFlags.Bytes);
+            if (length == this.EndPosition)
+            {
+                BassUtils.OK(Bass.ChannelSetSync(
+                    this.OutputStream.ChannelHandle,
+                    SyncFlags.End,
+                    0,
+                    this.OnEnded
+                ));
+            }
+            else
+            {
+                BassUtils.OK(Bass.ChannelSetSync(
+                    this.OutputStream.ChannelHandle,
+                    SyncFlags.Position,
+                    this.EndPosition,
+                    this.OnEnded
+                ));
+            }
             base.InitializeComponent(core);
+        }
+
+        public void Check()
+        {
+            var position = Bass.ChannelGetPosition(this.OutputStream.ChannelHandle, PositionFlags.Bytes);
+            if (position > this.EndingPosition)
+            {
+                this.OnEnding();
+            }
         }
 
         protected virtual void OnEnding(int Handle, int Channel, int Data, IntPtr User)

@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace FoxTunes
         public const byte PRIORITY_NORMAL = 100;
 
         public const byte PRIORITY_LOW = 255;
+
+        public static readonly SyncProcedure EndProcedure = new SyncProcedure((Handle, Channel, Data, User) => Bass.ChannelStop(Handle));
 
         public BassStreamProvider()
         {
@@ -60,20 +63,20 @@ namespace FoxTunes
             return true;
         }
 
-        public virtual Task<int> CreateStream(PlaylistItem playlistItem)
+        public virtual Task<IBassStream> CreateStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)
         {
             var flags = BassFlags.Decode;
             if (this.Output != null && this.Output.Float)
             {
                 flags |= BassFlags.Float;
             }
-            return this.CreateStream(playlistItem, flags);
+            return this.CreateStream(playlistItem, flags, advice);
         }
 
 #if NET40
-        public virtual Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+        public virtual Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
 #else
-        public virtual async Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+        public virtual async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
 #endif
         {
 #if NET40
@@ -84,28 +87,76 @@ namespace FoxTunes
             try
             {
                 var channelHandle = default(int);
+                var fileName = this.GetFileName(playlistItem, advice);
                 if (this.Output != null && this.Output.PlayFromMemory)
                 {
-                    channelHandle = BassInMemoryHandler.CreateStream(playlistItem.FileName, 0, 0, flags);
+                    channelHandle = BassInMemoryHandler.CreateStream(fileName, 0, 0, flags);
                     if (channelHandle == 0)
                     {
-                        Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", fileName);
                     }
                 }
                 else
                 {
-                    channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, flags);
+                    channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
                 }
 #if NET40
-                return TaskEx.FromResult(channelHandle);
+                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
 #else
-                return channelHandle;
+                return this.CreateStream(channelHandle, advice);
 #endif
             }
             finally
             {
                 this.Semaphore.Release();
             }
+        }
+
+        protected virtual IBassStream CreateStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
+        {
+            var offset = default(long);
+            var length = default(long);
+            foreach (var advisory in advice)
+            {
+                if (advisory.Offset != TimeSpan.Zero)
+                {
+                    offset = Bass.ChannelSeconds2Bytes(channelHandle, advisory.Offset.TotalSeconds);
+                }
+                if (advisory.Length != TimeSpan.Zero)
+                {
+                    length = Bass.ChannelSeconds2Bytes(channelHandle, advisory.Length.TotalSeconds);
+                }
+            }
+            if (offset != 0)
+            {
+                BassUtils.OK(Bass.ChannelSetPosition(channelHandle, offset, PositionFlags.Bytes));
+            }
+            if (length != 0)
+            {
+                Bass.ChannelSetSync(
+                    channelHandle,
+                    SyncFlags.Position,
+                    length,
+                    EndProcedure
+                );
+            }
+            else
+            {
+                length = Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes) - offset;
+            }
+            return new BassStream(this, channelHandle, offset, length);
+        }
+
+        protected virtual string GetFileName(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)
+        {
+            foreach (var advisory in advice)
+            {
+                if (!string.IsNullOrEmpty(advisory.FileName))
+                {
+                    return advisory.FileName;
+                }
+            }
+            return playlistItem.FileName;
         }
 
         public virtual void FreeStream(PlaylistItem playlistItem, int channelHandle)
