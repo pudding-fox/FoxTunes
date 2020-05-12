@@ -85,5 +85,14 @@ namespace FoxTunes
             }
             await this.MetaDataManager.Synchronize(playlistItems).ConfigureAwait(false);
         }
+
+        protected override void OnDisposing()
+        {
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
+            base.OnDisposing();
+        }
     }
 }
