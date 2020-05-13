@@ -69,7 +69,7 @@ namespace FoxTunes
                         {
                             builder.Append(", ");
                         }
-                        builder.Append(Path.GetFileName(encoderItem.InputFileName));
+                        builder.Append(Path.GetFileName(encoderItem.OutputFileName));
                     }
                 }
                 if (builder.Length > 0)

@@ -78,17 +78,17 @@ namespace FoxTunes
         {
             return fileDatas
                 .OrderBy(fileData => fileData.FileName)
-                .Select(fileData => Create(fileData, profile))
+                .Select(fileData => Create(fileDatas, fileData, profile))
                 .ToArray();
         }
 
-        public EncoderItem Create(IFileData fileData, string profile)
+        public EncoderItem Create(IFileData[] fileDatas, IFileData fileData, string profile)
         {
-            var outputFileName = this.GetOutputFileName(fileData, profile);
+            var outputFileName = this.GetOutputFileName(fileDatas, fileData, profile);
             return EncoderItem.Create(fileData.FileName, outputFileName, fileData.MetaDatas, profile);
         }
 
-        protected virtual string GetOutputFileName(IFileData fileData, string profile)
+        protected virtual string GetOutputFileName(IFileData[] fileDatas, IFileData fileData, string profile)
         {
             var settings = default(IBassEncoderSettings);
             if (!this.Settings.TryGetValue(profile, out settings))
@@ -97,7 +97,37 @@ namespace FoxTunes
                 this.Settings[profile] = settings;
             }
             var extension = settings.Extension;
-            var name = Path.GetFileNameWithoutExtension(fileData.FileName);
+            var name = default(string);
+            if (FileSystemHelper.IsLocalPath(fileData.FileName))
+            {
+                name = Path.GetFileNameWithoutExtension(fileData.FileName);
+            }
+            else
+            {
+                lock (fileData.MetaDatas)
+                {
+                    var metaData = fileData.MetaDatas.ToDictionary(
+                        metaDataItem => metaDataItem.Name,
+                        metaDataItem => metaDataItem.Value,
+                        StringComparer.OrdinalIgnoreCase
+                    );
+                    var track = default(string);
+                    var title = default(string);
+                    if (!metaData.TryGetValue(CommonMetaData.Track, out track))
+                    {
+                        track = Convert.ToString(fileDatas.IndexOf(fileData) + 1);
+                    }
+                    if (!metaData.TryGetValue(CommonMetaData.Title, out title))
+                    {
+                        name = string.Format("Track {0:00}", track);
+                    }
+                    else
+                    {
+                        name = string.Format("{0:00} {1}", track, title);
+                    }
+                    name = name.Replace(Path.GetInvalidFileNameChars(), '_');
+                }
+            }
             var directoryName = default(string);
             switch (this.Destination)
             {
