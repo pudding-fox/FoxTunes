@@ -1,11 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using FoxTunes.ViewModel;
-using System;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LibraryBrowserTileBrushFactory : StandardFactory
     {
         public LibraryBrowserTileBrushFactory()

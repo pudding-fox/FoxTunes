@@ -28,7 +28,7 @@ namespace FoxTunes
             set
             {
                 BassDsd.DefaultGain = value;
-                Logger.Write(this, LogLevel.Debug, "DSD to PCM gain: +{0}dB", BassDsd.DefaultGain);
+                Logger.Write(this, LogLevel.Debug, "DSD to PCM gain: {0}{1}dB", BassDsd.DefaultGain > 0 ? "+" : string.Empty, BassDsd.DefaultGain);
             }
         }
 
