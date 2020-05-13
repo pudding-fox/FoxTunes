@@ -13,6 +13,8 @@ namespace FoxTunes
             this.Output = output;
             this.Manager = manager;
             this.Stream = stream;
+            this.Stream.Ending += this.Ending;
+            this.Stream.Ended += this.Ended;
             if (!BassOutputStreams.Add(this))
             {
                 //TODO: Warn.
@@ -32,8 +34,6 @@ namespace FoxTunes
                 return this.Stream.ChannelHandle;
             }
         }
-
-        public BassNotificationSource NotificationSource { get; private set; }
 
         public override long Position
         {
@@ -82,15 +82,6 @@ namespace FoxTunes
                 position = this.Length - 1;
             }
             this.Stream.Position = position;
-            this.NotificationSource.Check();
-        }
-
-        public long Offset
-        {
-            get
-            {
-                return this.Stream.Offset;
-            }
         }
 
         public override long Length
@@ -114,31 +105,6 @@ namespace FoxTunes
             get
             {
                 return BassUtils.GetChannelCount(this.ChannelHandle);
-            }
-        }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.NotificationSource = new BassNotificationSource(this);
-            this.NotificationSource.Ending += this.OnEnding;
-            this.NotificationSource.Ended += this.OnEnded;
-            this.NotificationSource.InitializeComponent(core);
-            base.InitializeComponent(core);
-        }
-
-        protected virtual async void OnEnding(object sender, AsyncEventArgs e)
-        {
-            using (e.Defer())
-            {
-                await this.OnEnding().ConfigureAwait(false);
-            }
-        }
-
-        protected virtual async void OnEnded(object sender, AsyncEventArgs e)
-        {
-            using (e.Defer())
-            {
-                await this.OnEnded().ConfigureAwait(false);
             }
         }
 
@@ -239,16 +205,21 @@ namespace FoxTunes
             return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(this.ChannelHandle, position));
         }
 
+        public override event AsyncEventHandler Ended;
+
+        public override event AsyncEventHandler Ending;
+
         protected override void OnDisposing()
         {
-            if (this.NotificationSource != null)
-            {
-                this.NotificationSource.Ending -= this.OnEnding;
-                this.NotificationSource.Ended -= this.OnEnded;
-            }
+
             try
             {
-                this.Stream.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
+                if (this.Stream != null)
+                {
+                    this.Stream.Ending -= this.Ending;
+                    this.Stream.Ended -= this.Ended;
+                    this.Stream.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
+                }
             }
             finally
             {

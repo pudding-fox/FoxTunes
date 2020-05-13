@@ -8,8 +8,6 @@ namespace FoxTunes.Interfaces
 
         int ChannelHandle { get; }
 
-        long Offset { get; }
-
         long Length { get; }
 
         long Position { get; set; }
@@ -17,5 +15,9 @@ namespace FoxTunes.Interfaces
         bool IsEmpty { get; }
 
         Errors Errors { get; }
+
+        event AsyncEventHandler Ending;
+
+        event AsyncEventHandler Ended;
     }
 }

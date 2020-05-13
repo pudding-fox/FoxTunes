@@ -15,6 +15,10 @@ namespace FoxTunes
 
         const int BUFFER_SIZE = 102400;
 
+        const int BASS_ERROR_UNKNOWN = -1;
+
+        const int BASS_STREAMPROC_END = -2147483648;
+
         public ChannelReader(EncoderItem encoderItem, IBassStream stream)
         {
             this.EncoderItem = encoderItem;
@@ -35,6 +39,12 @@ namespace FoxTunes
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;
+                }
+                switch (length)
+                {
+                    case BASS_STREAMPROC_END:
+                    case BASS_ERROR_UNKNOWN:
+                        break;
                 }
                 writer.Write(buffer, length);
                 this.Update();

@@ -9,6 +9,11 @@ namespace FoxTunes
 {
     public class BassStreamProvider : StandardComponent, IBassStreamProvider
     {
+        static BassStreamProvider()
+        {
+            BassSubstreamHandler.Init();
+        }
+
         public const byte PRIORITY_HIGH = 0;
 
         public const byte PRIORITY_NORMAL = 100;
@@ -116,6 +121,7 @@ namespace FoxTunes
         {
             var offset = default(long);
             var length = default(long);
+            var stream = default(BassStream);
             foreach (var advisory in advice)
             {
                 if (advisory.Offset != TimeSpan.Zero)
@@ -127,24 +133,26 @@ namespace FoxTunes
                     length = Bass.ChannelSeconds2Bytes(channelHandle, advisory.Length.TotalSeconds);
                 }
             }
-            if (offset != 0)
+            if (offset != 0 || length != 0)
             {
-                BassUtils.OK(Bass.ChannelSetPosition(channelHandle, offset, PositionFlags.Bytes));
-            }
-            if (length != 0)
-            {
-                Bass.ChannelSetSync(
+                if (length == 0)
+                {
+                    length = Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes) - offset;
+                }
+                stream = new BassSubstream(
+                    this,
+                    BassSubstreamHandler.CreateStream(channelHandle, offset, length, BassFlags.AutoFree),
                     channelHandle,
-                    SyncFlags.Position,
-                    length,
-                    EndProcedure
+                    offset,
+                    length
                 );
             }
             else
             {
-                length = Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes) - offset;
+                stream = new BassStream(this, channelHandle, length);
             }
-            return new BassStream(this, channelHandle, offset, length);
+            stream.RegisterSyncHandlers();
+            return stream;
         }
 
         protected virtual string GetFileName(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)

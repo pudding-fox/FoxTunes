@@ -85,6 +85,9 @@
     <None Include="..\lib\bass_inmemory_handler.dll" Link="bass_inmemory_handler.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\lib\bass_substream_handler.dll" Link="bass_substream_handler.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
