@@ -149,6 +149,7 @@ namespace FoxTunes
             }
             else
             {
+                length = Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes);
                 stream = new BassStream(this, channelHandle, length);
             }
             stream.RegisterSyncHandlers();
