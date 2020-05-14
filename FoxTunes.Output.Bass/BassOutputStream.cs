@@ -205,9 +205,9 @@ namespace FoxTunes
             return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(this.ChannelHandle, position));
         }
 
-        public override event AsyncEventHandler Ended;
+        public override event EventHandler Ended;
 
-        public override event AsyncEventHandler Ending;
+        public override event EventHandler Ending;
 
         protected override void OnDisposing()
         {

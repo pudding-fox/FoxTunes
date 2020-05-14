@@ -104,7 +104,7 @@ namespace FoxTunes
                     throw;
                 }
             }
-            await this.OnCurrentStreamChanged().ConfigureAwait(false);
+            this.OnCurrentStreamChanged();
         }
 
 
@@ -117,7 +117,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task OnCurrentStreamChanged()
+        protected virtual void OnCurrentStreamChanged()
         {
             if (this.CurrentStream != null)
             {
@@ -126,18 +126,16 @@ namespace FoxTunes
             }
             if (this.CurrentStreamChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.CurrentStreamChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.CurrentStreamChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("CurrentStream");
         }
 
-        public event AsyncEventHandler CurrentStreamChanged;
+        public event EventHandler CurrentStreamChanged;
 
-        public event AsyncEventHandler Ending;
+        public event EventHandler Ending;
 
-        public event AsyncEventHandler Ended;
+        public event EventHandler Ended;
 
         public async Task Load(PlaylistItem playlistItem, bool immediate)
         {

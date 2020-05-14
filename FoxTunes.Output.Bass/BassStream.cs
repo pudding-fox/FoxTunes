@@ -36,6 +36,15 @@ namespace FoxTunes
             set
             {
                 BassUtils.OK(Bass.ChannelSetPosition(this.ChannelHandle, value, PositionFlags.Bytes));
+                this.OnPositionChanged();
+            }
+        }
+
+        protected virtual void OnPositionChanged()
+        {
+            if (this.Position > this.Length - Bass.ChannelSeconds2Bytes(this.ChannelHandle, ENDING_THRESHOLD))
+            {
+                this.OnEnding();
             }
         }
 
@@ -75,22 +84,15 @@ namespace FoxTunes
 #endif
         }
 
-        public virtual Task OnEnding()
+        protected virtual void OnEnding()
         {
-            if (this.Ending == null)
+            if (this.Ending != null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                this.Ending(this, EventArgs.Empty);
             }
-            var e = new AsyncEventArgs();
-            this.Ending(this, e);
-            return e.Complete();
         }
 
-        public event AsyncEventHandler Ending;
+        public event EventHandler Ending;
 
         protected virtual void OnEnded(int Handle, int Channel, int Data, IntPtr User)
         {
@@ -102,22 +104,15 @@ namespace FoxTunes
 #endif
         }
 
-        public virtual Task OnEnded()
+        protected virtual void OnEnded()
         {
-            if (this.Ended == null)
+            if (this.Ended != null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                this.Ended(this, EventArgs.Empty);
             }
-            var e = new AsyncEventArgs();
-            this.Ended(this, e);
-            return e.Complete();
         }
 
-        public event AsyncEventHandler Ended;
+        public event EventHandler Ended;
 
         public static IBassStream Error(Errors errors)
         {

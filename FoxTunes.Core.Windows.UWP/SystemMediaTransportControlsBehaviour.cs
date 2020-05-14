@@ -337,14 +337,10 @@ namespace FoxTunes
         //    //Nothing to do.
         //}
 
-        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
-#if NET40
-            var task = TaskEx.Run(() => this.Refresh());
-#else
-            var task = Task.Run(() => this.Refresh());
-#endif
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)

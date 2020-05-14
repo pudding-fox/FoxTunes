@@ -66,7 +66,7 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
             this.Dispatch(this.Refresh);

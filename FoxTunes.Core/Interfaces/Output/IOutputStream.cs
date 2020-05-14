@@ -33,9 +33,9 @@ namespace FoxTunes.Interfaces
 
         Task Stop();
 
-        event AsyncEventHandler Ending;
+        event EventHandler Ending;
 
-        event AsyncEventHandler Ended;
+        event EventHandler Ended;
 
         string Description { get; }
 

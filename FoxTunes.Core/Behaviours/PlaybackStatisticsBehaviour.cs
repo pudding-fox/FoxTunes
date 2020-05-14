@@ -81,14 +81,10 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
-#if NET40
-            var task = TaskEx.Run(() => this.IncrementPlayCount(this.PlaybackManager.CurrentStream));
-#else
-            var task = Task.Run(() => this.IncrementPlayCount(this.PlaybackManager.CurrentStream));
-#endif
+            this.Dispatch(() => this.IncrementPlayCount(this.PlaybackManager.CurrentStream));
         }
 
         protected virtual Task IncrementPlayCount(IOutputStream currentStream)

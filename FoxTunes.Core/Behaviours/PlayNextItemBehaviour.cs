@@ -18,13 +18,10 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnEnded(object sender, AsyncEventArgs e)
+        protected virtual void OnEnded(object sender, EventArgs e)
         {
             Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
-            using (e.Defer())
-            {
-                await this.PlaylistManager.Next().ConfigureAwait(false);
-            }
+            this.Dispatch(this.PlaylistManager.Next);
         }
 
         public bool IsDisposed { get; private set; }

@@ -80,12 +80,10 @@ namespace FoxTunes.ViewModel
             ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
         }
 
-        protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentItemChanged(object sender, EventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.RefreshSelectedItem().ConfigureAwait(false);
-            }
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            this.Dispatch(this.RefreshSelectedItem);
         }
 
         public virtual async Task Refresh()
