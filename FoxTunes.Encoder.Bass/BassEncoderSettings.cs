@@ -37,10 +37,13 @@ namespace FoxTunes
         {
             if (this.Format.AutoDepth)
             {
-                if (encoderItem.BitsPerSample != 0)
+                switch (encoderItem.BitsPerSample)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Using meta data suggested bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, encoderItem.BitsPerSample);
-                    return encoderItem.BitsPerSample;
+                    case DEPTH_16:
+                    case DEPTH_24:
+                    case DEPTH_32:
+                        Logger.Write(this, LogLevel.Debug, "Using meta data suggested bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, encoderItem.BitsPerSample);
+                        return encoderItem.BitsPerSample;
                 }
                 var channelInfo = default(ChannelInfo);
                 if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
