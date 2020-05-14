@@ -7,26 +7,18 @@
 typedef struct {
 	QWORD offset;
 	QWORD length;
-	QWORD position;
 	DWORD handle;
 	DWORD flags;
 } SUBSTREAM;
 
 DWORD CALLBACK substream_proc(HSTREAM handle, void* buffer, DWORD length, void* user) {
 	SUBSTREAM* stream = user;
-	DWORD remaining = (DWORD)(stream->length - stream->position);
+	DWORD remaining = (DWORD)((stream->offset + stream->length) - BASS_ChannelGetPosition(stream->handle, BASS_POS_BYTE));
 	if (length > remaining) {
 		length = remaining;
 	}
-	if (BASS_ChannelIsActive(stream->handle) == BASS_ACTIVE_PLAYING && length) {
+	if (length && BASS_ChannelIsActive(stream->handle) == BASS_ACTIVE_PLAYING) {
 		length = BASS_ChannelGetData(stream->handle, buffer, length);
-		switch (length) {
-		case BASS_STREAMPROC_END:
-		case BASS_ERROR_UNKNOWN:
-			break;
-		default:
-			stream->position += length;
-		}
 	}
 	else {
 		length = BASS_STREAMPROC_END;
@@ -78,4 +70,4 @@ HSTREAM substream_create(HSTREAM handle, QWORD offset, QWORD length, DWORD flags
 		free(stream);
 	}
 	return result;
-	}
+}
