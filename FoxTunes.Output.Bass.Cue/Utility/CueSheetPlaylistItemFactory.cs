@@ -1,6 +1,10 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -19,13 +23,32 @@ namespace FoxTunes
             { "DATE", CommonMetaData.Year }
         };
 
-        public PlaylistItem[] Create(CueSheet cueSheet)
+        public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            base.InitializeComponent(core);
+        }
+
+        public async Task<PlaylistItem[]> Create(CueSheet cueSheet)
         {
             var playlistItems = new List<PlaylistItem>();
             var directoryName = Path.GetDirectoryName(cueSheet.FileName);
+            var metaDataSource = this.MetaDataSourceFactory.Create();
             for (var a = 0; a < cueSheet.Files.Length; a++)
             {
                 var file = cueSheet.Files[a];
+                var metaData = default(IEnumerable<MetaDataItem>);
+                try
+                {
+                    metaData = (await metaDataSource.GetMetaData(Path.Combine(directoryName, file.Path))).ToArray();
+                }
+                catch (Exception e)
+                {
+                    metaData = Enumerable.Empty<MetaDataItem>();
+                    Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", file.Path, e.Message);
+                }
                 for (var b = 0; b < file.Tracks.Length; b++)
                 {
                     var fileName = default(string);
@@ -49,16 +72,23 @@ namespace FoxTunes
                         DirectoryName = directoryName,
                         FileName = fileName
                     };
-                    playlistItem.MetaDatas = this.GetMetaData(cueSheet, file.Tracks[b]);
+                    playlistItem.MetaDatas = this.GetMetaData(cueSheet, file.Tracks[b], metaData);
                     playlistItems.Add(playlistItem);
                 }
             }
             return playlistItems.ToArray();
         }
 
-        protected virtual MetaDataItem[] GetMetaData(CueSheet cueSheet, CueSheetTrack cueSheetTrack)
+        protected virtual MetaDataItem[] GetMetaData(CueSheet cueSheet, CueSheetTrack cueSheetTrack, IEnumerable<MetaDataItem> fileMetaData)
         {
-            var metaDataItems = new List<MetaDataItem>();
+            var metaDataItems = new Dictionary<string, MetaDataItem>(StringComparer.OrdinalIgnoreCase);
+            if (fileMetaData != null)
+            {
+                foreach (var metaDataItem in fileMetaData)
+                {
+                    metaDataItems[metaDataItem.Name] = metaDataItem;
+                }
+            }
             foreach (var tag in cueSheet.Tags)
             {
                 var name = default(string);
@@ -69,10 +99,10 @@ namespace FoxTunes
                         name = tag.Name;
                     }
                 }
-                metaDataItems.Add(new MetaDataItem(name, MetaDataItemType.Tag)
+                metaDataItems[name] = new MetaDataItem(name, MetaDataItemType.Tag)
                 {
                     Value = tag.Value
-                });
+                };
             }
             foreach (var tag in cueSheetTrack.Tags)
             {
@@ -84,18 +114,20 @@ namespace FoxTunes
                         name = tag.Name;
                     }
                 }
-                metaDataItems.Add(new MetaDataItem(name, MetaDataItemType.Tag)
+                metaDataItems[name] = new MetaDataItem(name, MetaDataItemType.Tag)
                 {
                     Value = tag.Value
-                });
+                };
             }
-            metaDataItems.Add(new MetaDataItem(CommonMetaData.Track, MetaDataItemType.Tag)
+            metaDataItems[CommonMetaData.Track] = new MetaDataItem(CommonMetaData.Track, MetaDataItemType.Tag)
             {
                 Value = cueSheetTrack.Number
-            });
+            };
             //TODO: We could create the CommonProperties.Duration for all but the last track in each file. 
             //TODO: Without understanding the file format we can't determine the length of the last track.
-            return metaDataItems.ToArray();
+            //TODO: Just don't provide any duration for now.
+            metaDataItems.Remove(CommonProperties.Duration);
+            return metaDataItems.Values.ToArray();
         }
     }
 }

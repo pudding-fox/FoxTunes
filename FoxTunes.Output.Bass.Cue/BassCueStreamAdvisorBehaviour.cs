@@ -180,7 +180,7 @@ namespace FoxTunes
             protected override async Task OnRun()
             {
                 var cueSheet = this.Parser.Parse(this.FileName);
-                var playlistItems = this.Factory.Create(cueSheet);
+                var playlistItems = await this.Factory.Create(cueSheet);
                 using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                 {
                     //Always append for now.
