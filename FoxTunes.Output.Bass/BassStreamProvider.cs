@@ -9,11 +9,6 @@ namespace FoxTunes
 {
     public class BassStreamProvider : StandardComponent, IBassStreamProvider
     {
-        static BassStreamProvider()
-        {
-            BassSubstreamHandler.Init();
-        }
-
         public const byte PRIORITY_HIGH = 0;
 
         public const byte PRIORITY_NORMAL = 100;
@@ -119,38 +114,17 @@ namespace FoxTunes
 
         protected virtual IBassStream CreateStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
         {
-            var offset = default(long);
-            var length = default(long);
-            var stream = default(BassStream);
+            var stream = default(IBassStream);
             foreach (var advisory in advice)
             {
-                if (advisory.Offset != TimeSpan.Zero)
+                if (advisory.Wrap(this, channelHandle, out stream))
                 {
-                    offset = Bass.ChannelSeconds2Bytes(channelHandle, advisory.Offset.TotalSeconds);
-                }
-                if (advisory.Length != TimeSpan.Zero)
-                {
-                    length = Bass.ChannelSeconds2Bytes(channelHandle, advisory.Length.TotalSeconds);
+                    break;
                 }
             }
-            if (offset != 0 || length != 0)
+            if (stream == null)
             {
-                if (length == 0)
-                {
-                    length = Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes) - offset;
-                }
-                stream = new BassSubstream(
-                    this,
-                    BassSubstreamHandler.CreateStream(channelHandle, offset, length, BassFlags.AutoFree),
-                    channelHandle,
-                    offset,
-                    length
-                );
-            }
-            else
-            {
-                length = Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes);
-                stream = new BassStream(this, channelHandle, length);
+                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes));
             }
             stream.RegisterSyncHandlers();
             return stream;
