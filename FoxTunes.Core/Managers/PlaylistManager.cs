@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -480,6 +481,16 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public bool CanHandle(string path)
+        {
+            return Directory.Exists(path) || this.PlaybackManager.IsSupported(path);
+        }
+
+        public Task Handle(IEnumerable<string> paths)
+        {
+            return this.Add(paths, false);
         }
 
         public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)

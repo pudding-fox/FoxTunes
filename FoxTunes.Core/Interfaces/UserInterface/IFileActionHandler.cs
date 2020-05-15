@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
     public interface IFileActionHandler : IBaseComponent
     {
-        Task<bool> Handle(string fileName);
+        bool CanHandle(string path);
+
+        Task Handle(IEnumerable<string> paths);
     }
 }

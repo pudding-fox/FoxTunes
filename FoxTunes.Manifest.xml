@@ -109,13 +109,13 @@
           </uap3:FileTypeAssociation>
         </uap:Extension>
         <uap:Extension Category="windows.fileTypeAssociation">
-          <uap3:FileTypeAssociation Name="foxtunes.application.cue" MultiSelectModel="Single">
+          <uap3:FileTypeAssociation Name="foxtunes.application.cue" MultiSelectModel="Player">
             <uap:DisplayName>Cue Sheet File</uap:DisplayName>
             <uap:SupportedFileTypes>
               <uap:FileType ContentType="application/x-cue">.cue</uap:FileType>
             </uap:SupportedFileTypes>
             <uap2:SupportedVerbs>
-              <uap3:Verb Id="Open" MultiSelectModel="Single" Parameters="&quot;%1&quot;">Open</uap3:Verb>
+              <uap3:Verb Id="Enqueue" MultiSelectModel="Document" Parameters="--add &quot;%1&quot;">Enqueue</uap3:Verb>
             </uap2:SupportedVerbs>
           </uap3:FileTypeAssociation>
         </uap:Extension>
