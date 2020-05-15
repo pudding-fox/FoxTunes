@@ -10,6 +10,14 @@ namespace FoxTunes.ViewModel
 {
     public class MiniPlaylist : PlaylistBase, IValueConverter, IDisposable
     {
+        protected override string EMPTY
+        {
+            get
+            {
+                return "Drop files anywhere.";
+            }
+        }
+
         public IScriptingContext ScriptingContext { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -114,29 +122,6 @@ namespace FoxTunes.ViewModel
                     this.SelectedItem = null;
                 }
             });
-        }
-
-        public override string StatusMessage
-        {
-            get
-            {
-                if (this.PlaylistBrowser != null)
-                {
-                    switch (this.PlaylistBrowser.State)
-                    {
-                        case PlaylistBrowserState.Loading:
-                            return "Loading...";
-                    }
-                }
-                if (this.PlaylistManager != null)
-                {
-                    if (!this.PlaylistManager.CanNavigate)
-                    {
-                        return "Drop files anywhere.";
-                    }
-                }
-                return null;
-            }
         }
 
         public ICommand PlaySelectedItemCommand

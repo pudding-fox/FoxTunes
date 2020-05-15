@@ -7,11 +7,29 @@ namespace FoxTunes.ViewModel
 {
     public abstract class PlaylistBase : ViewModelBase
     {
-        const string LOADING = "Loading...";
+        protected virtual string LOADING
+        {
+            get
+            {
+                return "Loading...";
+            }
+        }
 
-        const string UPDATING = "Updating...";
+        protected virtual string UPDATING
+        {
+            get
+            {
+                return "Updating...";
+            }
+        }
 
-        const string EMPTY = "Add to playlist by dropping files here.";
+        protected virtual string EMPTY
+        {
+            get
+            {
+                return "Add to playlist by dropping files here.";
+            }
+        }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
@@ -63,26 +81,22 @@ namespace FoxTunes.ViewModel
                 {
                     return null;
                 }
-                if (!this.PlaylistManager.CanNavigate)
-                {
-                    var isUpdating = global::FoxTunes.BackgroundTask.Active
-                        .OfType<PlaylistTaskBase>()
-                        .Any();
-                    if (isUpdating)
-                    {
-                        return UPDATING;
-                    }
-                    else
-                    {
-                        return EMPTY;
-                    }
-                }
                 switch (this.PlaylistBrowser.State)
                 {
                     case PlaylistBrowserState.Loading:
                         return LOADING;
                 }
-                return null;
+                var isUpdating = global::FoxTunes.BackgroundTask.Active
+                        .OfType<PlaylistTaskBase>()
+                        .Any();
+                if (isUpdating)
+                {
+                    return UPDATING;
+                }
+                else
+                {
+                    return EMPTY;
+                }
             }
         }
 
@@ -101,20 +115,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null)
-                {
-                    return true;
-                }
-                if (this.Items.Count > 0)
-                {
-                    return false;
-                }
-                switch (this.PlaylistBrowser.State)
-                {
-                    case PlaylistBrowserState.Loading:
-                        return true;
-                }
-                if (!this.PlaylistManager.CanNavigate)
+                if (this.Items == null || this.Items.Count == 0)
                 {
                     return true;
                 }

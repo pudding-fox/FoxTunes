@@ -10,10 +10,6 @@ namespace FoxTunes.Interfaces
         Task Build(LibraryItemStatus? status);
 
         Task Clear(LibraryItemStatus? status, bool signal);
-
-        bool CanNavigate { get; }
-
-        event EventHandler CanNavigateChanged;
     }
 
     [Flags]

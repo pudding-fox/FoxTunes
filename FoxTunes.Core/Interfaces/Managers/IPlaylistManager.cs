@@ -32,10 +32,6 @@ namespace FoxTunes.Interfaces
 
         Task Play(int sequence);
 
-        bool CanNavigate { get; }
-
-        event EventHandler CanNavigateChanged;
-
         Task Next();
 
         Task Previous();
