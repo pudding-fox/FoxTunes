@@ -15,9 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\lib\bass.lib" />
-    <Library Include="..\lib\bassasio.lib" />
-    <Library Include="..\lib\msvcrt.lib" />
+    <Library Include="..\lib\x64\bass.lib" />
+    <Library Include="..\lib\x64\bassasio.lib" />
+    <Library Include="..\lib\x64\msvcrt.lib" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bass_asio_handler.c">

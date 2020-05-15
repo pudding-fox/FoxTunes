@@ -7,11 +7,15 @@
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.1.7.0</AssemblyVersion>
+    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass.Sox" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\ManagedBass.Sox.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -19,6 +23,21 @@
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.Sox" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\ManagedBass.Sox.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <None Include="..\lib\x86\bass_sox.dll" Link="bass_sox.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="..\lib\x64\bass_sox.dll" Link="bass_sox.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -38,7 +57,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManagedBass.Sox" Version="0.3.0"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 

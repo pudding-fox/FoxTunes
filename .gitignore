@@ -18,7 +18,6 @@ TestResults
 build
 [Dd]ebug/
 [Rr]elease/
-x64/
 *_i.c
 *_p.c
 *.ilk
@@ -122,8 +121,13 @@ runtime_env/
 source/.vs/
 
 #libs
-lib/bass_asio_handler.*
-lib/bass_wasapi_handler.*
-lib/bass_inmemory_handler.*
-lib/bass_inmemory_handler_dsd.*
-lib/bass_substream_handler.*
+lib/x86/bass_asio_handler.*
+lib/x86/bass_wasapi_handler.*
+lib/x86/bass_inmemory_handler.*
+lib/x86/bass_inmemory_handler_dsd.*
+lib/x86/bass_substream_handler.*
+lib/x64/bass_asio_handler.*
+lib/x64/bass_wasapi_handler.*
+lib/x64/bass_inmemory_handler.*
+lib/x64/bass_inmemory_handler_dsd.*
+lib/x64/bass_substream_handler.*

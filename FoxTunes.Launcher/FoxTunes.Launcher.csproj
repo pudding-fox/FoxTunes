@@ -7,7 +7,7 @@
     <ApplicationIcon>Fox.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>
     <StartupObject />
-    <Platforms>x86</Platforms>
+    <Platforms>x86;x64</Platforms>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.1.7.0</AssemblyVersion>
