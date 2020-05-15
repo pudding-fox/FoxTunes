@@ -3,13 +3,17 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassCueStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IDisposable
+    public class BassCueStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IFileActionHandler, IDisposable
     {
+        public const string CUE = ".cue";
+
         public const string OPEN_CUE = "FFGG";
 
         public ICore Core { get; private set; }
@@ -78,7 +82,21 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task OpenCue()
+        public async Task<bool> Handle(string fileName)
+        {
+            if (!this.Enabled)
+            {
+                return false;
+            }
+            if (!string.Equals(Path.GetExtension(fileName), CUE, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            await this.OpenCue(fileName);
+            return true;
+        }
+
+        public Task OpenCue()
         {
             var options = new BrowseOptions(
                 "Open",
@@ -87,7 +105,7 @@ namespace FoxTunes
                 {
                     new BrowseFilter("Cue sheets", new[]
                     {
-                        ".cue"
+                        CUE
                     })
                 },
                 BrowseFlags.File
@@ -95,9 +113,18 @@ namespace FoxTunes
             var result = this.FileSystemBrowser.Browse(options);
             if (!result.Success)
             {
-                return;
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
-            using (var task = new AddCueToPlaylistTask(result.Paths.FirstOrDefault()))
+            return this.OpenCue(result.Paths.FirstOrDefault());
+        }
+
+        public async Task OpenCue(string fileName)
+        {
+            using (var task = new AddCueToPlaylistTask(fileName))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
