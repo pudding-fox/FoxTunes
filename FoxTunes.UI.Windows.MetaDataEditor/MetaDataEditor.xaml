@@ -14,7 +14,9 @@
     <UserControl.Resources>
         <LocalViewModel:MetaDataEditor x:Key="ViewModel" Core="{Binding}"></LocalViewModel:MetaDataEditor>
         <ViewModel:NegatingBooleanToVisibilityConverter x:Key="NegatingBooleanToVisibilityConverter"></ViewModel:NegatingBooleanToVisibilityConverter>
+        <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Core="{Binding}" Width="100" Height="100" ShowPlaceholder="False"></ViewModel:ArtworkImageConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+        <SolidColorBrush x:Key="Transparent" Color="Transparent"></SolidColorBrush>
     </UserControl.Resources>
     <UserControl.Style>
         <Style TargetType="{x:Type UserControl}">
@@ -77,9 +79,7 @@
                                     </ContextMenu>
                                 </StackPanel.ContextMenu>
                                 <Grid Width="100" Height="100">
-                                    <Grid.Background>
-                                        <ImageBrush ImageSource="{Binding ImageSource, IsAsync=True}" Stretch="Uniform"/>
-                                    </Grid.Background>
+                                    <Rectangle DataContext="{Binding Value, Converter={StaticResource ArtworkImageConverter}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}"></Rectangle>
                                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasMultipleValues, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.MultipleValues}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasValue, Converter={StaticResource NegatingBooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.NoValue}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                 </Grid>
