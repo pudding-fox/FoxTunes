@@ -70,8 +70,12 @@ namespace FoxTunes
             DSD_24576000
         };
 
-        public static int[] GetRates(int min, int max)
+        public static int[] GetRates(int current, int min, int max)
         {
+            if (min == 0 || max == 0)
+            {
+                return new[] { current };
+            }
             return PCM
                 .Concat(DSD)
                 .Where(rate => rate >= min && rate <= max)
