@@ -4,7 +4,12 @@ namespace FoxTunes
 {
     public class ScriptingException : Exception
     {
-        public ScriptingException(int line, int startColumn, int endColumn, string message) : base(message)
+        public ScriptingException(string message) : base(message)
+        {
+
+        }
+
+        public ScriptingException(int line, int startColumn, int endColumn, string message) : this(message)
         {
             this.Line = line;
             this.StartColumn = startColumn;

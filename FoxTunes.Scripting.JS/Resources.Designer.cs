@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -152,7 +152,7 @@ namespace FoxTunes {
         ///    if (!lastplayed) {
         ///        return &quot;Unknown&quot;;
         ///    }
-        ///    return toLocaleDateString(lastplayed) || &quot;Unknown&quot;;
+        ///    return DateHelper.toLocaleDateString(lastplayed) || &quot;Unknown&quot;;
         ///})().
         /// </summary>
         internal static string LastPlayed {
