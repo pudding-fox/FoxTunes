@@ -1,21 +1,28 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Xml;
+using System.Runtime.InteropServices;
 using V8.Net;
 
 namespace FoxTunes
 {
     public class JSScriptingContext : ScriptingContext
     {
-        public JSScriptingContext(V8Engine engine)
+        private JSScriptingContext()
+        {
+            this.Scripts = new Dictionary<string, InternalHandle>();
+        }
+
+        public JSScriptingContext(V8Engine engine) : this()
         {
             this.Engine = engine;
             this.Context = this.Engine.CreateContext();
             this.Engine.SetContext(this.Context);
         }
+
+        public IDictionary<string, InternalHandle> Scripts { get; private set; }
 
         public V8Engine Engine { get; private set; }
 
@@ -79,12 +86,18 @@ namespace FoxTunes
         {
             try
             {
-                return this.GetValue(this.Engine.Execute(script, throwExceptionOnError: true));
+                var handle = this.Compile(script);
+                return this.GetValue(this.Engine.Execute(handle, throwExceptionOnError: true));
             }
             catch (V8ExecutionErrorException e)
             {
                 throw new ScriptingException(e.Message);
             }
+        }
+
+        protected virtual InternalHandle Compile(string script)
+        {
+            return this.Scripts.GetOrAdd(script, key => this.Engine.Compile(script, throwExceptionOnError: true));
         }
 
         protected override void OnDisposing()
