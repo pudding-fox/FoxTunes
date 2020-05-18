@@ -1,9 +1,9 @@
-﻿using FoxTunes.Interfaces;
+﻿#if X64
+using FoxTunes.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using V8.Net;
 
 namespace FoxTunes
@@ -108,3 +108,4 @@ namespace FoxTunes
         }
     }
 }
+#endif
