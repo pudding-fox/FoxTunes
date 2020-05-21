@@ -45,6 +45,10 @@ namespace FoxTunes.Interfaces
 
         TimeSpan GetDuration(long position);
 
+        bool CanReset { get; }
+
+        void Reset();
+
         bool IsDisposed { get; }
     }
 }

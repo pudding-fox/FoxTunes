@@ -91,6 +91,10 @@ namespace FoxTunes
             }
         }
 
+        public abstract bool CanReset { get; }
+
+        public abstract void Reset();
+
         public bool IsDisposed { get; private set; }
 
         public void Dispose()

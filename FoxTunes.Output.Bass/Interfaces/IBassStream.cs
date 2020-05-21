@@ -22,5 +22,9 @@ namespace FoxTunes.Interfaces
         event EventHandler Ended;
 
         void RegisterSyncHandlers();
+
+        bool CanReset { get; }
+
+        void Reset();
     }
 }

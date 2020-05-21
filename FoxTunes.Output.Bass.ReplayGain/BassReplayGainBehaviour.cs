@@ -236,6 +236,14 @@ namespace FoxTunes
 
         protected virtual bool TryCalculateReplayGain(BassOutputStream stream, out float gain, out float peak, out ReplayGainMode mode)
         {
+            if (!stream.CanReset)
+            {
+                Logger.Write(this, LogLevel.Debug, "Cannot calculate track replay gain for file \"{0}\": The stream cannot be reset.", stream.FileName);
+                gain = 0;
+                peak = 0;
+                mode = ReplayGainMode.None;
+                return false;
+            }
             Logger.Write(this, LogLevel.Debug, "Attempting to calculate track replay gain for file \"{0}\".", stream.FileName);
             try
             {
@@ -261,7 +269,7 @@ namespace FoxTunes
             {
                 try
                 {
-                    stream.Position = 0;
+                    stream.Reset();
                 }
                 catch
                 {

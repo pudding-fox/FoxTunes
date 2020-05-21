@@ -227,6 +227,19 @@ namespace FoxTunes
             }
         }
 
+        public override bool CanReset
+        {
+            get
+            {
+                return this.Stream.CanReset;
+            }
+        }
+
+        public override void Reset()
+        {
+            this.Stream.Reset();
+        }
+
         protected override void OnDisposing()
         {
             try
