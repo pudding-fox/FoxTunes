@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net40;net461</TargetFrameworks>
     <AssemblyName>FoxTunes.Encoder.Bass</AssemblyName>
-    <OutputPath>..\distribution\</OutputPath>
+    <OutputPath>..\distribution\$(Platform)\</OutputPath>
     <OutputType>WinExe</OutputType>
     <StartupObject />
     <Platforms>x86;x64</Platforms>
