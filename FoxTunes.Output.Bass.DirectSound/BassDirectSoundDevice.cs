@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -67,6 +68,20 @@ namespace FoxTunes
             public int Outputs { get; private set; }
 
             public IEnumerable<int> SupportedRates { get; private set; }
+
+            public int GetNearestRate(int rate)
+            {
+                //Find the closest supported rate.
+                foreach (var supportedRate in this.SupportedRates)
+                {
+                    if (supportedRate >= rate)
+                    {
+                        return supportedRate;
+                    }
+                }
+                //Ah. The minimum supported rate is not enough.
+                return this.SupportedRates.LastOrDefault();
+            }
         }
     }
 }
