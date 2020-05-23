@@ -28,6 +28,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
             this.ImageMode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -39,6 +40,21 @@ namespace FoxTunes
             );
             this.ImageMode.ValueChanged += this.OnValueChanged;
             this.TileSize.ValueChanged += this.OnValueChanged;
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.HierarchiesUpdated:
+                    this.Debouncer.Exec(() => this.Dispatch(this.RefreshImages));
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
