@@ -1,7 +1,7 @@
 # FoxTunes
 A modular music player and converter using the BASS framework.
 
-The main release is [FoxTunes-2.1.7-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.1.7/FoxTunes-2.1.7-net461.zip)
+The main release is [FoxTunes-2.1.8-net40-x86.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.1.8/FoxTunes-2.1.8-net40-x86.zip)
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
 The wiki is [FoxTunes-wiki](https://github.com/aidan-g/FoxTunes/wiki)
@@ -10,6 +10,8 @@ The wiki is [FoxTunes-wiki](https://github.com/aidan-g/FoxTunes/wiki)
 
 * The following input formats are supported: aac, ac3, aif, ape, dff, dsf, dts, fla, flac, kar, m4a, m4a, m4b, mac, mid, midi, mp1, mp2, mp3, mp4, oga, ogg, ogg, opus, rmi, wav, wma, wv
 * The following output formats are supported: flac, m4a, mp3, ogg, opus, wv
+* Cue sheets can be played and split using the converter.
+* 64 bit builds are available.
 
 The UI components can be relocated and removed.
 
@@ -35,7 +37,6 @@ A Windows XP compatibile .NET 4.0 build is available, can be configured minimall
 It needs at least;
 * [KB2468871](https://www.microsoft.com/en-us/download/details.aspx?id=3556) - Portable class libraries patch.
   * Microsoft keep breaking the link. Google: NDP40-KB2468871
-* [msvcp100.dll and msvcr100.dll](https://github.com/aidan-g/FoxTunes/releases/download/0.8/FoxTunes-0.8-Dependencies.tar.gz) - Microsoft Visual C++ 2010
 
 ![Minimal](Media/Screenshots/Minimal.PNG)
 
@@ -48,10 +49,12 @@ Various optional plugins are available;
 
 * ASIO - Low latency exclusive output, supports DSD direct.
 * CD - Play audio CDs from a physical drive.
+* CUE - Play cue sheets.
 * DSD - Required for DSD direct.
 * DTS - Play .dts multi channel format.
 * DirectSound - Use standard windows audio session for output.
 * Encoder - A converter with various output formats. 
+  * Can split cue sheets with the CUE plugin.
   * Can rip CDs with the CD plugin.
   * Can up/down sample rate/depth with the Resampler plugin.
 * Javascript - Use JS for scriptable elements.
@@ -59,6 +62,8 @@ Various optional plugins are available;
 * Logging - Use Log4Net logging back-end. Can be configured and disabled.
 * MetaDataEditor - A simple batch mode tag editor. Can embed artwork.
 * ParametricEqualizer - A ten band parametric equalizer.
+* ReplayGain - Canculate and utilize replay gain meta data for tracks and albums.
+  * Can calculate on demand (per track) if you don't mind waiting a moment for playback.
 * Resampler - SOXR based high quality configurable resampler. Can perform up/down sampling.
 * SQLite - Use SQLite for database functions.
 * SimpleMetaData - A meta data provider using the file path and regular expressions. Recommended for older systems.

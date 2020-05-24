@@ -376,7 +376,7 @@ namespace FoxTunes.ViewModel
             {
                 await Windows.Invoke(this.Items.Update(items)).ConfigureAwait(false);
             }
-            await this.RefreshStatus();
+            await this.RefreshStatus().ConfigureAwait(false);
         }
 
         protected virtual Task RefreshHierarchies()
