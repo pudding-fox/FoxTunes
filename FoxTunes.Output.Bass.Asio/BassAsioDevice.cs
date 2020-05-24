@@ -134,15 +134,15 @@ namespace FoxTunes
                 var info = default(AsioChannelInfo);
                 BassAsioUtils.OK(BassAsio.ChannelGetInfo(false, PRIMARY_CHANNEL, out info));
                 Info = new BassAsioDeviceInfo(
-                    device,
+                    BassAsio.CurrentDevice,
                     Convert.ToInt32(BassAsio.Rate),
                     BassAsio.Info.Inputs,
                     BassAsio.Info.Outputs,
                     GetSupportedRates(),
                     info.Format
                 );
-                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", device, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(AsioSampleFormat), Info.Format));
-                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Rates => {1}", device, string.Join(", ", Info.SupportedRates));
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", BassAsio.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(AsioSampleFormat), Info.Format));
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Rates => {1}", BassAsio.CurrentDevice, string.Join(", ", Info.SupportedRates));
             }
             finally
             {
@@ -171,15 +171,18 @@ namespace FoxTunes
                 return;
             }
 
-            var flags =
-                AsioChannelResetFlags.Enable |
-                AsioChannelResetFlags.Join |
-                AsioChannelResetFlags.Format |
-                AsioChannelResetFlags.Rate;
-            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Resetting BASS ASIO channel attributes.");
-            for (var channel = 0; channel < Info.Outputs; channel++)
+            if (Info != null)
             {
-                BassAsio.ChannelReset(false, channel, flags);
+                var flags =
+                    AsioChannelResetFlags.Enable |
+                    AsioChannelResetFlags.Join |
+                    AsioChannelResetFlags.Format |
+                    AsioChannelResetFlags.Rate;
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Resetting BASS ASIO channel attributes.");
+                for (var channel = 0; channel < Info.Outputs; channel++)
+                {
+                    BassAsio.ChannelReset(false, channel, flags);
+                }
             }
 
             Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Releasing BASS ASIO.");

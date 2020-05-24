@@ -86,6 +86,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
                 BassUtils.OK(BassWasapiHandler.StreamSet(previous.ChannelHandle));
             }
+            this.UpdateVolume();
         }
 
         protected virtual void ConfigureWASAPI(IBassStreamComponent previous)
@@ -296,10 +297,6 @@ namespace FoxTunes
 
         protected override float GetVolume()
         {
-            if (this.ChannelHandle == 0)
-            {
-                return 0;
-            }
             if (this.Behaviour.Exclusive)
             {
                 return 1;
@@ -309,10 +306,6 @@ namespace FoxTunes
 
         protected override void SetVolume(float volume)
         {
-            if (this.ChannelHandle == 0)
-            {
-                return;
-            }
             if (this.Behaviour.Exclusive)
             {
                 return;
@@ -325,8 +318,14 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            if (this.ChannelHandle != 0)
+            {
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);
+                BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
+            }
             this.Stop();
             BassWasapiDevice.Free();
+            base.OnDisposing();
         }
     }
 }

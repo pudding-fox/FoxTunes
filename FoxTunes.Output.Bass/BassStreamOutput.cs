@@ -137,7 +137,14 @@ namespace FoxTunes
             this.IsDisposed = true;
         }
 
-        protected abstract void OnDisposing();
+        protected virtual void OnDisposing()
+        {
+            if (this.Volume != null)
+            {
+                this.Volume.EnabledChanged -= this.OnVolumeEnabledChanged;
+                this.Volume.ValueChanged -= this.OnVolumeValueChanged;
+            }
+        }
 
         ~BassStreamOutput()
         {

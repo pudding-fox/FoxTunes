@@ -17,19 +17,19 @@ namespace FoxTunes
             }
         }
 
-        public static void Init(int device)
+        public static void Init()
         {
             IsInitialized = true;
             var info = default(DeviceInfo);
-            BassUtils.OK(Bass.GetDeviceInfo(BassUtils.GetDeviceNumber(device), out info));
+            BassUtils.OK(Bass.GetDeviceInfo(Bass.CurrentDevice, out info));
             Info = new BassDirectSoundDeviceInfo(
-                device,
+                Bass.CurrentDevice,
                 0,
                 Bass.Info.SpeakerCount,
                 OutputRate.GetRates(Bass.Info.SampleRate, Bass.Info.MinSampleRate, Bass.Info.MaxSampleRate)
             );
-            LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}", device, Info.Inputs, Info.Outputs, Info.Rate);
-            LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Rates => {1}", device, string.Join(", ", Info.SupportedRates));
+            LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}", Bass.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate);
+            LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Rates => {1}", Bass.CurrentDevice, string.Join(", ", Info.SupportedRates));
         }
 
         public static void Free()

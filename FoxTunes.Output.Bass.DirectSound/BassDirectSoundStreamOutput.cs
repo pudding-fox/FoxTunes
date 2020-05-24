@@ -280,16 +280,12 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.Volume != null)
-            {
-                this.Volume.EnabledChanged += this.OnVolumeEnabledChanged;
-                this.Volume.ValueChanged += this.OnVolumeValueChanged;
-            }
             if (this.ChannelHandle != 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);
                 BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
             }
+            base.OnDisposing();
         }
     }
 }

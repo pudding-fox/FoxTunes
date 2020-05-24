@@ -89,6 +89,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
                 BassUtils.OK(BassAsioHandler.StreamSet(previous.ChannelHandle));
             }
+            this.UpdateVolume();
         }
 
         protected virtual void ConfigureASIO(IBassStreamComponent previous)
@@ -323,10 +324,6 @@ namespace FoxTunes
 
         protected override float GetVolume()
         {
-            if (this.ChannelHandle == 0)
-            {
-                return 0;
-            }
             if (!BassAsioDevice.CanControlVolume)
             {
                 return 1;
@@ -336,10 +333,6 @@ namespace FoxTunes
 
         protected override void SetVolume(float volume)
         {
-            if (this.ChannelHandle == 0)
-            {
-                return;
-            }
             if (!BassAsioDevice.CanControlVolume)
             {
                 return;
@@ -349,8 +342,14 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            if (this.ChannelHandle != 0)
+            {
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);
+                BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
+            }
             this.Stop();
             BassAsioDevice.Free();
+            base.OnDisposing();
         }
     }
 }
