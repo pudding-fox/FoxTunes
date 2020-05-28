@@ -6,37 +6,49 @@ namespace FoxTunes.Interfaces
 {
     public interface IPlaylistManager : IStandardManager, IBackgroundTaskSource, IInvocableComponent, IFileActionHandler, IDatabaseInitializer
     {
-        Task Add(IEnumerable<string> paths, bool clear);
+        Task Add(Playlist playlist);
 
-        Task Insert(int index, IEnumerable<string> paths, bool clear);
+        Task Remove(Playlist playlist);
 
-        Task Add(LibraryHierarchyNode libraryHierarchyNode, bool clear);
+        Task Add(Playlist playlist, IEnumerable<string> paths, bool clear);
 
-        Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode, bool clear);
+        Task Insert(Playlist playlist, int index, IEnumerable<string> paths, bool clear);
 
-        Task Add(IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear);
+        Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode, bool clear);
 
-        Task Insert(int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear);
+        Task Insert(Playlist playlist, int index, LibraryHierarchyNode libraryHierarchyNode, bool clear);
 
-        Task Move(IEnumerable<PlaylistItem> playlistItems);
+        Task Add(Playlist playlist, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear);
 
-        Task Move(int index, IEnumerable<PlaylistItem> playlistItems);
+        Task Insert(Playlist playlist, int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear);
 
-        Task Remove(IEnumerable<PlaylistItem> playlistItems);
+        Task Move(Playlist playlist, IEnumerable<PlaylistItem> playlistItems);
 
-        Task Crop(IEnumerable<PlaylistItem> playlistItems);
+        Task Move(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems);
+
+        Task Remove(Playlist playlist, IEnumerable<PlaylistItem> playlistItems);
+
+        Task Crop(Playlist playlist, IEnumerable<PlaylistItem> playlistItems);
 
         Task Play(PlaylistItem playlistItem);
 
-        Task Play(string fileName);
+        Task Play(Playlist playlist, string fileName);
 
-        Task Play(int sequence);
+        Task Play(Playlist playlist, int sequence);
 
         Task Next();
 
         Task Previous();
 
-        Task Clear();
+        Task Clear(Playlist playlist);
+
+        Playlist SelectedPlaylist { get; set; }
+
+        event EventHandler SelectedPlaylistChanged;
+
+        Playlist CurrentPlaylist { get; }
+
+        event EventHandler CurrentPlaylistChanged;
 
         PlaylistItem CurrentItem { get; }
 

@@ -5,8 +5,8 @@ namespace FoxTunes
 {
     public class MovePlaylistItemsTask : PlaylistTaskBase
     {
-        public MovePlaylistItemsTask(int sequence, IEnumerable<PlaylistItem> playlistItems)
-            : base(sequence)
+        public MovePlaylistItemsTask(Playlist playlist, int sequence, IEnumerable<PlaylistItem> playlistItems)
+            : base(playlist, sequence)
         {
             this.PlaylistItems = playlistItems;
         }

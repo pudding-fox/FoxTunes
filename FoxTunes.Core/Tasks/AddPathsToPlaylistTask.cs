@@ -5,8 +5,8 @@ namespace FoxTunes
 {
     public class AddPathsToPlaylistTask : PlaylistTaskBase
     {
-        public AddPathsToPlaylistTask(int sequence, IEnumerable<string> paths, bool clear)
-            : base(sequence)
+        public AddPathsToPlaylistTask(Playlist playlist, int sequence, IEnumerable<string> paths, bool clear)
+            : base(playlist, sequence)
         {
             this.Paths = paths;
             this.Clear = clear;

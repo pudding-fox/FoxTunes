@@ -18,6 +18,7 @@ namespace FoxTunes
 
         public Task Write(PlaylistItem playlistItem)
         {
+            this.Command.Parameters["playlistId"] = playlistItem.Playlist_Id;
             this.Command.Parameters["directoryName"] = playlistItem.DirectoryName;
             this.Command.Parameters["fileName"] = playlistItem.FileName;
             this.Command.Parameters["sequence"] = playlistItem.Sequence;

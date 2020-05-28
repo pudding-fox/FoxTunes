@@ -16,8 +16,16 @@ CREATE TABLE [LibraryItems] (
 	Status INTEGER NOT NULL,
 	Flags INTEGER NOT NULL);
 
+CREATE TABLE [Playlists](
+	[Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
+	[Sequence] INTEGER NOT NULL,
+	[Name] nvarchar(4000) NOT NULL,
+	[Type] bigint NOT NULL,
+	[Enabled] bit NOT NULL);
+
 CREATE TABLE [PlaylistItems](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
+	[Playlist_Id] INTEGER NOT NULL REFERENCES Playlists([Id]),
 	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]),
     [Sequence] INTEGER NOT NULL, 
     [DirectoryName] nvarchar(4000) NOT NULL, 

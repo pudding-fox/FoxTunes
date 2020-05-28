@@ -270,7 +270,7 @@ namespace FoxTunes
             var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var libraryItem in libraryItems)
             {
-                var playlistItems = default(IEnumerable<PlaylistItem>);
+                var playlistItems = default(PlaylistItem[]);
                 if (playlistCache.TryGetItemsByLibraryId(libraryItem.Id, out playlistItems))
                 {
                     result.AddRange(MetaDataItem.Update(libraryItem, playlistItems, names));

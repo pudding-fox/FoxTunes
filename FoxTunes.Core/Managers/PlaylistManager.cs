@@ -1,7 +1,7 @@
 ﻿using FoxDb;
-using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace FoxTunes
 
         public PlaylistManager()
         {
-            this.SelectedItems = new PlaylistItem[] { };
+            this._SelectedItems = new ConcurrentDictionary<Playlist, PlaylistItem[]>();
         }
 
         private volatile bool IsNavigating = false;
@@ -59,61 +59,49 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task<bool> HasItems()
+        public Task Refresh()
         {
-            using (var database = this.DatabaseFactory.Create())
+            if (this.SelectedPlaylist != null)
             {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                this.SelectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == this.SelectedPlaylist.Id);
+                if (this.SelectedPlaylist != null)
                 {
-                    return await database.ExecuteScalarAsync<bool>(database.QueryFactory.Build().With(query1 =>
-                    {
-                        query1.Output.AddCase(
-                            query1.Output.CreateCaseCondition(
-                                query1.Output.CreateFunction(
-                                    QueryFunction.Exists,
-                                    query1.Output.CreateSubQuery(
-                                        database.QueryFactory.Build().With(query2 =>
-                                        {
-                                            query2.Output.AddOperator(QueryOperator.Star);
-                                            query2.Source.AddTable(database.Tables.PlaylistItem);
-                                        })
-                                    )
-                                ),
-                                query1.Output.CreateConstant(1)
-                            ),
-                            query1.Output.CreateCaseCondition(
-                                query1.Output.CreateConstant(0)
-                            )
-                        );
-                    }), transaction).ConfigureAwait(false);
+                    Logger.Write(this, LogLevel.Debug, "Refreshed selected playlist: {0} => {1}", this.SelectedPlaylist.Id, this.SelectedPlaylist.Name);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Failed to refresh selected playlist, it was removed or disabled.");
                 }
             }
-        }
-
-        public async Task Refresh()
-        {
+            if (this.SelectedPlaylist == null)
+            {
+                this.SelectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault();
+                if (this.SelectedPlaylist == null)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to select a playlist, perhaps none are enabled?");
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Selected first playlist: {0} => {1}", this.SelectedPlaylist.Id, this.SelectedPlaylist.Name);
+                }
+            }
+            if (this.CurrentItem != null)
+            {
+                var playlist = this.PlaylistBrowser.GetPlaylist(this.CurrentItem);
+                if (playlist != null)
+                {
+                    this.CurrentItem = this.PlaylistBrowser.GetItems(playlist).FirstOrDefault(playlistItem => playlistItem.Id == this.CurrentItem.Id && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase));
+                }
+            }
             if (this.CurrentItem == null)
             {
-                return;
+                Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
             }
-            Logger.Write(this, LogLevel.Debug, "Refreshing current item.");
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    var set = database.Set<PlaylistItem>(transaction);
-                    var playlistItem = await set.FindAsync(this.CurrentItem.Id).ConfigureAwait(false);
-                    if (playlistItem != null && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.CurrentItem = playlistItem;
-                    }
-                    else
-                    {
-                        this.CurrentItem = null;
-                        Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
-                    }
-                }
-            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -131,17 +119,37 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(IEnumerable<string> paths, bool clear)
+        public async Task Add(Playlist playlist)
+        {
+            using (var task = new AddPlaylistTask(playlist))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task Remove(Playlist playlist)
+        {
+            using (var task = new RemovePlaylistTask(playlist))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task Add(Playlist playlist, IEnumerable<string> paths, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding paths to playlist.");
-            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-            await this.Insert(index, paths, clear).ConfigureAwait(false);
+            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
+            await this.Insert(playlist, index, paths, clear).ConfigureAwait(false);
         }
 
-        public async Task Insert(int index, IEnumerable<string> paths, bool clear)
+        public async Task Insert(Playlist playlist, int index, IEnumerable<string> paths, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting paths into playlist at index: {0}", index);
-            using (var task = new AddPathsToPlaylistTask(index, paths, clear))
+            using (var task = new AddPathsToPlaylistTask(playlist, index, paths, clear))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
@@ -149,17 +157,17 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(LibraryHierarchyNode libraryHierarchyNode, bool clear)
+        public async Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding library node to playlist.");
-            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-            await this.Insert(index, libraryHierarchyNode, clear).ConfigureAwait(false);
+            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
+            await this.Insert(playlist, index, libraryHierarchyNode, clear).ConfigureAwait(false);
         }
 
-        public async Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
+        public async Task Insert(Playlist playlist, int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting library node into playlist at index: {0}", index);
-            using (var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode, clear))
+            using (var task = new AddLibraryHierarchyNodeToPlaylistTask(playlist, index, libraryHierarchyNode, clear))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
@@ -167,17 +175,17 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
+        public async Task Add(Playlist playlist, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding library nodes to playlist.");
-            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-            await this.Insert(index, libraryHierarchyNodes, clear).ConfigureAwait(false);
+            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
+            await this.Insert(playlist, index, libraryHierarchyNodes, clear).ConfigureAwait(false);
         }
 
-        public async Task Insert(int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
+        public async Task Insert(Playlist playlist, int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting library nodes into playlist at index: {0}", index);
-            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(index, libraryHierarchyNodes, clear))
+            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, index, libraryHierarchyNodes, clear))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
@@ -185,17 +193,17 @@ namespace FoxTunes
             }
         }
 
-        public async Task Move(IEnumerable<PlaylistItem> playlistItems)
+        public async Task Move(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");
-            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-            await this.Move(index, playlistItems).ConfigureAwait(false);
+            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
+            await this.Move(playlist, index, playlistItems).ConfigureAwait(false);
         }
 
-        public async Task Move(int index, IEnumerable<PlaylistItem> playlistItems)
+        public async Task Move(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items at index: {0}", index);
-            using (var task = new MovePlaylistItemsTask(index, playlistItems))
+            using (var task = new MovePlaylistItemsTask(playlist, index, playlistItems))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
@@ -203,9 +211,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task Remove(IEnumerable<PlaylistItem> playlistItems)
+        public async Task Remove(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
         {
-            using (var task = new RemoveItemsFromPlaylistTask(playlistItems))
+            using (var task = new RemoveItemsFromPlaylistTask(playlist, playlistItems))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
@@ -213,7 +221,7 @@ namespace FoxTunes
             }
         }
 
-        public async Task Crop(IEnumerable<PlaylistItem> playlistItems)
+        public async Task Crop(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
         {
             using (var database = this.DatabaseFactory.Create())
             {
@@ -221,14 +229,15 @@ namespace FoxTunes
                 {
                     var queryable = database.AsQueryable<PlaylistItem>(transaction);
                     var query = queryable.Except(playlistItems);
-                    //TODO: Bad .ToArray()
-                    using (var task = new RemoveItemsFromPlaylistTask(query.ToArray()))
-                    {
-                        task.InitializeComponent(this.Core);
-                        await this.OnBackgroundTask(task).ConfigureAwait(false);
-                        await task.Run().ConfigureAwait(false);
-                    }
+                    //TODO: Warning: Buffering a potentially large sequence.
+                    playlistItems = playlistItems.ToArray();
                 }
+            }
+            using (var task = new RemoveItemsFromPlaylistTask(playlist, playlistItems))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -243,7 +252,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.PlaylistBrowser.GetNext(true).ConfigureAwait(false);
+                var playlistItem = await this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist, true).ConfigureAwait(false);
                 if (playlistItem == null)
                 {
                     return;
@@ -268,7 +277,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.PlaylistBrowser.GetPrevious(true).ConfigureAwait(false);
+                var playlistItem = await this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist, true).ConfigureAwait(false);
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem).ConfigureAwait(false);
             }
@@ -299,9 +308,9 @@ namespace FoxTunes
             await this.OnError(exception).ConfigureAwait(false);
         }
 
-        public async Task Play(string fileName)
+        public async Task Play(Playlist playlist, string fileName)
         {
-            var playlistItem = await this.PlaylistBrowser.Get(fileName).ConfigureAwait(false);
+            var playlistItem = await this.PlaylistBrowser.GetItem(playlist, fileName).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;
@@ -309,9 +318,9 @@ namespace FoxTunes
             await this.Play(playlistItem).ConfigureAwait(false);
         }
 
-        public async Task Play(int sequence)
+        public async Task Play(Playlist playlist, int sequence)
         {
-            var playlistItem = await this.PlaylistBrowser.Get(sequence).ConfigureAwait(false);
+            var playlistItem = await this.PlaylistBrowser.GetItem(playlist, sequence).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;
@@ -319,15 +328,67 @@ namespace FoxTunes
             await this.Play(playlistItem).ConfigureAwait(false);
         }
 
-        public async Task Clear()
+        public async Task Clear(Playlist playlist)
         {
-            using (var task = new ClearPlaylistTask())
+            using (var task = new ClearPlaylistTask(playlist))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
+
+        private Playlist _SelectedPlaylist { get; set; }
+
+        public Playlist SelectedPlaylist
+        {
+            get
+            {
+                return this._SelectedPlaylist;
+            }
+            set
+            {
+                this._SelectedPlaylist = value;
+                this.OnSelectedPlaylistChanged();
+            }
+        }
+
+        protected virtual void OnSelectedPlaylistChanged()
+        {
+            if (this.SelectedPlaylistChanged != null)
+            {
+                this.SelectedPlaylistChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedPlaylist");
+        }
+
+        public event EventHandler SelectedPlaylistChanged;
+
+        private Playlist _CurrentPlaylist { get; set; }
+
+        public Playlist CurrentPlaylist
+        {
+            get
+            {
+                return this._CurrentPlaylist;
+            }
+            protected set
+            {
+                this._CurrentPlaylist = value;
+                this.OnCurrentPlaylistChanged();
+            }
+        }
+
+        protected virtual void OnCurrentPlaylistChanged()
+        {
+            if (this.CurrentPlaylistChanged != null)
+            {
+                this.CurrentPlaylistChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CurrentPlaylist");
+        }
+
+        public event EventHandler CurrentPlaylistChanged;
 
         private PlaylistItem _CurrentItem { get; set; }
 
@@ -346,6 +407,14 @@ namespace FoxTunes
 
         protected virtual void OnCurrentItemChanged()
         {
+            if (this.CurrentItem == null)
+            {
+                this.CurrentPlaylist = null;
+            }
+            else
+            {
+                this.CurrentPlaylist = this.PlaylistBrowser.GetPlaylist(this.CurrentItem);
+            }
             if (this.CurrentItemChanged != null)
             {
                 this.CurrentItemChanged(this, EventArgs.Empty);
@@ -355,17 +424,26 @@ namespace FoxTunes
 
         public event EventHandler CurrentItemChanged;
 
-        private PlaylistItem[] _SelectedItems { get; set; }
+        private ConcurrentDictionary<Playlist, PlaylistItem[]> _SelectedItems { get; set; }
 
         public PlaylistItem[] SelectedItems
         {
             get
             {
-                return this._SelectedItems;
+                var playlistItems = default(PlaylistItem[]);
+                if (this.SelectedPlaylist == null || !this._SelectedItems.TryGetValue(this.SelectedPlaylist, out playlistItems))
+                {
+                    return default(PlaylistItem[]);
+                }
+                return playlistItems;
             }
             set
             {
-                this._SelectedItems = value;
+                if (this.SelectedPlaylist == null || object.Equals(this.SelectedPlaylist, value))
+                {
+                    return;
+                }
+                this._SelectedItems[this.SelectedPlaylist] = value;
                 this.OnSelectedItemsChanged();
             }
         }
@@ -431,7 +509,7 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case CLEAR_PLAYLIST:
-                    return this.Clear();
+                    return this.Clear(this.SelectedPlaylist);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -447,7 +525,7 @@ namespace FoxTunes
 
         public Task Handle(IEnumerable<string> paths)
         {
-            return this.Add(paths, false);
+            return this.Add(this.SelectedPlaylist, paths, false);
         }
 
         public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
@@ -463,20 +541,27 @@ namespace FoxTunes
             }
             using (var transaction = database.BeginTransaction())
             {
-                var set = database.Set<PlaylistColumn>(transaction);
-                set.Clear();
-                set.Add(new PlaylistColumn() { Name = "Artist / album", Type = PlaylistColumnType.Script, Sequence = 1, Script = scriptingRuntime.CoreScripts.Artist_Album, Width = PlaylistColumn.WIDTH_LARGE, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Track no", Type = PlaylistColumnType.Script, Sequence = 2, Script = scriptingRuntime.CoreScripts.Track, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Title / track artist", Type = PlaylistColumnType.Script, Sequence = 3, Script = scriptingRuntime.CoreScripts.Title_Performer, Width = PlaylistColumn.WIDTH_LARGE, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Duration", Type = PlaylistColumnType.Script, Sequence = 4, Script = scriptingRuntime.CoreScripts.Duration, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "Codec", Type = PlaylistColumnType.Script, Sequence = 5, Script = scriptingRuntime.CoreScripts.Codec, Enabled = true });
-                set.Add(new PlaylistColumn() { Name = "BPM", Type = PlaylistColumnType.Script, Sequence = 6, Script = scriptingRuntime.CoreScripts.BPM, Enabled = false });
-                set.Add(new PlaylistColumn() { Name = "Album gain", Type = PlaylistColumnType.Script, Sequence = 7, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumGain, Enabled = false });
-                set.Add(new PlaylistColumn() { Name = "Album peak", Type = PlaylistColumnType.Script, Sequence = 8, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumPeak, Enabled = false });
-                set.Add(new PlaylistColumn() { Name = "Track gain", Type = PlaylistColumnType.Script, Sequence = 9, Script = scriptingRuntime.CoreScripts.ReplayGainTrackGain, Enabled = false });
-                set.Add(new PlaylistColumn() { Name = "Track peak", Type = PlaylistColumnType.Script, Sequence = 10, Script = scriptingRuntime.CoreScripts.ReplayGainTrackPeak, Enabled = false });
-                set.Add(new PlaylistColumn() { Name = "Play count", Type = PlaylistColumnType.Script, Sequence = 11, Script = scriptingRuntime.CoreScripts.PlayCount, Enabled = false });
-                set.Add(new PlaylistColumn() { Name = "Last played", Type = PlaylistColumnType.Script, Sequence = 12, Script = scriptingRuntime.CoreScripts.LastPlayed, Enabled = false });
+                {
+                    var set = database.Set<Playlist>(transaction);
+                    set.Clear();
+                    set.Add(new Playlist() { Name = "Default", Type = PlaylistType.None, Enabled = true });
+                }
+                {
+                    var set = database.Set<PlaylistColumn>(transaction);
+                    set.Clear();
+                    set.Add(new PlaylistColumn() { Name = "Artist / album", Type = PlaylistColumnType.Script, Sequence = 1, Script = scriptingRuntime.CoreScripts.Artist_Album, Width = PlaylistColumn.WIDTH_LARGE, Enabled = true });
+                    set.Add(new PlaylistColumn() { Name = "Track no", Type = PlaylistColumnType.Script, Sequence = 2, Script = scriptingRuntime.CoreScripts.Track, Enabled = true });
+                    set.Add(new PlaylistColumn() { Name = "Title / track artist", Type = PlaylistColumnType.Script, Sequence = 3, Script = scriptingRuntime.CoreScripts.Title_Performer, Width = PlaylistColumn.WIDTH_LARGE, Enabled = true });
+                    set.Add(new PlaylistColumn() { Name = "Duration", Type = PlaylistColumnType.Script, Sequence = 4, Script = scriptingRuntime.CoreScripts.Duration, Enabled = true });
+                    set.Add(new PlaylistColumn() { Name = "Codec", Type = PlaylistColumnType.Script, Sequence = 5, Script = scriptingRuntime.CoreScripts.Codec, Enabled = true });
+                    set.Add(new PlaylistColumn() { Name = "BPM", Type = PlaylistColumnType.Script, Sequence = 6, Script = scriptingRuntime.CoreScripts.BPM, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Album gain", Type = PlaylistColumnType.Script, Sequence = 7, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumGain, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Album peak", Type = PlaylistColumnType.Script, Sequence = 8, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumPeak, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Track gain", Type = PlaylistColumnType.Script, Sequence = 9, Script = scriptingRuntime.CoreScripts.ReplayGainTrackGain, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Track peak", Type = PlaylistColumnType.Script, Sequence = 10, Script = scriptingRuntime.CoreScripts.ReplayGainTrackPeak, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Play count", Type = PlaylistColumnType.Script, Sequence = 11, Script = scriptingRuntime.CoreScripts.PlayCount, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Last played", Type = PlaylistColumnType.Script, Sequence = 12, Script = scriptingRuntime.CoreScripts.LastPlayed, Enabled = false });
+                }
                 transaction.Commit();
             }
         }

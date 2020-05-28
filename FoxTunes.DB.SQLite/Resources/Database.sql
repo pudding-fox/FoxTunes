@@ -16,8 +16,16 @@ CREATE TABLE [LibraryItems] (
 	[Status] INTEGER NOT NULL,
 	[Flags] INTEGER NOT NULL);
 
+CREATE TABLE [Playlists](
+    [Id] INTEGER PRIMARY KEY NOT NULL, 
+	[Sequence] INTEGER NOT NULL,
+	[Name] TEXT NOT NULL COLLATE NOCASE,
+	[Type] bigint NOT NULL,
+	[Enabled] bit NOT NULL);
+
 CREATE TABLE [PlaylistItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
+	[Playlist_Id] INTEGER NOT NULL,
 	[LibraryItem_Id] INTEGER NULL,
     [Sequence] bigint NOT NULL, 
     [DirectoryName] text NOT NULL COLLATE NOCASE, 

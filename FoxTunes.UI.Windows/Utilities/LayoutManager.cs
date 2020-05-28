@@ -277,7 +277,9 @@ namespace FoxTunes
                 }
                 components.Add(new UIComponent(attribute, type));
             }
-            return components;
+            return components.OrderBy(
+                component => component.Name
+            ).ToArray();
         }
 
         public UIComponent GetComponent(string id)

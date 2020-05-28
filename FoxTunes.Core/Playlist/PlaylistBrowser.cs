@@ -38,6 +38,8 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
+        public IPlaylistManager PlaylistManager { get; private set; }
+
         public IPlaylistCache PlaylistCache { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -49,6 +51,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.DatabaseFactory = core.Factories.Database;
             this.Configuration = core.Components.Configuration;
@@ -70,12 +73,42 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public PlaylistItem[] GetItems()
+        public Playlist[] GetPlaylists()
         {
-            return this.PlaylistCache.GetItems(this.GetItemsCore);
+            return this.PlaylistCache.GetPlaylists(this.GetPlaylistsCore);
         }
 
-        private IEnumerable<PlaylistItem> GetItemsCore()
+        private IEnumerable<Playlist> GetPlaylistsCore()
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var set = database.Set<Playlist>(transaction);
+                    set.Fetch.Filter.AddColumn(
+                        set.Table.GetColumn(ColumnConfig.By("Enabled", ColumnFlags.None))
+                    ).With(filter => filter.Right = filter.CreateConstant(1));
+                    set.Fetch.Sort.Expressions.Clear();
+                    set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
+                    foreach (var element in set)
+                    {
+                        yield return element;
+                    }
+                }
+            }
+        }
+
+        public Playlist GetPlaylist(PlaylistItem playlistItem)
+        {
+            return this.GetPlaylists().FirstOrDefault(playlist => playlist.Id == playlistItem.Playlist_Id);
+        }
+
+        public PlaylistItem[] GetItems(Playlist playlist)
+        {
+            return this.PlaylistCache.GetItems(playlist, () => this.GetItemsCore(playlist));
+        }
+
+        private IEnumerable<PlaylistItem> GetItemsCore(Playlist playlist)
         {
             this.State |= PlaylistBrowserState.Loading;
             try
@@ -85,6 +118,7 @@ namespace FoxTunes
                     using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
                         var sequence = database.AsQueryable<PlaylistItem>(transaction)
+                            .Where(playlistItem => playlistItem.Playlist_Id == playlist.Id)
                             .OrderBy(playlistItem => playlistItem.Sequence);
                         foreach (var element in sequence)
                         {
@@ -99,7 +133,7 @@ namespace FoxTunes
             }
         }
 
-        public virtual async Task<PlaylistItem> Get(int sequence)
+        public virtual async Task<PlaylistItem> GetItem(Playlist playlist, int sequence)
         {
             using (var database = this.DatabaseFactory.Create())
             {
@@ -113,40 +147,27 @@ namespace FoxTunes
             }
         }
 
-        public async Task<int> GetInsertIndex()
+        public Task<PlaylistItem> GetNextItem(Playlist playlist, bool navigate)
         {
-            var playlistItem = await this.NavigationStrategy.GetLastPlaylistItem().ConfigureAwait(false);
-            if (playlistItem == null)
-            {
-                return 0;
-            }
-            else
-            {
-                return playlistItem.Sequence + 1;
-            }
+            return this.NavigationStrategy.GetNext(this.PlaylistManager.CurrentItem, navigate);
         }
 
-        public Task<PlaylistItem> GetNext(bool navigate)
+        public Task<PlaylistItem> GetNextItem(PlaylistItem playlistItem)
         {
-            return this.NavigationStrategy.GetNext(navigate);
+            return this.NavigationStrategy.GetNext(playlistItem, false);
         }
 
-        public Task<PlaylistItem> GetNext(PlaylistItem playlistItem)
+        public Task<PlaylistItem> GetPreviousItem(Playlist playlist, bool navigate)
         {
-            return this.NavigationStrategy.GetNext(playlistItem);
+            return this.NavigationStrategy.GetPrevious(this.PlaylistManager.CurrentItem, navigate);
         }
 
-        public Task<PlaylistItem> GetPrevious(bool navigate)
+        public Task<PlaylistItem> GetPreviousItem(PlaylistItem playlistItem)
         {
-            return this.NavigationStrategy.GetPrevious(navigate);
+            return this.NavigationStrategy.GetPrevious(playlistItem, false);
         }
 
-        public Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem)
-        {
-            return this.NavigationStrategy.GetPrevious(playlistItem);
-        }
-
-        public virtual async Task<PlaylistItem> Get(string fileName)
+        public virtual async Task<PlaylistItem> GetItem(Playlist playlist, string fileName)
         {
             using (var database = this.DatabaseFactory.Create())
             {
@@ -157,6 +178,19 @@ namespace FoxTunes
                         .Take(1)
                         .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
+            }
+        }
+
+        public async Task<int> GetInsertIndex(Playlist playlist)
+        {
+            var playlistItem = await this.NavigationStrategy.GetLastPlaylistItem(playlist).ConfigureAwait(false);
+            if (playlistItem == null)
+            {
+                return 0;
+            }
+            else
+            {
+                return playlistItem.Sequence + 1;
             }
         }
     }

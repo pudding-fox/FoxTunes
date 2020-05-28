@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -11,6 +12,8 @@ namespace FoxTunes
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
+        public IPlaylistManager PlaylistManager { get; private set; }
+
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
@@ -19,6 +22,7 @@ namespace FoxTunes
         {
             this.Output = core.Components.Output;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
+            this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.Ending += this.OnEnding;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
@@ -32,7 +36,7 @@ namespace FoxTunes
 
         private async Task PreemptItems()
         {
-            var playlistItem = await this.PlaylistBrowser.GetNext(false).ConfigureAwait(false);
+            var playlistItem = await this.PlaylistBrowser.GetNextItem(this.PlaylistManager.CurrentPlaylist, false).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;

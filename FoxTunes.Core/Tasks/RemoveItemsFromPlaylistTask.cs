@@ -5,8 +5,8 @@ namespace FoxTunes
 {
     public class RemoveItemsFromPlaylistTask : PlaylistTaskBase
     {
-        public RemoveItemsFromPlaylistTask(IEnumerable<PlaylistItem> playlistItems)
-            : base()
+        public RemoveItemsFromPlaylistTask(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
+            : base(playlist)
         {
             this.PlaylistItems = playlistItems;
         }

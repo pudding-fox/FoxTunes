@@ -7,8 +7,8 @@ namespace FoxTunes
 {
     public class AddLibraryHierarchyNodeToPlaylistTask : PlaylistTaskBase
     {
-        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode, bool clear)
-            : base(sequence)
+        public AddLibraryHierarchyNodeToPlaylistTask(Playlist playlist, int sequence, LibraryHierarchyNode libraryHierarchyNode, bool clear)
+            : base(playlist, sequence)
         {
             this.LibraryHierarchyNode = libraryHierarchyNode;
             this.Clear = clear;
@@ -60,6 +60,7 @@ namespace FoxTunes
                         switch (phase)
                         {
                             case DatabaseParameterPhase.Fetch:
+                                parameters["playlistId"] = this.Playlist.Id;
                                 parameters["libraryHierarchyId"] = this.LibraryHierarchyNode.LibraryHierarchyId;
                                 parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
                                 parameters["sequence"] = this.Sequence;

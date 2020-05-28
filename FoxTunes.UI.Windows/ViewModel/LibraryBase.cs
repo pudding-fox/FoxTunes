@@ -489,9 +489,13 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        private async Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode, bool clear)
+        private Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
-            await this.PlaylistManager.Add(libraryHierarchyNode, clear).ConfigureAwait(false);
+            return this.PlaylistManager.Add(
+                this.PlaylistManager.SelectedPlaylist,
+                libraryHierarchyNode,
+                clear
+            );
         }
 
         public ICommand DragEnterCommand
@@ -608,6 +612,7 @@ namespace FoxTunes.ViewModel
                     break;
             }
             return this.PlaylistManager.Add(
+                this.PlaylistManager.SelectedPlaylist,
                 this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy),
                 clear
             );

@@ -24,8 +24,6 @@ namespace FoxTunes
         public const string TOGGLE_GROUPING = "MMMM";
 #endif
 
-        public const string TOGGLE_FOLLOW_LIBRARY = "NNNN";
-
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IMetaDataBrowser MetaDataBrowser { get; private set; }
@@ -39,8 +37,6 @@ namespace FoxTunes
 #else
         public BooleanConfigurationElement Grouping { get; private set; }
 #endif
-
-        public BooleanConfigurationElement FollowLibrary { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -59,10 +55,6 @@ namespace FoxTunes
                 PlaylistGroupingBehaviourConfiguration.GROUP_ENABLED_ELEMENT
             );
 #endif
-            this.FollowLibrary = this.Configuration.GetElement<BooleanConfigurationElement>(
-                PlaylistBehaviourConfiguration.SECTION,
-                PlaylistTracksLibraryBehaviourConfiguration.ENABLED_ELEMENT
-            );
             base.InitializeComponent(core);
         }
 
@@ -105,13 +97,6 @@ namespace FoxTunes
                     attributes: this.Grouping.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
 #endif
-                yield return new InvocationComponent(
-                    InvocationComponent.CATEGORY_PLAYLIST, 
-                        TOGGLE_FOLLOW_LIBRARY, 
-                        "Follow Library", 
-                        path: "Playlist", 
-                        attributes: this.FollowLibrary.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                );
             }
         }
 
@@ -128,17 +113,13 @@ namespace FoxTunes
                 case SET_RATING:
                     return this.SetRating(component.Name);
 #if NET40
-                //ListView grouping is too slow under net40 due to lack of virtualization.
+                    //ListView grouping is too slow under net40 due to lack of virtualization.
 #else
                 case TOGGLE_GROUPING:
                     this.Grouping.Toggle();
                     this.Configuration.Save();
                     break;
 #endif
-                case TOGGLE_FOLLOW_LIBRARY:
-                    this.FollowLibrary.Toggle();
-                    this.Configuration.Save();
-                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -149,12 +130,12 @@ namespace FoxTunes
 
         protected virtual Task RemovePlaylistItems()
         {
-            return this.PlaylistManager.Remove(this.PlaylistManager.SelectedItems);
+            return this.PlaylistManager.Remove(this.PlaylistManager.SelectedPlaylist, this.PlaylistManager.SelectedItems);
         }
 
         protected virtual Task CropPlaylistItems()
         {
-            return this.PlaylistManager.Crop(this.PlaylistManager.SelectedItems);
+            return this.PlaylistManager.Crop(this.PlaylistManager.SelectedPlaylist, this.PlaylistManager.SelectedItems);
         }
 
         protected virtual Task LocatePlaylistItems()

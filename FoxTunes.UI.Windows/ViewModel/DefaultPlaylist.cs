@@ -12,8 +12,70 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class Playlist : PlaylistBase
+    public class DefaultPlaylist : PlaylistBase
     {
+        public static readonly DependencyProperty PlaylistProperty = DependencyProperty.Register(
+            "Playlist",
+            typeof(Playlist),
+            typeof(DefaultPlaylist),
+            new PropertyMetadata(new PropertyChangedCallback(OnPlaylistChanged))
+        );
+
+        public static Playlist GetPlaylist(DefaultPlaylist source)
+        {
+            return (Playlist)source.GetValue(PlaylistProperty);
+        }
+
+        public static void SetPlaylist(DefaultPlaylist source, Playlist value)
+        {
+            source.SetValue(PlaylistProperty, value);
+        }
+
+        public static void OnPlaylistChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var defaultPlaylist = sender as DefaultPlaylist;
+            if (defaultPlaylist == null)
+            {
+                return;
+            }
+            defaultPlaylist.OnPlaylistChanged();
+        }
+
+        public Playlist Playlist
+        {
+            get
+            {
+                return this.GetValue(PlaylistProperty) as Playlist;
+            }
+            set
+            {
+                this.SetValue(PlaylistProperty, value);
+            }
+        }
+
+        protected virtual void OnPlaylistChanged()
+        {
+            this.Dispatch(this.Refresh);
+            if (this.PlaylistChanged != null)
+            {
+                this.PlaylistChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Playlist");
+        }
+
+        public event EventHandler PlaylistChanged;
+
+        public async Task<Playlist> GetPlaylist()
+        {
+            var playlist = default(Playlist);
+            await Windows.Invoke(() => playlist = this.Playlist).ConfigureAwait(false);
+            if (playlist == null)
+            {
+                playlist = this.PlaylistManager.SelectedPlaylist;
+            }
+            return playlist;
+        }
+
         public IConfiguration Configuration { get; private set; }
 
         private bool _GroupingEnabled { get; set; }
@@ -202,6 +264,12 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.Refresh);
         }
 
+        protected override async Task RefreshItems()
+        {
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
+            await this.RefreshItems(playlist).ConfigureAwait(false);
+        }
+
         protected virtual void OnColumnChanged(object sender, PlaylistColumn e)
         {
             if (this.DatabaseFactory != null)
@@ -246,14 +314,16 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual Task RemovePlaylistItems()
+        protected virtual async Task RemovePlaylistItems()
         {
-            return this.PlaylistManager.Remove(this.SelectedItems.OfType<PlaylistItem>());
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
+            await this.PlaylistManager.Remove(playlist, this.SelectedItems.OfType<PlaylistItem>()).ConfigureAwait(false);
         }
 
-        protected virtual Task CropPlaylistItems()
+        protected virtual async Task CropPlaylistItems()
         {
-            return this.PlaylistManager.Crop(this.SelectedItems.OfType<PlaylistItem>());
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
+            await this.PlaylistManager.Crop(playlist, this.SelectedItems.OfType<PlaylistItem>()).ConfigureAwait(false);
         }
 
         protected virtual Task LocatePlaylistItems()
@@ -391,35 +461,38 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        private Task AddToPlaylist(IEnumerable<string> paths)
+        private async Task AddToPlaylist(IEnumerable<string> paths)
         {
             var sequence = default(int);
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
             if (this.TryGetInsertSequence(out sequence))
             {
-                return this.PlaylistManager.Insert(sequence, paths, false);
+                await this.PlaylistManager.Insert(playlist, sequence, paths, false).ConfigureAwait(false);
             }
             else
             {
-                return this.PlaylistManager.Add(paths, false);
+                await this.PlaylistManager.Add(playlist, paths, false).ConfigureAwait(false);
             }
         }
 
-        private Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)
+        private async Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)
         {
             var sequence = default(int);
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
             if (this.TryGetInsertSequence(out sequence))
             {
-                return this.PlaylistManager.Insert(sequence, libraryHierarchyNode, false);
+                await this.PlaylistManager.Insert(playlist, sequence, libraryHierarchyNode, false).ConfigureAwait(false);
             }
             else
             {
-                return this.PlaylistManager.Add(libraryHierarchyNode, false);
+                await this.PlaylistManager.Add(playlist, libraryHierarchyNode, false).ConfigureAwait(false);
             }
         }
 
-        private Task AddToPlaylist(IEnumerable<PlaylistItem> playlistItems)
+        private async Task AddToPlaylist(IEnumerable<PlaylistItem> playlistItems)
         {
             var sequence = default(int);
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
             if (this.TryGetInsertSequence(out sequence))
             {
                 //TODO: This was really confusing, there is some disconnection between what the UI suggests will happen (where the items will be moved to) and what happens.
@@ -430,11 +503,11 @@ namespace FoxTunes.ViewModel
                 {
                     sequence--;
                 }
-                return this.PlaylistManager.Move(sequence, playlistItems);
+                await this.PlaylistManager.Move(playlist, sequence, playlistItems).ConfigureAwait(false);
             }
             else
             {
-                return this.PlaylistManager.Move(playlistItems);
+                await this.PlaylistManager.Move(playlist, playlistItems).ConfigureAwait(false);
             }
         }
 
@@ -546,7 +619,7 @@ namespace FoxTunes.ViewModel
 
         protected override Freezable CreateInstanceCore()
         {
-            return new Playlist();
+            return new DefaultPlaylist();
         }
     }
 }

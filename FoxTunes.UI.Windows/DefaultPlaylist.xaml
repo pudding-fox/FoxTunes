@@ -4,15 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
-             xmlns:Interfaces="clr-namespace:FoxTunes.Interfaces;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             x:Class="FoxTunes.Playlist" 
+             x:Class="FoxTunes.DefaultPlaylist" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True" IsVisibleChanged="OnIsVisibleChanged">
     <UserControl.Resources>
-        <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}"></ViewModel:Playlist>
+        <ViewModel:DefaultPlaylist x:Key="ViewModel" Core="{Binding}" Playlist="{Binding Playlist, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:DefaultPlaylist}}}"></ViewModel:DefaultPlaylist>
         <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
