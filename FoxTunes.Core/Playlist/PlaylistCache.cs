@@ -36,13 +36,21 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.PlaylistsUpdated:
-                    Logger.Write(this, LogLevel.Debug, "Playlists were updated, resetting cache.");
-                    this.Reset();
-                    break;
                 case CommonSignals.PlaylistUpdated:
-                    Logger.Write(this, LogLevel.Debug, "Playlist was updated, resetting cache.");
-                    this.Reset();
+                    var playlists = signal.State as IEnumerable<Playlist>;
+                    if (playlists != null)
+                    {
+                        foreach (var playlist in playlists)
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Playlist \"{0}\" was updated, resetting cache.", playlist.Name);
+                            this.Reset(playlist);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Playlists were updated, resetting cache.");
+                        this.Reset();
+                    }
                     break;
             }
 #if NET40
@@ -143,6 +151,23 @@ namespace FoxTunes
             this.Items = new ConcurrentDictionary<Playlist, PlaylistItem[]>();
             this.ItemsById = new ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem>>();
             this.ItemsByLibraryId = new ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem[]>>();
+        }
+
+        public void Reset(Playlist playlist)
+        {
+            this.Playlists = null;
+            if (this.Items != null)
+            {
+                this.Items.TryRemove(playlist);
+            }
+            if (this.ItemsById != null)
+            {
+                this.ItemsById.TryRemove(playlist);
+            }
+            if (this.ItemsByLibraryId != null)
+            {
+                this.ItemsByLibraryId.TryRemove(playlist);
+            }
         }
 
         public bool IsDisposed { get; private set; }

@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace FoxTunes
         protected override async Task OnCompleted()
         {
             await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
         }
 
         private async Task AddPlaylistItems()
@@ -103,6 +104,7 @@ namespace FoxTunes
                 switch (phase)
                 {
                     case DatabaseParameterPhase.Fetch:
+                        parameters["playlistId"] = this.Playlist.Id;
                         parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
                         parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
                         parameters["sequence"] = this.Sequence;

@@ -24,7 +24,7 @@
         <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}" IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseLeftButtonUp">
-                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding RestoreCommand, Source={StaticResource ViewModel}}" />
+                    <Interactivity:InvokeCommandAction Command="{Binding RestoreCommand, Source={StaticResource ViewModel}}" />
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
             <Windows:NotifyIconElement.ContextMenu>

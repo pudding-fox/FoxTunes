@@ -40,8 +40,7 @@ namespace FoxTunes
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            //TODO: Bad .Wait().
-            this.Refresh().Wait();
+            this.Refresh();
             base.InitializeComponent(core);
         }
 
@@ -50,7 +49,27 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    return this.Refresh();
+                    var playlists = signal.State as IEnumerable<Playlist>;
+                    if (playlists != null)
+                    {
+                        if (this.SelectedPlaylist == null || playlists.Contains(this.SelectedPlaylist))
+                        {
+                            this.RefreshSelectedPlaylist();
+                        }
+                        if (this.CurrentPlaylist != null && playlists.Contains(this.CurrentPlaylist))
+                        {
+                            this.RefreshCurrentPlaylist();
+                        }
+                        if (this.CurrentItem != null && playlists.Any(playlist => playlist.Id == this.CurrentItem.Playlist_Id))
+                        {
+                            this.RefreshCurrentItem();
+                        }
+                    }
+                    else
+                    {
+                        this.Refresh();
+                    }
+                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -59,7 +78,14 @@ namespace FoxTunes
 #endif
         }
 
-        public Task Refresh()
+        public void Refresh()
+        {
+            this.RefreshSelectedPlaylist();
+            this.RefreshCurrentPlaylist();
+            this.RefreshCurrentItem();
+        }
+
+        protected virtual void RefreshSelectedPlaylist()
         {
             if (this.SelectedPlaylist != null)
             {
@@ -85,23 +111,40 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Selected first playlist: {0} => {1}", this.SelectedPlaylist.Id, this.SelectedPlaylist.Name);
                 }
             }
+        }
+
+        protected virtual void RefreshCurrentPlaylist()
+        {
+            if (this.CurrentPlaylist != null)
+            {
+                this.CurrentPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == this.CurrentPlaylist.Id);
+                if (this.CurrentPlaylist != null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Refreshed current playlist: {0} => {1}", this.CurrentPlaylist.Id, this.CurrentPlaylist.Name);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Failed to refresh current playlist, it was removed or disabled.");
+                }
+            }
+        }
+
+        protected virtual void RefreshCurrentItem()
+        {
             if (this.CurrentItem != null)
             {
                 var playlist = this.PlaylistBrowser.GetPlaylist(this.CurrentItem);
                 if (playlist != null)
                 {
-                    this.CurrentItem = this.PlaylistBrowser.GetItems(playlist).FirstOrDefault(playlistItem => playlistItem.Id == this.CurrentItem.Id && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase));
+                    this.CurrentItem = this.PlaylistBrowser.GetItems(playlist).FirstOrDefault(
+                        playlistItem => playlistItem.Id == this.CurrentItem.Id && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase)
+                    );
                 }
             }
             if (this.CurrentItem == null)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -228,9 +271,11 @@ namespace FoxTunes
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     var queryable = database.AsQueryable<PlaylistItem>(transaction);
-                    var query = queryable.Except(playlistItems);
+                    var query = queryable.Where(
+                        playlistItem => playlistItem.Playlist_Id == playlist.Id
+                    ).Except(playlistItems);
                     //TODO: Warning: Buffering a potentially large sequence.
-                    playlistItems = playlistItems.ToArray();
+                    playlistItems = query.ToArray();
                 }
             }
             using (var task = new RemoveItemsFromPlaylistTask(playlist, playlistItems))
@@ -278,6 +323,10 @@ namespace FoxTunes
             {
                 this.IsNavigating = true;
                 var playlistItem = await this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist, true).ConfigureAwait(false);
+                if (playlistItem == null)
+                {
+                    return;
+                }
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem).ConfigureAwait(false);
             }
@@ -433,7 +482,7 @@ namespace FoxTunes
                 var playlistItems = default(PlaylistItem[]);
                 if (this.SelectedPlaylist == null || !this._SelectedItems.TryGetValue(this.SelectedPlaylist, out playlistItems))
                 {
-                    return default(PlaylistItem[]);
+                    return new PlaylistItem[] { };
                 }
                 return playlistItems;
             }

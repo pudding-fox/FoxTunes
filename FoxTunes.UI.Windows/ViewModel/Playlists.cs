@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -110,7 +109,7 @@ namespace FoxTunes.ViewModel
         {
             switch (signal.Name)
             {
-                case CommonSignals.PlaylistsUpdated:
+                case CommonSignals.PlaylistUpdated:
                     return this.Reload();
             }
 #if NET40
@@ -133,11 +132,9 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async Task AddPlaylist()
+        public Task AddPlaylist()
         {
-            var playlist = this.CreatePlaylist();
-            await this.PlaylistManager.Add(playlist).ConfigureAwait(false);
-            this.PlaylistManager.SelectedPlaylist = playlist;
+            return PlaylistsActionsBehaviour.Instance.AddPlaylist();
         }
 
         public ICommand RemovePlaylistCommand
@@ -148,47 +145,9 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async Task RemovePlaylist()
+        public Task RemovePlaylist()
         {
-            var playlists = this.PlaylistBrowser.GetPlaylists();
-            if (playlists.Length > 1)
-            {
-                var index = playlists.IndexOf(this.PlaylistManager.SelectedPlaylist);
-                this.PlaylistManager.SelectedPlaylist = playlists[index - 1];
-                await this.PlaylistManager.Remove(this.PlaylistManager.SelectedPlaylist).ConfigureAwait(false);
-            }
-            else
-            {
-                await this.PlaylistManager.Remove(this.PlaylistManager.SelectedPlaylist).ConfigureAwait(false);
-                await this.AddPlaylist().ConfigureAwait(false);
-            }
-        }
-
-        protected virtual Playlist CreatePlaylist()
-        {
-            var name = "New Playlist";
-            for (var a = 0; a < 100; a++)
-            {
-                var success = true;
-                foreach (var playlist in this.PlaylistBrowser.GetPlaylists())
-                {
-                    if (string.Equals(playlist.Name, name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        name = string.Format("New Playlist ({0})", a);
-                        success = false;
-                        break;
-                    }
-                }
-                if (success)
-                {
-                    break;
-                }
-            }
-            return new Playlist()
-            {
-                Name = name,
-                Enabled = true
-            };
+            return PlaylistsActionsBehaviour.Instance.RemovePlaylist();
         }
 
         protected override Freezable CreateInstanceCore()

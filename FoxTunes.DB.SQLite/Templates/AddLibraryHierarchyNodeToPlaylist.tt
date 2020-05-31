@@ -63,4 +63,5 @@ WHERE "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId
 
 SELECT COUNT(*)
 FROM "PlaylistItems"
-WHERE "Status" = @status
+WHERE "Playlist_Id" = @playlistId
+	AND "Status" = @status

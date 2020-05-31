@@ -9,6 +9,8 @@ namespace FoxTunes
 
         public const string CATEGORY_PLAYLIST = "42BC8F63-202C-4F77-8383-04A54FFFDCD5";
 
+        public const string CATEGORY_PLAYLISTS = "629D58AA-351C-4380-80EA-E95A7C29DD3B";
+
         public const string CATEGORY_LIBRARY = "CE91AB2A-3442-4019-B585-C4DCFEF1DB65";
 
         public const string CATEGORY_PLAYBACK = "8302CD2E-B798-4765-81DD-A9E6DA86820A";

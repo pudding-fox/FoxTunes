@@ -99,7 +99,7 @@ namespace FoxTunes
              {
                  await this.AddPlaylistItems(paths, cancellationToken).ConfigureAwait(false);
                  await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
-                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
+                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
                  if (this.MetaDataSourceFactory.Enabled)
                  {
                      await this.AddOrUpdateMetaData(cancellationToken).ConfigureAwait(false);
@@ -303,8 +303,8 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
-            query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Playlist_Id"));
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
+            query.Filter.AddColumn(this.Database.Tables.PlaylistItem.Column("Playlist_Id"));
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 await this.Database.ExecuteAsync(query, (parameters, phase) =>

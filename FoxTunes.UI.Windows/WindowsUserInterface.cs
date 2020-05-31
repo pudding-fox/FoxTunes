@@ -159,7 +159,7 @@ namespace FoxTunes
                 }
                 foreach (var pair in handlers)
                 {
-                    await pair.Key.Handle(pair.Value);
+                    await pair.Key.Handle(pair.Value).ConfigureAwait(false);
                 }
                 if (this.OpenMode == CommandLineParser.OpenMode.Play)
                 {

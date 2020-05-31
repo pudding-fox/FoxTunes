@@ -323,7 +323,7 @@ namespace FoxTunes
                     //Ignoring result on purpose.
                     BassCd.Release(this.Drive);
                 }
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
             }
 
             private async Task AddPlaylistItems()

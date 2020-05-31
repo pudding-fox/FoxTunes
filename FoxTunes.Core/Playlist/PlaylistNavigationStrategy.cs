@@ -2,7 +2,6 @@
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +14,15 @@ namespace FoxTunes
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
+
+        protected virtual Playlist GetPlaylist(PlaylistItem playlistItem)
+        {
+            if (playlistItem == null)
+            {
+                return this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+            }
+            return this.PlaylistBrowser.GetPlaylist(playlistItem);
+        }
 
         public abstract Task<PlaylistItem> GetNext(PlaylistItem playlistItem, bool navigate);
 
@@ -91,10 +99,13 @@ namespace FoxTunes
 
     public class StandardPlaylistNavigationStrategy : PlaylistNavigationStrategy
     {
-
         public override async Task<PlaylistItem> GetNext(PlaylistItem playlistItem, bool navigate)
         {
-            var playlist = this.PlaylistBrowser.GetPlaylist(playlistItem);
+            var playlist = this.GetPlaylist(playlistItem);
+            if (playlistItem == null)
+            {
+                return await this.GetFirstPlaylistItem(playlist).ConfigureAwait(false);
+            }
             playlistItem = await this.GetNextPlaylistItem(playlist, playlistItem.Sequence).ConfigureAwait(false);
             if (playlistItem == null)
             {
@@ -105,7 +116,11 @@ namespace FoxTunes
 
         public override async Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem, bool navigate)
         {
-            var playlist = this.PlaylistBrowser.GetPlaylist(playlistItem);
+            var playlist = this.GetPlaylist(playlistItem);
+            if (playlistItem == null)
+            {
+                return await this.GetLastPlaylistItem(playlist).ConfigureAwait(false);
+            }
             playlistItem = await this.GetPreviousPlaylistItem(playlist, playlistItem.Sequence).ConfigureAwait(false);
             if (playlistItem == null)
             {
@@ -159,7 +174,7 @@ namespace FoxTunes
 #if NET40
             this.Semaphore.Wait();
 #else
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
@@ -199,7 +214,7 @@ namespace FoxTunes
 #if NET40
             this.Semaphore.Wait();
 #else
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
@@ -253,7 +268,7 @@ namespace FoxTunes
 #if NET40
             this.Semaphore.Wait();
 #else
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
