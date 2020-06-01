@@ -52,6 +52,7 @@ namespace FoxTunes
                     var playlists = signal.State as IEnumerable<Playlist>;
                     if (playlists != null)
                     {
+                        this.RefreshSelectedItems(playlists);
                         if (this.SelectedPlaylist == null || playlists.Contains(this.SelectedPlaylist))
                         {
                             this.RefreshSelectedPlaylist();
@@ -80,9 +81,25 @@ namespace FoxTunes
 
         public void Refresh()
         {
+            this.RefreshSelectedItems();
             this.RefreshSelectedPlaylist();
             this.RefreshCurrentPlaylist();
             this.RefreshCurrentItem();
+        }
+
+        protected virtual void RefreshSelectedItems()
+        {
+            this._SelectedItems.Clear();
+            this.OnSelectedItemsChanged();
+        }
+
+        protected virtual void RefreshSelectedItems(IEnumerable<Playlist> playlists)
+        {
+            foreach (var playlist in playlists)
+            {
+                this._SelectedItems.TryRemove(playlist);
+            }
+            this.OnSelectedItemsChanged();
         }
 
         protected virtual void RefreshSelectedPlaylist()
@@ -165,6 +182,16 @@ namespace FoxTunes
         public async Task Add(Playlist playlist)
         {
             using (var task = new AddPlaylistTask(playlist))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode)
+        {
+            using (var task = new AddPlaylistTask(playlist, libraryHierarchyNode))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
@@ -397,6 +424,10 @@ namespace FoxTunes
             }
             set
             {
+                if (object.ReferenceEquals(this._SelectedPlaylist, value))
+                {
+                    return;
+                }
                 this._SelectedPlaylist = value;
                 this.OnSelectedPlaylistChanged();
             }
@@ -423,6 +454,10 @@ namespace FoxTunes
             }
             protected set
             {
+                if (object.ReferenceEquals(this._CurrentPlaylist, value))
+                {
+                    return;
+                }
                 this._CurrentPlaylist = value;
                 this.OnCurrentPlaylistChanged();
             }
@@ -449,6 +484,10 @@ namespace FoxTunes
             }
             protected set
             {
+                if (object.ReferenceEquals(this._CurrentItem, value))
+                {
+                    return;
+                }
                 this._CurrentItem = value;
                 this.OnCurrentItemChanged();
             }

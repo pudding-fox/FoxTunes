@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media.TextFormatting;
 
 namespace FoxTunes.ViewModel
 {
@@ -177,7 +176,7 @@ namespace FoxTunes.ViewModel
                     if (playlists != null)
                     {
                         var playlist = await this.GetPlaylist().ConfigureAwait(false);
-                        if (playlists.Contains(playlist))
+                        if (playlist == null || playlists.Contains(playlist))
                         {
                             await this.RefreshItems().ConfigureAwait(false);
                         }
@@ -198,16 +197,20 @@ namespace FoxTunes.ViewModel
         protected virtual async Task RefreshItems()
         {
             var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            if (playlist == null)
-            {
-                return;
-            }
             await this.RefreshItems(playlist).ConfigureAwait(false);
         }
 
         protected virtual async Task RefreshItems(Playlist playlist)
         {
-            var items = this.PlaylistBrowser.GetItems(playlist);
+            var items = default(PlaylistItem[]);
+            if (playlist != null)
+            {
+                items = this.PlaylistBrowser.GetItems(playlist);
+            }
+            else
+            {
+                items = new PlaylistItem[] { };
+            }
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);

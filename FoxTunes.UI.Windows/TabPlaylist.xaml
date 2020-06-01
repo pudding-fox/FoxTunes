@@ -7,11 +7,11 @@
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             x:Class="FoxTunes.DefaultPlaylist" 
+             x:Class="FoxTunes.TabPlaylist" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True" IsVisibleChanged="OnIsVisibleChanged">
     <UserControl.Resources>
-        <ViewModel:DefaultPlaylist x:Key="ViewModel" Core="{Binding}"></ViewModel:DefaultPlaylist>
+        <ViewModel:TabPlaylist x:Key="ViewModel" Core="{Binding}" Playlist="{Binding Playlist, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:TabPlaylist}}}"></ViewModel:TabPlaylist>
         <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
