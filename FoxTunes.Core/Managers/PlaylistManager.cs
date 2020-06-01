@@ -324,7 +324,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist, true).ConfigureAwait(false);
+                var playlistItem = await this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist).ConfigureAwait(false);
                 if (playlistItem == null)
                 {
                     return;
@@ -349,7 +349,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist, true).ConfigureAwait(false);
+                var playlistItem = await this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist).ConfigureAwait(false);
                 if (playlistItem == null)
                 {
                     return;

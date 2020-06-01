@@ -147,24 +147,24 @@ namespace FoxTunes
             }
         }
 
-        public Task<PlaylistItem> GetNextItem(Playlist playlist, bool navigate)
+        public Task<PlaylistItem> GetNextItem(Playlist playlist)
         {
-            return this.NavigationStrategy.GetNext(this.PlaylistManager.CurrentItem, navigate);
+            return this.NavigationStrategy.GetNext(this.PlaylistManager.CurrentItem);
         }
 
         public Task<PlaylistItem> GetNextItem(PlaylistItem playlistItem)
         {
-            return this.NavigationStrategy.GetNext(playlistItem, false);
+            return this.NavigationStrategy.GetNext(playlistItem);
         }
 
-        public Task<PlaylistItem> GetPreviousItem(Playlist playlist, bool navigate)
+        public Task<PlaylistItem> GetPreviousItem(Playlist playlist)
         {
-            return this.NavigationStrategy.GetPrevious(this.PlaylistManager.CurrentItem, navigate);
+            return this.NavigationStrategy.GetPrevious(this.PlaylistManager.CurrentItem);
         }
 
         public Task<PlaylistItem> GetPreviousItem(PlaylistItem playlistItem)
         {
-            return this.NavigationStrategy.GetPrevious(playlistItem, false);
+            return this.NavigationStrategy.GetPrevious(playlistItem);
         }
 
         public virtual async Task<PlaylistItem> GetItem(Playlist playlist, string fileName)

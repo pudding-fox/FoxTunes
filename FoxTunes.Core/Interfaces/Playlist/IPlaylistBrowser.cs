@@ -19,11 +19,11 @@ namespace FoxTunes.Interfaces
 
         Task<PlaylistItem> GetItem(Playlist playlist, string fileName);
 
-        Task<PlaylistItem> GetNextItem(Playlist playlist, bool navigate);
+        Task<PlaylistItem> GetNextItem(Playlist playlist);
 
         Task<PlaylistItem> GetNextItem(PlaylistItem playlistItem);
 
-        Task<PlaylistItem> GetPreviousItem(Playlist playlist, bool navigate);
+        Task<PlaylistItem> GetPreviousItem(Playlist playlist);
 
         Task<PlaylistItem> GetPreviousItem(PlaylistItem playlistItem);
 
