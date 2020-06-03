@@ -8,7 +8,11 @@ namespace FoxTunes.Interfaces
     {
         Task Add(Playlist playlist);
 
+        Task Add(Playlist playlist, IEnumerable<string> paths);
+
         Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode);
+
+        Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems);
 
         Task Remove(Playlist playlist);
 

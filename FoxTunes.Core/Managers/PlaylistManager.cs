@@ -189,9 +189,29 @@ namespace FoxTunes
             }
         }
 
+        public async Task Add(Playlist playlist, IEnumerable<string> paths)
+        {
+            using (var task = new AddPlaylistTask(playlist, paths))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
         public async Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode)
         {
             using (var task = new AddPlaylistTask(playlist, libraryHierarchyNode))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
+        {
+            using (var task = new AddPlaylistTask(playlist, playlistItems))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
