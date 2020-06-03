@@ -34,8 +34,6 @@ namespace FoxTunes.Interfaces
 
         Task Play(PlaylistItem playlistItem);
 
-        Task Play(Playlist playlist, string fileName);
-
         Task Play(Playlist playlist, int sequence);
 
         Task Next();

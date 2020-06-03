@@ -8,15 +8,18 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
+    [Component("AF71D00F-5D47-4740-BC14-1B3E4513A1A3", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class PlaylistCache : StandardComponent, IPlaylistCache, IDisposable
     {
         public Playlist[] Playlists { get; private set; }
 
-        public ConcurrentDictionary<Playlist, PlaylistItem[]> Items { get; private set; }
+        public ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>> Items { get; private set; }
 
-        public ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem>> ItemsById { get; private set; }
+        public ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>> ItemsById { get; private set; }
 
-        public ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem[]>> ItemsByLibraryId { get; private set; }
+        public ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>> ItemsBySequence { get; private set; }
+
+        public ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>> ItemsByLibraryId { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -73,84 +76,78 @@ namespace FoxTunes
         {
             return this.Items.GetOrAdd(
                 playlist,
-                key => factory().ToArray()
-            );
+                key => new IndexedArray<PlaylistItem>(factory().ToArray())
+            ).InnerArray;
         }
 
         public bool TryGetItemById(int id, out PlaylistItem result)
         {
-            if (this.Playlists != null)
+            foreach (var playlist in this.Playlists)
             {
-                foreach (var playlist in this.Playlists)
+                var playlistItems = default(IndexedArray<PlaylistItem>);
+                if (!this.Items.TryGetValue(playlist, out playlistItems))
                 {
-                    var sequence = default(IDictionary<int, PlaylistItem>);
-                    if (!this.ItemsById.TryGetValue(playlist, out sequence))
-                    {
-                        var playlistItems = default(PlaylistItem[]);
-                        if (!this.Items.TryGetValue(playlist, out playlistItems))
-                        {
-                            continue;
-                        }
-                        sequence = this.ItemsById.GetOrAdd(
-                            playlist,
-                            key => playlistItems.ToDictionary(playlistItem => playlistItem.Id)
-                        );
-                    }
-                    if (sequence.TryGetValue(id, out result))
-                    {
-                        return true;
-                    }
+                    continue;
+                }
+                if (this.ItemsById.GetOrAdd(
+                    playlist,
+                    key => playlistItems.By(playlistItem => playlistItem.Id, IndexedCollection.IndexType.Single)
+                ).TryFind(id, out result))
+                {
+                    return true;
                 }
             }
-            result = null;
+            result = default(PlaylistItem);
+            return false;
+        }
+
+        public bool TryGetItemBySequence(Playlist playlist, int sequence, out PlaylistItem result)
+        {
+            var playlistItems = default(IndexedArray<PlaylistItem>);
+            if (this.Items.TryGetValue(playlist, out playlistItems))
+            {
+                if (this.ItemsBySequence.GetOrAdd(
+                    playlist,
+                    key => playlistItems.By(playlistItem => playlistItem.Sequence, IndexedCollection.IndexType.Single)
+                ).TryFind(sequence, out result))
+                {
+                    return true;
+                }
+            }
+            result = default(PlaylistItem);
             return false;
         }
 
         public bool TryGetItemsByLibraryId(int id, out PlaylistItem[] result)
         {
-            if (this.Playlists != null)
+            var list = new List<PlaylistItem>();
+            foreach (var playlist in this.Playlists)
             {
-                foreach (var playlist in this.Playlists)
+                var playlistItems = default(IndexedArray<PlaylistItem>);
+                if (!this.Items.TryGetValue(playlist, out playlistItems))
                 {
-                    var sequence = default(IDictionary<int, PlaylistItem[]>);
-                    if (!this.ItemsByLibraryId.TryGetValue(playlist, out sequence))
-                    {
-                        var playlistItems = default(PlaylistItem[]);
-                        if (!this.Items.TryGetValue(playlist, out playlistItems))
-                        {
-                            continue;
-                        }
-                        sequence = this.ItemsByLibraryId.GetOrAdd(
-                            playlist,
-                            key => this.GetItemsByLibraryId(playlistItems)
-                        );
-                    }
-                    if (sequence.TryGetValue(id, out result))
-                    {
-                        return true;
-                    }
+                    continue;
                 }
+                list.AddRange(this.ItemsById.GetOrAdd(
+                    playlist,
+                    key => playlistItems.By(playlistItem => playlistItem.LibraryItem_Id.GetValueOrDefault(), IndexedCollection.IndexType.Multiple)
+                ).FindAll(id));
             }
-            result = null;
-            return false;
-        }
-
-        protected virtual IDictionary<int, PlaylistItem[]> GetItemsByLibraryId(PlaylistItem[] playlistItems)
-        {
-            var query =
-                from playlistItem in playlistItems
-                where playlistItem.LibraryItem_Id.HasValue
-                group playlistItem by playlistItem.LibraryItem_Id.Value into grouping
-                select grouping;
-            return query.ToDictionary(group => group.Key, group => group.ToArray());
+            if (!list.Any())
+            {
+                result = default(PlaylistItem[]);
+                return false;
+            }
+            result = list.ToArray();
+            return true;
         }
 
         public void Reset()
         {
-            this.Playlists = null;
-            this.Items = new ConcurrentDictionary<Playlist, PlaylistItem[]>();
-            this.ItemsById = new ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem>>();
-            this.ItemsByLibraryId = new ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem[]>>();
+            this.Items = new ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>>();
+            this.ItemsById = new ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>>();
+            this.ItemsBySequence = new ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>>();
+            this.ItemsByLibraryId = new ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>>();
         }
 
         public void Reset(Playlist playlist)
@@ -163,6 +160,10 @@ namespace FoxTunes
             if (this.ItemsById != null)
             {
                 this.ItemsById.TryRemove(playlist);
+            }
+            if (this.ItemsBySequence != null)
+            {
+                this.ItemsBySequence.TryRemove(playlist);
             }
             if (this.ItemsByLibraryId != null)
             {

@@ -209,11 +209,11 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(Playlist playlist, IEnumerable<string> paths, bool clear)
+        public Task Add(Playlist playlist, IEnumerable<string> paths, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding paths to playlist.");
-            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
-            await this.Insert(playlist, index, paths, clear).ConfigureAwait(false);
+            var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
+            return this.Insert(playlist, index, paths, clear);
         }
 
         public async Task Insert(Playlist playlist, int index, IEnumerable<string> paths, bool clear)
@@ -227,11 +227,11 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode, bool clear)
+        public Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding library node to playlist.");
-            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
-            await this.Insert(playlist, index, libraryHierarchyNode, clear).ConfigureAwait(false);
+            var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
+            return this.Insert(playlist, index, libraryHierarchyNode, clear);
         }
 
         public async Task Insert(Playlist playlist, int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
@@ -245,11 +245,11 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(Playlist playlist, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
+        public Task Add(Playlist playlist, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding library nodes to playlist.");
-            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
-            await this.Insert(playlist, index, libraryHierarchyNodes, clear).ConfigureAwait(false);
+            var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
+            return this.Insert(playlist, index, libraryHierarchyNodes, clear);
         }
 
         public async Task Insert(Playlist playlist, int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
@@ -263,11 +263,11 @@ namespace FoxTunes
             }
         }
 
-        public async Task Move(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
+        public Task Move(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");
-            var index = await this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist).ConfigureAwait(false);
-            await this.Move(playlist, index, playlistItems).ConfigureAwait(false);
+            var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
+            return this.Move(playlist, index, playlistItems);
         }
 
         public async Task Move(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems)
@@ -324,7 +324,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist).ConfigureAwait(false);
+                var playlistItem = this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist);
                 if (playlistItem == null)
                 {
                     return;
@@ -349,7 +349,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist).ConfigureAwait(false);
+                var playlistItem = this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist);
                 if (playlistItem == null)
                 {
                     return;
@@ -384,24 +384,18 @@ namespace FoxTunes
             await this.OnError(exception).ConfigureAwait(false);
         }
 
-        public async Task Play(Playlist playlist, string fileName)
+        public Task Play(Playlist playlist, int sequence)
         {
-            var playlistItem = await this.PlaylistBrowser.GetItem(playlist, fileName).ConfigureAwait(false);
+            var playlistItem = this.PlaylistBrowser.GetItem(playlist, sequence);
             if (playlistItem == null)
             {
-                return;
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
-            await this.Play(playlistItem).ConfigureAwait(false);
-        }
-
-        public async Task Play(Playlist playlist, int sequence)
-        {
-            var playlistItem = await this.PlaylistBrowser.GetItem(playlist, sequence).ConfigureAwait(false);
-            if (playlistItem == null)
-            {
-                return;
-            }
-            await this.Play(playlistItem).ConfigureAwait(false);
+            return this.Play(playlistItem);
         }
 
         public async Task Clear(Playlist playlist)

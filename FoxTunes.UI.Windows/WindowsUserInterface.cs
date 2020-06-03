@@ -151,7 +151,7 @@ namespace FoxTunes
             try
             {
                 var playlist = this.PlaylistManager.SelectedPlaylist;
-                var index = await this.PlaylistBrowser.GetInsertIndex(playlist).ConfigureAwait(false);
+                var index = this.PlaylistBrowser.GetInsertIndex(playlist);
                 var handlers = new Dictionary<IFileActionHandler, IList<string>>();
                 foreach (var element in sequence)
                 {

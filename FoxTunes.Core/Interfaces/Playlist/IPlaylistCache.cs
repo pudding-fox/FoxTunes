@@ -11,6 +11,8 @@ namespace FoxTunes.Interfaces
 
         bool TryGetItemById(int id, out PlaylistItem playlistItem);
 
+        bool TryGetItemBySequence(Playlist playlist, int sequence, out PlaylistItem playlistItem);
+
         bool TryGetItemsByLibraryId(int id, out PlaylistItem[] playlistItems);
     }
 }

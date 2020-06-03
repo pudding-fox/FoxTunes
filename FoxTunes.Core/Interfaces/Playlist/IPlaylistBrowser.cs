@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -15,19 +14,21 @@ namespace FoxTunes.Interfaces
 
         PlaylistItem[] GetItems(Playlist playlist);
 
-        Task<PlaylistItem> GetItem(Playlist playlist, int sequence);
+        PlaylistItem GetItem(Playlist playlist, int sequence);
 
-        Task<PlaylistItem> GetItem(Playlist playlist, string fileName);
+        PlaylistItem GetFirstItem(Playlist playlist);
 
-        Task<PlaylistItem> GetNextItem(Playlist playlist);
+        PlaylistItem GetLastItem(Playlist playlist);
 
-        Task<PlaylistItem> GetNextItem(PlaylistItem playlistItem);
+        PlaylistItem GetNextItem(Playlist playlist);
 
-        Task<PlaylistItem> GetPreviousItem(Playlist playlist);
+        PlaylistItem GetNextItem(PlaylistItem playlistItem);
 
-        Task<PlaylistItem> GetPreviousItem(PlaylistItem playlistItem);
+        PlaylistItem GetPreviousItem(Playlist playlist);
 
-        Task<int> GetInsertIndex(Playlist playlist);
+        PlaylistItem GetPreviousItem(PlaylistItem playlistItem);
+
+        int GetInsertIndex(Playlist playlist);
     }
 
     public enum PlaylistBrowserState : byte
