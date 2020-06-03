@@ -16,7 +16,7 @@
     <Windows:UIComponentBase.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLISTS}}"></Windows:Menu>
     </Windows:UIComponentBase.ContextMenu>
-    <TabControl ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" DisplayMemberPath="Name">
+    <TabControl ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" DisplayMemberPath="Name">
         <Interactivity:Interaction.Triggers>
             <Windows:FilteredEventTrigger EventName="DragEnter" SourceType="{x:Type TabPanel}">
                 <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragEnterCommand, Source={StaticResource ViewModel}}" />
