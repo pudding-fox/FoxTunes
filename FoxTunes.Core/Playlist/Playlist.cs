@@ -1,5 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -83,6 +86,32 @@ namespace FoxTunes
 
         public event EventHandler TypeChanged;
 
+        private string _Filter { get; set; }
+
+        public string Filter
+        {
+            get
+            {
+                return this._Filter;
+            }
+            set
+            {
+                this._Filter = value;
+                this.OnFilterChanged();
+            }
+        }
+
+        protected virtual void OnFilterChanged()
+        {
+            if (this.FilterChanged != null)
+            {
+                this.FilterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Filter");
+        }
+
+        public event EventHandler FilterChanged;
+
         private bool _Enabled { get; set; }
 
         public bool Enabled
@@ -119,11 +148,44 @@ namespace FoxTunes
             return base.Equals(obj as Playlist);
         }
 
+        public static string GetName(IEnumerable<Playlist> playlists)
+        {
+            var name = default(string);
+            if (!playlists.Any())
+            {
+                name = "Default";
+            }
+            else
+            {
+                name = "New Playlist";
+                for (var a = 1; a < 100; a++)
+                {
+                    var success = true;
+                    foreach (var playlist in playlists)
+                    {
+                        if (string.Equals(playlist.Name, name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            name = string.Format("New Playlist ({0})", a);
+                            success = false;
+                            break;
+                        }
+                    }
+                    if (success)
+                    {
+                        return name;
+                    }
+                }
+            }
+            return name;
+        }
+
         public static readonly Playlist Empty = new Playlist();
     }
 
     public enum PlaylistType : byte
     {
-        None = 0
+        None = 0,
+        LibrarySelection = 1,
+        LibraryFilter = 2
     }
 }

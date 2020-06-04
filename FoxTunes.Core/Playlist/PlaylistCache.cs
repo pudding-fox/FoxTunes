@@ -144,6 +144,7 @@ namespace FoxTunes
 
         public void Reset()
         {
+            this.Playlists = null;
             this.Items = new ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>>();
             this.ItemsById = new ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>>();
             this.ItemsBySequence = new ConcurrentDictionary<Playlist, IndexedArray<PlaylistItem>.Index<int>>();

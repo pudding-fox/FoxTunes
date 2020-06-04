@@ -222,8 +222,15 @@ namespace FoxTunes
         {
             var collection = this.ItemsSource as ICollection<T>;
             collection.Remove(this.SelectedValue);
-            this.Refresh();
-            this.SelectedValue = default(T);
+            if (collection.Count == 0 && this.CanAdd)
+            {
+                this.Add();
+            }
+            else
+            {
+                this.Refresh();
+                this.SelectedValue = default(T);
+            }
         }
 
         public ICommand ExchangeCommand
