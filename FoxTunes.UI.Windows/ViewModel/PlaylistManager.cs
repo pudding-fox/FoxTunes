@@ -164,20 +164,19 @@ namespace FoxTunes.ViewModel
             {
                 using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
+                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var playlists = database.Set<Playlist>(transaction);
-                            playlists.Remove(playlists.Except(this.Playlists.ItemsSource));
+                            foreach (var playlist in playlists.Except(this.Playlists.ItemsSource).ToArray())
+                            {
+                                await PlaylistTaskBase.RemovePlaylistItems(database, playlist.Id, PlaylistItemStatus.None, transaction).ConfigureAwait(false);
+                                playlists.Remove(playlist);
+                            }
                             playlists.AddOrUpdate(this.Playlists.ItemsSource);
                             transaction.Commit();
                         }
-#if NET40
-                        return TaskEx.FromResult(false);
-#else
-                        return Task.CompletedTask;
-#endif
                     }))
                     {
                         await task.Run().ConfigureAwait(false);

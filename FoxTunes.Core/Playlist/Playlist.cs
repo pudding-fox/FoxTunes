@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,6 +17,10 @@ namespace FoxTunes
             }
             set
             {
+                if (this._Sequence == value)
+                {
+                    return;
+                }
                 this._Sequence = value;
                 this.OnSequenceChanged();
             }
@@ -44,6 +47,10 @@ namespace FoxTunes
             }
             set
             {
+                if (string.Equals(this._Name, value))
+                {
+                    return;
+                }
                 this._Name = value;
                 this.OnNameChanged();
             }
@@ -70,6 +77,10 @@ namespace FoxTunes
             }
             set
             {
+                if (this._Type == value)
+                {
+                    return;
+                }
                 this._Type = value;
                 this.OnTypeChanged();
             }
@@ -185,7 +196,7 @@ namespace FoxTunes
     public enum PlaylistType : byte
     {
         None = 0,
-        LibrarySelection = 1,
-        LibraryFilter = 2
+        Selection = 1,
+        Dynamic = 2
     }
 }

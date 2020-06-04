@@ -50,7 +50,7 @@ namespace FoxTunes
             {
                 case CommonSignals.PlaylistUpdated:
                     var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null)
+                    if (playlists != null && playlists.Any())
                     {
                         this.RefreshSelectedItems(playlists);
                         if (this.SelectedPlaylist == null || playlists.Contains(this.SelectedPlaylist))
