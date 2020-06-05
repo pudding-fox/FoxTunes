@@ -1,6 +1,4 @@
 ﻿using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,10 +7,11 @@ namespace FoxTunes
 {
     public class AddLibraryHierarchyNodesToPlaylistTask : PlaylistTaskBase
     {
-        public AddLibraryHierarchyNodesToPlaylistTask(Playlist playlist, int sequence, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
+        public AddLibraryHierarchyNodesToPlaylistTask(Playlist playlist, int sequence, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, string filter, bool clear)
             : base(playlist, sequence)
         {
             this.LibraryHierarchyNodes = libraryHierarchyNodes;
+            this.Filter = filter;
             this.Clear = clear;
         }
 
@@ -34,18 +33,9 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> LibraryHierarchyNodes { get; private set; }
 
+        public string Filter { get; private set; }
+
         public bool Clear { get; private set; }
-
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
-        public IConfiguration Configuration { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
-            this.Configuration = core.Components.Configuration;
-            base.InitializeComponent(core);
-        }
 
         protected override async Task OnRun()
         {
@@ -83,7 +73,7 @@ namespace FoxTunes
                             break;
                         }
                         this.Description = libraryHierarchyNode.Value;
-                        await this.AddPlaylistItems(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist(this.LibraryHierarchyBrowser.Filter), libraryHierarchyNode, transaction).ConfigureAwait(false);
+                        await this.AddPlaylistItems(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist(this.Filter), libraryHierarchyNode, transaction).ConfigureAwait(false);
                         this.Position = ++position;
                     }
                     if (transaction.HasTransaction)
