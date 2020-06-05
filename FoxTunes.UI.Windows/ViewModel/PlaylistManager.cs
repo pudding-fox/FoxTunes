@@ -1,6 +1,7 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -74,7 +75,6 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.Playlists = new CollectionManager<Playlist>()
             {
                 ItemFactory = () => new Playlist()
@@ -103,7 +103,16 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    return this.Refresh();
+                    var playlists = signal.State as IEnumerable<Playlist>;
+                    if (playlists != null && playlists.Any())
+                    {
+
+                    }
+                    else
+                    {
+                        return this.Refresh();
+                    }
+                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -127,6 +136,37 @@ namespace FoxTunes.ViewModel
                 }
             });
         }
+
+        public bool PlaylistManagerVisible
+        {
+            get
+            {
+                return Windows.IsPlaylistManagerWindowCreated;
+            }
+            set
+            {
+                if (value)
+                {
+                    Windows.PlaylistManagerWindow.DataContext = this.Core;
+                    Windows.PlaylistManagerWindow.Show();
+                }
+                else if (Windows.IsPlaylistManagerWindowCreated)
+                {
+                    Windows.PlaylistManagerWindow.Close();
+                }
+            }
+        }
+
+        protected virtual void OnPlaylistManagerVisibleChanged()
+        {
+            if (this.PlaylistManagerVisibleChanged != null)
+            {
+                this.PlaylistManagerVisibleChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("PlaylistManagerVisible");
+        }
+
+        public event EventHandler PlaylistManagerVisibleChanged;
 
         public bool IsSaving
         {
@@ -197,16 +237,8 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Cancel)
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                return new Command(() => this.PlaylistManagerVisible = false);
             }
-        }
-
-        public void Cancel()
-        {
-            this.Dispatch(this.Refresh);
         }
 
         protected override void OnDisposing()

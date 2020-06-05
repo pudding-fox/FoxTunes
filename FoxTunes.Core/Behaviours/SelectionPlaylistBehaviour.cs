@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class LibrarySelectionPlaylistBehaviour : PlaylistBehaviourBase
+    public class SelectionPlaylistBehaviour : PlaylistBehaviourBase
     {
         public override Func<Playlist, bool> Predicate
         {
@@ -14,10 +14,13 @@ namespace FoxTunes
             }
         }
 
+        public ICore Core { get; private set; }
+
         public ILibraryManager LibraryManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
             base.InitializeComponent(core);
@@ -25,13 +28,7 @@ namespace FoxTunes
 
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
         {
-            this.Dispatch(() =>
-            {
-                foreach (var playlist in this.Playlists)
-                {
-                    var task = this.Refresh(playlist);
-                }
-            });
+            this.Dispatch(this.Refresh);
         }
 
         protected override async Task Refresh(Playlist playlist)
@@ -41,7 +38,11 @@ namespace FoxTunes
             {
                 playlist.Name = libraryHierarchyNode.Value;
                 await this.Update(playlist).ConfigureAwait(false);
-                await this.PlaylistManager.Add(playlist, libraryHierarchyNode, true).ConfigureAwait(false);
+                using (var task = new AddLibraryHierarchyNodeToPlaylistTask(playlist, 0, libraryHierarchyNode, true))
+                {
+                    task.InitializeComponent(this.Core);
+                    await task.Run().ConfigureAwait(false);
+                }
             }
         }
 

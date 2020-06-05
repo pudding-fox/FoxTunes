@@ -39,34 +39,32 @@ namespace FoxTunes
             {
                 case CommonSignals.MetaDataUpdated:
                     var names = signal.State as IEnumerable<string>;
-                    var appliesTo = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var playlist in this.Playlists)
-                    {
-                        if (string.IsNullOrEmpty(playlist.Filter))
-                        {
-                            continue;
-                        }
-                        if (names != null && names.Any())
-                        {
-                            if (!appliesTo.GetOrAdd(playlist.Filter, filter => this.FilterParser.AppliesTo(filter, names)))
-                            {
-                                continue;
-                            }
-                        }
-                        await this.Refresh(playlist).ConfigureAwait(false);
-                    }
+                    await this.Refresh(names).ConfigureAwait(false);
                     break;
                 case CommonSignals.HierarchiesUpdated:
-                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
-                    {
-                        foreach (var playlist in this.Playlists)
-                        {
-                            await this.Refresh(playlist).ConfigureAwait(false);
-                        }
-                    }
+                    await this.Refresh().ConfigureAwait(false);
                     break;
             }
             await base.OnSignal(sender, signal).ConfigureAwait(false);
+        }
+
+        protected virtual async Task Refresh(IEnumerable<string> names)
+        {
+            foreach (var playlist in this.GetPlaylists())
+            {
+                if (string.IsNullOrEmpty(playlist.Filter))
+                {
+                    continue;
+                }
+                if (names != null && names.Any())
+                {
+                    if (this.FilterParser.AppliesTo(playlist.Filter, names))
+                    {
+                        continue;
+                    }
+                }
+                await this.Refresh(playlist).ConfigureAwait(false);
+            }
         }
 
         protected override async Task Refresh(Playlist playlist)
@@ -77,7 +75,7 @@ namespace FoxTunes
                 return;
             }
             var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
-            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, 0, libraryHierarchyNodes, playlist.Filter, true))
+            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, 0, libraryHierarchyNodes, playlist.Filter, false))
             {
                 task.InitializeComponent(this.Core);
                 await task.Run().ConfigureAwait(false);
