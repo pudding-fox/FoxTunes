@@ -138,7 +138,11 @@ namespace FoxTunes
 
             protected virtual IFilterParserResultGroup Parse(string filter)
             {
-                filter = string.Format("{0}{1}{0}", FilterParserResultEntry.WILDCARD, filter.Trim());
+                filter = string.Format(
+                    "{0}{1}{0}", 
+                    FilterParserResultEntry.UNBOUNDED_WILDCARD, 
+                    filter.Trim()
+                );
                 var entries = this.SearchNames.Select(
                     name => new FilterParserResultEntry(name, FilterParserEntryOperator.Match, filter)
                 ).ToArray();
@@ -210,7 +214,7 @@ namespace FoxTunes
                         case FilterParserEntryOperator.Match:
                             value = string.Format(
                                 "{0}{1}{0}",
-                                FilterParserResultEntry.WILDCARD,
+                                FilterParserResultEntry.UNBOUNDED_WILDCARD,
                                 value
                             );
                             break;
@@ -413,7 +417,9 @@ namespace FoxTunes
 
     public class FilterParserResultEntry : IFilterParserResultEntry
     {
-        public const string WILDCARD = "*";
+        public const string BOUNDED_WILDCARD = "?";
+
+        public const string UNBOUNDED_WILDCARD = "*";
 
         public const string EQUAL = ":";
 

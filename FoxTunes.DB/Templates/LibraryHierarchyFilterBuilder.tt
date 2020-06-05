@@ -92,7 +92,7 @@ AND EXISTS
 			}
 			else
 			{
-#><#= this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.WILDCARD, "%"))  #><#
+#><#= this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.BOUNDED_WILDCARD, "_").Replace(FilterParserResultEntry.UNBOUNDED_WILDCARD, "%"))  #><#
 			}
 #>
 )<#

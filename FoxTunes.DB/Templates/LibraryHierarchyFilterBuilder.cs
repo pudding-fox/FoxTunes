@@ -236,7 +236,7 @@ AND EXISTS
             #line hidden
             
             #line 95 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.WILDCARD, "%"))));
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.BOUNDED_WILDCARD, "_").Replace(FilterParserResultEntry.UNBOUNDED_WILDCARD, "%"))));
             
             #line default
             #line hidden
