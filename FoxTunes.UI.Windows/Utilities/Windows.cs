@@ -185,6 +185,10 @@ namespace FoxTunes
 
         private static void OnSettingsWindowClosed(object sender, EventArgs e)
         {
+            if (IsSettingsWindowCreated)
+            {
+                ResourceDisposer.Dispose(SettingsWindow);
+            }
             _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
             if (SettingsWindowClosed == null)
             {
@@ -239,6 +243,10 @@ namespace FoxTunes
 
         private static void OnEqualizerWindowClosed(object sender, EventArgs e)
         {
+            if (IsEqualizerWindowCreated)
+            {
+                ResourceDisposer.Dispose(EqualizerWindow);
+            }
             _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
             if (EqualizerWindowClosed == null)
             {
@@ -293,6 +301,10 @@ namespace FoxTunes
 
         private static void OnPlaylistManagerWindowClosed(object sender, EventArgs e)
         {
+            if (IsPlaylistManagerWindowCreated)
+            {
+                ResourceDisposer.Dispose(PlaylistManagerWindow);
+            }
             _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
             if (PlaylistManagerWindowClosed == null)
             {
