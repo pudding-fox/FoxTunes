@@ -62,6 +62,7 @@ namespace FoxTunes
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
                     var set = this.Database.Set<Playlist>(transaction);
+                    this.Playlist.Sequence = set.Count;
                     await set.AddAsync(this.Playlist).ConfigureAwait(false);
                     if (transaction.HasTransaction)
                     {
