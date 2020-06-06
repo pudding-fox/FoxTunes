@@ -58,7 +58,7 @@ namespace FoxTunes
                 }
                 if (names != null && names.Any())
                 {
-                    if (this.FilterParser.AppliesTo(playlist.Filter, names))
+                    if (!this.FilterParser.AppliesTo(playlist.Filter, names))
                     {
                         continue;
                     }
@@ -75,7 +75,7 @@ namespace FoxTunes
                 return;
             }
             var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
-            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, 0, libraryHierarchyNodes, playlist.Filter, false))
+            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, 0, libraryHierarchyNodes, playlist.Filter, true, false))
             {
                 task.InitializeComponent(this.Core);
                 await task.Run().ConfigureAwait(false);

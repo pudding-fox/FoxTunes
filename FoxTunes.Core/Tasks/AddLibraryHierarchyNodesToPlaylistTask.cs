@@ -7,19 +7,20 @@ namespace FoxTunes
 {
     public class AddLibraryHierarchyNodesToPlaylistTask : PlaylistTaskBase
     {
-        public AddLibraryHierarchyNodesToPlaylistTask(Playlist playlist, int sequence, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, string filter, bool clear)
+        public AddLibraryHierarchyNodesToPlaylistTask(Playlist playlist, int sequence, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, string filter, bool clear, bool visible = true)
             : base(playlist, sequence)
         {
             this.LibraryHierarchyNodes = libraryHierarchyNodes;
             this.Filter = filter;
             this.Clear = clear;
+            this._Visible = visible;
         }
 
         public override bool Visible
         {
             get
             {
-                return this.LibraryHierarchyNodes.Count() > 1;
+                return this._Visible && this.LibraryHierarchyNodes.Count() > 1;
             }
         }
 
@@ -27,7 +28,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.LibraryHierarchyNodes.Count() > 1;
+                return this._Visible && this.LibraryHierarchyNodes.Count() > 1;
             }
         }
 
@@ -36,6 +37,8 @@ namespace FoxTunes
         public string Filter { get; private set; }
 
         public bool Clear { get; private set; }
+
+        private bool _Visible { get; set; }
 
         protected override async Task OnRun()
         {
