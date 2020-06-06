@@ -91,14 +91,22 @@ namespace FoxTunes
             {
                 this.OrderedItemsSource = this._ItemsSource;
             }
+            //TODO: This is sketchy because T is not properly equatable.
+            //TODO: We need to always set SelectedValue to null and then try to "restore" it from the new ItemsSource.
+            //TODO: If it isn't IPersistableComponent then there's not much we can do.
             if (this.SelectedValue is IPersistableComponent persistable)
             {
                 if (this._ItemsSource != null && typeof(IPersistableComponent).IsAssignableFrom(typeof(T)))
                 {
+                    this.SelectedValue = default(T);
                     this.SelectedValue = this._ItemsSource
                         .OfType<IPersistableComponent>()
                         .FirstOrDefault(element => element.Id == persistable.Id) as T;
                 }
+            }
+            else
+            {
+                this.SelectedValue = default(T);
             }
             if (this.SelectedValue == default(T))
             {
