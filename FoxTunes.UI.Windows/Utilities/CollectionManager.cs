@@ -11,6 +11,13 @@ namespace FoxTunes
 {
     public class CollectionManager<T> : Freezable, INotifyPropertyChanged where T : class
     {
+        public CollectionManager()
+        {
+            this.Removed = new HashSet<T>();
+        }
+
+        public HashSet<T> Removed { get; private set; }
+
         private Func<T> _ItemFactory { get; set; }
 
         public Func<T> ItemFactory
@@ -80,38 +87,8 @@ namespace FoxTunes
 
         protected virtual void OnItemsSourceChanged()
         {
-            if (this._ItemsSource != null && typeof(ISequenceableComponent).IsAssignableFrom(typeof(T)))
-            {
-                this.OrderedItemsSource = this._ItemsSource
-                    .OfType<ISequenceableComponent>()
-                    .OrderBy(element => element.Sequence)
-                    .OfType<T>();
-            }
-            else
-            {
-                this.OrderedItemsSource = this._ItemsSource;
-            }
-            //TODO: This is sketchy because T is not properly equatable.
-            //TODO: We need to always set SelectedValue to null and then try to "restore" it from the new ItemsSource.
-            //TODO: If it isn't IPersistableComponent then there's not much we can do.
-            if (this.SelectedValue is IPersistableComponent persistable)
-            {
-                if (this._ItemsSource != null && typeof(IPersistableComponent).IsAssignableFrom(typeof(T)))
-                {
-                    this.SelectedValue = default(T);
-                    this.SelectedValue = this._ItemsSource
-                        .OfType<IPersistableComponent>()
-                        .FirstOrDefault(element => element.Id == persistable.Id) as T;
-                }
-            }
-            else
-            {
-                this.SelectedValue = default(T);
-            }
-            if (this.SelectedValue == default(T))
-            {
-                this.SelectedValue = (this.OrderedItemsSource ?? this.ItemsSource ?? Enumerable.Empty<T>()).FirstOrDefault();
-            }
+            this.Refresh();
+            this.Reset();
             if (this.ItemsSourceChanged != null)
             {
                 this.ItemsSourceChanged(this, EventArgs.Empty);
@@ -226,8 +203,15 @@ namespace FoxTunes
 
         public void Remove()
         {
+            var selectedValue = this.SelectedValue;
             var collection = this.ItemsSource as ICollection<T>;
-            collection.Remove(this.SelectedValue);
+            if (collection.Remove(selectedValue))
+            {
+                if (selectedValue is IPersistableComponent)
+                {
+                    this.Removed.Add(selectedValue);
+                }
+            }
             if (collection.Count == 0 && this.CanAdd)
             {
                 this.Add();
@@ -276,7 +260,43 @@ namespace FoxTunes
 
         public void Refresh()
         {
-            this.OnItemsSourceChanged();
+            if (this._ItemsSource != null && typeof(ISequenceableComponent).IsAssignableFrom(typeof(T)))
+            {
+                this.OrderedItemsSource = this._ItemsSource
+                    .OfType<ISequenceableComponent>()
+                    .OrderBy(element => element.Sequence)
+                    .OfType<T>();
+            }
+            else
+            {
+                this.OrderedItemsSource = this._ItemsSource;
+            }
+            //TODO: This is sketchy because T is not properly equatable.
+            //TODO: We need to always set SelectedValue to null and then try to "restore" it from the new ItemsSource.
+            //TODO: If it isn't IPersistableComponent then there's not much we can do.
+            if (this.SelectedValue is IPersistableComponent persistable)
+            {
+                if (this._ItemsSource != null && typeof(IPersistableComponent).IsAssignableFrom(typeof(T)))
+                {
+                    this.SelectedValue = default(T);
+                    this.SelectedValue = this._ItemsSource
+                        .OfType<IPersistableComponent>()
+                        .FirstOrDefault(element => element.Id == persistable.Id) as T;
+                }
+            }
+            else
+            {
+                this.SelectedValue = default(T);
+            }
+            if (this.SelectedValue == default(T))
+            {
+                this.SelectedValue = (this.OrderedItemsSource ?? this.ItemsSource ?? Enumerable.Empty<T>()).FirstOrDefault();
+            }
+        }
+
+        public void Reset()
+        {
+            this.Removed.Clear();
         }
 
         protected virtual void OnPropertyChanged(string propertyName)

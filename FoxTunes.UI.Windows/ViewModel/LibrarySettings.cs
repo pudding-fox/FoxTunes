@@ -124,7 +124,11 @@ namespace FoxTunes.ViewModel
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var libraryHierarchies = database.Set<LibraryHierarchy>(transaction);
-                            await libraryHierarchies.RemoveAsync(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource)).ConfigureAwait(false);
+                            foreach (var libraryHierarchy in this.LibraryHierarchies.Removed)
+                            {
+                                await LibraryTaskBase.RemoveHierarchies(database, libraryHierarchy, null, transaction).ConfigureAwait(false);
+                                await libraryHierarchies.RemoveAsync(libraryHierarchy).ConfigureAwait(false);
+                            }
                             await libraryHierarchies.AddOrUpdateAsync(this.LibraryHierarchies.ItemsSource).ConfigureAwait(false);
                             transaction.Commit();
                         }
@@ -133,11 +137,9 @@ namespace FoxTunes.ViewModel
                         await task.Run().ConfigureAwait(false);
                     }
                 }
-                {
-                    //Deliberately forking so the dialog closes.
-                    this.Dispatch(this.Rebuild);
-                    return;
-                }
+                await this.Refresh().ConfigureAwait(false);
+                await this.Rebuild().ConfigureAwait(false);
+                return;
             }
             catch (Exception e)
             {

@@ -98,6 +98,11 @@ namespace FoxTunes
             using (var transaction = database.BeginTransaction())
             {
                 var set = database.Set<LibraryHierarchy>(transaction);
+                foreach (var libraryHierarchy in set)
+                {
+                    //TODO: Bad .Wait()
+                    LibraryTaskBase.RemoveHierarchies(database, libraryHierarchy, null, transaction).Wait();
+                }
                 set.Clear();
                 set.Add(new LibraryHierarchy()
                 {
