@@ -168,8 +168,9 @@ namespace FoxTunes.ViewModel
                     await task.Run().ConfigureAwait(false);
                 }
             }
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated)).ConfigureAwait(false);
             await this.Refresh().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated)).ConfigureAwait(false);
         }
 
         public override void InitializeComponent(ICore core)
