@@ -484,7 +484,7 @@ namespace FoxTunes.ViewModel
             {
                 return CommandFactory.Instance.CreateCommand<bool>(
                     force => this.AddToPlaylist(this.SelectedItem, false),
-                    force => this.SelectedItem != null && (force || this.SelectedItem.IsLeaf)
+                    force => this.PlaylistManager.SelectedPlaylist != null && this.SelectedItem != null && (force || this.SelectedItem.IsLeaf)
                 );
             }
         }
