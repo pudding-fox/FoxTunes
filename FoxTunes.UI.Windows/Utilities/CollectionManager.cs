@@ -207,9 +207,12 @@ namespace FoxTunes
             var collection = this.ItemsSource as ICollection<T>;
             if (collection.Remove(selectedValue))
             {
-                if (selectedValue is IPersistableComponent)
+                if (selectedValue is IPersistableComponent persistable)
                 {
-                    this.Removed.Add(selectedValue);
+                    if (persistable.Id > 0)
+                    {
+                        this.Removed.Add(selectedValue);
+                    }
                 }
             }
             if (collection.Count == 0 && this.CanAdd)
