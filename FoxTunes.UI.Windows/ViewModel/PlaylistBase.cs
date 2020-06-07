@@ -232,7 +232,7 @@ namespace FoxTunes.ViewModel
             }
             else
             {
-                await Windows.Invoke(this.Items.Update(items)).ConfigureAwait(false);
+                await Windows.Invoke(this.Items.Reset(items)).ConfigureAwait(false);
             }
             await this.RefreshStatus().ConfigureAwait(false);
         }

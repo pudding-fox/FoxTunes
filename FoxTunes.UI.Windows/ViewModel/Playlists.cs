@@ -82,14 +82,47 @@ namespace FoxTunes.ViewModel
             }
             else
             {
-                return Windows.Invoke(() => this.Items.Update(playlists));
+                return Windows.Invoke(this.Items.Reset(playlists));
             }
         }
 
-        public virtual Task Reload(IEnumerable<Playlist> playlists)
+        protected virtual Task RefreshItems(IEnumerable<Playlist> playlists)
         {
-            //TODO: Be more selective.
-            return this.Reload();
+            var cached = this.PlaylistBrowser.GetPlaylists();
+            if (this.Items == null)
+            {
+                return Windows.Invoke(() => this.Items = new PlaylistCollection(cached));
+            }
+            else
+            {
+                var updated = new List<Playlist>();
+                var removed = new List<Playlist>();
+                foreach (var playlist in playlists)
+                {
+                    if (cached.Contains(playlist))
+                    {
+                        updated.Add(playlist);
+                    }
+                    else
+                    {
+                        removed.Add(playlist);
+                    }
+                }
+                return Windows.Invoke(() =>
+                {
+                    this.Items.AddOrUpdate(updated);
+                    this.Items.Remove(removed);
+                });
+            }
+        }
+
+        public virtual async Task Reload(IEnumerable<Playlist> playlists)
+        {
+            await this.RefreshItems(playlists).ConfigureAwait(false);
+            await Windows.Invoke(() =>
+            {
+                this.OnSelectedItemChanged();
+            }).ConfigureAwait(false);
         }
 
         public virtual async Task Reload()
