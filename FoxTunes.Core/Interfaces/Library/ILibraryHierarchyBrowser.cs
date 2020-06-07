@@ -17,7 +17,11 @@ namespace FoxTunes.Interfaces
 
         LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy);
 
+        LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy, string filter);
+
         LibraryHierarchyNode[] GetNodes(LibraryHierarchyNode libraryHierarchyNode);
+
+        LibraryHierarchyNode[] GetNodes(LibraryHierarchyNode libraryHierarchyNode, string filter);
 
         IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode, bool loadMetaData);
     }
