@@ -158,6 +158,11 @@ namespace FoxTunes
             }
         }
 
+        protected virtual void OnAddCommandChanged()
+        {
+            this.OnPropertyChanged("AddCommand");
+        }
+
         public bool CanAdd
         {
             get
@@ -190,6 +195,11 @@ namespace FoxTunes
             {
                 return new Command(this.Remove, () => this.CanRemove);
             }
+        }
+
+        protected virtual void OnRemoveCommandChanged()
+        {
+            this.OnPropertyChanged("RemoveCommand");
         }
 
         public bool CanRemove
@@ -238,6 +248,11 @@ namespace FoxTunes
             }
         }
 
+        protected virtual void OnExchangeCommandChanged()
+        {
+            this.OnPropertyChanged("ExchangeCommand");
+        }
+
         public bool CanExchange(object[] items)
         {
             if (this.ExchangeHandler == null)
@@ -258,13 +273,22 @@ namespace FoxTunes
         public void Exchange(object[] items)
         {
             this.ExchangeHandler((T)items[0], (T)items[1]);
-            this.Refresh();
+            this.RefreshOrderedItemsSource();
         }
 
         public void Refresh()
         {
+            this.RefreshOrderedItemsSource();
+            this.RefreshSelectedItem();
+            this.RefreshCommands();
+        }
+
+        protected virtual void RefreshOrderedItemsSource()
+        {
             if (this._ItemsSource != null && typeof(ISequenceableComponent).IsAssignableFrom(typeof(T)))
             {
+                //TODO: This is just awful but we can't use CollectionViewSource with LiveSorting in NET40.
+                //TODO: Perhaps we could use some combination of SortedList and ObservableCollection?
                 this.OrderedItemsSource = this._ItemsSource
                     .OfType<ISequenceableComponent>()
                     .OrderBy(element => element.Sequence)
@@ -274,6 +298,10 @@ namespace FoxTunes
             {
                 this.OrderedItemsSource = this._ItemsSource;
             }
+        }
+
+        protected virtual void RefreshSelectedItem()
+        {
             //TODO: This is sketchy because T is not properly equatable.
             //TODO: We need to always set SelectedValue to null and then try to "restore" it from the new ItemsSource.
             //TODO: If it isn't IPersistableComponent then there's not much we can do.
@@ -295,6 +323,13 @@ namespace FoxTunes
             {
                 this.SelectedValue = (this.OrderedItemsSource ?? this.ItemsSource ?? Enumerable.Empty<T>()).FirstOrDefault();
             }
+        }
+
+        protected virtual void RefreshCommands()
+        {
+            this.OnAddCommandChanged();
+            this.OnRemoveCommandChanged();
+            this.OnExchangeCommandChanged();
         }
 
         public void Reset()
