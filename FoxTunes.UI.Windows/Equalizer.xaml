@@ -14,20 +14,12 @@
     <UserControl.IsEnabled>
         <Binding Mode="OneWay" Path="Available" Source="{StaticResource ViewModel}"/>
     </UserControl.IsEnabled>
-    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding EqualizerVisible, Source={StaticResource ViewModel}}" ToolTipService.ShowDuration="60000">
-        <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
-            <Viewbox.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform ScaleY="-1" ScaleX="1"/>
-                    <SkewTransform AngleY="0" AngleX="0"/>
-                    <RotateTransform Angle="0"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </Viewbox.RenderTransform>
-            <Canvas Width="500" Height="500">
+    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding EqualizerVisible, Source={StaticResource ViewModel}}">
+        <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="24" Height="24">
+            <Canvas Width="512" Height="512">
                 <Path Fill="{DynamicResource TextBrush}">
                     <Path.Data>
-                        <PathGeometry Figures="M341 320h86v-235h-86v235zM85 85v171h86v-171h-86zM213 85v342h86v-342h-86z" FillRule="NonZero"/>
+                        <PathGeometry Figures="M96 146V16H64v130a64 64 0 000 124v226h32V270a64 64 0 000-124zm-16 94a32 32 0 1132-32 32 32 0 01-32 32zm192 50V16h-32v274a64 64 0 000 124v82h32v-82a64 64 0 000-124zm-16 94a32 32 0 1132-32 32 32 0 01-32 32zM448 82V16h-32v66a64 64 0 000 124v290h32V206a64 64 0 000-124zm-16 94a32 32 0 1132-32 32 32 0 01-32 32z" FillRule="Nonzero"/>
                     </Path.Data>
                 </Path>
             </Canvas>
