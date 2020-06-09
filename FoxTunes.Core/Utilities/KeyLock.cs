@@ -20,6 +20,11 @@ namespace FoxTunes
             this.Counters = new Dictionary<T, Counter>();
         }
 
+        public KeyLock(IEqualityComparer<T> comparer)
+        {
+            this.Counters = new Dictionary<T, Counter>(comparer);
+        }
+
         public Dictionary<T, Counter> Counters { get; private set; }
 
         protected virtual SemaphoreSlim CreateOrIncrement(T key)

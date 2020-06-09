@@ -161,7 +161,7 @@ namespace FoxTunes
             {
                 monitor.Dispose();
                 Logger.Write(this, LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
-                Bass.StreamFree(stream.ChannelHandle);
+                Bass.StreamFree(stream.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
             if (this.CancellationToken.IsCancellationRequested)
             {
@@ -265,7 +265,7 @@ namespace FoxTunes
                     {
                         var stream = streams[scannerItem];
                         Logger.Write(this, LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
-                        Bass.StreamFree(stream.ChannelHandle);
+                        Bass.StreamFree(stream.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
                     }
                 }
                 foreach (var scannerItem in streams.Keys)

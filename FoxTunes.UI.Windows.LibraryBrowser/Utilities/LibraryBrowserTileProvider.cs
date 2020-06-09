@@ -17,7 +17,7 @@ namespace FoxTunes
 
         private static readonly string PREFIX = typeof(LibraryBrowserTileProvider).Name;
 
-        private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
+        private static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public ImageLoader ImageLoader { get; private set; }
 

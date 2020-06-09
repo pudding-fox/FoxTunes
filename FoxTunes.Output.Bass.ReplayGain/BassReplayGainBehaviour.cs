@@ -121,6 +121,10 @@ namespace FoxTunes
 
         protected virtual void Add(BassOutputStream stream)
         {
+            if (!FileSystemHelper.IsLocalPath(stream.FileName))
+            {
+                return;
+            }
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
                 return;
