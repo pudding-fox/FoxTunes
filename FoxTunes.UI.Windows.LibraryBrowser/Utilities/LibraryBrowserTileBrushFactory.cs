@@ -5,6 +5,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
+    [Component("8080D985-D642-4189-901B-A84530A1F110", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LibraryBrowserTileBrushFactory : StandardFactory
     {
@@ -170,6 +171,14 @@ namespace FoxTunes
 
         protected virtual void CalculateTileSize(int width, int height)
         {
+            if (this.Store != null)
+            {
+                this.Store.Clear();
+            }
+            if (this.FallbackValue != null)
+            {
+                this.FallbackValue.Reset();
+            }
             if (width == 0 || height == 0)
             {
                 this.Width = 0;
@@ -186,8 +195,6 @@ namespace FoxTunes
             this.Height = height;
             this.PixelWidth = global::System.Convert.ToInt32(size.Width);
             this.PixelHeight = global::System.Convert.ToInt32(size.Height);
-            this.Store.Clear();
-            this.FallbackValue.Reset();
         }
 
         protected virtual Task Reset()

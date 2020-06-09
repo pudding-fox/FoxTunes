@@ -9,6 +9,8 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
+    [Component("AA3CF53F-5358-4AD5-A3E5-0F19B1A1F8B5", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ArtworkBrushFactory : BaseComponent
     {
         public ArtworkBrushFactory()
@@ -153,6 +155,14 @@ namespace FoxTunes
 
         protected virtual void CalculateTileSize(int width, int height)
         {
+            if (this.Store != null)
+            {
+                this.Store.Clear();
+            }
+            if (this.FallbackValue != null)
+            {
+                this.FallbackValue.Reset();
+            }
             if (width == 0 || height == 0)
             {
                 this.Width = 0;
@@ -169,8 +179,6 @@ namespace FoxTunes
             this.Height = height;
             this.PixelWidth = global::System.Convert.ToInt32(size.Width);
             this.PixelHeight = global::System.Convert.ToInt32(size.Height);
-            this.Store.Clear();
-            this.FallbackValue.Reset();
         }
 
         protected virtual Task Reset(IEnumerable<string> names)
