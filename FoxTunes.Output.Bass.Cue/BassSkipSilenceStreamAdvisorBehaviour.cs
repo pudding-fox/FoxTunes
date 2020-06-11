@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -23,6 +22,21 @@ namespace FoxTunes
             }
         }
 
+        private int _Threshold { get; set; }
+
+        public int Threshold
+        {
+            get
+            {
+                return this._Threshold;
+            }
+            set
+            {
+                this._Threshold = value;
+                Logger.Write(this, LogLevel.Debug, "Threshold = {0}", this.Threshold);
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -30,6 +44,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassSkipSilenceStreamAdvisorBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassSkipSilenceStreamAdvisorBehaviourConfiguration.SENSITIVITY_ELEMENT
+            ).ConnectValue(option => this.Threshold = BassSkipSilenceStreamAdvisorBehaviourConfiguration.GetSensitivity(option));
             base.InitializeComponent(core);
         }
 

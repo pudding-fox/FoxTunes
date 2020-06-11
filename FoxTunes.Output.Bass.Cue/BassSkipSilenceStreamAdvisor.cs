@@ -1,17 +1,17 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class BassSkipSilenceStreamAdvisor : BassStreamAdvisor
     {
+        //50ms
+        const float WINDOW = 0.05f;
+
         public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public override byte Priority
@@ -75,6 +75,7 @@ namespace FoxTunes
             {
                 return false;
             }
+            return true;
             lock (playlistItem.MetaDatas)
             {
                 playlistItem.MetaDatas.Add(
@@ -147,8 +148,8 @@ namespace FoxTunes
             }
             try
             {
-                var leadInBytes = this.GetLeadIn(channelHandle);
-                var leadOutBytes = this.GetLeadOut(channelHandle);
+                var leadInBytes = this.GetLeadIn(channelHandle, this.Behaviour.Threshold);
+                var leadOutBytes = this.GetLeadOut(channelHandle, this.Behaviour.Threshold);
                 if (leadInBytes == -1 || leadOutBytes == -1)
                 {
                     leadIn = default(TimeSpan);
@@ -175,93 +176,63 @@ namespace FoxTunes
             }
         }
 
-        protected virtual long GetLeadIn(int channelHandle)
+        protected virtual long GetLeadIn(int channelHandle, int threshold)
         {
-            var bytesPerSecond = Bass.ChannelSeconds2Bytes(
-                channelHandle,
-                1
-            );
-            var buffer = new byte[bytesPerSecond];
-            var leadIn = default(long);
             do
             {
-                if (Bass.ChannelIsActive(channelHandle) != PlaybackState.Playing)
+                var levels = new float[1];
+                if (!Bass.ChannelGetLevel(channelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
                 {
                     break;
                 }
-                var count = Bass.ChannelGetData(
-                    channelHandle,
-                    buffer,
-                    buffer.Length
-                );
-                if (count <= 0)
+                var dB = levels[0] > 0 ? 20 * Math.Log10(levels[0]) : -1000;
+                if (dB > threshold)
                 {
-                    break;
-                }
-                for (var position = 0; position < count; position++)
-                {
-                    if (buffer[position] != 0)
-                    {
-                        return leadIn;
-                    }
-                    leadIn++;
+                    return Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
                 }
             } while (true);
-            //Track was silent?
             return -1;
         }
 
-        protected virtual long GetLeadOut(int channelHandle)
+        protected virtual long GetLeadOut(int channelHandle, int threshold)
         {
-            var bytesPerSecond = Bass.ChannelSeconds2Bytes(
-               channelHandle,
-               1
+            var length = Bass.ChannelSeconds2Bytes(
+                channelHandle,
+                WINDOW
             );
-            var buffer = new byte[bytesPerSecond];
-            var leadOut = default(long);
             BassUtils.OK(
                 Bass.ChannelSetPosition(
                     channelHandle,
                     Bass.ChannelGetLength(
                         channelHandle,
                         PositionFlags.Bytes
-                    ) - bytesPerSecond,
+                    ) - length,
                     PositionFlags.Bytes
                 )
             );
             do
             {
-                if (Bass.ChannelIsActive(channelHandle) != PlaybackState.Playing)
+                var levels = new float[1];
+                if (!Bass.ChannelGetLevel(channelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
                 {
                     break;
                 }
-                var count = Bass.ChannelGetData(
+                var dB = levels[0] > 0 ? 20 * Math.Log10(levels[0]) : -1000;
+                if (dB > threshold)
+                {
+                    return Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes) - Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
+                }
+                if (!Bass.ChannelSetPosition(
                     channelHandle,
-                    buffer,
-                    buffer.Length
-                );
-                if (count <= 0)
+                    Bass.ChannelGetPosition(
+                        channelHandle,
+                        PositionFlags.Bytes
+                    ) - (length * 2),
+                    PositionFlags.Bytes
+                ))
                 {
                     break;
                 }
-                for (var position = count - 1; position > 0; position--)
-                {
-                    if (buffer[position] != 0)
-                    {
-                        return leadOut;
-                    }
-                    leadOut++;
-                }
-                BassUtils.OK(
-                    Bass.ChannelSetPosition(
-                        channelHandle,
-                        Bass.ChannelGetPosition(
-                            channelHandle,
-                            PositionFlags.Bytes
-                        ) - (bytesPerSecond * 2),
-                        PositionFlags.Bytes
-                    )
-                );
             } while (true);
             //Track was silent?
             return -1;
