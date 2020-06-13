@@ -50,7 +50,7 @@ namespace FoxTunes
             {
                 return this.PlaylistBrowser.GetFirstItem(playlist);
             }
-            playlistItem = this.PlaylistBrowser.GetItem(playlist, playlistItem.Sequence + 1);
+            playlistItem = this.PlaylistBrowser.GetItemBySequence(playlist, playlistItem.Sequence + 1);
             if (playlistItem == null)
             {
                 playlistItem = this.PlaylistBrowser.GetFirstItem(playlist);
@@ -69,7 +69,7 @@ namespace FoxTunes
             {
                 return this.PlaylistBrowser.GetLastItem(playlist);
             }
-            playlistItem = this.PlaylistBrowser.GetItem(playlist, playlistItem.Sequence - 1);
+            playlistItem = this.PlaylistBrowser.GetItemBySequence(playlist, playlistItem.Sequence - 1);
             if (playlistItem == null)
             {
                 return this.PlaylistBrowser.GetLastItem(playlist);
@@ -181,7 +181,7 @@ namespace FoxTunes
                 position = 0;
             }
             var sequence = this.Sequences[position];
-            return this.PlaylistBrowser.GetItem(playlist, sequence);
+            return this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
         }
 
         public override PlaylistItem GetPrevious(PlaylistItem playlistItem)
@@ -217,7 +217,7 @@ namespace FoxTunes
                 position = this.Sequences.Count - 1;
             }
             var sequence = this.Sequences[position];
-            return this.PlaylistBrowser.GetItem(playlist, sequence);
+            return this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
         }
     }
 }

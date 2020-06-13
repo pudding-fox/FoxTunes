@@ -96,7 +96,6 @@ namespace FoxTunes.ViewModel
                     return;
                 }
                 this.PlaylistManager.SelectedItems = value.OfType<PlaylistItem>().ToArray();
-                this.OnSelectedItemsChanged();
             }
         }
 
@@ -192,6 +191,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
+            this.PlaylistManager.SelectedItemsChanged += this.OnSelectedItemsChanged;
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.ScriptingRuntime);
             this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
@@ -209,6 +209,11 @@ namespace FoxTunes.ViewModel
             ).ConnectValue(value => this.GroupingScript = value);
 #endif
             this.Dispatch(this.Refresh);
+        }
+
+        protected virtual void OnSelectedItemsChanged(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(this.OnSelectedItemsChanged);
         }
 
         protected virtual void OnColumnChanged(object sender, PlaylistColumn e)
@@ -308,6 +313,14 @@ namespace FoxTunes.ViewModel
                     () =>
                     {
                         var playlistItem = this.SelectedItems[0] as PlaylistItem;
+                        if (playlistItem == null)
+                        {
+#if NET40
+                            return TaskEx.FromResult(false);
+#else
+                            return Task.CompletedTask;
+#endif
+                        }
                         return this.PlaylistManager.Play(playlistItem);
                     },
                     () => this.PlaylistManager != null && this.SelectedItems.Count > 0

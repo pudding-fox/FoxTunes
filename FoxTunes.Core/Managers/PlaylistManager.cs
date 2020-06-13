@@ -92,17 +92,43 @@ namespace FoxTunes
 
         protected virtual void RefreshSelectedItems()
         {
-            this._SelectedItems.Clear();
-            this.OnSelectedItemsChanged();
+            this.RefreshSelectedItems(this._SelectedItems.Keys);
         }
 
         protected virtual void RefreshSelectedItems(IEnumerable<Playlist> playlists)
         {
             foreach (var playlist in playlists)
             {
-                this._SelectedItems.TryRemove(playlist);
+                this.RefreshSelectedItems(playlist);
             }
             this.OnSelectedItemsChanged();
+        }
+
+        protected virtual void RefreshSelectedItems(Playlist playlist)
+        {
+            var playlistItems = default(PlaylistItem[]);
+            if (!this._SelectedItems.TryGetValue(playlist, out playlistItems))
+            {
+                return;
+            }
+            if (playlistItems == null)
+            {
+                return;
+            }
+            for (var a = 0; a < playlistItems.Length; a++)
+            {
+                if (playlistItems[a] == null)
+                {
+                    continue;
+                }
+                var playlistItem = this.PlaylistBrowser.GetItemById(playlist, playlistItems[a].Id);
+                if (playlistItem == null)
+                {
+                    //TODO: Technically we should remove the item but it's an array so that's a pain.
+                    continue;
+                }
+                playlistItems[a] = playlistItem;
+            }
         }
 
         protected virtual void RefreshSelectedPlaylist()
@@ -419,7 +445,7 @@ namespace FoxTunes
 
         public Task Play(Playlist playlist, int sequence)
         {
-            var playlistItem = this.PlaylistBrowser.GetItem(playlist, sequence);
+            var playlistItem = this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
             if (playlistItem == null)
             {
 #if NET40

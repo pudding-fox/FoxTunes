@@ -132,7 +132,22 @@ namespace FoxTunes
             }
         }
 
-        public PlaylistItem GetItem(Playlist playlist, int sequence)
+        public PlaylistItem GetItemById(Playlist playlist, int id)
+        {
+            var playlistItem = default(PlaylistItem);
+            if (!this.PlaylistCache.TryGetItemById(id, out playlistItem))
+            {
+                //TODO: This could potentially be very expensive if somebody keeps calling this routine trying to retrieve items that aren't in the specified playlist.
+                this.GetItems(playlist);
+                if (!this.PlaylistCache.TryGetItemById(id, out playlistItem))
+                {
+                    return null;
+                }
+            }
+            return playlistItem;
+        }
+
+        public PlaylistItem GetItemBySequence(Playlist playlist, int sequence)
         {
             var playlistItem = default(PlaylistItem);
             if (!this.PlaylistCache.TryGetItemBySequence(playlist, sequence, out playlistItem))
