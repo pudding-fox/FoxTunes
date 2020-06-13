@@ -1,5 +1,8 @@
 ﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -39,6 +42,13 @@ namespace FoxTunes
 
     public class StandardPlaylistNavigationStrategy : PlaylistNavigationStrategy
     {
+        public StandardPlaylistNavigationStrategy()
+        {
+            this.SequenceQueries = new ConcurrentDictionary<Tuple<QueryOperator, OrderByDirection>, IDatabaseQuery>();
+        }
+
+        public ConcurrentDictionary<Tuple<QueryOperator, OrderByDirection>, IDatabaseQuery> SequenceQueries { get; private set; }
+
         public override PlaylistItem GetNext(PlaylistItem playlistItem)
         {
             var playlist = this.GetPlaylist(playlistItem);
@@ -50,8 +60,16 @@ namespace FoxTunes
             {
                 return this.PlaylistBrowser.GetFirstItem(playlist);
             }
-            playlistItem = this.PlaylistBrowser.GetItemBySequence(playlist, playlistItem.Sequence + 1);
-            if (playlistItem == null)
+            var sequence = default(int);
+            if (this.TryGetNextSequence(playlist, playlistItem.Sequence, out sequence))
+            {
+                playlistItem = this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
+                if (playlistItem == null)
+                {
+                    playlistItem = this.PlaylistBrowser.GetFirstItem(playlist);
+                }
+            }
+            else
             {
                 playlistItem = this.PlaylistBrowser.GetFirstItem(playlist);
             }
@@ -69,12 +87,79 @@ namespace FoxTunes
             {
                 return this.PlaylistBrowser.GetLastItem(playlist);
             }
-            playlistItem = this.PlaylistBrowser.GetItemBySequence(playlist, playlistItem.Sequence - 1);
-            if (playlistItem == null)
+            var sequence = default(int);
+            if (this.TryGetPreviousSequence(playlist, playlistItem.Sequence, out sequence))
             {
-                return this.PlaylistBrowser.GetLastItem(playlist);
+                playlistItem = this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
+                if (playlistItem == null)
+                {
+                    return this.PlaylistBrowser.GetLastItem(playlist);
+                }
+            }
+            else
+            {
+                playlistItem = this.PlaylistBrowser.GetLastItem(playlist);
             }
             return playlistItem;
+        }
+
+        protected virtual bool TryGetNextSequence(Playlist playlist, int currentSequence, out int nextSequence)
+        {
+            var sequence = this.GetSequence(playlist, currentSequence, QueryOperator.Greater, OrderByDirection.Ascending);
+            if (sequence.HasValue)
+            {
+                nextSequence = sequence.Value;
+                return true;
+            }
+            nextSequence = default(int);
+            return false;
+        }
+
+        protected virtual bool TryGetPreviousSequence(Playlist playlist, int currentSequence, out int nextSequence)
+        {
+            var sequence = this.GetSequence(playlist, currentSequence, QueryOperator.Less, OrderByDirection.Descending);
+            if (sequence.HasValue)
+            {
+                nextSequence = sequence.Value;
+                return true;
+            }
+            nextSequence = default(int);
+            return false;
+        }
+
+        protected virtual int? GetSequence(Playlist playlist, int sequence, QueryOperator @operator, OrderByDirection direction)
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var query = this.SequenceQueries.GetOrAdd(
+                        new Tuple<QueryOperator, OrderByDirection>(@operator, direction),
+                        key =>
+                        {
+                            var table = database.Tables.PlaylistItem;
+                            var column = table.GetColumn(ColumnConfig.By("Sequence"));
+                            var builder = database.QueryFactory.Build();
+                            builder.Output.AddColumn(column);
+                            builder.Source.AddTable(table);
+                            builder.Filter.AddColumn(table.GetColumn(ColumnConfig.By("Playlist_Id")));
+                            builder.Filter.AddColumn(column).Operator = builder.Filter.CreateOperator(@operator);
+                            builder.Sort.AddColumn(column).Direction = direction;
+                            return builder.Build();
+                        }
+                    );
+                    return database.ExecuteScalar<int?>(query, (parameters, phase) =>
+                    {
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["playlistId"] = playlist.Id;
+                                parameters["sequence"] = sequence;
+                                break;
+                        }
+                    }, transaction);
+                }
+            }
         }
     }
 
