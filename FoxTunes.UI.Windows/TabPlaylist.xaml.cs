@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,7 +9,7 @@ using System.Windows.Input;
 
 namespace FoxTunes
 {
-    public partial class TabPlaylist : UIComponentBase
+    public partial class TabPlaylist : UserControl, INotifyPropertyChanged
     {
         public static readonly DependencyProperty PlaylistProperty = DependencyProperty.Register(
             "Playlist",
@@ -125,5 +126,16 @@ namespace FoxTunes
                 this.ListView.SelectedItems.Add(item);
             }
         }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged == null)
+            {
+                return;
+            }
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
