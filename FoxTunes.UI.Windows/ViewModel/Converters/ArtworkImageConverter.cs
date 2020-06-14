@@ -174,11 +174,11 @@ namespace FoxTunes.ViewModel
         {
             if (Provider == null || this.ArtworkBrushFactory == null)
             {
-                return value;
+                return null;
             }
             if (double.IsNaN(this.Width) || double.IsNaN(this.Height) || this.Width == 0 || this.Height == 0)
             {
-                return value;
+                return null;
             }
             var fileName = default(string);
             if (value is string)

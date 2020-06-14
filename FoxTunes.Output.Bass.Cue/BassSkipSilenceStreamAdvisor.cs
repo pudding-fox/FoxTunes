@@ -54,7 +54,7 @@ namespace FoxTunes
 
         protected virtual bool TryGetSilence(PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
         {
-            if (this.TryGetMetaData(playlistItem, out leadIn, out leadOut))
+            if (TryGetMetaData(this.Behaviour, playlistItem, out leadIn, out leadOut))
             {
                 return true;
             }
@@ -70,61 +70,6 @@ namespace FoxTunes
 #else
             var task = Task.Run(() => this.UpdateMetaData(playlistItem, _leadIn, _leadOut));
 #endif
-            return true;
-        }
-
-        protected virtual bool TryGetMetaData(PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
-        {
-            Logger.Write(this, LogLevel.Debug, "Attempting to fetch lead in/out for file \"{0}\" from meta data.", playlistItem.FileName);
-
-            var leadInMetaDataItem = default(MetaDataItem);
-            var leadOutMetaDataItem = default(MetaDataItem);
-            lock (playlistItem.MetaDatas)
-            {
-                var metaDatas = playlistItem.MetaDatas.ToDictionary(
-                    metaDataItem => metaDataItem.Name,
-                    StringComparer.OrdinalIgnoreCase
-                );
-                metaDatas.TryGetValue(CustomMetaData.LeadIn, out leadInMetaDataItem);
-                metaDatas.TryGetValue(CustomMetaData.LeadOut, out leadOutMetaDataItem);
-                if (leadInMetaDataItem == null && leadOutMetaDataItem == null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Lead in/out meta data does not exist for file \"{0}\".", playlistItem.FileName);
-
-                    leadIn = default(TimeSpan);
-                    leadOut = default(TimeSpan);
-                    return false;
-                }
-            }
-
-            if (leadInMetaDataItem == null)
-            {
-                leadIn = TimeSpan.Zero;
-            }
-            else if (!this.TryParseDuration(leadInMetaDataItem.Value, out leadIn))
-            {
-                Logger.Write(this, LogLevel.Debug, "Lead in meta data value \"{0}\" for file \"{1}\" is not valid.", leadInMetaDataItem.Value, playlistItem.FileName);
-
-                leadIn = default(TimeSpan);
-                leadOut = default(TimeSpan);
-                return false;
-            }
-
-            if (leadOutMetaDataItem == null)
-            {
-                leadOut = TimeSpan.Zero;
-            }
-            else if (!this.TryParseDuration(leadOutMetaDataItem.Value, out leadOut))
-            {
-                Logger.Write(this, LogLevel.Debug, "Lead out meta data value \"{0}\" for file \"{1}\" is not valid.", leadOutMetaDataItem.Value, playlistItem.FileName);
-
-                leadIn = default(TimeSpan);
-                leadOut = default(TimeSpan);
-                return false;
-            }
-
-            Logger.Write(this, LogLevel.Debug, "Successfully fetched lead in/out from meta data for file \"{0}\": {1}/{2}", playlistItem.FileName, leadIn, leadOut);
-
             return true;
         }
 
@@ -165,38 +110,6 @@ namespace FoxTunes
                 false,
                 new[] { CustomMetaData.LeadIn, CustomMetaData.LeadOut }
             );
-        }
-
-        protected virtual bool TryParseDuration(string value, out TimeSpan duration)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                duration = TimeSpan.Zero;
-                return false;
-            }
-            var parts = value.Split(new[] { ':' }, 2);
-            if (parts.Length != 2)
-            {
-                duration = TimeSpan.Zero;
-                return false;
-            }
-            var threshold = default(int);
-            if (!int.TryParse(parts[0], out threshold) || this.Behaviour.Threshold != threshold)
-            {
-                Logger.Write(this, LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid threshold.", parts[0]);
-
-                duration = TimeSpan.Zero;
-                return false;
-            }
-            if (!TimeSpan.TryParse(parts[1], out duration))
-            {
-                Logger.Write(this, LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid duration.", parts[1]);
-
-                duration = TimeSpan.Zero;
-                return false;
-            }
-
-            return true;
         }
 
         protected virtual bool TryCalculateSilence(PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
@@ -363,6 +276,93 @@ namespace FoxTunes
             } while (true);
             //Track was silent?
             return -1;
+        }
+
+        public static bool TryGetMetaData(BassSkipSilenceStreamAdvisorBehaviour behaviour, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
+        {
+            Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Attempting to fetch lead in/out for file \"{0}\" from meta data.", playlistItem.FileName);
+
+            var leadInMetaDataItem = default(MetaDataItem);
+            var leadOutMetaDataItem = default(MetaDataItem);
+            lock (playlistItem.MetaDatas)
+            {
+                var metaDatas = playlistItem.MetaDatas.ToDictionary(
+                    metaDataItem => metaDataItem.Name,
+                    StringComparer.OrdinalIgnoreCase
+                );
+                metaDatas.TryGetValue(CustomMetaData.LeadIn, out leadInMetaDataItem);
+                metaDatas.TryGetValue(CustomMetaData.LeadOut, out leadOutMetaDataItem);
+                if (leadInMetaDataItem == null && leadOutMetaDataItem == null)
+                {
+                    Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead in/out meta data does not exist for file \"{0}\".", playlistItem.FileName);
+
+                    leadIn = default(TimeSpan);
+                    leadOut = default(TimeSpan);
+                    return false;
+                }
+            }
+
+            if (leadInMetaDataItem == null)
+            {
+                leadIn = TimeSpan.Zero;
+            }
+            else if (!TryParseDuration(behaviour, leadInMetaDataItem.Value, out leadIn))
+            {
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead in meta data value \"{0}\" for file \"{1}\" is not valid.", leadInMetaDataItem.Value, playlistItem.FileName);
+
+                leadIn = default(TimeSpan);
+                leadOut = default(TimeSpan);
+                return false;
+            }
+
+            if (leadOutMetaDataItem == null)
+            {
+                leadOut = TimeSpan.Zero;
+            }
+            else if (!TryParseDuration(behaviour, leadOutMetaDataItem.Value, out leadOut))
+            {
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead out meta data value \"{0}\" for file \"{1}\" is not valid.", leadOutMetaDataItem.Value, playlistItem.FileName);
+
+                leadIn = default(TimeSpan);
+                leadOut = default(TimeSpan);
+                return false;
+            }
+
+            Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Successfully fetched lead in/out from meta data for file \"{0}\": {1}/{2}", playlistItem.FileName, leadIn, leadOut);
+
+            return true;
+        }
+
+        private static bool TryParseDuration(BassSkipSilenceStreamAdvisorBehaviour behaviour, string value, out TimeSpan duration)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                duration = TimeSpan.Zero;
+                return false;
+            }
+            var parts = value.Split(new[] { ':' }, 2);
+            if (parts.Length != 2)
+            {
+                duration = TimeSpan.Zero;
+                return false;
+            }
+            var threshold = default(int);
+            if (!int.TryParse(parts[0], out threshold) || behaviour.Threshold != threshold)
+            {
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid threshold.", parts[0]);
+
+                duration = TimeSpan.Zero;
+                return false;
+            }
+            if (!TimeSpan.TryParse(parts[1], out duration))
+            {
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid duration.", parts[1]);
+
+                duration = TimeSpan.Zero;
+                return false;
+            }
+
+            return true;
         }
     }
 }
