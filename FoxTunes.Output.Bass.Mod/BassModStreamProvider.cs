@@ -1,0 +1,89 @@
+﻿using FoxTunes;
+using FoxTunes.Interfaces;
+using ManagedBass;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace FoxTunes
+{
+    public class BassModStreamProvider : BassStreamProvider
+    {
+        public static readonly string[] EXTENSIONS = new[]
+        {
+            "it",
+            "mo3",
+            "mod",
+            "mptm",
+            "mtm",
+            "s3m",
+            "umx",
+            "xm"
+        };
+
+
+        public override byte Priority
+        {
+            get
+            {
+                return PRIORITY_HIGH;
+            }
+        }
+
+        public override bool CanCreateStream(PlaylistItem playlistItem)
+        {
+            if (!EXTENSIONS.Contains(playlistItem.FileName.GetExtension(), StringComparer.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)
+        {
+            var flags = BassFlags.Decode;
+            if (this.Output != null && this.Output.Float)
+            {
+                flags |= BassFlags.Float;
+            }
+            return this.CreateStream(playlistItem, flags, advice);
+        }
+
+#if NET40
+        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
+#else
+        public override async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
+#endif
+        {
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+#endif
+            try
+            {
+                if (this.Output != null && this.Output.PlayFromMemory)
+                {
+                    Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+                }
+                var channelHandle = Bass.MusicLoad(playlistItem.FileName, 0, 0, flags | BassFlags.Prescan);
+#if NET40
+                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
+#else
+                return this.CreateStream(channelHandle, advice);
+#endif
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+        }
+
+        public override void FreeStream(PlaylistItem playlistItem, int channelHandle)
+        {
+            Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
+            Bass.MusicFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
+        }
+    }
+}
