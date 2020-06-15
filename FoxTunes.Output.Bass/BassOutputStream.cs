@@ -106,6 +106,22 @@ namespace FoxTunes
             }
         }
 
+        public override bool IsReady
+        {
+            get
+            {
+                var result = default(bool);
+                this.Manager.WithPipeline(pipeline =>
+                {
+                    if (pipeline != null)
+                    {
+                        result = pipeline.Input.Contains(this.ChannelHandle);
+                    }
+                });
+                return result;
+            }
+        }
+
         public override bool IsPlaying
         {
             get

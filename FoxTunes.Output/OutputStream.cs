@@ -37,6 +37,8 @@ namespace FoxTunes
 
         public abstract int Channels { get; }
 
+        public abstract bool IsReady { get; }
+
         public abstract bool IsPlaying { get; }
 
         public abstract bool IsPaused { get; }
