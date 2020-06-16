@@ -30,6 +30,6 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public abstract bool Advice(PlaylistItem playlistItem, out IBassStreamAdvice advice);
+        public abstract bool Advice(IBassStreamProvider provider, PlaylistItem playlistItem, out IBassStreamAdvice advice);
     }
 }

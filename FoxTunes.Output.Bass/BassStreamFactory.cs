@@ -62,12 +62,12 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Registered bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
         }
 
-        public IEnumerable<IBassStreamAdvice> GetAdvice(PlaylistItem playlistItem)
+        public IEnumerable<IBassStreamAdvice> GetAdvice(IBassStreamProvider provider, PlaylistItem playlistItem)
         {
             foreach (var advisor in this.Advisors.Values)
             {
                 var advice = default(IBassStreamAdvice);
-                if (advisor.Advice(playlistItem, out advice))
+                if (advisor.Advice(provider, playlistItem, out advice))
                 {
                     yield return advice;
                 }
@@ -89,10 +89,10 @@ namespace FoxTunes
 #endif
             try
             {
-                var advice = this.GetAdvice(playlistItem).ToArray();
                 var providers = this.GetProviders(playlistItem).ToArray();
                 foreach (var provider in providers)
                 {
+                    var advice = this.GetAdvice(provider, playlistItem).ToArray();
                     //We will try twice if we get BASS_ERROR_ALREADY.
                     for (var a = 0; a < 2; a++)
                     {
@@ -142,14 +142,10 @@ namespace FoxTunes
 #endif
             try
             {
-                var advice = this.GetAdvice(playlistItem).ToArray();
                 var providers = this.GetProviders(playlistItem).ToArray();
                 foreach (var provider in providers)
                 {
-                    if (!provider.CanCreateStream(playlistItem))
-                    {
-                        continue;
-                    }
+                    var advice = this.GetAdvice(provider, playlistItem).ToArray();
                     var stream = await provider.CreateStream(playlistItem, flags, advice).ConfigureAwait(false);
                     if (stream.ChannelHandle != 0)
                     {

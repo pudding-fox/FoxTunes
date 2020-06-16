@@ -16,8 +16,22 @@ namespace FoxTunes
             }
         }
 
-        public override bool Advice(PlaylistItem playlistItem, out IBassStreamAdvice advice)
+        public BassCueStreamAdvisorBehaviour Behaviour { get; private set; }
+
+        public override void InitializeComponent(ICore core)
         {
+            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassCueStreamAdvisorBehaviour>();
+            base.InitializeComponent(core);
+        }
+
+        public override bool Advice(IBassStreamProvider provider, PlaylistItem playlistItem, out IBassStreamAdvice advice)
+        {
+            if (this.Behaviour == null || !this.Behaviour.Enabled)
+            {
+                advice = null;
+                return false;
+            }
+
             var fileName = default(string);
             var offset = default(string);
             var length = default(string);
