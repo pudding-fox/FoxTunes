@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FoxTunes.Interfaces;
 using ManagedBass.Cd;
-using FoxTunes.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -30,10 +30,18 @@ namespace FoxTunes
         public override bool InitializeComponent()
         {
             Logger.Write(this, LogLevel.Debug, "Querying CDDB for drive: {0}", this.Drive);
-            this.Parser = new CddbTextParser(BassCd.GetID(this.Drive, CDID.CDDB), BassCd.GetID(this.Drive, CDID.Read));
-            if (this.Parser.Count == 0)
+            try
             {
-                Logger.Write(this, LogLevel.Debug, "CDDB did not return any information for drive: {0}", this.Drive);
+                this.Parser = new CddbTextParser(BassCd.GetID(this.Drive, CDID.CDDB), BassCd.GetID(this.Drive, CDID.Read));
+                if (this.Parser.Count == 0)
+                {
+                    Logger.Write(this, LogLevel.Debug, "CDDB did not return any information for drive: {0}", this.Drive);
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to query CDDB for drive {0}: {1}", this.Drive, e.Message);
                 return false;
             }
             return base.InitializeComponent();
@@ -44,7 +52,7 @@ namespace FoxTunes
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var index in new[] { -1, track })
             {
-                if (this.Parser.Contains(index))
+                if (this.Parser != null && this.Parser.Contains(index))
                 {
                     foreach (var element in this.Parser.Get(index))
                     {
