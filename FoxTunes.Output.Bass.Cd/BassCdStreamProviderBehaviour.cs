@@ -6,8 +6,6 @@ using ManagedBass.Cd;
 using ManagedBass.Gapless.Cd;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -281,14 +279,13 @@ namespace FoxTunes
 
             public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
-            public IMetaDataSource MetaDataSource { get; private set; }
+            public CdPlaylistItemFactory Factory { get; private set; }
 
             public override void InitializeComponent(ICore core)
             {
                 this.PlaylistManager = core.Managers.Playlist;
                 this.PlaylistBrowser = core.Components.PlaylistBrowser;
-                this.MetaDataSource = new BassCdMetaDataSource(this.GetStrategy());
-                this.MetaDataSource.InitializeComponent(this.Core);
+                this.Factory = new CdPlaylistItemFactory(this.Drive, this.CdLookup, this.CdLookupHost);
                 base.InitializeComponent(core);
             }
 
@@ -305,13 +302,14 @@ namespace FoxTunes
                     {
                         throw new InvalidOperationException("Drive is not ready.");
                     }
+                    var playlist = this.PlaylistManager.SelectedPlaylist;
+                    var playlistItems = await this.Factory.Create().ConfigureAwait(false);
                     using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
                         //Always append for now.
                         this.Sequence = this.PlaylistBrowser.GetInsertIndex(this.PlaylistManager.SelectedPlaylist);
-                        await this.AddPlaylistItems().ConfigureAwait(false);
+                        await this.AddPlaylistItems(playlist, playlistItems).ConfigureAwait(false);
                         await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
-                        await this.AddOrUpdateMetaData().ConfigureAwait(false);
                         await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
                     }))
                     {
@@ -326,116 +324,26 @@ namespace FoxTunes
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
             }
 
-            private async Task AddPlaylistItems()
+            private async Task AddPlaylistItems(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
             {
-                this.Name = "Getting track list";
-                var info = default(CDInfo);
-                BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
-                var id = BassCd.GetID(this.Drive, CDID.CDPlayer);
-                var directoryName = string.Format("{0}:\\", info.DriveLetter);
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    using (var writer = new PlaylistWriter(this.Database, transaction))
+                    var set = this.Database.Set<PlaylistItem>(transaction);
+                    var position = 0;
+                    foreach (var playlistItem in playlistItems)
                     {
-                        for (int a = 0, b = BassCd.GetTracks(this.Drive); a < b; a++)
-                        {
-                            if (BassCd.GetTrackLength(this.Drive, a) == -1)
-                            {
-                                //Not a music track.
-                                continue;
-                            }
-                            var fileName = BassCdUtils.CreateUrl(this.Drive, id, a);
-                            fileName += string.Format("/{0}", await this.GetFileName(fileName, a));
-                            Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
-                            var playlistItem = new PlaylistItem()
-                            {
-                                DirectoryName = directoryName,
-                                FileName = fileName,
-                                Sequence = this.Sequence + a,
-                                Status = PlaylistItemStatus.Import
-                            };
-                            await writer.Write(playlistItem).ConfigureAwait(false);
-                            this.Offset++;
-                        }
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        playlistItem.Playlist_Id = playlist.Id;
+                        playlistItem.Sequence = this.Sequence + position;
+                        playlistItem.Status = PlaylistItemStatus.Import;
+                        await set.AddAsync(playlistItem).ConfigureAwait(false);
+                        position++;
                     }
-                    transaction.Commit();
-                }
-            }
-
-            private async Task AddOrUpdateMetaData()
-            {
-                Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
-                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-                {
-                    var query = this.Database
-                        .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
-                        .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
-                    var info = default(CDInfo);
-                    BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
-                    using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, transaction))
+                    this.Offset += position;
+                    if (transaction.HasTransaction)
                     {
-                        foreach (var playlistItem in query)
-                        {
-                            var metaData = await this.MetaDataSource.GetMetaData(playlistItem.FileName).ConfigureAwait(false);
-                            foreach (var metaDataItem in metaData)
-                            {
-                                await writer.Write(playlistItem.Id, metaDataItem).ConfigureAwait(false);
-                            }
-                        }
+                        transaction.Commit();
                     }
-                    transaction.Commit();
-                }
-            }
-
-            private IBassCdMetaDataSourceStrategy GetStrategy()
-            {
-                if (this.CdLookup)
-                {
-                    var strategy = new BassCdMetaDataSourceCddaStrategy(this.Drive, this.CdLookupHost);
-                    if (strategy.InitializeComponent())
-                    {
-                        return strategy;
-                    }
-                }
-                {
-                    var strategy = new BassCdMetaDataSourceCdTextStrategy(this.Drive);
-                    if (strategy.InitializeComponent())
-                    {
-                        return strategy;
-                    }
-                }
-                return new BassCdMetaDataSourceStrategy(this.Drive);
-            }
-
-            private async Task<string> GetFileName(string fileName, int track)
-            {
-                var metaDatas = await this.MetaDataSource.GetMetaData(fileName).ConfigureAwait(false);
-                var metaData = metaDatas.ToDictionary(
-                    metaDataItem => metaDataItem.Name,
-                    metaDataItem => metaDataItem.Value,
-                    StringComparer.OrdinalIgnoreCase
-                );
-                var title = metaData.GetValueOrDefault(CommonMetaData.Title) ?? string.Empty;
-                if (!string.IsNullOrEmpty(title))
-                {
-                    var sanitize = new Func<string, string>(value =>
-                    {
-                        const char PLACEHOLDER = '_';
-                        var characters = Enumerable.Concat(
-                            Path.GetInvalidPathChars(),
-                            Path.GetInvalidFileNameChars()
-                        );
-                        foreach (var character in characters)
-                        {
-                            value = value.Replace(character, PLACEHOLDER);
-                        }
-                        return value;
-                    });
-                    return string.Format("{0:00} - {1}.cda", track + 1, sanitize(title));
-                }
-                else
-                {
-                    return string.Format("Track {0}.cda", track + 1);
                 }
             }
         }

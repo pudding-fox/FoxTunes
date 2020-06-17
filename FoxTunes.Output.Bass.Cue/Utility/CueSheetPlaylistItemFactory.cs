@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,7 +41,9 @@ namespace FoxTunes
                 var metaData = default(IEnumerable<MetaDataItem>);
                 try
                 {
-                    metaData = (await metaDataSource.GetMetaData(Path.Combine(directoryName, file.Path))).ToArray();
+                    metaData = (
+                        await metaDataSource.GetMetaData(Path.Combine(directoryName, file.Path)).ConfigureAwait(false)
+                    ).ToArray();
                 }
                 catch (Exception e)
                 {
