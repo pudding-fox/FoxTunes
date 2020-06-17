@@ -4,13 +4,10 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
+    //This component does not technically require an output but we don't want to present anything else with DSD data.
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent
     {
-        static BassDsdStreamProviderBehaviour()
-        {
-            BassPluginLoader.Instance.Load();
-        }
-
         public int Rate
         {
             get

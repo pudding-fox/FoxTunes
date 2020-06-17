@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FoxTunes
@@ -7,14 +8,6 @@ namespace FoxTunes
     public class BassCueStreamAdvisor : BassStreamAdvisor
     {
         public const string SCHEME = "cue";
-
-        public override byte Priority
-        {
-            get
-            {
-                return PRIORITY_HIGH;
-            }
-        }
 
         public BassCueStreamAdvisorBehaviour Behaviour { get; private set; }
 
@@ -24,12 +17,11 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override bool Advice(IBassStreamProvider provider, PlaylistItem playlistItem, out IBassStreamAdvice advice)
+        public override void Advise(IBassStreamProvider provider, PlaylistItem playlistItem, IList<IBassStreamAdvice> advice)
         {
             if (this.Behaviour == null || !this.Behaviour.Enabled)
             {
-                advice = null;
-                return false;
+                return;
             }
 
             var fileName = default(string);
@@ -37,11 +29,9 @@ namespace FoxTunes
             var length = default(string);
             if (!ParseUrl(playlistItem.FileName, out fileName, out offset, out length))
             {
-                advice = null;
-                return false;
+                return;
             }
-            advice = new BassCueStreamAdvice(fileName, offset, length);
-            return true;
+            advice.Add(new BassCueStreamAdvice(fileName, offset, length));
         }
 
         public static string CreateUrl(string fileName, string offset)

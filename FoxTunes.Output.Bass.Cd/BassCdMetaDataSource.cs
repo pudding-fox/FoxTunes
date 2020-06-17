@@ -25,7 +25,7 @@ namespace FoxTunes
             var drive = default(int);
             var id = default(string);
             var track = default(int);
-            if (!BassCdStreamProvider.ParseUrl(fileName, out drive, out id, out track))
+            if (!BassCdUtils.ParseUrl(fileName, out drive, out id, out track))
             {
                 //TODO: Warn.
 #if NET40

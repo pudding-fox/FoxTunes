@@ -3,22 +3,12 @@ using ManagedBass;
 using ManagedBass.Cd;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Data.Odbc;
 
 namespace FoxTunes
 {
     public class BassCdStreamProvider : BassStreamProvider
     {
-        public const string SCHEME = "cda";
-
-        public override byte Priority
-        {
-            get
-            {
-                return PRIORITY_HIGH;
-            }
-        }
-
         public override BassStreamProviderFlags Flags
         {
             get
@@ -27,68 +17,80 @@ namespace FoxTunes
             }
         }
 
-        public override bool CanCreateStream(PlaylistItem playlistItem)
+        public BassCdStreamProviderBehaviour Behaviour { get; private set; }
+
+        public override void InitializeComponent(ICore core)
         {
-            var drive = default(int);
-            var id = default(string);
-            var track = default(int);
-            return ParseUrl(playlistItem.FileName, out drive, out id, out track);
+            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassCdStreamProviderBehaviour>();
+            base.InitializeComponent(core);
         }
 
-#if NET40
-        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#else
-        public override async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#endif
+        public override bool CanCreateStream(PlaylistItem playlistItem)
+        {
+            if (this.Behaviour == null || !this.Behaviour.Enabled)
+            {
+                return false;
+            }
+            var drive = default(int);
+            var id = default(string);
+            var track = default(int);
+            return BassCdUtils.ParseUrl(playlistItem.FileName, out drive, out id, out track);
+        }
+
+        public override IBassStream CreateBasicStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             var drive = default(int);
             var id = default(string);
             var track = default(int);
-            if (!ParseUrl(playlistItem.FileName, out drive, out id, out track))
+            var fileName = this.GetFileName(playlistItem, advice);
+            if (!BassCdUtils.ParseUrl(fileName, out drive, out id, out track))
             {
-#if NET40
-                return TaskEx.FromResult(BassStream.Empty);
-#else
+                //This shouldn't happen as CanCreateStream would have returned false.
                 return BassStream.Empty;
-#endif
             }
             this.AssertDiscId(drive, id);
             var channelHandle = default(int);
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
+            if (this.GetCurrentStream(drive, track, out channelHandle))
             {
-                if (this.GetCurrentStream(drive, track, out channelHandle))
-                {
-#if NET40
-                    return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
-#else
-                    return this.CreateStream(channelHandle, advice);
-#endif
-                }
-                if (this.Output != null && this.Output.PlayFromMemory)
-                {
-                    Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
-                }
-                if (BassCd.FreeOld)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
-                    BassCd.FreeOld = false;
-                }
-                channelHandle = BassCd.CreateStream(drive, track, flags);
-#if NET40
-                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
-#else
-                return this.CreateStream(channelHandle, advice);
-#endif
+                return this.CreateBasicStream(channelHandle, advice);
             }
-            finally
+            if (BassCd.FreeOld)
             {
-                this.Semaphore.Release();
+                Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
+                BassCd.FreeOld = false;
             }
+            channelHandle = BassCd.CreateStream(drive, track, flags);
+            return this.CreateBasicStream(channelHandle, advice);
+        }
+
+        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        {
+            var drive = default(int);
+            var id = default(string);
+            var track = default(int);
+            var fileName = this.GetFileName(playlistItem, advice);
+            if (!BassCdUtils.ParseUrl(fileName, out drive, out id, out track))
+            {
+                //This shouldn't happen as CanCreateStream would have returned false.
+                return BassStream.Empty;
+            }
+            this.AssertDiscId(drive, id);
+            var channelHandle = default(int);
+            if (this.GetCurrentStream(drive, track, out channelHandle))
+            {
+                return this.CreateInteractiveStream(channelHandle, advice);
+            }
+            if (this.Output != null && this.Output.PlayFromMemory)
+            {
+                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+            }
+            if (BassCd.FreeOld)
+            {
+                Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
+                BassCd.FreeOld = false;
+            }
+            channelHandle = BassCd.CreateStream(drive, track, flags);
+            return this.CreateInteractiveStream(channelHandle, advice);
         }
 
         protected virtual void AssertDiscId(int drive, string expected)
@@ -131,34 +133,6 @@ namespace FoxTunes
             }
             channelHandle = 0;
             return false;
-        }
-
-        public static string CreateUrl(int drive, string id, int track)
-        {
-            return string.Format("{0}://{1}/{2}/{3}", SCHEME, id, drive, track);
-        }
-
-        public static bool ParseUrl(string url, out int drive, out string id, out int track)
-        {
-            return ParseUrl(new Uri(url), out drive, out id, out track);
-        }
-
-        public static bool ParseUrl(Uri url, out int drive, out string id, out int track)
-        {
-            drive = default(int);
-            id = default(string);
-            track = default(int);
-            if (!string.Equals(url.Scheme, SCHEME, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-            var host = url.GetComponents(UriComponents.Host, UriFormat.Unescaped);
-            var path = url.GetComponents(UriComponents.Path, UriFormat.Unescaped);
-            var parts = path.Split('/');
-            return
-                !string.IsNullOrEmpty(id = host) &&
-                parts.Length > 0 && int.TryParse(parts[0], out drive) &&
-                parts.Length > 1 && int.TryParse(parts[1], out track);
         }
     }
 }

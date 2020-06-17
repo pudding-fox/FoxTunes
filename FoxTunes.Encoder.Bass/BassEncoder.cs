@@ -349,12 +349,10 @@ namespace FoxTunes
             {
                 return BassStream.Empty;
             }
-            //TODO: Bad .Result
-            var stream = streamFactory.CreateStream(
+            var stream = streamFactory.CreateBasicStream(
                 playlistItem,
-                false,
                 flags
-            ).Result;
+            );
             if (stream.IsEmpty)
             {
                 if (stream.Errors == Errors.Already)

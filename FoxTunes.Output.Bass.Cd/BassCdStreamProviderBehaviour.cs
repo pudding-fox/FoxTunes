@@ -344,7 +344,7 @@ namespace FoxTunes
                                 //Not a music track.
                                 continue;
                             }
-                            var fileName = BassCdStreamProvider.CreateUrl(this.Drive, id, a);
+                            var fileName = BassCdUtils.CreateUrl(this.Drive, id, a);
                             fileName += string.Format("/{0}", await this.GetFileName(fileName, a));
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                             var playlistItem = new PlaylistItem()
