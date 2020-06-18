@@ -55,7 +55,7 @@ namespace FoxTunes
             if (channelHandle == 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
-                return BassStream.Empty;
+                return BassStream.Error(Bass.LastError);
             }
             var stream = default(IBassStream);
             foreach (var advisory in advice)
@@ -101,7 +101,7 @@ namespace FoxTunes
             if (channelHandle == 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
-                return BassStream.Empty;
+                return BassStream.Error(Bass.LastError);
             }
             var stream = default(IBassStream);
             foreach (var advisory in advice)

@@ -3,6 +3,7 @@ using System;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassOutputVolume : BassOutputEffect, IOutputVolume, IStandardComponent, IDisposable
     {
         public override bool Available

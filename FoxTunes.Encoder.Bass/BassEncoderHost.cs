@@ -145,15 +145,23 @@ namespace FoxTunes
             };
             var thread3 = new Thread(() =>
             {
+                var exit = default(bool);
                 try
                 {
                     Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Starting encoder input thread.");
                     while (thread1.IsAlive)
                     {
-                        ProcessInput(encoder, input, output);
+                        ProcessInput(encoder, input, output, out exit);
+                        if (exit)
+                        {
+                            break;
+                        }
                         Thread.Sleep(INTERVAL);
                     }
-                    ProcessInput(encoder, input, output);
+                    if (!exit)
+                    {
+                        ProcessInput(encoder, input, output, out exit);
+                    }
                     Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Finished encoder input thread.");
                 }
                 catch (Exception e)
@@ -180,7 +188,7 @@ namespace FoxTunes
             }
         }
 
-        private static void ProcessInput(IBassEncoder encoder, Stream input, Stream output)
+        private static void ProcessInput(IBassEncoder encoder, Stream input, Stream output, out bool exit)
         {
             Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Begin reading command.");
             var command = ReadInput<EncoderCommand>(input);
@@ -192,11 +200,16 @@ namespace FoxTunes
                     encoder.Cancel();
                     Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Closing stdin.");
                     input.Close();
+                    exit = true;
                     break;
                 case EncoderCommandType.Quit:
                     Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Closing stdin/stdout.");
                     input.Close();
                     output.Close();
+                    exit = true;
+                    break;
+                default:
+                    exit = false;
                     break;
             }
         }

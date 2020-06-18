@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class FilterParser : StandardComponent, IFilterParser, IConfigurableComponent
     {
         public FilterParser()
@@ -71,6 +72,7 @@ namespace FoxTunes
         }
 
         [Component("219DC49B-0916-4820-BDE2-9354A9586753", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+        [ComponentDependency(Slot = ComponentSlots.Database)]
         public class DefaultFilterParserProvider : FilterParserProvider
         {
             public ILibraryHierarchyCache LibraryHierarchyCache { get; private set; }
@@ -126,6 +128,7 @@ namespace FoxTunes
         }
 
         [Component("E49288CB-3FDA-4AE3-862C-F2E0911EE1DD", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_NORMAL)]
+        [ComponentDependency(Slot = ComponentSlots.Database)]
         public class KeyValueFilterParserProvider : FilterParserProvider
         {
             const string ENTRY = "ENTRY";
@@ -194,6 +197,7 @@ namespace FoxTunes
         }
 
         [Component("A14FFBBF-1985-45BA-8B9D-472B875A17FC", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+        [ComponentDependency(Slot = ComponentSlots.Database)]
         public class RatingFilterParserProvider : FilterParserProvider
         {
             const string RATING = "RATING";

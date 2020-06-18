@@ -49,7 +49,7 @@ namespace FoxTunes
                     //Not a music track.
                     continue;
                 }
-                var fileName = BassCdUtils.CreateUrl(this.Drive, id, a);
+                var fileName = CdUtils.CreateUrl(this.Drive, id, a);
                 var metaData = default(MetaDataItem[]);
                 try
                 {

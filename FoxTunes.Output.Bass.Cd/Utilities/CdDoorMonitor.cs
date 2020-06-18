@@ -139,7 +139,7 @@ namespace FoxTunes
             }
             var id = default(string);
             var track = default(int);
-            return BassCdUtils.ParseUrl(outputStream.FileName, out drive, out id, out track);
+            return CdUtils.ParseUrl(outputStream.FileName, out drive, out id, out track);
         }
 
         protected virtual void UpdateState(bool notify)
@@ -149,7 +149,12 @@ namespace FoxTunes
             {
                 return;
             }
-            if (BassCd.DoorIsOpen(drive) || !BassCd.IsReady(drive))
+            var state = default(bool);
+            lock (SyncRoot)
+            {
+                state = BassCd.DoorIsOpen(drive) || !BassCd.IsReady(drive);
+            }
+            if (state)
             {
                 this.UpdateState(notify, CdDoorState.Open);
             }

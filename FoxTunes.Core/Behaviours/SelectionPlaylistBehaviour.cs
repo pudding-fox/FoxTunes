@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class SelectionPlaylistBehaviour : PlaylistBehaviourBase
     {
         public override Func<Playlist, bool> Predicate

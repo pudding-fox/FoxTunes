@@ -145,15 +145,23 @@ namespace FoxTunes
             };
             var thread3 = new Thread(() =>
             {
+                var exit = default(bool);
                 try
                 {
                     Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Starting scanner input thread.");
                     while (thread1.IsAlive)
                     {
-                        ProcessInput(scanner, input, output);
+                        ProcessInput(scanner, input, output, out exit);
+                        if (exit)
+                        {
+                            break;
+                        }
                         Thread.Sleep(INTERVAL);
                     }
-                    ProcessInput(scanner, input, output);
+                    if (!exit)
+                    {
+                        ProcessInput(scanner, input, output, out exit);
+                    }
                     Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Finished scanner input thread.");
                 }
                 catch (Exception e)
@@ -180,7 +188,7 @@ namespace FoxTunes
             }
         }
 
-        private static void ProcessInput(IBassReplayGainScanner scanner, Stream input, Stream output)
+        private static void ProcessInput(IBassReplayGainScanner scanner, Stream input, Stream output, out bool exit)
         {
             Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Begin reading command.");
             var command = ReadInput<ScannerCommand>(input);
@@ -192,11 +200,16 @@ namespace FoxTunes
                     scanner.Cancel();
                     Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Closing stdin.");
                     input.Close();
+                    exit = true;
                     break;
                 case ScannerCommandType.Quit:
                     Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Closing stdin/stdout.");
                     input.Close();
                     output.Close();
+                    exit = true;
+                    break;
+                default:
+                    exit = false;
                     break;
             }
         }

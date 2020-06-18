@@ -43,18 +43,18 @@ namespace FoxTunes
             }
         }
 
-        private int _CdDrive { get; set; }
+        private int _Drive { get; set; }
 
-        public int CdDrive
+        public int Drive
         {
             get
             {
-                return this._CdDrive;
+                return this._Drive;
             }
             set
             {
-                this._CdDrive = value;
-                Logger.Write(this, LogLevel.Debug, "CD Drive = {0}", this.CdDrive);
+                this._Drive = value;
+                Logger.Write(this, LogLevel.Debug, "Drive = {0}", this.Drive);
             }
         }
 
@@ -102,10 +102,6 @@ namespace FoxTunes
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
-            this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassCdStreamProviderBehaviourConfiguration.SECTION,
-                BassCdStreamProviderBehaviourConfiguration.DRIVE_ELEMENT
-            ).ConnectValue(value => this.CdDrive = BassCdStreamProviderBehaviourConfiguration.GetDrive(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_ELEMENT
@@ -119,7 +115,7 @@ namespace FoxTunes
 
         protected virtual void OnInit(object sender, EventArgs e)
         {
-            if (!this.Enabled || this.CdDrive == BassCdStreamProviderBehaviourConfiguration.CD_NO_DRIVE)
+            if (!this.Enabled || this.Drive == CdUtils.NO_DRIVE)
             {
                 return;
             }
@@ -129,7 +125,7 @@ namespace FoxTunes
                 flags |= BassFlags.Float;
             }
             BassUtils.OK(BassGaplessCd.Init());
-            BassUtils.OK(BassGaplessCd.Enable(this.CdDrive, flags));
+            BassUtils.OK(BassGaplessCd.Enable(this.Drive, flags));
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS CD Initialized.");
         }
@@ -143,7 +139,7 @@ namespace FoxTunes
             BassGaplessCd.Disable();
             BassGaplessCd.Free();
             //Ignoring result on purpose.
-            BassCd.Release(this.CdDrive);
+            BassCd.Release(this.Drive);
             this.IsInitialized = false;
         }
 
@@ -165,9 +161,12 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled && this.CdDrive != BassCdStreamProviderBehaviourConfiguration.CD_NO_DRIVE)
+                if (this.Enabled)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, "Open CD");
+                    foreach (var drive in CdUtils.GetDrives())
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, drive, path: "Open CD");
+                    }
                 }
             }
         }
@@ -177,7 +176,12 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case OPEN_CD:
-                    return this.OpenCd();
+                    var drive = CdUtils.GetDrive(component.Name);
+                    if (drive == CdUtils.NO_DRIVE)
+                    {
+                        break;
+                    }
+                    return this.OpenCd(drive);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -186,14 +190,14 @@ namespace FoxTunes
 #endif
         }
 
-        public Task OpenCd()
+        public Task OpenCd(int drive)
         {
-            return this.OpenCd(this.PlaylistManager.SelectedPlaylist);
+            return this.OpenCd(this.PlaylistManager.SelectedPlaylist, drive);
         }
 
-        public async Task OpenCd(Playlist playlist)
+        public async Task OpenCd(Playlist playlist, int drive)
         {
-            using (var task = new AddCdToPlaylistTask(playlist, this.CdDrive, this.CdLookup, this.CdLookupHost))
+            using (var task = new AddCdToPlaylistTask(playlist, drive, this.CdLookup, this.CdLookupHost))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -286,15 +290,12 @@ namespace FoxTunes
                 this.PlaylistManager = core.Managers.Playlist;
                 this.PlaylistBrowser = core.Components.PlaylistBrowser;
                 this.Factory = new CdPlaylistItemFactory(this.Drive, this.CdLookup, this.CdLookupHost);
+                this.Factory.InitializeComponent(core);
                 base.InitializeComponent(core);
             }
 
             protected override async Task OnRun()
             {
-                if (this.Drive == BassCdStreamProviderBehaviourConfiguration.CD_NO_DRIVE)
-                {
-                    throw new InvalidOperationException("A valid drive must be provided.");
-                }
                 this.Name = "Opening CD";
                 try
                 {

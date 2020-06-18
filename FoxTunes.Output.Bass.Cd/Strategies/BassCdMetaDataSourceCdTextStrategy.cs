@@ -7,6 +7,8 @@ namespace FoxTunes
 {
     public class BassCdMetaDataSourceCdTextStrategy : BassCdMetaDataSourceStrategy
     {
+        public static readonly object SyncRoot = new object();
+
         private static IDictionary<string, string> NAMES = new Dictionary<string, string>()
         {
             { "TITLE", CommonMetaData.Title },
@@ -26,7 +28,10 @@ namespace FoxTunes
         public override bool InitializeComponent()
         {
             Logger.Write(this, LogLevel.Debug, "Querying CD-TEXT for drive: {0}", this.Drive);
-            this.Parser = new CdTextParser(BassCd.GetIDText(this.Drive));
+            lock (SyncRoot)
+            {
+                this.Parser = new CdTextParser(BassCd.GetIDText(this.Drive));
+            }
             if (this.Parser.Count == 0)
             {
                 Logger.Write(this, LogLevel.Debug, "CD-TEXT did not return any information for drive: {0}", this.Drive);

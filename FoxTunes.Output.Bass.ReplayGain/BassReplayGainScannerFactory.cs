@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassReplayGainScannerFactory : StandardComponent, IBassReplayGainScannerFactory
     {
         public string Location

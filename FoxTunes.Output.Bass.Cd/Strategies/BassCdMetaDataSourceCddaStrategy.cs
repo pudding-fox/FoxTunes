@@ -7,6 +7,8 @@ namespace FoxTunes
 {
     public class BassCdMetaDataSourceCddaStrategy : BassCdMetaDataSourceStrategy
     {
+        public static readonly object SyncRoot = new object();
+
         private static IDictionary<string, string> NAMES = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "TTITLE", CommonMetaData.Title },
@@ -32,7 +34,13 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Querying CDDB for drive: {0}", this.Drive);
             try
             {
-                this.Parser = new CddbTextParser(BassCd.GetID(this.Drive, CDID.CDDB), BassCd.GetID(this.Drive, CDID.Read));
+                //The CDDB and Read must be executed together so synchronize.
+                lock (SyncRoot)
+                {
+                    var id = BassCd.GetID(this.Drive, CDID.CDDB);
+                    var sequence = BassCd.GetID(this.Drive, CDID.Read);
+                    this.Parser = new CddbTextParser(id, sequence);
+                }
                 if (this.Parser.Count == 0)
                 {
                     Logger.Write(this, LogLevel.Debug, "CDDB did not return any information for drive: {0}", this.Drive);

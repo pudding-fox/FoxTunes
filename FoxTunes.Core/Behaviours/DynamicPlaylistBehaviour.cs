@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class DynamicPlaylistBehaviour : PlaylistBehaviourBase
     {
         public override Func<Playlist, bool> Predicate

@@ -3,6 +3,7 @@ using System.Text;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public abstract class FilterParserProvider : StandardComponent, IFilterParserProvider
     {
         public IFilterParser FilterParser { get; private set; }
