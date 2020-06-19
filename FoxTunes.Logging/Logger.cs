@@ -158,6 +158,10 @@ namespace FoxTunes
                 //Failed to open the output file, nothing can be done.
                 return;
             }
+            message = this.FormatMessage(type, level, message, args);
+#if DEBUG
+            global::System.Diagnostics.Debug.WriteLine(message);
+#endif
             try
             {
                 if (!this.Semaphore.Wait(TIMEOUT))
@@ -167,7 +171,7 @@ namespace FoxTunes
                 }
                 try
                 {
-                    this.Writer.Value.WriteLine(this.FormatMessage(type, level, message, args));
+                    this.Writer.Value.WriteLine(message);
                     this.Writer.Value.Flush();
                 }
                 finally

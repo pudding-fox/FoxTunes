@@ -423,17 +423,17 @@ namespace FoxTunes
                     {
                         if (pipeline.Input.Contains(outputStream.ChannelHandle))
                         {
-                            var current = pipeline.Input.Position(outputStream.ChannelHandle) == 0;
-                            if (current)
-                            {
-                                Logger.Write(this, LogLevel.Debug, "Stream is playing, stopping the pipeline and clearing the buffer: {0}", outputStream.ChannelHandle);
-                                pipeline.Stop();
-                            }
+                            //var current = pipeline.Input.Position(outputStream.ChannelHandle) == 0;
                             pipeline.Input.Remove(outputStream.ChannelHandle);
-                            if (current)
-                            {
-                                pipeline.ClearBuffer();
-                            }
+                            //if (current)
+                            //{
+                            //    Logger.Write(this, LogLevel.Debug, "Stream is playing, stopping the pipeline and clearing the buffer: {0}", outputStream.ChannelHandle);
+                            //    pipeline.Stop();
+                            //}
+                            //if (current)
+                            //{
+                            //    pipeline.ClearBuffer();
+                            //}
                         }
                     }
                 }).ConfigureAwait(false);

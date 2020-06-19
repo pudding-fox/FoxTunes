@@ -215,6 +215,12 @@ MOD="
 FoxTunes.Output.Bass.Mod.dll
 "
 
+CROSSFADE="
+FoxTunes.Output.Bass.Crossfade.dll
+ManagedBass.Crossfade.dll
+bass_crossfade.dll
+"
+
 MINIMAL="
 bass
 conf
@@ -228,6 +234,7 @@ BUNDLED="
 asio
 cd
 cue
+crossfade
 dsd
 dts
 encoder
@@ -242,8 +249,8 @@ wasapi
 windows
 "
 
-TAG=$(git describe --abbrev=0 --tags)
-#TAG="$(date +%F)-nightly"
+#TAG=$(git describe --abbrev=0 --tags)
+TAG="$(date +%F)-nightly"
 
 echo "Current version is $TAG.."
 sleep 1
@@ -269,6 +276,7 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/bass/addon"
 		mkdir -p "./release/$platform/$target/Plugins/cd"
 		mkdir -p "./release/$platform/$target/Plugins/cue"
+		mkdir -p "./release/$platform/$target/Plugins/crossfade"
 		mkdir -p "./release/$platform/$target/Plugins/conf"
 		mkdir -p "./release/$platform/$target/Plugins/dsd"
 		mkdir -p "./release/$platform/$target/Plugins/dts"
@@ -527,6 +535,14 @@ do
 		do
 			echo "$file"
 			cp "./distribution/$platform/$target/Addon/$file" "./release/$platform/$target/Plugins/mod/addon"
+		done
+		echo
+
+		echo "Creating plugin: crossfade"
+		for file in $CROSSFADE
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/crossfade"
 		done
 		echo
 

@@ -31,12 +31,7 @@ namespace FoxTunes
         static BassPluginLoader()
         {
             FxVersion = BassFx.Version;
-#if NET40
             MixVersion = BassMix.Version;
-#else
-            //TODO: Why is BassMix.Version not available?
-            MixVersion = default(Version);
-#endif
         }
 
         public static string Location

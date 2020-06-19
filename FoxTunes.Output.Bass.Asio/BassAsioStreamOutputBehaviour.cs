@@ -99,8 +99,8 @@ namespace FoxTunes
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
-                BassOutputConfiguration.MODE_ELEMENT
-            ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassAsioStreamOutputConfiguration.MODE_ASIO_OPTION, StringComparison.OrdinalIgnoreCase));
+                BassOutputConfiguration.OUTPUT_ELEMENT
+            ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassAsioStreamOutputConfiguration.OUTPUT_ASIO_OPTION, StringComparison.OrdinalIgnoreCase));
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassAsioStreamOutputConfiguration.ELEMENT_ASIO_DEVICE

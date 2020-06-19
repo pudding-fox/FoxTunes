@@ -9,6 +9,8 @@ namespace FoxTunes.Interfaces
 
         int ChannelHandle { get; }
 
+        int[] Syncs { get; }
+
         long Length { get; }
 
         long Position { get; set; }

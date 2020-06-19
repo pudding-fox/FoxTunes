@@ -1,23 +1,52 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass.Gapless;
 using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
+    [Component("9B40FE6A-89F1-4F97-888C-05D7B34EC42A", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassGaplessStreamInputBehaviour : StandardBehaviour, IDisposable
+    public class BassGaplessStreamInputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public ICore Core { get; private set; }
+
         public IBassOutput Output { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
 
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         new public bool IsInitialized { get; private set; }
 
+        private bool _Enabled { get; set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this._Enabled;
+            }
+            set
+            {
+                this._Enabled = value;
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.INPUT_ELEMENT
+            ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassGaplessStreamInputConfiguration.INPUT_GAPLESS_OPTION, StringComparison.OrdinalIgnoreCase));
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
@@ -42,7 +71,17 @@ namespace FoxTunes
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             e.Input = new BassGaplessStreamInput(this, e.Stream);
+            e.Input.InitializeComponent(this.Core);
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return BassGaplessStreamInputConfiguration.GetConfigurationSections();
         }
 
         public bool IsDisposed { get; private set; }
