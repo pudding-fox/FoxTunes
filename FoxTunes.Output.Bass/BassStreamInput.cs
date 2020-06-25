@@ -55,15 +55,15 @@ namespace FoxTunes
 
         public event EventHandler Invalidate;
 
-        public abstract bool CheckFormat(int channelHandle);
+        public abstract bool CheckFormat(BassOutputStream stream);
 
-        public abstract bool Contains(int channelHandle);
+        public abstract bool Contains(BassOutputStream stream);
 
-        public abstract int Position(int channelHandle);
+        public abstract int Position(BassOutputStream stream);
 
-        public abstract bool Add(int channelHandle);
+        public abstract bool Add(BassOutputStream stream);
 
-        public abstract bool Remove(int channelHandle);
+        public abstract bool Remove(BassOutputStream stream, bool dispose);
 
         public abstract void Reset();
 

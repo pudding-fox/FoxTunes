@@ -123,7 +123,7 @@ namespace FoxTunes
                 {
                     if (pipeline != null)
                     {
-                        result = pipeline.Input.Contains(this.ChannelHandle);
+                        result = pipeline.Input.Contains(this);
                     }
                 });
                 return result;

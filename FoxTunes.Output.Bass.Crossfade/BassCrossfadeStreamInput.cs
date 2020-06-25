@@ -81,56 +81,71 @@ namespace FoxTunes
             }
         }
 
-        public override bool CheckFormat(int channelHandle)
+        public override bool CheckFormat(BassOutputStream stream)
         {
             var rate = default(int);
             var channels = default(int);
-            if (BassUtils.GetChannelDsdRaw(channelHandle))
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
-                rate = BassUtils.GetChannelDsdRate(channelHandle);
-                channels = BassUtils.GetChannelCount(channelHandle);
+                rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
+                channels = BassUtils.GetChannelCount(stream.ChannelHandle);
             }
             else
             {
-                rate = BassUtils.GetChannelPcmRate(channelHandle);
-                channels = BassUtils.GetChannelCount(channelHandle);
+                rate = BassUtils.GetChannelPcmRate(stream.ChannelHandle);
+                channels = BassUtils.GetChannelCount(stream.ChannelHandle);
             }
             return this.Rate == rate && this.Channels == channels;
         }
 
-        public override bool Contains(int channelHandle)
+        public override bool Contains(BassOutputStream stream)
         {
-            return this.Queue.Contains(channelHandle);
+            return this.Queue.Contains(stream.ChannelHandle);
         }
 
-        public override int Position(int channelHandle)
+        public override int Position(BassOutputStream stream)
         {
             var count = default(int);
             var channelHandles = BassCrossfade.GetChannels(out count);
-            return channelHandles.IndexOf(channelHandle);
+            return channelHandles.IndexOf(stream.ChannelHandle);
         }
 
-        public override bool Add(int channelHandle)
+        public override bool Add(BassOutputStream stream)
         {
-            if (this.Queue.Contains(channelHandle))
+            if (this.Queue.Contains(stream.ChannelHandle))
             {
-                Logger.Write(this, LogLevel.Debug, "Stream is already enqueued: {0}", channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Stream is already enqueued: {0}", stream.ChannelHandle);
                 return false;
             }
-            Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", channelHandle);
-            BassUtils.OK(BassCrossfade.ChannelEnqueue(channelHandle));
+            Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", stream.ChannelHandle);
+            BassUtils.OK(BassCrossfade.ChannelEnqueue(stream.ChannelHandle));
             return true;
         }
 
-        public override bool Remove(int channelHandle)
+        public override bool Remove(BassOutputStream stream, bool dispose)
         {
-            if (!this.Queue.Contains(channelHandle))
+            if (!this.Queue.Contains(stream.ChannelHandle))
             {
-                Logger.Write(this, LogLevel.Debug, "Stream is not enqueued: {0}", channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Stream is not enqueued: {0}", stream.ChannelHandle);
                 return false;
             }
-            Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
-            BassUtils.OK(BassCrossfade.ChannelRemove(channelHandle));
+            Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", stream.ChannelHandle);
+            //Fork because fade out blocks.
+            this.Dispatch(() =>
+            {
+                try
+                {
+                    BassUtils.OK(BassCrossfade.ChannelRemove(stream.ChannelHandle));
+                    if (dispose)
+                    {
+                        stream.Dispose();
+                    }
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on background thread.
+                }
+            });
             return true;
         }
 
@@ -139,7 +154,8 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Resetting the queue.");
             foreach (var channelHandle in this.Queue)
             {
-                this.Remove(channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
+                BassCrossfade.ChannelRemove(channelHandle);
             }
             this.ClearBuffer();
         }
