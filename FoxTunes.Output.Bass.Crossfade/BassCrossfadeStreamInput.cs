@@ -133,17 +133,10 @@ namespace FoxTunes
             //Fork because fade out blocks.
             this.Dispatch(() =>
             {
-                try
+                BassUtils.OK(BassCrossfade.ChannelRemove(stream.ChannelHandle));
+                if (dispose)
                 {
-                    BassUtils.OK(BassCrossfade.ChannelRemove(stream.ChannelHandle));
-                    if (dispose)
-                    {
-                        stream.Dispose();
-                    }
-                }
-                catch
-                {
-                    //Nothing can be done, never throw on background thread.
+                    stream.Dispose();
                 }
             });
             return true;

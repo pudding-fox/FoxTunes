@@ -141,11 +141,7 @@ namespace FoxTunes
                     {
                         return;
                     }
-#if NET40
-                    var task = TaskEx.Run(() => this.UpdateMetaData(stream, gain, peak, mode));
-#else
-                    var task = Task.Run(() => this.UpdateMetaData(stream, gain, peak, mode));
-#endif
+                    this.Dispatch(() => this.UpdateMetaData(stream, gain, peak, mode));
                 }
                 else
                 {

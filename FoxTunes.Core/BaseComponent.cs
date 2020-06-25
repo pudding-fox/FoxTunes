@@ -26,19 +26,44 @@ namespace FoxTunes
         protected virtual void Dispatch(Action action)
         {
 #if NET40
-            var task = TaskEx.Run(action);
+            var task = TaskEx.Run(() =>
 #else
-            var task = Task.Run(action);
+            var task = Task.Run(() =>
 #endif
+            {
+                try
+                {
+                    action();
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on background thread.
+                }
+            });
         }
 
         protected virtual void Dispatch(Func<Task> function)
         {
 #if NET40
-            var task = TaskEx.Run(function);
+            var task = TaskEx.Run(() =>
 #else
-            var task = Task.Run(function);
+            var task = Task.Run(() =>
 #endif
+            {
+                try
+                {
+                    return function();
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on background thread.
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }
+            });
         }
 
         protected virtual void OnPropertyChanging(string propertyName)

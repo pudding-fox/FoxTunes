@@ -28,10 +28,12 @@ namespace FoxTunes
             }
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
-            var task = TaskEx.Run(() => this.DeviceStateChanged(this, new NotificationClientEventArgs(null, null, deviceId, state, PropertyKey.Empty)));
+            var task = TaskEx.Run(
 #else
-            var task = Task.Run(() => this.DeviceStateChanged(this, new NotificationClientEventArgs(null, null, deviceId, state, PropertyKey.Empty)));
+            var task = Task.Run(
 #endif
+                () => this.DeviceStateChanged(this, new NotificationClientEventArgs(null, null, deviceId, state, PropertyKey.Empty))
+            );
         }
 
         public event NotificationClientEventHandler DeviceStateChanged;
@@ -44,10 +46,12 @@ namespace FoxTunes
             }
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
-            var task = TaskEx.Run(() => this.DeviceAdded(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty)));
+            var task = TaskEx.Run(
 #else
-            var task = Task.Run(() => this.DeviceAdded(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty)));
+            var task = Task.Run(
 #endif
+                () => this.DeviceAdded(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty))
+            );
         }
 
         public event NotificationClientEventHandler DeviceAdded;
@@ -60,10 +64,12 @@ namespace FoxTunes
             }
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
-            var task = TaskEx.Run(() => this.DeviceRemoved(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty)));
+            var task = TaskEx.Run(
 #else
-            var task = Task.Run(() => this.DeviceRemoved(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty)));
+            var task = Task.Run(
 #endif
+                () => this.DeviceRemoved(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty))
+            );
         }
 
         public event NotificationClientEventHandler DeviceRemoved;
@@ -76,10 +82,12 @@ namespace FoxTunes
             }
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
-            var task = TaskEx.Run(() => this.DefaultDeviceChanged(this, new NotificationClientEventArgs(flow, role, deviceId, null, PropertyKey.Empty)));
+            var task = TaskEx.Run(
 #else
-            var task = Task.Run(() => this.DefaultDeviceChanged(this, new NotificationClientEventArgs(flow, role, deviceId, null, PropertyKey.Empty)));
+            var task = Task.Run(
 #endif
+                () => this.DefaultDeviceChanged(this, new NotificationClientEventArgs(flow, role, deviceId, null, PropertyKey.Empty))
+            );
         }
 
         public event NotificationClientEventHandler DefaultDeviceChanged;
@@ -92,10 +100,12 @@ namespace FoxTunes
             }
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
-            var task = TaskEx.Run(() => this.PropertyValueChanged(this, new NotificationClientEventArgs(null, null, deviceId, null, key)));
+            var task = TaskEx.Run(
 #else
-            var task = Task.Run(() => this.PropertyValueChanged(this, new NotificationClientEventArgs(null, null, deviceId, null, key)));
+            var task = Task.Run(
 #endif
+                () => this.PropertyValueChanged(this, new NotificationClientEventArgs(null, null, deviceId, null, key))
+            );
         }
 
         public event NotificationClientEventHandler PropertyValueChanged;

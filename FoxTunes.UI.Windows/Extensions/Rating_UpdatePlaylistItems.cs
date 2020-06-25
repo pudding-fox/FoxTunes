@@ -86,13 +86,7 @@ namespace FoxTunes
 
             protected virtual void SetRating(IEnumerable<PlaylistItem> playlistItems, byte rating)
             {
-#if NET40
-                var task = TaskEx.Run(
-#else
-                var task = Task.Run(
-#endif
-                    () => PlaylistManager.SetRating(playlistItems, rating)
-                );
+                this.Dispatch(() => PlaylistManager.SetRating(playlistItems, rating));
             }
         }
     }

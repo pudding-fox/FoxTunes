@@ -44,14 +44,7 @@ namespace FoxTunes
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
-            this.Debouncer.Exec(() =>
-            {
-#if NET40
-                var task = TaskEx.Run(() => this.EnqueueItems());
-#else
-                var task = Task.Run(() => this.EnqueueItems());
-#endif
-            });
+            this.Debouncer.Exec(() => this.Dispatch(this.EnqueueItems));
         }
 
         private async Task EnqueueItems()
@@ -71,6 +64,7 @@ namespace FoxTunes
                 }
                 if (this.OutputStreamQueue.Requeue(playlistItem))
                 {
+                    //TODO: What is this Delay for?
 #if NET40
                     await TaskEx.Delay(1).ConfigureAwait(false);
 #else
