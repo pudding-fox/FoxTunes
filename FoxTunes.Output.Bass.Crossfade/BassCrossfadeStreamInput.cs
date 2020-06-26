@@ -33,7 +33,7 @@ namespace FoxTunes
         {
             get
             {
-                return "Crossfade";
+                return "Fading";
             }
         }
 
@@ -42,8 +42,10 @@ namespace FoxTunes
             get
             {
                 return string.Format(
-                    "{0} ({1}/{2}/{3})",
+                    "{0} ({1:0.00s}/{2:0.00s}) ({3}/{4}/{5})",
                     this.Name,
+                    (float)this.Behaviour.InPeriod / 1000,
+                    (float)this.Behaviour.OutPeriod / 1000,
                     BassUtils.DepthDescription(this.Flags),
                     MetaDataInfo.SampleRateDescription(this.Rate),
                     MetaDataInfo.ChannelDescription(this.Channels)
