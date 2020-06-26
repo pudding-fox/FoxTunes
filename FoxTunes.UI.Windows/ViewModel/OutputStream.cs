@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
@@ -125,20 +126,20 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler IsSeekingChanged;
 
-        public void BeginSeek()
+        public Task BeginSeek()
         {
             var position = this.Position;
             this.IsSeeking = true;
             this.Position = position;
-            this.InnerOutputStream.BeginSeek();
+            return this.InnerOutputStream.BeginSeek();
         }
 
-        public void EndSeek()
+        public Task EndSeek()
         {
             var position = this.Position;
             this.IsSeeking = false;
             this.Position = position;
-            this.InnerOutputStream.EndSeek();
+            return this.InnerOutputStream.EndSeek();
         }
 
         protected override void OnDisposing()

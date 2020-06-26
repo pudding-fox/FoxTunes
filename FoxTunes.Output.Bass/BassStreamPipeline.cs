@@ -74,23 +74,47 @@ namespace FoxTunes
             this.All.ForEach(component => component.ClearBuffer());
         }
 
+        public void PreviewPlay()
+        {
+            //Nothing to do.
+        }
+
+        public void PreviewPause()
+        {
+            //Nothing to do.
+        }
+
+        public void PreviewResume()
+        {
+            //Nothing to do.
+        }
+
+        public void PreviewStop()
+        {
+            //Nothing to do.
+        }
+
         public void Play()
         {
+            this.Controllable.ForEach(component => component.PreviewPlay());
             this.Controllable.ForEach(component => component.Play());
         }
 
         public void Pause()
         {
+            this.Controllable.Reverse().ForEach(component => component.PreviewPause());
             this.Controllable.Reverse().ForEach(component => component.Pause());
         }
 
         public void Resume()
         {
+            this.Controllable.ForEach(component => component.PreviewResume());
             this.Controllable.ForEach(component => component.Resume());
         }
 
         public void Stop()
         {
+            this.Controllable.Reverse().ForEach(component => component.PreviewStop());
             this.Controllable.Reverse().ForEach(component => component.Stop());
         }
 

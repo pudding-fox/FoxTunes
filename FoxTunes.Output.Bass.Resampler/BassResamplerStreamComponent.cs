@@ -285,6 +285,26 @@ namespace FoxTunes
             }
         }
 
+        public void PreviewPlay()
+        {
+            //Nothing to do.
+        }
+
+        public void PreviewPause()
+        {
+            //Nothing to do.
+        }
+
+        public void PreviewResume()
+        {
+            //Nothing to do.
+        }
+
+        public void PreviewStop()
+        {
+            //Nothing to do.
+        }
+
         public void Play()
         {
             this.IsBackground = true;

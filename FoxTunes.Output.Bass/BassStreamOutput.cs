@@ -105,6 +105,26 @@ namespace FoxTunes
 
         public abstract int Latency { get; }
 
+        public virtual void PreviewPlay()
+        {
+            //Nothing to do.
+        }
+
+        public virtual void PreviewPause()
+        {
+            //Nothing to do.
+        }
+
+        public virtual void PreviewResume()
+        {
+            //Nothing to do.
+        }
+
+        public virtual void PreviewStop()
+        {
+            //Nothing to do.
+        }
+
         public abstract void Play();
 
         public abstract void Pause();
