@@ -24,24 +24,27 @@ namespace FoxTunes
 
         public const string TYPE_LINEAR_OPTION = "AAAA6A54-B0D9-4CFA-9AEC-4AE730D62716";
 
-        public const string TYPE_LOGARITHMIC_OPTION = "BBBBC8C7-FFE1-4522-AAC6-17D9F2E2638A";
+        public const string TYPE_IN_QUAD_OPTION = "BBBBC8C7-FFE1-4522-AAC6-17D9F2E2638A";
 
-        public const string TYPE_EXPONENTIAL_OPTION = "CCCC416A-08A4-4255-87CF-B4DF467A2285";
+        public const string TYPE_OUT_QUAD_OPTION = "CCCC416A-08A4-4255-87CF-B4DF467A2285";
 
-        public const string TYPE_EASE_IN_OPTION = "DDDD083D-8F1D-460C-A557-66DD71366F5C";
+        public const string TYPE_IN_EXPO_OPTION = "DDDD083D-8F1D-460C-A557-66DD71366F5C";
 
-        public const string TYPE_EASE_OUT_OPTION = "EEEED4F2-9E6E-4499-8D36-F219AB45AC85";
+        public const string TYPE_OUT_EXPO_OPTION = "EEEED4F2-9E6E-4499-8D36-F219AB45AC85";
+
+        public const string MIX_ELEMENT = "FFFF9C57-11C6-4D50-A0FF-BD38AE70EF0E";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Input")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.INPUT_ELEMENT, "Transport")
-                    .WithOptions(new[] { new SelectionConfigurationOption(INPUT_CROSSFADE_OPTION, "Crossfade") }))
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode", path: "Crossfade").WithOptions(GetModeOptions()))
-                .WithElement(new IntegerConfigurationElement(PERIOD_IN_ELEMENT, "Fade In Period", path: "Crossfade").WithValue(100).WithValidationRule(new IntegerValidationRule(0, 5000, step: 100)))
-                .WithElement(new IntegerConfigurationElement(PERIOD_OUT_ELEMENT, "Fade Out Period", path: "Crossfade").WithValue(100).WithValidationRule(new IntegerValidationRule(0, 5000, step: 100)))
-                .WithElement(new SelectionConfigurationElement(TYPE_IN_ELEMENT, "Fade In Curve", path: "Crossfade").WithOptions(GetTypeOptions(TYPE_EASE_IN_OPTION)))
-                .WithElement(new SelectionConfigurationElement(TYPE_OUT_ELEMENT, "Fade Out Curve", path: "Crossfade").WithOptions(GetTypeOptions(TYPE_EASE_OUT_OPTION))
+                    .WithOptions(new[] { new SelectionConfigurationOption(INPUT_CROSSFADE_OPTION, "Fading") }))
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode", path: "Fading").WithOptions(GetModeOptions()))
+                .WithElement(new IntegerConfigurationElement(PERIOD_IN_ELEMENT, "Fade In Period", path: "Fading").WithValue(100).WithValidationRule(new IntegerValidationRule(0, 5000, step: 100)))
+                .WithElement(new IntegerConfigurationElement(PERIOD_OUT_ELEMENT, "Fade Out Period", path: "Fading").WithValue(100).WithValidationRule(new IntegerValidationRule(0, 5000, step: 100)))
+                .WithElement(new SelectionConfigurationElement(TYPE_IN_ELEMENT, "Fade In Curve", path: "Fading").WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION)))
+                .WithElement(new SelectionConfigurationElement(TYPE_OUT_ELEMENT, "Fade Out Curve", path: "Fading").WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION)))
+                .WithElement(new BooleanConfigurationElement(MIX_ELEMENT, "Crossfade", path: "Fading").WithValue(false)
             );
         }
 
@@ -68,10 +71,10 @@ namespace FoxTunes
             var options = new[]
             {
                 new SelectionConfigurationOption(TYPE_LINEAR_OPTION, "Linear"),
-                new SelectionConfigurationOption(TYPE_LOGARITHMIC_OPTION, "Logarithmic"),
-                new SelectionConfigurationOption(TYPE_EXPONENTIAL_OPTION, "Exponential"),
-                new SelectionConfigurationOption(TYPE_EASE_IN_OPTION, "Ease In"),
-                new SelectionConfigurationOption(TYPE_EASE_OUT_OPTION, "Ease Out")
+                new SelectionConfigurationOption(TYPE_IN_QUAD_OPTION, "In Quad"),
+                new SelectionConfigurationOption(TYPE_OUT_QUAD_OPTION, "Out Quad"),
+                new SelectionConfigurationOption(TYPE_IN_EXPO_OPTION, "In Expo"),
+                new SelectionConfigurationOption(TYPE_OUT_EXPO_OPTION, "Out Expo")
             };
             foreach (var option in options)
             {
@@ -89,15 +92,15 @@ namespace FoxTunes
             {
                 case TYPE_LINEAR_OPTION:
                     return BassCrossfadeType.Linear;
-                case TYPE_LOGARITHMIC_OPTION:
-                    return BassCrossfadeType.Logarithmic;
-                case TYPE_EXPONENTIAL_OPTION:
-                    return BassCrossfadeType.Exponential;
+                case TYPE_IN_QUAD_OPTION:
+                    return BassCrossfadeType.InQuad;
                 default:
-                case TYPE_EASE_IN_OPTION:
-                    return BassCrossfadeType.EaseIn;
-                case TYPE_EASE_OUT_OPTION:
-                    return BassCrossfadeType.EaseOut;
+                case TYPE_OUT_QUAD_OPTION:
+                    return BassCrossfadeType.OutQuad;
+                case TYPE_IN_EXPO_OPTION:
+                    return BassCrossfadeType.InExpo;
+                case TYPE_OUT_EXPO_OPTION:
+                    return BassCrossfadeType.OutExpo;
             }
         }
     }
