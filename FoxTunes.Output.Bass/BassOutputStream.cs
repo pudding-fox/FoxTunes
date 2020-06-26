@@ -26,13 +26,19 @@ namespace FoxTunes
 
         public IBassStream Stream { get; private set; }
 
-        public IEnumerable<IBassStreamAdvice> Advice { get; private set; }
-
         public IBassStreamProvider Provider
         {
             get
             {
                 return this.Stream.Provider;
+            }
+        }
+
+        public IEnumerable<IBassStreamAdvice> Advice
+        {
+            get
+            {
+                return this.Stream.Advice;
             }
         }
 
