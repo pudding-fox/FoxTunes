@@ -1,5 +1,6 @@
 ﻿using ManagedBass;
 using System;
+using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
@@ -16,6 +17,8 @@ namespace FoxTunes.Interfaces
         long Position { get; set; }
 
         bool IsEmpty { get; }
+
+        IEnumerable<IBassStreamAdvice> Advice { get; }
 
         Errors Errors { get; }
 

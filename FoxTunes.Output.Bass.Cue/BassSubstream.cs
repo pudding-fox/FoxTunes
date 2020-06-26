@@ -1,12 +1,13 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public class BassSubstream : BassStream
     {
-        public BassSubstream(IBassStreamProvider provider, int channelHandle, int innerChannelHandle, long offset, long length) : base(provider, channelHandle, length)
+        public BassSubstream(IBassStreamProvider provider, int channelHandle, int innerChannelHandle, long offset, long length, IEnumerable<IBassStreamAdvice> advice) : base(provider, channelHandle, length, advice)
         {
             this.InnerChannelHandle = innerChannelHandle;
             this.Offset = offset;

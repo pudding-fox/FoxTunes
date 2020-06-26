@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
@@ -6,6 +6,6 @@ namespace FoxTunes.Interfaces
     {
         string FileName { get; }
 
-        bool Wrap(IBassStreamProvider provider, int channelHandle, out IBassStream stream);
+        bool Wrap(IBassStreamProvider provider, int channelHandle, IEnumerable<IBassStreamAdvice> advice, out IBassStream stream);
     }
 }
