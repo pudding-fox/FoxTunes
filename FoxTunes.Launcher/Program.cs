@@ -45,7 +45,13 @@ namespace FoxTunes.Launcher
                         }
                         if (!core.Factories.Database.Test())
                         {
-                            core.Components.UserInterface.Warn("The database was not found, attempting to initialize it.");
+                            if (core.Factories.Database.Flags.HasFlag(DatabaseFactoryFlags.ConfirmCreate))
+                            {
+                                if (!core.Components.UserInterface.Confirm("The database was not found, initialize it?."))
+                                {
+                                    throw new OperationCanceledException("Database initialization was cancelled.");
+                                }
+                            }
                             core.Factories.Database.Initialize();
                             if (!core.Factories.Database.Test())
                             {

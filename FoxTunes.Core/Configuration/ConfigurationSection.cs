@@ -2,11 +2,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace FoxTunes
 {
     [Serializable]
-    public class ConfigurationSection : BaseComponent
+    public class ConfigurationSection : BaseComponent, ISerializable
     {
         public ConfigurationSection()
         {
@@ -35,21 +37,26 @@ namespace FoxTunes
             return this;
         }
 
-        public void Update(ConfigurationSection section)
+        public void Update(ConfigurationSection section, bool create)
         {
-            this.Name = section.Name;
-            this.Description = section.Description;
             foreach (var element in section.Elements.ToArray())
             {
-                if (this.Contains(element.Id))
+                if (!this.Contains(element.Id))
                 {
-                    this.Update(element);
+                    if (!create)
+                    {
+                        //If config was created by a component that is no longer loaded then it will be lost here.
+                        //TODO: Add the config but hide it so it's preserved but not displayed.
+                        Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", element.Id);
+                        continue;
+                    }
+                    this.Add(element);
                 }
                 else
                 {
-                    this.Add(element);
+                    this.Update(element, create);
                 }
-            }            
+            }
         }
 
         private bool Contains(string id)
@@ -64,11 +71,11 @@ namespace FoxTunes
             this.Elements.Add(element);
         }
 
-        private void Update(ConfigurationElement element)
+        private void Update(ConfigurationElement element, bool create)
         {
             Logger.Write(this, LogLevel.Debug, "Updating configuration element: {0} => {1}", element.Id, element.Name);
             var existing = this.GetElement(element.Id);
-            existing.Update(element);
+            existing.Update(element, create);
         }
 
         private void Hide(ConfigurationElement element)
@@ -95,5 +102,22 @@ namespace FoxTunes
                 element.Reset();
             }
         }
+
+        #region ISerializable
+
+        protected ConfigurationSection(SerializationInfo info, StreamingContext context)
+        {
+            this.Id = info.GetString(nameof(this.Id));
+            this.Elements = (ObservableCollection<ConfigurationElement>)info.GetValue(nameof(this.Elements), typeof(ObservableCollection<ConfigurationElement>));
+        }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(this.Id), this.Id);
+            info.AddValue(nameof(this.Elements), this.Elements);
+        }
+
+        #endregion
     }
 }

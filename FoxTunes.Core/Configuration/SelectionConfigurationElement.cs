@@ -1,8 +1,9 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace FoxTunes
 {
@@ -28,19 +29,6 @@ namespace FoxTunes
         private bool Contains(string id)
         {
             return this.GetOption(id) != null;
-        }
-
-        private void Add(SelectionConfigurationOption option)
-        {
-            Logger.Write(this, LogLevel.Debug, "Adding configuration option: {0} => {1}", option.Id, option.Name);
-            this.Options.Add(option);
-        }
-
-        private void Update(SelectionConfigurationOption option)
-        {
-            Logger.Write(this, LogLevel.Debug, "Updating configuration option: {0} => {1}", option.Id, option.Name);
-            var existing = this.GetOption(option.Id);
-            existing.Update(option);
         }
 
         private SelectionConfigurationOption GetOption(string optionId)
@@ -81,51 +69,52 @@ namespace FoxTunes
             return this;
         }
 
-        protected override void OnUpdate(ConfigurationElement element)
+        protected override void OnUpdate(ConfigurationElement element, bool create)
         {
-            if (element is SelectionConfigurationElement)
+            var other = element as SelectionConfigurationElement;
+            if (other == null)
             {
-                this.OnUpdate(element as SelectionConfigurationElement);
+                return;
             }
-            base.OnUpdate(element);
+            if (create)
+            {
+                this.WithOptions(other.Options);
+            }
+            else
+            {
+                if (other.Value != null)
+                {
+                    var option = this.GetOption(other.Value.Id);
+                    if (option == null)
+                    {
+                        return;
+                    }
+                    this.Value = option;
+                }
+            }
+        }
+
+        #region ISerializable
+
+        public override bool IsPersistent
+        {
+            get
+            {
+                return true;
+            }
         }
 
-        protected virtual void OnUpdate(SelectionConfigurationElement element)
+        protected SelectionConfigurationElement(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            foreach (var option in element.Options.ToArray())
-            {
-                if (this.Contains(option.Id))
-                {
-                    this.Update(option);
-                }
-                else
-                {
-                    this.Add(option);
-                }
-                if (this.Value != null && string.Equals(this.Value.Id, option.Id, StringComparison.OrdinalIgnoreCase))
-                {
-                    this.Value.Update(option);
-                }
-            }
-            if (this.DefaultValue != null)
-            {
-                var value = element.GetOption(this.DefaultValue.Id);
-                if (value != null)
-                {
-                    this.DefaultValue.Update(value);
-                }
-            }
-            if (this.Value == null)
-            {
-                if (element.Value != null)
-                {
-                    this.Value = element.Value;
-                }
-                else
-                {
-                    this.Value = this.Options.FirstOrDefault(option => option.IsDefault) ?? this.Options.FirstOrDefault();
-                }
-            }
+
         }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+        }
+
+        #endregion
     }
 }

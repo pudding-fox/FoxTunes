@@ -51,7 +51,6 @@ namespace FoxTunes
             this.PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
         }
 
-        [field: NonSerialized]
         public event PropertyChangingEventHandler PropertyChanging;
 
         protected virtual void OnPropertyChanged(string propertyName)
@@ -63,7 +62,6 @@ namespace FoxTunes
             this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnError(string message)
@@ -90,7 +88,6 @@ namespace FoxTunes
             return this.Error(this, new ComponentErrorEventArgs(message, exception));
         }
 
-        [field: NonSerialized]
         public event ComponentErrorEventHandler Error;
     }
 }

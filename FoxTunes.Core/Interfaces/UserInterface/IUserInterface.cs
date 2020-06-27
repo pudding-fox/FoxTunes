@@ -14,6 +14,8 @@ namespace FoxTunes.Interfaces
 
         void Fatal(Exception exception);
 
+        bool Confirm(string message);
+
         void Restart();
 
         event UserInterfaceWindowCreatedEventHandler WindowCreated;

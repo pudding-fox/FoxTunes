@@ -57,15 +57,16 @@ namespace FoxTunes
                     continue;
                 }
                 var name = attribute.Name;
+                var @default = attribute.Default;
                 if (string.IsNullOrEmpty(name))
                 {
                     name = component.GetType().FullName;
                 }
-                this.Add(slot, attribute.Id, name);
+                this.Add(slot, attribute.Id, name, @default);
             }
         }
 
-        private void Add(string slot, string id, string name)
+        private void Add(string slot, string id, string name, bool @default)
         {
             var document = XDocument.Load(FILE_NAME);
             var appSettings = document.Root.Element("appSettings");
@@ -78,8 +79,16 @@ namespace FoxTunes
             {
                 return;
             }
-            appSettings.Add(new XComment(string.Format("Uncomment the next element to use component {0}.", name)));
-            appSettings.Add(new XComment(new XElement("add", new XAttribute("key", slot), new XAttribute("value", id)).ToString()));
+            if (@default)
+            {
+                appSettings.Add(new XComment(string.Format("Comment out the next element to not use component {0}.", name)));
+                appSettings.Add(new XElement("add", new XAttribute("key", slot), new XAttribute("value", id)));
+            }
+            else
+            {
+                appSettings.Add(new XComment(string.Format("Uncomment the next element to use component {0}.", name)));
+                appSettings.Add(new XComment(new XElement("add", new XAttribute("key", slot), new XAttribute("value", id)).ToString()));
+            }
             document.Save(FILE_NAME);
         }
 

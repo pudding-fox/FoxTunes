@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public abstract void Fatal(Exception exception);
 
+        public abstract bool Confirm(string message);
+
         public abstract void Restart();
 
         protected virtual void OnWindowCreated(IntPtr handle)
