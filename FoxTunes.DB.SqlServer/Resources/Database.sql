@@ -1,3 +1,6 @@
+CREATE TABLE [Main](
+	[Checksum] nvarchar(4000));
+
 CREATE TABLE [MetaDataItems](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
     [Name] nvarchar(4000) NOT NULL, 

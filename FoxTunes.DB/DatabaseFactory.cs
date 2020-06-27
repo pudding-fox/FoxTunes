@@ -2,6 +2,8 @@
 using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
+using System.Drawing.Design;
 
 namespace FoxTunes
 {
@@ -19,7 +21,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public bool Test()
+        public DatabaseTestResult Test()
         {
             using (var database = this.OnCreate())
             {
@@ -27,7 +29,7 @@ namespace FoxTunes
             }
         }
 
-        protected abstract bool OnTest(IDatabase database);
+        protected abstract DatabaseTestResult OnTest(IDatabase database);
 
         public void Initialize()
         {

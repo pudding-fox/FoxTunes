@@ -19,25 +19,28 @@ namespace FoxTunes
             }
         }
 
-        protected override bool OnTest(IDatabase database)
+        protected override DatabaseTestResult OnTest(IDatabase database)
         {
-            if (!File.Exists(SQLiteDatabase.FileName))
+            if (File.Exists(SQLiteDatabase.FileName))
             {
-                return false;
-            }
-            try
-            {
-                switch (database.Connection.State)
+                try
                 {
-                    case ConnectionState.Open:
-                        return true;
+                    switch (database.Connection.State)
+                    {
+                        case ConnectionState.Open:
+                            if (!DatabaseChecksum.Instance.Validate(database, Resources.Database))
+                            {
+                                return DatabaseTestResult.Mismatch;
+                            }
+                            return DatabaseTestResult.OK;
+                    }
+                }
+                catch (SQLiteException)
+                {
+                    //Nothing can be done.
                 }
             }
-            catch (SQLiteException)
-            {
-                //Nothing can be done.
-            }
-            return false;
+            return DatabaseTestResult.Missing;
         }
 
         protected override void OnInitialize(IDatabase database)
@@ -53,10 +56,15 @@ namespace FoxTunes
         protected virtual void CreateDatabase(IDatabase database)
         {
             var exception = default(Exception);
+            if (File.Exists(SQLiteDatabase.FileName))
+            {
+                File.Delete(SQLiteDatabase.FileName);
+            }
             database.Provider.CreateDatabase(SQLiteDatabase.FileName);
             try
             {
                 database.Execute(database.QueryFactory.Create(Resources.Database));
+                DatabaseChecksum.Instance.Set(database, Resources.Database);
                 return;
             }
             catch (Exception e)

@@ -20,21 +20,25 @@ namespace FoxTunes
             }
         }
 
-        protected override bool OnTest(IDatabase database)
+        protected override DatabaseTestResult OnTest(IDatabase database)
         {
             try
             {
                 switch (database.Connection.State)
                 {
                     case ConnectionState.Open:
-                        return true;
+                        if (!DatabaseChecksum.Instance.Validate(database, Resources.Database))
+                        {
+                            return DatabaseTestResult.Mismatch;
+                        }
+                        return DatabaseTestResult.OK;
                 }
             }
             catch (SqlException)
             {
                 //Nothing can be done.
             }
-            return false;
+            return DatabaseTestResult.Missing;
         }
 
         protected override void OnInitialize(IDatabase database)
@@ -51,6 +55,14 @@ namespace FoxTunes
         {
             var exception = default(Exception);
             var builder = new SqlConnectionStringBuilder(SqlServerDatabase.ConnectionString);
+            try
+            {
+                database.Provider.DeleteDatabase(builder.InitialCatalog);
+            }
+            catch
+            {
+                //Probably doesn't exist, difficult to determine.
+            }
             database.Provider.CreateDatabase(builder.InitialCatalog);
             //Sometimes the database isn't available right away.
             for (var a = 0; a < 5; a++)
@@ -58,6 +70,7 @@ namespace FoxTunes
                 try
                 {
                     database.Execute(database.QueryFactory.Create(Resources.Database));
+                    DatabaseChecksum.Instance.Set(database, Resources.Database);
                     return;
                 }
                 catch (Exception e)
