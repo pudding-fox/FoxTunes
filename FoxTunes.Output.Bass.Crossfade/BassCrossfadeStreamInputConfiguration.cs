@@ -34,6 +34,8 @@ namespace FoxTunes
 
         public const string MIX_ELEMENT = "FFFF9C57-11C6-4D50-A0FF-BD38AE70EF0E";
 
+        public const string PAUSE_SEEK_ELEMENT = "AABB7924-99C6-46DF-B35A-F23D3D078882";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Input")
@@ -44,7 +46,8 @@ namespace FoxTunes
                 .WithElement(new IntegerConfigurationElement(PERIOD_OUT_ELEMENT, "Fade Out Period", path: "Fading").WithValue(100).WithValidationRule(new IntegerValidationRule(0, 5000, step: 100)))
                 .WithElement(new SelectionConfigurationElement(TYPE_IN_ELEMENT, "Fade In Curve", path: "Fading").WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION)))
                 .WithElement(new SelectionConfigurationElement(TYPE_OUT_ELEMENT, "Fade Out Curve", path: "Fading").WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION)))
-                .WithElement(new BooleanConfigurationElement(MIX_ELEMENT, "Crossfade", path: "Fading").WithValue(false)
+                .WithElement(new BooleanConfigurationElement(MIX_ELEMENT, "Crossfade", path: "Fading").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(PAUSE_SEEK_ELEMENT, "Pause/Resume", path: "Fading").WithValue(true)
             );
         }
 

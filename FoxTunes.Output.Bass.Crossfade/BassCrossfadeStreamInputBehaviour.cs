@@ -122,6 +122,21 @@ namespace FoxTunes
             }
         }
 
+        private bool _PauseSeek { get; set; }
+
+        public bool PauseSeek
+        {
+            get
+            {
+                return this._PauseSeek;
+            }
+            set
+            {
+                this._PauseSeek = value;
+                Logger.Write(this, LogLevel.Debug, "Pause/Seek = {0}", this.PauseSeek);
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -155,6 +170,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassCrossfadeStreamInputConfiguration.MIX_ELEMENT
             ).ConnectValue(value => this.Mix = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassCrossfadeStreamInputConfiguration.PAUSE_SEEK_ELEMENT
+            ).ConnectValue(value => this.PauseSeek = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
