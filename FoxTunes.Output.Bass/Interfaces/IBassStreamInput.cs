@@ -6,6 +6,8 @@ namespace FoxTunes.Interfaces
     {
         IEnumerable<int> Queue { get; }
 
+        bool PreserveBuffer { get; }
+
         bool CheckFormat(BassOutputStream stream);
 
         bool Contains(BassOutputStream stream);

@@ -13,6 +13,14 @@ namespace FoxTunes
 
         public abstract IEnumerable<int> Queue { get; }
 
+        public virtual bool PreserveBuffer
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public abstract int Rate { get; protected set; }
 
         public abstract int Channels { get; protected set; }
