@@ -2,8 +2,8 @@
 using ManagedBass;
 using ManagedBass.Crossfade;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -129,6 +129,21 @@ namespace FoxTunes
                 return false;
             }
             Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", stream.ChannelHandle);
+            //If there's nothing in the queue then we're starting.
+            if (this.Queue.Count() == 0)
+            {
+                var flags = default(BassCrossfadeFlags);
+                if (this.Behaviour.Start)
+                {
+                    flags = BassCrossfadeFlags.FadeIn;
+                }
+                else
+                {
+                    flags = BassCrossfadeFlags.None;
+                }
+                BassUtils.OK(BassCrossfade.ChannelEnqueue(stream.ChannelHandle, flags));
+                return true;
+            }
             BassUtils.OK(BassCrossfade.ChannelEnqueue(stream.ChannelHandle));
             return true;
         }
@@ -141,7 +156,18 @@ namespace FoxTunes
                 return false;
             }
             Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", stream.ChannelHandle);
-            //Fork because fade out blocks.
+            //If there's only one stream in the queue then we're stopping. 
+            //Block so the fade out behaviour can be applied before Reset is called.
+            if (this.Queue.Count() == 1)
+            {
+                BassUtils.OK(BassCrossfade.StreamReset(this.Behaviour.Stop));
+                if (dispose)
+                {
+                    stream.Dispose();
+                }
+                return true;
+            }
+            //Fork so fade out doesn't block the next track being enqueued.
             this.Dispatch(() =>
             {
                 BassUtils.OK(BassCrossfade.ChannelRemove(stream.ChannelHandle));
@@ -185,18 +211,22 @@ namespace FoxTunes
             //}
         }
 
+        private bool Fading { get; set; }
+
         public void PreviewPause()
         {
-            if (this.Behaviour.PauseSeek)
+            if (this.Behaviour.PauseResume)
             {
+                this.Fading = true;
                 BassCrossfade.StreamFadeOut();
             }
         }
 
         public void PreviewResume()
         {
-            if (this.Behaviour.PauseSeek)
+            if (this.Fading || this.Behaviour.PauseResume)
             {
+                this.Fading = false;
                 BassCrossfade.StreamFadeIn();
             }
         }

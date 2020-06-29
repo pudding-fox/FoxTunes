@@ -34,7 +34,11 @@ namespace FoxTunes
 
         public const string MIX_ELEMENT = "FFFF9C57-11C6-4D50-A0FF-BD38AE70EF0E";
 
-        public const string PAUSE_SEEK_ELEMENT = "AABB7924-99C6-46DF-B35A-F23D3D078882";
+        public const string START_ELEMENT = "EEEF1406-957D-493C-A520-FC999E525F8A";
+
+        public const string PAUSE_RESUME_ELEMENT = "EEEG5ABC-E0FC-43D1-8CD0-54D269FD809D";
+
+        public const string STOP_ELEMENT = "EEEIB80E-222F-4A0A-8C83-AE8D03C3F479";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -47,7 +51,9 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(TYPE_IN_ELEMENT, "Fade In Curve", path: "Fading").WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION)))
                 .WithElement(new SelectionConfigurationElement(TYPE_OUT_ELEMENT, "Fade Out Curve", path: "Fading").WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION)))
                 .WithElement(new BooleanConfigurationElement(MIX_ELEMENT, "Crossfade", path: "Fading").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(PAUSE_SEEK_ELEMENT, "Pause/Resume", path: "Fading").WithValue(true)
+                .WithElement(new BooleanConfigurationElement(START_ELEMENT, "Start", path: "Fading").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(PAUSE_RESUME_ELEMENT, "Pause/Resume", path: "Fading").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(STOP_ELEMENT, "Stop", path: "Fading").WithValue(false)
             );
         }
 
