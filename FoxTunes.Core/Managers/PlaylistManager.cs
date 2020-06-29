@@ -463,11 +463,28 @@ namespace FoxTunes
 
         public async Task Clear(Playlist playlist)
         {
-            using (var task = new ClearPlaylistTask(playlist))
+            var behaviour = default(PlaylistBehaviourBase);
+            switch (playlist.Type)
             {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
+                case PlaylistType.Selection:
+                    behaviour = ComponentRegistry.Instance.GetComponent<SelectionPlaylistBehaviour>();
+                    break;
+                case PlaylistType.Dynamic:
+                    behaviour = ComponentRegistry.Instance.GetComponent<DynamicPlaylistBehaviour>();
+                    break;
+            }
+            if (behaviour != null)
+            {
+                await behaviour.Refresh(playlist).ConfigureAwait(false);
+            }
+            else
+            {
+                using (var task = new ClearPlaylistTask(playlist))
+                {
+                    task.InitializeComponent(this.Core);
+                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                }
             }
         }
 
@@ -645,7 +662,17 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                if (this.SelectedPlaylist != null)
+                {
+                    if (this.SelectedPlaylist.Type == PlaylistType.None)
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    }
+                    else
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Reset", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    }
+                }
             }
         }
 
