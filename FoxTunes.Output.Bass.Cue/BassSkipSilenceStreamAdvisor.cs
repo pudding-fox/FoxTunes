@@ -38,11 +38,18 @@ namespace FoxTunes
 
             var leadIn = default(TimeSpan);
             var leadOut = default(TimeSpan);
-            if (!this.TryGetSilence(provider, playlistItem, advice, out leadIn, out leadOut))
+            try
             {
-                return;
+                if (!this.TryGetSilence(provider, playlistItem, advice, out leadIn, out leadOut))
+                {
+                    return;
+                }
+                advice.Add(new BassSkipSilenceStreamAdvice(playlistItem.FileName, leadIn, leadOut));
             }
-            advice.Add(new BassSkipSilenceStreamAdvice(playlistItem.FileName, leadIn, leadOut));
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create stream advice for file \"{0}\": {1}", playlistItem.FileName, e.Message);
+            }
         }
 
         protected virtual bool TryGetSilence(IBassStreamProvider provider, PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, out TimeSpan leadIn, out TimeSpan leadOut)

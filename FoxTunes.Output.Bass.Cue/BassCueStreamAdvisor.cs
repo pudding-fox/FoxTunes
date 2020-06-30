@@ -27,11 +27,18 @@ namespace FoxTunes
             var fileName = default(string);
             var offset = default(string);
             var length = default(string);
-            if (!ParseUrl(playlistItem.FileName, out fileName, out offset, out length))
+            try
             {
-                return;
+                if (!ParseUrl(playlistItem.FileName, out fileName, out offset, out length))
+                {
+                    return;
+                }
+                advice.Add(new BassCueStreamAdvice(fileName, offset, length));
             }
-            advice.Add(new BassCueStreamAdvice(fileName, offset, length));
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create stream advice for file \"{0}\": {1}", playlistItem.FileName, e.Message);
+            }
         }
 
         public static string CreateUrl(string fileName, string offset)
