@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace FoxTunes
@@ -169,6 +168,21 @@ namespace FoxTunes
                 }
             }
             return result;
+        }
+
+        public static IEnumerable<MetaDataItem> Clone(IEnumerable<MetaDataItem> metaDatas)
+        {
+            return metaDatas.Select(Clone);
+        }
+
+        public static MetaDataItem Clone(MetaDataItem metaDataItem)
+        {
+            return new MetaDataItem()
+            {
+                Name = metaDataItem.Name,
+                Type = metaDataItem.Type,
+                Value = metaDataItem.Value
+            };
         }
 
         public static readonly MetaDataItem Empty = new MetaDataItem();

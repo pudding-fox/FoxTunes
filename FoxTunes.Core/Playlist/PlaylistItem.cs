@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -54,6 +55,30 @@ namespace FoxTunes
                 return base.Equals(other) && string.Equals(this.FileName, (other as PlaylistItem).FileName, StringComparison.OrdinalIgnoreCase);
             }
             return base.Equals(other);
+        }
+
+        public static IEnumerable<PlaylistItem> Clone(IEnumerable<PlaylistItem> playlistItems)
+        {
+            return playlistItems.Select(Clone);
+        }
+
+        public static PlaylistItem Clone(PlaylistItem playlistItem)
+        {
+            var result = new PlaylistItem()
+            {
+                Playlist_Id = playlistItem.Id,
+                LibraryItem_Id = playlistItem.LibraryItem_Id,
+                Sequence = playlistItem.Sequence,
+                DirectoryName = playlistItem.DirectoryName,
+                FileName = playlistItem.FileName,
+                Status = playlistItem.Status,
+                Flags = playlistItem.Flags
+            };
+            if (!result.LibraryItem_Id.HasValue)
+            {
+                result.MetaDatas = new List<MetaDataItem>(playlistItem.MetaDatas);
+            }
+            return result;
         }
     }
 

@@ -156,6 +156,32 @@ namespace FoxTunes
             }
         }
 
+        protected virtual async Task AddPlaylistItems(IEnumerable<PlaylistItem> playlistItems)
+        {
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            {
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    var set = this.Database.Set<PlaylistItem>(transaction);
+                    var position = 0;
+                    foreach (var playlistItem in PlaylistItem.Clone(playlistItems))
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        playlistItem.Playlist_Id = this.Playlist.Id;
+                        playlistItem.Sequence = this.Sequence + position;
+                        playlistItem.Status = PlaylistItemStatus.Import;
+                        await set.AddAsync(playlistItem).ConfigureAwait(false);
+                        position++;
+                    }
+                    this.Offset += position;
+                    transaction.Commit();
+                }
+            }))
+            {
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
         protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken)
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
