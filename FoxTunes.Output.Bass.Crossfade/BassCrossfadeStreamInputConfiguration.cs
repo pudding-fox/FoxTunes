@@ -42,8 +42,8 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Input")
-                .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.INPUT_ELEMENT, "Transport")
+            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
+                .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.INPUT_ELEMENT, "Input")
                     .WithOptions(new[] { new SelectionConfigurationOption(INPUT_CROSSFADE_OPTION, "Fading") }))
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode", path: "Fading").WithOptions(GetModeOptions()))
                 .WithElement(new IntegerConfigurationElement(PERIOD_IN_ELEMENT, "Fade In Period", path: "Fading").WithValue(100).WithValidationRule(new IntegerValidationRule(0, 5000, step: 100)))
