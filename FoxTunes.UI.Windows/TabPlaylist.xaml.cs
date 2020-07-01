@@ -75,7 +75,9 @@ namespace FoxTunes
 
         protected virtual void DragSourceInitialized(object sender, ListViewExtensions.DragSourceInitializedEventArgs e)
         {
-            var items = (e.Data as IEnumerable).OfType<PlaylistItem>();
+            var items = (e.Data as IEnumerable)
+                .OfType<PlaylistItem>()
+                .ToArray();
             if (!items.Any())
             {
                 return;

@@ -228,6 +228,7 @@ namespace FoxTunes
                                 this.ListView.SelectedItems.Add(selectedItem);
                             }
                         }
+                        draggingItems.Clear();
                     }
                 }
             }
