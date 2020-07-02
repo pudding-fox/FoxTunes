@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public BooleanConfigurationElement MetaData { get; private set; }
+
         public BooleanConfigurationElement Popularimeter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -33,6 +35,10 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this.Configuration = core.Components.Configuration;
+            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
+            );
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
@@ -51,7 +57,7 @@ namespace FoxTunes
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
                     }
-                    if (this.Popularimeter.Value)
+                    if (this.MetaData.Value && this.Popularimeter.Value)
                     {
                         var invocationComponents = new Dictionary<byte, InvocationComponent>();
                         for (var a = 0; a <= 5; a++)
