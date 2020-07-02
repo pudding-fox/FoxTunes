@@ -249,8 +249,12 @@ wasapi
 windows
 "
 
-#TAG=$(git describe --abbrev=0 --tags)
-TAG="$(date +%F)-nightly"
+if [ -z "$1" ]
+then
+	TAG=$(git describe --abbrev=0 --tags)
+else
+	TAG="$(date +%F)-nightly"
+fi
 
 echo "Current version is $TAG.."
 sleep 1
