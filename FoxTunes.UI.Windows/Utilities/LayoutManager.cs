@@ -273,7 +273,9 @@ namespace FoxTunes
                 var attribute = default(UIComponentAttribute);
                 if (!type.HasCustomAttribute<UIComponentAttribute>(false, out attribute))
                 {
-                    attribute = new UIComponentAttribute(type.AssemblyQualifiedName, UIComponentSlots.NONE, type.Name);
+                    //We don't really want to expose components without annotations.
+                    //attribute = new UIComponentAttribute(type.AssemblyQualifiedName, UIComponentSlots.NONE, type.Name);
+                    continue;
                 }
                 components.Add(new UIComponent(attribute, type));
             }

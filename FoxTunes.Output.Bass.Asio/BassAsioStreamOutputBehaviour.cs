@@ -10,7 +10,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassAsioStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
-        public const string SETTINGS = "AAAA";
+        public const string SETTINGS = "ZZZZ";
 
         public ICore Core { get; private set; }
 

@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="FoxTunes.Tool"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <ViewModel:Tool x:Key="ViewModel" Core="{Binding}"></ViewModel:Tool>
+    </UserControl.Resources>
+    <Windows:UIComponentContainer 
+        ContentName="{Binding Title, Source={StaticResource ViewModel}, Mode=TwoWay}" 
+        ContentString="{Binding Content, Source={StaticResource ViewModel}, Mode=TwoWay}"/>
+</UserControl>

@@ -383,6 +383,7 @@ namespace FoxTunes
                     DispatcherPriority.ApplicationIdle,
                     new Action(() =>
                     {
+                        ShuttingDown(typeof(Windows), EventArgs.Empty);
                         if (IsMiniWindowCreated)
                         {
                             MiniWindow.Close();
@@ -408,6 +409,8 @@ namespace FoxTunes
                 );
             }
         }
+
+        public static event EventHandler ShuttingDown;
 
         private static void Reset()
         {
