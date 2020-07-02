@@ -21,12 +21,18 @@ namespace FoxTunes
 
         public const string BARS_256_OPTION = "EEEEFFC1-592E-4EC6-9CCD-5182935AD12E";
 
+        public const string PEAKS_ELEMENT = "DDDD7FCF-8A71-4367-8F48-4F8D8C89739C";
+
+        public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, "Spectrum")
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(releaseType == ReleaseType.Default))
-                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions())
+                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions()).DependsOn(SECTION, ENABLED_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks").WithValue(true).DependsOn(SECTION, ENABLED_ELEMENT))
+                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval").WithValue(100).WithValidationRule(new IntegerValidationRule(1, 1000)).DependsOn(SECTION, ENABLED_ELEMENT)
             );
         }
 
