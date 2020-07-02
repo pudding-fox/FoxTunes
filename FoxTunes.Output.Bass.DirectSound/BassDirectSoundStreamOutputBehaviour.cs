@@ -2,7 +2,6 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace FoxTunes
 {
@@ -98,7 +97,7 @@ namespace FoxTunes
             {
                 return;
             }
-            BassDirectSoundDevice.Init();
+            BassDirectSoundDevice.Init(this.DirectSoundDevice);
         }
 
         protected virtual void OnFree(object sender, EventArgs e)

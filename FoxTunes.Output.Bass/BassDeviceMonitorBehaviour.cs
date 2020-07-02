@@ -7,6 +7,15 @@ namespace FoxTunes
 {
     public abstract class BassDeviceMonitorBehaviour : StandardBehaviour, IDisposable
     {
+        public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(100);
+
+        protected BassDeviceMonitorBehaviour()
+        {
+            this.Debouncer = new Debouncer(TIMEOUT);
+        }
+
+        public Debouncer Debouncer { get; private set; }
+
         public IBassOutput Output { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -92,18 +101,18 @@ namespace FoxTunes
             //Nothing to do.
         }
 
-        protected virtual async void OnDefaultDeviceChanged(object sender, NotificationClientEventArgs e)
+        protected virtual void OnDefaultDeviceChanged(object sender, NotificationClientEventArgs e)
         {
-            if (!this.RestartRequired(e.Flow, e.Role))
+            this.Debouncer.Exec(() =>
             {
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
-            Logger.Write(this, LogLevel.Debug, "Restarting the output.");
-            using (e.Defer())
-            {
-                await this.Restart().ConfigureAwait(false);
-            }
+                if (!this.RestartRequired(e.Flow, e.Role))
+                {
+                    return;
+                }
+                Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
+                Logger.Write(this, LogLevel.Debug, "Restarting the output.");
+                var task = this.Restart();
+            });
         }
 
         protected virtual void OnPropertyValueChanged(object sender, NotificationClientEventArgs e)

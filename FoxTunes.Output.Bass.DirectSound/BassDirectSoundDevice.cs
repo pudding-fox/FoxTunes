@@ -13,20 +13,19 @@ namespace FoxTunes
         {
             get
             {
-                return Info != null && Info.Device == Bass.DefaultDevice;
+                return Info != null && Info.IsDefault;
             }
         }
 
-        public static void Init()
+        public static void Init(int device)
         {
             IsInitialized = true;
-            var info = default(DeviceInfo);
-            BassUtils.OK(Bass.GetDeviceInfo(Bass.CurrentDevice, out info));
             Info = new BassDirectSoundDeviceInfo(
                 Bass.CurrentDevice,
                 0,
                 Bass.Info.SpeakerCount,
-                OutputRate.GetRates(Bass.Info.SampleRate, Bass.Info.MinSampleRate, Bass.Info.MaxSampleRate)
+                OutputRate.GetRates(Bass.Info.SampleRate, Bass.Info.MinSampleRate, Bass.Info.MaxSampleRate),
+                device == Bass.DefaultDevice
             );
             LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}", Bass.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate);
             LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Rates => {1}", Bass.CurrentDevice, string.Join(", ", Info.SupportedRates));
@@ -45,12 +44,13 @@ namespace FoxTunes
 
         public class BassDirectSoundDeviceInfo
         {
-            public BassDirectSoundDeviceInfo(int device, int inputs, int outputs, IEnumerable<int> supportedRates)
+            public BassDirectSoundDeviceInfo(int device, int inputs, int outputs, IEnumerable<int> supportedRates, bool isDefault)
             {
                 this.Device = device;
                 this.Inputs = inputs;
                 this.Outputs = outputs;
                 this.SupportedRates = supportedRates;
+                this.IsDefault = isDefault;
             }
 
             public int Device { get; private set; }
@@ -68,6 +68,8 @@ namespace FoxTunes
             public int Outputs { get; private set; }
 
             public IEnumerable<int> SupportedRates { get; private set; }
+
+            public bool IsDefault { get; private set; }
 
             public int GetNearestRate(int rate)
             {
