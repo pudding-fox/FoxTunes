@@ -86,6 +86,8 @@ namespace FoxTunes
 
             const int UPDATE_INTERVAL = 100;
 
+            const int HOLD_INTERVAL = 10;
+
             public static readonly int SampleCount = 512;
 
             public static readonly float[] Buffer = new float[SampleCount];
@@ -100,9 +102,13 @@ namespace FoxTunes
 
             public int[,] Peaks;
 
+            public int[] Holds;
+
             public int SamplesPerElement;
 
             public float Weight;
+
+            public int Iteration;
 
             public bool HasData = false;
 
@@ -226,7 +232,14 @@ namespace FoxTunes
                     }
                     else
                     {
-                        Update(this.ElementCount, this.SamplesPerElement, this.Weight, this.Step, this.Dimentions[1], this.Elements, this.Peaks);
+                        this.Iteration++;
+                        var iterations = 10 / this.Timer.Interval;
+                        Update(this.ElementCount, this.SamplesPerElement, this.Weight, this.Step, this.Dimentions[1], this.Elements, this.Peaks, this.Holds);
+                        if (this.Iteration >= iterations)
+                        {
+                            Update(this.ElementCount, this.Dimentions[1], this.Elements, this.Peaks, this.Holds);
+                            this.Iteration = 0;
+                        }
                         this.HasData = true;
                     }
                     Windows.Invoke(() => this.InvalidateVisual());
@@ -243,12 +256,13 @@ namespace FoxTunes
                 this.ElementCount = count;
                 this.Elements = new int[count, 4];
                 this.Peaks = new int[count, 4];
+                this.Holds = new int[count];
                 this.SamplesPerElement = SampleCount / count;
                 this.Weight = (float)16 / this.ElementCount;
                 this.Step = width / ElementCount;
             }
 
-            private static void Update(int count, int samples, float weight, int step, int height, int[,] elements, int[,] peaks)
+            private static void Update(int count, int samples, float weight, int step, int height, int[,] elements, int[,] peaks, int[] holds)
             {
                 for (int a = 0, b = 0; a < count; a++)
                 {
@@ -278,10 +292,31 @@ namespace FoxTunes
                         peaks[a, 2] = step;
                         peaks[a, 3] = 1;
                         peaks[a, 1] = elements[a, 1];
+                        holds[a] = HOLD_INTERVAL;
                     }
-                    else if (peaks[a, 1] < height - 1)
+                }
+            }
+
+            private static void Update(int count, int height, int[,] elements, int[,] peaks, int[] holds)
+            {
+                for (int a = 0; a < count; a++)
+                {
+                    if (elements[a, 1] > peaks[a, 1] && peaks[a, 1] < height - 1)
                     {
-                        peaks[a, 1]++;
+                        if (holds[a] > 0)
+                        {
+                            if (holds[a] < HOLD_INTERVAL - 3)
+                            {
+                                var distance = (float)holds[a] / HOLD_INTERVAL;
+                                var increment = 1 - Math.Pow(1 - distance, 3);
+                                peaks[a, 1] += (int)(4 / increment);
+                            }
+                            holds[a]--;
+                        }
+                        else if (peaks[a, 1] < height - 1)
+                        {
+                            peaks[a, 1]++;
+                        }
                     }
                 }
             }
