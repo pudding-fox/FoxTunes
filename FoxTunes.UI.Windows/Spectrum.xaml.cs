@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public static readonly BooleanConfigurationElement ShowPeaks;
 
+        public static readonly BooleanConfigurationElement HighCut;
+
         public static readonly IntegerConfigurationElement UpdateInterval;
 
         static Spectrum()
@@ -43,6 +45,10 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.PEAKS_ELEMENT
             );
+            HighCut = configuration.GetElement<BooleanConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.HIGH_CUT
+            );
             UpdateInterval = configuration.GetElement<IntegerConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.INTERVAL_ELEMENT
@@ -52,9 +58,21 @@ namespace FoxTunes
         public Spectrum()
         {
             this.InitializeComponent();
-            var renderer = new Renderer();
-            this.Border.Child = renderer;
-            if (Enabled != null)
+            this.Border.Child = new Renderer();
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var renderer = this.Border.Child as Renderer;
+            if (renderer == null)
+            {
+                return;
+            }
+            if (this.Parent is UIComponentContainer)
+            {
+                renderer.Start();
+            }
+            else if (Enabled != null)
             {
                 Enabled.ConnectValue(value =>
                 {
@@ -92,6 +110,8 @@ namespace FoxTunes
 
             public static readonly int SampleCount = 512;
 
+            public static readonly int HighCutOff = 128;
+
             public static readonly float[] Buffer = new float[SampleCount];
 
             public int[] Dimentions = new int[2];
@@ -116,6 +136,7 @@ namespace FoxTunes
 
             public Renderer()
             {
+                this.SnapsToDevicePixels = true;
                 if (BarCount != null)
                 {
                     BarCount.ConnectValue(value =>
@@ -124,6 +145,10 @@ namespace FoxTunes
                         var task = Windows.Invoke(() => this.MinWidth = SpectrumBehaviourConfiguration.GetWidth(value));
                         Configure();
                     });
+                }
+                if (HighCut != null)
+                {
+                    HighCut.ConnectValue(value => Configure());
                 }
                 if (UpdateInterval != null)
                 {
@@ -221,7 +246,10 @@ namespace FoxTunes
                         }
                     }
                 }
-                this.Timer.Start();
+                if (this.Timer != null)
+                {
+                    this.Timer.Start();
+                }
             }
 
             protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
@@ -258,7 +286,14 @@ namespace FoxTunes
                 this.Elements = new int[this.ElementCount, 4];
                 this.Peaks = new int[this.ElementCount, 4];
                 this.Holds = new int[this.ElementCount];
-                this.SamplesPerElement = SampleCount / this.ElementCount;
+                if (HighCut != null && HighCut.Value)
+                {
+                    this.SamplesPerElement = (SampleCount - HighCutOff) / this.ElementCount;
+                }
+                else
+                {
+                    this.SamplesPerElement = SampleCount / this.ElementCount;
+                }
                 this.Weight = (float)16 / this.ElementCount;
                 this.Step = this.Dimentions[0] / ElementCount;
             }

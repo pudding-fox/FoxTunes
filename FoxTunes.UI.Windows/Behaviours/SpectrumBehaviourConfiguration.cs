@@ -23,16 +23,19 @@ namespace FoxTunes
 
         public const string PEAKS_ELEMENT = "DDDD7FCF-8A71-4367-8F48-4F8D8C89739C";
 
+        public const string HIGH_CUT = "DDEE2ADA-C904-4AA5-82F0-F53412EF24BD";
+
         public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, "Spectrum")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(releaseType == ReleaseType.Default))
-                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions()).DependsOn(SECTION, ENABLED_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks").WithValue(true).DependsOn(SECTION, ENABLED_ELEMENT))
-                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval").WithValue(100).WithValidationRule(new IntegerValidationRule(1, 1000)).DependsOn(SECTION, ENABLED_ELEMENT)
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Show In Toolbar").WithValue(releaseType == ReleaseType.Default))
+                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks").WithValue(true))
+                .WithElement(new BooleanConfigurationElement(HIGH_CUT, "High Cut").WithValue(true))
+                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval").WithValue(100).WithValidationRule(new IntegerValidationRule(1, 1000))
             );
         }
 
