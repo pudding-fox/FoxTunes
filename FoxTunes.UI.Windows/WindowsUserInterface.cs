@@ -18,7 +18,6 @@ namespace FoxTunes
         public WindowsUserInterface()
         {
             this.Application = new Application();
-            this.Application.ShutdownMode = ShutdownMode.OnMainWindowClose;
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
             this.Queue = new PendingQueue<KeyValuePair<IFileActionHandler, string>>(TimeSpan.FromSeconds(1));
             this.Queue.Complete += this.OnComplete;
