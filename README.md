@@ -1,7 +1,7 @@
 # FoxTunes
 A modular music player and converter using the BASS framework.
 
-The main release is [FoxTunes-2.1.8-net461-x86.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.1.8/FoxTunes-2.1.8-net461-x86.zip)
+The main release is [FoxTunes-2.2.1-net461-x86.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.2.1/FoxTunes-2.2.1-net461-x86.zip)
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
 The wiki is [FoxTunes-wiki](https://github.com/aidan-g/FoxTunes/wiki)
@@ -49,22 +49,25 @@ Various optional plugins are available;
 
 * ASIO - Low latency exclusive output, supports DSD direct.
 * CD - Play audio CDs from a physical drive.
+* CROSSFADE - A fading input transport: https://github.com/aidan-g/BASS_CROSSFADE
 * CUE - Play cue sheets.
 * DSD - Required for DSD direct.
-* DTS - Play .dts multi channel format.
+* DTS - Play .dts multi channel format: https://github.com/aidan-g/BASS_DTS
 * DirectSound - Use standard windows audio session for output.
 * Encoder - A converter with various output formats. 
   * Can split cue sheets with the CUE plugin.
   * Can rip CDs with the CD plugin.
   * Can up/down sample rate/depth with the Resampler plugin.
+* GAPLESS - A "true" gapless input transport: https://github.com/aidan-g/BASS_GAPLESS
 * Javascript - Use JS for scriptable elements.
 * LibraryBrowser - An album art grid interface for the library. It can use lots of memory.
 * Logging - Use Log4Net logging back-end. Can be configured and disabled.
 * MetaDataEditor - A simple batch mode tag editor. Can embed artwork.
+* MOD - Play various mod music formats.
 * ParametricEqualizer - A ten band parametric equalizer.
-* ReplayGain - Canculate and utilize replay gain meta data for tracks and albums.
+* ReplayGain - Canculate and utilize replay gain meta data for tracks and albums: https://github.com/aidan-g/BASS_REPLAY_GAIN
   * Can calculate on demand (per track) if you don't mind waiting a moment for playback.
-* Resampler - SOXR based high quality configurable resampler. Can perform up/down sampling.
+* Resampler - SOXR based high quality configurable resampler. Can perform up/down sampling: https://github.com/aidan-g/BASS_SOX
 * SQLite - Use SQLite for database functions.
 * SimpleMetaData - A meta data provider using the file path and regular expressions. Recommended for older systems.
 * SqlServer - Use Microsoft SQL Server for database functions.
