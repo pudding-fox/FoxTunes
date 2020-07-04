@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,8 +9,10 @@ using System.Windows.Data;
 
 namespace FoxTunes
 {
-    public class UIComponentSelector : Grid, IUIComponent
+    public class UIComponentSelector : Grid, IUIComponent, IValueConverter
     {
+        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
+
         protected static ILogger Logger
         {
             get
@@ -20,17 +23,17 @@ namespace FoxTunes
 
         public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
             "Component",
-            typeof(UIComponent),
+            typeof(UIComponentConfiguration),
             typeof(UIComponentSelector),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnComponentChanged))
+            new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnComponentChanged))
         );
 
-        public static UIComponent GetComponent(UIComponentSelector source)
+        public static UIComponentConfiguration GetComponent(UIComponentSelector source)
         {
-            return (UIComponent)source.GetValue(ComponentProperty);
+            return (UIComponentConfiguration)source.GetValue(ComponentProperty);
         }
 
-        public static void SetComponent(UIComponentSelector source, UIComponent value)
+        public static void SetComponent(UIComponentSelector source, UIComponentConfiguration value)
         {
             source.SetValue(ComponentProperty, value);
         }
@@ -48,14 +51,18 @@ namespace FoxTunes
         public UIComponentSelector()
         {
             this.ComboBox = new ComboBox();
-            this.ComboBox.ItemsSource = LayoutManager.Instance.Components;
+            if (LayoutManager.Instance != null)
+            {
+                this.ComboBox.ItemsSource = LayoutManager.Instance.Components;
+            }
             this.ComboBox.DisplayMemberPath = "Name";
             this.ComboBox.SetBinding(
                 ComboBox.SelectedValueProperty,
                 new Binding()
                 {
                     Source = this,
-                    Path = new PropertyPath("Component")
+                    Path = new PropertyPath("Component"),
+                    Converter = this
                 }
             );
 
@@ -77,7 +84,7 @@ namespace FoxTunes
 
         public TextBlock TextBlock { get; private set; }
 
-        public UIComponent Component
+        public UIComponentConfiguration Component
         {
             get
             {
@@ -107,6 +114,40 @@ namespace FoxTunes
         }
 
         public event EventHandler ComponentChanged;
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            if (value is UIComponent component)
+            {
+                return Factory.CreateConfiguration(component);
+            }
+            if (value is UIComponentConfiguration configuration)
+            {
+                return Factory.CreateComponent(configuration);
+            }
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            if (value is UIComponent component)
+            {
+                return Factory.CreateConfiguration(component);
+            }
+            if (value is UIComponentConfiguration configuration)
+            {
+                return Factory.CreateComponent(configuration);
+            }
+            return value;
+        }
 
         public virtual void InitializeComponent(ICore core)
         {

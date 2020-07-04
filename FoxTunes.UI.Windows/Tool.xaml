@@ -12,7 +12,25 @@
     <UserControl.Resources>
         <ViewModel:Tool x:Key="ViewModel" Core="{Binding}"></ViewModel:Tool>
     </UserControl.Resources>
-    <Windows:UIComponentContainer 
-        ContentName="{Binding Title, Source={StaticResource ViewModel}, Mode=TwoWay}" 
-        ContentString="{Binding Content, Source={StaticResource ViewModel}, Mode=TwoWay}"/>
+    <UserControl.Style>
+        <Style TargetType="{x:Type UserControl}">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Windows:UIComponentContainer Component="{Binding Component, Source={StaticResource ViewModel}}"></Windows:UIComponentContainer>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Component, Source={StaticResource ViewModel}}" Value="{x:Null}">
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <Windows:UIComponentSelector 
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Component="{Binding Component, Mode=TwoWay, Source={StaticResource ViewModel}}"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
 </UserControl>
