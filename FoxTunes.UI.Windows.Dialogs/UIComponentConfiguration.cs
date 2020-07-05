@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 namespace FoxTunes
 {
-    [Serializable]
-    public class UIComponentConfiguration : BaseComponent, IEquatable<UIComponentConfiguration>, ISerializable
+    public class UIComponentConfiguration : IEquatable<UIComponentConfiguration>
     {
         public UIComponentConfiguration()
         {
             this.Children = new ObservableCollection<UIComponentConfiguration>();
+            this.MetaData = new ObservableCollection<MetaDataEntry>();
         }
 
         private string _Component { get; set; }
@@ -65,6 +64,73 @@ namespace FoxTunes
         }
 
         public event EventHandler ChildrenChanged;
+
+        private ObservableCollection<MetaDataEntry> _MetaData { get; set; }
+
+        public ObservableCollection<MetaDataEntry> MetaData
+        {
+            get
+            {
+                return this._MetaData;
+            }
+            set
+            {
+                this._MetaData = value;
+                this.OnMetaDataChanged();
+            }
+        }
+
+        protected virtual void OnMetaDataChanged()
+        {
+            if (this.MetaDataChanged != null)
+            {
+                this.MetaDataChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MetaData");
+        }
+
+        public event EventHandler MetaDataChanged;
+
+        public bool TryGet(string name, out string value)
+        {
+            var metaData = this.MetaData.FirstOrDefault(
+                _metaData => string.Equals(_metaData.Name, name, StringComparison.OrdinalIgnoreCase)
+            );
+            if (metaData == null)
+            {
+                value = default(string);
+                return false;
+            }
+            value = metaData.Value;
+            return true;
+        }
+
+        public void AddOrUpdate(string name, string value)
+        {
+            var metaData = this.MetaData.FirstOrDefault(
+                _metaData => string.Equals(_metaData.Name, name, StringComparison.OrdinalIgnoreCase)
+            );
+            if (metaData == null)
+            {
+                metaData = new MetaDataEntry()
+                {
+                    Name = name
+                };
+                this.MetaData.Add(metaData);
+            }
+            metaData.Value = value;
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged == null)
+            {
+                return;
+            }
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public virtual bool Equals(UIComponentConfiguration other)
         {
@@ -123,23 +189,11 @@ namespace FoxTunes
             return !(a == b);
         }
 
-        #region ISerializable
-
-        protected UIComponentConfiguration(SerializationInfo info, StreamingContext context)
+        public class MetaDataEntry
         {
-            this.Component = info.GetString(nameof(this.Component));
-            this.Children = new ObservableCollection<UIComponentConfiguration>(
-                (UIComponentConfiguration[])info.GetValue(nameof(this.Children), typeof(UIComponentConfiguration[]))
-            );
-        }
+            public string Name { get; set; }
 
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(this.Component), this.Component);
-            info.AddValue(nameof(this.Children), this.Children.ToArray());
+            public string Value { get; set; }
         }
-
-        #endregion
     }
 }

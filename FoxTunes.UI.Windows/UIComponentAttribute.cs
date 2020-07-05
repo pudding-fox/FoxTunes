@@ -28,6 +28,7 @@ namespace FoxTunes
     public enum UIComponentRole : byte
     {
         None,
-        LibraryView
+        LibraryView,
+        Hidden
     }
 }

@@ -11,7 +11,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for Spectrum.xaml
     /// </summary>
-    [UIComponent("381328C3-C2CE-4FDA-AC92-71A15C3FC387", UIComponentSlots.NONE, "Spectrum")]
+    [UIComponent("381328C3-C2CE-4FDA-AC92-71A15C3FC387", UIComponentSlots.NONE, "Spectrum", role: UIComponentRole.Hidden)]
     public partial class Spectrum : UIComponentBase
     {
         public static readonly IOutput Output = ComponentRegistry.Instance.GetComponent<IOutput>();

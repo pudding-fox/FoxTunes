@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class Tool : ViewModelBase
+    public class ToolWindow : ViewModelBase
     {
         public string Title
         {
@@ -18,7 +18,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.Configuration == null)
+                if (this.Configuration == null || string.Equals(this.Configuration.Title, value))
                 {
                     return;
                 }
@@ -49,7 +49,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.Configuration == null)
+                if (this.Configuration == null || this.Configuration.Left == Convert.ToInt32(value))
                 {
                     return;
                 }
@@ -80,7 +80,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.Configuration == null)
+                if (this.Configuration == null || this.Configuration.Top == Convert.ToInt32(value))
                 {
                     return;
                 }
@@ -111,7 +111,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.Configuration == null)
+                if (this.Configuration == null || this.Configuration.Width == Convert.ToInt32(value))
                 {
                     return;
                 }
@@ -142,7 +142,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.Configuration == null)
+                if (this.Configuration == null || this.Configuration.Height == Convert.ToInt32(value))
                 {
                     return;
                 }
@@ -173,7 +173,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.Configuration == null)
+                if (this.Configuration == null || object.ReferenceEquals(this.Configuration.Component, value))
                 {
                     return;
                 }
@@ -204,7 +204,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.Configuration == null)
+                if (this.Configuration == null || this.Configuration.AlwaysOnTop == value)
                 {
                     return;
                 }
@@ -233,6 +233,10 @@ namespace FoxTunes.ViewModel
             }
             set
             {
+                if (object.ReferenceEquals(this.Configuration, value))
+                {
+                    return;
+                }
                 this._Configuration = value;
                 this.OnConfigurationChanged();
             }
@@ -304,7 +308,7 @@ namespace FoxTunes.ViewModel
 
         protected override Freezable CreateInstanceCore()
         {
-            return new Tool();
+            return new ToolWindow();
         }
 
         protected override void OnDisposing()

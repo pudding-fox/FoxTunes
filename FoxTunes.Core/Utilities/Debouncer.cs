@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Timers;
 
 namespace FoxTunes
@@ -53,6 +54,25 @@ namespace FoxTunes
                 {
                     this.Timer.Stop();
                 }
+            }
+        }
+
+        public void Wait()
+        {
+            while (true)
+            {
+                lock (SyncRoot)
+                {
+                    if (this.Timer == null || !this.Timer.Enabled)
+                    {
+                        return;
+                    }
+                    if (this.Actions.Count == 0)
+                    {
+                        return;
+                    }
+                }
+                Thread.Sleep(1000);
             }
         }
 

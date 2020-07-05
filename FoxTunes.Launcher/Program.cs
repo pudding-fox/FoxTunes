@@ -111,6 +111,7 @@ namespace FoxTunes.Launcher
                         {
                             //TODO: Warn.
                         }
+                        core.Components.Configuration.Wait();
                     }
                     catch (Exception e)
                     {

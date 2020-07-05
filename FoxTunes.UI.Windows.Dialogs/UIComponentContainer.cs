@@ -22,10 +22,10 @@ namespace FoxTunes
         }
 
         public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
-           "Component",
-           typeof(UIComponentConfiguration),
-           typeof(UIComponentContainer),
-           new PropertyMetadata(new PropertyChangedCallback(OnComponentChanged))
+            "Component",
+            typeof(UIComponentConfiguration),
+            typeof(UIComponentContainer),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnComponentChanged))
        );
 
         public static UIComponentConfiguration GetComponent(UIComponentContainer source)
@@ -86,9 +86,9 @@ namespace FoxTunes
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var configuration = value as UIComponentConfiguration;
-            if (configuration == null)
+            if (configuration == null || string.IsNullOrEmpty(configuration.Component))
             {
-                return null;
+                return this.CreateSelector();
             }
             return Factory.CreateControl(configuration);
         }
@@ -96,6 +96,22 @@ namespace FoxTunes
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+
+        protected virtual UIComponentSelector CreateSelector()
+        {
+            var selector = new UIComponentSelector();
+            selector.HorizontalAlignment = HorizontalAlignment.Center;
+            selector.VerticalAlignment = VerticalAlignment.Center;
+            selector.SetBinding(
+                UIComponentSelector.ComponentProperty,
+                new Binding()
+                {
+                    Source = this,
+                    Path = new PropertyPath("Component")
+                }
+            );
+            return selector;
         }
 
         public void InitializeComponent(ICore core)

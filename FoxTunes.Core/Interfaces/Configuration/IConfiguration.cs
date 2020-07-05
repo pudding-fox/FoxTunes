@@ -14,6 +14,8 @@ namespace FoxTunes.Interfaces
 
         void Save();
 
+        void Wait();
+
         void Reset();
 
         void ConnectDependencies();
@@ -23,10 +25,6 @@ namespace FoxTunes.Interfaces
         ConfigurationElement GetElement(string sectionId, string elementId);
 
         T GetElement<T>(string sectionId, string elementId) where T : ConfigurationElement;
-
-        string SaveValue<T>(T value);
-
-        T LoadValue<T>(string value);
     }
 
     public enum ReleaseType : byte

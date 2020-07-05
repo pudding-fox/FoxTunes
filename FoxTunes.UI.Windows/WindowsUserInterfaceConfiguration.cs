@@ -94,6 +94,11 @@ namespace FoxTunes
             yield return new SelectionConfigurationOption(UIComponent.PLACEHOLDER, "Empty");
             foreach (var component in LayoutManager.Instance.Components)
             {
+                if (component.Role == UIComponentRole.Hidden)
+                {
+                    //Don't show hidden components to the user.
+                    continue;
+                }
                 var option = new SelectionConfigurationOption(component.Id, component.Name, component.Description);
                 if (string.Equals(component.Slot, id, StringComparison.OrdinalIgnoreCase))
                 {

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using System.Linq;
+﻿using System.Windows;
 
 #if NET40
 using Microsoft.Windows.Shell;
@@ -25,32 +23,25 @@ namespace FoxTunes
             this.InitializeComponent();
         }
 
-        public IEnumerable<global::FoxTunes.ViewModel.Tool> ViewModels
-        {
-            get
-            {
-                return new FrameworkElement[] { this, this.Tool }.Select(
-                    element => element.FindResource<global::FoxTunes.ViewModel.Tool>("ViewModel")
-                );
-            }
-        }
-
         public ToolWindowConfiguration Configuration
         {
             get
             {
-                foreach (var viewModel in this.ViewModels)
+                var viewModel = this.TryFindResource("ViewModel") as global::FoxTunes.ViewModel.ToolWindow;
+                if (viewModel == null)
                 {
-                    return viewModel.Configuration;
+                    return null;
                 }
-                return default(ToolWindowConfiguration);
+                return viewModel.Configuration;
             }
             set
             {
-                foreach (var viewModel in this.ViewModels)
+                var viewModel = this.TryFindResource("ViewModel") as global::FoxTunes.ViewModel.ToolWindow;
+                if (viewModel == null)
                 {
-                    viewModel.Configuration = value;
+                    return;
                 }
+                viewModel.Configuration = value;
             }
         }
     }
