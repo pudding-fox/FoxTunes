@@ -85,18 +85,18 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return global::FoxTunes.Windows.IsToolWindowManagerWindowCreated;
+                return ToolWindowBehaviour.IsToolWindowManagerWindowCreated;
             }
             set
             {
                 if (value)
                 {
-                    global::FoxTunes.Windows.ToolWindowManagerWindow.DataContext = this.Core;
-                    global::FoxTunes.Windows.ToolWindowManagerWindow.Show();
+                    ToolWindowBehaviour.ToolWindowManagerWindow.DataContext = this.Core;
+                    ToolWindowBehaviour.ToolWindowManagerWindow.Show();
                 }
-                else if (global::FoxTunes.Windows.IsToolWindowManagerWindowCreated)
+                else if (ToolWindowBehaviour.IsToolWindowManagerWindowCreated)
                 {
-                    global::FoxTunes.Windows.ToolWindowManagerWindow.Close();
+                    ToolWindowBehaviour.ToolWindowManagerWindow.Close();
                 }
             }
         }
