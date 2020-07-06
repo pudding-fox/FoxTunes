@@ -60,7 +60,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.Behaviour = ComponentRegistry.Instance.GetComponent<ToolWindowBehaviour>();
-            this.Windows = new CollectionManager<ToolWindowConfiguration>()
+            this.Windows = new CollectionManager<ToolWindowConfiguration>(CollectionManagerFlags.AllowEmptyCollection)
             {
                 ItemFactory = () => new ToolWindowConfiguration()
                 {

@@ -146,6 +146,14 @@ namespace FoxTunes
             {
                 return false;
             }
+            if (!Enumerable.SequenceEqual(this.Children, other.Children))
+            {
+                return false;
+            }
+            if (!Enumerable.SequenceEqual(this.MetaData, other.MetaData))
+            {
+                return false;
+            }
             return true;
         }
 
@@ -162,6 +170,14 @@ namespace FoxTunes
                 if (!string.IsNullOrEmpty(this.Component))
                 {
                     hashCode += this.Component.ToLower().GetHashCode();
+                }
+                foreach (var child in this.Children)
+                {
+                    hashCode += child.GetHashCode();
+                }
+                foreach (var metaData in this.MetaData)
+                {
+                    hashCode += metaData.GetHashCode();
                 }
             }
             return hashCode;
@@ -189,11 +205,76 @@ namespace FoxTunes
             return !(a == b);
         }
 
-        public class MetaDataEntry
+        public class MetaDataEntry : IEquatable<MetaDataEntry>
         {
             public string Name { get; set; }
 
             public string Value { get; set; }
+
+            public virtual bool Equals(MetaDataEntry other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+                if (object.ReferenceEquals(this, other))
+                {
+                    return true;
+                }
+                if (!string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                if (!string.Equals(this.Value, other.Value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return this.Equals(obj as MetaDataEntry);
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = default(int);
+                unchecked
+                {
+                    if (!string.IsNullOrEmpty(this.Name))
+                    {
+                        hashCode += this.Name.ToLower().GetHashCode();
+                    }
+                    if (!string.IsNullOrEmpty(this.Value))
+                    {
+                        hashCode += this.Value.ToLower().GetHashCode();
+                    }
+                }
+                return hashCode;
+            }
+
+            public static bool operator ==(MetaDataEntry a, MetaDataEntry b)
+            {
+                if ((object)a == null && (object)b == null)
+                {
+                    return true;
+                }
+                if ((object)a == null || (object)b == null)
+                {
+                    return false;
+                }
+                if (object.ReferenceEquals((object)a, (object)b))
+                {
+                    return true;
+                }
+                return a.Equals(b);
+            }
+
+            public static bool operator !=(MetaDataEntry a, MetaDataEntry b)
+            {
+                return !(a == b);
+            }
         }
     }
 }

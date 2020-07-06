@@ -14,9 +14,17 @@ namespace FoxTunes
         public CollectionManager()
         {
             this.Removed = new HashSet<T>();
+            this.Flags = CollectionManagerFlags.None;
+        }
+
+        public CollectionManager(CollectionManagerFlags flags) : this()
+        {
+            this.Flags = flags;
         }
 
         public HashSet<T> Removed { get; private set; }
+
+        public CollectionManagerFlags Flags { get; private set; }
 
         private Func<T> _ItemFactory { get; set; }
 
@@ -225,9 +233,12 @@ namespace FoxTunes
                     }
                 }
             }
-            if (collection.Count == 0 && this.CanAdd)
+            if (collection.Count == 0)
             {
-                this.Add();
+                if (this.CanAdd && !this.Flags.HasFlag(CollectionManagerFlags.AllowEmptyCollection))
+                {
+                    this.Add();
+                }
             }
             else
             {
@@ -352,5 +363,12 @@ namespace FoxTunes
         {
             return new CollectionManager<T>();
         }
+    }
+
+    [Flags]
+    public enum CollectionManagerFlags : byte
+    {
+        None = 0,
+        AllowEmptyCollection = 1
     }
 }

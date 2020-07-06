@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.ViewModel;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace FoxTunes
 {
@@ -117,6 +119,19 @@ namespace FoxTunes
         public void InitializeComponent(ICore core)
         {
             throw new NotImplementedException();
+        }
+
+        public ICommand ClearCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(this.Clear);
+            }
+        }
+
+        public void Clear()
+        {
+            this.Component = null;
         }
 
         protected virtual void Dispatch(Func<Task> function)
