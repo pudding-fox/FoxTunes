@@ -15,13 +15,13 @@
         <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
     </LocalWindows:UIComponentPanel.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{Binding SplitterDistance, Converter={StaticResource GridLengthConverter}, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <LocalWindows:UIComponentContainer Grid.Column="0" Component="{Binding LeftComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></LocalWindows:UIComponentContainer>
-        <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
-        <LocalWindows:UIComponentContainer Grid.Column="2" Component="{Binding RightComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></LocalWindows:UIComponentContainer>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding SplitterDistance, Converter={StaticResource GridLengthConverter}, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <LocalWindows:UIComponentContainer Grid.Row="0" Component="{Binding TopComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></LocalWindows:UIComponentContainer>
+        <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+        <LocalWindows:UIComponentContainer Grid.Row="2" Component="{Binding BottomComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></LocalWindows:UIComponentContainer>
     </Grid>
 </LocalWindows:UIComponentPanel>

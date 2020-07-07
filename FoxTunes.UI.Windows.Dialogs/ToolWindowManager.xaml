@@ -69,11 +69,11 @@
                     <Label Grid.Column="0" Grid.Row="1">Component</Label>
                     <Windows:UIComponentSelector Grid.Column="1" Grid.Row="1" Component="{Binding Component, Mode=TwoWay}"></Windows:UIComponentSelector>
                     <Label Grid.Column="0" Grid.Row="2">Main Window</Label>
-                    <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding ShowWithMainWindow}"></CheckBox>
+                    <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding ShowWithMainWindow}"></CheckBox>
                     <Label Grid.Column="0" Grid.Row="3">Mini Window</Label>
-                    <CheckBox Grid.Column="1" Grid.Row="3" IsChecked="{Binding ShowWithMiniWindow}"></CheckBox>
+                    <CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" IsChecked="{Binding ShowWithMiniWindow}"></CheckBox>
                     <Label Grid.Column="0" Grid.Row="4">Always On Top</Label>
-                    <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding AlwaysOnTop}"></CheckBox>
+                    <CheckBox Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" IsChecked="{Binding AlwaysOnTop}"></CheckBox>
                 </Grid>
             </Grid>
         </Grid>

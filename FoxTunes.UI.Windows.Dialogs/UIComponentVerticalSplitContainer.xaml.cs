@@ -1,7 +1,5 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 
 namespace FoxTunes
@@ -9,61 +7,61 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for UIComponentVerticalSplitContainer.xaml
     /// </summary>
-    [UIComponent("A6820FDA-E415-40C6-AEFB-A73B6FBE4C93", UIComponentSlots.NONE, "Vertical Split", role: UIComponentRole.Hidden)]
+    [UIComponent("18E98420-F039-4504-A116-3D0F26BEAAD5", UIComponentSlots.NONE, "Vertical Split", role: UIComponentRole.Hidden)]
     public partial class UIComponentVerticalSplitContainer : UIComponentPanel
     {
-        public static readonly DependencyProperty TopComponentProperty = DependencyProperty.Register(
-            "TopComponent",
+        public static readonly DependencyProperty LeftComponentProperty = DependencyProperty.Register(
+            "LeftComponent",
             typeof(UIComponentConfiguration),
             typeof(UIComponentVerticalSplitContainer),
-            new PropertyMetadata(new PropertyChangedCallback(OnTopComponentChanged))
+            new PropertyMetadata(new PropertyChangedCallback(OnLeftComponentChanged))
         );
 
-        public static UIComponentConfiguration GetTopComponent(UIComponentVerticalSplitContainer source)
+        public static UIComponentConfiguration GetLeftComponent(UIComponentVerticalSplitContainer source)
         {
-            return (UIComponentConfiguration)source.GetValue(TopComponentProperty);
+            return (UIComponentConfiguration)source.GetValue(LeftComponentProperty);
         }
 
-        public static void SetTopComponent(UIComponentVerticalSplitContainer source, UIComponentConfiguration value)
+        public static void SetLeftComponent(UIComponentVerticalSplitContainer source, UIComponentConfiguration value)
         {
-            source.SetValue(TopComponentProperty, value);
+            source.SetValue(LeftComponentProperty, value);
         }
 
-        public static void OnTopComponentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        public static void OnLeftComponentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var container = sender as UIComponentVerticalSplitContainer;
             if (container == null)
             {
                 return;
             }
-            container.OnTopComponentChanged();
+            container.OnLeftComponentChanged();
         }
 
-        public static readonly DependencyProperty BottomComponentProperty = DependencyProperty.Register(
-            "BottomComponent",
+        public static readonly DependencyProperty RightComponentProperty = DependencyProperty.Register(
+            "RightComponent",
             typeof(UIComponentConfiguration),
             typeof(UIComponentVerticalSplitContainer),
-            new PropertyMetadata(new PropertyChangedCallback(OnBottomComponentChanged))
+            new PropertyMetadata(new PropertyChangedCallback(OnRightComponentChanged))
         );
 
-        public static UIComponentConfiguration GetBottomComponent(UIComponentVerticalSplitContainer source)
+        public static UIComponentConfiguration GetRightComponent(UIComponentVerticalSplitContainer source)
         {
-            return (UIComponentConfiguration)source.GetValue(BottomComponentProperty);
+            return (UIComponentConfiguration)source.GetValue(RightComponentProperty);
         }
 
-        public static void SetBottomComponent(UIComponentVerticalSplitContainer source, UIComponentConfiguration value)
+        public static void SetRightComponent(UIComponentVerticalSplitContainer source, UIComponentConfiguration value)
         {
-            source.SetValue(BottomComponentProperty, value);
+            source.SetValue(RightComponentProperty, value);
         }
 
-        public static void OnBottomComponentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        public static void OnRightComponentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var container = sender as UIComponentVerticalSplitContainer;
             if (container == null)
             {
                 return;
             }
-            container.OnBottomComponentChanged();
+            container.OnRightComponentChanged();
         }
 
         public static readonly DependencyProperty SplitterDistanceProperty = DependencyProperty.Register(
@@ -110,10 +108,10 @@ namespace FoxTunes
 
         protected virtual void UpdateChildren()
         {
-            if (this.Component.Children != null && this.Component.Children.Count == 2)
+            if (this.Component.Children.Count == 2)
             {
-                this.TopComponent = this.Component.Children[0];
-                this.BottomComponent = this.Component.Children[1];
+                this.LeftComponent = this.Component.Children[0];
+                this.RightComponent = this.Component.Children[1];
             }
             else
             {
@@ -138,59 +136,59 @@ namespace FoxTunes
             }
         }
 
-        public UIComponentConfiguration TopComponent
+        public UIComponentConfiguration LeftComponent
         {
             get
             {
-                return this.GetValue(TopComponentProperty) as UIComponentConfiguration;
+                return this.GetValue(LeftComponentProperty) as UIComponentConfiguration;
             }
             set
             {
-                this.SetValue(TopComponentProperty, value);
+                this.SetValue(LeftComponentProperty, value);
             }
         }
 
-        protected virtual void OnTopComponentChanged()
+        protected virtual void OnLeftComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count == 2 && this.TopComponent != null)
+            if (this.Component != null && this.Component.Children.Count == 2 && this.LeftComponent != null)
             {
-                this.Component.Children[0] = this.TopComponent;
+                this.Component.Children[0] = this.LeftComponent;
             }
-            if (this.TopComponentChanged != null)
+            if (this.LeftComponentChanged != null)
             {
-                this.TopComponentChanged(this, EventArgs.Empty);
+                this.LeftComponentChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("TopComponent");
+            this.OnPropertyChanged("LeftComponent");
         }
 
-        public event EventHandler TopComponentChanged;
+        public event EventHandler LeftComponentChanged;
 
-        public UIComponentConfiguration BottomComponent
+        public UIComponentConfiguration RightComponent
         {
             get
             {
-                return this.GetValue(BottomComponentProperty) as UIComponentConfiguration;
+                return this.GetValue(RightComponentProperty) as UIComponentConfiguration;
             }
             set
             {
-                this.SetValue(BottomComponentProperty, value);
+                this.SetValue(RightComponentProperty, value);
             }
         }
 
-        protected virtual void OnBottomComponentChanged()
+        protected virtual void OnRightComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count == 2 && this.BottomComponent != null)
+            if (this.Component != null && this.Component.Children.Count == 2 && this.RightComponent != null)
             {
-                this.Component.Children[1] = this.BottomComponent;
+                this.Component.Children[1] = this.RightComponent;
             }
-            if (this.BottomComponentChanged != null)
+            if (this.RightComponentChanged != null)
             {
-                this.BottomComponentChanged(this, EventArgs.Empty);
+                this.RightComponentChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("BottomComponent");
+            this.OnPropertyChanged("RightComponent");
         }
 
-        public event EventHandler BottomComponentChanged;
+        public event EventHandler RightComponentChanged;
 
         public string SplitterDistance
         {

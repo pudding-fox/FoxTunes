@@ -9,7 +9,7 @@ using System.Windows.Data;
 
 namespace FoxTunes
 {
-    public class UIComponentSelector : Grid, IUIComponent, IValueConverter
+    public class UIComponentSelector : ContentControl, IUIComponent, IValueConverter
     {
         public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
@@ -50,13 +50,18 @@ namespace FoxTunes
 
         public UIComponentSelector()
         {
-            this.ComboBox = new ComboBox();
+            this.InitializeComponent();
+        }
+
+        protected virtual void InitializeComponent()
+        {
+            var comboBox = new ComboBox();
             if (LayoutManager.Instance != null)
             {
-                this.ComboBox.ItemsSource = LayoutManager.Instance.Components;
+                comboBox.ItemsSource = LayoutManager.Instance.Components;
             }
-            this.ComboBox.DisplayMemberPath = "Name";
-            this.ComboBox.SetBinding(
+            comboBox.DisplayMemberPath = "Name";
+            comboBox.SetBinding(
                 ComboBox.SelectedValueProperty,
                 new Binding()
                 {
@@ -66,24 +71,8 @@ namespace FoxTunes
                 }
             );
 
-            this.TextBlock = new TextBlock();
-            this.TextBlock.Text = "Select Component";
-            this.TextBlock.HorizontalAlignment = HorizontalAlignment.Left;
-            this.TextBlock.VerticalAlignment = VerticalAlignment.Center;
-            this.TextBlock.Margin = new Thickness(8, 0, 40, 0);
-            this.TextBlock.IsHitTestVisible = false;
-            this.TextBlock.SetResourceReference(
-                TextBlock.ForegroundProperty,
-                "TextBrush"
-            );
-
-            this.Children.Add(this.ComboBox);
-            this.Children.Add(this.TextBlock);
+            this.Content = comboBox;
         }
-
-        public ComboBox ComboBox { get; private set; }
-
-        public TextBlock TextBlock { get; private set; }
 
         public UIComponentConfiguration Component
         {
@@ -99,14 +88,6 @@ namespace FoxTunes
 
         protected virtual void OnComponentChanged()
         {
-            if (this.Component == null || string.IsNullOrEmpty(this.Component.Component))
-            {
-                this.TextBlock.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                this.TextBlock.Visibility = Visibility.Collapsed;
-            }
             if (this.ComponentChanged != null)
             {
                 this.ComponentChanged(this, EventArgs.Empty);
