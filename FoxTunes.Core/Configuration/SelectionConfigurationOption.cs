@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 namespace FoxTunes
 {
-    [Serializable]
-    public class SelectionConfigurationOption : BaseComponent, IEquatable<SelectionConfigurationOption>, ISerializable
+    public class SelectionConfigurationOption : BaseComponent, IEquatable<SelectionConfigurationOption>
     {
         public SelectionConfigurationOption(string id, string name = null, string description = null)
         {
@@ -33,21 +30,6 @@ namespace FoxTunes
             this.IsDefault = true;
             return this;
         }
-
-        #region ISerializable
-
-        protected SelectionConfigurationOption(SerializationInfo info, StreamingContext context)
-        {
-            this.Id = info.GetString(nameof(this.Id));
-        }
-
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(this.Id), this.Id);
-        }
-
-        #endregion
 
         public bool Equals(SelectionConfigurationOption other)
         {

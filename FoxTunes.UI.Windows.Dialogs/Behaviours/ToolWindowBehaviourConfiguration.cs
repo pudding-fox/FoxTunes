@@ -11,7 +11,7 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new TextConfigurationElement(ELEMENT))
+                .WithElement(new TextConfigurationElement(ELEMENT).WithValue(string.Empty))
                 .WithFlags(ConfigurationSectionFlags.System);
         }
     }

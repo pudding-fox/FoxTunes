@@ -1,14 +1,20 @@
-﻿using System;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
-    [Serializable]
     public class CommandConfigurationElement : ConfigurationElement
     {
         public CommandConfigurationElement(string id, string name = null, string description = null, string path = null) : base(id, name, description, path)
         {
+        }
+
+        public override bool IsModified
+        {
+            get
+            {
+                return false;
+            }
         }
 
         public void Invoke()
@@ -31,11 +37,27 @@ namespace FoxTunes
                 }
                 catch (Exception exception)
                 {
-                    this.OnError(exception);
+                    Logger.Write(
+                        typeof(CommandConfigurationElement),
+                        LogLevel.Warn,
+                        "Failed to invoke command handler \"{0}\": {1}",
+                        this.Id,
+                        exception.Message
+                    );
                 }
             });
             this.Invoked += handler;
             return this;
+        }
+
+        public override void InitializeComponent()
+        {
+            //Nothing to do.
+        }
+
+        public override void Update(ConfigurationElement element)
+        {
+            //Nothing to do.
         }
 
         public override void Reset()
@@ -43,32 +65,14 @@ namespace FoxTunes
             //Nothing to do.
         }
 
-        protected override void OnUpdate(ConfigurationElement element, bool create)
+        public override string GetPersistentValue()
         {
-            //Nothing to do.
+            throw new NotImplementedException();
         }
 
-        #region ISerializable
-
-        public override bool IsPersistent
+        public override void SetPersistentValue(string value)
         {
-            get
-            {
-                return false;
-            }
+            throw new NotImplementedException();
         }
-
-        protected CommandConfigurationElement(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-
-        }
-
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-        }
-
-        #endregion
     }
 }

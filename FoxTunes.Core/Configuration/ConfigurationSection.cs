@@ -1,15 +1,21 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 namespace FoxTunes
 {
-    [Serializable]
-    public class ConfigurationSection : BaseComponent, ISerializable
+    public class ConfigurationSection : INotifyPropertyChanged
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public ConfigurationSection()
         {
             this.Elements = new ObservableCollection<ConfigurationElement>();
@@ -24,7 +30,7 @@ namespace FoxTunes
             this.Description = description;
         }
 
-        public string Id { get; private set; }
+        public string Id { get; set; }
 
         public string Name { get; private set; }
 
@@ -34,8 +40,20 @@ namespace FoxTunes
 
         public ConfigurationSection WithElement(ConfigurationElement element)
         {
-            this.Add(element);
+            if (this.Contains(element.Id))
+            {
+                this.Update(element);
+            }
+            else
+            {
+                this.Add(element);
+            }
             return this;
+        }
+
+        public bool Contains(string id)
+        {
+            return this.GetElement(id) != null;
         }
 
         private ConfigurationSectionFlags _Flags { get; set; }
@@ -70,50 +88,45 @@ namespace FoxTunes
             return this;
         }
 
-        public void Update(ConfigurationSection section, bool create)
+        public void InitializeComponent()
+        {
+            foreach (var element in this.Elements)
+            {
+                element.InitializeComponent();
+            }
+        }
+
+        public void Update(ConfigurationSection section)
         {
             foreach (var element in section.Elements.ToArray())
             {
                 if (!this.Contains(element.Id))
                 {
-                    if (!create)
-                    {
-                        //If config was created by a component that is no longer loaded then it will be lost here.
-                        //TODO: Add the config but hide it so it's preserved but not displayed.
-                        Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", element.Id);
-                        continue;
-                    }
                     this.Add(element);
                 }
                 else
                 {
-                    this.Update(element, create);
+                    this.Update(element);
                 }
             }
         }
 
-        private bool Contains(string id)
-        {
-            return this.GetElement(id) != null;
-        }
-
         private void Add(ConfigurationElement element)
         {
-            Logger.Write(this, LogLevel.Debug, "Adding configuration element: {0} => {1}", element.Id, element.Name);
-            element.Error += this.OnError;
+            Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Adding configuration element: {0} => {1}", element.Id, element.Name);
             this.Elements.Add(element);
         }
 
-        private void Update(ConfigurationElement element, bool create)
+        private void Update(ConfigurationElement element)
         {
-            Logger.Write(this, LogLevel.Debug, "Updating configuration element: {0} => {1}", element.Id, element.Name);
+            Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Updating configuration element: {0} => {1}", element.Id, element.Name);
             var existing = this.GetElement(element.Id);
-            existing.Update(element, create);
+            existing.Update(element);
         }
 
         private void Hide(ConfigurationElement element)
         {
-            Logger.Write(this, LogLevel.Debug, "Hiding configuration element: {0} => {1}", element.Id, element.Name);
+            Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Hiding configuration element: {0} => {1}", element.Id, element.Name);
             var existing = this.GetElement(element.Id);
             existing.Hide();
         }
@@ -136,22 +149,16 @@ namespace FoxTunes
             }
         }
 
-        #region ISerializable
-
-        protected ConfigurationSection(SerializationInfo info, StreamingContext context)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            this.Id = info.GetString(nameof(this.Id));
-            this.Elements = (ObservableCollection<ConfigurationElement>)info.GetValue(nameof(this.Elements), typeof(ObservableCollection<ConfigurationElement>));
+            if (this.PropertyChanged == null)
+            {
+                return;
+            }
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(this.Id), this.Id);
-            info.AddValue(nameof(this.Elements), this.Elements);
-        }
-
-        #endregion
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     [Flags]

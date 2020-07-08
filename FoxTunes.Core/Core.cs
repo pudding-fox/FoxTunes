@@ -110,7 +110,7 @@ namespace FoxTunes
                     var sections = (component as IConfigurableComponent).GetConfigurationSections();
                     foreach (var section in sections)
                     {
-                        this.Components.Configuration.RegisterSection(section);
+                        this.Components.Configuration.WithSection(section);
                     }
                 }
                 catch (Exception e)

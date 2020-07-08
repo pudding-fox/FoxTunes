@@ -34,76 +34,131 @@ namespace FoxTunes
         {
             public bool IsTraceEnabled(IBaseComponent component)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsDebugEnabled(IBaseComponent component)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsInfoEnabled(IBaseComponent component)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsWarnEnabled(IBaseComponent component)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsErrorEnabled(IBaseComponent component)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsFatalEnabled(IBaseComponent component)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsTraceEnabled(Type type)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsDebugEnabled(Type type)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsInfoEnabled(Type type)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsWarnEnabled(Type type)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsErrorEnabled(Type type)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public bool IsFatalEnabled(Type type)
             {
+#if DEBUG
+                return true;
+#else
                 return false;
+#endif
             }
 
             public void Write(IBaseComponent component, LogLevel level, string message, params object[] args)
             {
-                //Nothing to do.
+#if DEBUG
+                global::System.Diagnostics.Debug.WriteLine(this.FormatMessage(component.GetType(), level, message, args));
+#endif
             }
 
             public void Write(Type type, LogLevel level, string message, params object[] args)
             {
-                //Nothing to do.
+#if DEBUG
+                global::System.Diagnostics.Debug.WriteLine(this.FormatMessage(type, level, message, args));
+#endif
             }
 
             public Task WriteAsync(IBaseComponent component, LogLevel level, string message, params object[] args)
             {
+#if DEBUG
+                global::System.Diagnostics.Debug.WriteLine(this.FormatMessage(component.GetType(), level, message, args));
+#endif
 #if NET40
                 return TaskEx.FromResult(false);
 #else
@@ -113,11 +168,29 @@ namespace FoxTunes
 
             public Task WriteAsync(Type type, LogLevel level, string message, params object[] args)
             {
+#if DEBUG
+                global::System.Diagnostics.Debug.WriteLine(this.FormatMessage(type, level, message, args));
+#endif
 #if NET40
                 return TaskEx.FromResult(false);
 #else
                 return Task.CompletedTask;
 #endif
+            }
+
+            protected virtual string FormatMessage(Type type, LogLevel level, string message, object[] args)
+            {
+                if (args != null && args.Length > 0)
+                {
+                    message = string.Format(message, args);
+                }
+                return string.Format(
+                    "{0} {1} {2} : {3}",
+                    DateTime.Now.Ticks,
+                    type.FullName,
+                    Enum.GetName(typeof(LogLevel), level),
+                    message
+                );
             }
 
             public void Dispose()
