@@ -9,9 +9,19 @@ namespace FoxTunes
     {
         public UIComponentConfiguration()
         {
+            this.Id = Guid.NewGuid().ToString("d");
             this.Children = new ObservableCollection<UIComponentConfiguration>();
             this.MetaData = new ObservableCollection<MetaDataEntry>();
         }
+
+        public UIComponentConfiguration(string id)
+        {
+            this.Id = id;
+            this.Children = new ObservableCollection<UIComponentConfiguration>();
+            this.MetaData = new ObservableCollection<MetaDataEntry>();
+        }
+
+        public string Id { get; private set; }
 
         private string _Component { get; set; }
 
@@ -207,6 +217,18 @@ namespace FoxTunes
 
         public class MetaDataEntry : IEquatable<MetaDataEntry>
         {
+            public MetaDataEntry()
+            {
+                this.Id = Guid.NewGuid().ToString("d");
+            }
+
+            public MetaDataEntry(string id)
+            {
+                this.Id = id;
+            }
+
+            public string Id { get; private set; }
+
             public string Name { get; set; }
 
             public string Value { get; set; }
