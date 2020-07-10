@@ -313,6 +313,10 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             var task = this.Shutdown();
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
         }
 
         ~ToolWindowBehaviour()
