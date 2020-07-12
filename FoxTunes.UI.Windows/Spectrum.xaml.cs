@@ -273,7 +273,8 @@ namespace FoxTunes
                             Elements = this.Elements,
                             Peaks = this.Peaks,
                             Holds = this.Holds,
-                            Duration = Convert.ToInt32(duration.TotalMilliseconds),
+                            //We want a value kind of like the actual update interval but not too far off.
+                            Duration = Math.Min(Convert.ToInt32(duration.TotalMilliseconds), UpdateInterval.Value * 100),
                             HoldInterval = HoldInterval.Value,
                             UpdateInterval = UpdateInterval.Value
                         };
@@ -359,7 +360,7 @@ namespace FoxTunes
 
             private static void UpdateSmooth(SpectrumData data)
             {
-                var fast = data.Height / 8;
+                var fast = data.Height / 10;
                 for (int a = 0, b = 0; a < data.ElementCount; a++)
                 {
                     var sample = 0f;
@@ -383,14 +384,35 @@ namespace FoxTunes
                     data.Elements[a, 2] = data.Step;
                     if (barHeight > 0)
                     {
-                        var barDifference = Convert.ToInt32((Math.Abs((float)data.Elements[a, 3] - barHeight) / barHeight) * fast);
-                        if (barHeight > data.Elements[a, 3])
+                        var difference = Math.Abs(data.Elements[a, 3] - barHeight);
+                        if (difference > 0)
                         {
-                            data.Elements[a, 3] = Math.Min(data.Elements[a, 3] + barDifference, data.Height);
-                        }
-                        else if (barHeight < data.Elements[a, 3])
-                        {
-                            data.Elements[a, 3] = Math.Max(data.Elements[a, 3] - barDifference, 0);
+                            if (difference < 2)
+                            {
+                                if (barHeight > data.Elements[a, 3])
+                                {
+                                    data.Elements[a, 3]++;
+                                }
+                                else if (barHeight < data.Elements[a, 3])
+                                {
+                                    data.Elements[a, 3]--;
+                                }
+                            }
+                            else
+                            {
+                                var distance = (float)difference / barHeight;
+                                //var increment = distance * distance * distance;
+                                //var increment = 1 - Math.Pow(1 - distance, 5);
+                                var increment = distance;
+                                if (barHeight > data.Elements[a, 3])
+                                {
+                                    data.Elements[a, 3] = (int)Math.Min(data.Elements[a, 3] + Math.Min(Math.Max(fast * increment, 1), difference), data.Height);
+                                }
+                                else if (barHeight < data.Elements[a, 3])
+                                {
+                                    data.Elements[a, 3] = (int)Math.Max(data.Elements[a, 3] - Math.Min(Math.Max(fast * increment, 1), difference), 0);
+                                }
+                            }
                         }
                     }
                     else
@@ -420,7 +442,7 @@ namespace FoxTunes
                         {
                             if (data.Holds[a] < data.HoldInterval)
                             {
-                                var distance = 1 - (float)data.Holds[a] / data.HoldInterval;
+                                var distance = 1 - ((float)data.Holds[a] / data.HoldInterval);
                                 var increment = distance * distance * distance;
                                 data.Peaks[a, 1] += (int)Math.Round(fast * increment);
                             }
