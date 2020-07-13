@@ -21,7 +21,7 @@ namespace FoxTunes
             return this.GetOption(id) != null;
         }
 
-        private SelectionConfigurationOption GetOption(string optionId)
+        public SelectionConfigurationOption GetOption(string optionId)
         {
             return this.Options.FirstOrDefault(option => string.Equals(option.Id, optionId, StringComparison.OrdinalIgnoreCase));
         }

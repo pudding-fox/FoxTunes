@@ -171,9 +171,16 @@ namespace FoxTunes
             this.Sequences = new List<int>();
         }
 
+        public ShufflePlaylistNavigationStrategy(Func<PlaylistItem, string> selector) : this()
+        {
+            this.Selector = selector;
+        }
+
         public SemaphoreSlim Semaphore { get; private set; }
 
         public IList<int> Sequences { get; private set; }
+
+        public Func<PlaylistItem, string> Selector { get; private set; }
 
         public Playlist Playlist { get; private set; }
 
@@ -225,12 +232,29 @@ namespace FoxTunes
         {
             this.Playlist = playlist;
             this.Sequences.Clear();
-            this.Sequences.AddRange(
-                this.PlaylistBrowser.GetItems(playlist).Select(
-                    playlistItem => playlistItem.Sequence
-                )
-            );
-            this.Sequences.Shuffle();
+            if (this.Selector == null)
+            {
+                this.Sequences.AddRange(
+                    this.PlaylistBrowser.GetItems(playlist).Select(
+                        playlistItem => playlistItem.Sequence
+                    )
+                );
+                this.Sequences.Shuffle();
+            }
+            else
+            {
+                var groups = this.PlaylistBrowser.GetItems(playlist).GroupBy(
+                    playlistItem => this.Selector(playlistItem)
+                );
+                foreach (var group in groups)
+                {
+                    var sequences = group.Select(
+                        playlistItem => playlistItem.Sequence
+                    ).ToList();
+                    sequences.Shuffle();
+                    this.Sequences.AddRange(sequences);
+                }
+            }
         }
 
         public override PlaylistItem GetNext(PlaylistItem playlistItem)
