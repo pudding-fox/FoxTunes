@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="FoxTunes.EqualizerDialog"
+﻿<Windows:UIComponentBase x:Class="FoxTunes.EqualizerDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,9 +8,9 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
+    <Windows:UIComponentBase.Resources>
         <ViewModel:Equalizer x:Key="ViewModel" Core="{Binding}"></ViewModel:Equalizer>
-    </UserControl.Resources>
+    </Windows:UIComponentBase.Resources>
     <Grid IsEnabled="{Binding Available, Mode=OneWay, Source={StaticResource ViewModel}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -50,4 +50,4 @@
             </Interactivity:Interaction.Triggers>
         </ComboBox>
     </Grid>
-</UserControl>
+</Windows:UIComponentBase>
