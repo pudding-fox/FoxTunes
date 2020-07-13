@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -105,9 +106,10 @@ namespace FoxTunes
         {
             ComponentRegistry.Instance.ForEach<IConfigurableComponent>(component =>
             {
+                Logger.Write(this, LogLevel.Debug, "Registering configuration for component {0}.", component.GetType().Name);
                 try
                 {
-                    var sections = (component as IConfigurableComponent).GetConfigurationSections();
+                    var sections = component.GetConfigurationSections();
                     foreach (var section in sections)
                     {
                         this.Components.Configuration.WithSection(section);

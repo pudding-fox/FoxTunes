@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class ImageBehaviour : StandardBehaviour, IInvocableComponent
+    public class ImageBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         const string REFRESH_IMAGES = "ZAAA";
 
