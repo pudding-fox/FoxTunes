@@ -20,7 +20,22 @@
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                 <Windows:Playback></Windows:Playback>
                 <Windows:Shuffle Margin="2,0,0,0"></Windows:Shuffle>
-                <Windows:Spectrum Margin="2,0,2,0"></Windows:Spectrum>
+                <ContentControl Margin="2,0,2,0">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}">
+                            <Setter Property="Content" Value="{x:Null}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowSpectrum.Value, Source={StaticResource ViewModel}}" Value="True">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Windows:Spectrum ></Windows:Spectrum>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
             </StackPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Windows:Volume Width="80" Margin="4,0,4,0"></Windows:Volume>

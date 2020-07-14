@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
@@ -47,6 +48,16 @@ namespace FoxTunes
 
         public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
 
+        public const string FFT_SIZE_ELEMENT = "GGGGAE69-551B-4E86-BE04-7EB00AD30099";
+
+        public const string FFT_512_OPTION = "AAAA7106-4174-4A1E-9590-B1798B4187A3";
+
+        public const string FFT_1024_OPTION = "BBBB7106-4174-4A1E-9590-B1798B4187A3";
+
+        public const string FFT_2048_OPTION = "CCCCA066-CABA-4FEF-8987-14B11F16E5AE";
+
+        public const string AMPLITUDE_ELEMENT = "HHHH7D69-3C36-44EB-8960-4147A148F31A";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
@@ -59,7 +70,9 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, "High Cut", path: "Advanced").WithValue(true))
                 .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth", path: "Advanced"))
                 .WithElement(new IntegerConfigurationElement(SMOOTH_FACTOR_ELEMENT, "Smooth Factor", path: "Advanced").WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)).DependsOn(SECTION, SMOOTH_ELEMENT))
-                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval", path: "Advanced").WithValidationRule(new IntegerValidationRule(1, 100))
+                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval", path: "Advanced").WithValidationRule(new IntegerValidationRule(1, 100)))
+                .WithElement(new SelectionConfigurationElement(FFT_SIZE_ELEMENT, "FFT Size", path: "Advanced").WithOptions(GetFFTOptions()))
+                .WithElement(new IntegerConfigurationElement(AMPLITUDE_ELEMENT, "Amplitude", path: "Advanced").WithValue(5).WithValidationRule(new IntegerValidationRule(1, 10))
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
                 SECTION,
@@ -82,6 +95,10 @@ namespace FoxTunes
                 SECTION,
                 INTERVAL_ELEMENT
             );
+            var fftSize = configuration.GetElement<SelectionConfigurationElement>(
+                SECTION,
+                FFT_SIZE_ELEMENT
+            );
             switch (option.Id)
             {
                 default:
@@ -89,13 +106,15 @@ namespace FoxTunes
                     Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using high quality profile.");
                     peaks.Value = true;
                     smooth.Value = true;
-                    interval.Value = 1;
+                    interval.Value = 20;
+                    fftSize.Value = fftSize.GetOption(FFT_2048_OPTION);
                     break;
                 case QUALITY_LOW_OPTION:
                     Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using low quality profile.");
                     peaks.Value = false;
                     smooth.Value = false;
                     interval.Value = 100;
+                    fftSize.Value = fftSize.GetOption(FFT_512_OPTION);
                     break;
             }
         }
@@ -142,6 +161,27 @@ namespace FoxTunes
             }
             yield return high;
             yield return low;
+        }
+
+        private static IEnumerable<SelectionConfigurationOption> GetFFTOptions()
+        {
+            yield return new SelectionConfigurationOption(FFT_512_OPTION, "512");
+            yield return new SelectionConfigurationOption(FFT_1024_OPTION, "1024");
+            yield return new SelectionConfigurationOption(FFT_2048_OPTION, "2048");
+        }
+
+        public static int GetFFTSize(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
+            {
+                case FFT_512_OPTION:
+                    return 256;
+                case FFT_1024_OPTION:
+                    return 512;
+                default:
+                case FFT_2048_OPTION:
+                    return 1024;
+            }
         }
 
         public static int GetWidth(SelectionConfigurationOption option)

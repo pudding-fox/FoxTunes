@@ -9,10 +9,12 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
              Background="Transparent" 
              Foreground="{DynamicResource TextBrush}"
-             SnapsToDevicePixels="True"
-             Loaded="OnLoaded">
+             Loaded="OnLoaded"
+             Unloaded="OnUnloaded"                 
+             SizeChanged="OnSizeChanged"
+             SnapsToDevicePixels="True">
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Windows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <Border Name="Border" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" Padding="1"></Border>
+    <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
 </Windows:UIComponentBase>

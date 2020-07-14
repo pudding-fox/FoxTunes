@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using ManagedBass.Mix;
 using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -11,6 +13,8 @@ namespace FoxTunes
         public const uint FFT512 = 0x80000001;
 
         public const uint FFT1024 = 0x80000002;
+
+        public const uint FFT2048 = 0x80000003;
 
         public abstract string Name { get; }
 
@@ -133,7 +137,40 @@ namespace FoxTunes
 
         public abstract void Stop();
 
-        public abstract int GetData(float[] buffer);
+        protected abstract IEnumerable<int> GetMixerChannelHandles();
+
+        private static readonly object ChannelDataSyncRoot = new object();
+
+        public virtual int GetData(float[] buffer)
+        {
+            var length = default(uint);
+            switch (buffer.Length)
+            {
+                case 128:
+                    length = FFT256;
+                    break;
+                case 256:
+                    length = FFT512;
+                    break;
+                case 512:
+                    length = FFT1024;
+                    break;
+                case 1024:
+                    length = FFT2048;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            foreach (var channelHandle in this.GetMixerChannelHandles())
+            {
+                //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
+                lock (ChannelDataSyncRoot)
+                {
+                    return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
+                }
+            }
+            return 0;
+        }
 
         protected abstract float GetVolume();
 
