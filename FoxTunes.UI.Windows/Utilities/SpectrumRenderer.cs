@@ -39,11 +39,11 @@ namespace FoxTunes
             this.LastUpdated = DateTime.UtcNow;
         }
 
-        public SpectrumRenderer(int width, int height, int elements, int fftSize, int updateInterval, int holdInterval, int smoothingFactor, int amplitude, Color color, SpectrumRendererFlags flags) : this()
+        public SpectrumRenderer(int width, int height, int count, int fftSize, int updateInterval, int holdInterval, int smoothingFactor, int amplitude, Color color, SpectrumRendererFlags flags) : this()
         {
             this.Data.Width = width;
             this.Data.Height = height;
-            this.Data.ElementCount = elements;
+            this.Data.Count = count;
             this.Data.FFTSize = fftSize;
             this.Data.HoldInterval = holdInterval;
             this.Data.Smoothing = smoothingFactor;
@@ -61,12 +61,12 @@ namespace FoxTunes
             PlaybackStateNotifier.Notify += this.OnNotify;
             this.Output = core.Components.Output;
             this.Data.Samples = new float[this.Data.FFTSize];
-            this.Data.Values = new float[this.Data.ElementCount];
-            this.Data.Elements = new int[this.Data.ElementCount, 4];
+            this.Data.Values = new float[this.Data.Count];
+            this.Data.Elements = new Int32Rect[this.Data.Count];
             if (this.Flags.HasFlag(SpectrumRendererFlags.ShowPeaks))
             {
-                this.Data.Peaks = new int[this.Data.ElementCount, 4];
-                this.Data.Holds = new int[this.Data.ElementCount];
+                this.Data.Peaks = new Int32Rect[this.Data.Count];
+                this.Data.Holds = new int[this.Data.Count];
             }
             else
             {
@@ -81,8 +81,8 @@ namespace FoxTunes
             {
                 this.Data.FFTRange = this.Data.FFTSize;
             }
-            this.Data.SamplesPerElement = Math.Max(this.Data.FFTRange / this.Data.ElementCount, 1);
-            this.Data.Step = this.Data.Width / this.Data.ElementCount;
+            this.Data.SamplesPerElement = Math.Max(this.Data.FFTRange / this.Data.Count, 1);
+            this.Data.Step = this.Data.Width / this.Data.Count;
             this.Bitmap = new WriteableBitmap(
                this.Data.Width,
                this.Data.Height,
@@ -159,18 +159,18 @@ namespace FoxTunes
             {
                 var elements = this.Data.Elements;
                 var peaks = this.Data.Peaks;
-                var elementCount = this.Data.ElementCount;
+                var count = this.Data.Count;
                 BitmapHelper.Clear(info);
-                for (var a = 0; a < elementCount; a++)
+                for (var a = 0; a < count; a++)
                 {
-                    BitmapHelper.DrawRectangle(info, elements[a, 0], elements[a, 1], elements[a, 2], elements[a, 3]);
+                    BitmapHelper.DrawRectangle(info, elements[a].X, elements[a].Y, elements[a].Width, elements[a].Height);
                     if (peaks != null)
                     {
-                        if (peaks[a, 1] >= elements[a, 1])
+                        if (peaks[a].Y >= elements[a].Y)
                         {
                             continue;
                         }
-                        BitmapHelper.DrawRectangle(info, peaks[a, 0], peaks[a, 1], peaks[a, 2], peaks[a, 3]);
+                        BitmapHelper.DrawRectangle(info, peaks[a].X, peaks[a].Y, peaks[a].Width, peaks[a].Height);
                     }
                 }
 
@@ -190,18 +190,18 @@ namespace FoxTunes
 
         protected virtual void Clear()
         {
-            for (var a = 0; a < this.Data.ElementCount; a++)
+            for (var a = 0; a < this.Data.Count; a++)
             {
-                this.Data.Elements[a, 0] = a * this.Data.Step;
-                this.Data.Elements[a, 1] = this.Data.Height - 1;
-                this.Data.Elements[a, 2] = this.Data.Step;
-                this.Data.Elements[a, 3] = 1;
+                this.Data.Elements[a].X = a * this.Data.Step;
+                this.Data.Elements[a].Y = this.Data.Height - 1;
+                this.Data.Elements[a].Width = this.Data.Step;
+                this.Data.Elements[a].Height = 1;
                 if (this.Data.Peaks != null)
                 {
-                    this.Data.Peaks[a, 0] = a * this.Data.Step;
-                    this.Data.Peaks[a, 1] = this.Data.Height - 1;
-                    this.Data.Peaks[a, 2] = this.Data.Step;
-                    this.Data.Peaks[a, 3] = 1;
+                    this.Data.Peaks[a].X = a * this.Data.Step;
+                    this.Data.Peaks[a].Y = this.Data.Height - 1;
+                    this.Data.Peaks[a].Width = this.Data.Step;
+                    this.Data.Peaks[a].Height = 1;
                 }
             }
         }
@@ -319,7 +319,7 @@ namespace FoxTunes
             else
             {
                 //Not enough samples to fill the values, do the best we can.
-                for (int a = 0; a < data.ElementCount; a++)
+                for (int a = 0; a < data.Count; a++)
                 {
                     var boost = (float)(1.0f + a * data.Amplitude);
                     var value = (float)(Math.Sqrt(data.Samples[a] * boost) * SCALE_FACTOR);
@@ -330,45 +330,45 @@ namespace FoxTunes
 
         private static void UpdateFast(SpectrumData data)
         {
-            for (var a = 0; a < data.ElementCount; a++)
+            for (var a = 0; a < data.Count; a++)
             {
                 var barHeight = Convert.ToInt32(data.Values[a] * data.Height);
-                data.Elements[a, 0] = a * data.Step;
-                data.Elements[a, 2] = data.Step;
+                data.Elements[a].X = a * data.Step;
+                data.Elements[a].Width = data.Step;
                 if (barHeight > 0)
                 {
-                    data.Elements[a, 3] = barHeight;
+                    data.Elements[a].Height = barHeight;
                 }
                 else
                 {
-                    data.Elements[a, 3] = 1;
+                    data.Elements[a].Height = 1;
                 }
-                data.Elements[a, 1] = data.Height - data.Elements[a, 3];
+                data.Elements[a].Y = data.Height - data.Elements[a].Height;
             }
         }
 
         private static void UpdateSmooth(SpectrumData data)
         {
             var fast = (float)data.Height / data.Smoothing;
-            for (var a = 0; a < data.ElementCount; a++)
+            for (var a = 0; a < data.Count; a++)
             {
                 var barHeight = Convert.ToInt32(data.Values[a] * data.Height);
-                data.Elements[a, 0] = a * data.Step;
-                data.Elements[a, 2] = data.Step;
+                data.Elements[a].X = a * data.Step;
+                data.Elements[a].Width = data.Step;
                 if (barHeight > 0)
                 {
-                    var difference = Math.Abs(data.Elements[a, 3] - barHeight);
+                    var difference = Math.Abs(data.Elements[a].Height - barHeight);
                     if (difference > 0)
                     {
                         if (difference < 2)
                         {
-                            if (barHeight > data.Elements[a, 3])
+                            if (barHeight > data.Elements[a].Height)
                             {
-                                data.Elements[a, 3]++;
+                                data.Elements[a].Height++;
                             }
-                            else if (barHeight < data.Elements[a, 3])
+                            else if (barHeight < data.Elements[a].Height)
                             {
-                                data.Elements[a, 3]--;
+                                data.Elements[a].Height--;
                             }
                         }
                         else
@@ -378,39 +378,39 @@ namespace FoxTunes
                             //var increment = distance * distance * distance;
                             //var increment = 1 - Math.Pow(1 - distance, 5);
                             var increment = distance;
-                            if (barHeight > data.Elements[a, 3])
+                            if (barHeight > data.Elements[a].Height)
                             {
-                                data.Elements[a, 3] = (int)Math.Min(data.Elements[a, 3] + Math.Min(Math.Max(fast * increment, 1), difference), data.Height);
+                                data.Elements[a].Height = (int)Math.Min(data.Elements[a].Height + Math.Min(Math.Max(fast * increment, 1), difference), data.Height);
                             }
-                            else if (barHeight < data.Elements[a, 3])
+                            else if (barHeight < data.Elements[a].Height)
                             {
-                                data.Elements[a, 3] = (int)Math.Max(data.Elements[a, 3] - Math.Min(Math.Max(fast * increment, 1), difference), 1);
+                                data.Elements[a].Height = (int)Math.Max(data.Elements[a].Height - Math.Min(Math.Max(fast * increment, 1), difference), 1);
                             }
                         }
                     }
                 }
                 else
                 {
-                    data.Elements[a, 3] = 1;
+                    data.Elements[a].Height = 1;
                 }
-                data.Elements[a, 1] = data.Height - data.Elements[a, 3];
+                data.Elements[a].Y = data.Height - data.Elements[a].Height;
             }
         }
 
         private static void UpdatePeaks(SpectrumData data)
         {
             var fast = data.Height / 4;
-            for (int a = 0; a < data.ElementCount; a++)
+            for (int a = 0; a < data.Count; a++)
             {
-                if (data.Elements[a, 1] < data.Peaks[a, 1])
+                if (data.Elements[a].Y < data.Peaks[a].Y)
                 {
-                    data.Peaks[a, 0] = a * data.Step;
-                    data.Peaks[a, 2] = data.Step;
-                    data.Peaks[a, 3] = 1;
-                    data.Peaks[a, 1] = data.Elements[a, 1];
+                    data.Peaks[a].X = a * data.Step;
+                    data.Peaks[a].Width = data.Step;
+                    data.Peaks[a].Height = 1;
+                    data.Peaks[a].Y = data.Elements[a].Y;
                     data.Holds[a] = data.HoldInterval + ROLLOFF_INTERVAL;
                 }
-                else if (data.Elements[a, 1] > data.Peaks[a, 1] && data.Peaks[a, 1] < data.Height - 1)
+                else if (data.Elements[a].Y > data.Peaks[a].Y && data.Peaks[a].Y < data.Height - 1)
                 {
                     if (data.Holds[a] > 0)
                     {
@@ -418,24 +418,24 @@ namespace FoxTunes
                         {
                             var distance = 1 - ((float)data.Holds[a] / data.HoldInterval);
                             var increment = fast * (distance * distance * distance);
-                            if (data.Peaks[a, 1] < data.Height - increment)
+                            if (data.Peaks[a].Y < data.Height - increment)
                             {
-                                data.Peaks[a, 1] += (int)Math.Round(increment);
+                                data.Peaks[a].Y += (int)Math.Round(increment);
                             }
-                            else if (data.Peaks[a, 1] < data.Height - 1)
+                            else if (data.Peaks[a].Y < data.Height - 1)
                             {
-                                data.Peaks[a, 1] = data.Height - 1;
+                                data.Peaks[a].Y = data.Height - 1;
                             }
                         }
                         data.Holds[a] -= data.Duration;
                     }
-                    else if (data.Peaks[a, 1] < data.Height - fast)
+                    else if (data.Peaks[a].Y < data.Height - fast)
                     {
-                        data.Peaks[a, 1] += fast;
+                        data.Peaks[a].Y += fast;
                     }
-                    else if (data.Peaks[a, 1] < data.Height - 1)
+                    else if (data.Peaks[a].Y < data.Height - 1)
                     {
-                        data.Peaks[a, 1] = data.Height - 1;
+                        data.Peaks[a].Y = data.Height - 1;
                     }
                 }
             }
@@ -453,8 +453,6 @@ namespace FoxTunes
 
             public float[] Values;
 
-            public int ElementCount;
-
             public int SamplesPerElement;
 
             public int Step;
@@ -463,9 +461,11 @@ namespace FoxTunes
 
             public int Height;
 
-            public int[,] Elements;
+            public int Count;
 
-            public int[,] Peaks;
+            public Int32Rect[] Elements;
+
+            public Int32Rect[] Peaks;
 
             public int[] Holds;
 
