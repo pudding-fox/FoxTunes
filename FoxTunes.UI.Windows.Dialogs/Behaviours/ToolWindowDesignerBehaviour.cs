@@ -122,7 +122,14 @@ namespace FoxTunes
                 {
                     return;
                 }
-                this.HideDesignerOverlay(adorner.Container);
+                try
+                {
+                    this.HideDesignerOverlay(adorner.Container);
+                }
+                finally
+                {
+                    adorner.Dispose();
+                }
             }
 
             protected virtual void HideDesignerOverlay(UIComponentContainer container)
@@ -222,6 +229,7 @@ namespace FoxTunes
                                 this.ContextMenu.Items.Add(new Separator());
                                 continue;
                             }
+                            menuItem.Invocation.Source = this.Container;
                             this.ContextMenu.Items.Add(new MenuItem()
                             {
                                 Header = menuItem.Invocation.Name,

@@ -14,6 +14,8 @@ namespace FoxTunes.Interfaces
 
         string Path { get; }
 
+        object Source { get; set; }
+
         byte Attributes { get; set; }
 
         event EventHandler AttributesChanged;
