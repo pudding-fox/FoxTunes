@@ -1,20 +1,21 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace FoxTunes
 {
-    public class UIComponentContainer : DockPanel, IUIComponent, IValueConverter
+    public class UIComponentContainer : DockPanel, IInvocableComponent, IUIComponent, IValueConverter
     {
+        public const string CLEAR = "ZZZZ";
+
         public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
         protected static ILogger Logger
@@ -161,17 +162,31 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
-        public ICommand ClearCommand
+        public virtual IEnumerable<IInvocationComponent> Invocations
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(this.Clear);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, "Clear");
             }
         }
 
-        public void Clear()
+        public virtual Task InvokeAsync(IInvocationComponent component)
         {
-            this.Component = null;
+            switch (component.Id)
+            {
+                case CLEAR:
+                    return this.Clear();
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        public Task Clear()
+        {
+            return Windows.Invoke(() => this.Component = null);
         }
 
         protected virtual void Dispatch(Func<Task> function)

@@ -197,14 +197,39 @@ namespace FoxTunes
 
                 public UIComponentContainer Container { get; private set; }
 
+                protected virtual global::FoxTunes.ViewModel.Menu GetMenu()
+                {
+                    //TODO: Max depth should be about 2.
+                    var panel = this.Container.FindAncestor<UIComponentPanel>();
+                    var components = new List<IInvocableComponent>();
+                    if (panel != null)
+                    {
+                        components.Add(panel);
+                    }
+                    components.Add(this.Container);
+                    return new global::FoxTunes.ViewModel.Menu(components);
+                }
+
                 protected virtual void InitializeComponent()
                 {
                     this.ContextMenu = new ContextMenu();
-                    this.ContextMenu.Items.Add(new MenuItem()
+                    using (var menu = this.GetMenu())
                     {
-                        Header = "Clear",
-                        Command = this.Container.ClearCommand
-                    });
+                        foreach (var menuItem in menu.GetItems())
+                        {
+                            if (menuItem == null)
+                            {
+                                this.ContextMenu.Items.Add(new Separator());
+                                continue;
+                            }
+                            this.ContextMenu.Items.Add(new MenuItem()
+                            {
+                                Header = menuItem.Invocation.Name,
+                                Command = menuItem.Command,
+                                IsChecked = menuItem.Selected
+                            });
+                        }
+                    }
                     this.ContextMenu.Opened += this.OnOpened;
                     this.ContextMenu.Closed += this.OnClosed;
                     this.ContextMenu.IsOpen = true;

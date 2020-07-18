@@ -1,5 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes
@@ -55,5 +58,22 @@ namespace FoxTunes
         }
 
         public event EventHandler ComponentChanged;
+
+        public virtual IEnumerable<IInvocationComponent> Invocations
+        {
+            get
+            {
+                return Enumerable.Empty<IInvocationComponent>();
+            }
+        }
+
+        public virtual Task InvokeAsync(IInvocationComponent component)
+        {
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
     }
 }
