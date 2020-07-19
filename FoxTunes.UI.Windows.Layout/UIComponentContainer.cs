@@ -53,6 +53,33 @@ namespace FoxTunes
             componentContainer.OnComponentChanged();
         }
 
+        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
+            "Content",
+            typeof(UIComponentBase),
+            typeof(UIComponentContainer),
+            new PropertyMetadata(new PropertyChangedCallback(OnContentChanged))
+       );
+
+        public static UIComponentBase GetContent(UIComponentContainer source)
+        {
+            return (UIComponentBase)source.GetValue(ContentProperty);
+        }
+
+        public static void SetContent(UIComponentContainer source, UIComponentBase value)
+        {
+            source.SetValue(ContentProperty, value);
+        }
+
+        public static void OnContentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var container = sender as UIComponentContainer;
+            if (container == null)
+            {
+                return;
+            }
+            container.OnContentChanged();
+        }
+
         public UIComponentContainer()
         {
             this.InitializeComponent();
@@ -84,6 +111,29 @@ namespace FoxTunes
 
         public event EventHandler ComponentChanged;
 
+        public UIComponentBase Content
+        {
+            get
+            {
+                return this.GetValue(ContentProperty) as UIComponentBase;
+            }
+            set
+            {
+                this.SetValue(ContentProperty, value);
+            }
+        }
+
+        protected virtual void OnContentChanged()
+        {
+            if (this.ContentChanged != null)
+            {
+                this.ContentChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Content");
+        }
+
+        public event EventHandler ContentChanged;
+
         protected virtual void InitializeComponent()
         {
             this.Rectangle = new Rectangle();
@@ -111,12 +161,14 @@ namespace FoxTunes
             {
                 return this.CreateSelector();
             }
-            var control = Factory.CreateControl(configuration);
+            var component = default(UIComponentBase);
+            var control = Factory.CreateControl(configuration, out component);
             if (control == null)
             {
                 //If a plugin was uninstalled the control will be null.
                 return this.CreateSelector();
             }
+            this.Content = component;
             return control;
         }
 

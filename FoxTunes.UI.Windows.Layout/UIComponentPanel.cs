@@ -9,6 +9,56 @@ namespace FoxTunes
 {
     public abstract class UIComponentPanel : UIComponentBase, IUIComponentPanel
     {
+        public static readonly DependencyProperty IsInDesignModeProperty = DependencyProperty.Register(
+            "IsInDesignMode",
+            typeof(bool),
+            typeof(UIComponentPanel),
+            new PropertyMetadata(new PropertyChangedCallback(OnIsInDesignModeChanged))
+        );
+
+        public static bool GetIsInDesignMode(UIComponentPanel source)
+        {
+            return (bool)source.GetValue(IsInDesignModeProperty);
+        }
+
+        public static void SetIsInDesignMode(UIComponentPanel source, bool value)
+        {
+            source.SetValue(IsInDesignModeProperty, value);
+        }
+
+        public static void OnIsInDesignModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var container = sender as UIComponentPanel;
+            if (container == null)
+            {
+                return;
+            }
+            container.OnIsInDesignModeChanged();
+        }
+
+        public bool IsInDesignMode
+        {
+            get
+            {
+                return (bool)this.GetValue(IsInDesignModeProperty);
+            }
+            set
+            {
+                this.SetValue(IsInDesignModeProperty, value);
+            }
+        }
+
+        protected virtual void OnIsInDesignModeChanged()
+        {
+            if (this.IsInDesignModeChanged != null)
+            {
+                this.IsInDesignModeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsInDesignMode");
+        }
+
+        public event EventHandler IsInDesignModeChanged;
+
         public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
             "Component",
             typeof(UIComponentConfiguration),

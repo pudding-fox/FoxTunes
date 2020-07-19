@@ -79,6 +79,7 @@ namespace FoxTunes
 
             public override void InitializeComponent(ICore core)
             {
+                this.Window.ForEachVisualChild<UIComponentPanel>(panel => panel.IsInDesignMode = true);
                 this.Window.PreviewMouseRightButtonDown += this.OnPreviewMouseRightButtonDown;
                 base.InitializeComponent(core);
             }
@@ -176,6 +177,7 @@ namespace FoxTunes
 
             protected virtual void OnDisposing()
             {
+                this.Window.ForEachVisualChild<UIComponentPanel>(panel => panel.IsInDesignMode = false);
                 if (this.Window != null)
                 {
                     this.Window.PreviewMouseRightButtonDown -= this.OnPreviewMouseRightButtonDown;

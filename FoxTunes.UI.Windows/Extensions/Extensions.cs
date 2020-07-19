@@ -155,6 +155,24 @@ namespace FoxTunes
             return default(T);
         }
 
+        public static void ForEachVisualChild<T>(this FrameworkElement parent, Action<T> action) where T : FrameworkElement
+        {
+            var stack = new Stack<DependencyObject>();
+            stack.Push(parent);
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                if (current is T)
+                {
+                    action(current as T);
+                }
+                for (int a = 0, b = VisualTreeHelper.GetChildrenCount(current); a < b; a++)
+                {
+                    stack.Push(VisualTreeHelper.GetChild(current, a));
+                }
+            }
+        }
+
         public static bool IsMouseOver(this FrameworkElement element)
         {
             var x = default(int);
