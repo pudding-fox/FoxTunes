@@ -15,6 +15,8 @@ namespace FoxTunes
     [UIComponent("C1BD2AF7-ACF8-4710-99A3-AB5F34C46A90", UIComponentSlots.NONE, "Grid", role: UIComponentRole.Hidden)]
     public partial class UIComponentGridContainer : UIComponentPanel
     {
+        const int MIN_WIDTH = 80;
+
         const string ADD = "AAAA";
 
         const string REMOVE = "BBBB";
@@ -114,6 +116,11 @@ namespace FoxTunes
             }
             foreach (var component in components)
             {
+                var margin = default(Thickness);
+                if (this.Grid.ColumnDefinitions.Count > 0)
+                {
+                    margin = new Thickness(2, 0, 0, 0);
+                }
                 this.Grid.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = width
@@ -121,6 +128,8 @@ namespace FoxTunes
                 var container = new UIComponentContainer()
                 {
                     Component = component,
+                    MinWidth = MIN_WIDTH,
+                    Margin = margin,
                     HorizontalAlignment = alignment,
                 };
                 //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
@@ -226,12 +235,44 @@ namespace FoxTunes
 
         public Task MoveLeft(UIComponentContainer container)
         {
-            throw new NotImplementedException();
+            return Windows.Invoke(() =>
+            {
+                for (var a = 0; a < this.Component.Children.Count; a++)
+                {
+                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
+                    {
+                        continue;
+                    }
+                    if (a > 0)
+                    {
+                        this.Component.Children[a] = this.Component.Children[a - 1];
+                        this.Component.Children[a - 1] = container.Component;
+                        this.UpdateChildren();
+                    }
+                    return;
+                }
+            });
         }
 
         public Task MoveRight(UIComponentContainer container)
         {
-            throw new NotImplementedException();
+            return Windows.Invoke(() =>
+            {
+                for (var a = 0; a < this.Component.Children.Count; a++)
+                {
+                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
+                    {
+                        continue;
+                    }
+                    if (this.Component.Children.Count - 1 > a)
+                    {
+                        this.Component.Children[a] = this.Component.Children[a + 1];
+                        this.Component.Children[a + 1] = container.Component;
+                        this.UpdateChildren();
+                    }
+                    return;
+                }
+            });
         }
 
         public Task SetAlignment(UIComponentContainer container, string alignment)

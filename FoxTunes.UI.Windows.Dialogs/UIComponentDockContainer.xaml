@@ -14,7 +14,21 @@
     <DockPanel>
         <LocalWindows:UIComponentContainer 
             DockPanel.Dock="{Binding DockLocation, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}"
-            Component="{Binding DockComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}">
+            Component="{Binding DockComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}"
+            MinHeight="30">
+            <LocalWindows:UIComponentContainer.Style>
+                <Style TargetType="{x:Type LocalWindows:UIComponentContainer}">
+                    <Setter Property="Margin" Value="0"></Setter>
+                    <Style.Triggers>
+                        <Trigger Property="DockPanel.Dock" Value="Top">
+                            <Setter Property="Margin" Value="0,0,0,2"></Setter>
+                        </Trigger>
+                        <Trigger Property="DockPanel.Dock" Value="Bottom">
+                            <Setter Property="Margin" Value="0,2,0,0"></Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </LocalWindows:UIComponentContainer.Style>
         </LocalWindows:UIComponentContainer>
         <LocalWindows:UIComponentContainer Component="{Binding ContentComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}"></LocalWindows:UIComponentContainer>
     </DockPanel>

@@ -8,6 +8,8 @@
             x:Key="ViewModel" 
             Core="{Binding}" 
             Category="{Binding Category, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}" 
+            Components="{Binding Components, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}"
+            Source="{Binding Source, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}"
             MenuVisible="{Binding IsOpen, Mode=TwoWay, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}, FallbackValue=False}"/>
     </ContextMenu.Resources>
     <Windows:FrameworkElementExtensions.Style>
