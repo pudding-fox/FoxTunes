@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,9 +16,17 @@ namespace FoxTunes
     [UIComponent("18E98420-F039-4504-A116-3D0F26BEAAD5", UIComponentSlots.NONE, "Vertical Split", role: UIComponentRole.Hidden)]
     public partial class UIComponentVerticalSplitContainer : UIComponentPanel
     {
-        const string COLLAPSE_LEFT = "AAAA";
+        const string FREEZE_LEFT = "AAAA";
 
-        const string COLLAPSE_RIGHT = "BBBB";
+        const string FREEZE_RIGHT = "BBBB";
+
+        const string COLLAPSE_LEFT = "CCCC";
+
+        const string COLLAPSE_RIGHT = "DDDD";
+
+        const string DirectionLeft = "Left";
+
+        const string DirectionRight = "Right";
 
         public static readonly DependencyProperty LeftComponentProperty = DependencyProperty.Register(
             "LeftComponent",
@@ -152,6 +161,33 @@ namespace FoxTunes
                 return;
             }
             container.OnSplitterDistanceChanged();
+        }
+
+        public static readonly DependencyProperty SplitterDirectionProperty = DependencyProperty.Register(
+            "SplitterDirection",
+            typeof(string),
+            typeof(UIComponentVerticalSplitContainer),
+            new PropertyMetadata(new PropertyChangedCallback(OnSplitterDirectionChanged))
+        );
+
+        public static string GetSplitterDirection(UIComponentVerticalSplitContainer source)
+        {
+            return (string)source.GetValue(SplitterDirectionProperty);
+        }
+
+        public static void SetSplitterDirection(UIComponentVerticalSplitContainer source, string value)
+        {
+            source.SetValue(SplitterDirectionProperty, value);
+        }
+
+        public static void OnSplitterDirectionChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var container = sender as UIComponentVerticalSplitContainer;
+            if (container == null)
+            {
+                return;
+            }
+            container.OnSplitterDirectionChanged();
         }
 
         public static readonly DependencyProperty CollapseLeftProperty = DependencyProperty.Register(
@@ -307,22 +343,38 @@ namespace FoxTunes
 
             var grid = new Grid();
 
-            var topColumn = new ColumnDefinition();
+            var leftColumn = new ColumnDefinition();
             var splitterColumn = new ColumnDefinition();
-            var bottomColumn = new ColumnDefinition();
+            var rightColumn = new ColumnDefinition();
 
             var splitter = new GridSplitter();
 
-            topColumn.SetBinding(
-                ColumnDefinition.WidthProperty,
-                new Binding()
-                {
-                    Source = this,
-                    Path = new PropertyPath(nameof(this.SplitterDistance)),
-                    Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                    Mode = BindingMode.TwoWay
-                }
-            );
+            if (string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase))
+            {
+                leftColumn.SetBinding(
+                    ColumnDefinition.WidthProperty,
+                    new Binding()
+                    {
+                        Source = this,
+                        Path = new PropertyPath(nameof(this.SplitterDistance)),
+                        Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                        Mode = BindingMode.TwoWay
+                    }
+                );
+            }
+            else
+            {
+                rightColumn.SetBinding(
+                    ColumnDefinition.WidthProperty,
+                    new Binding()
+                    {
+                        Source = this,
+                        Path = new PropertyPath(nameof(this.SplitterDistance)),
+                        Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                        Mode = BindingMode.TwoWay
+                    }
+                );
+            }
 
             splitterColumn.Width = new GridLength(0, GridUnitType.Auto);
 
@@ -331,15 +383,58 @@ namespace FoxTunes
             splitter.HorizontalAlignment = HorizontalAlignment.Center;
             splitter.VerticalAlignment = VerticalAlignment.Stretch;
 
-            grid.ColumnDefinitions.Add(topColumn);
+            grid.ColumnDefinitions.Add(leftColumn);
             grid.ColumnDefinitions.Add(splitterColumn);
-            grid.ColumnDefinitions.Add(bottomColumn);
+            grid.ColumnDefinitions.Add(rightColumn);
 
             grid.Children.Add(this.LeftContainer);
             grid.Children.Add(splitter);
             grid.Children.Add(this.RightContainer);
 
             this.Content = grid;
+        }
+
+        protected virtual void UpdateSplitterDirection()
+        {
+            if (this.Content is Grid grid)
+            {
+                var leftColumn = grid.ColumnDefinitions.FirstOrDefault();
+                var rightColumn = grid.ColumnDefinitions.LastOrDefault();
+                if (leftColumn == null || rightColumn == null || object.ReferenceEquals(leftColumn, rightColumn))
+                {
+                    return;
+                }
+                BindingOperations.ClearBinding(leftColumn, ColumnDefinition.WidthProperty);
+                BindingOperations.ClearBinding(rightColumn, ColumnDefinition.WidthProperty);
+                if (string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase))
+                {
+                    leftColumn.SetBinding(
+                        ColumnDefinition.WidthProperty,
+                        new Binding()
+                        {
+                            Source = this,
+                            Path = new PropertyPath(nameof(this.SplitterDistance)),
+                            Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                            Mode = BindingMode.TwoWay
+                        }
+                    );
+                    rightColumn.Width = new GridLength(1, GridUnitType.Star);
+                }
+                else
+                {
+                    leftColumn.Width = new GridLength(1, GridUnitType.Star);
+                    rightColumn.SetBinding(
+                       ColumnDefinition.WidthProperty,
+                       new Binding()
+                       {
+                           Source = this,
+                           Path = new PropertyPath(nameof(this.SplitterDistance)),
+                           Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                           Mode = BindingMode.TwoWay
+                       }
+                   );
+                }
+            }
         }
 
         protected virtual void CreateLayout(UIComponentContainer container)
@@ -390,6 +485,7 @@ namespace FoxTunes
         protected virtual void UpdateMetaData()
         {
             var splitterDistance = default(string);
+            var splitterDirection = default(string);
             var collapseLeft = default(string);
             var collapseRight = default(string);
             if (this.Component.TryGet(nameof(this.SplitterDistance), out splitterDistance))
@@ -399,6 +495,14 @@ namespace FoxTunes
             else
             {
                 this.SplitterDistance = "1*";
+            }
+            if (this.Component.TryGet(nameof(this.SplitterDirection), out splitterDirection))
+            {
+                this.SplitterDirection = splitterDirection;
+            }
+            else
+            {
+                this.SplitterDirection = DirectionLeft;
             }
             if (this.Component.TryGet(nameof(this.CollapseLeft), out collapseLeft))
             {
@@ -550,6 +654,37 @@ namespace FoxTunes
 
         public event EventHandler SplitterDistanceChanged;
 
+        public string SplitterDirection
+        {
+            get
+            {
+                return (string)this.GetValue(SplitterDirectionProperty);
+            }
+            set
+            {
+                this.SetValue(SplitterDirectionProperty, value);
+            }
+        }
+
+        protected virtual void OnSplitterDirectionChanged()
+        {
+            if (this.Component != null)
+            {
+                this.Component.AddOrUpdate(
+                    nameof(this.SplitterDirection),
+                    this.SplitterDirection
+                );
+            }
+            this.UpdateSplitterDirection();
+            if (this.SplitterDirectionChanged != null)
+            {
+                this.SplitterDirectionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SplitterDirection");
+        }
+
+        public event EventHandler SplitterDirectionChanged;
+
         public bool CollapseLeft
         {
             get
@@ -616,9 +751,21 @@ namespace FoxTunes
             {
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
+                    FREEZE_LEFT,
+                    "Freeze Left", attributes:
+                    string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    FREEZE_RIGHT,
+                    "Freeze Right", attributes:
+                    string.Equals(this.SplitterDirection, DirectionRight, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_LEFT,
                     "Collapsable Left", attributes:
-                    this.CollapseLeft ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    (byte)((this.CollapseLeft ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
@@ -633,6 +780,10 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
+                case FREEZE_LEFT:
+                    return Windows.Invoke(() => this.SplitterDirection = DirectionLeft);
+                case FREEZE_RIGHT:
+                    return Windows.Invoke(() => this.SplitterDirection = DirectionRight);
                 case COLLAPSE_LEFT:
                     return Windows.Invoke(() => this.CollapseLeft = !this.CollapseLeft);
                 case COLLAPSE_RIGHT:
