@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 
 namespace FoxTunes
 {
@@ -108,6 +109,23 @@ namespace FoxTunes
         }
 
         public event EventHandler ComponentChanged;
+
+        protected UIComponentPanel()
+        {
+            this.CreateBindings();
+        }
+
+        protected virtual void CreateBindings()
+        {
+            this.SetBinding(
+                IsInDesignModeProperty,
+                new Binding()
+                {
+                    RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(UIComponentPanel), 1),
+                    Path = new PropertyPath(nameof(this.IsInDesignMode))
+                }
+            );
+        }
 
         public virtual IEnumerable<IInvocationComponent> Invocations
         {
