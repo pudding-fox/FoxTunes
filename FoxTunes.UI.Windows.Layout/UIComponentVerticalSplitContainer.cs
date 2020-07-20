@@ -264,36 +264,47 @@ namespace FoxTunes
 
         protected virtual void CreateLayout()
         {
-            this.LeftContainer.Disconnect();
-            this.RightContainer.Disconnect();
             if (this.IsInDesignMode)
             {
                 this.CreateSplitLayout();
                 this.IsComponentEnabled = true;
+                return;
             }
-            else if (this.LeftEnabled && this.RightEnabled)
+            var showLeft = !this.CollapseLeft || this.LeftEnabled;
+            var showRight = !this.CollapseRight || this.RightEnabled;
+            if (showLeft && showRight)
             {
                 this.CreateSplitLayout();
                 this.IsComponentEnabled = true;
             }
-            else if (this.LeftEnabled)
+            else if (showLeft)
             {
                 this.CreateLayout(this.LeftContainer);
                 this.IsComponentEnabled = true;
             }
-            else if (this.RightEnabled)
+            else if (showRight)
             {
                 this.CreateLayout(this.RightContainer);
                 this.IsComponentEnabled = true;
             }
             else
             {
+                this.Content = null;
                 this.IsComponentEnabled = false;
             }
         }
 
         protected virtual void CreateSplitLayout()
         {
+            if (this.Content is Grid)
+            {
+                //Nothing to do.
+                return;
+            }
+
+            this.LeftContainer.Disconnect();
+            this.RightContainer.Disconnect();
+
             var grid = new Grid();
 
             var topColumn = new ColumnDefinition();
@@ -333,6 +344,12 @@ namespace FoxTunes
 
         protected virtual void CreateLayout(UIComponentContainer container)
         {
+            if (object.ReferenceEquals(this.Content, container))
+            {
+                //Nothing to do.
+                return;
+            }
+            container.Disconnect();
             this.Content = container;
         }
 
@@ -346,8 +363,8 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
+                this.UpdateMetaData();
                 this.UpdateChildren();
-                this.UpdateSplitterDistance();
                 this.CreateLayout();
             }
             base.OnComponentChanged();
@@ -370,9 +387,11 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdateSplitterDistance()
+        protected virtual void UpdateMetaData()
         {
             var splitterDistance = default(string);
+            var collapseLeft = default(string);
+            var collapseRight = default(string);
             if (this.Component.TryGet(nameof(this.SplitterDistance), out splitterDistance))
             {
                 this.SplitterDistance = splitterDistance;
@@ -380,6 +399,22 @@ namespace FoxTunes
             else
             {
                 this.SplitterDistance = "1*";
+            }
+            if (this.Component.TryGet(nameof(this.CollapseLeft), out collapseLeft))
+            {
+                this.CollapseLeft = Convert.ToBoolean(collapseLeft);
+            }
+            else
+            {
+                this.CollapseLeft = false;
+            }
+            if (this.Component.TryGet(nameof(this.CollapseRight), out collapseRight))
+            {
+                this.CollapseRight = Convert.ToBoolean(collapseRight);
+            }
+            else
+            {
+                this.CollapseRight = false;
             }
         }
 
@@ -587,7 +622,7 @@ namespace FoxTunes
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
-                    COLLAPSE_LEFT,
+                    COLLAPSE_RIGHT,
                     "Collapsable Right", attributes:
                     this.CollapseRight ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );

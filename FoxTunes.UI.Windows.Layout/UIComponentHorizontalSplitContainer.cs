@@ -264,36 +264,47 @@ namespace FoxTunes
 
         protected virtual void CreateLayout()
         {
-            this.TopContainer.Disconnect();
-            this.BottomContainer.Disconnect();
             if (this.IsInDesignMode)
             {
                 this.CreateSplitLayout();
                 this.IsComponentEnabled = true;
+                return;
             }
-            else if (this.TopEnabled && this.BottomEnabled)
+            var showTop = !this.CollapseTop || this.TopEnabled;
+            var showBottom = !this.CollapseBottom || this.BottomEnabled;
+            if (showTop && showBottom)
             {
                 this.CreateSplitLayout();
                 this.IsComponentEnabled = true;
             }
-            else if (this.TopEnabled)
+            else if (showTop)
             {
                 this.CreateLayout(this.TopContainer);
                 this.IsComponentEnabled = true;
             }
-            else if (this.BottomEnabled)
+            else if (showBottom)
             {
                 this.CreateLayout(this.BottomContainer);
                 this.IsComponentEnabled = true;
             }
             else
             {
+                this.Content = null;
                 this.IsComponentEnabled = false;
             }
         }
 
         protected virtual void CreateSplitLayout()
         {
+            if (this.Content is Grid)
+            {
+                //Nothing to do.
+                return;
+            }
+
+            this.TopContainer.Disconnect();
+            this.BottomContainer.Disconnect();
+
             var grid = new Grid();
 
             var topRow = new RowDefinition();
@@ -333,8 +344,15 @@ namespace FoxTunes
 
         protected virtual void CreateLayout(UIComponentContainer container)
         {
+            if (object.ReferenceEquals(this.Content, container))
+            {
+                //Nothing to do.
+                return;
+            }
+            container.Disconnect();
             this.Content = container;
         }
+
 
         protected override void OnIsInDesignModeChanged()
         {
@@ -346,8 +364,8 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
+                this.UpdateMetaData();
                 this.UpdateChildren();
-                this.UpdateSplitterDistance();
                 this.CreateLayout();
             }
             base.OnComponentChanged();
@@ -370,9 +388,11 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdateSplitterDistance()
+        protected virtual void UpdateMetaData()
         {
             var splitterDistance = default(string);
+            var collapseTop = default(string);
+            var collapseBottom = default(string);
             if (this.Component.TryGet(nameof(this.SplitterDistance), out splitterDistance))
             {
                 this.SplitterDistance = splitterDistance;
@@ -380,6 +400,22 @@ namespace FoxTunes
             else
             {
                 this.SplitterDistance = "1*";
+            }
+            if (this.Component.TryGet(nameof(this.CollapseTop), out collapseTop))
+            {
+                this.CollapseTop = Convert.ToBoolean(collapseTop);
+            }
+            else
+            {
+                this.CollapseTop = false;
+            }
+            if (this.Component.TryGet(nameof(this.CollapseBottom), out collapseBottom))
+            {
+                this.CollapseBottom = Convert.ToBoolean(collapseBottom);
+            }
+            else
+            {
+                this.CollapseBottom = false;
             }
         }
 
@@ -587,7 +623,7 @@ namespace FoxTunes
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
-                    COLLAPSE_TOP,
+                    COLLAPSE_BOTTOM,
                     "Collapsable Bottom", attributes:
                     this.CollapseBottom ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );

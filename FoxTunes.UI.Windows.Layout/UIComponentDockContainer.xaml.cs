@@ -108,8 +108,8 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
+                this.UpdateMetaData();
                 this.UpdateChildren();
-                this.UpdateDockLocation();
             }
             base.OnComponentChanged();
         }
@@ -131,12 +131,12 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdateDockLocation()
+        protected virtual void UpdateMetaData()
         {
-            var DockLocation = default(string);
-            if (this.Component.TryGet(nameof(this.DockLocation), out DockLocation))
+            var dockLocation = default(string);
+            if (this.Component.TryGet(nameof(this.DockLocation), out dockLocation))
             {
-                this.DockLocation = DockLocation;
+                this.DockLocation = dockLocation;
             }
             else
             {
