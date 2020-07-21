@@ -222,6 +222,7 @@ namespace FoxTunes
             if (this.Queue != null)
             {
                 this.Queue.Complete -= this.OnComplete;
+                this.Queue.Dispose();
             }
             Windows.MainWindowCreated -= this.OnWindowCreated;
             Windows.MiniWindowCreated -= this.OnWindowCreated;
