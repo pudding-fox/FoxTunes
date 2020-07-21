@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace FoxTunes
 {
@@ -17,6 +18,12 @@ namespace FoxTunes
         const string DOCK_TOP = "AAAA";
 
         const string DOCK_BOTTOM = "BBBB";
+
+        const string DOCK_LEFT = "CCCC";
+
+        const string DOCK_RIGHT = "DDDD";
+
+        const string COLLAPSE = "EEEE";
 
         public static readonly DependencyProperty ContentComponentProperty = DependencyProperty.Register(
             "ContentComponent",
@@ -72,6 +79,33 @@ namespace FoxTunes
             container.OnDockComponentChanged();
         }
 
+        public static readonly DependencyProperty DockEnabledProperty = DependencyProperty.Register(
+            "DockEnabled",
+            typeof(bool),
+            typeof(UIComponentDockContainer),
+            new PropertyMetadata(true, new PropertyChangedCallback(OnDockEnabledChanged))
+        );
+
+        public static bool GetDockEnabled(UIComponentDockContainer source)
+        {
+            return (bool)source.GetValue(DockEnabledProperty);
+        }
+
+        public static void SetDockEnabled(UIComponentDockContainer source, bool value)
+        {
+            source.SetValue(DockEnabledProperty, value);
+        }
+
+        public static void OnDockEnabledChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var container = sender as UIComponentDockContainer;
+            if (container == null)
+            {
+                return;
+            }
+            container.OnDockEnabledChanged();
+        }
+
         public static readonly DependencyProperty DockLocationProperty = DependencyProperty.Register(
            "DockLocation",
            typeof(string),
@@ -99,9 +133,45 @@ namespace FoxTunes
             container.OnDockLocationChanged();
         }
 
+        public static readonly DependencyProperty CollapseProperty = DependencyProperty.Register(
+            "Collapse",
+            typeof(bool),
+            typeof(UIComponentDockContainer),
+            new PropertyMetadata(new PropertyChangedCallback(OnCollapseChanged))
+        );
+
+        public static bool GetCollapse(UIComponentDockContainer source)
+        {
+            return (bool)source.GetValue(CollapseProperty);
+        }
+
+        public static void SetCollapse(UIComponentDockContainer source, bool value)
+        {
+            source.SetValue(CollapseProperty, value);
+        }
+
+        public static void OnCollapseChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var container = sender as UIComponentDockContainer;
+            if (container == null)
+            {
+                return;
+            }
+            container.OnCollapseChanged();
+        }
+
         public UIComponentDockContainer()
         {
             this.InitializeComponent();
+            this.SetBinding(
+                UIComponentDockContainer.DockEnabledProperty,
+                new Binding()
+                {
+                    Source = this.DockContainer,
+                    Path = new PropertyPath("Content.IsComponentEnabled"),
+                    FallbackValue = true
+                }
+            );
         }
 
         protected override void OnComponentChanged()
@@ -134,6 +204,7 @@ namespace FoxTunes
         protected virtual void UpdateMetaData()
         {
             var dockLocation = default(string);
+            var collapse = default(string);
             if (this.Component.TryGet(nameof(this.DockLocation), out dockLocation))
             {
                 this.DockLocation = dockLocation;
@@ -141,6 +212,14 @@ namespace FoxTunes
             else
             {
                 this.DockLocation = "Top";
+            }
+            if (this.Component.TryGet(nameof(this.Collapse), out collapse))
+            {
+                this.Collapse = Convert.ToBoolean(collapse);
+            }
+            else
+            {
+                this.Collapse = false;
             }
         }
 
@@ -198,6 +277,29 @@ namespace FoxTunes
 
         public event EventHandler DockComponentChanged;
 
+        public bool DockEnabled
+        {
+            get
+            {
+                return (bool)this.GetValue(DockEnabledProperty);
+            }
+            set
+            {
+                this.SetValue(DockEnabledProperty, value);
+            }
+        }
+
+        protected virtual void OnDockEnabledChanged()
+        {
+            if (this.DockEnabledChanged != null)
+            {
+                this.DockEnabledChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("DockEnabled");
+        }
+
+        public event EventHandler DockEnabledChanged;
+
         public string DockLocation
         {
             get
@@ -228,6 +330,36 @@ namespace FoxTunes
 
         public event EventHandler DockLocationChanged;
 
+        public bool Collapse
+        {
+            get
+            {
+                return (bool)this.GetValue(CollapseProperty);
+            }
+            set
+            {
+                this.SetValue(CollapseProperty, value);
+            }
+        }
+
+        protected virtual void OnCollapseChanged()
+        {
+            if (this.Component != null)
+            {
+                this.Component.AddOrUpdate(
+                    nameof(this.Collapse),
+                    Convert.ToString(this.Collapse)
+                );
+            }
+            if (this.CollapseChanged != null)
+            {
+                this.CollapseChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Collapse");
+        }
+
+        public event EventHandler CollapseChanged;
+
         public override IEnumerable<IInvocationComponent> Invocations
         {
             get
@@ -244,6 +376,24 @@ namespace FoxTunes
                     "Dock Bottom",
                     attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Bottom), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    DOCK_LEFT,
+                    "Dock Left",
+                    attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Left), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    DOCK_RIGHT,
+                    "Dock Right",
+                    attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Right), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    COLLAPSE,
+                    "Collapsable",
+                    attributes: (byte)((this.Collapse ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                );
             }
         }
 
@@ -252,16 +402,17 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case DOCK_TOP:
-                    return this.SetDockLocation(Enum.GetName(typeof(Dock), Dock.Top));
+                    return Windows.Invoke(() => this.DockLocation = Enum.GetName(typeof(Dock), Dock.Top));
                 case DOCK_BOTTOM:
-                    return this.SetDockLocation(Enum.GetName(typeof(Dock), Dock.Bottom));
+                    return Windows.Invoke(() => this.DockLocation = Enum.GetName(typeof(Dock), Dock.Bottom));
+                case DOCK_LEFT:
+                    return Windows.Invoke(() => this.DockLocation = Enum.GetName(typeof(Dock), Dock.Left));
+                case DOCK_RIGHT:
+                    return Windows.Invoke(() => this.DockLocation = Enum.GetName(typeof(Dock), Dock.Right));
+                case COLLAPSE:
+                    return Windows.Invoke(() => this.Collapse = !this.Collapse);
             }
             return base.InvokeAsync(component);
-        }
-
-        public Task SetDockLocation(string dockLocation)
-        {
-            return Windows.Invoke(() => this.DockLocation = dockLocation);
         }
     }
 }

@@ -262,11 +262,28 @@ namespace FoxTunes
             Grid.SetColumn(this.RightContainer, 2);
 
             this.LeftContainer.SetBinding(
+                FrameworkElement.DataContextProperty,
+                new Binding()
+                {
+                    Source = this,
+                    Path = new PropertyPath(nameof(this.DataContext))
+                }
+            );
+            this.LeftContainer.SetBinding(
                 UIComponentContainer.ComponentProperty,
                 new Binding()
                 {
                     Source = this,
                     Path = new PropertyPath(nameof(this.LeftComponent))
+                }
+            );
+
+            this.RightContainer.SetBinding(
+                FrameworkElement.DataContextProperty,
+                new Binding()
+                {
+                    Source = this,
+                    Path = new PropertyPath(nameof(this.DataContext))
                 }
             );
             this.RightContainer.SetBinding(
@@ -752,26 +769,26 @@ namespace FoxTunes
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_LEFT,
-                    "Freeze Left", attributes:
-                    string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    "Freeze Left",
+                    attributes: string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_RIGHT,
-                    "Freeze Right", attributes:
-                    string.Equals(this.SplitterDirection, DirectionRight, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    "Freeze Right",
+                    attributes: string.Equals(this.SplitterDirection, DirectionRight, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_LEFT,
-                    "Collapsable Left", attributes:
-                    (byte)((this.CollapseLeft ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                    "Collapsable Left",
+                    attributes: (byte)((this.CollapseLeft ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_RIGHT,
-                    "Collapsable Right", attributes:
-                    this.CollapseRight ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    "Collapsable Right",
+                    attributes: this.CollapseRight ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
             }
         }
