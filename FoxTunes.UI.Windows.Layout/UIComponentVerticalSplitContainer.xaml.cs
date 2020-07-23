@@ -281,51 +281,59 @@ namespace FoxTunes
                 this.RightColumn,
                 ColumnDefinition.WidthProperty
             );
-            if (this.CollapseLeft && !this.LeftEnabled && !this.IsInDesignMode)
+            if (this.CollapseLeft && !this.LeftEnabled && this.CollapseRight && !this.RightEnabled && !this.IsInDesignMode)
             {
-                this.LeftContainer.Visibility = Visibility.Collapsed;
-                this.LeftColumn.Width = new GridLength(0, GridUnitType.Pixel);
-                this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
-            }
-            else if (this.CollapseRight && !this.RightEnabled && !this.IsInDesignMode)
-            {
-                this.RightContainer.Visibility = Visibility.Collapsed;
-                this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
-                this.RightColumn.Width = new GridLength(0, GridUnitType.Pixel);
+                this.IsComponentEnabled = false;
             }
             else
             {
-                this.SplitterColumn.Width = new GridLength(4, GridUnitType.Pixel);
-                if (string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase))
+                if (this.CollapseLeft && !this.LeftEnabled && !this.IsInDesignMode)
                 {
-                    this.LeftColumn.SetBinding(
-                        ColumnDefinition.WidthProperty,
-                        new Binding()
-                        {
-                            Source = this,
-                            Path = new PropertyPath(nameof(this.SplitterDistance)),
-                            Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                            Mode = BindingMode.TwoWay
-                        }
-                    );
-                    this.RightColumn.Width = new GridLength(1, GridUnitType.Star);
+                    this.LeftContainer.Visibility = Visibility.Collapsed;
+                    this.LeftColumn.Width = new GridLength(0, GridUnitType.Pixel);
+                    this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
+                }
+                else if (this.CollapseRight && !this.RightEnabled && !this.IsInDesignMode)
+                {
+                    this.RightContainer.Visibility = Visibility.Collapsed;
+                    this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
+                    this.RightColumn.Width = new GridLength(0, GridUnitType.Pixel);
                 }
                 else
                 {
-                    this.LeftColumn.Width = new GridLength(1, GridUnitType.Star);
-                    this.RightColumn.SetBinding(
-                        ColumnDefinition.WidthProperty,
-                        new Binding()
-                        {
-                            Source = this,
-                            Path = new PropertyPath(nameof(this.SplitterDistance)),
-                            Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                            Mode = BindingMode.TwoWay
-                        }
-                    );
+                    this.SplitterColumn.Width = new GridLength(4, GridUnitType.Pixel);
+                    if (string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.LeftColumn.SetBinding(
+                            ColumnDefinition.WidthProperty,
+                            new Binding()
+                            {
+                                Source = this,
+                                Path = new PropertyPath(nameof(this.SplitterDistance)),
+                                Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                                Mode = BindingMode.TwoWay
+                            }
+                        );
+                        this.RightColumn.Width = new GridLength(1, GridUnitType.Star);
+                    }
+                    else
+                    {
+                        this.LeftColumn.Width = new GridLength(1, GridUnitType.Star);
+                        this.RightColumn.SetBinding(
+                            ColumnDefinition.WidthProperty,
+                            new Binding()
+                            {
+                                Source = this,
+                                Path = new PropertyPath(nameof(this.SplitterDistance)),
+                                Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                                Mode = BindingMode.TwoWay
+                            }
+                        );
+                    }
+                    this.LeftContainer.Visibility = Visibility.Visible;
+                    this.RightContainer.Visibility = Visibility.Visible;
                 }
-                this.LeftContainer.Visibility = Visibility.Visible;
-                this.RightContainer.Visibility = Visibility.Visible;
+                this.IsComponentEnabled = true;
             }
         }
 

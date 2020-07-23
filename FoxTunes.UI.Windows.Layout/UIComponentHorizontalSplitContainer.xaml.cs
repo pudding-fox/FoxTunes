@@ -280,52 +280,59 @@ namespace FoxTunes
             BindingOperations.ClearBinding(
                 this.BottomRow,
                 RowDefinition.HeightProperty
-            );
-            if (this.CollapseTop && !this.TopEnabled && !this.IsInDesignMode)
+            ); if (this.CollapseTop && !this.TopEnabled && this.CollapseBottom && !this.BottomEnabled && !this.IsInDesignMode)
             {
-                this.TopContainer.Visibility = Visibility.Collapsed;
-                this.TopRow.Height = new GridLength(0, GridUnitType.Pixel);
-                this.SplitterRow.Height = new GridLength(0, GridUnitType.Pixel);
-            }
-            else if (this.CollapseBottom && !this.BottomEnabled && !this.IsInDesignMode)
-            {
-                this.BottomContainer.Visibility = Visibility.Collapsed;
-                this.SplitterRow.Height = new GridLength(0, GridUnitType.Pixel);
-                this.BottomRow.Height = new GridLength(0, GridUnitType.Pixel);
+                this.IsComponentEnabled = false;
             }
             else
             {
-                this.SplitterRow.Height = new GridLength(4, GridUnitType.Pixel);
-                if (string.Equals(this.SplitterDirection, DirectionTop, StringComparison.OrdinalIgnoreCase))
+                if (this.CollapseTop && !this.TopEnabled && !this.IsInDesignMode)
                 {
-                    this.TopRow.SetBinding(
-                        RowDefinition.HeightProperty,
-                        new Binding()
-                        {
-                            Source = this,
-                            Path = new PropertyPath(nameof(this.SplitterDistance)),
-                            Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                            Mode = BindingMode.TwoWay
-                        }
-                    );
-                    this.BottomRow.Height = new GridLength(1, GridUnitType.Star);
+                    this.TopContainer.Visibility = Visibility.Collapsed;
+                    this.TopRow.Height = new GridLength(0, GridUnitType.Pixel);
+                    this.SplitterRow.Height = new GridLength(0, GridUnitType.Pixel);
+                }
+                else if (this.CollapseBottom && !this.BottomEnabled && !this.IsInDesignMode)
+                {
+                    this.BottomContainer.Visibility = Visibility.Collapsed;
+                    this.SplitterRow.Height = new GridLength(0, GridUnitType.Pixel);
+                    this.BottomRow.Height = new GridLength(0, GridUnitType.Pixel);
                 }
                 else
                 {
-                    this.TopRow.Height = new GridLength(1, GridUnitType.Star);
-                    this.BottomRow.SetBinding(
-                        RowDefinition.HeightProperty,
-                        new Binding()
-                        {
-                            Source = this,
-                            Path = new PropertyPath(nameof(this.SplitterDistance)),
-                            Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                            Mode = BindingMode.TwoWay
-                        }
-                    );
+                    this.SplitterRow.Height = new GridLength(4, GridUnitType.Pixel);
+                    if (string.Equals(this.SplitterDirection, DirectionTop, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.TopRow.SetBinding(
+                            RowDefinition.HeightProperty,
+                            new Binding()
+                            {
+                                Source = this,
+                                Path = new PropertyPath(nameof(this.SplitterDistance)),
+                                Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                                Mode = BindingMode.TwoWay
+                            }
+                        );
+                        this.BottomRow.Height = new GridLength(1, GridUnitType.Star);
+                    }
+                    else
+                    {
+                        this.TopRow.Height = new GridLength(1, GridUnitType.Star);
+                        this.BottomRow.SetBinding(
+                            RowDefinition.HeightProperty,
+                            new Binding()
+                            {
+                                Source = this,
+                                Path = new PropertyPath(nameof(this.SplitterDistance)),
+                                Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                                Mode = BindingMode.TwoWay
+                            }
+                        );
+                    }
+                    this.TopContainer.Visibility = Visibility.Visible;
+                    this.BottomContainer.Visibility = Visibility.Visible;
                 }
-                this.TopContainer.Visibility = Visibility.Visible;
-                this.BottomContainer.Visibility = Visibility.Visible;
+                this.IsComponentEnabled = true;
             }
         }
 

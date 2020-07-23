@@ -6,7 +6,8 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core"
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}"
+             MinWidth="80">
     <UserControl.Resources>
         <ViewModel:Volume x:Key="ViewModel" Core="{Binding}"></ViewModel:Volume>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>

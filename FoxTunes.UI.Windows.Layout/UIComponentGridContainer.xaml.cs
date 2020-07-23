@@ -15,8 +15,6 @@ namespace FoxTunes
     [UIComponent("C1BD2AF7-ACF8-4710-99A3-AB5F34C46A90", UIComponentSlots.NONE, "Grid", role: UIComponentRole.Hidden)]
     public partial class UIComponentGridContainer : UIComponentPanel
     {
-        const int MIN_WIDTH = 80;
-
         const string ADD = "AAAA";
 
         const string REMOVE = "BBBB";
@@ -128,7 +126,6 @@ namespace FoxTunes
                 var container = new UIComponentContainer()
                 {
                     Component = component,
-                    MinWidth = MIN_WIDTH,
                     Margin = margin,
                     HorizontalAlignment = alignment,
                 };
