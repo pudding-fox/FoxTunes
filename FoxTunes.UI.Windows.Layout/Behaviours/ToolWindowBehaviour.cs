@@ -15,9 +15,9 @@ namespace FoxTunes
     {
         const int TIMEOUT = 1000;
 
-        public const string NEW = "AAAA";
+        public const string NEW = "BBBB";
 
-        public const string MANAGE = "BBBB";
+        public const string MANAGE = "CCCC";
 
         static ToolWindowBehaviour()
         {

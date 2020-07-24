@@ -40,8 +40,11 @@ namespace FoxTunes
             lock (SyncRoot)
             {
                 this.Actions.Add(action);
-                this.Timer.Stop();
-                this.Timer.Start();
+                if (this.Timer != null)
+                {
+                    this.Timer.Stop();
+                    this.Timer.Start();
+                }
             }
         }
 
@@ -134,6 +137,7 @@ namespace FoxTunes
                 {
                     this.Timer.Elapsed -= this.OnElapsed;
                     this.Timer.Dispose();
+                    this.Timer = null;
                 }
             }
         }
