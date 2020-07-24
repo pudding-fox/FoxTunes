@@ -16,11 +16,16 @@
     <Window.Resources>
         <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
     </Window.Resources>
-    <Grid>
+    <Grid Background="{DynamicResource NormalBrush}">
         <Grid.LayoutTransform>
             <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
         </Grid.LayoutTransform>
-        <Windows:Main></Windows:Main>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Windows:Titlebar></Windows:Titlebar>
+        <Windows:Main Grid.Row="1" Margin="2,0,2,2"></Windows:Main>
         <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}" IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseLeftButtonUp">
@@ -31,6 +36,6 @@
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_NOTIFY_ICON}}"></Windows:Menu>
             </Windows:NotifyIconElement.ContextMenu>
         </Windows:NotifyIconElement>
-        <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+        <Rectangle Grid.RowSpan="2"  Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
 </Window>

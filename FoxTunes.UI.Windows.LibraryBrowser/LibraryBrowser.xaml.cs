@@ -7,8 +7,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for LibraryBrowser.xaml
     /// </summary>
-    [UIComponent(ID, UIComponentSlots.TOP_CENTER, "Library Browser", role: UIComponentRole.LibraryView)]
-    [UIComponentDependency(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)]
+    [UIComponent(ID, "Library Browser")]
     public partial class LibraryBrowser : UIComponentBase
     {
         public const string ID = "FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3";

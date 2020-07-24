@@ -8,7 +8,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for Spectrum.xaml
     /// </summary>
-    [UIComponent("381328C3-C2CE-4FDA-AC92-71A15C3FC387", UIComponentSlots.NONE, "Spectrum", role: UIComponentRole.Hidden)]
+    [UIComponent("381328C3-C2CE-4FDA-AC92-71A15C3FC387", "Spectrum")]
     public partial class Spectrum : UIComponentBase
     {
         const int TIMEOUT = 1000;
@@ -184,7 +184,7 @@ namespace FoxTunes
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
-            this.Debouncer.Exec(this.UpdateRenderer);
+            this.Debouncer.ExecNow(this.UpdateRenderer);
         }
 
         protected virtual void OnUnloaded(object sender, RoutedEventArgs e)

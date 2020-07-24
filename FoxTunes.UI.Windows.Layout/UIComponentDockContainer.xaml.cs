@@ -12,7 +12,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for UIComponentDockContainer.xaml
     /// </summary>
-    [UIComponent("3E899F79-380C-4EF7-8570-4B4E3B3467CB", UIComponentSlots.NONE, "Dock", role: UIComponentRole.Hidden)]
+    [UIComponent("3E899F79-380C-4EF7-8570-4B4E3B3467CB", "Dock")]
     public partial class UIComponentDockContainer : UIComponentPanel
     {
         const string DOCK_TOP = "AAAA";

@@ -111,8 +111,8 @@ namespace FoxTunes.ViewModel
               NotifyIconConfiguration.ENABLED_ELEMENT
             );
             this.ShowSpectrum = this.Configuration.GetElement<BooleanConfigurationElement>(
-              SpectrumBehaviourConfiguration.SECTION,
-              SpectrumBehaviourConfiguration.ENABLED_ELEMENT
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.ENABLED_ELEMENT
             );
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
