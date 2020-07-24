@@ -20,7 +20,10 @@ namespace FoxTunes
 
         protected virtual Task LoadLayout()
         {
-            return Windows.Invoke(() => this.Content = LayoutManager.Instance.Load(UILayoutTemplate.Main));
+            return Windows.Invoke(() =>
+            {
+                this.Content = LayoutManager.Instance.Load(UILayoutTemplate.Main);
+            });
         }
     }
 }

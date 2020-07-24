@@ -52,7 +52,7 @@ namespace FoxTunes
                 {
                     using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Element.Value)))
                     {
-                        var configs = Serializer.Load(stream);
+                        var configs = Serializer.LoadWindows(stream);
                         foreach (var config in configs)
                         {
                             await this.Load(config).ConfigureAwait(false);
@@ -83,7 +83,7 @@ namespace FoxTunes
                     window.Closed += this.OnClosed;
                 }).ConfigureAwait(false);
                 this.Windows[config] = window;
-                this.OnLoaded(config);
+                this.OnLoaded(config, window);
                 return window;
             }
             catch (Exception e)
@@ -93,13 +93,13 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnLoaded(ToolWindowConfiguration config)
+        protected virtual void OnLoaded(ToolWindowConfiguration config, ToolWindow window)
         {
             if (this.Loaded == null)
             {
                 return;
             }
-            this.Loaded(this, new ToolWindowConfigurationEventArgs(config));
+            this.Loaded(this, new ToolWindowConfigurationEventArgs(config, window));
         }
 
         public event ToolWindowConfigurationEventHandler Loaded;
@@ -135,23 +135,24 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void Unload(ToolWindowConfiguration config)
+        protected virtual void Unload(ToolWindowConfiguration config, ToolWindow window)
         {
+            this.Windows.TryGetValue(config, out window);
             if (!this.Windows.Remove(config))
             {
                 return;
             }
-            this.OnUnloaded(config);
+            this.OnUnloaded(config, window);
             this.Debouncer.Exec(this.Save);
         }
 
-        protected virtual void OnUnloaded(ToolWindowConfiguration config)
+        protected virtual void OnUnloaded(ToolWindowConfiguration config, ToolWindow window)
         {
             if (this.Unloaded == null)
             {
                 return;
             }
-            this.Unloaded(this, new ToolWindowConfigurationEventArgs(config));
+            this.Unloaded(this, new ToolWindowConfigurationEventArgs(config, window));
         }
 
         public event ToolWindowConfigurationEventHandler Unloaded;
@@ -184,7 +185,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Unload(window.Configuration);
+            this.Unload(window.Configuration, window);
         }
 
         public override void InitializeComponent(ICore core)
@@ -676,11 +677,14 @@ namespace FoxTunes
 
     public class ToolWindowConfigurationEventArgs : EventArgs
     {
-        public ToolWindowConfigurationEventArgs(ToolWindowConfiguration configuration)
+        public ToolWindowConfigurationEventArgs(ToolWindowConfiguration configuration, ToolWindow window)
         {
             this.Configuration = configuration;
+            this.Window = window;
         }
 
         public ToolWindowConfiguration Configuration { get; private set; }
+
+        public ToolWindow Window { get; private set; }
     }
 }

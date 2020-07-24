@@ -19,7 +19,7 @@ namespace FoxTunes
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             var option = new SelectionConfigurationOption(ID, "Basic");
-            if (releaseType == ReleaseType.Default)
+            if (releaseType == ReleaseType.Minimal)
             {
                 option.Default();
             }
