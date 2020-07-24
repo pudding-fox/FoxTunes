@@ -83,6 +83,7 @@ namespace FoxTunes
                     window.Closed += this.OnClosed;
                 }).ConfigureAwait(false);
                 this.Windows[config] = window;
+                this.OnLoaded(config);
                 return window;
             }
             catch (Exception e)
@@ -91,6 +92,17 @@ namespace FoxTunes
                 return null;
             }
         }
+
+        protected virtual void OnLoaded(ToolWindowConfiguration config)
+        {
+            if (this.Loaded == null)
+            {
+                return;
+            }
+            this.Loaded(this, new ToolWindowConfigurationEventArgs(config));
+        }
+
+        public event ToolWindowConfigurationEventHandler Loaded;
 
         protected virtual async Task Show()
         {
@@ -129,8 +141,20 @@ namespace FoxTunes
             {
                 return;
             }
+            this.OnUnloaded(config);
             this.Debouncer.Exec(this.Save);
         }
+
+        protected virtual void OnUnloaded(ToolWindowConfiguration config)
+        {
+            if (this.Unloaded == null)
+            {
+                return;
+            }
+            this.Unloaded(this, new ToolWindowConfigurationEventArgs(config));
+        }
+
+        public event ToolWindowConfigurationEventHandler Unloaded;
 
         protected virtual void Save()
         {
@@ -198,11 +222,8 @@ namespace FoxTunes
         {
             get
             {
-                if (!IsToolWindowManagerWindowCreated)
-                {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                }
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
             }
         }
 
@@ -222,7 +243,7 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task New()
+        public async Task<ToolWindowConfiguration> New()
         {
             var config = new ToolWindowConfiguration()
             {
@@ -235,9 +256,10 @@ namespace FoxTunes
             var window = await this.Load(config).ConfigureAwait(false);
             if (window == null)
             {
-                return;
+                return null;
             }
             await this.Show(config, window).ConfigureAwait(false);
+            return config;
         }
 
         public Task Manage()
@@ -273,18 +295,12 @@ namespace FoxTunes
             });
         }
 
-        public async Task Update(IEnumerable<ToolWindowConfiguration> configs)
+        public async Task Refresh()
         {
-            if (this.IsLoaded)
+            foreach (var pair in this.Windows)
             {
-                await this.Shutdown().ConfigureAwait(false);
+                await this.Show(pair.Key, pair.Value).ConfigureAwait(false);
             }
-            foreach (var config in configs)
-            {
-                await this.Load(config).ConfigureAwait(false);
-            }
-            await this.Show().ConfigureAwait(false);
-            this.Debouncer.Exec(this.Save);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -654,5 +670,17 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    public delegate void ToolWindowConfigurationEventHandler(object sender, ToolWindowConfigurationEventArgs e);
+
+    public class ToolWindowConfigurationEventArgs : EventArgs
+    {
+        public ToolWindowConfigurationEventArgs(ToolWindowConfiguration configuration)
+        {
+            this.Configuration = configuration;
+        }
+
+        public ToolWindowConfiguration Configuration { get; private set; }
     }
 }
