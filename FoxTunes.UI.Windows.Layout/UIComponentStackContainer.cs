@@ -70,11 +70,11 @@ namespace FoxTunes
                 {
                     var horizontalAlignment = default(string);
                     var verticalAlignment = default(string);
-                    if (!component.TryGet(HorizontalAlignment, out horizontalAlignment))
+                    if (component == null || !component.TryGet(HorizontalAlignment, out horizontalAlignment))
                     {
                         horizontalAlignment = Fill;
                     }
-                    if (!component.TryGet(VerticalAlignment, out verticalAlignment))
+                    if (component == null || !component.TryGet(VerticalAlignment, out verticalAlignment))
                     {
                         verticalAlignment = Fill;
                     }
@@ -134,15 +134,79 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, ADD, "Add");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REMOVE, "Remove");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, MOVE_UP, "Move Up", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, MOVE_DOWN, "Move Down");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, ALIGN_LEFT, "Fill", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, ALIGN_LEFT, "Align Left", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, ALIGN_RIGHT, "Align Right");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, ALIGN_TOP, "Align Top");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, ALIGN_BOTTOM, "Align Bottom");
+                var horizontalAlignment = default(string);
+                var verticalAlignment = default(string);
+                var container = UIComponentDesignerOverlay.Container;
+
+                if (container != null && container.Component != null)
+                {
+                    if (!container.Component.TryGet(HorizontalAlignment, out horizontalAlignment))
+                    {
+                        horizontalAlignment = Fill;
+                    }
+                    if (!container.Component.TryGet(VerticalAlignment, out verticalAlignment))
+                    {
+                        verticalAlignment = Fill;
+                    }
+                }
+                else
+                {
+                    //Don't know.
+                }
+
+                var isFill = string.Equals(horizontalAlignment, Fill, StringComparison.OrdinalIgnoreCase) && string.Equals(verticalAlignment, Fill, StringComparison.OrdinalIgnoreCase);
+
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    ADD,
+                    "Add"
+                    );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    REMOVE,
+                    "Remove"
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    MOVE_UP,
+                    "Move Up",
+                    attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    MOVE_DOWN,
+                    "Move Down"
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    FILL,
+                    "Fill",
+                    attributes: (byte)((isFill ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    ALIGN_LEFT,
+                    "Align Left",
+                    attributes: (byte)((string.Equals(horizontalAlignment, AlignLeft, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    ALIGN_RIGHT,
+                    "Align Right",
+                    attributes: string.Equals(horizontalAlignment, AlignRight, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    ALIGN_TOP,
+                    "Align Top",
+                    attributes: (byte)((string.Equals(verticalAlignment, AlignTop, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    ALIGN_BOTTOM,
+                    "Align Bottom",
+                    attributes: string.Equals(verticalAlignment, AlignBottom, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
             }
         }
 

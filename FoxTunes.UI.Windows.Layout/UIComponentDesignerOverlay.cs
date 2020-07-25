@@ -11,6 +11,8 @@ namespace FoxTunes
 {
     public class UIComponentDesignerOverlay : BaseComponent, IDisposable
     {
+        public static UIComponentContainer Container { get; private set; }
+
         public UIComponentDesignerOverlay(UIComponentRoot root)
         {
             this.Root = root;
@@ -48,6 +50,7 @@ namespace FoxTunes
 
         protected virtual void ShowDesignerOverlay(UIComponentContainer container)
         {
+            Container = container;
             var layer = AdornerLayer.GetAdornerLayer(container);
             if (layer == null)
             {
@@ -77,6 +80,7 @@ namespace FoxTunes
 
         protected virtual void HideDesignerOverlay(UIComponentContainer container)
         {
+            Container = null;
             var layer = AdornerLayer.GetAdornerLayer(container);
             if (layer == null)
             {
