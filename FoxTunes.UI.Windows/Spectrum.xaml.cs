@@ -9,7 +9,7 @@ namespace FoxTunes
     /// Interaction logic for Spectrum.xaml
     /// </summary>
     [UIComponent("381328C3-C2CE-4FDA-AC92-71A15C3FC387", "Spectrum")]
-    public partial class Spectrum : UIComponentBase
+    public partial class Spectrum : UIComponentBase, IDisposable
     {
         const int TIMEOUT = 1000;
 
@@ -208,6 +208,48 @@ namespace FoxTunes
                 }
             }
             this.Debouncer.Exec(this.UpdateRenderer);
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
+            if (this.Renderer != null)
+            {
+                this.Renderer.Dispose();
+            }
+        }
+
+        ~Spectrum()
+        {
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

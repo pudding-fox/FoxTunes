@@ -160,6 +160,10 @@ namespace FoxTunes
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (this.ContentControl.Content is FrameworkElement element)
+            {
+                UIDisposer.Dispose(element);
+            }
             var configuration = value as UIComponentConfiguration;
             if (configuration == null || string.IsNullOrEmpty(configuration.Component))
             {
