@@ -37,6 +37,7 @@
                 <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" />
             </Grid.LayoutTransform>
             <Windows:Mini MouseDown="OnMouseDown"></Windows:Mini>
+            <Windows:Components></Windows:Components>
             <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}"  IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
                 <Interactivity:Interaction.Triggers>
                     <Interactivity:EventTrigger EventName="MouseLeftButtonUp">

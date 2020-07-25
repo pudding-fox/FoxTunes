@@ -1,11 +1,10 @@
-﻿using System.Windows.Controls;
-
-namespace FoxTunes
+﻿namespace FoxTunes
 {
     /// <summary>
     /// Interaction logic for BackgroundTasks.xaml
     /// </summary>
-    public partial class BackgroundTasks : UserControl
+    [UIComponent("EDC787A6-7B1E-4161-B2E1-843C58806D81", "Background Tasks")]
+    public partial class BackgroundTasks : UIComponentBase
     {
         public BackgroundTasks()
         {

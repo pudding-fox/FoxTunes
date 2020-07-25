@@ -74,7 +74,6 @@
                 <Windows:Equalizer Margin="0,0,2,0"></Windows:Equalizer>
                 <Windows:MiniPlayer></Windows:MiniPlayer>
             </StackPanel>
-            <Windows:Components></Windows:Components>
         </Grid>
     </StackPanel>
 </UserControl>

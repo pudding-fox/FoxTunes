@@ -26,6 +26,7 @@
         </Grid.RowDefinitions>
         <Windows:Titlebar></Windows:Titlebar>
         <Windows:Main Grid.Row="1" Margin="2,0,2,2"></Windows:Main>
+        <Windows:Components></Windows:Components>
         <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}" IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseLeftButtonUp">

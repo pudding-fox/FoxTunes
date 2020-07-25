@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,6 +53,12 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ItemsChanged;
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Dispatch(this.Refresh);
+            base.InitializeComponent(core);
+        }
 
         protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
