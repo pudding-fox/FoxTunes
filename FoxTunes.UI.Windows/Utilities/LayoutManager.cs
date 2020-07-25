@@ -6,7 +6,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class LayoutManager : StandardComponent, IDisposable
+    public class LayoutManager : StandardComponent
     {
         public static readonly Type PLACEHOLDER = typeof(object);
 
@@ -37,15 +37,31 @@ namespace FoxTunes
 
         public HashSet<IUILayoutProvider> Providers { get; private set; }
 
+        private IUILayoutProvider _Provider { get; set; }
+
         public IUILayoutProvider Provider
         {
             get
             {
-                return this.Providers.FirstOrDefault(
-                    provider => string.Equals(provider.Id, this.Layout, StringComparison.OrdinalIgnoreCase)
-                ) ?? this.Providers.FirstOrDefault();
+                return this._Provider;
+            }
+            set
+            {
+                this._Provider = value;
+                this.OnProviderChanged();
             }
         }
+
+        protected virtual void OnProviderChanged()
+        {
+            if (this.ProviderChanged != null)
+            {
+                this.ProviderChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Provider");
+        }
+
+        public event EventHandler ProviderChanged;
 
         public IEnumerable<UIComponent> Components
         {
@@ -57,50 +73,40 @@ namespace FoxTunes
 
         public bool IsComponentActive(string id)
         {
-            var provider = this.Provider;
-            if (provider == null)
+            if (this.Provider == null)
             {
                 return false;
             }
-            return provider.IsComponentActive(id);
+            return this.Provider.IsComponentActive(id);
         }
 
         public IConfiguration Configuration { get; private set; }
 
-        private string _Layout { get; set; }
-
-        public string Layout
-        {
-            get
-            {
-                return this._Layout;
-            }
-            set
-            {
-                this._Layout = value;
-                this.OnLayoutChanged();
-            }
-        }
-
-        protected virtual void OnLayoutChanged()
-        {
-            if (this.LayoutChanged != null)
-            {
-                this.LayoutChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Layout");
-        }
-
-        public event EventHandler LayoutChanged;
+        public SelectionConfigurationElement Layout { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Layout = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.LAYOUT_ELEMENT
-            ).ConnectValue(value => this.Layout = value.Id);
+            );
+            this.Layout.ConnectValue(value => this.UpdateProvider());
             base.InitializeComponent(core);
+        }
+
+        protected virtual void UpdateProvider()
+        {
+            if (this.Layout != null && this.Layout.Value != null)
+            {
+                this.Provider = this.Providers.FirstOrDefault(
+                    provider => string.Equals(provider.Id, this.Layout.Value.Id, StringComparison.OrdinalIgnoreCase)
+                );
+            }
+            if (this.Provider == null)
+            {
+                this.Provider = this.Providers.FirstOrDefault();
+            }
         }
 
         public UIComponent GetComponent(string id)
@@ -111,6 +117,7 @@ namespace FoxTunes
         public void Register(IUILayoutProvider layoutProvider)
         {
             this.Providers.Add(layoutProvider);
+            this.UpdateProvider();
         }
 
         public UIComponentBase Load(UILayoutTemplate template)
@@ -121,42 +128,6 @@ namespace FoxTunes
                 return null;
             }
             return provider.Load(template);
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-
-        }
-
-        ~LayoutManager()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
         }
 
         public static LayoutManager Instance { get; private set; }

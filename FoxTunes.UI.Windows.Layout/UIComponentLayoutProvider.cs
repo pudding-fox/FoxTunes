@@ -18,6 +18,8 @@ namespace FoxTunes
             }
         }
 
+        public LayoutDesignerBehaviour LayoutDesignerBehaviour { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public TextConfigurationElement Main { get; private set; }
@@ -50,6 +52,9 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
+            this.LayoutDesignerBehaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
+            this.LayoutDesignerBehaviour.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Configuration = core.Components.Configuration;
             this.Main = this.Configuration.GetElement<TextConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -57,6 +62,20 @@ namespace FoxTunes
             );
             this.Main.ConnectValue(value => this.MainComponent = this.LoadComponent(value));
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnShuttingDown(object sender, EventArgs e)
+        {
+            this.Save();
+        }
+
+        protected virtual void OnIsDesigningChanged(object sender, EventArgs e)
+        {
+            if (this.LayoutDesignerBehaviour.IsDesigning)
+            {
+                return;
+            }
+            this.Save();
         }
 
         protected virtual UIComponentConfiguration LoadComponent(string value)
@@ -156,6 +175,12 @@ namespace FoxTunes
             }
         }
 
+        public void Reset()
+        {
+            this.MainComponent = this.LoadComponent(this.Main.Value);
+            this.OnUpdated();
+        }
+
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return UIComponentLayoutProviderConfiguration.GetConfigurationSections();
@@ -181,7 +206,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            this.Save();
+            global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
         }
 
         ~UIComponentLayoutProvider()

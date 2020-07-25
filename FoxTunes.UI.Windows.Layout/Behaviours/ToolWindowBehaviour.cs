@@ -13,8 +13,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ToolWindowBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IDisposable
     {
-        const int TIMEOUT = 1000;
-
         public const string NEW = "BBBB";
 
         public const string MANAGE = "CCCC";
@@ -26,17 +24,16 @@ namespace FoxTunes
 
         public ToolWindowBehaviour()
         {
-            this.Debouncer = new Debouncer(TIMEOUT);
             this.Windows = new Dictionary<ToolWindowConfiguration, ToolWindow>();
         }
 
         public ICore Core { get; private set; }
 
+        public LayoutDesignerBehaviour LayoutDesignerBehaviour { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public TextConfigurationElement Element { get; private set; }
-
-        public Debouncer Debouncer { get; private set; }
 
         public IDictionary<ToolWindowConfiguration, ToolWindow> Windows { get; private set; }
 
@@ -144,7 +141,6 @@ namespace FoxTunes
                 return;
             }
             this.OnUnloaded(config, window);
-            this.Debouncer.Exec(this.Save);
         }
 
         protected virtual void OnUnloaded(ToolWindowConfiguration config, ToolWindow window)
@@ -194,6 +190,8 @@ namespace FoxTunes
             global::FoxTunes.Windows.ActiveWindowChanged += this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
             this.Core = core;
+            this.LayoutDesignerBehaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
+            this.LayoutDesignerBehaviour.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Configuration = core.Components.Configuration;
             this.Element = this.Configuration.GetElement<TextConfigurationElement>(
                 ToolWindowBehaviourConfiguration.SECTION,
@@ -217,7 +215,17 @@ namespace FoxTunes
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
+            this.Save();
             var task = this.Shutdown();
+        }
+
+        protected virtual void OnIsDesigningChanged(object sender, EventArgs e)
+        {
+            if (this.LayoutDesignerBehaviour.IsDesigning)
+            {
+                return;
+            }
+            this.Save();
         }
 
         public IEnumerable<IInvocationComponent> Invocations
@@ -278,10 +286,6 @@ namespace FoxTunes
 
         public Task Shutdown()
         {
-            if (this.Windows.Count > 0)
-            {
-                this.Save();
-            }
             return global::FoxTunes.Windows.Invoke(() =>
             {
                 if (IsToolWindowManagerWindowCreated)
@@ -330,11 +334,8 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            var task = this.Shutdown();
-            if (this.Debouncer != null)
-            {
-                this.Debouncer.Dispose();
-            }
+            global::FoxTunes.Windows.ActiveWindowChanged -= this.OnActiveWindowChanged;
+            global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
         }
 
         ~ToolWindowBehaviour()

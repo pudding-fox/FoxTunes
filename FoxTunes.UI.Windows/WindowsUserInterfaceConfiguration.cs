@@ -13,8 +13,6 @@ namespace FoxTunes
 
         public const string LAYOUT_ELEMENT = "BBBB9A67-F909-49EA-A4D3-6E26659A5797";
 
-        public const string LAYOUT_STATE_ELEMENT = "CCCC6F9A-8886-44FA-83C2-262F8D5334C0";
-
         public const string PRIMARY_LIBRARY_VIEW = "GGII1A2C-E16D-449D-A0E7-262B49D28C7D";
 
         public const string UI_SCALING_ELEMENT = "IIIIFB85-BA70-4412-87BA-E4DC58AD9BA8";
