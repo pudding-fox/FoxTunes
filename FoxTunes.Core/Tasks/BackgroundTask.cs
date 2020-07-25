@@ -12,11 +12,11 @@ namespace FoxTunes
     {
         static BackgroundTask()
         {
-            Instances = new List<WeakReference>();
+            Instances = new List<WeakReference<IBackgroundTask>>();
             Semaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
         }
 
-        private static IList<WeakReference> Instances { get; set; }
+        private static IList<WeakReference<IBackgroundTask>> Instances { get; set; }
 
         private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
 
@@ -28,7 +28,7 @@ namespace FoxTunes
                 {
                     return Instances
                         .Where(instance => instance != null && instance.IsAlive)
-                        .Select(instance => (IBackgroundTask)instance.Target)
+                        .Select(instance => instance.Target)
                         .Where(backgroundTask => !(backgroundTask.IsCompleted || backgroundTask.IsFaulted))
                         .ToArray();
                 }
@@ -206,7 +206,7 @@ namespace FoxTunes
         {
             lock (Instances)
             {
-                Instances.Add(new WeakReference(this));
+                Instances.Add(new WeakReference<IBackgroundTask>(this));
             }
             OnActiveChanged();
             base.InitializeComponent(core);

@@ -137,7 +137,7 @@ namespace FoxTunes
 
         protected virtual void Unload(ToolWindowConfiguration config, ToolWindow window)
         {
-            ResourceDisposer.Dispose(window);
+            UIDisposer.Dispose(window);
             this.Windows.TryGetValue(config, out window);
             if (!this.Windows.Remove(config))
             {
@@ -396,7 +396,7 @@ namespace FoxTunes
         {
             if (IsToolWindowManagerWindowCreated)
             {
-                ResourceDisposer.Dispose(ToolWindowManagerWindow);
+                UIDisposer.Dispose(ToolWindowManagerWindow);
             }
             _ToolWindowManagerWindow = new Lazy<Window>(() => new ToolWindowManagerWindow() { Owner = global::FoxTunes.Windows.ActiveWindow });
             if (ToolWindowManagerWindowClosed == null)

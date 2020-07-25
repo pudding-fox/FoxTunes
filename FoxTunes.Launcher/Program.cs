@@ -92,7 +92,8 @@ namespace FoxTunes.Launcher
                     {
                         if (core.Components.UserInterface != null)
                         {
-                            core.Components.UserInterface.Show();
+                            //TODO: Bad .Wait().
+                            core.Components.UserInterface.Show().Wait();
                         }
                         Core.IsShuttingDown = true;
                         if (core.Components.Output != null)

@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
     public interface IUserInterface : IStandardComponent
     {
-        void Show();
+        Task Show();
 
         void Activate();
 

@@ -79,7 +79,7 @@ namespace FoxTunes
         {
             if (IsMainWindowCreated)
             {
-                ResourceDisposer.Dispose(MainWindow);
+                UIDisposer.Dispose(MainWindow);
             }
             _MainWindow = new Lazy<Window>(() => new MainWindow());
             if (MainWindowClosed != null)
@@ -137,7 +137,7 @@ namespace FoxTunes
         {
             if (IsMiniWindowCreated)
             {
-                ResourceDisposer.Dispose(MiniWindow);
+                UIDisposer.Dispose(MiniWindow);
             }
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
             if (MiniWindowClosed != null)
@@ -195,7 +195,7 @@ namespace FoxTunes
         {
             if (IsSettingsWindowCreated)
             {
-                ResourceDisposer.Dispose(SettingsWindow);
+                UIDisposer.Dispose(SettingsWindow);
             }
             _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
             if (SettingsWindowClosed == null)
@@ -253,7 +253,7 @@ namespace FoxTunes
         {
             if (IsEqualizerWindowCreated)
             {
-                ResourceDisposer.Dispose(EqualizerWindow);
+                UIDisposer.Dispose(EqualizerWindow);
             }
             _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
             if (EqualizerWindowClosed == null)
@@ -311,7 +311,7 @@ namespace FoxTunes
         {
             if (IsPlaylistManagerWindowCreated)
             {
-                ResourceDisposer.Dispose(PlaylistManagerWindow);
+                UIDisposer.Dispose(PlaylistManagerWindow);
             }
             _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
             if (PlaylistManagerWindowClosed == null)
@@ -379,43 +379,37 @@ namespace FoxTunes
             {
                 return;
             }
-            Shutdown();
+            var task = Shutdown();
         }
 
-        public static void Shutdown()
+        public static Task Shutdown()
         {
-            var dispatcher = Dispatcher;
-            if (dispatcher != null)
+            return Invoke(() =>
             {
-                dispatcher.BeginInvoke(
-                    DispatcherPriority.ApplicationIdle,
-                    new Action(() =>
-                    {
-                        ShuttingDown(typeof(Windows), EventArgs.Empty);
-                        if (IsMiniWindowCreated)
-                        {
-                            MiniWindow.Close();
-                        }
-                        if (IsMainWindowCreated)
-                        {
-                            MainWindow.Close();
-                        }
-                        if (IsSettingsWindowCreated)
-                        {
-                            SettingsWindow.Close();
-                        }
-                        if (IsEqualizerWindowCreated)
-                        {
-                            EqualizerWindow.Close();
-                        }
-                        if (IsPlaylistManagerWindowCreated)
-                        {
-                            PlaylistManagerWindow.Close();
-                        }
-                        Reset();
-                    })
-                );
-            }
+                ShuttingDown(typeof(Windows), EventArgs.Empty);
+                if (IsMiniWindowCreated)
+                {
+                    MiniWindow.Close();
+                }
+                if (IsMainWindowCreated)
+                {
+                    MainWindow.Close();
+                }
+                if (IsSettingsWindowCreated)
+                {
+                    SettingsWindow.Close();
+                }
+                if (IsEqualizerWindowCreated)
+                {
+                    EqualizerWindow.Close();
+                }
+                if (IsPlaylistManagerWindowCreated)
+                {
+                    PlaylistManagerWindow.Close();
+                }
+                UIBehaviour.Shutdown();
+                Reset();
+            });
         }
 
         public static event EventHandler ShuttingDown;

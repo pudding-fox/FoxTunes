@@ -75,7 +75,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override void Show()
+        public override Task Show()
         {
             if (Windows.IsMiniWindowCreated)
             {
@@ -87,6 +87,7 @@ namespace FoxTunes
                 Windows.MainWindow.DataContext = this.Core;
                 this.Application.Run(Windows.MainWindow);
             }
+            return Windows.Shutdown();
         }
 
         public override void Activate()
