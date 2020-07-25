@@ -1,15 +1,45 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Windows;
+using System.Linq;
 using System.Windows.Data;
 
 namespace FoxTunes
 {
     public class UIComponentRoot : UIComponentPanel, IDisposable
     {
-        new public static event EventHandler Loaded;
+        static UIComponentRoot()
+        {
+            Instances = new List<WeakReference<UIComponentRoot>>();
+        }
 
-        new public static event EventHandler Unloaded;
+        private static IList<WeakReference<UIComponentRoot>> Instances { get; set; }
+
+        public static IEnumerable<UIComponentRoot> Active
+        {
+            get
+            {
+                lock (Instances)
+                {
+                    return Instances
+                        .Where(instance => instance != null && instance.IsAlive)
+                        .Select(instance => instance.Target)
+                        .ToArray();
+                }
+            }
+        }
+
+        protected static void OnActiveChanged(UIComponentRoot sender)
+        {
+            if (ActiveChanged == null)
+            {
+                return;
+            }
+            ActiveChanged(sender, EventArgs.Empty);
+        }
+
+        public static event EventHandler ActiveChanged;
 
         public UIComponentRoot()
         {
@@ -23,26 +53,11 @@ namespace FoxTunes
                 }
             );
             this.Content = container;
-            base.Loaded += this.OnLoaded;
-            base.Unloaded += this.OnUnloaded;
-        }
-
-        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            if (Loaded == null)
+            lock (Instances)
             {
-                return;
+                Instances.Add(new WeakReference<UIComponentRoot>(this));
             }
-            Loaded(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
-        {
-            if (Unloaded == null)
-            {
-                return;
-            }
-            Unloaded(this, EventArgs.Empty);
+            OnActiveChanged(this);
         }
 
         protected override void CreateBindings()
@@ -70,9 +85,22 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            //TODO: Cannot unsubscribe from GC thread.
-            //base.Loaded -= this.OnLoaded;
-            //base.Unloaded -= this.OnUnloaded;
+            lock (Instances)
+            {
+                for (var a = Instances.Count - 1; a >= 0; a--)
+                {
+                    var instance = Instances[a];
+                    if (instance == null || !instance.IsAlive)
+                    {
+                        Instances.RemoveAt(a);
+                    }
+                    else if (object.ReferenceEquals(this, instance.Target))
+                    {
+                        Instances.RemoveAt(a);
+                    }
+                }
+            }
+            OnActiveChanged(this);
         }
 
         ~UIComponentRoot()

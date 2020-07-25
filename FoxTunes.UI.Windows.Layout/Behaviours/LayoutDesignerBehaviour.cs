@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,11 +13,8 @@ namespace FoxTunes
 
         public LayoutDesignerBehaviour()
         {
-            this.Roots = new List<UIComponentRoot>();
             this.Overlays = new List<UIComponentDesignerOverlay>();
         }
-
-        public IList<UIComponentRoot> Roots { get; private set; }
 
         public IList<UIComponentDesignerOverlay> Overlays { get; private set; }
 
@@ -26,7 +24,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Roots.Count > 0;
+                return UIComponentRoot.Active.Any();
             }
         }
 
@@ -68,36 +66,25 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            UIComponentRoot.Loaded += this.OnLoaded;
-            UIComponentRoot.Unloaded += this.OnUnloaded;
+            UIComponentRoot.ActiveChanged += this.OnActiveChanged;
             ToolWindowBehaviour.ToolWindowManagerWindowCreated += this.OnToolWindowManagerWindowCreated;
             ToolWindowBehaviour.ToolWindowManagerWindowClosed += this.OnToolWindowManagerWindowClosed;
             this.Core = core;
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnLoaded(object sender, EventArgs e)
+        protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
-            var root = sender as UIComponentRoot;
-            if (root == null)
+            if (!this.IsDesigning)
             {
                 return;
             }
-            this.Roots.Add(root);
-            if (this.IsDesigning)
-            {
-                this.ShowDesignerOverlay(root);
-            }
-        }
-
-        protected virtual void OnUnloaded(object sender, EventArgs e)
-        {
             var root = sender as UIComponentRoot;
-            if (root == null)
+            if (root == null || !UIComponentRoot.Active.Contains(root))
             {
                 return;
             }
-            this.Roots.Remove(root);
+            this.ShowDesignerOverlay(root);
         }
 
         protected virtual void OnToolWindowManagerWindowCreated(object sender, EventArgs e)
@@ -117,7 +104,7 @@ namespace FoxTunes
             this.OnBackgroundTask(this.DesignerTask);
             this.Dispatch(this.DesignerTask.Run);
 
-            foreach (var root in this.Roots)
+            foreach (var root in UIComponentRoot.Active)
             {
                 this.ShowDesignerOverlay(root);
             }
@@ -149,7 +136,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled)
+                if (this.Enabled && !ToolWindowBehaviour.IsToolWindowManagerWindowCreated)
                 {
                     yield return new InvocationComponent(
                         InvocationComponent.CATEGORY_SETTINGS,
@@ -207,8 +194,7 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             this.HideDesignerOverlay();
-            UIComponentRoot.Loaded -= this.OnLoaded;
-            UIComponentRoot.Unloaded -= this.OnUnloaded;
+            UIComponentRoot.ActiveChanged -= this.OnActiveChanged;
             ToolWindowBehaviour.ToolWindowManagerWindowCreated -= this.OnToolWindowManagerWindowCreated;
             ToolWindowBehaviour.ToolWindowManagerWindowClosed -= this.OnToolWindowManagerWindowClosed;
         }

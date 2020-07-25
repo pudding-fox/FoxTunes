@@ -223,7 +223,10 @@ namespace FoxTunes
             get
             {
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, "Done");
+                if (!ToolWindowBehaviour.IsToolWindowManagerWindowCreated)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, "Done");
+                }
             }
         }
 
