@@ -54,6 +54,11 @@ namespace FoxTunes
             {
                 return;
             }
+            if (e.OldValue is UIComponentConfiguration oldComponent && e.NewValue is UIComponentConfiguration newComponent)
+            {
+                //Preserve alignment and such.
+                newComponent.MetaData.AddRange(oldComponent.MetaData);
+            }
             componentContainer.OnComponentChanged();
         }
 
@@ -255,7 +260,7 @@ namespace FoxTunes
 
         public Task Clear()
         {
-            return Windows.Invoke(() => this.Component = null);
+            return Windows.Invoke(() => this.Component = new UIComponentConfiguration());
         }
 
         public Task Exit()
