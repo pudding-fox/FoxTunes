@@ -47,6 +47,8 @@ namespace FoxTunes.Interfaces
 
         TimeSpan GetDuration(long position);
 
+        int GetData(ref float[] buffer, TimeSpan duration);
+
         bool CanReset { get; }
 
         void Reset();

@@ -51,6 +51,8 @@ namespace FoxTunes
 
         public abstract Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate);
 
+        public abstract Task<IOutputStream> Duplicate(IOutputStream stream);
+
         public abstract Task<bool> Preempt(IOutputStream stream);
 
         protected virtual void OnLoaded(IOutputStream stream)

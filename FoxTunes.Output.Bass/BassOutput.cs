@@ -397,6 +397,22 @@ namespace FoxTunes
             return outputStream;
         }
 
+        public override Task<IOutputStream> Duplicate(IOutputStream stream)
+        {
+            var result = this.StreamFactory.CreateBasicStream(stream.PlaylistItem, BassFlags.Default | BassFlags.Float);
+            if (result.IsEmpty)
+            {
+                return null;
+            }
+            var outputStream = new BassOutputStream(this, this.PipelineManager, result, stream.PlaylistItem);
+            outputStream.InitializeComponent(this.Core);
+#if NET40
+            return TaskEx.FromResult<IOutputStream>(outputStream);
+#else
+            return Task.FromResult<IOutputStream>(outputStream);
+#endif
+        }
+
         public override Task<bool> Preempt(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
