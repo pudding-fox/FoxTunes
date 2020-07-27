@@ -17,6 +17,8 @@ namespace FoxTunes
 
         const int INTERVAL = 100;
 
+        public static readonly SelectionConfigurationElement Mode;
+
         public static readonly DoubleConfigurationElement ScalingFactor;
 
         static WaveFormStreamPosition()
@@ -26,6 +28,10 @@ namespace FoxTunes
             {
                 return;
             }
+            Mode = configuration.GetElement<SelectionConfigurationElement>(
+                WaveBarBehaviourConfiguration.SECTION,
+                WaveBarBehaviourConfiguration.MODE_ELEMENT
+            );
             ScalingFactor = configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
@@ -36,6 +42,7 @@ namespace FoxTunes
         {
             this.Debouncer = new Debouncer(TIMEOUT);
             this.InitializeComponent();
+            Mode.ValueChanged += this.OnValueChanged;
             ScalingFactor.ValueChanged += this.OnValueChanged;
         }
 
@@ -60,7 +67,10 @@ namespace FoxTunes
 
                 if (this.Renderer == null)
                 {
-                    this.Renderer = new WaveFormRenderer(RESOLUTION, INTERVAL);
+                    this.Renderer = new WaveFormRenderer(
+                        RESOLUTION,
+                        INTERVAL
+                    );
                     this.Renderer.InitializeComponent(core);
                 }
 
@@ -90,7 +100,8 @@ namespace FoxTunes
                 this.Renderer.Create(
                     Convert.ToInt32(size.Width),
                     Convert.ToInt32(size.Height),
-                    color
+                    color,
+                    WaveBarBehaviourConfiguration.GetMode(Mode.Value)
                 );
 
                 this.Background = new ImageBrush()

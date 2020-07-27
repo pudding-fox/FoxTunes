@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -27,11 +28,18 @@ namespace FoxTunes
 
         public int Resolution;
 
+        public WaveFormRendererMode Mode;
+
         public bool IsStarted;
 
         public global::System.Timers.Timer Timer;
 
-        public WaveFormRenderer(int resolution, int updateInterval)
+        private WaveFormRenderer()
+        {
+            this.Data = new WaveFormData();
+        }
+
+        public WaveFormRenderer(int resolution, int updateInterval) : this()
         {
             this.Resolution = resolution;
             this.Timer = new global::System.Timers.Timer();
@@ -59,10 +67,6 @@ namespace FoxTunes
 
         protected virtual async Task Populate(IOutputStream stream)
         {
-            if (this.Data.CancellationToken != null)
-            {
-                this.Data.CancellationToken.Cancel();
-            }
             if (stream == null)
             {
                 this.Stop();
@@ -75,8 +79,8 @@ namespace FoxTunes
             stream = await this.Output.Duplicate(stream).ConfigureAwait(false);
             try
             {
-                this.Data = GetData(stream, this.Resolution);
-                Populate(ref this.Data);
+                this.Data = GetData(stream, this.Resolution, this.Mode);
+                Populate(this.Data);
             }
             finally
             {
@@ -108,7 +112,7 @@ namespace FoxTunes
             }
         }
 
-        public void Create(int width, int height, Color color)
+        public void Create(int width, int height, Color color, WaveFormRendererMode mode)
         {
             this.Bitmap = new WriteableBitmap(
                width,
@@ -119,12 +123,15 @@ namespace FoxTunes
                null
             );
             this.Color = color;
+            this.Mode = mode;
+            this.Start();
         }
 
         public async Task Render()
         {
             var success = default(bool);
             var info = default(BitmapHelper.RenderInfo);
+            var bitmap = this.Bitmap;
 
             await Windows.Invoke(() =>
             {
@@ -133,8 +140,8 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(this.Bitmap, this.Color);
-            });
+                info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+            }).ConfigureAwait(false);
 
             if (!success)
             {
@@ -145,29 +152,16 @@ namespace FoxTunes
 
             try
             {
-                if (info.Width != this.Data.Width || info.Height != this.Data.Height)
-                {
-                    this.Data.Width = info.Width;
-                    this.Data.Height = info.Height;
-                    this.Data.ValuesPerElement = this.Data.DataCount / info.Width;
-                    this.Data.ElementPosition = 0;
-                    this.Data.ElementCount = 0;
-                    this.Data.Elements = new Int32Rect[info.Width];
-                    BitmapHelper.Clear(info);
-                }
-                else
-                {
-                    for (; this.Data.ElementPosition < this.Data.ElementCount; this.Data.ElementPosition++)
-                    {
-                        BitmapHelper.DrawRectangle(info, this.Data.Elements[this.Data.ElementPosition].X, this.Data.Elements[this.Data.ElementPosition].Y, this.Data.Elements[this.Data.ElementPosition].Width, this.Data.Elements[this.Data.ElementPosition].Height);
-                    }
-                }
+                Render(info, this.Data, this.Mode);
 
                 await Windows.Invoke(() =>
                 {
-                    this.Bitmap.AddDirtyRect(new Int32Rect(0, 0, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight));
-                    this.Bitmap.Unlock();
-                    this.Start();
+                    bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                    bitmap.Unlock();
+                    if (!this.Data.Complete)
+                    {
+                        this.Start();
+                    }
                 }).ConfigureAwait(false);
             }
             catch (Exception e)
@@ -180,7 +174,7 @@ namespace FoxTunes
         {
             try
             {
-                Update(ref this.Data);
+                Update(this.Data, this.Mode);
                 if (this.Bitmap != null)
                 {
                     var task = this.Render();
@@ -236,13 +230,112 @@ namespace FoxTunes
             }
         }
 
-        private static void Update(ref WaveFormData data)
+        private static void Render(BitmapHelper.RenderInfo info, WaveFormData data, WaveFormRendererMode mode)
+        {
+            if (data.DataCount == 0)
+            {
+                return;
+            }
+            else if (info.Width != data.Width || info.Height != data.Height || data.Mode != mode)
+            {
+                data.Width = info.Width;
+                data.Height = info.Height;
+                data.ValuesPerElement = Math.Max(data.DataCount / info.Width, 1);
+                data.ElementPosition = 0;
+                data.ElementCount = 0;
+                data.Elements = new Int32Rect[info.Width * (mode == WaveFormRendererMode.Seperate ? data.ChannelCount : 1)];
+                data.Mode = mode;
+                data.Complete = false;
+                BitmapHelper.Clear(info);
+            }
+            else
+            {
+                for (; data.ElementPosition < data.ElementCount; data.ElementPosition++)
+                {
+                    BitmapHelper.DrawRectangle(info, data.Elements[data.ElementPosition].X, data.Elements[data.ElementPosition].Y, data.Elements[data.ElementPosition].Width, data.Elements[data.ElementPosition].Height);
+                }
+
+                if (data.ElementPosition == data.Width)
+                {
+                    data.Complete = true;
+                }
+            }
+        }
+
+        private static void Update(WaveFormData data, WaveFormRendererMode mode)
         {
             if (data.Elements == null)
             {
                 return;
             }
 
+            switch (mode)
+            {
+                case WaveFormRendererMode.Mono:
+                    UpdateMono(data);
+                    break;
+                case WaveFormRendererMode.Stereo:
+                    UpdateStereo(data);
+                    break;
+                case WaveFormRendererMode.Seperate:
+                    UpdateSeperate(data);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private static void UpdateMono(WaveFormData data)
+        {
+            var center = data.Height / 2;
+
+            while (data.ElementCount < data.Elements.Length)
+            {
+                var valuePosition = data.ElementCount * data.ValuesPerElement;
+                if (valuePosition > data.DataPosition)
+                {
+                    break;
+                }
+                var x = data.ElementCount;
+                var y = default(int);
+                var width = 1;
+                var height = default(int);
+
+                var value = default(float);
+                for (var a = 0; a < data.ValuesPerElement; a++)
+                {
+                    value += data.Data[valuePosition + a, 0];
+                }
+                value /= data.ValuesPerElement;
+
+                y = Convert.ToInt32(center - (value * center));
+                height = Convert.ToInt32((center - y) + (value * center));
+
+                data.Elements[data.ElementCount].X = x;
+                data.Elements[data.ElementCount].Y = y;
+                data.Elements[data.ElementCount].Width = width;
+                data.Elements[data.ElementCount].Height = height;
+
+#if DEBUG
+                //Check arguments are valid.
+
+                if (x < 0 || y < 0)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+
+                if (x + width > data.Width || y + height > data.Height)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+#endif
+
+                data.ElementCount++;
+            }
+        }
+
+        private static void UpdateStereo(WaveFormData data)
+        {
             var center = data.Height / 2;
 
             while (data.ElementCount < data.Elements.Length)
@@ -261,8 +354,8 @@ namespace FoxTunes
                 var rightValue = default(float);
                 for (var a = 0; a < data.ValuesPerElement; a++)
                 {
-                    leftValue += data.LeftData[valuePosition + a];
-                    rightValue += data.RightData[valuePosition + a];
+                    leftValue += data.Data[valuePosition + a, 0];
+                    rightValue += data.Data[valuePosition + a, 1];
                 }
                 leftValue /= data.ValuesPerElement;
                 rightValue /= data.ValuesPerElement;
@@ -293,7 +386,63 @@ namespace FoxTunes
             }
         }
 
-        private static void Populate(ref WaveFormData data)
+        private static void UpdateSeperate(WaveFormData data)
+        {
+            while (data.ElementCount < data.Elements.Length)
+            {
+                var valuePosition = (data.ElementCount / data.ChannelCount) * data.ValuesPerElement;
+                if (valuePosition > data.DataPosition)
+                {
+                    break;
+                }
+
+                var x = data.ElementCount / data.ChannelCount;
+
+                var waveHeight = data.Height / data.ChannelCount;
+
+                for (var channel = 0; channel < data.ChannelCount; channel++)
+                {
+                    var waveCenter = (waveHeight * channel) + (waveHeight / 2);
+
+                    var y = default(int);
+                    var width = 1;
+                    var height = default(int);
+
+                    var value = default(float);
+                    for (var a = 0; a < data.ValuesPerElement; a++)
+                    {
+                        value += data.Data[valuePosition + a, channel];
+                    }
+                    value /= data.ValuesPerElement;
+
+                    y = Convert.ToInt32(waveCenter - (value * waveHeight));
+                    height = Convert.ToInt32((waveCenter - y) + (value * waveHeight));
+
+                    data.Elements[data.ElementCount].X = x;
+                    data.Elements[data.ElementCount].Y = y;
+                    data.Elements[data.ElementCount].Width = width;
+                    data.Elements[data.ElementCount].Height = height;
+
+#if DEBUG
+                    //Check arguments are valid.
+
+                    if (x < 0 || y < 0)
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
+
+                    if (x + width > data.Width || y + height > data.Height)
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
+#endif
+
+                    data.ElementCount++;
+                }
+            }
+        }
+
+        private static void Populate(WaveFormData data)
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
             var buffer = default(float[]);
@@ -312,20 +461,23 @@ namespace FoxTunes
                 {
                     break;
                 }
-                var leftValue = default(float);
-                var rightValue = default(float);
-                for (var a = 0; a < length; a += 2)
+
+                for (var a = 0; a < length; a += data.ChannelCount)
                 {
-                    leftValue = Math.Max(leftValue, buffer[a]);
-                    rightValue = Math.Max(rightValue, buffer[a + 1]);
+                    for (var b = 0; b < data.ChannelCount; b++)
+                    {
+                        data.Data[data.DataPosition, b] = Math.Max(
+                            data.Data[data.DataPosition, b],
+                            buffer[a + b]
+                        );
+                    }
                 }
-                data.LeftData[data.DataPosition] = leftValue;
-                data.RightData[data.DataPosition] = rightValue;
+
                 data.DataPosition++;
             } while (!data.CancellationToken.IsCancellationRequested);
         }
 
-        private static WaveFormData GetData(IOutputStream stream, int resolution)
+        private static WaveFormData GetData(IOutputStream stream, int resolution, WaveFormRendererMode mode)
         {
             var length = Convert.ToInt32(Math.Ceiling(
                 stream.GetDuration(stream.Length).TotalMilliseconds / resolution
@@ -340,15 +492,16 @@ namespace FoxTunes
                 Elements = null,
                 ElementPosition = 0,
                 ElementCount = 0,
-                LeftData = new float[length],
-                RightData = new float[length],
+                Data = new float[length, stream.Channels],
                 DataPosition = 0,
                 DataCount = length,
-                CancellationToken = new CancellationToken()
+                ChannelCount = stream.Channels,
+                CancellationToken = new CancellationToken(),
+                Mode = mode
             };
         }
 
-        public struct WaveFormData
+        public class WaveFormData
         {
             public int Width;
 
@@ -366,15 +519,27 @@ namespace FoxTunes
 
             public int ElementCount;
 
-            public float[] LeftData;
-
-            public float[] RightData;
+            public float[,] Data;
 
             public int DataPosition;
 
             public int DataCount;
 
+            public int ChannelCount;
+
+            public bool Complete;
+
             public CancellationToken CancellationToken;
+
+            public WaveFormRendererMode Mode;
         }
+    }
+
+    public enum WaveFormRendererMode : byte
+    {
+        None,
+        Mono,
+        Stereo,
+        Seperate
     }
 }
