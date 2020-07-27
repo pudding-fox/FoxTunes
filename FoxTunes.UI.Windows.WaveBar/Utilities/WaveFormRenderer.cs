@@ -1,7 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -70,6 +68,7 @@ namespace FoxTunes
             if (stream == null)
             {
                 this.Stop();
+                await this.Clear().ConfigureAwait(false);
                 return;
             }
             else
@@ -124,6 +123,7 @@ namespace FoxTunes
             );
             this.Color = color;
             this.Mode = mode;
+            //TODO: We actually need to restart and only if there's something to do.
             this.Start();
         }
 
@@ -167,6 +167,44 @@ namespace FoxTunes
             catch (Exception e)
             {
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to paint wave form, disabling: {0}", e.Message);
+            }
+        }
+
+        public async Task Clear()
+        {
+            var success = default(bool);
+            var info = default(BitmapHelper.RenderInfo);
+            var bitmap = this.Bitmap;
+
+            await Windows.Invoke(() =>
+            {
+                success = this.Bitmap.TryLock(LockTimeout);
+                if (!success)
+                {
+                    return;
+                }
+                info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+            }).ConfigureAwait(false);
+
+            if (!success)
+            {
+                //Failed to establish lock.
+                return;
+            }
+
+            try
+            {
+                BitmapHelper.Clear(info);
+
+                await Windows.Invoke(() =>
+                {
+                    bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                    bitmap.Unlock();
+                }).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to clear wave form: {0}", e.Message);
             }
         }
 
@@ -269,6 +307,15 @@ namespace FoxTunes
                 return;
             }
 
+            if (data.ElementPeak == 0)
+            {
+                if (data.DataPeak == 0)
+                {
+                    return;
+                }
+                data.ElementPeak = data.DataPeak;
+            }
+
             switch (mode)
             {
                 case WaveFormRendererMode.Mono:
@@ -282,6 +329,13 @@ namespace FoxTunes
                     break;
                 default:
                     throw new NotImplementedException();
+            }
+
+            if (data.ElementPeak != data.DataPeak)
+            {
+                data.ElementPosition = 0;
+                data.ElementCount = 0;
+                data.ElementPeak = 0;
             }
         }
 
@@ -307,6 +361,7 @@ namespace FoxTunes
                     value += data.Data[valuePosition + a, 0];
                 }
                 value /= data.ValuesPerElement;
+                value /= data.DataPeak;
 
                 y = Convert.ToInt32(center - (value * center));
                 height = Convert.ToInt32((center - y) + (value * center));
@@ -358,7 +413,9 @@ namespace FoxTunes
                     rightValue += data.Data[valuePosition + a, 1];
                 }
                 leftValue /= data.ValuesPerElement;
+                leftValue /= data.DataPeak;
                 rightValue /= data.ValuesPerElement;
+                rightValue /= data.DataPeak;
 
                 y = Convert.ToInt32(center - (leftValue * center));
                 height = Convert.ToInt32((center - y) + (rightValue * center));
@@ -414,9 +471,10 @@ namespace FoxTunes
                         value += data.Data[valuePosition + a, channel];
                     }
                     value /= data.ValuesPerElement;
+                    value /= data.DataPeak;
 
-                    y = Convert.ToInt32(waveCenter - (value * waveHeight));
-                    height = Convert.ToInt32((waveCenter - y) + (value * waveHeight));
+                    y = Convert.ToInt32(waveCenter - (value * (waveHeight / 2)));
+                    height = Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2)));
 
                     data.Elements[data.ElementCount].X = x;
                     data.Elements[data.ElementCount].Y = y;
@@ -462,6 +520,8 @@ namespace FoxTunes
                     break;
                 }
 
+                var peak = default(float);
+
                 for (var a = 0; a < length; a += data.ChannelCount)
                 {
                     for (var b = 0; b < data.ChannelCount; b++)
@@ -470,7 +530,13 @@ namespace FoxTunes
                             data.Data[data.DataPosition, b],
                             buffer[a + b]
                         );
+                        peak = Math.Max(peak, buffer[a + b]);
                     }
+                }
+
+                if (peak > data.DataPeak)
+                {
+                    data.DataPeak = peak;
                 }
 
                 data.DataPosition++;
@@ -492,9 +558,11 @@ namespace FoxTunes
                 Elements = null,
                 ElementPosition = 0,
                 ElementCount = 0,
+                ElementPeak = 0,
                 Data = new float[length, stream.Channels],
                 DataPosition = 0,
                 DataCount = length,
+                DataPeak = 0,
                 ChannelCount = stream.Channels,
                 CancellationToken = new CancellationToken(),
                 Mode = mode
@@ -519,11 +587,15 @@ namespace FoxTunes
 
             public int ElementCount;
 
+            public float ElementPeak;
+
             public float[,] Data;
 
             public int DataPosition;
 
             public int DataCount;
+
+            public float DataPeak;
 
             public int ChannelCount;
 

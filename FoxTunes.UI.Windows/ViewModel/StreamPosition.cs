@@ -40,10 +40,23 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(
-                    () => this.CurrentStream.BeginSeek(),
-                    () => this.CurrentStream != null
-                );
+                return CommandFactory.Instance.CreateCommand<MouseButtonEventArgs>(this.BeginSeek);
+            }
+        }
+
+        public Task BeginSeek(MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && this.CurrentStream != null)
+            {
+                return this.CurrentStream.BeginSeek();
+            }
+            else
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
         }
 
@@ -51,10 +64,23 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(
-                    () => this.CurrentStream.EndSeek(),
-                    () => this.CurrentStream != null
-                );
+                return CommandFactory.Instance.CreateCommand<MouseButtonEventArgs>(this.EndSeek);
+            }
+        }
+
+        public Task EndSeek(MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && this.CurrentStream != null)
+            {
+                return this.CurrentStream.EndSeek();
+            }
+            else
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
         }
 

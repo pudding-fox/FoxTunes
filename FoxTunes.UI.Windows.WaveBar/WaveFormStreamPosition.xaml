@@ -23,66 +23,60 @@
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:WaveBarBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <Grid>
-        <Windows:DraggableSlider IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
-            <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName = "PreviewMouseLeftButtonDown">
-                    <Interactivity:InvokeCommandAction Command = "{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></Interactivity:InvokeCommandAction>
-                </Interactivity:EventTrigger>
-                <Interactivity:EventTrigger EventName = "PreviewMouseLeftButtonUp">
-                    <Interactivity:InvokeCommandAction Command = "{Binding Source={StaticResource ViewModel}, Path=EndSeekCommand}"></Interactivity:InvokeCommandAction>
-                </Interactivity:EventTrigger>
-            </Interactivity:Interaction.Triggers>
-            <Slider.Style>
-                <Style TargetType="{x:Type Slider}">
-                    <Setter Property="Background" Value="{DynamicResource TextBrush}"/>
-                    <Setter Property="Height" Value="20"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type Slider}">
-                                <ControlTemplate.Resources>
-                                    <Style TargetType="{x:Type RepeatButton}">
-                                        <Setter Property="OverridesDefaultStyle" Value="true"/>
-                                        <Setter Property="IsTabStop" Value="false"/>
-                                        <Setter Property="Focusable" Value="false"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type RepeatButton}">
-                                                    <Border Background="{TemplateBinding Background}"/>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ControlTemplate.Resources>
+    <Interactivity:Interaction.Triggers>
+        <Interactivity:EventTrigger EventName="PreviewMouseDown">
+            <ViewModel:InvokeParameterizedCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></ViewModel:InvokeParameterizedCommandAction>
+        </Interactivity:EventTrigger>
+        <Interactivity:EventTrigger EventName="PreviewMouseUp">
+            <ViewModel:InvokeParameterizedCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=EndSeekCommand}"></ViewModel:InvokeParameterizedCommandAction>
+        </Interactivity:EventTrigger>
+    </Interactivity:Interaction.Triggers>
+    <Windows:DraggableSlider Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <Slider.Style>
+            <Style TargetType="{x:Type Slider}">
+                <Setter Property="Background" Value="{DynamicResource TextBrush}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Slider}">
+                            <ControlTemplate.Resources>
+                                <Style TargetType="{x:Type RepeatButton}">
+                                    <Setter Property="OverridesDefaultStyle" Value="true"/>
+                                    <Setter Property="IsTabStop" Value="false"/>
+                                    <Setter Property="Focusable" Value="false"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Rectangle Fill="{TemplateBinding Background}" Opacity="0.25"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ControlTemplate.Resources>
+                            <Grid>
                                 <Grid>
-                                    <Grid>
-                                        <Grid.OpacityMask>
-                                            <SolidColorBrush Color="Black" Opacity="0.25"></SolidColorBrush>
-                                        </Grid.OpacityMask>
-                                        <Track Name="PART_Track" Value="{TemplateBinding Value}">
-                                            <Track.Thumb>
-                                                <Thumb Width="0">
-                                                    <Thumb.Template>
-                                                        <ControlTemplate TargetType="{x:Type Thumb}">
-                                                            <Border/>
-                                                        </ControlTemplate>
-                                                    </Thumb.Template>
-                                                </Thumb>
-                                            </Track.Thumb>
-                                            <Track.DecreaseRepeatButton>
-                                                <RepeatButton Background="{TemplateBinding Background}" Command="Slider.DecreaseLarge"/>
-                                            </Track.DecreaseRepeatButton>
-                                            <Track.IncreaseRepeatButton>
-                                                <RepeatButton Background="Transparent" Command="Slider.IncreaseLarge"/>
-                                            </Track.IncreaseRepeatButton>
-                                        </Track>
-                                    </Grid>
+                                    <Track Name="PART_Track" Value="{TemplateBinding Value}">
+                                        <Track.Thumb>
+                                            <Thumb Width="0">
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="{x:Type Thumb}">
+
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Track.Thumb>
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Background="{TemplateBinding Background}" Command="Slider.DecreaseLarge"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Background="Transparent" Command="Slider.IncreaseLarge"/>
+                                        </Track.IncreaseRepeatButton>
+                                    </Track>
                                 </Grid>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Slider.Style>
-        </Windows:DraggableSlider>
-    </Grid>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Slider.Style>
+    </Windows:DraggableSlider>
 </Windows:UIComponentBase>
