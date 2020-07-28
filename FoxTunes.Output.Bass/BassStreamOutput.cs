@@ -3,19 +3,12 @@ using ManagedBass;
 using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
     public abstract class BassStreamOutput : BaseComponent, IBassStreamOutput
     {
-        public const uint FFT256 = 0x80000000;
-
-        public const uint FFT512 = 0x80000001;
-
-        public const uint FFT1024 = 0x80000002;
-
-        public const uint FFT2048 = 0x80000003;
-
         public abstract string Name { get; }
 
         public abstract string Description { get; }
@@ -141,25 +134,29 @@ namespace FoxTunes
 
         private static readonly object ChannelDataSyncRoot = new object();
 
-        public virtual int GetData(float[] buffer)
+        public virtual int GetData(float[] buffer, int fftSize, bool interleaved)
         {
             var length = default(uint);
-            switch (buffer.Length)
+            switch (fftSize)
             {
-                case 128:
-                    length = FFT256;
+                case BassFFT.FFT256:
+                    length = BassFFT.FFT256_MASK;
                     break;
-                case 256:
-                    length = FFT512;
+                case BassFFT.FFT512:
+                    length = BassFFT.FFT512_MASK;
                     break;
-                case 512:
-                    length = FFT1024;
+                case BassFFT.FFT1024:
+                    length = BassFFT.FFT1024_MASK;
                     break;
-                case 1024:
-                    length = FFT2048;
+                case BassFFT.FFT2048:
+                    length = BassFFT.FFT2048_MASK;
                     break;
                 default:
                     throw new NotImplementedException();
+            }
+            if (interleaved)
+            {
+                length |= BassFFT.FFT_INDIVIDUAL_MASK;
             }
             foreach (var channelHandle in this.GetMixerChannelHandles())
             {

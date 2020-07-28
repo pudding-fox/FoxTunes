@@ -104,10 +104,6 @@ namespace FoxTunes
         public IBassStream CreateInteractiveStream(PlaylistItem playlistItem, bool immidiate, BassFlags flags)
         {
             flags |= BassFlags.Decode;
-            if (this.Output != null && this.Output.Float)
-            {
-                flags |= BassFlags.Float;
-            }
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for file \"{0}\".", playlistItem.FileName);
             var provider = this.GetProviders(playlistItem).FirstOrDefault();
             if (provider == null)

@@ -56,7 +56,7 @@ namespace FoxTunes
             {
                 if (this.GetCurrentStream(drive, track, out channelHandle))
                 {
-                    return this.CreateBasicStream(channelHandle, advice);
+                    return this.CreateBasicStream(channelHandle, advice, flags);
                 }
                 if (BassCd.FreeOld)
                 {
@@ -65,7 +65,7 @@ namespace FoxTunes
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
             }
-            return this.CreateBasicStream(channelHandle, advice);
+            return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
@@ -85,7 +85,7 @@ namespace FoxTunes
             {
                 if (this.GetCurrentStream(drive, track, out channelHandle))
                 {
-                    return this.CreateInteractiveStream(channelHandle, advice);
+                    return this.CreateInteractiveStream(channelHandle, advice, flags);
                 }
                 if (this.Output != null && this.Output.PlayFromMemory)
                 {
@@ -98,7 +98,7 @@ namespace FoxTunes
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
             }
-            return this.CreateInteractiveStream(channelHandle, advice);
+            return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 
         protected virtual void AssertDiscId(int drive, string expected)

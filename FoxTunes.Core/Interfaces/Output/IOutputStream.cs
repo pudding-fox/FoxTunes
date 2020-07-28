@@ -47,12 +47,29 @@ namespace FoxTunes.Interfaces
 
         TimeSpan GetDuration(long position);
 
-        int GetData(ref float[] buffer, TimeSpan duration);
+        OutputStreamFormat Format { get; }
+
+        T[] GetBuffer<T>(TimeSpan duration) where T : struct;
+
+        int GetData(short[] buffer);
+
+        int GetData(float[] buffer);
+
+        float[] GetBuffer(int fftSize);
+
+        int GetData(float[] buffer, int fftSize, bool interleaved);
 
         bool CanReset { get; }
 
         void Reset();
 
         bool IsDisposed { get; }
+    }
+
+    public enum OutputStreamFormat : byte
+    {
+        None,
+        Short,
+        Float
     }
 }

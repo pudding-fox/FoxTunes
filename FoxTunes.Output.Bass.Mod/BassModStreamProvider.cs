@@ -42,7 +42,7 @@ namespace FoxTunes
         {
             var fileName = this.GetFileName(playlistItem, advice);
             var channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
-            return this.CreateBasicStream(channelHandle, advice);
+            return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
@@ -54,7 +54,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
             }
             channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
-            return this.CreateInteractiveStream(channelHandle, advice);
+            return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 
         public override void FreeStream(PlaylistItem playlistItem, int channelHandle)

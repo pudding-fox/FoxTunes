@@ -17,7 +17,7 @@ namespace FoxTunes
 
         public TimeSpan LeadOut { get; private set; }
 
-        public override bool Wrap(IBassStreamProvider provider, int channelHandle, IEnumerable<IBassStreamAdvice> advice, out IBassStream stream)
+        public override bool Wrap(IBassStreamProvider provider, int channelHandle, IEnumerable<IBassStreamAdvice> advice, BassFlags flags, out IBassStream stream)
         {
             var offset = default(long);
             var length = default(long);
@@ -50,7 +50,8 @@ namespace FoxTunes
                     channelHandle,
                     offset,
                     length,
-                    advice
+                    advice,
+                    flags
                 );
                 return true;
             }

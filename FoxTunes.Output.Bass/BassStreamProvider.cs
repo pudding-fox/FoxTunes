@@ -47,10 +47,10 @@ namespace FoxTunes
         {
             var fileName = this.GetFileName(playlistItem, advice);
             var channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
-            return this.CreateBasicStream(channelHandle, advice);
+            return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
-        protected virtual IBassStream CreateBasicStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
+        protected virtual IBassStream CreateBasicStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             if (channelHandle == 0)
             {
@@ -60,14 +60,14 @@ namespace FoxTunes
             var stream = default(IBassStream);
             foreach (var advisory in advice)
             {
-                if (advisory.Wrap(this, channelHandle, advice, out stream))
+                if (advisory.Wrap(this, channelHandle, advice, flags, out stream))
                 {
                     break;
                 }
             }
             if (stream == null)
             {
-                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice);
+                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
             }
             return stream;
         }
@@ -93,10 +93,10 @@ namespace FoxTunes
             {
                 channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
             }
-            return this.CreateInteractiveStream(channelHandle, advice);
+            return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 
-        protected virtual IBassStream CreateInteractiveStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
+        protected virtual IBassStream CreateInteractiveStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             if (channelHandle == 0)
             {
@@ -106,14 +106,14 @@ namespace FoxTunes
             var stream = default(IBassStream);
             foreach (var advisory in advice)
             {
-                if (advisory.Wrap(this, channelHandle, advice, out stream))
+                if (advisory.Wrap(this, channelHandle, advice, flags, out stream))
                 {
                     break;
                 }
             }
             if (stream == null)
             {
-                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice);
+                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
             }
             stream.RegisterSyncHandlers();
             return stream;

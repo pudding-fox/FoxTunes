@@ -20,6 +20,8 @@ namespace FoxTunes.Interfaces
 
         IEnumerable<IBassStreamAdvice> Advice { get; }
 
+        BassFlags Flags { get; }
+
         Errors Errors { get; }
 
         event EventHandler Ending;

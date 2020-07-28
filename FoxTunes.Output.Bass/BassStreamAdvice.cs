@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -12,6 +13,6 @@ namespace FoxTunes
 
         public string FileName { get; private set; }
 
-        public abstract bool Wrap(IBassStreamProvider provider, int channelHandle, IEnumerable<IBassStreamAdvice> advice, out IBassStream stream);
+        public abstract bool Wrap(IBassStreamProvider provider, int channelHandle, IEnumerable<IBassStreamAdvice> advice, BassFlags flags, out IBassStream stream);
     }
 }

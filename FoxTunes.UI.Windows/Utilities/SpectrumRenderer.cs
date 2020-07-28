@@ -60,7 +60,7 @@ namespace FoxTunes
         {
             PlaybackStateNotifier.Notify += this.OnNotify;
             this.Output = core.Components.Output;
-            this.Data.Samples = new float[this.Data.FFTSize];
+            this.Data.Samples = this.Output.GetBuffer(this.Data.FFTSize);
             this.Data.Values = new float[this.Data.Count];
             this.Data.Elements = new Int32Rect[this.Data.Count];
             if (this.Flags.HasFlag(SpectrumRendererFlags.ShowPeaks))
@@ -75,11 +75,11 @@ namespace FoxTunes
             }
             if (this.Flags.HasFlag(SpectrumRendererFlags.HighCut))
             {
-                this.Data.FFTRange = this.Data.FFTSize - (this.Data.FFTSize / 4);
+                this.Data.FFTRange = this.Data.Samples.Length - (this.Data.Samples.Length / 4);
             }
             else
             {
-                this.Data.FFTRange = this.Data.FFTSize;
+                this.Data.FFTRange = this.Data.Samples.Length;
             }
             this.Data.SamplesPerElement = Math.Max(this.Data.FFTRange / this.Data.Count, 1);
             this.Data.Step = this.Data.Width / this.Data.Count;
@@ -223,7 +223,7 @@ namespace FoxTunes
         {
             try
             {
-                var length = this.Output.GetData(this.Data.Samples);
+                var length = this.Output.GetData(this.Data.Samples, this.Data.FFTSize, false);
                 if (length <= 0)
                 {
                     this.Clear();
