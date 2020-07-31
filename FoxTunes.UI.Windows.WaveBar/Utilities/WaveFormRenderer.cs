@@ -51,6 +51,7 @@ namespace FoxTunes
 
         protected virtual async Task Update(IOutputStream stream)
         {
+            var cached = default(bool);
             var generatorData = this.GeneratorData;
             var rendererData = this.RendererData;
 
@@ -67,10 +68,17 @@ namespace FoxTunes
                 return;
             }
 
-            stream = await this.Output.Duplicate(stream).ConfigureAwait(false);
+            if (WaveFormCache.TryLoad(stream, this.Resolution, out generatorData))
+            {
+                cached = true;
+            }
+            else
+            {
+                stream = await this.Output.Duplicate(stream).ConfigureAwait(false);
 
-            generatorData = WaveFormGenerator.Create(stream, this.Resolution);
-            generatorData.Updated += this.OnUpdated;
+                generatorData = WaveFormGenerator.Create(stream, this.Resolution);
+                generatorData.Updated += this.OnUpdated;
+            }
 
             var bitmap = this.Bitmap;
             if (bitmap != null)
@@ -84,6 +92,12 @@ namespace FoxTunes
 
             this.GeneratorData = generatorData;
             this.RendererData = rendererData;
+
+            if (cached)
+            {
+                var task = this.Update();
+                return;
+            }
 
             try
             {

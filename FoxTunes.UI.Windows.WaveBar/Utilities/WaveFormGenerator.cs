@@ -3,8 +3,16 @@ using System;
 
 namespace FoxTunes
 {
-    public class WaveFormGenerator : BaseComponent
+    public static class WaveFormGenerator
     {
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static WaveFormGeneratorData Create(IOutputStream stream, int resolution)
         {
             var length = Convert.ToInt32(Math.Ceiling(
@@ -34,6 +42,20 @@ namespace FoxTunes
                     break;
                 default:
                     throw new NotImplementedException();
+            }
+
+            if (data.CancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            try
+            {
+                WaveFormCache.Save(stream, data);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(WaveFormGenerator), LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
             }
         }
 
@@ -155,6 +177,7 @@ namespace FoxTunes
             data.Update();
         }
 
+        [Serializable]
         public class WaveFormGeneratorData
         {
             public int Resolution;
@@ -178,11 +201,14 @@ namespace FoxTunes
                 this.Updated(this, EventArgs.Empty);
             }
 
+            [field: NonSerialized]
             public event EventHandler Updated;
 
+            [field: NonSerialized]
             public CancellationToken CancellationToken;
         }
 
+        [Serializable]
         public struct WaveFormDataElement
         {
             public float Min;
