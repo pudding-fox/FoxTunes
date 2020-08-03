@@ -20,8 +20,7 @@
             Core="{Binding}" 
             Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:WaveFormStreamPosition}}}" 
             Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:WaveFormStreamPosition}}}" 
-            Color1="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:WaveFormStreamPosition}}}" 
-            Color2="Transparent"></LocalWindows:WaveFormRenderer>
+            Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:WaveFormStreamPosition}}}"></LocalWindows:WaveFormRenderer>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:WaveBarBehaviour.CATEGORY}}"></Windows:Menu>
