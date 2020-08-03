@@ -1,12 +1,11 @@
 ﻿using FoxDb;
 using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 
 namespace FoxTunes.ViewModel
 {
-    public class IntegerToVisibilityConverter : IValueConverter
+    public class IntegerToBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -16,11 +15,7 @@ namespace FoxTunes.ViewModel
             {
                 value2 = Converter.ChangeType<int>(parameter);
             }
-            if (value1 <= value2)
-            {
-                return Visibility.Collapsed;
-            }
-            return Visibility.Visible;
+            return value1 <= value2;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

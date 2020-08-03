@@ -17,9 +17,6 @@
     <UserControl.Resources>
         <LocalViewModel:LibraryBrowser x:Key="ViewModel" Core="{Binding}"></LocalViewModel:LibraryBrowser>
         <LocalViewModel:LibraryBrowserImageConverter x:Key="LibraryBrowserImageConverter"></LocalViewModel:LibraryBrowserImageConverter>
-        <ViewModel:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter"></ViewModel:IntegerToVisibilityConverter>
-        <ViewModel:MultiVisibilityConverter x:Key="MultiVisibilityConverter"></ViewModel:MultiVisibilityConverter>
-        <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
         <System:Boolean x:Key="False">False</System:Boolean>
@@ -109,23 +106,7 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <ComboBox 
-            ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}, IsAsync=True}" 
-            SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
-            DisplayMemberPath="Name">
-            <ComboBox.Visibility>
-                <MultiBinding Converter="{StaticResource MultiVisibilityConverter}">
-                    <Binding Path="IsPrimaryView" Source="{StaticResource ViewModel}" Converter="{StaticResource BooleanToVisibilityConverter}" Mode="OneWay"></Binding>
-                    <Binding Path="Hierarchies.Count" Source="{StaticResource ViewModel}" Converter="{StaticResource IntegerToVisibilityConverter}" ConverterParameter="1" Mode="OneWay"></Binding>
-                </MultiBinding>
-            </ComboBox.Visibility>
-        </ComboBox>
-        <ItemsControl Name="ItemsControl" Grid.Row="1" ItemsSource="{Binding Frames, Source={StaticResource ViewModel}}" >
+        <ItemsControl Name="ItemsControl" Grid.Row="0" ItemsSource="{Binding Frames, Source={StaticResource ViewModel}}" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid></Grid>
@@ -184,17 +165,6 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Windows:SearchBox 
-            Grid.Row="2" 
-            SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"
-            Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}"
-            Visibility="{Binding IsPrimaryView, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
-            <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="Commit">
-                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding SearchCommitCommand, Source={StaticResource ViewModel}}" />
-                </Interactivity:EventTrigger>
-            </Interactivity:Interaction.Triggers>
-        </Windows:SearchBox>
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner" Visibility="{Binding ShowCursorAdorners, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
             <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>

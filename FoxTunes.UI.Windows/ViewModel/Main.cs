@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -103,8 +104,38 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged;
 
+        public bool ShowLibrarySelector
+        {
+            get
+            {
+                if (this.LibraryHierarchyBrowser == null)
+                {
+                    return false;
+                }
+                return this.LibraryHierarchyBrowser.GetHierarchies().Length > 1;
+            }
+        }
+
+        protected virtual void OnShowLibrarySelectorChanged()
+        {
+            if (this.ShowLibrarySelectorChanged != null)
+            {
+                this.ShowLibrarySelectorChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowLibrarySelector");
+        }
+
+        public event EventHandler ShowLibrarySelectorChanged;
+
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
+            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = this.Core.Components.Configuration;
             this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
               NotifyIconConfiguration.SECTION,
@@ -118,7 +149,22 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
+            var task = Windows.Invoke(this.OnShowLibrarySelectorChanged);
             base.InitializeComponent(core);
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.HierarchiesUpdated:
+                    return Windows.Invoke(this.OnShowLibrarySelectorChanged);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public ICommand RestoreCommand

@@ -33,7 +33,8 @@
         <Binding Path="Left" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
     </Window.Left>
     <Window.Title>
-        <Binding Mode="OneWay" Path="Title" Source="{StaticResource ViewModel}" FallbackValue="Tool Window"/>
+        <!-- This seems to produce a binding warning but I don't know why. The FallbackValue doesn't seem to help. -->
+        <Binding Path="Title" Source="{StaticResource ViewModel}" Mode="OneWay" FallbackValue="Tool Window"/>
     </Window.Title>
     <Grid Background="{DynamicResource NormalBrush}">
         <Grid.LayoutTransform>
