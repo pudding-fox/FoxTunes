@@ -79,9 +79,9 @@ namespace FoxTunes.ViewModel
         protected override Task<Playlist> GetPlaylist()
         {
 #if NET40
-            return TaskEx.FromResult(this.PlaylistManager.CurrentPlaylist);
+            return TaskEx.FromResult(this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist);
 #else
-            return Task.FromResult(this.PlaylistManager.CurrentPlaylist);
+            return Task.FromResult(this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist);
 #endif
         }
 
@@ -90,6 +90,7 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
             this.PlaylistManager.CurrentPlaylistChanged += this.OnCurrentPlaylistChanged;
+            this.PlaylistManager.SelectedPlaylistChanged += this.OnSelectedPlaylistChanged;
             this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
@@ -100,6 +101,15 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnCurrentPlaylistChanged(object sender, EventArgs e)
         {
+            var task = this.Refresh();
+        }
+
+        protected virtual void OnSelectedPlaylistChanged(object sender, EventArgs e)
+        {
+            if (this.PlaylistManager.CurrentPlaylist != null)
+            {
+                return;
+            }
             var task = this.Refresh();
         }
 
