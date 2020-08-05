@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class DefaultLayoutProvider : UILayoutProviderBase, IConfigurableComponent
     {
         public override string Id
