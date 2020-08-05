@@ -15,7 +15,7 @@ namespace FoxTunes.ViewModel
             {
                 value2 = Converter.ChangeType<int>(parameter);
             }
-            return value1 <= value2;
+            return value1 >= value2;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
