@@ -297,7 +297,7 @@ namespace FoxTunes
             (this).Try(() => this.AddTag(metaData, CommonMetaData.TrackCount, tag.TrackCount.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Year, tag.Year.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute.ToString()), this.ErrorHandler);
-            (this).Try(() => this.AddTag(metaData, CommonMetaData.InitialKey, tag.InitialKey.ToString()), this.ErrorHandler);
+            (this).Try(() => this.AddTag(metaData, CommonMetaData.InitialKey, tag.InitialKey), this.ErrorHandler);
 
             if (this.Extended.Value)
             {
