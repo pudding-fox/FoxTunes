@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FoxTunes
@@ -54,12 +55,18 @@ namespace FoxTunes
 
         public void Load()
         {
+            this.Load(Enumerable.Empty<IBaseComponent>());
+        }
+
+        public void Load(IEnumerable<IBaseComponent> components)
+        {
             try
             {
                 this.LoadComponents();
                 this.LoadFactories();
                 this.LoadManagers();
                 this.LoadBehaviours();
+                ComponentRegistry.Instance.AddComponents(components);
                 this.LoadConfiguration();
             }
             catch (Exception e)

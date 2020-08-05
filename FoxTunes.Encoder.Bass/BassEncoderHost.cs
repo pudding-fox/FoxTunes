@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
@@ -72,7 +73,11 @@ namespace FoxTunes
             {
                 try
                 {
-                    core.Load();
+                    core.Load(new[]
+                    {
+                        //Stub component used to provide the configuration.
+                        new BassEncoderBehaviourStub()
+                    });
                     core.Initialize();
                 }
                 catch (Exception e)
@@ -234,6 +239,14 @@ namespace FoxTunes
             {
                 Serializer.Instance.Write(stream, value);
                 stream.Flush();
+            }
+        }
+
+        private class BassEncoderBehaviourStub : BaseComponent, IConfigurableComponent
+        {
+            public IEnumerable<ConfigurationSection> GetConfigurationSections()
+            {
+                return BassEncoderBehaviourConfiguration.GetConfigurationSections();
             }
         }
     }
