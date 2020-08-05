@@ -10,8 +10,7 @@
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}"
-             MinHeight="30">
+             d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <LocalWindows:UIComponentPanel.Resources>
         <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
     </LocalWindows:UIComponentPanel.Resources>

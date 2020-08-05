@@ -21,19 +21,15 @@
                     <Setter Property="Margin" Value="0"></Setter>
                     <Style.Triggers>
                         <Trigger Property="DockPanel.Dock" Value="Top">
-                            <Setter Property="MinHeight" Value="30"></Setter>
                             <Setter Property="Margin" Value="0,0,0,2"></Setter>
                         </Trigger>
                         <Trigger Property="DockPanel.Dock" Value="Bottom">
-                            <Setter Property="MinHeight" Value="30"></Setter>
                             <Setter Property="Margin" Value="0,2,0,0"></Setter>
                         </Trigger>
                         <Trigger Property="DockPanel.Dock" Value="Left">
-                            <Setter Property="MinWidth" Value="30"></Setter>
                             <Setter Property="Margin" Value="0,0,2,0"></Setter>
                         </Trigger>
                         <Trigger Property="DockPanel.Dock" Value="Right">
-                            <Setter Property="MinWidth" Value="30"></Setter>
                             <Setter Property="Margin" Value="2,0,0,0"></Setter>
                         </Trigger>
                         <MultiDataTrigger>
