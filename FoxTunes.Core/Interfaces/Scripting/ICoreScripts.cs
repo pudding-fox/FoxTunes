@@ -24,6 +24,8 @@
 
         string BPM { get; }
 
+        string InitialKey { get; }
+
         string ReplayGainAlbumGain { get; }
 
         string ReplayGainAlbumPeak { get; }
