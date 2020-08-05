@@ -66,11 +66,17 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            Windows.ShuttingDown += this.OnShuttingDown;
             UIComponentRoot.ActiveChanged += this.OnActiveChanged;
             ToolWindowBehaviour.ToolWindowManagerWindowCreated += this.OnToolWindowManagerWindowCreated;
             ToolWindowBehaviour.ToolWindowManagerWindowClosed += this.OnToolWindowManagerWindowClosed;
             this.Core = core;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnShuttingDown(object sender, EventArgs e)
+        {
+            this.IsDesigning = false;
         }
 
         protected virtual void OnActiveChanged(object sender, EventArgs e)
@@ -194,6 +200,7 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             this.HideDesignerOverlay();
+            Windows.ShuttingDown -= this.OnShuttingDown;
             UIComponentRoot.ActiveChanged -= this.OnActiveChanged;
             ToolWindowBehaviour.ToolWindowManagerWindowCreated -= this.OnToolWindowManagerWindowCreated;
             ToolWindowBehaviour.ToolWindowManagerWindowClosed -= this.OnToolWindowManagerWindowClosed;
