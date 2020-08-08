@@ -2,55 +2,76 @@
 
 using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public static class WaveFormGenerator
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    public class WaveFormGenerator : StandardComponent
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
+        public WaveFormCache Cache { get; private set; }
 
-        public static readonly IntegerConfigurationElement Resolution = ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<IntegerConfigurationElement>(
-            WaveBarBehaviourConfiguration.SECTION,
-            WaveBarBehaviourConfiguration.RESOLUTION_ELEMENT
-        );
+        public IOutput Output { get; private set; }
 
-        public static WaveFormGeneratorData Create(IOutputStream stream)
+        public IConfiguration Configuration { get; private set; }
+
+        public IntegerConfigurationElement Resolution { get; private set; }
+
+        public override void InitializeComponent(ICore core)
         {
-            var length = Convert.ToInt32(
-                Math.Ceiling(
-                    stream.GetDuration(stream.Length).TotalMilliseconds / Resolution.Value
-                )
+            this.Cache = ComponentRegistry.Instance.GetComponent<WaveFormCache>();
+            this.Output = core.Components.Output;
+            this.Configuration = core.Components.Configuration;
+            this.Resolution = this.Configuration.GetElement<IntegerConfigurationElement>(
+                WaveBarBehaviourConfiguration.SECTION,
+                WaveBarBehaviourConfiguration.RESOLUTION_ELEMENT
             );
-            return new WaveFormGeneratorData()
-            {
-                Resolution = Resolution.Value,
-                Data = new WaveFormDataElement[length, stream.Channels],
-                Position = 0,
-                Capacity = length,
-                Peak = 0,
-                Channels = stream.Channels,
-                CancellationToken = new CancellationToken(),
-            };
+            base.InitializeComponent(core);
         }
 
-        public static void Populate(IOutputStream stream, WaveFormGeneratorData data)
+        public WaveFormGeneratorData Generate(IOutputStream stream)
         {
-            switch (stream.Format)
+            return this.Cache.GetOrCreate(
+                stream,
+                this.Resolution.Value,
+                () =>
+                {
+                    var length = Convert.ToInt32(
+                        Math.Ceiling(
+                            stream.GetDuration(stream.Length).TotalMilliseconds / this.Resolution.Value
+                        )
+                    );
+                    var data = new WaveFormGeneratorData()
+                    {
+                        Resolution = this.Resolution.Value,
+                        Data = new WaveFormDataElement[length, stream.Channels],
+                        Position = 0,
+                        Capacity = length,
+                        Peak = 0,
+                        Channels = stream.Channels,
+                        CancellationToken = new CancellationToken(),
+                    };
+                    this.Dispatch(() => this.Populate(stream, data));
+                    return data;
+                }
+            );
+        }
+
+        protected virtual async Task Populate(IOutputStream stream, WaveFormGeneratorData data)
+        {
+            using (var duplicated = await this.Output.Duplicate(stream).ConfigureAwait(false))
             {
-                case OutputStreamFormat.Short:
-                    PopulateShort(stream, data);
-                    break;
-                case OutputStreamFormat.Float:
-                    PopulateFloat(stream, data);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                switch (duplicated.Format)
+                {
+                    case OutputStreamFormat.Short:
+                        PopulateShort(duplicated, data);
+                        break;
+                    case OutputStreamFormat.Float:
+                        PopulateFloat(duplicated, data);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
 
             if (data.CancellationToken.IsCancellationRequested)
@@ -65,7 +86,7 @@ namespace FoxTunes
 
             try
             {
-                WaveFormCache.Save(stream, data);
+                this.Cache.Save(stream, data);
             }
             catch (Exception e)
             {

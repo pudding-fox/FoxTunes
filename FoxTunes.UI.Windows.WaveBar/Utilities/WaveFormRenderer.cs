@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -124,7 +123,7 @@ namespace FoxTunes
 
         public WaveFormRendererData RendererData { get; private set; }
 
-        public IOutput Output { get; private set; }
+        public WaveFormGenerator Generator { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -242,7 +241,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Output = core.Components.Output;
+            this.Generator = ComponentRegistry.Instance.GetComponent<WaveFormGenerator>();
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.Configuration = core.Components.Configuration;
@@ -288,8 +287,6 @@ namespace FoxTunes
 
         protected virtual async Task Update(IOutputStream stream)
         {
-            var cached = default(bool);
-
             if (this.GeneratorData != null)
             {
                 this.GeneratorData.Updated -= this.OnUpdated;
@@ -307,51 +304,14 @@ namespace FoxTunes
                 return;
             }
 
-            if (this.LoadGeneratorData(stream))
-            {
-                cached = true;
-            }
-            else
-            {
-                stream = await this.Output.Duplicate(stream).ConfigureAwait(false);
-
-                this.GeneratorData = WaveFormGenerator.Create(stream);
-                this.GeneratorData.Updated += this.OnUpdated;
-            }
+            this.GeneratorData = this.Generator.Generate(stream);
+            this.GeneratorData.Updated += this.OnUpdated;
 
             await Windows.Invoke(
                 () => this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight)
             ).ConfigureAwait(false);
 
-            if (cached)
-            {
-                this.Update();
-            }
-            else
-            {
-                try
-                {
-                    WaveFormGenerator.Populate(stream, this.GeneratorData);
-                }
-                finally
-                {
-                    stream.Dispose();
-                }
-            }
-        }
-
-        protected virtual bool LoadGeneratorData(IOutputStream stream)
-        {
-            var generatorData = default(WaveFormGenerator.WaveFormGeneratorData);
-            if (WaveFormCache.TryLoad(stream, out generatorData))
-            {
-                this.GeneratorData = generatorData;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            this.Update();
         }
 
         protected virtual void OnUpdated(object sender, EventArgs e)

@@ -4,72 +4,103 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public static class WaveFormCache
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    public class WaveFormCache : StandardComponent
     {
+        const int CACHE_SIZE = 4;
+
         private static readonly string PREFIX = typeof(WaveFormCache).Name;
 
-        private static readonly BooleanConfigurationElement Enabled = ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-            WaveBarBehaviourConfiguration.SECTION,
-            WaveBarBehaviourConfiguration.CACHE_ELEMENT
-        );
-
-        public static bool TryLoad(IOutputStream stream, out WaveFormGenerator.WaveFormGeneratorData data)
+        public WaveFormCache()
         {
-            if (!Enabled.Value)
-            {
-                data = null;
-                return false;
-            }
-
-            var id = GetId(stream, WaveFormGenerator.Resolution.Value);
-            var fileName = default(string);
-            if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
-            {
-                data = Load(fileName);
-                return data != null;
-            }
-            data = null;
-            return false;
+            this.Store = new CappedDictionary<string, WaveFormGenerator.WaveFormGeneratorData>(CACHE_SIZE, StringComparer.OrdinalIgnoreCase);
         }
 
-        private static WaveFormGenerator.WaveFormGeneratorData Load(string fileName)
+        public CappedDictionary<string, WaveFormGenerator.WaveFormGeneratorData> Store { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement Enabled { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Configuration = core.Components.Configuration;
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+                WaveBarBehaviourConfiguration.SECTION,
+                WaveBarBehaviourConfiguration.CACHE_ELEMENT
+            );
+            base.InitializeComponent(core);
+        }
+
+        public WaveFormGenerator.WaveFormGeneratorData GetOrCreate(IOutputStream stream, int resolution, Func<WaveFormGenerator.WaveFormGeneratorData> factory)
+        {
+            return this.Store.GetOrAdd(stream.FileName, () =>
+            {
+                if (this.Enabled.Value)
+                {
+                    var id = this.GetDataId(stream, resolution);
+                    var fileName = default(string);
+                    if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                    {
+                        var data = default(WaveFormGenerator.WaveFormGeneratorData);
+                        if (this.TryLoad(fileName, out data))
+                        {
+                            return data;
+                        }
+                    }
+                }
+                return factory();
+            });
+        }
+
+        protected virtual bool TryLoad(string fileName, out WaveFormGenerator.WaveFormGeneratorData data)
         {
             try
             {
                 using (var stream = File.OpenRead(fileName))
                 {
-                    return Serializer.Instance.Read(stream) as WaveFormGenerator.WaveFormGeneratorData;
+                    data = Serializer.Instance.Read(stream) as WaveFormGenerator.WaveFormGeneratorData;
+                    return true;
                 }
             }
-            catch
+            catch (Exception e)
             {
-                return null;
+                Logger.Write(this, LogLevel.Warn, "Failed to load wave form from file \"{0}\": {1}", fileName, e.Message);
             }
+            data = null;
+            return false;
         }
 
-        public static void Save(IOutputStream stream, WaveFormGenerator.WaveFormGeneratorData data)
+        public void Save(IOutputStream stream, WaveFormGenerator.WaveFormGeneratorData data)
         {
-            if (!Enabled.Value)
+            if (!this.Enabled.Value)
             {
                 return;
             }
 
-            var id = GetId(stream, data.Resolution);
-            Save(id, data);
+            var id = this.GetDataId(stream, data.Resolution);
+            this.Save(id, data);
         }
 
-        private static void Save(string id, WaveFormGenerator.WaveFormGeneratorData data)
+        protected virtual void Save(string id, WaveFormGenerator.WaveFormGeneratorData data)
         {
-            using (var stream = new MemoryStream())
+            try
             {
-                Serializer.Instance.Write(stream, data);
-                stream.Seek(0, SeekOrigin.Begin);
-                FileMetaDataStore.Write(PREFIX, id, stream);
-                stream.Seek(0, SeekOrigin.Begin);
+                using (var stream = new MemoryStream())
+                {
+                    Serializer.Instance.Write(stream, data);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    FileMetaDataStore.Write(PREFIX, id, stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to save wave form: {0}", e.Message);
             }
         }
 
-        private static string GetId(IOutputStream stream, int resolution)
+        private string GetDataId(IOutputStream stream, int resolution)
         {
             var hashCode = default(int);
             unchecked
