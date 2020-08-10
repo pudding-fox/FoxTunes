@@ -13,10 +13,10 @@ namespace FoxTunes
 
         public WaveFormCache()
         {
-            this.Store = new CappedDictionary<string, WaveFormGenerator.WaveFormGeneratorData>(CACHE_SIZE, StringComparer.OrdinalIgnoreCase);
+            this.Store = new CappedDictionary<Key, WaveFormGenerator.WaveFormGeneratorData>(CACHE_SIZE);
         }
 
-        public CappedDictionary<string, WaveFormGenerator.WaveFormGeneratorData> Store { get; private set; }
+        public CappedDictionary<Key, WaveFormGenerator.WaveFormGeneratorData> Store { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -34,7 +34,8 @@ namespace FoxTunes
 
         public WaveFormGenerator.WaveFormGeneratorData GetOrCreate(IOutputStream stream, int resolution, Func<WaveFormGenerator.WaveFormGeneratorData> factory)
         {
-            return this.Store.GetOrAdd(stream.FileName, () =>
+            var key = new Key(string.Empty, resolution);
+            return this.Store.GetOrAdd(key, () =>
             {
                 if (this.Enabled.Value)
                 {
@@ -109,6 +110,81 @@ namespace FoxTunes
                 hashCode = (hashCode * 29) + resolution.GetHashCode();
             }
             return Math.Abs(hashCode).ToString();
+        }
+
+        public class Key : IEquatable<Key>
+        {
+            public Key(string fileName, int resolution)
+            {
+                this.FileName = fileName;
+                this.Resolution = resolution;
+            }
+
+            public string FileName { get; private set; }
+
+            public int Resolution { get; private set; }
+
+            public virtual bool Equals(Key other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+                if (object.ReferenceEquals(this, other))
+                {
+                    return true;
+                }
+                if (!string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                if (this.Resolution != other.Resolution)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return this.Equals(obj as Key);
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = default(int);
+                unchecked
+                {
+                    if (!string.IsNullOrEmpty(this.FileName))
+                    {
+                        hashCode += this.FileName.ToLower().GetHashCode();
+                    }
+                    hashCode += this.Resolution.GetHashCode();
+                }
+                return hashCode;
+            }
+
+            public static bool operator ==(Key a, Key b)
+            {
+                if ((object)a == null && (object)b == null)
+                {
+                    return true;
+                }
+                if ((object)a == null || (object)b == null)
+                {
+                    return false;
+                }
+                if (object.ReferenceEquals((object)a, (object)b))
+                {
+                    return true;
+                }
+                return a.Equals(b);
+            }
+
+            public static bool operator !=(Key a, Key b)
+            {
+                return !(a == b);
+            }
         }
     }
 }
