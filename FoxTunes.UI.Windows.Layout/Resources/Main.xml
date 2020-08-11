@@ -49,7 +49,7 @@
       <UIComponentConfiguration Id="af666ad7-5a0c-48bf-91ea-a5b1edcd7dfc" Component="26A6EFC8-E2A5-4157-AAF7-6E7A52516FCA" />
       <UIComponentConfiguration Id="1f4662e0-6b2e-4e50-9f7e-fdf27dcbf000" Component="DA832CBE-3C11-4F1F-80D4-B72A801DD972" />
       <UIComponentConfiguration Id="145095fb-478c-4e88-aa39-aba5ce2a57fd" Component="381328C3-C2CE-4FDA-AC92-71A15C3FC387" />
-      <UIComponentConfiguration Id="e8266d6a-9dd2-466d-8180-f3a6a7c4cc3a" Component="1CABFBE6-C5BD-4818-A092-2D79509D3A52">
+      <UIComponentConfiguration Id="e8266d6a-9dd2-466d-8180-f3a6a7c4cc3a" Component="9C2BD136-A337-448C-906B-7317C43990B6">
         <MetaDataEntry Id="6e03693f-5646-4003-b5a5-4ed0881dfc2d" Name="Alignment" Value="Stretch" />
       </UIComponentConfiguration>
       <UIComponentConfiguration Id="2dbd6741-0008-47ee-a2c5-bbadfaafc909" Component="82279C77-7959-4FCA-A699-270612C20F62">
