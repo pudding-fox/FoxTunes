@@ -221,6 +221,14 @@ ManagedBass.Crossfade.dll
 bass_crossfade.dll
 "
 
+SPECTRUM="
+FoxTunes.UI.Windows.Spectrum.dll
+"
+
+WAVEBAR="
+FoxTunes.UI.Windows.WaveBar.dll
+"
+
 MINIMAL="
 bass
 conf
@@ -233,8 +241,8 @@ wpf
 BUNDLED="
 asio
 cd
-cue
 crossfade
+cue
 dsd
 dts
 encoder
@@ -244,8 +252,10 @@ logger
 metadataeditor
 replaygain
 sox
+spectrum,
 tools
 wasapi
+wavebar
 windows
 "
 
@@ -279,9 +289,9 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/bass"
 		mkdir -p "./release/$platform/$target/Plugins/bass/addon"
 		mkdir -p "./release/$platform/$target/Plugins/cd"
-		mkdir -p "./release/$platform/$target/Plugins/cue"
-		mkdir -p "./release/$platform/$target/Plugins/crossfade"
 		mkdir -p "./release/$platform/$target/Plugins/conf"
+		mkdir -p "./release/$platform/$target/Plugins/crossfade"
+		mkdir -p "./release/$platform/$target/Plugins/cue"
 		mkdir -p "./release/$platform/$target/Plugins/dsd"
 		mkdir -p "./release/$platform/$target/Plugins/dts"
 		mkdir -p "./release/$platform/$target/Plugins/encoder"
@@ -296,11 +306,13 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/replaygain"
 		mkdir -p "./release/$platform/$target/Plugins/simplemetadata"
 		mkdir -p "./release/$platform/$target/Plugins/sox"
+		mkdir -p "./release/$platform/$target/Plugins/spectrum"
 		mkdir -p "./release/$platform/$target/Plugins/sqlite"
 		mkdir -p "./release/$platform/$target/Plugins/sqlserver"
 		mkdir -p "./release/$platform/$target/Plugins/taglibmetadata"
 		mkdir -p "./release/$platform/$target/Plugins/tools"
 		mkdir -p "./release/$platform/$target/Plugins/wasapi"
+		mkdir -p "./release/$platform/$target/Plugins/wavebar"
 		mkdir -p "./release/$platform/$target/Plugins/windows"
 		mkdir -p "./release/$platform/$target/Plugins/wpf"
 
@@ -547,6 +559,22 @@ do
 		do
 				echo $file
 				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/crossfade"
+		done
+		echo
+
+		echo "Creating plugin: spectrum"
+		for file in $SPECTRUM
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/spectrum"
+		done
+		echo
+
+		echo "Creating plugin: wavebar"
+		for file in $WAVEBAR
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/wavebar"
 		done
 		echo
 
