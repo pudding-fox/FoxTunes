@@ -15,8 +15,6 @@ namespace FoxTunes
 
         public const string SECTION = "B06236E7-F320-4D87-A1A6-9937E0B399BB";
 
-        public const string ENABLED_ELEMENT = "50564810-FD40-4A44-BDF6-F0B2F60E674A";
-
         public const string BARS_ELEMENT = "AAAA0663-7CBF-4EE4-99C8-A0A096D4E876";
 
         public const string BARS_16_OPTION = "AAAADF84-DC4C-463E-9A76-D9D424890D91";
@@ -61,7 +59,6 @@ namespace FoxTunes
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, "Spectrum")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Show In Toolbar").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions()))
                 .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality").WithOptions(GetQualityOptions()))
                 .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks", path: "Advanced"))

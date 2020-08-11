@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
-             xmlns:Windows="clr-namespace:FoxTunes" 
-             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
+             xmlns:LocalWindows="clr-namespace:FoxTunes"
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
              Foreground="{DynamicResource TextBrush}"
@@ -13,17 +14,17 @@
              MinWidth="80">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-        <Windows:SpectrumRenderer x:Key="Renderer"
+        <LocalWindows:SpectrumRenderer x:Key="Renderer"
             Core="{Binding}"                                  
-            Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Spectrum}}}" 
-            Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Spectrum}}}" 
-            Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Spectrum}}}"></Windows:SpectrumRenderer>
+            Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}" 
+            Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}" 
+            Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}"></LocalWindows:SpectrumRenderer>
     </UserControl.Resources>
     <UserControl.Background>
         <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}"></ImageBrush>
     </UserControl.Background>
     <UserControl.ContextMenu>
-        <Windows:Menu Category="{Binding Source={x:Static Windows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
 </Windows:UIComponentBase>
