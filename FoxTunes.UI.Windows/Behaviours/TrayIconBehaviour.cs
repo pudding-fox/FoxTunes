@@ -2,8 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Interop;
 
 namespace FoxTunes
 {
@@ -11,6 +15,43 @@ namespace FoxTunes
     public class TrayIconBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         public const string QUIT = "ZZZZ";
+
+        private static readonly Lazy<Icon> _Icon = new Lazy<Icon>(() =>
+        {
+            using (var stream = typeof(Mini).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico"))
+            {
+                if (stream == null)
+                {
+                    return null;
+                }
+                return new Icon(stream);
+            }
+        });
+
+        public static Icon Icon
+        {
+            get
+            {
+                return _Icon.Value;
+            }
+        }
+
+        private static readonly Lazy<Menu> _Menu = new Lazy<Menu>(() =>
+        {
+            return new Menu()
+            {
+                Category = InvocationComponent.CATEGORY_NOTIFY_ICON,
+                Placement = PlacementMode.AbsolutePoint
+            };
+        });
+
+        public static Menu Menu
+        {
+            get
+            {
+                return _Menu.Value;
+            }
+        }
 
         public TrayIconBehaviour()
         {
@@ -29,6 +70,10 @@ namespace FoxTunes
                 }
             };
         }
+
+        public ICore Core { get; private set; }
+
+        public INotifyIcon NotifyIcon { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -65,6 +110,8 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
+            this.NotifyIcon = ComponentRegistry.Instance.GetComponent<NotifyIcon>();
             this.Configuration = core.Components.Configuration;
             if (this.Configuration.GetSection(NotifyIconConfiguration.SECTION) != null)
             {
@@ -86,6 +133,13 @@ namespace FoxTunes
 
         protected virtual void Enable()
         {
+            this.NotifyIcon.Icon = Icon.Handle;
+            this.NotifyIcon.Show();
+            if (this.NotifyIcon.MessageSink != null)
+            {
+                this.NotifyIcon.MessageSink.MouseLeftButtonUp += this.OnMouseLeftButtonUp;
+                this.NotifyIcon.MessageSink.MouseRightButtonUp += this.OnMouseRightButtonUp;
+            }
             if (Windows.ActiveWindow != null)
             {
                 Windows.ActiveWindow.StateChanged += this.OnStateChanged;
@@ -95,11 +149,56 @@ namespace FoxTunes
 
         protected virtual void Disable()
         {
+            this.NotifyIcon.Hide();
+            if (this.NotifyIcon.MessageSink != null)
+            {
+                this.NotifyIcon.MessageSink.MouseLeftButtonUp -= this.OnMouseLeftButtonUp;
+                this.NotifyIcon.MessageSink.MouseRightButtonUp -= this.OnMouseRightButtonUp;
+            }
             if (Windows.ActiveWindow != null)
             {
                 Windows.ActiveWindow.StateChanged -= this.OnStateChanged;
                 Windows.ActiveWindow.Closing -= this.OnClosing;
             }
+        }
+
+        protected virtual void OnMouseLeftButtonUp(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(() =>
+            {
+                Windows.ActiveWindow.Show();
+                if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
+                {
+                    Windows.ActiveWindow.WindowState = WindowState.Normal;
+                }
+                Windows.ActiveWindow.BringToFront();
+            });
+        }
+
+        protected virtual void OnMouseRightButtonUp(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(() =>
+            {
+                var x = default(int);
+                var y = default(int);
+                MouseHelper.GetPosition(out x, out y);
+                DpiHelper.TransformPosition(ref x, ref y);
+
+                if (!object.ReferenceEquals(Menu.DataContext, this.Core))
+                {
+                    Menu.DataContext = this.Core;
+                }
+
+                Menu.HorizontalOffset = x;
+                Menu.VerticalOffset = y;
+                Menu.IsOpen = true;
+
+                var source = PresentationSource.FromVisual(Menu) as HwndSource;
+                if (source != null && source.Handle != IntPtr.Zero)
+                {
+                    SetForegroundWindow(source.Handle);
+                }
+            });
         }
 
         protected virtual void OnClose(object sender, EventArgs e)
@@ -200,5 +299,8 @@ namespace FoxTunes
                 //Nothing can be done, never throw on GC thread.
             }
         }
+
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
     }
 }
