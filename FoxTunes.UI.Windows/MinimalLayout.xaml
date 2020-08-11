@@ -9,7 +9,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <Windows:UIComponentBase.Resources>
-        <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
         <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
     </Windows:UIComponentBase.Resources>
     <DockPanel>

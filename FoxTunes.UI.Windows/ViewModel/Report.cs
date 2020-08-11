@@ -89,44 +89,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedRowChanged;
 
-        public IConfiguration Configuration { get; private set; }
-
-        private DoubleConfigurationElement _ScalingFactor { get; set; }
-
-        public DoubleConfigurationElement ScalingFactor
-        {
-            get
-            {
-                return this._ScalingFactor;
-            }
-            set
-            {
-                this._ScalingFactor = value;
-                this.OnScalingFactorChanged();
-            }
-        }
-
-        protected virtual void OnScalingFactorChanged()
-        {
-            if (this.ScalingFactorChanged != null)
-            {
-                this.ScalingFactorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ScalingFactor");
-        }
-
-        public event EventHandler ScalingFactorChanged;
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.Configuration = this.Core.Components.Configuration;
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
-            base.InitializeComponent(core);
-        }
-
         public ICommand ActionCommand
         {
             get

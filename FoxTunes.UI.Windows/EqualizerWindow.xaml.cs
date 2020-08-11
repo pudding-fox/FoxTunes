@@ -1,26 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 
-#if NET40
-using Microsoft.Windows.Shell;
-#else
-using System.Windows.Shell;
-#endif
-
 namespace FoxTunes
 {
     /// <summary>
     /// Interaction logic for EqualizerWindow.xaml
     /// </summary>
-    public partial class EqualizerWindow : Window
+    public partial class EqualizerWindow : WindowBase
     {
         public EqualizerWindow()
         {
-            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
-            {
-                CaptionHeight = 30,
-                ResizeBorderThickness = new Thickness(5)
-            });
             if (!global::FoxTunes.Properties.Settings.Default.EqualizerWindowBounds.IsEmpty())
             {
                 if (ScreenHelper.WindowBoundsVisible(global::FoxTunes.Properties.Settings.Default.EqualizerWindowBounds))

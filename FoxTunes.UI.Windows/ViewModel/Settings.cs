@@ -13,35 +13,7 @@ namespace FoxTunes.ViewModel
             Windows.SettingsWindowClosed += this.OnSettingsWindowClosed;
         }
 
-        public IConfiguration Configuration { get; private set; }
-
         public ISignalEmitter SignalEmitter { get; private set; }
-
-        private DoubleConfigurationElement _ScalingFactor { get; set; }
-
-        public DoubleConfigurationElement ScalingFactor
-        {
-            get
-            {
-                return this._ScalingFactor;
-            }
-            set
-            {
-                this._ScalingFactor = value;
-                this.OnScalingFactorChanged();
-            }
-        }
-
-        protected virtual void OnScalingFactorChanged()
-        {
-            if (this.ScalingFactorChanged != null)
-            {
-                this.ScalingFactorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ScalingFactor");
-        }
-
-        public event EventHandler ScalingFactorChanged;
 
         public bool SettingsVisible
         {
@@ -101,11 +73,6 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.Configuration = this.Core.Components.Configuration;
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }

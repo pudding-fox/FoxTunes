@@ -3,26 +3,15 @@ using System.Windows;
 using FoxTunes.Interfaces;
 using System.Linq;
 
-#if NET40
-using Microsoft.Windows.Shell;
-#else
-using System.Windows.Shell;
-#endif
-
 namespace FoxTunes
 {
     /// <summary>
     /// Interaction logic for ReportWindow.xaml
     /// </summary>
-    public partial class ReportWindow : Window
+    public partial class ReportWindow : WindowBase
     {
         public ReportWindow()
         {
-            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
-            {
-                CaptionHeight = 30,
-                ResizeBorderThickness = new Thickness(5)
-            });
             this.InitializeComponent();
         }
 

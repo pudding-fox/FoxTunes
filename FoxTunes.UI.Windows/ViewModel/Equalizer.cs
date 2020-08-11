@@ -135,35 +135,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedPresetChanged;
 
-        public IConfiguration Configuration { get; private set; }
-
         public IOutputEffects Effects { get; private set; }
-
-        private DoubleConfigurationElement _ScalingFactor { get; set; }
-
-        public DoubleConfigurationElement ScalingFactor
-        {
-            get
-            {
-                return this._ScalingFactor;
-            }
-            set
-            {
-                this._ScalingFactor = value;
-                this.OnScalingFactorChanged();
-            }
-        }
-
-        protected virtual void OnScalingFactorChanged()
-        {
-            if (this.ScalingFactorChanged != null)
-            {
-                this.ScalingFactorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ScalingFactor");
-        }
-
-        public event EventHandler ScalingFactorChanged;
 
         protected override void OnCoreChanged()
         {
@@ -178,11 +150,6 @@ namespace FoxTunes.ViewModel
                 this.Effects.Equalizer.EnabledChanged += this.OnEnabledChanged;
             }
             this.Bands = new List<EqualizerBand>(this.GetBands());
-            this.Configuration = this.Core.Components.Configuration;
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
             //TODO: Bad .Wait().
             this.Refresh().Wait();
             base.OnCoreChanged();
