@@ -181,9 +181,8 @@ namespace FoxTunes {
         ///    xmlns:Windows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows&quot;
         ///    xmlns:ViewModel=&quot;clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows&quot;
         ///    TargetType=&quot;{x:Type Window}&quot;&gt;
-        ///    &lt;Grid Background=&quot;{DynamicResource NormalBrush}&quot;&gt;
-        ///        &lt;Grid.LayoutTransform&gt;
-        ///            &lt;Scale [rest of string was truncated]&quot;;.
+        ///    &lt;ControlTemplate.Resources&gt;
+        ///        &lt;ViewModel:WindowBase x:Key=&quot;ViewModel&quot; Core=&quot;{Binding}&quot;&gt;&lt;/ViewM [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WindowBase {
             get {
