@@ -226,7 +226,12 @@ namespace FoxTunes.ViewModel
 
         protected virtual async Task RefreshItems()
         {
-            var items = this.LibraryHierarchyBrowser.GetNodes(this.LibraryManager.SelectedHierarchy);
+            var libraryHierarchy = this.LibraryManager.SelectedHierarchy;
+            if (libraryHierarchy == null || LibraryHierarchy.Empty.Equals(libraryHierarchy))
+            {
+                return;
+            }
+            var items = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
