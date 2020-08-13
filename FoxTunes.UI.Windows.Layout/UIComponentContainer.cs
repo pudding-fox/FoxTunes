@@ -57,7 +57,10 @@ namespace FoxTunes
             if (e.OldValue is UIComponentConfiguration oldComponent && e.NewValue is UIComponentConfiguration newComponent)
             {
                 //Preserve alignment and such.
-                newComponent.MetaData.AddRange(oldComponent.MetaData);
+                foreach (var pair in oldComponent.MetaData)
+                {
+                    newComponent.MetaData.TryAdd(pair.Key, pair.Value);
+                }
             }
             componentContainer.OnComponentChanged();
         }

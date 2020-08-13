@@ -468,18 +468,6 @@ namespace FoxTunes
 
     public class ToolWindowConfiguration
     {
-        public ToolWindowConfiguration()
-        {
-            this.Id = Guid.NewGuid().ToString("d");
-        }
-
-        public ToolWindowConfiguration(string id)
-        {
-            this.Id = id;
-        }
-
-        public string Id { get; private set; }
-
         private string _Title { get; set; }
 
         public string Title

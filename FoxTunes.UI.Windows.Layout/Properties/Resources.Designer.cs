@@ -63,10 +63,12 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;Windows-1252&quot;?&gt;
         ///&lt;FoxTunes&gt;
-        ///  &lt;UIComponentConfiguration Id=&quot;57ea7065-84f5-4b14-a331-adac016728d0&quot; Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
-        ///    &lt;UIComponentConfiguration Id=&quot;941e96b5-2119-4bb6-869e-930caa3a3772&quot; Component=&quot;3451DAA4-C643-4CB2-8105-B441F0277559&quot;&gt;
-        ///      &lt;UIComponentConfiguration Id=&quot;98fd0220-bbe8-4680-81c9-80a0e231103b&quot; Component=&quot;18E98420-F039-4504-A116-3D0F26BEAAD5&quot;&gt;
-        ///        &lt;UIComponentConfiguration Id=&quot;715ba44c-672b-4156-9c1b-b55c952ddf39&quot; Componen [rest of string was truncated]&quot;;.
+        ///	&lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
+        ///		&lt;UIComponentConfiguration Component=&quot;3451DAA4-C643-4CB2-8105-B441F0277559&quot;&gt;
+        ///			&lt;UIComponentConfiguration Component=&quot;18E98420-F039-4504-A116-3D0F26BEAAD5&quot;&gt;
+        ///				&lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
+        ///					&lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
+        ///						&lt;UIComponentConfiguration Component=&quot;3E899F79-3 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Main {
             get {

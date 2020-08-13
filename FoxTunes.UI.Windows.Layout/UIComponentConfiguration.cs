@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -9,19 +10,9 @@ namespace FoxTunes
     {
         public UIComponentConfiguration()
         {
-            this.Id = Guid.NewGuid().ToString("d");
             this.Children = new ObservableCollection<UIComponentConfiguration>();
-            this.MetaData = new ObservableCollection<MetaDataEntry>();
+            this.MetaData = new ConcurrentDictionary<string, string>();
         }
-
-        public UIComponentConfiguration(string id)
-        {
-            this.Id = id;
-            this.Children = new ObservableCollection<UIComponentConfiguration>();
-            this.MetaData = new ObservableCollection<MetaDataEntry>();
-        }
-
-        public string Id { get; private set; }
 
         private string _Component { get; set; }
 
@@ -75,9 +66,9 @@ namespace FoxTunes
 
         public event EventHandler ChildrenChanged;
 
-        private ObservableCollection<MetaDataEntry> _MetaData { get; set; }
+        private ConcurrentDictionary<string, string> _MetaData { get; set; }
 
-        public ObservableCollection<MetaDataEntry> MetaData
+        public ConcurrentDictionary<string, string> MetaData
         {
             get
             {
@@ -100,36 +91,6 @@ namespace FoxTunes
         }
 
         public event EventHandler MetaDataChanged;
-
-        public bool TryGet(string name, out string value)
-        {
-            var metaData = this.MetaData.FirstOrDefault(
-                _metaData => string.Equals(_metaData.Name, name, StringComparison.OrdinalIgnoreCase)
-            );
-            if (metaData == null)
-            {
-                value = default(string);
-                return false;
-            }
-            value = metaData.Value;
-            return true;
-        }
-
-        public void AddOrUpdate(string name, string value)
-        {
-            var metaData = this.MetaData.FirstOrDefault(
-                _metaData => string.Equals(_metaData.Name, name, StringComparison.OrdinalIgnoreCase)
-            );
-            if (metaData == null)
-            {
-                metaData = new MetaDataEntry()
-                {
-                    Name = name
-                };
-                this.MetaData.Add(metaData);
-            }
-            metaData.Value = value;
-        }
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -213,90 +174,6 @@ namespace FoxTunes
         public static bool operator !=(UIComponentConfiguration a, UIComponentConfiguration b)
         {
             return !(a == b);
-        }
-
-        public class MetaDataEntry : IEquatable<MetaDataEntry>
-        {
-            public MetaDataEntry()
-            {
-                this.Id = Guid.NewGuid().ToString("d");
-            }
-
-            public MetaDataEntry(string id)
-            {
-                this.Id = id;
-            }
-
-            public string Id { get; private set; }
-
-            public string Name { get; set; }
-
-            public string Value { get; set; }
-
-            public virtual bool Equals(MetaDataEntry other)
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-                if (object.ReferenceEquals(this, other))
-                {
-                    return true;
-                }
-                if (!string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-                if (!string.Equals(this.Value, other.Value, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-                return true;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return this.Equals(obj as MetaDataEntry);
-            }
-
-            public override int GetHashCode()
-            {
-                var hashCode = default(int);
-                unchecked
-                {
-                    if (!string.IsNullOrEmpty(this.Name))
-                    {
-                        hashCode += this.Name.ToLower().GetHashCode();
-                    }
-                    if (!string.IsNullOrEmpty(this.Value))
-                    {
-                        hashCode += this.Value.ToLower().GetHashCode();
-                    }
-                }
-                return hashCode;
-            }
-
-            public static bool operator ==(MetaDataEntry a, MetaDataEntry b)
-            {
-                if ((object)a == null && (object)b == null)
-                {
-                    return true;
-                }
-                if ((object)a == null || (object)b == null)
-                {
-                    return false;
-                }
-                if (object.ReferenceEquals((object)a, (object)b))
-                {
-                    return true;
-                }
-                return a.Equals(b);
-            }
-
-            public static bool operator !=(MetaDataEntry a, MetaDataEntry b)
-            {
-                return !(a == b);
-            }
         }
     }
 }

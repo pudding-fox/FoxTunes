@@ -70,11 +70,11 @@ namespace FoxTunes
                 {
                     var horizontalAlignment = default(string);
                     var verticalAlignment = default(string);
-                    if (component == null || !component.TryGet(HorizontalAlignment, out horizontalAlignment))
+                    if (component == null || !component.MetaData.TryGetValue(HorizontalAlignment, out horizontalAlignment))
                     {
                         horizontalAlignment = Fill;
                     }
-                    if (component == null || !component.TryGet(VerticalAlignment, out verticalAlignment))
+                    if (component == null || !component.MetaData.TryGetValue(VerticalAlignment, out verticalAlignment))
                     {
                         verticalAlignment = Fill;
                     }
@@ -143,11 +143,11 @@ namespace FoxTunes
 
                 if (container != null && container.Component != null)
                 {
-                    if (!container.Component.TryGet(HorizontalAlignment, out horizontalAlignment))
+                    if (!container.Component.MetaData.TryGetValue(HorizontalAlignment, out horizontalAlignment))
                     {
                         horizontalAlignment = Fill;
                     }
-                    if (!container.Component.TryGet(VerticalAlignment, out verticalAlignment))
+                    if (!container.Component.MetaData.TryGetValue(VerticalAlignment, out verticalAlignment))
                     {
                         verticalAlignment = Fill;
                     }
@@ -327,8 +327,8 @@ namespace FoxTunes
                 {
                     container.Component = new UIComponentConfiguration();
                 }
-                container.Component.AddOrUpdate(HorizontalAlignment, Fill);
-                container.Component.AddOrUpdate(VerticalAlignment, Fill);
+                container.Component.MetaData.AddOrUpdate(HorizontalAlignment, Fill);
+                container.Component.MetaData.AddOrUpdate(VerticalAlignment, Fill);
                 this.UpdateChildren();
             });
         }
@@ -341,7 +341,7 @@ namespace FoxTunes
                 {
                     container.Component = new UIComponentConfiguration();
                 }
-                container.Component.AddOrUpdate(HorizontalAlignment, alignment);
+                container.Component.MetaData.AddOrUpdate(HorizontalAlignment, alignment);
                 this.UpdateChildren();
             });
         }
@@ -354,7 +354,7 @@ namespace FoxTunes
                 {
                     container.Component = new UIComponentConfiguration();
                 }
-                container.Component.AddOrUpdate(VerticalAlignment, alignment);
+                container.Component.MetaData.AddOrUpdate(VerticalAlignment, alignment);
                 this.UpdateChildren();
             });
         }
