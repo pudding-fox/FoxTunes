@@ -21,6 +21,24 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="Properties\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<CustomToolNamespace>FoxTunes.Properties</CustomToolNamespace>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<Compile Update="Properties\Settings.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+		</Compile>
+	</ItemGroup>
+
   <ItemGroup>
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
@@ -52,8 +70,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="MetaDataEditor.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>FoxTunes.Properties</CustomToolNamespace>
     </None>
   </ItemGroup>
 

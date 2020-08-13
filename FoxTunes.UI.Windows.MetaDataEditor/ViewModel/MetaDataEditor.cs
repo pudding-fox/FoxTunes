@@ -122,105 +122,26 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler StatusMessageChanged;
 
-        public IPlaylistManager PlaylistManager { get; private set; }
-
         public ILibraryManager LibraryManager { get; private set; }
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
-        public IPlaylistCache PlaylistCache { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = core.Managers.Playlist;
             this.LibraryManager = core.Managers.Library;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
-            this.PlaylistCache = core.Components.PlaylistCache;
-            this.SignalEmitter = core.Components.SignalEmitter;
-            this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
         }
 
-        protected virtual Task OnSignal(object sender, ISignal signal)
+        public void Edit(IFileData[] fileDatas)
         {
-            switch (signal.Name)
-            {
-                case CommonSignals.PluginInvocation:
-                    var invocation = signal.State as IInvocationComponent;
-                    if (invocation != null)
-                    {
-                        switch (invocation.Id)
-                        {
-                            case MetaDataEditorBehaviour.EDIT_METADATA:
-                                switch (invocation.Category)
-                                {
-                                    case InvocationComponent.CATEGORY_LIBRARY:
-                                        return this.EditLibrary();
-                                    case InvocationComponent.CATEGORY_PLAYLIST:
-                                        return this.EditPlaylist();
-                                }
-                                break;
-                        }
-                    }
-                    break;
-            }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
-        }
-
-        public async Task EditLibrary()
-        {
-            if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
-            {
-                return;
-            }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryManager.SelectedItem,
-                true
-            ).ToArray();
-            if (!libraryItems.Any())
-            {
-                await this.Cancel().ConfigureAwait(false);
-                return;
-            }
-            await this.SetItems(
-                this.GetItems(libraryItems),
-                libraryItems.Length
-            ).ConfigureAwait(false);
-        }
-
-        public async Task EditPlaylist()
-        {
-            if (this.PlaylistManager == null || this.PlaylistManager.SelectedItems == null)
-            {
-                return;
-            }
-            //TODO: If the playlist contains duplicate tracks, will all be refreshed properly?
-            var playlistItems = this.PlaylistManager.SelectedItems
-                .GroupBy(playlistItem => playlistItem.FileName)
-                .Select(group => group.First())
-                .ToArray();
-            if (!playlistItems.Any())
-            {
-                await this.Cancel().ConfigureAwait(false);
-                return;
-            }
-            await this.SetItems(
-                this.GetItems(playlistItems),
-                playlistItems.Length
-            ).ConfigureAwait(false);
+            this.SetItems(
+                this.GetItems(fileDatas),
+                fileDatas.Length
+            );
         }
 
         protected IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> GetItems(IEnumerable<IFileData> sources)
@@ -246,16 +167,13 @@ namespace FoxTunes.ViewModel
             return result;
         }
 
-        protected virtual Task SetItems(IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> items, int count)
+        protected virtual void SetItems(IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> items, int count)
         {
-            return Windows.Invoke(() =>
-            {
-                this.Tags.Clear();
-                this.Tags.AddRange(items[MetaDataItemType.Tag]);
-                this.Images.Clear();
-                this.Images.AddRange(items[MetaDataItemType.Image]);
-                this.Count = count;
-            });
+            this.Tags.Clear();
+            this.Tags.AddRange(items[MetaDataItemType.Tag]);
+            this.Images.Clear();
+            this.Images.AddRange(items[MetaDataItemType.Image]);
+            this.Count = count;
         }
 
         public ICommand SaveCommand
@@ -310,7 +228,6 @@ namespace FoxTunes.ViewModel
             {
                 await Windows.Invoke(() => this.IsSaving = false).ConfigureAwait(false);
             }
-            await this.Cancel().ConfigureAwait(false);
         }
 
         protected virtual async Task SaveLibrary(IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names)
@@ -330,24 +247,6 @@ namespace FoxTunes.ViewModel
                 await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
                 await this.LibraryManager.SetStatus(LibraryItemStatus.None).ConfigureAwait(false);
             }
-        }
-
-        public ICommand CancelCommand
-        {
-            get
-            {
-                return CommandFactory.Instance.CreateCommand(this.Cancel, () => !this.IsSaving);
-            }
-        }
-
-        public Task Cancel()
-        {
-            return Windows.Invoke(() =>
-            {
-                this.Tags.Clear();
-                this.Images.Clear();
-                this.Count = 0;
-            });
         }
 
         protected override Freezable CreateInstanceCore()

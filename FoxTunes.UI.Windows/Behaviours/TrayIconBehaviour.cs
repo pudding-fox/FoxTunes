@@ -149,11 +149,14 @@ namespace FoxTunes
 
         protected virtual void Disable()
         {
-            this.NotifyIcon.Hide();
-            if (this.NotifyIcon.MessageSink != null)
+            if (this.NotifyIcon != null)
             {
-                this.NotifyIcon.MessageSink.MouseLeftButtonUp -= this.OnMouseLeftButtonUp;
-                this.NotifyIcon.MessageSink.MouseRightButtonUp -= this.OnMouseRightButtonUp;
+                this.NotifyIcon.Hide();
+                if (this.NotifyIcon.MessageSink != null)
+                {
+                    this.NotifyIcon.MessageSink.MouseLeftButtonUp -= this.OnMouseLeftButtonUp;
+                    this.NotifyIcon.MessageSink.MouseRightButtonUp -= this.OnMouseRightButtonUp;
+                }
             }
             if (Windows.ActiveWindow != null)
             {

@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using FoxTunes.Interfaces;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FoxTunes
@@ -6,14 +8,20 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for MetaDataEditor.xaml
     /// </summary>
-    [UIComponent(ID, "Meta Data Editor")]
-    public partial class MetaDataEditor : UIComponentBase
+    public partial class MetaDataEditor : UserControl
     {
-        public const string ID = "3D1B2C8E-DEAF-4689-B0C2-33AB3FD8F061";
-
         public MetaDataEditor()
         {
             this.InitializeComponent();
+        }
+
+        public void Edit(IFileData[] fileDatas)
+        {
+            var viewModel = this.FindResource<global::FoxTunes.ViewModel.MetaDataEditor>("ViewModel");
+            if (viewModel != null)
+            {
+                viewModel.Edit(fileDatas);
+            }
         }
 
         protected virtual void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)

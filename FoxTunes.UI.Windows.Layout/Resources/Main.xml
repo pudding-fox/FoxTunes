@@ -25,14 +25,7 @@
 						<MetaDataEntry Name="SplitterDistance" Value="1*" />
 						<MetaDataEntry Name="SplitterDirection" Value="Bottom" />
 					</UIComponentConfiguration>
-					<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
-						<UIComponentConfiguration Component="F7774E81-26FC-4F0C-8E0A-67214D155547" />
-						<UIComponentConfiguration Component="3D1B2C8E-DEAF-4689-B0C2-33AB3FD8F061" />
-						<MetaDataEntry Name="SplitterDistance" Value="1*" />
-						<MetaDataEntry Name="CollapseBottom" Value="True" />
-						<MetaDataEntry Name="CollapseTop" Value="True" />
-						<MetaDataEntry Name="SplitterDirection" Value="Top" />
-					</UIComponentConfiguration>
+					<UIComponentConfiguration Component="F7774E81-26FC-4F0C-8E0A-67214D155547" />
 					<MetaDataEntry Name="SplitterDistance" Value="0.35*" />
 					<MetaDataEntry Name="CollapseRight" Value="True" />
 					<MetaDataEntry Name="SplitterDirection" Value="Right" />

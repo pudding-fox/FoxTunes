@@ -7,7 +7,6 @@
         xmlns:Windows="clr-namespace:FoxTunes" 
         x:Class="FoxTunes.EqualizerWindow"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        WindowStartupLocation="CenterOwner"
         Title="Equalizer" 
         Topmost="True"
         ResizeMode="NoResize" 
