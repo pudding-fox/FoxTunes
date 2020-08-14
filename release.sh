@@ -252,7 +252,7 @@ logger
 metadataeditor
 replaygain
 sox
-spectrum,
+spectrum
 tools
 wasapi
 wavebar
