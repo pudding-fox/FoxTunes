@@ -33,13 +33,8 @@
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <Windows:Artwork Grid.Column="0" Grid.Row="0"></Windows:Artwork>
-            <Windows:Rating Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" Height="20" FileData="{Binding FileData, Source={StaticResource ViewModel}}" Visibility="{Binding ShowRating, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}" Margin="0,4,0,0">
-                <Interactivity:Interaction.Triggers>
-                    <Interactivity:EventTrigger EventName="ValueChanged">
-                        <ViewModel:InvokeParameterizedCommandAction Command="{Binding UpdateRatingCommand, Source={StaticResource ViewModel}}" />
-                    </Interactivity:EventTrigger>
-                </Interactivity:Interaction.Triggers>
-            </Windows:Rating>
+            <!-- Use the rating plugin if it's available. -->
+            <Windows:UIComponentShim Grid.Column="0" Grid.Row="1" Component="CAF4D8AD-80C3-4421-90C1-3E063FA9D5CB" HorizontalAlignment="Center" Height="20" Margin="0,4,0,0"></Windows:UIComponentShim>
             <Grid Grid.Column="1" Grid.RowSpan="2" Margin="4,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition></ColumnDefinition>

@@ -1,35 +1,34 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace FoxTunes
 {
     /// <summary>
-    /// Interaction logic for Rating.xaml
+    /// Interaction logic for RatingBase.xaml
     /// </summary>
-    public partial class Rating : UserControl
+    public partial class RatingBase : UIComponentBase
     {
         public static readonly DependencyProperty FileDataProperty = DependencyProperty.Register(
             "FileData",
             typeof(IFileData),
-            typeof(Rating),
+            typeof(RatingBase),
             new PropertyMetadata(new PropertyChangedCallback(OnFileDataChanged))
         );
 
-        public static IFileData GetFileData(Rating source)
+        public static IFileData GetFileData(RatingBase source)
         {
             return (IFileData)source.GetValue(FileDataProperty);
         }
 
-        public static void SetFileData(Rating source, IFileData value)
+        public static void SetFileData(RatingBase source, IFileData value)
         {
             source.SetValue(FileDataProperty, value);
         }
 
         public static void OnFileDataChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var rating = sender as Rating;
+            var rating = sender as RatingBase;
             if (rating == null)
             {
                 return;
@@ -41,12 +40,12 @@ namespace FoxTunes
             "ValueChanged",
             RoutingStrategy.Bubble,
             typeof(RatingEventHandler),
-            typeof(Rating)
+            typeof(RatingBase)
         );
 
         public static void AddValueChangedHandler(DependencyObject source, RatingEventHandler handler)
         {
-            var rating = source as Rating;
+            var rating = source as RatingBase;
             if (rating != null)
             {
                 rating.AddHandler(ValueChangedEvent, handler);
@@ -55,14 +54,14 @@ namespace FoxTunes
 
         public static void RemoveValueChangedHandler(DependencyObject source, RatingEventHandler handler)
         {
-            var rating = source as Rating;
+            var rating = source as RatingBase;
             if (rating != null)
             {
                 rating.RemoveHandler(ValueChangedEvent, handler);
             }
         }
 
-        public Rating()
+        public RatingBase()
         {
             this.InitializeComponent();
         }
@@ -111,7 +110,7 @@ namespace FoxTunes
 
     public class RatingEventArgs : RoutedEventArgs
     {
-        public RatingEventArgs(IFileData fileData, byte value) : base(Rating.ValueChangedEvent)
+        public RatingEventArgs(IFileData fileData, byte value) : base(RatingBase.ValueChangedEvent)
         {
             this.FileData = fileData;
             this.Value = value;

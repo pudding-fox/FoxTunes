@@ -62,8 +62,6 @@ namespace FoxTunes.Interfaces
 
         event EventHandler SelectedItemsChanged;
 
-        Task SetRating(IEnumerable<PlaylistItem> playlistItems, byte rating);
-
         Task IncrementPlayCount(PlaylistItem playlistItem);
     }
 }

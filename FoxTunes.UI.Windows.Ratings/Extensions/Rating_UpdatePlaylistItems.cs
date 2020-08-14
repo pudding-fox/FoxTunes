@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes
@@ -11,7 +10,9 @@ namespace FoxTunes
     {
         public static readonly IPlaylistManager PlaylistManager = ComponentRegistry.Instance.GetComponent<IPlaylistManager>();
 
-        private static readonly ConditionalWeakTable<Rating, UpdatePlaylistItemsBehaviour> UpdatePlaylistItemsBehaviours = new ConditionalWeakTable<Rating, UpdatePlaylistItemsBehaviour>();
+        public static readonly RatingManager RatingManager = ComponentRegistry.Instance.GetComponent<RatingManager>();
+
+        private static readonly ConditionalWeakTable<RatingBase, UpdatePlaylistItemsBehaviour> UpdatePlaylistItemsBehaviours = new ConditionalWeakTable<RatingBase, UpdatePlaylistItemsBehaviour>();
 
         public static readonly DependencyProperty UpdatePlaylistItemsProperty = DependencyProperty.RegisterAttached(
             "UpdatePlaylistItems",
@@ -20,19 +21,19 @@ namespace FoxTunes
             new FrameworkPropertyMetadata(false, new PropertyChangedCallback(OnUpdatePlaylistItemsPropertyChanged))
         );
 
-        public static bool GetUpdatePlaylistItems(Rating source)
+        public static bool GetUpdatePlaylistItems(RatingBase source)
         {
             return (bool)source.GetValue(UpdatePlaylistItemsProperty);
         }
 
-        public static void SetUpdatePlaylistItems(Rating source, bool value)
+        public static void SetUpdatePlaylistItems(RatingBase source, bool value)
         {
             source.SetValue(UpdatePlaylistItemsProperty, value);
         }
 
         private static void OnUpdatePlaylistItemsPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var rating = sender as Rating;
+            var rating = sender as RatingBase;
             if (rating == null)
             {
                 return;
@@ -58,13 +59,13 @@ namespace FoxTunes
 
         private class UpdatePlaylistItemsBehaviour : UIBehaviour
         {
-            public UpdatePlaylistItemsBehaviour(Rating rating)
+            public UpdatePlaylistItemsBehaviour(RatingBase rating)
             {
                 this.Rating = rating;
                 this.Rating.ValueChanged += this.OnValueChanged;
             }
 
-            public Rating Rating { get; private set; }
+            public RatingBase Rating { get; private set; }
 
             protected virtual void OnValueChanged(object sender, RatingEventArgs e)
             {
@@ -86,7 +87,7 @@ namespace FoxTunes
 
             protected virtual void SetRating(IEnumerable<PlaylistItem> playlistItems, byte rating)
             {
-                this.Dispatch(() => PlaylistManager.SetRating(playlistItems, rating));
+                this.Dispatch(() => RatingManager.SetRating(playlistItems, rating));
             }
         }
     }
