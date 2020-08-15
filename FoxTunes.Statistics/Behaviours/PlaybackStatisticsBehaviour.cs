@@ -9,7 +9,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class PlaybackStatisticsBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public StatisticsManager StatisticsManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -27,7 +27,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = core.Managers.Playlist;
+            this.StatisticsManager = ComponentRegistry.Instance.GetComponent<StatisticsManager>();
             this.PlaybackManager = core.Managers.Playback;
             this.Configuration = core.Components.Configuration;
             this.MetaDataEnabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -104,7 +104,7 @@ namespace FoxTunes
         {
             try
             {
-                await this.PlaylistManager.IncrementPlayCount(playlistItem).ConfigureAwait(false);
+                await this.StatisticsManager.IncrementPlayCount(playlistItem).ConfigureAwait(false);
             }
             catch (Exception e)
             {
