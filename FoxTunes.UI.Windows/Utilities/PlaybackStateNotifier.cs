@@ -46,10 +46,11 @@ namespace FoxTunes
         static PlaybackStateNotifier()
         {
             PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
-            if (PlaybackManager != null)
+            if (PlaybackManager == null)
             {
-                PlaybackManager.CurrentStreamChanged += OnCurrentStreamChanged;
+                return;
             }
+            PlaybackManager.CurrentStreamChanged += OnCurrentStreamChanged;
             Timer = new DispatcherTimer(DispatcherPriority.Background);
             Timer.Interval = UPDATE_INTERVAL;
             Timer.Start();
