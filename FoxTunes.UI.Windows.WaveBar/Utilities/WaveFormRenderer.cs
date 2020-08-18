@@ -163,8 +163,6 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Resolution { get; private set; }
 
-        public IntegerConfigurationElement Amplitude { get; private set; }
-
         public BooleanConfigurationElement Rms { get; private set; }
 
         public WriteableBitmap Bitmap
@@ -312,10 +310,6 @@ namespace FoxTunes
                 WaveBarBehaviourConfiguration.SECTION,
                 WaveBarBehaviourConfiguration.RESOLUTION_ELEMENT
             );
-            this.Amplitude = this.Configuration.GetElement<IntegerConfigurationElement>(
-                WaveBarBehaviourConfiguration.SECTION,
-                WaveBarBehaviourConfiguration.AMPLITUDE_ELEMENT
-            );
             this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
                 WaveBarBehaviourConfiguration.SECTION,
                 WaveBarBehaviourConfiguration.RMS_ELEMENT
@@ -323,7 +317,6 @@ namespace FoxTunes
             this.ScalingFactor.ValueChanged += this.OnValueChanged;
             this.Mode.ValueChanged += this.OnValueChanged;
             this.Resolution.ValueChanged += this.OnValueChanged;
-            this.Amplitude.ValueChanged += this.OnValueChanged;
             this.Rms.ValueChanged += this.OnValueChanged;
 #if NET40
             var task = TaskEx.Run(async () =>
@@ -529,7 +522,6 @@ namespace FoxTunes
                 Update(
                     this.GeneratorData,
                     this.RendererData,
-                    this.Amplitude.Value,
                     this.Rms.Value,
                     WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
                 );
@@ -582,13 +574,9 @@ namespace FoxTunes
             {
                 this.Resolution.ValueChanged += this.OnValueChanged;
             }
-            if (this.Amplitude != null)
-            {
-                this.Amplitude.ValueChanged -= this.OnValueChanged;
-            }
         }
 
-        private static void Update(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, int amplitude, bool rms, WaveFormRendererMode mode)
+        private static void Update(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, bool rms, WaveFormRendererMode mode)
         {
             if (generatorData.Peak == 0)
             {
@@ -598,25 +586,26 @@ namespace FoxTunes
             {
                 rendererData.Position = 0;
                 rendererData.Peak = generatorData.Peak;
+                rendererData.NormalizedPeak = GetPeak(generatorData, rendererData);
             }
 
             switch (mode)
             {
                 case WaveFormRendererMode.Mono:
-                    UpdateMono(generatorData, rendererData, amplitude, rms);
+                    UpdateMono(generatorData, rendererData, rms);
                     break;
                 case WaveFormRendererMode.Seperate:
-                    UpdateSeperate(generatorData, rendererData, amplitude, rms);
+                    UpdateSeperate(generatorData, rendererData, rms);
                     break;
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        private static void UpdateMono(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, int amplitude, bool rms)
+        private static void UpdateMono(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, bool rms)
         {
             var center = rendererData.Height / 2.0f;
-            var factor = (rendererData.Peak / 2.0f) * (10.0f - amplitude);
+            var factor = rendererData.NormalizedPeak;
 
             var data = generatorData.Data;
             var waveElements = rendererData.WaveElements;
@@ -708,9 +697,9 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateSeperate(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, int amplitude, bool rms)
+        private static void UpdateSeperate(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, bool rms)
         {
-            var factor = rendererData.Peak / (generatorData.Channels * 2) * (10.0f - amplitude);
+            var factor = rendererData.NormalizedPeak / generatorData.Channels;
 
             var data = generatorData.Data;
             var waveElements = rendererData.WaveElements;
@@ -800,6 +789,54 @@ namespace FoxTunes
 
                 rendererData.Position++;
             }
+        }
+
+        public static float GetPeak(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
+        {
+            var data = generatorData.Data;
+            var valuesPerElement = rendererData.ValuesPerElement;
+            var peak = rendererData.NormalizedPeak;
+
+            var position = rendererData.Position;
+            while (position < rendererData.Capacity)
+            {
+                var valuePosition = position * rendererData.ValuesPerElement;
+                if ((valuePosition + rendererData.ValuesPerElement) > generatorData.Position)
+                {
+                    if (generatorData.Position <= generatorData.Capacity)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        valuesPerElement = generatorData.Capacity - valuePosition;
+                    }
+                }
+
+                var value = default(float);
+                for (var a = 0; a < valuesPerElement; a++)
+                {
+                    for (var b = 0; b < generatorData.Channels; b++)
+                    {
+                        value += Math.Max(
+                            Math.Abs(data[valuePosition + a, b].Min),
+                            Math.Abs(data[valuePosition + a, b].Max)
+                        );
+                    }
+                }
+                value /= (valuesPerElement * generatorData.Channels);
+
+                peak = Math.Max(peak, value);
+
+                if (peak >= 1)
+                {
+                    return 1;
+                }
+
+                position++;
+            }
+
+            return peak;
         }
 
         public static void Render(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo, bool rms, WaveFormRendererMode mode)
@@ -953,6 +990,8 @@ namespace FoxTunes
             public int Capacity;
 
             public float Peak;
+
+            public float NormalizedPeak;
         }
     }
 
