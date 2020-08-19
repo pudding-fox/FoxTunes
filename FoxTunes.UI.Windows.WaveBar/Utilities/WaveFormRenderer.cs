@@ -432,7 +432,6 @@ namespace FoxTunes
                     {
 
                         var y = default(int);
-                        var width = 1;
                         var height = default(int);
 
                         var topValue = default(float);
