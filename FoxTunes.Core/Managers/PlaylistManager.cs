@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -680,8 +681,17 @@ namespace FoxTunes
             return this.Add(this.SelectedPlaylist, paths, false);
         }
 
+        public string Checksum
+        {
+            get
+            {
+                return "BB66B4BA-7236-4A48-8D95-191134DA5F05";
+            }
+        }
+
         public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
         {
+            //IMPORTANT: When editing this function remember to change the checksum.
             if (!type.HasFlag(DatabaseInitializeType.Playlist))
             {
                 return;
