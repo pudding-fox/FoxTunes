@@ -3,6 +3,7 @@ using System.Windows;
 using FoxTunes.Interfaces;
 using System.Linq;
 using System;
+using System.ComponentModel;
 
 namespace FoxTunes
 {
@@ -122,6 +123,13 @@ namespace FoxTunes
         protected virtual void OnClose(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            global::FoxTunes.Properties.Settings.Default.ReportWindowBounds = this.RestoreBounds;
+            global::FoxTunes.Properties.Settings.Default.Save();
+            base.OnClosing(e);
         }
     }
 }
