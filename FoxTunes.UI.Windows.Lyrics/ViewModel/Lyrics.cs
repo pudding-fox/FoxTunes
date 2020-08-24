@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,6 +12,8 @@ namespace FoxTunes.ViewModel
         public static readonly string PADDING = string.Join(string.Empty, Enumerable.Repeat(Environment.NewLine, 10));
 
         public IPlaybackManager PlaybackManager { get; private set; }
+
+        public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -168,6 +171,8 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = this.Core.Managers.Playback;
+            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -199,6 +204,21 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
         }
 
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
+                    return this.Refresh(names);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
@@ -212,6 +232,22 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.OnPositionChanged();
+        }
+
+        protected virtual Task Refresh(IEnumerable<string> names)
+        {
+            if (names != null && names.Any())
+            {
+                if (!names.Contains(CommonMetaData.Lyrics, true))
+                {
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }
+            }
+            return this.Refresh();
         }
 
         protected virtual Task Refresh()
