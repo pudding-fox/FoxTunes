@@ -19,18 +19,29 @@ namespace FoxTunes.Interfaces
 
         void Restart();
 
-        event UserInterfaceWindowCreatedEventHandler WindowCreated;
+        event UserInterfaceWindowEventHandler WindowCreated;
+
+        event UserInterfaceWindowEventHandler WindowDestroyed;
     }
 
-    public delegate void UserInterfaceWindowCreatedEventHandler(object sender, UserInterfaceWindowCreatedEvent e);
+    public delegate void UserInterfaceWindowEventHandler(object sender, UserInterfaceWindowEventArgs e);
 
-    public class UserInterfaceWindowCreatedEvent : EventArgs
+    public class UserInterfaceWindowEventArgs : EventArgs
     {
-        public UserInterfaceWindowCreatedEvent(IntPtr handle)
+        public UserInterfaceWindowEventArgs(IntPtr handle, UserInterfaceWindowRole role)
         {
             this.Handle = handle;
+            this.Role = role;
         }
 
         public IntPtr Handle { get; private set; }
+
+        public UserInterfaceWindowRole Role { get; private set; }
+    }
+
+    public enum UserInterfaceWindowRole : byte
+    {
+        None,
+        Main
     }
 }
