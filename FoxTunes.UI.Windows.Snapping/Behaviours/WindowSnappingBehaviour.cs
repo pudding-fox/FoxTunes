@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -17,12 +18,15 @@ namespace FoxTunes
 
         public IList<SnappingWindow> Windows { get; private set; }
 
+        public ICore Core { get; private set; }
+
         public IUserInterface UserInterface { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.UserInterface = core.Components.UserInterface;
             this.UserInterface.WindowCreated += this.OnWindowCreated;
             this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
@@ -67,7 +71,9 @@ namespace FoxTunes
         {
             foreach (var handle in this.Handles)
             {
-                this.Windows.Add(new SnappingWindow(handle));
+                var window = new SnappingWindow(handle);
+                window.InitializeComponent(this.Core);
+                this.Windows.Add(window);
             }
         }
 

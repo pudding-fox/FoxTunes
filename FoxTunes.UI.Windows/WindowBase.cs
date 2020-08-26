@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
 
@@ -21,6 +20,18 @@ namespace FoxTunes
         public WindowBase()
         {
             this.InitializeComponent();
+            if (Created != null)
+            {
+                Created(this, EventArgs.Empty);
+            }
+        }
+
+        protected virtual bool ApplyTemplate
+        {
+            get
+            {
+                return true;
+            }
         }
 
         private void InitializeComponent()
@@ -28,13 +39,29 @@ namespace FoxTunes
             this.WindowStyle = WindowStyle.None;
             this.AllowsTransparency = true;
             this.Background = Brushes.Transparent;
-            this.Template = TemplateFactory.Template;
-            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
+            if (this.ApplyTemplate)
             {
-                CaptionHeight = 30,
-                ResizeBorderThickness = new Thickness(5)
-            });
+                this.Template = TemplateFactory.Template;
+                this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
+                {
+                    CaptionHeight = 30,
+                    ResizeBorderThickness = new Thickness(5)
+                });
+            }
         }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if (Destroyed != null)
+            {
+                Destroyed(this, EventArgs.Empty);
+            }
+            base.OnClosed(e);
+        }
+
+        public static event EventHandler Created;
+
+        public static event EventHandler Destroyed;
 
         private static class TemplateFactory
         {
