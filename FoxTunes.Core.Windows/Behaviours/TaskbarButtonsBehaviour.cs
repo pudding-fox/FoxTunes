@@ -101,19 +101,19 @@ namespace FoxTunes
 
         protected virtual void OnWindowCreated(object sender, UserInterfaceWindowEventArgs e)
         {
-            if (e.Role != UserInterfaceWindowRole.Main)
+            if (e.Window.Role != UserInterfaceWindowRole.Main)
             {
                 //Only create taskbar buttons for main windows.
                 return;
             }
             lock (SyncRoot)
             {
-                if (this.Windows.ContainsKey(e.Handle))
+                if (this.Windows.ContainsKey(e.Window.Handle))
                 {
                     //Uh.. Why was a window with the same handle "created" twice?
                     return;
                 }
-                this.Windows.Add(e.Handle, TaskbarButtonsWindowFlags.None);
+                this.Windows.Add(e.Window.Handle, TaskbarButtonsWindowFlags.None);
                 this.Update();
             }
         }

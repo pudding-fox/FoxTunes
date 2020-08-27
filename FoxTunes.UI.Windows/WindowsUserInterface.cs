@@ -75,32 +75,40 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public override IEnumerable<IUserInterfaceWindow> Windows
+        {
+            get
+            {
+                return WindowBase.Active;
+            }
+        }
+
         public override Task Show()
         {
-            if (Windows.IsMiniWindowCreated)
+            if (global::FoxTunes.Windows.IsMiniWindowCreated)
             {
-                Windows.MiniWindow.DataContext = this.Core;
-                this.Application.Run(Windows.MiniWindow);
+                global::FoxTunes.Windows.MiniWindow.DataContext = this.Core;
+                this.Application.Run(global::FoxTunes.Windows.MiniWindow);
             }
             else
             {
-                Windows.MainWindow.DataContext = this.Core;
-                this.Application.Run(Windows.MainWindow);
+                global::FoxTunes.Windows.MainWindow.DataContext = this.Core;
+                this.Application.Run(global::FoxTunes.Windows.MainWindow);
             }
-            return Windows.Shutdown();
+            return global::FoxTunes.Windows.Shutdown();
         }
 
         public override void Activate()
         {
-            Windows.Invoke(() =>
+            global::FoxTunes.Windows.Invoke(() =>
             {
-                if (Windows.ActiveWindow != null)
+                if (global::FoxTunes.Windows.ActiveWindow != null)
                 {
-                    if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
+                    if (global::FoxTunes.Windows.ActiveWindow.WindowState == WindowState.Minimized)
                     {
-                        Windows.ActiveWindow.WindowState = WindowState.Normal;
+                        global::FoxTunes.Windows.ActiveWindow.WindowState = WindowState.Normal;
                     }
-                    Windows.ActiveWindow.Activate();
+                    global::FoxTunes.Windows.ActiveWindow.Activate();
                 }
             });
         }
@@ -187,32 +195,22 @@ namespace FoxTunes
 
         protected virtual void OnWindowCreated(object sender, EventArgs e)
         {
-            var window = sender as Window;
+            var window = sender as WindowBase;
             if (window == null)
             {
                 return;
             }
-            var role = UserInterfaceWindowRole.None;
-            if (window is MainWindow || window is MiniWindow)
-            {
-                role = UserInterfaceWindowRole.Main;
-            }
-            this.OnWindowCreated(window.GetHandle(), role);
+            this.OnWindowCreated(window);
         }
 
         protected virtual void OnWindowDestroyed(object sender, EventArgs e)
         {
-            var window = sender as Window;
+            var window = sender as WindowBase;
             if (window == null)
             {
                 return;
             }
-            var role = UserInterfaceWindowRole.None;
-            if (window is MainWindow || window is MiniWindow)
-            {
-                role = UserInterfaceWindowRole.Main;
-            }
-            this.OnWindowDestroyed(window.GetHandle(), role);
+            this.OnWindowDestroyed(window);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
