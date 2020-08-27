@@ -134,6 +134,18 @@ namespace FoxTunes
             source.AddHook(this.Callback);
         }
 
+        protected virtual void RemoveHook()
+        {
+            Logger.Write(this, LogLevel.Debug, "Removing Windows event handler.");
+            var source = HwndSource.FromHwnd(this.Handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", this.Handle);
+                return;
+            }
+            source.RemoveHook(this.Callback);
+        }
+
         protected virtual IntPtr OnCallback(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == WM_NCLBUTTONDOWN)
@@ -238,6 +250,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            this.RemoveHook();
             lock (Instances)
             {
                 for (var a = Instances.Count - 1; a >= 0; a--)
