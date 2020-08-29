@@ -244,10 +244,7 @@ namespace FoxTunes
         {
             var point = GetMousePosition();
             var bounds = this.Adapter.Bounds;
-            var offset = new Point(
-                SnappingHelper.PROXIMITY + 1,
-                SnappingHelper.PROXIMITY + 1
-            );
+            var offset = Point.Empty;
 
             point.Offset(-this.MouseOrigin.X, -this.MouseOrigin.Y);
             point.Offset(this.PreviousBounds.X, this.PreviousBounds.Y);
@@ -256,7 +253,7 @@ namespace FoxTunes
 
             //TODO: Use only WPF frameworks.
             var screen = global::System.Windows.Forms.Screen.FromHandle(this.Handle);
-            var direction = SnappingHelper.SnapMove(bounds, screen.WorkingArea, ref offset, false);
+            var direction = SnappingHelper.SnapMove(bounds, screen.WorkingArea, ref offset, true);
 
             foreach (var snappingWindow in Active)
             {
@@ -264,7 +261,7 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                direction |= SnappingHelper.SnapMove(bounds, snappingWindow.Adapter.Bounds, ref offset, true);
+                direction |= SnappingHelper.SnapMove(bounds, snappingWindow.Adapter.Bounds, ref offset, false);
             }
 
             if (direction.HasFlag(SnapDirection.Left) || direction.HasFlag(SnapDirection.Right))
@@ -304,12 +301,7 @@ namespace FoxTunes
         {
             var point = GetMousePosition();
             var bounds = this.Adapter.Bounds;
-            var offset = new Rectangle(
-                SnappingHelper.PROXIMITY + 1,
-                SnappingHelper.PROXIMITY + 1,
-                0,
-                0
-            );
+            var offset = Rectangle.Empty;
 
             point.Offset(-this.MouseOrigin.X, -this.MouseOrigin.Y);
 
