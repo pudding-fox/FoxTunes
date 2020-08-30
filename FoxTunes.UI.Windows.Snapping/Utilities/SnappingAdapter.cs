@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Interop;
 
 namespace FoxTunes
@@ -20,37 +21,16 @@ namespace FoxTunes
         {
             get
             {
-                var position = PointConverter.TransformToDevice(
-                    this.Window,
-                    this.Window.Left,
-                    this.Window.Top
-                );
-                var size = PointConverter.TransformToDevice(
-                    this.Window,
-                    this.Window.ActualWidth,
-                    this.Window.ActualHeight
-                );
-                return new Rectangle(
-                    PointConverter.ToDrawingPoint(position),
-                    PointConverter.ToDrawingSize(size)
-                );
+                var rect = default(RECT);
+                if (!GetWindowRect(this.Handle, out rect))
+                {
+                    return Rectangle.Empty;
+                }
+                return new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
             }
             set
             {
-                var position = PointConverter.TransformFromDevice(
-                    this.Window,
-                    value.X,
-                    value.Y
-                );
-                var size = PointConverter.TransformFromDevice(
-                    this.Window,
-                    value.Width,
-                    value.Height
-                );
-                this.Window.Left = position.X;
-                this.Window.Top = position.Y;
-                this.Window.Width = size.X;
-                this.Window.Height = size.Y;
+                SetWindowPos(this.Handle, IntPtr.Zero, value.X, value.Y, value.Width, value.Height, SWP_SHOWWINDOW);
             }
         }
 
@@ -123,5 +103,23 @@ namespace FoxTunes
             }
             return null;
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        const uint SWP_SHOWWINDOW = 0x0040;
     }
 }
