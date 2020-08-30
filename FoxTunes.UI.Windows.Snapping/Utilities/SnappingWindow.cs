@@ -253,7 +253,7 @@ namespace FoxTunes
 
             //TODO: Use only WPF frameworks.
             var screen = global::System.Windows.Forms.Screen.FromHandle(this.Handle);
-            var direction = SnappingHelper.SnapMove(bounds, screen.WorkingArea, ref offset, true);
+            var direction = SnappingHelper.Snap(bounds, screen.WorkingArea, ref offset, true);
 
             foreach (var snappingWindow in Active)
             {
@@ -261,7 +261,7 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                direction |= SnappingHelper.SnapMove(bounds, snappingWindow.Adapter.Bounds, ref offset, false);
+                direction |= SnappingHelper.Snap(bounds, snappingWindow.Adapter.Bounds, ref offset, false);
             }
 
             if (direction.HasFlag(SnapDirection.Left) || direction.HasFlag(SnapDirection.Right))
@@ -301,7 +301,7 @@ namespace FoxTunes
         {
             var point = GetMousePosition();
             var bounds = this.Adapter.Bounds;
-            var offset = Rectangle.Empty;
+            var offset = Point.Empty;
 
             point.Offset(-this.MouseOrigin.X, -this.MouseOrigin.Y);
 
@@ -326,7 +326,7 @@ namespace FoxTunes
 
             //TODO: Use only WPF frameworks.
             var screen = global::System.Windows.Forms.Screen.FromHandle(this.Handle);
-            var direction = SnappingHelper.SnapResize(bounds, screen.WorkingArea, ref offset, ResizeDirection, false);
+            var direction = SnappingHelper.Snap(bounds, screen.WorkingArea, ref offset, true);
 
             foreach (var snappingWindow in Active)
             {
@@ -334,26 +334,26 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                direction |= SnappingHelper.SnapResize(bounds, snappingWindow.Adapter.Bounds, ref offset, ResizeDirection, true);
+                direction |= SnappingHelper.Snap(bounds, snappingWindow.Adapter.Bounds, ref offset, false);
             }
 
             if (direction.HasFlag(SnapDirection.Left))
             {
-                bounds.X -= offset.X;
-                bounds.Width += offset.X;
+                bounds.X += offset.X;
+                bounds.Width += -offset.X;
             }
             if (direction.HasFlag(SnapDirection.Right))
             {
-                bounds.Width += offset.Width;
+                bounds.Width += offset.X;
             }
             if (direction.HasFlag(SnapDirection.Top))
             {
-                bounds.Y -= offset.Y;
-                bounds.Height += offset.Y;
+                bounds.Y += offset.Y;
+                bounds.Height += -offset.Y;
             }
             if (direction.HasFlag(SnapDirection.Bottom))
             {
-                bounds.Height += offset.Height;
+                bounds.Height += offset.Y;
             }
 
             if (this.Adapter.Bounds != bounds)
