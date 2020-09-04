@@ -70,8 +70,12 @@ namespace FoxTunes
 
         public static event EventHandler ActiveChanged;
 
+        private SnappingWindow()
+        {
+            this.StickyWindows = new Dictionary<SnappingWindow, SnapDirection>();
+        }
 
-        public SnappingWindow(IntPtr handle)
+        public SnappingWindow(IntPtr handle) : this()
         {
             this.Handle = handle;
         }
@@ -246,8 +250,12 @@ namespace FoxTunes
 
             this.MouseOrigin = GetMousePosition();
             this.PreviousBounds = this.Adapter.Bounds;
+            foreach (var snappingWindow in this.StickyWindows.Keys)
+            {
+                snappingWindow.MouseOrigin = this.MouseOrigin;
+                snappingWindow.PreviousBounds = snappingWindow.Adapter.Bounds;
+            }
             this.ResizeDirection = ResizeDirection.None;
-            this.StickyWindows = new Dictionary<SnappingWindow, SnapDirection>();
             this.SetHook(this.MoveHook);
         }
 
@@ -263,7 +271,6 @@ namespace FoxTunes
                 this.PreviousBounds.Y + mouseOffset.Y
             );
             var bounds = this.Adapter.Bounds;
-            var offset = Point.Empty;
 
             bounds.Location = location;
 
@@ -272,31 +279,24 @@ namespace FoxTunes
             if (this.Adapter.Bounds != bounds)
             {
                 this.Adapter.Bounds = bounds;
-            }
-
-            if (this.IsSticky)
-            {
-                foreach (var pair in this.StickyWindows)
+                if (this.IsSticky)
                 {
-                    this.Move(mousePosition, pair.Key);
+                    foreach (var pair in this.StickyWindows)
+                    {
+                        this.Move(pair.Key, pair.Value, mouseOffset);
+                    }
                 }
             }
         }
 
-        protected virtual void Move(Point mousePosition, SnappingWindow snappingWindow)
+        protected virtual void Move(SnappingWindow snappingWindow, SnapDirection direction, Point mouseOffset)
         {
-            var mouseOffset = new Point(
-                mousePosition.X - snappingWindow.MouseOrigin.X,
-                mousePosition.Y - snappingWindow.MouseOrigin.Y
-            );
+            var bounds = snappingWindow.Adapter.Bounds;
             var location = new Point(
                 snappingWindow.PreviousBounds.X + mouseOffset.X,
                 snappingWindow.PreviousBounds.Y + mouseOffset.Y
             );
-            var bounds = snappingWindow.PreviousBounds;
-
             bounds.Location = location;
-
             if (snappingWindow.Adapter.Bounds != bounds)
             {
                 snappingWindow.Adapter.Bounds = bounds;
@@ -313,14 +313,10 @@ namespace FoxTunes
 
         protected virtual SnapDirection SnapToWindows(Point mousePosition, ref Rectangle bounds, bool resize)
         {
-            var result = SnapDirection.None;
+            var direction = SnapDirection.None;
             foreach (var snappingWindow in Active)
             {
                 if (object.ReferenceEquals(snappingWindow, this))
-                {
-                    continue;
-                }
-                if (!snappingWindow.Adapter.IsVisible)
                 {
                     continue;
                 }
@@ -328,27 +324,18 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var direction = SnappingHelper.Snap(ref bounds, snappingWindow.Adapter.Bounds, false, resize);
-                if (direction == SnapDirection.None)
+                if (!snappingWindow.Adapter.IsVisible)
                 {
                     continue;
                 }
-                if (this.IsSticky)
-                {
-                    if (!this.StickyWindows.ContainsKey(snappingWindow))
-                    {
-                        snappingWindow.MouseOrigin = mousePosition;
-                        snappingWindow.PreviousBounds = snappingWindow.Adapter.Bounds;
-                    }
-                    this.StickyWindows[snappingWindow] = direction;
-                }
-                result |= direction;
+                direction |= SnappingHelper.Snap(ref bounds, snappingWindow.Adapter.Bounds, false, resize);
             }
-            return result;
+            return direction;
         }
 
         protected virtual void EndMove()
         {
+            UpdateStickyWindows();
             this.Cancel();
         }
 
@@ -362,7 +349,11 @@ namespace FoxTunes
             this.MouseOrigin = GetMousePosition();
             this.PreviousBounds = this.Adapter.Bounds;
             this.ResizeDirection = direction;
-            this.StickyWindows = new Dictionary<SnappingWindow, SnapDirection>();
+            foreach (var snappingWindow in this.StickyWindows.Keys)
+            {
+                snappingWindow.MouseOrigin = this.MouseOrigin;
+                snappingWindow.PreviousBounds = snappingWindow.Adapter.Bounds;
+            }
             this.SetHook(this.ResizeHook);
         }
 
@@ -399,6 +390,36 @@ namespace FoxTunes
             if (this.Adapter.Bounds != bounds)
             {
                 this.Adapter.Bounds = bounds;
+                if (this.IsSticky)
+                {
+                    foreach (var pair in this.StickyWindows)
+                    {
+                        this.Resize(pair.Key, pair.Value, mouseOffset);
+                    }
+                }
+            }
+        }
+
+        protected virtual void Resize(SnappingWindow snappingWindow, SnapDirection direction, Point mouseOffset)
+        {
+            var bounds = snappingWindow.Adapter.Bounds;
+            if (direction.HasFlag(SnapDirection.Left) || direction.HasFlag(SnapDirection.Right))
+            {
+                if (this.ResizeDirection.HasFlag(ResizeDirection.Left) || this.ResizeDirection.HasFlag(ResizeDirection.Right))
+                {
+                    bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
+                }
+            }
+            if (direction.HasFlag(SnapDirection.Top) || direction.HasFlag(SnapDirection.Bottom))
+            {
+                if (this.ResizeDirection.HasFlag(ResizeDirection.Top) || this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
+                {
+                    bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
+                }
+            }
+            if (snappingWindow.Adapter.Bounds != bounds)
+            {
+                snappingWindow.Adapter.Bounds = bounds;
             }
         }
 
@@ -412,7 +433,7 @@ namespace FoxTunes
 
         protected virtual SnapDirection ResizeToWindows(Point mousePosition, ref Rectangle bounds)
         {
-            var result = SnapDirection.None;
+            var direction = SnapDirection.None;
             foreach (var snappingWindow in Active)
             {
                 if (object.ReferenceEquals(snappingWindow, this))
@@ -423,27 +444,14 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var direction = SnappingHelper.Snap(ref bounds, snappingWindow.Adapter.Bounds, false, true);
-                if (direction == SnapDirection.None)
-                {
-                    continue;
-                }
-                if (this.IsSticky)
-                {
-                    if (!this.StickyWindows.ContainsKey(snappingWindow))
-                    {
-                        snappingWindow.MouseOrigin = mousePosition;
-                        snappingWindow.PreviousBounds = snappingWindow.Adapter.Bounds;
-                    }
-                    this.StickyWindows[snappingWindow] = direction;
-                }
-                result |= direction;
+                direction |= SnappingHelper.Snap(ref bounds, snappingWindow.Adapter.Bounds, false, true);
             }
-            return result;
+            return direction;
         }
 
         protected virtual void EndResize()
         {
+            UpdateStickyWindows();
             this.Cancel();
         }
 
@@ -515,6 +523,37 @@ namespace FoxTunes
             var y = default(int);
             MouseHelper.GetPosition(out x, out y);
             return new Point(x, y);
+        }
+
+        public static void UpdateStickyWindows()
+        {
+            foreach (var stickyWindow in Active)
+            {
+                stickyWindow.StickyWindows.Clear();
+                if (!stickyWindow.IsSticky || !stickyWindow.Adapter.IsVisible)
+                {
+                    continue;
+                }
+                var bounds = stickyWindow.Adapter.Bounds;
+                foreach (var snappingWindow in Active)
+                {
+                    if (object.ReferenceEquals(stickyWindow, snappingWindow))
+                    {
+                        continue;
+                    }
+                    if (snappingWindow.IsSticky || !snappingWindow.Adapter.IsVisible)
+                    {
+                        //Don't stick sticky windows together or they can't be separated!
+                        continue;
+                    }
+                    var direction = SnappingHelper.IsSnapped(bounds, snappingWindow.Adapter.Bounds);
+                    if (direction == SnapDirection.None)
+                    {
+                        continue;
+                    }
+                    stickyWindow.StickyWindows[snappingWindow] = direction;
+                }
+            }
         }
     }
 }
