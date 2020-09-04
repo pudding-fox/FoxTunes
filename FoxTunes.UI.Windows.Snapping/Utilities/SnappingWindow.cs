@@ -405,16 +405,60 @@ namespace FoxTunes
             var bounds = snappingWindow.Adapter.Bounds;
             if (direction.HasFlag(SnapDirection.Left) || direction.HasFlag(SnapDirection.Right))
             {
-                if (this.ResizeDirection.HasFlag(ResizeDirection.Left) || this.ResizeDirection.HasFlag(ResizeDirection.Right))
+                if (direction.HasFlag(SnapDirection.Top) && direction.HasFlag(SnapDirection.Bottom))
                 {
-                    bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
+                    {
+                        bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
+                        bounds.Height = snappingWindow.PreviousBounds.Height - mouseOffset.Y;
+                    }
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
+                    {
+                        bounds.Height = snappingWindow.PreviousBounds.Height + mouseOffset.Y;
+                    }
+                }
+                else if (direction.HasFlag(SnapDirection.Top))
+                {
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
+                    {
+                        bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
+                    }
+                }
+                else if (direction.HasFlag(SnapDirection.Bottom))
+                {
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
+                    {
+                        bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
+                    }
                 }
             }
             if (direction.HasFlag(SnapDirection.Top) || direction.HasFlag(SnapDirection.Bottom))
             {
-                if (this.ResizeDirection.HasFlag(ResizeDirection.Top) || this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
+                if (direction.HasFlag(SnapDirection.Left) && direction.HasFlag(SnapDirection.Right))
                 {
-                    bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
+                    {
+                        bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
+                        bounds.Width = snappingWindow.PreviousBounds.Width - mouseOffset.X;
+                    }
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
+                    {
+                        bounds.Width = snappingWindow.PreviousBounds.Width + mouseOffset.X;
+                    }
+                }
+                else if (direction.HasFlag(SnapDirection.Left))
+                {
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
+                    {
+                        bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
+                    }
+                }
+                else if (direction.HasFlag(SnapDirection.Right))
+                {
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
+                    {
+                        bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
+                    }
                 }
             }
             if (snappingWindow.Adapter.Bounds != bounds)
