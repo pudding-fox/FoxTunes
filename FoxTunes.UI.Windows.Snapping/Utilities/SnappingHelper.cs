@@ -193,27 +193,57 @@ namespace FoxTunes
 
         public static SnapDirection IsSnapped(Rectangle from, Rectangle to)
         {
+            return IsSnapped(from, to, Proximity.Value);
+        }
+
+        public static SnapDirection IsSnapped(Rectangle from, Rectangle to, int proximity)
+        {
             var result = SnapDirection.None;
-            if (from.Bottom >= to.Top && from.Top <= to.Bottom)
+            if (from.Bottom >= to.Top - proximity && from.Top <= to.Bottom + proximity)
             {
-                if (from.Left == to.Right || from.Left == to.Left)
+
+                if (Math.Abs(from.Right - to.Left) <= proximity)
                 {
                     result |= SnapDirection.Left;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped left.");
                 }
-                if (from.Right == to.Left || from.Right == to.Right)
+                else if (Math.Abs(from.Left - to.Left) <= proximity)
+                {
+                    result |= SnapDirection.Left;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped left.");
+                }
+                if (Math.Abs(from.Left - to.Right) <= proximity)
                 {
                     result |= SnapDirection.Right;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped right.");
+                }
+                else if (Math.Abs(from.Right - to.Right) <= proximity)
+                {
+                    result |= SnapDirection.Right;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped right.");
                 }
             }
-            if (from.Right >= to.Left && from.Left <= to.Right)
+            if (from.Right >= to.Left - proximity && from.Left <= to.Right + proximity)
             {
-                if (from.Top == to.Bottom || from.Top == to.Top)
+                if (Math.Abs(from.Bottom - to.Top) <= proximity)
                 {
                     result |= SnapDirection.Top;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped top.");
                 }
-                if (from.Bottom == to.Top || from.Bottom == to.Bottom)
+                else if (Math.Abs(from.Top - to.Top) <= proximity)
+                {
+                    result |= SnapDirection.Top;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped top.");
+                }
+                if (Math.Abs(from.Top - to.Bottom) <= proximity)
                 {
                     result |= SnapDirection.Bottom;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped bottom.");
+                }
+                else if (Math.Abs(from.Bottom - to.Bottom) <= proximity)
+                {
+                    result |= SnapDirection.Bottom;
+                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped bottom.");
                 }
             }
             return result;
