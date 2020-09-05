@@ -344,9 +344,9 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                if (this.StickyWindows.ContainsKey(snappingWindow))
+                if (!resize && this.StickyWindows.ContainsKey(snappingWindow))
                 {
-                    //continue;
+                    continue;
                 }
                 if (!snappingWindow.Adapter.IsVisible)
                 {
@@ -378,6 +378,7 @@ namespace FoxTunes
                 snappingWindow.MouseOrigin = this.MouseOrigin;
                 snappingWindow.PreviousBounds = snappingWindow.Adapter.Bounds;
             }
+            this.Adapter.SetCursor(direction);
             this.SetHook(this.ResizeHook);
         }
 
@@ -530,6 +531,7 @@ namespace FoxTunes
             this.IsMoving = false;
             this.IsResizing = false;
             this.ResizeDirection = ResizeDirection.None;
+            this.Adapter.SetCursor(ResizeDirection.None);
 
             this.SetHook(this.DefaultHook);
         }
