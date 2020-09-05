@@ -632,7 +632,7 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    if (snappingWindow.IsSticky || !snappingWindow.Adapter.IsVisible)
+                    if (snappingWindow.IsSticky)
                     {
                         //Don't stick sticky windows together or they can't be separated!
                         continue;
