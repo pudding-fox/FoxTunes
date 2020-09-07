@@ -424,7 +424,7 @@ namespace FoxTunes
                     var offset = this.GetOffset(bounds);
                     foreach (var pair in this.StickyWindows)
                     {
-                        if (!this.IsSticky) //&& !this.IsStuck(pair.Key, pair.Value))
+                        if (!this.IsSticky && !this.IsStuck(pair.Key, pair.Value))
                         {
                             continue;
                         }
@@ -563,19 +563,19 @@ namespace FoxTunes
         {
             if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
             {
-                return direction.HasFlag(SnapDirection.InsideRight);
+                return direction.HasFlag(SnapDirection.OutsideRight);
             }
             if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
             {
-                return direction.HasFlag(SnapDirection.InsideLeft);
+                return direction.HasFlag(SnapDirection.OutsideLeft);
             }
             if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
             {
-                return direction.HasFlag(SnapDirection.InsideBottom);
+                return direction.HasFlag(SnapDirection.OutsideBottom);
             }
             if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
             {
-                return direction.HasFlag(SnapDirection.InsideTop);
+                return direction.HasFlag(SnapDirection.OutsideTop);
             }
             return false;
         }
