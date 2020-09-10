@@ -38,6 +38,17 @@ namespace FoxTunes
                 runner.Prepare();
                 value2 = Convert.ToString(runner.Run());
             }
+            return this.Compare(value1, value2);
+        }
+
+        protected virtual int Compare(string value1, string value2)
+        {
+            var numeric1 = default(float);
+            var numeric2 = default(float);
+            if (float.TryParse(value1, out numeric1) && float.TryParse(value2, out numeric2))
+            {
+                return numeric1.CompareTo(numeric2);
+            }
             return string.Compare(value1, value2, StringComparison.OrdinalIgnoreCase);
         }
 
