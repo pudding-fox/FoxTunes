@@ -14,6 +14,8 @@ namespace FoxTunes.ViewModel
 {
     public abstract class GridPlaylist : PlaylistBase
     {
+        public PlaylistColumn SortColumn { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         private bool _GroupingEnabled { get; set; }
@@ -585,7 +587,17 @@ namespace FoxTunes.ViewModel
         public async Task Sort(PlaylistColumn playlistColumn)
         {
             var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            await this.PlaylistManager.Sort(playlist, playlistColumn).ConfigureAwait(false);
+            var descending = default(bool);
+            if (object.ReferenceEquals(this.SortColumn, playlistColumn))
+            {
+                this.SortColumn = null;
+                descending = true;
+            }
+            else
+            {
+                this.SortColumn = playlistColumn;
+            }
+            await this.PlaylistManager.Sort(playlist, playlistColumn, descending).ConfigureAwait(false);
         }
 
         protected override void OnDisposing()
