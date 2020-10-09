@@ -1,12 +1,13 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes.Templates
 {
-    public partial class PlaylistSequenceBuilder
+    public partial class PlaylistSortBuilder
     {
-        public PlaylistSequenceBuilder(IDatabase database, ISortParserResult sort)
+        public PlaylistSortBuilder(IDatabase database, ISortParserResult sort)
         {
             this.Database = database;
             this.Sort = sort;
@@ -31,6 +32,16 @@ namespace FoxTunes.Templates
                     }
                 }
             }
+        }
+
+        public string GetColumn(string name)
+        {
+            var index = this.Names.IndexOf(name, StringComparer.OrdinalIgnoreCase);
+            if (index == -1)
+            {
+                throw new NotImplementedException();
+            }
+            return string.Format("Value_{0}_Value", index);
         }
     }
 }

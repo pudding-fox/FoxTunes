@@ -44,6 +44,10 @@ namespace FoxTunes
 
         public IMetaDataBrowser MetaDataBrowser { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public TextConfigurationElement Sort { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -53,6 +57,11 @@ namespace FoxTunes
             this.SignalEmitter = core.Components.SignalEmitter;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
+            this.Configuration = core.Components.Configuration;
+            this.Sort = this.Configuration.GetElement<TextConfigurationElement>(
+                PlaylistBehaviourConfiguration.SECTION,
+                PlaylistBehaviourConfiguration.PRE_SORT_ORDER_ELEMENT
+            );
             base.InitializeComponent(core);
         }
 
@@ -136,7 +145,7 @@ namespace FoxTunes
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist(filter), (parameters, phase) =>
+                    this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist(filter, this.Sort.Value), (parameters, phase) =>
                     {
                         switch (phase)
                         {
@@ -333,7 +342,8 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                await this.Database.ExecuteAsync(this.Database.Queries.SequencePlaylistItems, (parameters, phase) =>
+                var query = this.Database.Queries.SequencePlaylistItems(this.Sort.Value);
+                await this.Database.ExecuteAsync(query, (parameters, phase) =>
                 {
                     switch (phase)
                     {

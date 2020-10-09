@@ -5,6 +5,7 @@ using System.Timers;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class MetaDataSynchronizer : StandardComponent, IMetaDataSynchronizer
     {
         const int UPDATE_INTERVAL = 60000;

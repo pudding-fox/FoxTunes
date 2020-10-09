@@ -67,6 +67,19 @@
   </ItemGroup>
 
   <ItemGroup>
+      <None Update="Templates\PlaylistSortBuilder.tt">
+  	    <Generator>TextTemplatingFilePreprocessor</Generator>
+  	    <LastGenOutput>PlaylistSortBuilder.cs</LastGenOutput>
+  	    <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      </None>
+      <Compile Update="Templates\PlaylistSortBuilder.cs">
+  	    <DesignTime>True</DesignTime>
+  	    <AutoGen>True</AutoGen>
+  	    <DependentUpon>PlaylistSortBuilder.tt</DependentUpon>
+      </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 
