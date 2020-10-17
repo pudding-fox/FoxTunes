@@ -35,7 +35,32 @@ namespace FoxTunes
 
         protected virtual void OnComplete(object sender, PendingQueueEventArgs<string> e)
         {
-            var task = this.RunPaths(e.Sequence);
+#if NET40            
+            var task = TaskEx.Run(async () =>
+#else
+            var task = Task.Run(async () =>
+#endif
+            {
+                try
+                {
+                    var playlist = default(Playlist);
+                    var index = default(int);
+                    if (this.OpenMode == CommandLineParser.OpenMode.Play)
+                    {
+                        playlist = this.PlaylistManager.SelectedPlaylist;
+                        index = this.PlaylistBrowser.GetInsertIndex(playlist);
+                    }
+                    await this.RunPaths(e.Sequence).ConfigureAwait(false);
+                    if (this.OpenMode == CommandLineParser.OpenMode.Play)
+                    {
+                        await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    this.OpenMode = CommandLineParser.OpenMode.Default;
+                }
+            });
         }
 
         public virtual void RunCommand(string command)
@@ -52,42 +77,21 @@ namespace FoxTunes
 
         public virtual async Task RunPaths(IEnumerable<string> paths)
         {
-            try
+            var handlers = new Dictionary<IFileActionHandler, IList<string>>();
+            foreach (var path in paths)
             {
-                var playlist = default(Playlist);
-                var index = default(int);
-                if (this.OpenMode == CommandLineParser.OpenMode.Play)
+                foreach (var handler in this.FileActionHandlers)
                 {
-                    playlist = this.PlaylistManager.SelectedPlaylist;
-                    index = this.PlaylistBrowser.GetInsertIndex(playlist);
-                }
-
-                var handlers = new Dictionary<IFileActionHandler, IList<string>>();
-                foreach (var path in paths)
-                {
-                    foreach (var handler in this.FileActionHandlers)
+                    if (!handler.CanHandle(path))
                     {
-                        if (!handler.CanHandle(path))
-                        {
-                            continue;
-                        }
-                        handlers.GetOrAdd(handler, key => new List<string>()).Add(path);
+                        continue;
                     }
-                }
-
-                foreach (var pair in handlers)
-                {
-                    await pair.Key.Handle(pair.Value).ConfigureAwait(false);
-                }
-
-                if (this.OpenMode == CommandLineParser.OpenMode.Play)
-                {
-                    await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
+                    handlers.GetOrAdd(handler, key => new List<string>()).Add(path);
                 }
             }
-            finally
+            foreach (var pair in handlers)
             {
-                this.OpenMode = CommandLineParser.OpenMode.Default;
+                await pair.Key.Handle(pair.Value).ConfigureAwait(false);
             }
         }
 
