@@ -293,6 +293,11 @@ namespace FoxTunes
 
         protected virtual async Task ShiftItems(QueryOperator @operator, int at, int by)
         {
+            if (by == 0)
+            {
+                //Nothing to do.
+                return;
+            }
             Logger.Write(
                 this,
                 LogLevel.Debug,
