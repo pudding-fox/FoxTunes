@@ -4,15 +4,15 @@ namespace FoxTunes.Interfaces
 {
     public interface IOutputTempo : IOutputEffect
     {
-        float Tempo { get; set; }
+        int Tempo { get; set; }
 
         event EventHandler TempoChanged;
 
-        float Pitch { get; set; }
+        int Pitch { get; set; }
 
         event EventHandler PitchChanged;
 
-        float Rate { get; set; }
+        int Rate { get; set; }
 
         event EventHandler RateChanged;
 

@@ -76,13 +76,84 @@ namespace FoxTunes
             this.OutputEffects = core.Components.OutputEffects;
             if (this.OutputEffects.Tempo != null)
             {
-
+                this.OutputEffects.Tempo.EnabledChanged += this.OnEnabledChanged;
+                this.OutputEffects.Tempo.TempoChanged += this.OnTempoChanged;
+                this.OutputEffects.Tempo.PitchChanged += this.OnPitchChanged;
+                this.OutputEffects.Tempo.RateChanged += this.OnRateChanged;
+                this.OutputEffects.Tempo.AAFilterChanged += this.OnAAFilterChanged;
+                this.OutputEffects.Tempo.AAFilterLengthChanged += this.OnAAFilterLengthChanged;
             }
             base.InitializeComponent(core);
         }
 
+        protected virtual void OnEnabledChanged(object sender, EventArgs e)
+        {
+            if (this.IsActive)
+            {
+                this.Update();
+            }
+            else
+            {
+                this.Stop();
+            }
+        }
+
+        protected virtual void OnTempoChanged(object sender, EventArgs e)
+        {
+            if (this.IsActive)
+            {
+                this.Update();
+            }
+        }
+
+        protected virtual void OnPitchChanged(object sender, EventArgs e)
+        {
+            if (this.IsActive)
+            {
+                this.Update();
+            }
+        }
+
+        protected virtual void OnRateChanged(object sender, EventArgs e)
+        {
+            if (this.IsActive)
+            {
+                this.Update();
+            }
+        }
+
+        protected virtual void OnAAFilterChanged(object sender, EventArgs e)
+        {
+            if (this.IsActive)
+            {
+                this.Update();
+            }
+        }
+
+        protected virtual void OnAAFilterLengthChanged(object sender, EventArgs e)
+        {
+            if (this.IsActive)
+            {
+                this.Update();
+            }
+        }
+
         protected virtual void Update()
         {
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, this.OutputEffects.Tempo.Tempo));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, this.OutputEffects.Tempo.Pitch));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, 1.0 + ((double)this.OutputEffects.Tempo.Rate / Tempo.MAX_RATE)));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, this.OutputEffects.Tempo.AAFilter ? 1 : 0));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, this.OutputEffects.Tempo.AAFilterLength));
+        }
+
+        protected virtual void Stop()
+        {
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, 0));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, 0));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, 0));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, 1));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, 32));
         }
 
         public override void Connect(IBassStreamComponent previous)
@@ -102,7 +173,16 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-
+            if (this.OutputEffects != null && this.OutputEffects.Tempo != null)
+            {
+                this.OutputEffects.Tempo.EnabledChanged -= this.OnEnabledChanged;
+                this.OutputEffects.Tempo.TempoChanged -= this.OnTempoChanged;
+                this.OutputEffects.Tempo.PitchChanged -= this.OnPitchChanged;
+                this.OutputEffects.Tempo.RateChanged -= this.OnRateChanged;
+                this.OutputEffects.Tempo.AAFilterChanged -= this.OnAAFilterChanged;
+                this.OutputEffects.Tempo.AAFilterLengthChanged -= this.OnAAFilterLengthChanged;
+            }
+            this.Stop();
         }
     }
 }
