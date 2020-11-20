@@ -115,6 +115,10 @@ namespace FoxTunes
             {
                 this.Update();
             }
+            else
+            {
+                this.Stop();
+            }
         }
 
         private void OnValueChanged(object sender, EventArgs e)
@@ -164,7 +168,7 @@ namespace FoxTunes
             this.Rate = previous.Rate;
             this.Channels = previous.Channels;
             this.ChannelHandle = previous.ChannelHandle;
-            if (this.OutputEffects.Equalizer.Enabled)
+            if (this.IsActive)
             {
                 this.Update();
             }

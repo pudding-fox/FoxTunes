@@ -10,7 +10,7 @@
 
         public const int MAX_PITCH = 60;
 
-        public const int MIN_RATE = -100;
+        public const int MIN_RATE = -50;
 
         public const int MAX_RATE = 100;
 
