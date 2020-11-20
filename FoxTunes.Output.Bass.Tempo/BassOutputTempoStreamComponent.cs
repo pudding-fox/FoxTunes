@@ -41,11 +41,13 @@ namespace FoxTunes
                 }
                 var rate = GetTempoFrequency(this.Rate, this.OutputEffects.Tempo.Rate);
                 return string.Format(
-                    "{0}%, Pitch {1} semitones, Rate {2}{3}",
+                    "{0} ({1}%, Pitch {2} semitones, Rate {3}{4}{5})",
+                    this.Name,
                     this.OutputEffects.Tempo.Value,
                     this.OutputEffects.Tempo.Pitch,
                     MetaDataInfo.SampleRateDescription(rate),
-                    this.AAFilter.Value ? string.Format(", aa filter {0} taps", this.AAFilterLength.Value) : string.Empty
+                    this.AAFilter.Value ? string.Format(", aa filter {0} taps", this.AAFilterLength.Value) : string.Empty,
+                    this.Fast.Value ? ", fast" : string.Empty
                 );
             }
         }
