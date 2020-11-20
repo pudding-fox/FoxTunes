@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public const string AA_FILTER_LENGTH = "FFFFFF38-8567-46EA-A1DB-5EEE64BA3099";
 
+        public const string FAST = "GGGG5143-4B5D-4B87-A1A7-1E2A83F10E78";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
@@ -46,7 +48,11 @@ namespace FoxTunes
                         .WithValue(32)
                         .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
                         .DependsOn(BassOutputConfiguration.SECTION, AA_FILTER)
-                        .WithValidationRule(new IntegerValidationRule(Tempo.MIN_AA_FILTER_LENGTH, Tempo.MAX_AA_FILTER_LENGTH, 1)));
+                        .WithValidationRule(new IntegerValidationRule(Tempo.MIN_AA_FILTER_LENGTH, Tempo.MAX_AA_FILTER_LENGTH, 1)))
+                .WithElement(
+                    new BooleanConfigurationElement(FAST, "Fast Algorithm", path: "Tempo")
+                        .WithValue(false)
+                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED));
         }
     }
 }
