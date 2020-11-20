@@ -23,7 +23,23 @@ namespace FoxTunes
             }
         }
 
-        public int Tempo
+        public int MinValue
+        {
+            get
+            {
+                return Tempo.MIN_TEMPO;
+            }
+        }
+
+        public int MaxValue
+        {
+            get
+            {
+                return Tempo.MAX_TEMPO;
+            }
+        }
+
+        public int Value
         {
             get
             {
@@ -39,16 +55,32 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnTempoChanged()
+        protected virtual void OnValueChanged()
         {
-            if (this.TempoChanged != null)
+            if (this.ValueChanged != null)
             {
-                this.TempoChanged(this, EventArgs.Empty);
+                this.ValueChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Tempo");
+            this.OnPropertyChanged("Value");
         }
 
-        public event EventHandler TempoChanged;
+        public event EventHandler ValueChanged;
+
+        public int MinPitch
+        {
+            get
+            {
+                return Tempo.MIN_PITCH;
+            }
+        }
+
+        public int MaxPitch
+        {
+            get
+            {
+                return Tempo.MAX_PITCH;
+            }
+        }
 
         public int Pitch
         {
@@ -76,6 +108,22 @@ namespace FoxTunes
         }
 
         public event EventHandler PitchChanged;
+
+        public int MinRate
+        {
+            get
+            {
+                return Tempo.MIN_RATE;
+            }
+        }
+
+        public int MaxRate
+        {
+            get
+            {
+                return Tempo.MAX_RATE;
+            }
+        }
 
         public int Rate
         {
@@ -201,7 +249,7 @@ namespace FoxTunes
                  BassOutputTempoStreamComponentBehaviourConfiguration.AA_FILTER_LENGTH
              );
             this.EnabledElement.ValueChanged += this.OnEnabledChanged;
-            this.TempoElement.ValueChanged += this.OnTempoChanged;
+            this.TempoElement.ValueChanged += this.OnValueChanged;
             this.PitchElement.ValueChanged += this.OnPitchChanged;
             this.RateElement.ValueChanged += this.OnRateChanged;
             this.AAFilterElement.ValueChanged += this.OnAAFilterChanged;
@@ -213,9 +261,9 @@ namespace FoxTunes
             this.OnEnabledChanged();
         }
 
-        protected virtual void OnTempoChanged(object sender, EventArgs e)
+        protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            this.OnTempoChanged();
+            this.OnValueChanged();
         }
 
         protected virtual void OnPitchChanged(object sender, EventArgs e)
@@ -264,7 +312,7 @@ namespace FoxTunes
             }
             if (this.TempoElement != null)
             {
-                this.TempoElement.ValueChanged -= this.OnTempoChanged;
+                this.TempoElement.ValueChanged -= this.OnValueChanged;
             }
             if (this.PitchElement != null)
             {
