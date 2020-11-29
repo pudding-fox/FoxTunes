@@ -166,7 +166,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Tempo effect disabled.");
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, 0));
-            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, 0));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, this.Rate));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, 1));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, 32));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseQuickAlgorithm, 0));
