@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public const string COMPRESSION_ELEMENT = "FFFF737A-B151-436D-8EAE-603A2202597A";
 
+        public const string IGNORE_ERRORS_ELEMENT = "GGGG821F-7A7B-4B3F-BE5D-F046AEFAAC6A";
+
         public const int DEFAULT_DEPTH = 16;
 
         public const int MIN_COMPRESSION = 0;
@@ -31,7 +33,9 @@ namespace FoxTunes
                     .WithOptions(GetDepthOptions()))
                 .WithElement(new IntegerConfigurationElement(COMPRESSION_ELEMENT, "Compression Level", path: settings.Name)
                     .WithValue(DEFAULT_COMPRESSION)
-                    .WithValidationRule(new IntegerValidationRule(MIN_COMPRESSION, MAX_COMPRESSION))
+                    .WithValidationRule(new IntegerValidationRule(MIN_COMPRESSION, MAX_COMPRESSION)))
+                .WithElement(new BooleanConfigurationElement(IGNORE_ERRORS_ELEMENT, "Ignore Errors", path: settings.Name)
+                    .WithValue(true)
             );
         }
 
