@@ -33,7 +33,7 @@ namespace FoxTunes.ViewModel
                 {
                     return;
                 }
-                this.OnSelectedSectionChanged();
+                this.OnSelectedSectionChanging();
                 this._SelectedSection = value;
                 this.OnSelectedSectionChanged();
             }
