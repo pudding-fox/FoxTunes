@@ -1,5 +1,4 @@
-﻿#if VISTA
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 
 namespace FoxTunes
@@ -29,4 +28,3 @@ namespace FoxTunes
         }
     }
 }
-#endif
