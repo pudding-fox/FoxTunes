@@ -62,7 +62,7 @@ namespace FoxTunes
 
         private static IEnumerable<string> GetFolders(ModernShell.IShellItem shellItem)
         {
-            var id = new Guid(ModernShell.ShellGuids.IShellItemArray);
+            var id = new Guid(ModernShell.InterfaceGuids.IShellItemArray);
             var shellLibrary = (ModernShell.IShellLibrary)new ModernShell.ShellLibrary();
             var shellItems = default(ModernShell.IShellItemArray);
             try

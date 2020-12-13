@@ -18,11 +18,6 @@ namespace FoxTunes
             public const string ShellLibrary = "D9B3211D-E57F-4426-AAEF-30A806ADD397";
         }
 
-        public static class ShellGuids
-        {
-            public const string IShellItemArray = "B63EA76D-1F85-456F-A19C-48159EFA858B";
-        }
-
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
         public static extern void SHCreateShellItemArrayFromDataObject([In] global::System.Runtime.InteropServices.ComTypes.IDataObject pdo, [In, MarshalAs(UnmanagedType.LPStruct)] Guid riid, [MarshalAs(UnmanagedType.Interface)] out IShellItemArray ppv);
 
