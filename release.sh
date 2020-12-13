@@ -208,7 +208,7 @@ bass_replay_gain.dll
 
 CUE="
 FoxTunes.Output.Bass.Cue.dll
-bass_substream_handler.dll
+bass_substream.dll
 "
 
 MOD="
