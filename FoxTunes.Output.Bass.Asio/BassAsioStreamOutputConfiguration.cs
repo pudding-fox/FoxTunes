@@ -9,6 +9,10 @@ namespace FoxTunes
     {
         public const int ASIO_NO_DEVICE = -1;
 
+        public const string SECTION = BassOutputConfiguration.SECTION;
+
+        public const string OUTPUT_ELEMENT = BassOutputConfiguration.OUTPUT_ELEMENT;
+
         public const string ELEMENT_ASIO_DEVICE = "AAAAB9CE-96FC-4FBB-8956-84B9A7E3FEB3";
 
         public const string DSD_RAW_ELEMENT = "BBBB043A-8A30-42A0-B2CB-3DE379636DD6";
@@ -21,14 +25,21 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
-                .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.OUTPUT_ELEMENT, "Mode")
-                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_ASIO_OPTION, "ASIO") }))
+            yield return new ConfigurationSection(SECTION, "Output")
+                .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT, "Mode")
+                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_ASIO_OPTION, "ASIO") })
+                    .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device", path: "ASIO")
-                    .WithOptions(GetASIODevices()))
-                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(MIXER_ELEMENT, "Mixer", path: "ASIO").WithValue(false))
+                    .WithOptions(GetASIODevices())
+                    .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION))
+                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO")
+                    .WithValue(false)
+                    .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION))
+                .WithElement(new BooleanConfigurationElement(MIXER_ELEMENT, "Mixer", path: "ASIO")
+                    .WithValue(false)
+                    .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION))
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "ASIO")
+                    .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION)
             );
             StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
                 BassOutputConfiguration.SECTION,
