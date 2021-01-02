@@ -27,23 +27,20 @@ namespace FoxTunes
                     .WithOptions(GetDSDevices())
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_DS_OPTION))
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "Direct Sound")
+                    .WithHandler(() =>
+                    {
+                        var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
+                            BassOutputConfiguration.SECTION,
+                            ELEMENT_DS_DEVICE
+                        );
+                        if (element == null)
+                        {
+                            return;
+                        }
+                        element.WithOptions(GetDSDevices(), true);
+                    })
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_DS_OPTION)
             );
-            StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                ELEMENT_REFRESH
-            ).WithHandler(() =>
-            {
-                var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
-                    BassOutputConfiguration.SECTION,
-                    ELEMENT_DS_DEVICE
-                );
-                if (element == null)
-                {
-                    return;
-                }
-                element.WithOptions(GetDSDevices(), true);
-            });
         }
 
         public static int GetDsDevice(SelectionConfigurationOption option)
