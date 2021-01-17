@@ -104,6 +104,29 @@ namespace FoxTunes
 #endif
         }
 
+        public Task<PlaylistItem> Dequeue(Playlist playlist)
+        {
+            var queue = default(List<PlaylistItem>);
+            var playlistItem = default(PlaylistItem);
+            if (this.Queue.TryGetValue(playlist, out queue))
+            {
+                playlistItem = queue.FirstOrDefault();
+                if (playlistItem != null)
+                {
+                    queue.Remove(playlistItem);
+                    if (queue.Count == 0)
+                    {
+                        this.Queue.TryRemove(playlist);
+                    }
+                }
+            }
+#if NET40
+            return TaskEx.FromResult(playlistItem);
+#else
+            return Task.FromResult(playlistItem);
+#endif
+        }
+
         public Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem)
         {
             var position = -1;
