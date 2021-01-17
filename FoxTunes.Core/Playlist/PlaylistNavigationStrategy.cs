@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -37,7 +36,7 @@ namespace FoxTunes
                 return null;
             }
             return
-                this.PlaylistQueue.Dequeue(playlist) ??
+                this.PlaylistQueue.GetNext(playlistItem) ??
                 this.GetNext(playlist, playlistItem);
         }
 
@@ -183,7 +182,6 @@ namespace FoxTunes
     {
         public ShufflePlaylistNavigationStrategy()
         {
-            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Sequences = new List<int>();
         }
 
@@ -191,8 +189,6 @@ namespace FoxTunes
         {
             this.Selector = selector;
         }
-
-        public SemaphoreSlim Semaphore { get; private set; }
 
         public IList<int> Sequences { get; private set; }
 

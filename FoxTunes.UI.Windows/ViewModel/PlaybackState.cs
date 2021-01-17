@@ -208,7 +208,7 @@ namespace FoxTunes.ViewModel
             }
             if (PlaylistQueue != null && this.PlaylistItem != null)
             {
-                var queuePosition = PlaylistQueue.GetQueuePosition(this.PlaylistItem) + 1;
+                var queuePosition = PlaylistQueue.GetPosition(this.PlaylistItem) + 1;
                 var isQueued = queuePosition > 0;
                 if (this.IsQueued != isQueued)
                 {

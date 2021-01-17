@@ -2,6 +2,8 @@
 {
     public interface IPlaylistQueue : IStandardComponent, IInvocableComponent
     {
-        int GetQueuePosition(PlaylistItem playlistItem);
+        PlaylistItem GetNext(PlaylistItem playlistItem);
+
+        int GetPosition(PlaylistItem playlistItem);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,18 +23,55 @@ namespace FoxTunes
 
         public ConcurrentDictionary<Playlist, List<PlaylistItem>> Queue { get; private set; }
 
+        public IPlaybackManager PlaybackManager { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        protected virtual Playlist GetPlaylist(PlaylistItem playlistItem)
+        {
+            if (playlistItem == null)
+            {
+                return this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+            }
+            return this.PlaylistBrowser.GetPlaylist(playlistItem) ?? this.PlaylistManager.SelectedPlaylist;
+        }
+
         public override void InitializeComponent(ICore core)
         {
+            this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+        }
+
+        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
+        {
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            this.Dispatch(this.Refresh);
+        }
+
+        public virtual Task Refresh()
+        {
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream != null)
+            {
+                var playlistItem = outputStream.PlaylistItem;
+                if (playlistItem != null)
+                {
+                    this.Enqueue(playlistItem, PlaylistQueueFlags.Reset);
+                }
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         private Task OnSignal(object sender, ISignal signal)
@@ -46,12 +84,12 @@ namespace FoxTunes
                     {
                         foreach (var playlist in playlists)
                         {
-                            this.Refresh(playlist);
+                            this.Queue.TryRemove(playlist);
                         }
                     }
                     else
                     {
-                        this.Refresh();
+                        this.Queue.Clear();
                     }
                     break;
             }
@@ -80,13 +118,13 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case QUEUE_LAST:
-                    this.Enqueue(PlaylistQueueFlags.None);
+                    this.Enqueue(this.PlaylistManager.SelectedItems, PlaylistQueueFlags.None);
                     break;
                 case QUEUE_NEXT:
-                    this.Enqueue(PlaylistQueueFlags.Next);
+                    this.Enqueue(this.PlaylistManager.SelectedItems, PlaylistQueueFlags.Next);
                     break;
                 case QUEUE_RESET:
-                    this.Enqueue(PlaylistQueueFlags.Reset);
+                    this.Enqueue(this.PlaylistManager.SelectedItems, PlaylistQueueFlags.Reset);
                     break;
             }
 #if NET40
@@ -96,98 +134,80 @@ namespace FoxTunes
 #endif
         }
 
-        public void Refresh()
+        public void Enqueue(IEnumerable<PlaylistItem> playlistItems, PlaylistQueueFlags flags)
         {
-            foreach (var pair in this.Queue)
-            {
-                this.Refresh(pair.Key);
-            }
-        }
-
-        public void Refresh(Playlist playlist)
-        {
-            var queue = default(List<PlaylistItem>);
-            if (!this.Queue.TryGetValue(playlist, out queue))
-            {
-                return;
-            }
-            for (var a = queue.Count - 1; a >= 0; a--)
-            {
-                var playlistItem = queue[a];
-                //TODO: Equality is not implemented.
-                if (this.PlaylistBrowser.GetPlaylist(playlistItem) != playlist)
-                {
-                    queue.RemoveAt(a);
-                }
-            }
-            if (queue.Count == 0)
-            {
-                this.Queue.TryRemove(playlist);
-            }
-        }
-
-        public void Enqueue(PlaylistQueueFlags flags)
-        {
-            var playlistItems = this.PlaylistManager.SelectedItems as IEnumerable<PlaylistItem>;
             if (flags == PlaylistQueueFlags.Next)
             {
                 playlistItems = playlistItems.Reverse();
             }
             foreach (var playlistItem in playlistItems)
             {
-                var playlist = this.PlaylistBrowser.GetPlaylist(playlistItem);
-                if (playlist == null)
-                {
-                    continue;
-                }
-                this.Enqueue(playlist, playlistItem, flags);
+                this.Enqueue(playlistItem, flags);
             }
         }
 
-        public void Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
+        public void Enqueue(PlaylistItem playlistItem, PlaylistQueueFlags flags)
         {
-            var queue = this.Queue.GetOrAdd(playlist, key => new List<PlaylistItem>());
-            queue.Remove(playlistItem);
+            var playlist = this.GetPlaylist(playlistItem);
+            var queue = default(List<PlaylistItem>);
+            if (this.Queue.TryGetValue(playlist, out queue))
+            {
+                queue.Remove(playlistItem);
+                if (queue.Count == 0)
+                {
+                    this.Queue.TryRemove(playlist);
+                }
+            }
             switch (flags)
             {
                 case PlaylistQueueFlags.None:
-                    queue.Add(playlistItem);
+                    this.Queue.GetOrAdd(playlist, key => new List<PlaylistItem>()).Add(playlistItem);
                     break;
                 case PlaylistQueueFlags.Next:
-                    queue.Insert(0, playlistItem);
+                    this.Queue.GetOrAdd(playlist, key => new List<PlaylistItem>()).Insert(0, playlistItem);
                     break;
             }
         }
 
-        public PlaylistItem Dequeue(Playlist playlist)
+        public PlaylistItem GetNext(PlaylistItem playlistItem)
         {
-            var queue = default(List<PlaylistItem>);
-            var playlistItem = default(PlaylistItem);
-            if (this.Queue.TryGetValue(playlist, out queue))
+            if (this.Queue.Count > 0)
             {
-                playlistItem = queue.FirstOrDefault();
-                if (playlistItem != null)
+                var playlist = this.GetPlaylist(playlistItem);
+                if (playlist == null)
                 {
-                    queue.Remove(playlistItem);
-                    if (queue.Count == 0)
-                    {
-                        this.Queue.TryRemove(playlist);
-                    }
+                    return null;
                 }
-            }
-            return playlistItem;
-        }
-
-        public int GetQueuePosition(PlaylistItem playlistItem)
-        {
-            var position = -1;
-            var playlist = this.PlaylistBrowser.GetPlaylist(playlistItem);
-            if (playlist != null)
-            {
                 var queue = default(List<PlaylistItem>);
                 if (this.Queue.TryGetValue(playlist, out queue))
                 {
-                    position = queue.IndexOf(playlistItem);
+                    if (playlistItem != null)
+                    {
+                        var position = queue.IndexOf(playlistItem);
+                        if (position >= 0 && position - 1 < queue.Count)
+                        {
+                            return queue[position + 1];
+                        }
+                    }
+                    return queue.FirstOrDefault();
+                }
+            }
+            return null;
+        }
+
+        public int GetPosition(PlaylistItem playlistItem)
+        {
+            var position = -1;
+            if (this.Queue.Count > 0)
+            {
+                var playlist = this.GetPlaylist(playlistItem);
+                if (playlist != null)
+                {
+                    var queue = default(List<PlaylistItem>);
+                    if (this.Queue.TryGetValue(playlist, out queue))
+                    {
+                        position = queue.IndexOf(playlistItem);
+                    }
                 }
             }
             return position;
