@@ -3,7 +3,6 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -191,16 +190,6 @@ namespace FoxTunes
             {
                 return playlistItem.Sequence + 1;
             }
-        }
-
-        public Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
-        {
-            return this.NavigationStrategy.Enqueue(playlist, playlistItem, flags);
-        }
-
-        public Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem)
-        {
-            return this.NavigationStrategy.GetQueuePosition(playlist, playlistItem);
         }
     }
 }

@@ -63,10 +63,6 @@ namespace FoxTunes.Interfaces
         PlaylistItem[] SelectedItems { get; set; }
 
         event EventHandler SelectedItemsChanged;
-
-        Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags);
-
-        Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem);
     }
 
     public enum PlaylistQueueFlags : byte

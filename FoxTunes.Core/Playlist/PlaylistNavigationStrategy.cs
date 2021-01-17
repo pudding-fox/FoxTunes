@@ -36,9 +36,8 @@ namespace FoxTunes
             {
                 return null;
             }
-            //TODO: Bad .Result
             return
-                this.PlaylistQueue.Dequeue(playlist).Result ??
+                this.PlaylistQueue.Dequeue(playlist) ??
                 this.GetNext(playlist, playlistItem);
         }
 
@@ -56,16 +55,6 @@ namespace FoxTunes
         }
 
         protected abstract PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem);
-
-        public Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
-        {
-            return this.PlaylistQueue.Enqueue(playlist, playlistItem, flags);
-        }
-
-        public Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem)
-        {
-            return this.PlaylistQueue.GetQueuePosition(playlist, playlistItem);
-        }
 
         public override void InitializeComponent(ICore core)
         {

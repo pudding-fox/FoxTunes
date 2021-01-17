@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -32,10 +31,6 @@ namespace FoxTunes.Interfaces
         PlaylistItem GetPreviousItem(PlaylistItem playlistItem);
 
         int GetInsertIndex(Playlist playlist);
-
-        Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags);
-
-        Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem);
     }
 
     public enum PlaylistBrowserState : byte
