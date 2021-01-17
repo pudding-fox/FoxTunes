@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -18,8 +19,11 @@ namespace FoxTunes
 
         public PlaylistQueue()
         {
+            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Queue = new ConcurrentDictionary<Playlist, List<PlaylistItem>>();
         }
+
+        public SemaphoreSlim Semaphore { get; private set; }
 
         public ConcurrentDictionary<Playlist, List<PlaylistItem>> Queue { get; private set; }
 
@@ -152,10 +156,19 @@ namespace FoxTunes
             var queue = default(List<PlaylistItem>);
             if (this.Queue.TryGetValue(playlist, out queue))
             {
-                queue.Remove(playlistItem);
-                if (queue.Count == 0)
+                //TODO: We should use WaitAsync for >NET40.
+                this.Semaphore.Wait();
+                try
                 {
-                    this.Queue.TryRemove(playlist);
+                    queue.Remove(playlistItem);
+                    if (queue.Count == 0)
+                    {
+                        this.Queue.TryRemove(playlist);
+                    }
+                }
+                finally
+                {
+                    this.Semaphore.Release();
                 }
             }
             switch (flags)
@@ -181,15 +194,24 @@ namespace FoxTunes
                 var queue = default(List<PlaylistItem>);
                 if (this.Queue.TryGetValue(playlist, out queue))
                 {
-                    if (playlistItem != null)
+                    //TODO: We should use WaitAsync for >NET40.
+                    this.Semaphore.Wait();
+                    try
                     {
-                        var position = queue.IndexOf(playlistItem);
-                        if (position >= 0 && position - 1 < queue.Count)
+                        if (playlistItem != null)
                         {
-                            return queue[position + 1];
+                            var position = queue.IndexOf(playlistItem);
+                            if (position >= 0 && position - 1 < queue.Count)
+                            {
+                                return queue[position + 1];
+                            }
                         }
+                        return queue.FirstOrDefault();
                     }
-                    return queue.FirstOrDefault();
+                    finally
+                    {
+                        this.Semaphore.Release();
+                    }
                 }
             }
             return null;
@@ -206,7 +228,16 @@ namespace FoxTunes
                     var queue = default(List<PlaylistItem>);
                     if (this.Queue.TryGetValue(playlist, out queue))
                     {
-                        position = queue.IndexOf(playlistItem);
+                        //TODO: We should use WaitAsync for >NET40.
+                        this.Semaphore.Wait();
+                        try
+                        {
+                            position = queue.IndexOf(playlistItem);
+                        }
+                        finally
+                        {
+                            this.Semaphore.Release();
+                        }
                     }
                 }
             }

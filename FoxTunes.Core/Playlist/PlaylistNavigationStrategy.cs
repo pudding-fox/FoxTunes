@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -182,6 +183,7 @@ namespace FoxTunes
     {
         public ShufflePlaylistNavigationStrategy()
         {
+            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Sequences = new List<int>();
         }
 
@@ -189,6 +191,8 @@ namespace FoxTunes
         {
             this.Selector = selector;
         }
+
+        public SemaphoreSlim Semaphore { get; private set; }
 
         public IList<int> Sequences { get; private set; }
 
@@ -242,30 +246,39 @@ namespace FoxTunes
 
         protected virtual void Refresh(Playlist playlist)
         {
-            this.Playlist = playlist;
-            this.Sequences.Clear();
-            if (this.Selector == null)
+            //TODO: We should use WaitAsync for >NET40.
+            this.Semaphore.Wait();
+            try
             {
-                this.Sequences.AddRange(
-                    this.PlaylistBrowser.GetItems(playlist).Select(
-                        playlistItem => playlistItem.Sequence
-                    )
-                );
-                this.Sequences.Shuffle();
-            }
-            else
-            {
-                var groups = this.PlaylistBrowser.GetItems(playlist).GroupBy(
-                    playlistItem => this.Selector(playlistItem)
-                );
-                foreach (var group in groups)
+                this.Playlist = playlist;
+                this.Sequences.Clear();
+                if (this.Selector == null)
                 {
-                    var sequences = group.Select(
-                        playlistItem => playlistItem.Sequence
-                    ).ToList();
-                    sequences.Shuffle();
-                    this.Sequences.AddRange(sequences);
+                    this.Sequences.AddRange(
+                        this.PlaylistBrowser.GetItems(playlist).Select(
+                            playlistItem => playlistItem.Sequence
+                        )
+                    );
+                    this.Sequences.Shuffle();
                 }
+                else
+                {
+                    var groups = this.PlaylistBrowser.GetItems(playlist).GroupBy(
+                        playlistItem => this.Selector(playlistItem)
+                    );
+                    foreach (var group in groups)
+                    {
+                        var sequences = group.Select(
+                            playlistItem => playlistItem.Sequence
+                        ).ToList();
+                        sequences.Shuffle();
+                        this.Sequences.AddRange(sequences);
+                    }
+                }
+            }
+            finally
+            {
+                this.Semaphore.Release();
             }
         }
 
@@ -275,29 +288,38 @@ namespace FoxTunes
             {
                 this.Refresh(playlist);
             }
-            if (this.Sequences.Count == 0)
+            //TODO: We should use WaitAsync for >NET40.
+            this.Semaphore.Wait();
+            try
             {
-                return default(PlaylistItem);
-            }
-            var position = default(int);
-            if (playlistItem != null)
-            {
-                position = this.Sequences.IndexOf(playlistItem.Sequence);
-                if (position >= this.Sequences.Count - 1)
+                if (this.Sequences.Count == 0)
                 {
-                    position = 0;
+                    return default(PlaylistItem);
+                }
+                var position = default(int);
+                if (playlistItem != null)
+                {
+                    position = this.Sequences.IndexOf(playlistItem.Sequence);
+                    if (position >= this.Sequences.Count - 1)
+                    {
+                        position = 0;
+                    }
+                    else
+                    {
+                        position++;
+                    }
                 }
                 else
                 {
-                    position++;
+                    position = 0;
                 }
+                var sequence = this.Sequences[position];
+                return this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
             }
-            else
+            finally
             {
-                position = 0;
+                this.Semaphore.Release();
             }
-            var sequence = this.Sequences[position];
-            return this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
         }
 
         protected override PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem)
@@ -306,29 +328,38 @@ namespace FoxTunes
             {
                 this.Refresh(playlist);
             }
-            if (this.Sequences.Count == 0)
+            //TODO: We should use WaitAsync for >NET40.
+            this.Semaphore.Wait();
+            try
             {
-                return default(PlaylistItem);
-            }
-            var position = default(int);
-            if (playlistItem != null)
-            {
-                position = this.Sequences.IndexOf(playlistItem.Sequence);
-                if (position == 0)
+                if (this.Sequences.Count == 0)
                 {
-                    position = this.Sequences.Count - 1;
+                    return default(PlaylistItem);
+                }
+                var position = default(int);
+                if (playlistItem != null)
+                {
+                    position = this.Sequences.IndexOf(playlistItem.Sequence);
+                    if (position == 0)
+                    {
+                        position = this.Sequences.Count - 1;
+                    }
+                    else
+                    {
+                        position--;
+                    }
                 }
                 else
                 {
-                    position--;
+                    position = this.Sequences.Count - 1;
                 }
+                var sequence = this.Sequences[position];
+                return this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
             }
-            else
+            finally
             {
-                position = this.Sequences.Count - 1;
+                this.Semaphore.Release();
             }
-            var sequence = this.Sequences[position];
-            return this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
         }
     }
 }
