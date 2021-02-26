@@ -175,14 +175,28 @@ namespace FoxTunes
             {
                 this.Path = element.Path;
             }
-            if (this.ValidationRules.Count == 0 && element.ValidationRules.Count > 0)
+            if (element.ValidationRules != null && element.ValidationRules.Count > 0)
             {
-                this.ValidationRules.AddRange(element.ValidationRules);
+                if (this.ValidationRules == null)
+                {
+                    this.ValidationRules = new ObservableCollection<ValidationRule>(element.ValidationRules);
+                }
+                else
+                {
+                    this.ValidationRules.AddRange(element.ValidationRules);
+                }
             }
             this.Flags |= element.Flags;
-            if (this.Dependencies.Count == 0 && element.Dependencies.Count > 0)
+            if (element.Dependencies != null && element.Dependencies.Count > 0)
             {
-                this.Dependencies.AddRange(element.Dependencies);
+                if (this.Dependencies == null)
+                {
+                    this.Dependencies = new ObservableCollection<Dependency>(element.Dependencies);
+                }
+                else
+                {
+                    this.Dependencies.AddRange(element.Dependencies);
+                }
             }
         }
 
