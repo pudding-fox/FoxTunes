@@ -4,6 +4,8 @@ namespace FoxTunes
 {
     public static class BassSkipSilenceStreamAdvisorBehaviourConfiguration
     {
+        public const string SECTION = BassOutputConfiguration.SECTION;
+
         public const string ENABLED_ELEMENT = "RRRR223E-4396-495B-8600-5130CCEB81E0";
 
         public const string SENSITIVITY_ELEMENT = "SSSSA77F-83AF-476D-8A6C-6C75FB40242A";
@@ -16,7 +18,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "Skip Silence").WithValue(false))
                 .WithElement(new SelectionConfigurationElement(SENSITIVITY_ELEMENT, "Sensitivity", path: "Skip Silence")
                     .WithOptions(GetSensitivityOptions())

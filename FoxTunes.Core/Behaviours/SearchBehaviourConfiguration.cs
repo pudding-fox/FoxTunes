@@ -13,11 +13,11 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Search")
+            yield return new ConfigurationSection(SECTION, Strings.SearchBehaviourConfiguration_Section)
                 .WithElement(
-                    new IntegerConfigurationElement(SEARCH_INTERVAL_ELEMENT, "Interval").WithValue(1000).WithValidationRule(new IntegerValidationRule(100, 1000, 100)))
+                    new IntegerConfigurationElement(SEARCH_INTERVAL_ELEMENT, Strings.SearchBehaviourConfiguration_Interval).WithValue(1000).WithValidationRule(new IntegerValidationRule(100, 1000, 100)))
                 .WithElement(
-                    new SelectionConfigurationElement(SEARCH_COMMIT_ELEMENT, "Commit Behaviour").WithOptions(GetCommitBehaviourOptions())
+                    new SelectionConfigurationElement(SEARCH_COMMIT_ELEMENT, Strings.SearchBehaviourConfiguration_Commit).WithOptions(GetCommitBehaviourOptions())
             );
         }
 

@@ -311,5 +311,32 @@ namespace FoxTunes {
                 return ResourceManager.GetString("MetaDataBehaviourConfiguration.WriteTagsAndStatistics", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Commit Behaviour.
+        /// </summary>
+        internal static string SearchBehaviourConfiguration_Commit {
+            get {
+                return ResourceManager.GetString("SearchBehaviourConfiguration.Commit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Interval.
+        /// </summary>
+        internal static string SearchBehaviourConfiguration_Interval {
+            get {
+                return ResourceManager.GetString("SearchBehaviourConfiguration.Interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        internal static string SearchBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("SearchBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
     }
 }

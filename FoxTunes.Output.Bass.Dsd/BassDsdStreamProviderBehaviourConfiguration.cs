@@ -4,13 +4,15 @@ namespace FoxTunes
 {
     public static class BassDsdStreamProviderBehaviourConfiguration
     {
+        public const string SECTION = BassOutputConfiguration.SECTION;
+
         public const string DSD_RATE_ELEMENT = "AAAAC170-6E90-4E55-9C14-8FCDAA39276B";
 
         public const string DSD_GAIN_ELEMENT = "BBBB4749-63C8-4866-9013-9AF01072CD2D";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(DSD_RATE_ELEMENT, "PCM Rate (Hz)", path: "DSD").WithOptions(GetRateOptions()))
                 .WithElement(new IntegerConfigurationElement(DSD_GAIN_ELEMENT, "PCM Gain (dB)", path: "DSD").WithValue(6).WithValidationRule(new IntegerValidationRule(0, 10))
             );

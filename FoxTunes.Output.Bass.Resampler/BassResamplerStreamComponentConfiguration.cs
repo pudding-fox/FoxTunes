@@ -6,6 +6,8 @@ namespace FoxTunes
 {
     public static class BassResamplerStreamComponentConfiguration
     {
+        public const string SECTION = BassOutputConfiguration.SECTION;
+
         public const string ENABLED_ELEMENT = "AAAA5C85-178C-470D-A977-C54350875AB3";
 
         public const string QUALITY_ELEMENT = "BBBB0ED2-67E6-4155-AFB0-FE8D7E7B9B8C";
@@ -20,7 +22,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "Resampler").WithValue(false))
                 .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality", path: "Resampler").WithOptions(GetQualityOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
                 .WithElement(new SelectionConfigurationElement(PHASE_ELEMENT, "Phase", path: "Resampler").WithOptions(GetPhaseOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
