@@ -29,15 +29,15 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Appearance")
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(
-                    new SelectionConfigurationElement(LIBRARY_BROWSER_VIEW, "View Type", path: "Library Browser")
+                    new SelectionConfigurationElement(LIBRARY_BROWSER_VIEW, Strings.LibraryBrowserBehaviourConfiguration_View, path: Strings.LibraryBrowserBehaviourConfiguration_Path)
                         .WithOptions(GetLibraryViewOptions()))
                 .WithElement(
-                    new SelectionConfigurationElement(LIBRARY_BROWSER_TILE_IMAGE, "Image Type", path: "Library Browser")
+                    new SelectionConfigurationElement(LIBRARY_BROWSER_TILE_IMAGE, Strings.LibraryBrowserBehaviourConfiguration_Image, path: Strings.LibraryBrowserBehaviourConfiguration_Path)
                         .WithOptions(GetLibraryImageOptions()))
                 .WithElement(
-                    new IntegerConfigurationElement(LIBRARY_BROWSER_TILE_SIZE, "Tile Size", path: "Library Browser")
+                    new IntegerConfigurationElement(LIBRARY_BROWSER_TILE_SIZE, Strings.LibraryBrowserBehaviourConfiguration_Size, path: Strings.LibraryBrowserBehaviourConfiguration_Path)
                         .WithValue(DEFAULT_GRID_TILE_SIZE)
                         .DependsOn(SECTION, LIBRARY_BROWSER_VIEW, LIBRARY_BROWSER_VIEW_GRID)
                         .WithValidationRule(new IntegerValidationRule(60, 300, 4))
@@ -51,8 +51,8 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetLibraryViewOptions()
         {
-            yield return new SelectionConfigurationOption(LIBRARY_BROWSER_VIEW_GRID, "Grid").Default();
-            yield return new SelectionConfigurationOption(LIBRARY_BROWSER_VIEW_LIST, "List");
+            yield return new SelectionConfigurationOption(LIBRARY_BROWSER_VIEW_GRID, Strings.LibraryBrowserBehaviourConfiguration_View_Grid).Default();
+            yield return new SelectionConfigurationOption(LIBRARY_BROWSER_VIEW_LIST, Strings.LibraryBrowserBehaviourConfiguration_View_List);
         }
 
         public static LibraryBrowserViewMode GetLibraryView(SelectionConfigurationOption option)
