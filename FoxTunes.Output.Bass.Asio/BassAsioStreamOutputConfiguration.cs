@@ -27,8 +27,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT)
-                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_ASIO_OPTION, Strings.ASIO) })
-                    .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION))
+                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_ASIO_OPTION, Strings.ASIO) }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device", path: Strings.ASIO)
                     .WithOptions(GetASIODevices())
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION))

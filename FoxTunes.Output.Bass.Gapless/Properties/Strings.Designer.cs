@@ -61,7 +61,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Gapless.
         /// </summary>
         internal static string BassGaplessStreamInput_Name {
             get {
