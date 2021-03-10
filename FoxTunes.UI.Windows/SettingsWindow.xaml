@@ -7,7 +7,7 @@
         xmlns:Windows="clr-namespace:FoxTunes" 
         x:Class="FoxTunes.SettingsWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="Settings" 
+        Title="{x:Static Windows:Strings.SettingsWindow_Title}" 
         Topmost="True">
     <TabControl>
         <TabItem Header="General">

@@ -70,6 +70,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Equalizer.
+        /// </summary>
+        public static string EqualizerWindow_Title {
+            get {
+                return ResourceManager.GetString("EqualizerWindow.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         public static string General_Advanced {
@@ -93,6 +102,15 @@ namespace FoxTunes {
         public static string General_OK {
             get {
                 return ResourceManager.GetString("General.OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string General_Search {
+            get {
+                return ResourceManager.GetString("General.Search", resourceCulture);
             }
         }
         
@@ -192,6 +210,60 @@ namespace FoxTunes {
         public static string ProfilesBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("ProfilesBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please select a sub page..
+        /// </summary>
+        public static string SettingsDialog_EmptyPage {
+            get {
+                return ResourceManager.GetString("SettingsDialog.EmptyPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Components.
+        /// </summary>
+        public static string SettingsDialog_GroupHeader {
+            get {
+                return ResourceManager.GetString("SettingsDialog.GroupHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset All.
+        /// </summary>
+        public static string SettingsDialog_ResetAll {
+            get {
+                return ResourceManager.GetString("SettingsDialog.ResetAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset Page.
+        /// </summary>
+        public static string SettingsDialog_ResetPage {
+            get {
+                return ResourceManager.GetString("SettingsDialog.ResetPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string SettingsDialog_Save {
+            get {
+                return ResourceManager.GetString("SettingsDialog.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsWindow_Title {
+            get {
+                return ResourceManager.GetString("SettingsWindow.Title", resourceCulture);
             }
         }
         
