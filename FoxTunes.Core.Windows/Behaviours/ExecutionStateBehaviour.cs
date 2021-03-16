@@ -17,43 +17,33 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        private EXECUTION_STATE _ExecutionState { get; set; }
+        public SelectionConfigurationElement Sleep { get; private set; }
 
-        public EXECUTION_STATE ExecutionState
+        public BooleanConfigurationElement OnlyWhilePlaying { get; private set; }
+
+        public EXECUTION_STATE ExecutionState { get; private set; }
+
+        protected virtual void Enable()
         {
-            get
+            if (this.Timer == null)
             {
-                return this._ExecutionState;
-            }
-            set
-            {
-                this._ExecutionState = value;
-                this.OnExecutionStateChanged();
+                this.Timer = new Timer();
+                this.Timer.Interval = UPDATE_INTERVAL;
+                this.Timer.Elapsed += this.OnElapsed;
+                this.Timer.Start();
+                Logger.Write(this, LogLevel.Debug, "Power state manager was started.");
             }
         }
 
-        protected virtual void OnExecutionStateChanged()
+        protected virtual void Disable()
         {
-            this.SetThreadExecutionState();
-            if (this.ExecutionState.HasFlag(EXECUTION_STATE.ES_SYSTEM_REQUIRED) || this.ExecutionState.HasFlag(EXECUTION_STATE.ES_DISPLAY_REQUIRED))
+            if (this.Timer != null)
             {
-                if (this.Timer == null)
-                {
-                    this.Timer = new Timer();
-                    this.Timer.Interval = UPDATE_INTERVAL;
-                    this.Timer.Elapsed += this.OnElapsed;
-                    this.Timer.Start();
-                }
-            }
-            else
-            {
-                if (this.Timer != null)
-                {
-                    this.Timer.Stop();
-                    this.Timer.Elapsed -= this.OnElapsed;
-                    this.Timer.Dispose();
-                    this.Timer = null;
-                }
+                this.Timer.Stop();
+                this.Timer.Elapsed -= this.OnElapsed;
+                this.Timer.Dispose();
+                this.Timer = null;
+                Logger.Write(this, LogLevel.Debug, "Power state manager was stopped.");
             }
         }
 
@@ -61,10 +51,30 @@ namespace FoxTunes
         {
             this.PlaybackManager = core.Managers.Playback;
             this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Sleep = this.Configuration.GetElement<SelectionConfigurationElement>(
                 ExecutionStateBehaviourConfiguration.SECTION,
                 ExecutionStateBehaviourConfiguration.SLEEP_ELEMENT
-            ).ConnectValue(value => this.ExecutionState = ExecutionStateBehaviourConfiguration.GetExecutionState(value));
+            );
+            this.OnlyWhilePlaying = this.Configuration.GetElement<BooleanConfigurationElement>(
+                ExecutionStateBehaviourConfiguration.SECTION,
+                ExecutionStateBehaviourConfiguration.ONLY_WHILE_PLAYING_ELEMENT
+            );
+            this.Sleep.ConnectValue(value =>
+            {
+                this.ExecutionState = ExecutionStateBehaviourConfiguration.GetExecutionState(this.Sleep.Value);
+                if (!this.SetThreadExecutionState())
+                {
+                    //If we can't set execution state then don't bother starting the timer.
+                }
+                if (this.ExecutionState.HasFlag(EXECUTION_STATE.ES_SYSTEM_REQUIRED) || this.ExecutionState.HasFlag(EXECUTION_STATE.ES_DISPLAY_REQUIRED))
+                {
+                    this.Enable();
+                }
+                else
+                {
+                    this.Disable();
+                }
+            });
             base.InitializeComponent(core);
         }
 
@@ -72,7 +82,11 @@ namespace FoxTunes
         {
             try
             {
-                this.SetThreadExecutionState();
+                if (!this.SetThreadExecutionState())
+                {
+                    //If we can't set execution state then disable the timer.
+                    this.Disable();
+                }
             }
             catch
             {
@@ -80,15 +94,29 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void SetThreadExecutionState()
+        protected virtual bool SetThreadExecutionState()
         {
-            if (this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsPlaying)
+            try
             {
-                SetThreadExecutionState(this.ExecutionState);
+                var preventSleep = true;
+                if (this.OnlyWhilePlaying.Value)
+                {
+                    preventSleep = this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsPlaying;
+                }
+                if (preventSleep)
+                {
+                    SetThreadExecutionState(this.ExecutionState);
+                }
+                else
+                {
+                    SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
+                }
+                return true;
             }
-            else
+            catch (Exception e)
             {
-                SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
+                Logger.Write(this, LogLevel.Error, "Failed to set thread execution state: {0}", e.Message);
+                return false;
             }
         }
 
@@ -117,13 +145,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.Timer != null)
-            {
-                this.Timer.Stop();
-                this.Timer.Elapsed -= this.OnElapsed;
-                this.Timer.Dispose();
-                this.Timer = null;
-            }
+            this.Disable();
         }
 
         ~ExecutionStateBehaviour()

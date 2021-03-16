@@ -214,14 +214,14 @@ namespace FoxTunes
 
         public abstract bool IsModified { get; }
 
-        public ConfigurationElement DependsOn(string sectionId, string elementId)
+        public ConfigurationElement DependsOn(string sectionId, string elementId, bool negate = false)
         {
-            return this.DependsOn(new BooleanDependency(sectionId, elementId));
+            return this.DependsOn(new BooleanDependency(sectionId, elementId, negate));
         }
 
-        public ConfigurationElement DependsOn(string sectionId, string elementId, string optionId)
+        public ConfigurationElement DependsOn(string sectionId, string elementId, string optionId, bool negate = false)
         {
-            return this.DependsOn(new SelectionDependency(sectionId, elementId, optionId));
+            return this.DependsOn(new SelectionDependency(sectionId, elementId, optionId, negate));
         }
 
         public ConfigurationElement DependsOn(Dependency dependency)
