@@ -8,8 +8,8 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(MetaDataBehaviourConfiguration.SECTION, "Meta Data")
-                .WithElement(new TextConfigurationElement(PATTERNS_ELEMENT, "Patterns", path: "File Name").WithValue(Resources.Patterns).WithFlags(ConfigurationElementFlags.MultiLine)
+            yield return new ConfigurationSection(MetaDataBehaviourConfiguration.SECTION)
+                .WithElement(new TextConfigurationElement(PATTERNS_ELEMENT, Strings.FileNameMetaDataSourceFactoryConfiguration_Patterns, path: Strings.FileNameMetaDataSourceFactoryConfiguration_Path).WithValue(Resources.Patterns).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }
     }
