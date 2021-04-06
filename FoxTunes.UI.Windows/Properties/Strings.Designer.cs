@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string DefaultLayoutProvider_Description {
+            get {
+                return ResourceManager.GetString("DefaultLayoutProvider.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default.
         /// </summary>
         public static string DefaultLayoutProvider_Name {
@@ -120,6 +129,15 @@ namespace FoxTunes {
         public static string LibraryBase_Add {
             get {
                 return ResourceManager.GetString("LibraryBase.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string MinimalLayoutProvider_Description {
+            get {
+                return ResourceManager.GetString("MinimalLayoutProvider.Description", resourceCulture);
             }
         }
         

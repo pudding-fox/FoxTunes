@@ -61,6 +61,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string ExpressionDarkTheme_Description {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression Dark.
+        /// </summary>
+        internal static string ExpressionDarkTheme_Name {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to List Row Shading.
         /// </summary>
         internal static string ExpressionDarkThemeConfiguration_ListRowShading {
@@ -75,6 +93,24 @@ namespace FoxTunes {
         internal static string General_Advanced {
             get {
                 return ResourceManager.GetString("General.Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string SystemTheme_Description {
+            get {
+                return ResourceManager.GetString("SystemTheme.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System.
+        /// </summary>
+        internal static string SystemTheme_Name {
+            get {
+                return ResourceManager.GetString("SystemTheme.Name", resourceCulture);
             }
         }
     }

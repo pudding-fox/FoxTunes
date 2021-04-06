@@ -7,12 +7,13 @@ namespace FoxTunes
 {
     [Component(ID, ComponentSlots.None)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [ComponentRelease(ReleaseType.Minimal)]
     public class SystemTheme : ThemeBase
     {
         public const string ID = "392B2FEE-B1E5-4776-AF3A-C28260EE8E81";
 
         public SystemTheme()
-            : base(ID, "System", releaseType: ReleaseType.Minimal)
+            : base(ID, Strings.SystemTheme_Name, Strings.SystemTheme_Description)
         {
 
         }

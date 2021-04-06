@@ -29,6 +29,8 @@ namespace FoxTunes.Interfaces
 
         void ForEach<T>(Action<T> action);
 
+        bool IsDefault(IBaseComponent component);
+
         void Clear();
     }
 }

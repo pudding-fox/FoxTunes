@@ -30,7 +30,7 @@ namespace FoxTunes
                 .WithElement(
                     new SelectionConfigurationElement(THEME_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Theme).WithOptions(GetThemeOptions()))
                 .WithElement(
-                    new SelectionConfigurationElement(LAYOUT_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Layout))
+                    new SelectionConfigurationElement(LAYOUT_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Layout).WithOptions(GetLayoutOptions()))
                 .WithElement(
                     new DoubleConfigurationElement(UI_SCALING_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Scaling, path: Strings.General_Advanced).WithValue(1.0).WithValidationRule(new DoubleValidationRule(1, 4, 0.4)))
                 .WithElement(
@@ -47,11 +47,10 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetThemeOptions()
         {
             var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             foreach (var theme in themes)
             {
                 var option = new SelectionConfigurationOption(theme.Id, theme.Name, theme.Description);
-                if (theme.ReleaseType == releaseType)
+                if (ComponentRegistry.Instance.IsDefault(theme))
                 {
                     option.Default();
                 }
@@ -65,6 +64,25 @@ namespace FoxTunes
             return themes.FirstOrDefault(theme => string.Equals(theme.Id, option.Id, StringComparison.OrdinalIgnoreCase));
         }
 
+        public static IEnumerable<SelectionConfigurationOption> GetLayoutOptions()
+        {
+            var layoutProviders = ComponentRegistry.Instance.GetComponents<IUILayoutProvider>();
+            foreach (var layoutProvider in layoutProviders)
+            {
+                var option = new SelectionConfigurationOption(layoutProvider.Id, layoutProvider.Name, layoutProvider.Description);
+                if (ComponentRegistry.Instance.IsDefault(layoutProvider))
+                {
+                    option.Default();
+                }
+                yield return option;
+            }
+        }
+
+        public static IUILayoutProvider GetLayout(SelectionConfigurationOption option)
+        {
+            var layoutProviders = ComponentRegistry.Instance.GetComponents<IUILayoutProvider>();
+            return layoutProviders.FirstOrDefault(layoutProvider => string.Equals(layoutProvider.Id, option.Id, StringComparison.OrdinalIgnoreCase));
+        }
 
         public static Type GetControl(SelectionConfigurationOption option)
         {

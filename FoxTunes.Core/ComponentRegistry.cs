@@ -115,6 +115,30 @@ namespace FoxTunes
             }
         }
 
+        public bool IsDefault(IBaseComponent component)
+        {
+            var type = component.GetType();
+            {
+                var attribute = type.GetCustomAttribute<ComponentAttribute>();
+                if (attribute != null && attribute.Default)
+                {
+                    return true;
+                }
+            }
+            {
+                var attribute = type.GetCustomAttribute<ComponentReleaseAttribute>();
+                if (attribute != null)
+                {
+                    var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
+                    if (attribute.ReleaseType == releaseType)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public void Clear()
         {
             this.Components = new List<IBaseComponent>();

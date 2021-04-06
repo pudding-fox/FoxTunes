@@ -1,17 +1,34 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class DefaultLayoutProvider : UILayoutProviderBase, IConfigurableComponent
+    public class DefaultLayoutProvider : UILayoutProviderBase
     {
+        public const string ID = "BBBB4ED2-782D-4622-ADF4-AAE2B543E0F3";
+
         public override string Id
         {
             get
             {
-                return DefaultLayoutProviderConfiguration.ID;
+                return ID;
+            }
+        }
+
+        public override string Name
+        {
+            get
+            {
+                return Strings.DefaultLayoutProvider_Name;
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                return Strings.DefaultLayoutProvider_Description;
             }
         }
 
@@ -28,11 +45,6 @@ namespace FoxTunes
                     return new DefaultLayout();
             }
             throw new NotImplementedException();
-        }
-
-        public IEnumerable<ConfigurationSection> GetConfigurationSections()
-        {
-            return DefaultLayoutProviderConfiguration.GetConfigurationSections();
         }
     }
 }

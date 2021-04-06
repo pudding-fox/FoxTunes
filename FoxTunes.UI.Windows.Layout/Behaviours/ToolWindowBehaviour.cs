@@ -32,7 +32,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Layout != null && string.Equals(this.Layout.Value.Id, UIComponentLayoutProviderConfiguration.ID);
+                return this.Layout != null && string.Equals(this.Layout.Value.Id, UIComponentLayoutProvider.ID);
             }
         }
 
