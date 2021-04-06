@@ -22,27 +22,27 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION)
+            yield return new ConfigurationSection(SECTION, Strings.KeyBindingsBehaviourConfiguration_Section)
                 .WithElement(
-                    new TextConfigurationElement(PLAY_ELEMENT, "Play")
+                    new TextConfigurationElement(PLAY_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Play)
                         .WithValue("Alt+Space"))
                 .WithElement(
-                    new TextConfigurationElement(PREVIOUS_ELEMENT, "Previous")
+                    new TextConfigurationElement(PREVIOUS_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Previous)
                         .WithValue("Alt+Left"))
                  .WithElement(
-                    new TextConfigurationElement(NEXT_ELEMENT, "Next")
+                    new TextConfigurationElement(NEXT_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Next)
                         .WithValue("Alt+Right"))
                 .WithElement(
-                    new TextConfigurationElement(STOP_ELEMENT, "Stop")
+                    new TextConfigurationElement(STOP_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Stop)
                         .WithValue("Alt+Back"))
                 .WithElement(
-                    new TextConfigurationElement(SETTINGS_ELEMENT, "Settings")
+                    new TextConfigurationElement(SETTINGS_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Settings)
                         .WithValue("Alt+S"))
                 .WithElement(
-                    new TextConfigurationElement(MINI_PLAYER_ELEMENT, "Toggle Mini Player")
+                    new TextConfigurationElement(MINI_PLAYER_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_ToggleMiniPlayer)
                         .WithValue("Alt+M"))
                 .WithElement(
-                    new TextConfigurationElement(SEARCH_ELEMENT, "Search")
+                    new TextConfigurationElement(SEARCH_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Search)
                         .WithValue("Alt+F")
             );
         }
