@@ -11,7 +11,7 @@ namespace FoxTunes
         {
             this._Providers = new Lazy<IDictionary<string, IUIPlaylistColumnProvider>>(
                 () => ComponentRegistry.Instance.GetComponents<IUIPlaylistColumnProvider>().ToDictionary(
-                    component => component.GetType().AssemblyQualifiedName
+                    component => component.Id
                 )
             );
         }

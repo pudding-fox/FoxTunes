@@ -11,10 +11,12 @@ using System.Windows.Markup;
 
 namespace FoxTunes
 {
-    [Component("2681C239-1291-4018-ACED-4933CC395FF6", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [Component(ID, ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class RatingBehaviour : StandardBehaviour, IInvocableComponent, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
+        public const string ID = "2681C239-1291-4018-ACED-4933CC395FF6";
+
         public const string SET_LIBRARY_RATING = "AAAE";
 
         public const string SET_PLAYLIST_RATING = "CCCC";
@@ -23,7 +25,7 @@ namespace FoxTunes
         {
             get
             {
-                return typeof(RatingBehaviour).AssemblyQualifiedName;
+                return ID;
             }
         }
 
@@ -63,7 +65,7 @@ namespace FoxTunes
         {
             get
             {
-                return "DA6971AA-FA99-46B6-83DB-22089DB935EC";
+                return "07E85D87-989A-46D5-9817-D7F837CE4091";
             }
         }
 

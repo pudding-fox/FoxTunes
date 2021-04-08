@@ -10,15 +10,17 @@ using System.Windows.Markup;
 
 namespace FoxTunes
 {
-    [Component("C0B2450C-DEDA-4D8B-8A32-5EA733F1FD45", null, priority: ComponentAttribute.PRIORITY_LOW)]
+    [Component(ID, null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class PlaybackStateBehaviour : StandardBehaviour, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
+        public const string ID = "C0B2450C-DEDA-4D8B-8A32-5EA733F1FD45";
+
         public string Id
         {
             get
             {
-                return typeof(PlaybackStateBehaviour).AssemblyQualifiedName;
+                return ID;
             }
         }
 
@@ -58,7 +60,7 @@ namespace FoxTunes
         {
             get
             {
-                return "5815AE1E-A96C-4DAF-BB78-9461B00C94A2";
+                return "784D5E56-D574-4CA9-8F93-70A7B0FF9B45";
             }
         }
 
