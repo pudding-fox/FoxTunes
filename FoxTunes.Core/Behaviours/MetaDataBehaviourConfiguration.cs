@@ -38,6 +38,8 @@ namespace FoxTunes
 
         public const string READ_POPULARIMETER_TAGS = "JJJJ6988-D3BF-434F-B326-3354D2922926";
 
+        public const string DETECT_COMPILATIONS = "JJKK150D-DB8D-4C64-99E4-10B453B26295";
+
         public const string THREADS_ELEMENT = "KKKK16BD-B4A7-4F9D-B4DA-F81E932F6DD9";
 
         public const string WRITE_ELEMENT = "LLLLEBD5-2675-42E4-8C9A-6E851DAA4D86";
@@ -80,6 +82,8 @@ namespace FoxTunes
                     new BooleanConfigurationElement(READ_REPLAY_GAIN_TAGS, Strings.MetaDataBehaviourConfiguration_ReplayGain).WithValue(releaseType == ReleaseType.Default).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
                     new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, Strings.MetaDataBehaviourConfiguration_Popularimeter).WithValue(releaseType == ReleaseType.Default).DependsOn(SECTION, ENABLE_ELEMENT))
+                .WithElement(
+                    new BooleanConfigurationElement(DETECT_COMPILATIONS, Strings.MetaDataBehaviourConfiguration_DetectCompilations).WithValue(releaseType == ReleaseType.Default).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
                     new IntegerConfigurationElement(THREADS_ELEMENT, Strings.MetaDataBehaviourConfiguration_Threads, path: Strings.General_Advanced).WithValue(Math.Max(Environment.ProcessorCount, 4)).WithValidationRule(new IntegerValidationRule(1, 32)).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(

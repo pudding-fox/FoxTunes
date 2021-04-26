@@ -28,5 +28,20 @@ namespace FoxTunes
                 }
             }, transaction);
         }
+
+        public Task Clear(PlaylistItemStatus playlistItemStatus, ITransactionSource transaction)
+        {
+            return this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryVariousArtists, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["name"] = CustomMetaData.VariousArtists;
+                        parameters["type"] = MetaDataItemType.Tag;
+                        parameters["status"] = playlistItemStatus;
+                        break;
+                }
+            }, transaction);
+        }
     }
 }
