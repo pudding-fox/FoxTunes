@@ -216,8 +216,20 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
                 }
+                this.OnSaved();
             });
         }
+
+        protected virtual void OnSaved()
+        {
+            if (this.Saved == null)
+            {
+                return;
+            }
+            this.Saved(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Saved;
 
         public void Delete()
         {
@@ -227,9 +239,17 @@ namespace FoxTunes
         public void Delete(string profile)
         {
             var fileName = Profiles.GetFileName(profile);
-            Profiles.Delete(profile);
-            File.Delete(fileName);
-            this.Load();
+            try
+            {
+                Profiles.Delete(profile);
+                File.Delete(fileName);
+                this.Load();
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to delete configuration: {0}", e.Message);
+            }
+            this.OnSaved();
         }
 
         public void Wait()

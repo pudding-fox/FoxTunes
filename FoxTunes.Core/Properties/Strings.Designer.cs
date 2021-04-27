@@ -322,6 +322,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Meta data settings were modified, rescan the library?.
+        /// </summary>
+        internal static string MetaDataRefreshBehaviour_Confirm {
+            get {
+                return ResourceManager.GetString("MetaDataRefreshBehaviour.Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Playback.
         /// </summary>
         internal static string PlaybackBehaviourConfiguration_Section {

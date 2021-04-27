@@ -98,7 +98,7 @@ namespace FoxTunes.ViewModel
                         await task.Run().ConfigureAwait(false);
                     }
                 }
-                await this.LibraryManager.Rescan().ConfigureAwait(false);
+                await this.LibraryManager.Rescan(false).ConfigureAwait(false);
                 return;
             }
             catch (Exception e)

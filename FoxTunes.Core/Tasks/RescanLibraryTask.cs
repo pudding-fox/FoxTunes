@@ -11,6 +11,13 @@ namespace FoxTunes
 {
     public class RescanLibraryTask : LibraryTaskBase
     {
+        public RescanLibraryTask(bool force)
+        {
+            this.Force = force;
+        }
+
+        public bool Force { get; private set; }
+
         public override bool Visible
         {
             get
@@ -59,6 +66,11 @@ namespace FoxTunes
         {
             var predicate = new Func<LibraryItem, bool>(libraryItem =>
             {
+                if (this.Force)
+                {
+                    //Full rescan was forced.
+                    return true;
+                }
                 if (!paths.Any(path => libraryItem.FileName.StartsWith(path)))
                 {
                     Logger.Write(this, LogLevel.Debug, "Removing unparented file: {0} => {1}", libraryItem.Id, libraryItem.FileName);

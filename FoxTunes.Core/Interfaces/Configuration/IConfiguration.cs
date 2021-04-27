@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
@@ -24,6 +25,8 @@ namespace FoxTunes.Interfaces
         void Save();
 
         void Save(string profile);
+
+        event EventHandler Saved;
 
         void Delete();
 

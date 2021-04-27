@@ -80,7 +80,7 @@ namespace FoxTunes
 
         protected virtual Task Rescan()
         {
-            return this.LibraryManager.Rescan();
+            return this.LibraryManager.Rescan(false);
         }
     }
 }

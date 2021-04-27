@@ -204,6 +204,9 @@
   <data name="MetaDataBehaviourConfiguration.WriteTagsAndStatistics" xml:space="preserve">
     <value>Tags &amp; Statistics</value>
   </data>
+  <data name="MetaDataRefreshBehaviour.Confirm" xml:space="preserve">
+    <value>Meta data settings were modified, rescan the library?</value>
+  </data>
   <data name="PlaybackBehaviourConfiguration.Section" xml:space="preserve">
     <value>Playback</value>
   </data>
