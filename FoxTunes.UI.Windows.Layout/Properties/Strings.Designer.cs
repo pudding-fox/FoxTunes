@@ -77,5 +77,50 @@ namespace FoxTunes {
                 return ResourceManager.GetString("UIComponentLayoutProvider.Name", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Main Layout.
+        /// </summary>
+        internal static string UIComponentLayoutProviderConfiguration_MainLayout {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderConfiguration.MainLayout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced\Layouts.
+        /// </summary>
+        internal static string UIComponentLayoutProviderConfiguration_Path {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preset.
+        /// </summary>
+        internal static string UIComponentLayoutProviderConfiguration_Preset {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderConfiguration.Preset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Main_1 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default (With WaveBar).
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Main_2 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.2", resourceCulture);
+            }
+        }
     }
 }
