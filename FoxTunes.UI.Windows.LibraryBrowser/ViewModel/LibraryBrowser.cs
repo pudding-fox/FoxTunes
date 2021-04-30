@@ -17,16 +17,6 @@ namespace FoxTunes.ViewModel
             this.Semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public override string UIComponent
-        {
-            get
-            {
-#pragma warning disable CS0436
-                return global::FoxTunes.LibraryBrowser.ID;
-#pragma warning restore CS0436
-            }
-        }
-
         public SemaphoreSlim Semaphore { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
