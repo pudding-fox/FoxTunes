@@ -14,13 +14,13 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Tray Icon")
+            yield return new ConfigurationSection(SECTION, Strings.NotifyIconConfiguration_Section)
                 .WithElement(
-                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
+                    new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.NotifyIconConfiguration_Enabled).WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(MINIMIZE_TO_TRAY_ELEMENT, "Minimize To Tray").WithValue(true).DependsOn(SECTION, ENABLED_ELEMENT))
+                    new BooleanConfigurationElement(MINIMIZE_TO_TRAY_ELEMENT, Strings.NotifyIconConfiguration_Minimize).WithValue(true).DependsOn(SECTION, ENABLED_ELEMENT))
                 .WithElement(
-                    new BooleanConfigurationElement(CLOSE_TO_TRAY_ELEMENT, "Close To Tray").WithValue(false).DependsOn(SECTION, ENABLED_ELEMENT)
+                    new BooleanConfigurationElement(CLOSE_TO_TRAY_ELEMENT, Strings.NotifyIconConfiguration_Close).WithValue(false).DependsOn(SECTION, ENABLED_ELEMENT)
             );
         }
     }

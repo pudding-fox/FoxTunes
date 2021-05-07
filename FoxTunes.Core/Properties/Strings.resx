@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EnqueueNextItemBehaviourConfiguration.Count" xml:space="preserve">
+    <value>Queue Size</value>
+  </data>
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
   </data>
@@ -207,8 +210,44 @@
   <data name="MetaDataRefreshBehaviour.Confirm" xml:space="preserve">
     <value>Meta data settings were modified, rescan the library?</value>
   </data>
+  <data name="NotifyIconConfiguration.Close" xml:space="preserve">
+    <value>Close To Tray</value>
+  </data>
+  <data name="NotifyIconConfiguration.Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="NotifyIconConfiguration.Minimize" xml:space="preserve">
+    <value>Minimize To Tray</value>
+  </data>
+  <data name="NotifyIconConfiguration.Section" xml:space="preserve">
+    <value>Tray Icon</value>
+  </data>
   <data name="PlaybackBehaviourConfiguration.Section" xml:space="preserve">
     <value>Playback</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.Order" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.Order.Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.Order.ShuffleAlbums" xml:space="preserve">
+    <value>Shuffle (Albums)</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.Order.ShuffleArtists" xml:space="preserve">
+    <value>Shuffle (Artists)</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.Order.ShuffleTracks" xml:space="preserve">
+    <value>Shuffle (Tracks)</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.PreSort" xml:space="preserve">
+    <value>Pre Sorting</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.Queue" xml:space="preserve">
+    <value>Queuing</value>
+  </data>
+  <data name="PlaylistBehaviourConfiguration.Section" xml:space="preserve">
+    <value>Playlist</value>
   </data>
   <data name="SearchBehaviourConfiguration.Commit" xml:space="preserve">
     <value>Commit Behaviour</value>
