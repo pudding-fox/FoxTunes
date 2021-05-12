@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxTunes.Integration;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -125,6 +126,16 @@ namespace FoxTunes
             //TODO: Bad .Wait().
             global::FoxTunes.Windows.Invoke(() => result = InputBox.ShowDialog(message)).Wait();
             return result;
+        }
+
+        public override void SelectInShell(string fileName)
+        {
+            Explorer.Select(fileName);
+        }
+
+        public override void OpenInShell(string fileName)
+        {
+            Explorer.Open(fileName);
         }
 
         public override void Restart()

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    //TODO: This code is platform specific and should be in the FoxTunes.Core.Windows package.
     public static class NetworkDrive
     {
         public static bool IsRemotePath(string path)
