@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -13,8 +12,6 @@ namespace FoxTunes
 
         public const string AUTO_LOOKUP_PROVIDER = "BBCC07C6-5584-4E7E-9526-EB60F9F72E49";
 
-        public const string EDITOR = "CCCCF394-0C2A-4BC3-ADA3-9E89F8C897D9";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.LyricsBehaviourConfiguration_Section)
@@ -25,8 +22,7 @@ namespace FoxTunes
                     .WithValue(false).DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
                 .WithElement(new SelectionConfigurationElement(AUTO_LOOKUP_PROVIDER, Strings.LyricsBehaviourConfiguration_AutoLookupProvider)
                     .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
-                    .DependsOn(SECTION, AUTO_LOOKUP))
-                .WithElement(new TextConfigurationElement(EDITOR, Strings.LyricsBehaviourConfiguration_Editor).WithValue("notepad.exe").DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
+                    .DependsOn(SECTION, AUTO_LOOKUP)
             );
         }
     }
