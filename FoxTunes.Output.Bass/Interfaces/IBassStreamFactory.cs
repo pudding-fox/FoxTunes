@@ -16,5 +16,9 @@ namespace FoxTunes.Interfaces
         IBassStream CreateBasicStream(PlaylistItem playlistItem, BassFlags flags);
 
         IBassStream CreateInteractiveStream(PlaylistItem playlistItem, bool immidiate, BassFlags flags);
+
+        bool HasActiveStream(string fileName);
+
+        bool ReleaseActiveStreams();
     }
 }
