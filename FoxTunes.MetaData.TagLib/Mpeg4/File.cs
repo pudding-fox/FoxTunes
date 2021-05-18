@@ -49,6 +49,11 @@ namespace FoxTunes.Mpeg4
 #endif
         }
 
+        public Task<IEnumerable<MetaDataItem>> GetMetaData(global::FoxTunes.Interfaces.IFileAbstraction fileAbstraction)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate)
         {
             var box = this.GetXtraBox();

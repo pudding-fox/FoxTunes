@@ -36,6 +36,11 @@ namespace FoxTunes
             return file;
         }
 
+        public File Create(IFileAbstraction fileAbstraction)
+        {
+            return File.Create(TagLibFileAbstraction.Create(fileAbstraction));
+        }
+
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return TagLibFileFactoryConfiguration.GetConfigurationSections();

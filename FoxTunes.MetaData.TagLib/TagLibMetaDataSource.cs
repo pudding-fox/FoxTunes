@@ -126,7 +126,17 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public async Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
+        public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
+        {
+            return this.GetMetaData(fileName, () => this.FileFactory.Create(fileName));
+        }
+
+        public Task<IEnumerable<MetaDataItem>> GetMetaData(IFileAbstraction fileAbstraction)
+        {
+            return this.GetMetaData(fileAbstraction.FileName, () => this.FileFactory.Create(fileAbstraction));
+        }
+
+        public async Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName, Func<File> factory)
         {
             if (!this.IsSupported(fileName))
             {
@@ -139,7 +149,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
             try
             {
-                using (var file = this.FileFactory.Create(fileName))
+                using (var file = factory())
                 {
                     if (file.PossiblyCorrupt)
                     {

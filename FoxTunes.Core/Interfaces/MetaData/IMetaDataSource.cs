@@ -10,6 +10,8 @@ namespace FoxTunes.Interfaces
 
         Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName);
 
+        Task<IEnumerable<MetaDataItem>> GetMetaData(IFileAbstraction fileAbstraction);
+
         Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate);
     }
 
