@@ -21,10 +21,19 @@ namespace FoxTunes
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement MetaData { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            this.Configuration = core.Components.Configuration;
+            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassArchiveStreamProviderBehaviourConfiguration.SECTION,
+                BassArchiveStreamProviderBehaviourConfiguration.METADATA_ELEMENT
+            );
             base.InitializeComponent(core);
         }
 
@@ -79,21 +88,24 @@ namespace FoxTunes
                             DirectoryName = directoryName,
                             FileName = fileName
                         };
-                        try
+                        if (this.MetaData.Value)
                         {
-                            using (var fileAbstraction = ArchiveFileAbstraction.Create(this.FileName, entry.path, a))
+                            try
                             {
-                                if (fileAbstraction.IsOpen)
+                                using (var fileAbstraction = ArchiveFileAbstraction.Create(this.FileName, entry.path, a))
                                 {
-                                    playlistItem.MetaDatas = (
-                                        await metaDataSource.GetMetaData(fileAbstraction).ConfigureAwait(false)
-                                    ).ToList();
+                                    if (fileAbstraction.IsOpen)
+                                    {
+                                        playlistItem.MetaDatas = (
+                                            await metaDataSource.GetMetaData(fileAbstraction).ConfigureAwait(false)
+                                        ).ToList();
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", this.FileName, e.Message);
+                            catch (Exception e)
+                            {
+                                Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", this.FileName, e.Message);
+                            }
                         }
                         this.EnsureMetaData(a, entry, playlistItem);
                         playlistItems.Add(playlistItem);

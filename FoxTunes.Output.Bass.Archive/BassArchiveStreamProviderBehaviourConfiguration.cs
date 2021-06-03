@@ -8,10 +8,17 @@ namespace FoxTunes
 
         public const string ENABLED_ELEMENT = "AAAA73E0-DAAD-4B73-A375-D6D820AFAE93";
 
+        public const string METADATA_ELEMENT = "BBBB68A8-AC18-4FBF-8C87-DE24EA49262C";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Archive")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false));
+            yield return new ConfigurationSection(SECTION, Strings.BassArchiveStreamProviderBehaviourConfiguration_Section)
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.BassArchiveStreamProviderBehaviourConfiguration_Enabled)
+                    .WithValue(false))
+                .WithElement(new BooleanConfigurationElement(METADATA_ELEMENT, Strings.BassArchiveStreamProviderBehaviourConfiguration_MetaData)
+                    .WithValue(true)
+                    .DependsOn(SECTION, ENABLED_ELEMENT)
+                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT));
         }
     }
 }
