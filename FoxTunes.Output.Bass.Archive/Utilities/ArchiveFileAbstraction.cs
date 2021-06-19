@@ -43,7 +43,7 @@ namespace FoxTunes
 
         public void Open()
         {
-            if (!ArchiveEntry.OpenEntry(this.FileName, this.Index, BassZipStream.Overwrite, out this.Entry))
+            if (!ArchiveEntry.OpenEntry(this.FileName, this.Index, out this.Entry))
             {
                 return;
             }

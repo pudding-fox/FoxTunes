@@ -64,11 +64,7 @@ namespace FoxTunes
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (offset != 0)
-            {
-                throw new NotImplementedException();
-            }
-            return ArchiveEntry.ReadEntry(this.Entry, buffer, count);
+            return ArchiveEntry.ReadEntry(this.Entry, buffer, offset, count);
         }
 
         public override long Seek(long offset, SeekOrigin origin)

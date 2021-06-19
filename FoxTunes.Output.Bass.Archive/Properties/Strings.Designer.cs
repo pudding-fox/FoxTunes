@@ -61,6 +61,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Buffer Size (%).
+        /// </summary>
+        internal static string BassArchiveStreamProviderBehaviourConfiguration_BufferMin {
+            get {
+                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.BufferMin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buffer Timeout (ms).
+        /// </summary>
+        internal static string BassArchiveStreamProviderBehaviourConfiguration_BufferTimeout {
+            get {
+                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.BufferTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         internal static string BassArchiveStreamProviderBehaviourConfiguration_Enabled {
