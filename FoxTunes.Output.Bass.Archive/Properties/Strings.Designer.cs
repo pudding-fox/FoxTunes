@@ -79,6 +79,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cleanup Temp Files.
+        /// </summary>
+        internal static string BassArchiveStreamProviderBehaviourConfiguration_Cleanup {
+            get {
+                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.Cleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         internal static string BassArchiveStreamProviderBehaviourConfiguration_Enabled {

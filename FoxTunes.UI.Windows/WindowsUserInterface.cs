@@ -120,11 +120,11 @@ namespace FoxTunes
             return result;
         }
 
-        public override string Prompt(string message)
+        public override string Prompt(string message, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None)
         {
             var result = default(string);
             //TODO: Bad .Wait().
-            global::FoxTunes.Windows.Invoke(() => result = InputBox.ShowDialog(message)).Wait();
+            global::FoxTunes.Windows.Invoke(() => result = InputBox.ShowDialog(message, flags)).Wait();
             return result;
         }
 

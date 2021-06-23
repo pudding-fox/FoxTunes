@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using FoxTunes.Interfaces;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FoxTunes
@@ -18,6 +20,15 @@ namespace FoxTunes
             get
             {
                 return "1EC1A063-DC6A-4264-8882-0A01B8F6B80E";
+            }
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var children = this.Result.FindChildren<Control>();
+            foreach (var child in children)
+            {
+                child.Focus();
             }
         }
 
@@ -44,21 +55,25 @@ namespace FoxTunes
             this.DialogResult = false;
         }
 
-        public static string ShowDialog(string prompt)
+        public static string ShowDialog(string prompt, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None)
         {
             var instance = new InputBox()
             {
                 Owner = Windows.ActiveWindow
             };
-            instance.Prompt.Text = prompt;
 
-            if (instance.ShowDialog().GetValueOrDefault())
+            var viewModel = instance.TryFindResource("ViewModel") as global::FoxTunes.ViewModel.InputBox;
+            if (viewModel != null)
             {
-                return instance.Result.Text;
+                viewModel.Prompt = prompt;
+                viewModel.Flags = flags;
+                if (instance.ShowDialog().GetValueOrDefault())
+                {
+                    return viewModel.Result.GetResult();
+                }
             }
 
             return null;
         }
-
     }
 }

@@ -19,7 +19,7 @@ namespace FoxTunes
 
         public abstract bool Confirm(string message);
 
-        public abstract string Prompt(string message);
+        public abstract string Prompt(string message, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None);
 
         public abstract void SelectInShell(string fileName);
 

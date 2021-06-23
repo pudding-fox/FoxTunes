@@ -73,6 +73,12 @@ namespace FoxTunes
             {
                 SetSelectedItems(this.ListView, this.ListView.SelectedItems);
             }
+
+            protected override void OnDisposing()
+            {
+                this.ListView.SelectionChanged -= this.OnSelectionChanged;
+                base.OnDisposing();
+            }
         }
     }
 }

@@ -31,20 +31,24 @@ namespace FoxTunes
 
         protected virtual bool GetPassword(ref Archive.ArchivePassword password)
         {
+            password.password = string.Empty;
             lock (SyncRoot)
             {
-                if (this.Passwords.TryGetValue(password.path, out password.password))
+                if (!this.Passwords.TryGetValue(password.path, out password.password))
                 {
-                    return true;
-                }
-                password.password = this.UserInterface.Prompt(string.Format("Please enter the password for \"{0}\":", password.path.GetName()));
-                if (!string.IsNullOrEmpty(password.password))
-                {
+                    password.password = this.UserInterface.Prompt(
+                        string.Format("Please enter the password for \"{0}\":", password.path.GetName()),
+                        UserInterfacePromptFlags.Password
+                    );
                     this.Passwords[password.path] = password.password;
-                    return true;
                 }
             }
-            return false;
+            return string.IsNullOrEmpty(password.password);
+        }
+
+        public void Reset()
+        {
+            this.Passwords.Clear();
         }
     }
 }
