@@ -43,12 +43,36 @@ namespace FoxTunes
                     this.Passwords[password.path] = password.password;
                 }
             }
-            return string.IsNullOrEmpty(password.password);
+            return !string.IsNullOrEmpty(password.password);
+        }
+
+        public bool WasCancelled(string fileName)
+        {
+            lock (SyncRoot)
+            {
+                var password = default(string);
+                if (this.Passwords.TryGetValue(fileName, out password))
+                {
+                    if (string.IsNullOrEmpty(password))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public void Reset()
         {
             this.Passwords.Clear();
+        }
+
+        public bool Reset(string fileName)
+        {
+            lock (SyncRoot)
+            {
+                return this.Passwords.Remove(fileName);
+            }
         }
     }
 }
