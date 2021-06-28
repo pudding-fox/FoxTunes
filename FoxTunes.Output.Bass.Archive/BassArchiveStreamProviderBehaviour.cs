@@ -61,6 +61,22 @@ namespace FoxTunes
             }
         }
 
+        private bool _DoubleBuffer { get; set; }
+
+        public bool DoubleBuffer
+        {
+            get
+            {
+                return this._DoubleBuffer;
+            }
+            set
+            {
+                this._DoubleBuffer = value;
+                BassZipStream.SetConfig(BassZipStreamAttribute.DoubleBuffer, value);
+                Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
+            }
+        }
+
         private bool _Enabled { get; set; }
 
         public bool Enabled
@@ -95,6 +111,10 @@ namespace FoxTunes
             ).ConnectValue(value => this.BufferTimeout = value);
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassArchiveStreamProviderBehaviourConfiguration.SECTION,
+                BassArchiveStreamProviderBehaviourConfiguration.DOUBLE_BUFFER_ELEMENT
+            ).ConnectValue(value => this.DoubleBuffer = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassArchiveStreamProviderBehaviourConfiguration.SECTION,
                 BassArchiveStreamProviderBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
             base.InitializeComponent(core);
@@ -112,8 +132,9 @@ namespace FoxTunes
                 flags |= BassFlags.Float;
             }
             BassUtils.OK(BassZipStream.Init());
+            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.BufferMin, this.BufferMin));
             BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, this.BufferTimeout));
-            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, this.BufferTimeout));
+            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.DoubleBuffer, this.DoubleBuffer));
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS ZIPSTREAM Initialized.");
         }
