@@ -13,11 +13,6 @@ namespace FoxTunes
     {
         const int START_STOP_TIMEOUT = 10000;
 
-        static BassOutput()
-        {
-            BassPluginLoader.Instance.Load();
-        }
-
         const int START_ATTEMPTS = 5;
 
         const int START_ATTEMPT_INTERVAL = 400;
@@ -73,6 +68,8 @@ namespace FoxTunes
         public ICore Core { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
+
+        public IBassPluginLoader PluginLoader { get; private set; }
 
         public IBassStreamFactory StreamFactory { get; private set; }
 
@@ -343,6 +340,7 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.RESAMPLE_QUALITY_ELEMENT
             ).ConnectValue(value => this.ResamplingQuality = value);
+            this.PluginLoader = ComponentRegistry.Instance.GetComponent<IBassPluginLoader>();
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             this.PipelineManager.Error += this.OnPipelineManagerError;
@@ -360,14 +358,14 @@ namespace FoxTunes
         {
             get
             {
-                return BassUtils.GetInputFormats();
+                return this.PluginLoader.Extensions;
             }
         }
 
         public override bool IsSupported(string fileName)
         {
             var extension = fileName.GetExtension();
-            return BassUtils.IsSupported(extension);
+            return this.PluginLoader.IsSupported(extension);
         }
 
         public override bool IsLoaded(string fileName)

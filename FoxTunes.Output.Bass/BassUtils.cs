@@ -1,19 +1,10 @@
 ﻿using ManagedBass;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public static class BassUtils
     {
-        private static readonly ConcurrentDictionary<string, bool> SUPPORTED_FORMATS = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-        public static readonly HashSet<string> BUILT_IN_FORMATS = new HashSet<string>(new[]
-        {
-            "mp1", "mp2", "mp3", "ogg", "wav", "aif"
-        });
-
         public static int GetDeviceNumber(int device)
         {
             if (device != Bass.DefaultDevice)
@@ -30,37 +21,6 @@ namespace FoxTunes
                 }
             }
             throw new BassException(Errors.Device);
-        }
-
-        public static IEnumerable<string> GetInputFormats()
-        {
-            var formats = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var format in BUILT_IN_FORMATS)
-            {
-                formats.Add(format);
-            }
-            foreach (var plugin in BassPluginLoader.Instance.Plugins)
-            {
-                foreach (var format in plugin.Info.Formats)
-                {
-                    foreach (var extension in format.FileExtensions.Split(';'))
-                    {
-                        formats.Add(extension.TrimStart('*', '.'));
-                    }
-                }
-            }
-            return formats;
-        }
-
-        public static bool IsSupported(string extension)
-        {
-            var supported = default(bool);
-            if (!SUPPORTED_FORMATS.TryGetValue(extension, out supported))
-            {
-                supported = GetInputFormats().Contains(extension, true);
-                SUPPORTED_FORMATS.TryAdd(extension, supported);
-            }
-            return supported;
         }
 
         public static string DepthDescription(BassFlags flags)

@@ -36,12 +36,9 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
-            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 

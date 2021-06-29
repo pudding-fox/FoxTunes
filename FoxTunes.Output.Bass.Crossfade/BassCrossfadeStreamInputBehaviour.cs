@@ -8,11 +8,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassCrossfadeStreamInputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
-        static BassCrossfadeStreamInputBehaviour()
-        {
-            BassPluginLoader.Instance.Load();
-        }
-
         public BassCrossfadeStreamInputBehaviour()
         {
             BassUtils.OK(BassCrossfade.Init());
