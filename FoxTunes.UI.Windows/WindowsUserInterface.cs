@@ -114,9 +114,17 @@ namespace FoxTunes
         public override bool Confirm(string message)
         {
             var result = default(bool);
-            //TODO: This is the only MessageBox provided with a Window.
-            //TODO: Bad .Wait().
-            global::FoxTunes.Windows.Invoke(() => result = MessageBox.Show(ActiveWindow, message, "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK).Wait();
+            if (ActiveWindow != null)
+            {
+                //TODO: This is the only MessageBox provided with a Window.
+                //TODO: Bad .Wait().
+                global::FoxTunes.Windows.Invoke(() => result = MessageBox.Show(ActiveWindow, message, "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK).Wait();
+            }
+            else
+            {
+                //TODO: Bad .Wait().
+                global::FoxTunes.Windows.Invoke(() => result = MessageBox.Show(message, "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK).Wait();
+            }
             return result;
         }
 

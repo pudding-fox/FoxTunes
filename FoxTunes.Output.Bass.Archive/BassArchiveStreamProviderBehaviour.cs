@@ -185,7 +185,7 @@ namespace FoxTunes
             {
                 return false;
             }
-            if (!File.Exists(path) || !ArchiveUtils.Extensions.Contains(path.GetExtension(), true))
+            if (!File.Exists(path) || !ArchiveUtils.Extensions.Contains(path.GetExtension(), StringComparer.OrdinalIgnoreCase))
             {
                 return false;
             }

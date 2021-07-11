@@ -24,6 +24,9 @@ namespace FoxTunes.ViewModel
             try
             {
                 this.OnPositionChanged();
+                this.OnPositionDescriptionChanged();
+                this.OnRemainingChanged();
+                this.OnRemainingDescriptionChanged();
                 this.OnDescriptionChanged();
             }
             catch
@@ -69,6 +72,63 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler PositionChanged;
 
+        public string PositionDescription
+        {
+            get
+            {
+                return this.InnerOutputStream.GetDuration(this.Position).ToString(@"mm\:ss");
+            }
+        }
+
+        protected virtual void OnPositionDescriptionChanged()
+        {
+            if (this.PositionDescriptionChanged != null)
+            {
+                this.PositionDescriptionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("PositionDescription");
+        }
+
+        public event EventHandler PositionDescriptionChanged;
+
+        public long Remaining
+        {
+            get
+            {
+                return this.Length - this.Position;
+            }
+        }
+
+        protected virtual void OnRemainingChanged()
+        {
+            if (this.RemainingChanged != null)
+            {
+                this.RemainingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Remaining");
+        }
+
+        public event EventHandler RemainingChanged;
+
+        public string RemainingDescription
+        {
+            get
+            {
+                return this.InnerOutputStream.GetDuration(this.Remaining).ToString(@"mm\:ss");
+            }
+        }
+
+        protected virtual void OnRemainingDescriptionChanged()
+        {
+            if (this.RemainingDescriptionChanged != null)
+            {
+                this.RemainingDescriptionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("RemainingDescription");
+        }
+
+        public event EventHandler RemainingDescriptionChanged;
+
         public long Length
         {
             get
@@ -77,15 +137,19 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public string LengthDescription
+        {
+            get
+            {
+                return this.InnerOutputStream.GetDuration(this.Length).ToString(@"mm\:ss");
+            }
+        }
+
         public string Description
         {
             get
             {
-                return string.Format(
-                    "{0}/{1}",
-                    this.InnerOutputStream.GetDuration(this.InnerOutputStream.Position).ToString(@"mm\:ss"),
-                    this.InnerOutputStream.GetDuration(this.InnerOutputStream.Length).ToString(@"mm\:ss")
-                );
+                return string.Format("{0}/{1}", this.PositionDescription, this.LengthDescription);
             }
         }
 

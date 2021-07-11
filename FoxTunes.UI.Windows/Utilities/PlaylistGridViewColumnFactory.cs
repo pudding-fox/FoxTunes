@@ -123,7 +123,7 @@ namespace FoxTunes
                     var provider = PlaylistColumnProviderManager.GetProvider(column.PlaylistColumn.Plugin);
                     if (provider != null)
                     {
-                        return names.Any(name => provider.MetaData.Contains(name, true));
+                        return names.Any(name => provider.MetaData.Contains(name, StringComparer.OrdinalIgnoreCase));
                     }
                     break;
             }

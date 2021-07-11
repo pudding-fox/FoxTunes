@@ -108,7 +108,7 @@ namespace FoxTunes.ViewModel
         {
             if (names != null && names.Any())
             {
-                if (!names.Contains(CommonImageTypes.FrontCover, true))
+                if (!names.Contains(CommonImageTypes.FrontCover, StringComparer.OrdinalIgnoreCase))
                 {
 #if NET40
                     return TaskEx.FromResult(false);

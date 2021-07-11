@@ -358,6 +358,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show Counters.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_Counters {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Counters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Cursor Adorners.
         /// </summary>
         public static string WindowsUserInterfaceConfiguration_Cursors {
