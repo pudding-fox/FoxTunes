@@ -13,6 +13,9 @@
     <UserControl.Resources>
         <ViewModel:StreamPosition x:Key="ViewModel" Core="{Binding}"></ViewModel:StreamPosition>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="FontSize" Value="20"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"></Setter>
             <Setter Property="Visibility" Value="Collapsed"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ShowCounters.Value, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
@@ -24,16 +27,16 @@
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_STREAM_POSITION}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <Grid>
+    <Grid ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding CurrentStream.PositionDescription, Source={StaticResource  ViewModel}}" Foreground="{DynamicResource TextBrush}" FontSize="20" Margin="0,0,3,0">
+        <TextBlock Grid.Column="0" Text="{Binding CurrentStream.PositionDescription, Source={StaticResource  ViewModel}}" Margin="0,0,4,0">
 
         </TextBlock>
-        <Slider Grid.Column="1" VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <Slider Grid.Column="1" VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="PreviewMouseDown">
                     <ViewModel:InvokeParameterizedCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></ViewModel:InvokeParameterizedCommandAction>
@@ -43,8 +46,9 @@
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
         </Slider>
-        <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{Binding CurrentStream.RemainingDescription, Source={StaticResource  ViewModel}}"  Foreground="{DynamicResource TextBrush}" FontSize="20" Margin="3,0,0,0">
+        <TextBlock Grid.Column="2" Text="{Binding CurrentStream.RemainingDescription, Source={StaticResource  ViewModel}}" Margin="4,0,0,0">
 
         </TextBlock>
+        <Rectangle Grid.ColumnSpan="3" Fill="Transparent"></Rectangle>
     </Grid>
 </Windows:UIComponentBase>
