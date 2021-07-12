@@ -14,7 +14,7 @@ namespace FoxTunes
         {
             get
             {
-                return Path.GetDirectoryName(typeof(BassPluginLoader).Assembly.Location);
+                return Path.GetDirectoryName(typeof(BassModStreamProvider).Assembly.Location);
             }
         }
 
