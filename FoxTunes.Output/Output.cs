@@ -81,6 +81,10 @@ namespace FoxTunes
 
         public abstract float[] GetBuffer(int fftSize);
 
-        public abstract int GetData(float[] buffer, int fftSize, bool interleaved);
+        public abstract int GetData(float[] buffer, int fftSize);
+
+        public abstract int GetRate();
+
+        public abstract int GetDepth();
     }
 }

@@ -51,7 +51,15 @@ namespace FoxTunes
 
         public const string FFT_1024_OPTION = "BBBB7106-4174-4A1E-9590-B1798B4187A3";
 
-        public const string FFT_2048_OPTION = "CCCCA066-CABA-4FEF-8987-14B11F16E5AE";
+        public const string FFT_2048_OPTION = "CCCC7106-4174-4A1E-9590-B1798B4187A3";
+
+        public const string FFT_4096_OPTION = "DDDD7106-4174-4A1E-9590-B1798B4187A3";
+
+        public const string FFT_8192_OPTION = "EEEE7106 - 4174 - 4A1E-9590-B1798B4187A3";
+
+        public const string FFT_16384_OPTION = "FFFF7106-4174-4A1E-9590-B1798B4187A3";
+
+        public const string FFT_32768_OPTION = "GGGG7106-4174-4A1E-9590-B1798B4187A3";
 
         public const string AMPLITUDE_ELEMENT = "HHHH7D69-3C36-44EB-8960-4147A148F31A";
 
@@ -164,6 +172,10 @@ namespace FoxTunes
             yield return new SelectionConfigurationOption(FFT_512_OPTION, "512");
             yield return new SelectionConfigurationOption(FFT_1024_OPTION, "1024");
             yield return new SelectionConfigurationOption(FFT_2048_OPTION, "2048");
+            yield return new SelectionConfigurationOption(FFT_4096_OPTION, "4096");
+            yield return new SelectionConfigurationOption(FFT_8192_OPTION, "8192");
+            yield return new SelectionConfigurationOption(FFT_16384_OPTION, "16384");
+            yield return new SelectionConfigurationOption(FFT_32768_OPTION, "32768");
         }
 
         public static int GetFFTSize(SelectionConfigurationOption option)
@@ -177,6 +189,14 @@ namespace FoxTunes
                 default:
                 case FFT_2048_OPTION:
                     return 2048;
+                case FFT_4096_OPTION:
+                    return 4096;
+                case FFT_8192_OPTION:
+                    return 8192;
+                case FFT_16384_OPTION:
+                    return 16384;
+                case FFT_32768_OPTION:
+                    return 32768;
             }
         }
 

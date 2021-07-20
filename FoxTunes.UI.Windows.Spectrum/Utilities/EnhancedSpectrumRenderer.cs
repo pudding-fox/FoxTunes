@@ -7,11 +7,31 @@ using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
-    public class SpectrumRenderer : RendererBase
+    public class EnhancedSpectrumRenderer : RendererBase
     {
-        const int SCALE_FACTOR = 4;
+        public static readonly int[] BANDS = new[]
+       {
+            20,
+            50,
+            100,
+            200,
+            500,
+            1000,
+            2000,
+            5000,
+            10000,
+            20000
+        };
 
-        const int ROLLOFF_INTERVAL = 500;
+        public static readonly int MIN_FREQ = BANDS[0];
+
+        public static readonly int MAX_FREQ = BANDS[BANDS.Length - 1];
+
+        public const float DB_MIN = -90;
+
+        public const float DB_MAX = 0;
+
+        public const int ROLLOFF_INTERVAL = 500;
 
         public readonly object SyncRoot = new object();
 
@@ -23,11 +43,7 @@ namespace FoxTunes
 
         public IOutput Output { get; private set; }
 
-        public SelectionConfigurationElement Bars { get; private set; }
-
         public BooleanConfigurationElement ShowPeaks { get; private set; }
-
-        public BooleanConfigurationElement HighCut { get; private set; }
 
         public BooleanConfigurationElement Smooth { get; private set; }
 
@@ -39,9 +55,7 @@ namespace FoxTunes
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
-        public IntegerConfigurationElement Amplitude { get; private set; }
-
-        public SpectrumRenderer()
+        public EnhancedSpectrumRenderer()
         {
             this.Timer = new global::System.Timers.Timer();
             this.Timer.AutoReset = false;
@@ -53,18 +67,10 @@ namespace FoxTunes
             base.InitializeComponent(core);
             PlaybackStateNotifier.Notify += this.OnNotify;
             this.Output = core.Components.Output;
-            this.Bars = this.Configuration.GetElement<SelectionConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.BARS_ELEMENT
-            );
             this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.PEAKS_ELEMENT
              );
-            this.HighCut = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.HIGH_CUT_ELEMENT
-            );
             this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.SMOOTH_ELEMENT
@@ -85,20 +91,13 @@ namespace FoxTunes
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
-            this.Amplitude = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.AMPLITUDE_ELEMENT
-            );
             this.ScalingFactor.ValueChanged += this.OnValueChanged;
-            this.Bars.ValueChanged += this.OnValueChanged;
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
-            this.HighCut.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
             this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.UpdateInterval.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
-            this.Amplitude.ValueChanged += this.OnValueChanged;
 #if NET40
             var task = TaskEx.Run(async () =>
 #else
@@ -136,15 +135,7 @@ namespace FoxTunes
                     this.Timer.Interval = UpdateInterval.Value;
                 }
             }
-            if (object.ReferenceEquals(sender, this.Bars))
-            {
-                //Changing bars requires full refresh.
-                var task = this.CreateBitmap();
-            }
-            else
-            {
-                var task = this.RefreshBitmap();
-            }
+            var task = this.RefreshBitmap();
         }
 
         protected override void CreateViewBox()
@@ -153,14 +144,11 @@ namespace FoxTunes
                 this.Output,
                 this.Bitmap.PixelWidth,
                 this.Bitmap.PixelHeight,
-                SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                 SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.HoldInterval.Value,
                 this.UpdateInterval.Value,
                 this.SmoothingFactor.Value,
-                this.Amplitude.Value,
-                this.ShowPeaks.Value,
-                this.HighCut.Value
+                this.ShowPeaks.Value
             );
             this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
         }
@@ -173,14 +161,11 @@ namespace FoxTunes
                     this.Output,
                     this.Bitmap.PixelWidth,
                     this.Bitmap.PixelHeight,
-                    SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                     SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                     this.HoldInterval.Value,
                     this.UpdateInterval.Value,
                     this.SmoothingFactor.Value,
-                    this.Amplitude.Value,
-                    this.ShowPeaks.Value,
-                    this.HighCut.Value
+                    this.ShowPeaks.Value
                 );
             });
         }
@@ -249,7 +234,7 @@ namespace FoxTunes
             var elements = this.RendererData.Elements;
             var peaks = this.RendererData.Peaks;
 
-            for (var a = 0; a < this.RendererData.Count; a++)
+            for (var a = 0; a < elements.Length; a++)
             {
                 elements[a].X = a * this.RendererData.Step;
                 elements[a].Y = this.RendererData.Height - 1;
@@ -304,7 +289,7 @@ namespace FoxTunes
             {
                 return 1;
             }
-            return this.RendererData.Count * this.RendererData.Step;
+            return BANDS.Length * this.RendererData.Step;
         }
 
         protected override Freezable CreateInstanceCore()
@@ -328,17 +313,9 @@ namespace FoxTunes
             {
                 this.ScalingFactor.ValueChanged -= this.OnValueChanged;
             }
-            if (this.Bars != null)
-            {
-                this.Bars.ValueChanged -= this.OnValueChanged;
-            }
             if (this.ShowPeaks != null)
             {
                 this.ShowPeaks.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.HighCut != null)
-            {
-                this.HighCut.ValueChanged -= this.OnValueChanged;
             }
             if (this.Smooth != null)
             {
@@ -360,10 +337,6 @@ namespace FoxTunes
             {
                 this.FFTSize.ValueChanged -= this.OnValueChanged;
             }
-            if (this.Amplitude != null)
-            {
-                this.Amplitude.ValueChanged -= this.OnValueChanged;
-            }
         }
 
         private static void Render(BitmapHelper.RenderInfo info, SpectrumRendererData rendererData)
@@ -373,7 +346,7 @@ namespace FoxTunes
 
             BitmapHelper.Clear(info);
 
-            for (var a = 0; a < rendererData.Count; a++)
+            for (var a = 0; a < elements.Length; a++)
             {
                 BitmapHelper.DrawRectangle(
                     info,
@@ -403,29 +376,28 @@ namespace FoxTunes
         {
             var samples = data.Samples;
             var values = data.Values;
+            var position = default(int);
+            var value = default(float);
 
-            if (data.SamplesPerElement > 1)
+            for (var a = FrequencyToIndex(BANDS[0], data.FFTSize, data.Rate); a < data.FFTSize; a++)
             {
-                for (int a = 0, b = 0; a < data.FFTRange && b < values.Length; a += data.SamplesPerElement, b++)
+                var frequency = IndexToFrequency(a, data.FFTSize, data.Rate);
+                while (frequency > BANDS[position])
                 {
-                    var value = 0.0f;
-                    for (var c = 0; c < data.SamplesPerElement; c++)
+                    if (position < (BANDS.Length - 1))
                     {
-                        var boost = (float)(1.0f + a * data.Amplitude);
-                        value += (float)(Math.Sqrt(samples[a + c] * boost) * SCALE_FACTOR);
+                        values[position] = value;
+                        position++;
+                        value = 0.0f;
                     }
-                    values[b] = Math.Min(Math.Max(value / data.SamplesPerElement, 0), 1);
+                    else
+                    {
+                        values[position] = value;
+                        return;
+                    }
                 }
-            }
-            else
-            {
-                //Not enough samples to fill the values, do the best we can.
-                for (int a = 0; a < data.Count; a++)
-                {
-                    var boost = (float)(1.0f + a * data.Amplitude);
-                    var value = (float)(Math.Sqrt(samples[a] * boost) * SCALE_FACTOR);
-                    data.Values[a] = Math.Min(Math.Max(value, 0), 1);
-                }
+                var dB = Math.Min(Math.Max((float)(20 * Math.Log10(samples[a])), DB_MIN), DB_MAX);
+                value = 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
             }
         }
 
@@ -434,7 +406,7 @@ namespace FoxTunes
             var values = data.Values;
             var elements = data.Elements;
 
-            for (var a = 0; a < data.Count; a++)
+            for (var a = 0; a < elements.Length; a++)
             {
                 var barHeight = Convert.ToInt32(values[a] * data.Height);
                 elements[a].X = a * data.Step;
@@ -457,7 +429,7 @@ namespace FoxTunes
             var elements = data.Elements;
 
             var fast = (float)data.Height / data.Smoothing;
-            for (var a = 0; a < data.Count; a++)
+            for (var a = 0; a < elements.Length; a++)
             {
                 var barHeight = Convert.ToInt32(values[a] * data.Height);
                 elements[a].X = a * data.Step;
@@ -518,7 +490,7 @@ namespace FoxTunes
             var elements = data.Elements;
 
             var fast = data.Height / 4;
-            for (int a = 0; a < data.Count; a++)
+            for (int a = 0; a < elements.Length; a++)
             {
                 if (elements[a].Y < peaks[a].Y)
                 {
@@ -561,38 +533,47 @@ namespace FoxTunes
             data.LastUpdated = DateTime.UtcNow;
         }
 
-        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, int holdInterval, int updateInterval, int smoothingFactor, int amplitude, bool showPeaks, bool highCut)
+        private static int Nyquist(int rate)
+        {
+            return rate / 2;
+        }
+
+        public static int IndexToFrequency(int index, int fftSize, int rate)
+        {
+            return (int)Math.Floor((double)index * (double)rate / (double)fftSize);
+        }
+
+        public static int FrequencyToIndex(int frequency, int fftSize, int rate)
+        {
+            var index = (int)Math.Floor((double)fftSize * (double)frequency / (double)rate);
+            if (index > fftSize / 2 - 1)
+            {
+                index = fftSize / 2 - 1;
+            }
+            return index;
+        }
+
+        public static SpectrumRendererData Create(IOutput output, int width, int height, int fftSize, int holdInterval, int updateInterval, int smoothingFactor, bool showPeaks)
         {
             var data = new SpectrumRendererData()
             {
                 Output = output,
                 Width = width,
                 Height = height,
-                Count = count,
                 FFTSize = fftSize,
                 HoldInterval = holdInterval,
                 UpdateInterval = updateInterval,
                 Smoothing = smoothingFactor,
-                Amplitude = (float)amplitude / 500,
                 Samples = output.GetBuffer(fftSize),
-                Values = new float[count],
-                Elements = new Int32Rect[count]
+                Values = new float[BANDS.Length],
+                Elements = new Int32Rect[BANDS.Length]
             };
             if (showPeaks)
             {
-                data.Peaks = new Int32Rect[count];
-                data.Holds = new int[count];
+                data.Peaks = new Int32Rect[BANDS.Length];
+                data.Holds = new int[BANDS.Length];
             }
-            if (highCut)
-            {
-                data.FFTRange = data.Samples.Length - (data.Samples.Length / 4);
-            }
-            else
-            {
-                data.FFTRange = data.Samples.Length;
-            }
-            data.SamplesPerElement = Math.Max(data.FFTRange / count, 1);
-            data.Step = width / count;
+            data.Step = width / BANDS.Length;
             return data;
         }
 
@@ -600,25 +581,21 @@ namespace FoxTunes
         {
             public IOutput Output;
 
+            public int Rate;
+
+            public int Depth;
+
             public int FFTSize;
-
-            public int FFTRange;
-
-            public float Amplitude;
 
             public float[] Samples;
 
             public float[] Values;
-
-            public int SamplesPerElement;
 
             public int Step;
 
             public int Width;
 
             public int Height;
-
-            public int Count;
 
             public Int32Rect[] Elements;
 
@@ -636,6 +613,8 @@ namespace FoxTunes
 
             public bool Update()
             {
+                this.Rate = this.Output.GetRate();
+                this.Depth = this.Output.GetDepth();
                 return this.Output.GetData(this.Samples, this.FFTSize) > 0;
             }
         }
