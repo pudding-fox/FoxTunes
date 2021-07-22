@@ -25,7 +25,7 @@
         <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
     </UserControl.Background>
     <UserControl.ContextMenu>
-        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.BASIC_CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
 </Windows:UIComponentBase>
