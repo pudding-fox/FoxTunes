@@ -463,46 +463,39 @@ namespace FoxTunes
             var fast = (float)data.Height / data.Smoothing;
             for (var a = 0; a < data.Count; a++)
             {
-                var barHeight = Convert.ToInt32(values[a] * data.Height);
+                var barHeight = Math.Max(Convert.ToInt32(values[a] * data.Height), 1);
                 elements[a].X = a * data.Step;
                 elements[a].Width = data.Step;
-                if (barHeight > 0)
+                var difference = Math.Abs(elements[a].Height - barHeight);
+                if (difference > 0)
                 {
-                    var difference = Math.Abs(elements[a].Height - barHeight);
-                    if (difference > 0)
+                    if (difference < 2)
                     {
-                        if (difference < 2)
+                        if (barHeight > elements[a].Height)
                         {
-                            if (barHeight > elements[a].Height)
-                            {
-                                elements[a].Height++;
-                            }
-                            else if (barHeight < elements[a].Height)
-                            {
-                                elements[a].Height--;
-                            }
+                            elements[a].Height++;
                         }
-                        else
+                        else if (barHeight < elements[a].Height)
                         {
-                            var distance = (float)difference / barHeight;
-                            //TODO: We should use some kind of easing function.
-                            //var increment = distance * distance * distance;
-                            //var increment = 1 - Math.Pow(1 - distance, 5);
-                            var increment = distance;
-                            if (barHeight > elements[a].Height)
-                            {
-                                elements[a].Height = (int)Math.Min(elements[a].Height + Math.Min(Math.Max(fast * increment, 1), difference), data.Height);
-                            }
-                            else if (barHeight < elements[a].Height)
-                            {
-                                elements[a].Height = (int)Math.Max(elements[a].Height - Math.Min(Math.Max(fast * increment, 1), difference), 1);
-                            }
+                            elements[a].Height--;
                         }
                     }
-                }
-                else
-                {
-                    elements[a].Height = 1;
+                    else
+                    {
+                        var distance = (float)difference / barHeight;
+                        //TODO: We should use some kind of easing function.
+                        //var increment = distance * distance * distance;
+                        //var increment = 1 - Math.Pow(1 - distance, 5);
+                        var increment = distance;
+                        if (barHeight > elements[a].Height)
+                        {
+                            elements[a].Height = (int)Math.Min(elements[a].Height + Math.Min(Math.Max(fast * increment, 1), difference), data.Height);
+                        }
+                        else if (barHeight < elements[a].Height)
+                        {
+                            elements[a].Height = (int)Math.Max(elements[a].Height - Math.Min(Math.Max(fast * increment, 1), difference), 1);
+                        }
+                    }
                 }
                 elements[a].Y = data.Height - elements[a].Height;
             }

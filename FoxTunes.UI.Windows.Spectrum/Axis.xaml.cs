@@ -138,6 +138,10 @@ namespace FoxTunes
             var formatted = labels.Select(
                 label => new FormattedText(label, culture, this.FlowDirection, typeFace, this.FontSize, this.Foreground)
             ).ToArray();
+            if (formatted.Length == 0)
+            {
+                return;
+            }
             switch (this.Orientation)
             {
                 case Orientation.Horizontal:
