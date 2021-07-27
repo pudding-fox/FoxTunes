@@ -47,6 +47,8 @@ namespace FoxTunes
 
         public const string RMS_ELEMENT = "DDDEE2B6A-188E-4FF4-A277-37D140D49C45";
 
+        public const string CREST_ELEMENT = "DEEEFFB9-2014-4004-94F9-E566874317ED";
+
         public const string HIGH_CUT_ELEMENT = "DDEE2ADA-C904-4AA5-82F0-F53412EF24BD";
 
         public const string SMOOTH_ELEMENT = "DEEEFBF0-AA25-456E-B759-AF94F6E9C371";
@@ -84,6 +86,7 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality").WithOptions(GetQualityOptions()))
                 .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks", path: "Advanced"))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, "Rms", path: "Advanced"))
+                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, "Crest Factor", path: "Advanced"))
                 .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, "Peak Hold", path: "Advanced").WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, "High Cut", path: "Advanced").WithValue(true))
                 .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth", path: "Advanced"))
@@ -109,6 +112,10 @@ namespace FoxTunes
                 SECTION,
                 RMS_ELEMENT
             );
+            var crest = configuration.GetElement<BooleanConfigurationElement>(
+                SECTION,
+                CREST_ELEMENT
+            );
             var smooth = configuration.GetElement<BooleanConfigurationElement>(
                 SECTION,
                 SMOOTH_ELEMENT
@@ -128,6 +135,7 @@ namespace FoxTunes
                     Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using high quality profile.");
                     peaks.Value = true;
                     rms.Value = true;
+                    crest.Value = true;
                     smooth.Value = true;
                     interval.Value = 20;
                     fftSize.Value = fftSize.GetOption(FFT_2048_OPTION);
@@ -136,6 +144,7 @@ namespace FoxTunes
                     Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using low quality profile.");
                     peaks.Value = false;
                     rms.Value = false;
+                    crest.Value = false;
                     smooth.Value = false;
                     interval.Value = 100;
                     fftSize.Value = fftSize.GetOption(FFT_512_OPTION);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -31,6 +32,8 @@ namespace FoxTunes
         public BooleanConfigurationElement ShowPeaks { get; private set; }
 
         public BooleanConfigurationElement ShowRms { get; private set; }
+
+        public BooleanConfigurationElement ShowCrestFactor { get; private set; }
 
         public BooleanConfigurationElement Smooth { get; private set; }
 
@@ -66,6 +69,10 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.RMS_ELEMENT
              );
+            this.ShowCrestFactor = this.Configuration.GetElement<BooleanConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.CREST_ELEMENT
+            );
             this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.SMOOTH_ELEMENT
@@ -90,6 +97,7 @@ namespace FoxTunes
             this.Bands.ValueChanged += this.OnValueChanged;
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
+            this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
             this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
@@ -155,7 +163,8 @@ namespace FoxTunes
                 this.UpdateInterval.Value,
                 this.SmoothingFactor.Value,
                 this.ShowPeaks.Value,
-                this.ShowRms.Value
+                this.ShowRms.Value,
+                this.ShowCrestFactor.Value
             );
             this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
         }
@@ -174,7 +183,8 @@ namespace FoxTunes
                     this.UpdateInterval.Value,
                     this.SmoothingFactor.Value,
                     this.ShowPeaks.Value,
-                    this.ShowRms.Value
+                    this.ShowRms.Value,
+                    this.ShowCrestFactor.Value
                 );
             });
         }
@@ -212,6 +222,7 @@ namespace FoxTunes
             var success = default(bool);
             var valueRenderInfo = default(BitmapHelper.RenderInfo);
             var rmsRenderInfo = default(BitmapHelper.RenderInfo);
+            var crestRenderInfo = default(BitmapHelper.RenderInfo);
 
             await Windows.Invoke(() =>
             {
@@ -226,6 +237,7 @@ namespace FoxTunes
                     var colors = this.Color.ToPair(SHADE);
                     valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[0]);
                     rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[1]);
+                    crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, Colors.Red);
                 }
                 else
                 {
@@ -240,7 +252,7 @@ namespace FoxTunes
                 return;
             }
 
-            Render(valueRenderInfo, rmsRenderInfo, this.RendererData);
+            Render(valueRenderInfo, rmsRenderInfo, crestRenderInfo, this.RendererData);
 
             await Windows.Invoke(() =>
             {
@@ -261,6 +273,7 @@ namespace FoxTunes
             var valueElements = data.ValueElements;
             var rmsElements = data.RmsElements;
             var peakElements = data.PeakElements;
+            var crestPoints = data.CrestPoints;
 
             var step = data.Step;
             var height = data.Height - 1;
@@ -284,6 +297,11 @@ namespace FoxTunes
                     peakElements[a].Y = height;
                     peakElements[a].Width = step;
                     peakElements[a].Height = 1;
+                }
+                if (crestPoints != null)
+                {
+                    crestPoints[a].X = (a * step) + (step / 2);
+                    crestPoints[a].Y = height - 1;
                 }
             }
         }
@@ -359,6 +377,14 @@ namespace FoxTunes
             {
                 this.ShowPeaks.ValueChanged -= this.OnValueChanged;
             }
+            if (this.ShowRms != null)
+            {
+                this.ShowRms.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.ShowCrestFactor != null)
+            {
+                this.ShowCrestFactor.ValueChanged -= this.OnValueChanged;
+            }
             if (this.Smooth != null)
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;
@@ -381,10 +407,11 @@ namespace FoxTunes
             }
         }
 
-        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, SpectrumRendererData rendererData)
+        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, BitmapHelper.RenderInfo crestRenderInfo, SpectrumRendererData rendererData)
         {
             var valueElements = rendererData.ValueElements;
             var rmsElements = rendererData.RmsElements;
+            var crestPoints = rendererData.CrestPoints;
             var peakElements = rendererData.PeakElements;
 
             BitmapHelper.Clear(valueRenderInfo);
@@ -420,6 +447,22 @@ namespace FoxTunes
                         peakElements[a].Y,
                         peakElements[a].Width,
                         peakElements[a].Height
+                    );
+                }
+            }
+
+            if (crestPoints != null)
+            {
+                for (var a = 0; a < crestPoints.Length - 1; a++)
+                {
+                    var point1 = crestPoints[a];
+                    var point2 = crestPoints[a + 1];
+                    BitmapHelper.DrawLine(
+                        crestRenderInfo,
+                        point1.X,
+                        point1.Y,
+                        point2.X,
+                        point2.Y
                     );
                 }
             }
@@ -505,6 +548,10 @@ namespace FoxTunes
             {
                 UpdateElementsFast(data.Rms, data.RmsElements, data.Step, data.Height);
             }
+            if (data.Rms != null && data.CrestPoints != null)
+            {
+                UpdateElementsFast(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height);
+            }
         }
 
         private static void UpdateElementsFast(float[] values, Int32Rect[] elements, int step, int height)
@@ -526,12 +573,36 @@ namespace FoxTunes
             }
         }
 
+        private static void UpdateElementsFast(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height)
+        {
+            height = height - 1;
+            for (var a = 0; a < values.Length; a++)
+            {
+                var x = (a * step) + (step / 2);
+                var y = default(int);
+                if (values[a] > 0)
+                {
+                    y = height - Convert.ToInt32(((values[a] - rms[a]) + (1.0f - rmsPeak)) * height);
+                }
+                else
+                {
+                    y = height;
+                }
+                elements[a].X = x;
+                elements[a].Y = y;
+            }
+        }
+
         private static void UpdateElementsSmooth(SpectrumRendererData data)
         {
             UpdateElementsSmooth(data.Values, data.ValueElements, data.Step, data.Height, data.Smoothing);
             if (data.Rms != null && data.RmsElements != null)
             {
                 UpdateElementsSmooth(data.Rms, data.RmsElements, data.Step, data.Height, data.Smoothing);
+            }
+            if (data.Rms != null && data.CrestPoints != null)
+            {
+                UpdateElementsSmooth(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height, data.Smoothing);
             }
         }
 
@@ -576,6 +647,58 @@ namespace FoxTunes
                     }
                 }
                 elements[a].Y = height - elements[a].Height;
+            }
+        }
+
+        private static void UpdateElementsSmooth(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height, int smoothing)
+        {
+            height = height - 1;
+            var fast = (float)height / smoothing;
+            for (var a = 0; a < values.Length; a++)
+            {
+                var x = (a * step) + (step / 2);
+                var y = default(int);
+                if (values[a] > 0)
+                {
+                    y = height - Convert.ToInt32(((values[a] - rms[a]) + (1.0f - rmsPeak)) * height);
+                }
+                else
+                {
+                    y = height;
+                }
+                elements[a].X = x;
+                var difference = Math.Abs(elements[a].Y - y);
+                if (difference > 0)
+                {
+                    if (difference < 2)
+                    {
+                        if (y > elements[a].Y)
+                        {
+                            elements[a].Y++;
+                        }
+                        else if (y < elements[a].Y)
+                        {
+                            elements[a].Y--;
+                        }
+                    }
+                    else
+                    {
+                        var distance = (float)difference / y;
+                        //TODO: We should use some kind of easing function.
+                        //var increment = distance * distance * distance;
+                        //var increment = 1 - Math.Pow(1 - distance, 5);
+                        var increment = distance;
+                        var smoothed = Math.Min(Math.Max(fast * increment, 1), difference);
+                        if (y > elements[a].Y)
+                        {
+                            elements[a].Y = (int)Math.Min(elements[a].Y + smoothed, height);
+                        }
+                        else if (y < elements[a].Y)
+                        {
+                            elements[a].Y = (int)Math.Max(elements[a].Y - smoothed, 1);
+                        }
+                    }
+                }
             }
         }
 
@@ -651,7 +774,7 @@ namespace FoxTunes
             return index;
         }
 
-        public static SpectrumRendererData Create(IOutput output, int width, int height, int[] bands, int fftSize, int holdInterval, int updateInterval, int smoothingFactor, bool showPeaks, bool showRms)
+        public static SpectrumRendererData Create(IOutput output, int width, int height, int[] bands, int fftSize, int holdInterval, int updateInterval, int smoothingFactor, bool showPeaks, bool showRms, bool showCrest)
         {
             var data = new SpectrumRendererData()
             {
@@ -678,6 +801,10 @@ namespace FoxTunes
             {
                 data.PeakElements = new Int32Rect[bands.Length];
                 data.Holds = new int[bands.Length];
+            }
+            if (showCrest)
+            {
+                data.CrestPoints = new Int32Point[bands.Length];
             }
             data.Step = width / bands.Length;
             return data;
@@ -718,6 +845,8 @@ namespace FoxTunes
             public Int32Rect[] ValueElements;
 
             public Int32Rect[] RmsElements;
+
+            public Int32Point[] CrestPoints;
 
             public Int32Rect[] PeakElements;
 

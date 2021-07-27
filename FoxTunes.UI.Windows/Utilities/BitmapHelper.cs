@@ -56,7 +56,7 @@ namespace FoxTunes
                     break;
                 }
             }
-            if (height > 0)
+            if (height > 1)
             {
                 //Fill each other line by copying the first line.
                 var lineStart = IntPtr.Add(topLeft, info.Stride);
@@ -65,6 +65,83 @@ namespace FoxTunes
                     memcpy(lineStart, topLeft, new UIntPtr((uint)(width * info.BytesPerPixel)));
                     lineStart = IntPtr.Add(lineStart, info.Stride);
                 }
+            }
+        }
+
+        public static void DrawLine(RenderInfo info, int x1, int y1, int x2, int y2)
+        {
+            var dx = Math.Abs(x2 - x1);
+            var dy = Math.Abs(y2 - y1);
+
+#if DEBUG
+            //Check arguments are valid.
+
+            if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            if (Math.Max(x1, x2) >= info.Width || Math.Max(y1, y2) >= info.Height)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+#endif
+
+            var source = IntPtr.Add(info.Buffer, (x1 * info.BytesPerPixel) + (y1 * info.Stride));
+
+            //Set initial pixel.
+            memset(IntPtr.Add(source, 0), info.Blue, new UIntPtr(1));
+            memset(IntPtr.Add(source, 1), info.Green, new UIntPtr(1));
+            memset(IntPtr.Add(source, 2), info.Red, new UIntPtr(1));
+            memset(IntPtr.Add(source, 3), info.Alpha, new UIntPtr(1));
+
+            //This code influenced by https://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm
+            var sx = default(int);
+            if (x1 == x2)
+            {
+                sx = 0;
+            }
+            else if (x1 < x2)
+            {
+                sx = 1;
+            }
+            else
+            {
+                sx = -1;
+            }
+
+            var sy = default(int);
+            if (y1 == y2)
+            {
+                sy = 0;
+            }
+            else if (y1 < y2)
+            {
+                sy = 1;
+            }
+            else
+            {
+                sy = -1;
+            }
+
+            var err = (dx > dy ? dx : -dy) / 2;
+
+            while (x1 != x2 || y1 != y2)
+            {
+                var e2 = err;
+                if (e2 > -dx)
+                {
+                    err -= dy;
+                    x1 += sx;
+                }
+                if (e2 < dy)
+                {
+                    err += dx;
+                    y1 += sy;
+                }
+
+                var destination = IntPtr.Add(info.Buffer, ((int)x1 * info.BytesPerPixel) + ((int)y1 * info.Stride));
+                memcpy(destination, source, new UIntPtr((uint)info.BytesPerPixel));
             }
         }
 
@@ -115,5 +192,18 @@ namespace FoxTunes
 
             public int Alpha;
         }
+    }
+
+    public struct Int32Point
+    {
+        public Int32Point(int x, int y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+
+        public int X;
+
+        public int Y;
     }
 }

@@ -93,17 +93,20 @@ namespace FoxTunes
 
         public void OnPropertyValueChanged(string deviceId, PropertyKey key)
         {
-            if (this.PropertyValueChanged == null)
-            {
-                return;
-            }
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
             var task = TaskEx.Run(
 #else
             var task = Task.Run(
 #endif
-                () => this.PropertyValueChanged(this, new NotificationClientEventArgs(null, null, deviceId, null, key))
+                () =>
+                {
+                    if (this.PropertyValueChanged == null)
+                    {
+                        return;
+                    }
+                    this.PropertyValueChanged(this, new NotificationClientEventArgs(null, null, deviceId, null, key));
+                }
             );
         }
 

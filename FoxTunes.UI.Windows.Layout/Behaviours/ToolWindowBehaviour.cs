@@ -184,11 +184,17 @@ namespace FoxTunes
             }
             try
             {
+                var value = default(string);
                 using (var stream = new MemoryStream())
                 {
                     Serializer.Save(stream, this.Windows.Keys);
-                    this.Element.Value = Encoding.Default.GetString(stream.ToArray());
+                    value = Encoding.Default.GetString(stream.ToArray());
                 }
+                if (string.Equals(this.Element.Value, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+                this.Element.Value = value;
                 this.Configuration.Save();
             }
             catch (Exception e)
