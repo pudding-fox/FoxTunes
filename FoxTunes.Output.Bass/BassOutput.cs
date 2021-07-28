@@ -11,10 +11,6 @@ namespace FoxTunes
     [Component("E0318CB1-57A0-4DC3-AA8D-F6E100F86190", ComponentSlots.Output)]
     public class BassOutput : Output, IBassOutput
     {
-        public const int DEPTH_16 = 16;
-
-        public const int DEPTH_32 = 32;
-
         const int START_STOP_TIMEOUT = 10000;
 
         const int START_ATTEMPTS = 5;
@@ -517,6 +513,87 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
         }
 
+        public override bool GetFormat(out int rate, out int channels, out OutputStreamFormat format)
+        {
+            var _rate = default(int);
+            var _channels = default(int);
+            var _format = default(OutputStreamFormat);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    _rate = pipeline.Output.Rate;
+                    _channels = pipeline.Output.Channels;
+                    if (pipeline.Output.Flags.HasFlag(BassFlags.Float))
+                    {
+                        _format = OutputStreamFormat.Float;
+                    }
+                    else
+                    {
+                        _format = OutputStreamFormat.Short;
+                    }
+                }
+            });
+            rate = _rate;
+            channels = _channels;
+            format = _format;
+            return true;
+        }
+
+        public override T[] GetBuffer<T>(TimeSpan duration)
+        {
+            var length = default(int);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    length = Convert.ToInt32(
+                        Bass.ChannelSeconds2Bytes(pipeline.Output.ChannelHandle, duration.TotalSeconds)
+                    );
+                }
+            });
+            if (typeof(T) == typeof(short))
+            {
+                length /= sizeof(short);
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                length /= sizeof(float);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            return new T[length];
+        }
+
+        public override int GetData(short[] buffer)
+        {
+            var result = default(int);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    result = pipeline.Output.GetData(buffer);
+                }
+            });
+            return result;
+        }
+
+        public override int GetData(float[] buffer)
+        {
+            var result = default(int);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    result = pipeline.Output.GetData(buffer);
+                }
+            });
+            return result;
+        }
+
+
         public override float[] GetBuffer(int fftSize)
         {
             var length = default(int);
@@ -560,39 +637,6 @@ namespace FoxTunes
                 if (pipeline != null)
                 {
                     result = pipeline.Output.GetData(buffer, fftSize);
-                }
-            });
-            return result;
-        }
-
-        public override int GetRate()
-        {
-            var result = default(int);
-            this.PipelineManager.WithPipeline(pipeline =>
-            {
-                if (pipeline != null)
-                {
-                    result = pipeline.Output.Rate;
-                }
-            });
-            return result;
-        }
-
-        public override int GetDepth()
-        {
-            var result = default(int);
-            this.PipelineManager.WithPipeline(pipeline =>
-            {
-                if (pipeline != null)
-                {
-                    if (pipeline.Output.Flags.HasFlag(BassFlags.Float))
-                    {
-                        result = DEPTH_32;
-                    }
-                    else
-                    {
-                        result = DEPTH_16;
-                    }
                 }
             });
             return result;

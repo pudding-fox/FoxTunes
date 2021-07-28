@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -79,12 +80,16 @@ namespace FoxTunes
 
         public abstract Task Shutdown();
 
+        public abstract bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
+
+        public abstract T[] GetBuffer<T>(TimeSpan duration) where T : struct;
+
+        public abstract int GetData(short[] buffer);
+
+        public abstract int GetData(float[] buffer);
+
         public abstract float[] GetBuffer(int fftSize);
 
         public abstract int GetData(float[] buffer, int fftSize);
-
-        public abstract int GetRate();
-
-        public abstract int GetDepth();
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -137,7 +138,7 @@ namespace FoxTunes
             {
                 if (this.Timer != null)
                 {
-                    this.Timer.Interval = UpdateInterval.Value;
+                    this.Timer.Interval = this.UpdateInterval.Value;
                 }
             }
             if (object.ReferenceEquals(sender, this.Bands))
@@ -543,37 +544,18 @@ namespace FoxTunes
 
         private static void UpdateElementsFast(SpectrumRendererData data)
         {
-            UpdateElementsFast(data.Values, data.ValueElements, data.Step, data.Height);
+            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, Orientation.Vertical);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsFast(data.Rms, data.RmsElements, data.Step, data.Height);
+                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, Orientation.Vertical);
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
-                UpdateElementsFast(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height);
+                UpdateCrestPointsFast(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height);
             }
         }
 
-        private static void UpdateElementsFast(float[] values, Int32Rect[] elements, int step, int height)
-        {
-            for (var a = 0; a < values.Length; a++)
-            {
-                var barHeight = Convert.ToInt32(values[a] * height);
-                elements[a].X = a * step;
-                elements[a].Width = step;
-                if (barHeight > 0)
-                {
-                    elements[a].Height = barHeight;
-                }
-                else
-                {
-                    elements[a].Height = 1;
-                }
-                elements[a].Y = height - elements[a].Height;
-            }
-        }
-
-        private static void UpdateElementsFast(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height)
+        private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height)
         {
             height = height - 1;
             for (var a = 0; a < values.Length; a++)
@@ -595,62 +577,18 @@ namespace FoxTunes
 
         private static void UpdateElementsSmooth(SpectrumRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.ValueElements, data.Step, data.Height, data.Smoothing);
+            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Smoothing, Orientation.Vertical);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Step, data.Height, data.Smoothing);
+                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Smoothing, Orientation.Vertical);
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
-                UpdateElementsSmooth(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height, data.Smoothing);
+                UpdateCrestPointsSmooth(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height, data.Smoothing);
             }
         }
 
-        private static void UpdateElementsSmooth(float[] values, Int32Rect[] elements, int step, int height, int smoothing)
-        {
-            var fast = (float)height / smoothing;
-            for (var a = 0; a < values.Length; a++)
-            {
-                var barHeight = Math.Max(Convert.ToInt32(values[a] * height), 1);
-                elements[a].X = a * step;
-                elements[a].Width = step;
-                var difference = Math.Abs(elements[a].Height - barHeight);
-                if (difference > 0)
-                {
-                    if (difference < 2)
-                    {
-                        if (barHeight > elements[a].Height)
-                        {
-                            elements[a].Height++;
-                        }
-                        else if (barHeight < elements[a].Height)
-                        {
-                            elements[a].Height--;
-                        }
-                    }
-                    else
-                    {
-                        var distance = (float)difference / barHeight;
-                        //TODO: We should use some kind of easing function.
-                        //var increment = distance * distance * distance;
-                        //var increment = 1 - Math.Pow(1 - distance, 5);
-                        var increment = distance;
-                        var smoothed = Math.Min(Math.Max(fast * increment, 1), difference);
-                        if (barHeight > elements[a].Height)
-                        {
-                            elements[a].Height = (int)Math.Min(elements[a].Height + smoothed, height);
-                        }
-                        else if (barHeight < elements[a].Height)
-                        {
-                            elements[a].Height = (int)Math.Max(elements[a].Height - smoothed, 1);
-                        }
-                    }
-                }
-                elements[a].Y = height - elements[a].Height;
-            }
-        }
-
-        private static void UpdateElementsSmooth(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height, int smoothing)
+        private static void UpdateCrestPointsSmooth(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height, int smoothing)
         {
             height = height - 1;
             var fast = (float)height / smoothing;
@@ -822,7 +760,9 @@ namespace FoxTunes
 
             public int Rate;
 
-            public int Depth;
+            public int Channels;
+
+            public OutputStreamFormat Format;
 
             public int FFTSize;
 
@@ -862,8 +802,10 @@ namespace FoxTunes
 
             public bool Update()
             {
-                this.Rate = this.Output.GetRate();
-                this.Depth = this.Output.GetDepth();
+                if (!this.Output.GetFormat(out this.Rate, out this.Channels, out this.Format))
+                {
+                    return false;
+                }
                 return this.Output.GetData(this.Samples, this.FFTSize) > 0;
             }
         }

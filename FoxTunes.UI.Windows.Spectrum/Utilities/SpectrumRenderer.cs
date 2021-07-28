@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -244,27 +245,6 @@ namespace FoxTunes
             }).ConfigureAwait(false);
         }
 
-        protected virtual void Clear()
-        {
-            var elements = this.RendererData.Elements;
-            var peaks = this.RendererData.Peaks;
-
-            for (var a = 0; a < this.RendererData.Count; a++)
-            {
-                elements[a].X = a * this.RendererData.Step;
-                elements[a].Y = this.RendererData.Height - 1;
-                elements[a].Width = this.RendererData.Step;
-                elements[a].Height = 1;
-                if (this.RendererData.Peaks != null)
-                {
-                    peaks[a].X = a * this.RendererData.Step;
-                    peaks[a].Y = this.RendererData.Height - 1;
-                    peaks[a].Width = this.RendererData.Step;
-                    peaks[a].Height = 1;
-                }
-            }
-        }
-
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
             var data = this.RendererData;
@@ -276,23 +256,20 @@ namespace FoxTunes
             {
                 if (!data.Update())
                 {
-                    this.Clear();
+                    data.Clear();
+                }
+                UpdateValues(data);
+                if (this.Smooth.Value)
+                {
+                    UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, data.Smoothing, Orientation.Vertical);
                 }
                 else
                 {
-                    UpdateValues(data);
-                    if (this.Smooth.Value)
-                    {
-                        UpdateElementsSmooth(data);
-                    }
-                    else
-                    {
-                        UpdateElementsFast(data);
-                    }
-                    if (this.ShowPeaks.Value)
-                    {
-                        UpdatePeaks(data);
-                    }
+                    UpdateElementsFast(data.Values, data.Elements, data.Width, data.Height, Orientation.Vertical);
+                }
+                if (this.ShowPeaks.Value)
+                {
+                    UpdatePeaks(data);
                 }
                 var task = this.Render();
             }
@@ -433,74 +410,6 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateElementsFast(SpectrumRendererData data)
-        {
-            var values = data.Values;
-            var elements = data.Elements;
-
-            for (var a = 0; a < data.Count; a++)
-            {
-                var barHeight = Convert.ToInt32(values[a] * data.Height);
-                elements[a].X = a * data.Step;
-                elements[a].Width = data.Step;
-                if (barHeight > 0)
-                {
-                    elements[a].Height = barHeight;
-                }
-                else
-                {
-                    elements[a].Height = 1;
-                }
-                elements[a].Y = data.Height - elements[a].Height;
-            }
-        }
-
-        private static void UpdateElementsSmooth(SpectrumRendererData data)
-        {
-            var values = data.Values;
-            var elements = data.Elements;
-
-            var fast = (float)data.Height / data.Smoothing;
-            for (var a = 0; a < data.Count; a++)
-            {
-                var barHeight = Math.Max(Convert.ToInt32(values[a] * data.Height), 1);
-                elements[a].X = a * data.Step;
-                elements[a].Width = data.Step;
-                var difference = Math.Abs(elements[a].Height - barHeight);
-                if (difference > 0)
-                {
-                    if (difference < 2)
-                    {
-                        if (barHeight > elements[a].Height)
-                        {
-                            elements[a].Height++;
-                        }
-                        else if (barHeight < elements[a].Height)
-                        {
-                            elements[a].Height--;
-                        }
-                    }
-                    else
-                    {
-                        var distance = (float)difference / barHeight;
-                        //TODO: We should use some kind of easing function.
-                        //var increment = distance * distance * distance;
-                        //var increment = 1 - Math.Pow(1 - distance, 5);
-                        var increment = distance;
-                        if (barHeight > elements[a].Height)
-                        {
-                            elements[a].Height = (int)Math.Min(elements[a].Height + Math.Min(Math.Max(fast * increment, 1), difference), data.Height);
-                        }
-                        else if (barHeight < elements[a].Height)
-                        {
-                            elements[a].Height = (int)Math.Max(elements[a].Height - Math.Min(Math.Max(fast * increment, 1), difference), 1);
-                        }
-                    }
-                }
-                elements[a].Y = data.Height - elements[a].Height;
-            }
-        }
-
         private static void UpdatePeaks(SpectrumRendererData data)
         {
             var duration = Convert.ToInt32(
@@ -634,6 +543,11 @@ namespace FoxTunes
             public bool Update()
             {
                 return this.Output.GetData(this.Samples, this.FFTSize) > 0;
+            }
+
+            public void Clear()
+            {
+                Array.Clear(this.Samples, 0, this.Samples.Length);
             }
         }
     }

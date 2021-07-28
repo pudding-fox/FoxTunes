@@ -67,10 +67,10 @@ namespace FoxTunes
                 switch (duplicated.Format)
                 {
                     case OutputStreamFormat.Short:
-                        PopulateShort(duplicated, data);
+                        PopulateShort(this.Output, duplicated, data);
                         break;
                     case OutputStreamFormat.Float:
-                        PopulateFloat(duplicated, data);
+                        PopulateFloat(this.Output, duplicated, data);
                         break;
                     default:
                         throw new NotImplementedException();
@@ -98,10 +98,10 @@ namespace FoxTunes
             }
         }
 
-        private static void PopulateShort(IOutputStream stream, WaveFormGeneratorData data)
+        private static void PopulateShort(IOutput output, IOutputStream stream, WaveFormGeneratorData data)
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
-            var buffer = stream.GetBuffer<short>(duration);
+            var buffer = output.GetBuffer<short>(duration);
             var interval = data.Capacity / 10;
 
             Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 16 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, duration.TotalMilliseconds);
@@ -155,10 +155,10 @@ namespace FoxTunes
             } while (!data.CancellationToken.IsCancellationRequested);
         }
 
-        private static void PopulateFloat(IOutputStream stream, WaveFormGeneratorData data)
+        private static void PopulateFloat(IOutput output, IOutputStream stream, WaveFormGeneratorData data)
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
-            var buffer = stream.GetBuffer<float>(duration);
+            var buffer = output.GetBuffer<float>(duration);
             var interval = data.Capacity / 10;
 
             Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 32 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, duration.TotalMilliseconds);

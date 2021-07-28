@@ -49,8 +49,6 @@ namespace FoxTunes.Interfaces
 
         OutputStreamFormat Format { get; }
 
-        T[] GetBuffer<T>(TimeSpan duration) where T : struct;
-
         int GetData(short[] buffer);
 
         int GetData(float[] buffer);

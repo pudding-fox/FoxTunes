@@ -38,13 +38,17 @@ namespace FoxTunes.Interfaces
 
         Task Shutdown();
 
+        bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
+
+        T[] GetBuffer<T>(TimeSpan duration) where T : struct;
+
+        int GetData(short[] buffer);
+
+        int GetData(float[] buffer);
+
         float[] GetBuffer(int fftSize);
 
         int GetData(float[] buffer, int fftSize);
-
-        int GetRate();
-
-        int GetDepth();
     }
 
     public delegate void OutputStreamEventHandler(object sender, OutputStreamEventArgs e);
