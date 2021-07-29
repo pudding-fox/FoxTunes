@@ -8,13 +8,11 @@ using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
-    public class PeakRenderer : RendererBase
+    public class PeakRenderer : VisualizationBase
     {
         public const int DB_MIN = -90;
 
         public const int DB_MAX = 0;
-
-        public const int ROLLOFF_INTERVAL = 500;
 
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
             "Orientation",
@@ -43,15 +41,7 @@ namespace FoxTunes
             renderer.OnOrientationChanged();
         }
 
-        public readonly object SyncRoot = new object();
-
         public PeakRendererData RendererData { get; private set; }
-
-        public bool IsStarted;
-
-        public global::System.Timers.Timer Timer;
-
-        public IOutput Output { get; private set; }
 
         public BooleanConfigurationElement ShowPeaks { get; private set; }
 
@@ -62,15 +52,6 @@ namespace FoxTunes
         public IntegerConfigurationElement SmoothingFactor { get; private set; }
 
         public IntegerConfigurationElement HoldInterval { get; private set; }
-
-        public IntegerConfigurationElement UpdateInterval { get; private set; }
-
-        public PeakRenderer()
-        {
-            this.Timer = new global::System.Timers.Timer();
-            this.Timer.AutoReset = false;
-            this.Timer.Elapsed += this.OnElapsed;
-        }
 
         public Orientation Orientation
         {
@@ -103,8 +84,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
-            PlaybackStateNotifier.Notify += this.OnNotify;
-            this.Output = core.Components.Output;
             this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.PEAKS_ELEMENT
@@ -125,16 +104,15 @@ namespace FoxTunes
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.HOLD_ELEMENT
             );
-            this.UpdateInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
+            this.Configuration.GetElement<IntegerConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.INTERVAL_ELEMENT
-            );
+            ).ConnectValue(value => this.UpdateInterval = value);
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
             this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
-            this.UpdateInterval.ValueChanged += this.OnValueChanged;
 #if NET40
             var task = TaskEx.Run(async () =>
 #else
@@ -149,29 +127,8 @@ namespace FoxTunes
             });
         }
 
-        protected virtual void OnNotify(object sender, EventArgs e)
-        {
-            if (PlaybackStateNotifier.IsPlaying && !this.IsStarted)
-            {
-                Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");
-                this.Start();
-            }
-            else if (!PlaybackStateNotifier.IsPlaying && this.IsStarted)
-            {
-                Logger.Write(this, LogLevel.Debug, "Playback was stopped, stopping renderer.");
-                this.Stop();
-            }
-        }
-
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            lock (this.SyncRoot)
-            {
-                if (this.Timer != null)
-                {
-                    this.Timer.Interval = this.UpdateInterval.Value;
-                }
-            }
             var task = this.RefreshBitmap();
         }
 
@@ -197,31 +154,6 @@ namespace FoxTunes
                     this.Orientation
                 );
             });
-        }
-
-        public void Start()
-        {
-            lock (this.SyncRoot)
-            {
-                if (this.Timer != null)
-                {
-                    this.IsStarted = true;
-                    this.Timer.Interval = UpdateInterval.Value;
-                    this.Timer.Start();
-                }
-            }
-        }
-
-        public void Stop()
-        {
-            lock (this.SyncRoot)
-            {
-                if (this.Timer != null)
-                {
-                    this.Timer.Stop();
-                    this.IsStarted = false;
-                }
-            }
         }
 
         protected virtual async Task Render()
@@ -270,7 +202,7 @@ namespace FoxTunes
             }).ConfigureAwait(false);
         }
 
-        protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
+        protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
             var data = this.RendererData;
             if (data == null)
@@ -294,8 +226,17 @@ namespace FoxTunes
                 }
                 if (this.ShowPeaks.Value)
                 {
-                    UpdatePeaks(data);
+                    var duration = Convert.ToInt32(
+                        Math.Min(
+                            (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
+                            this.UpdateInterval * 100
+                        )
+                    );
+                    UpdatePeaks(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, data.Orientation);
                 }
+
+                data.LastUpdated = DateTime.UtcNow;
+
                 var task = this.Render();
             }
             catch (Exception exception)
@@ -311,16 +252,6 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            PlaybackStateNotifier.Notify -= this.OnNotify;
-            lock (this.SyncRoot)
-            {
-                if (this.Timer != null)
-                {
-                    this.Timer.Elapsed -= this.OnElapsed;
-                    this.Timer.Dispose();
-                    this.Timer = null;
-                }
-            }
             if (this.ScalingFactor != null)
             {
                 this.ScalingFactor.ValueChanged -= this.OnValueChanged;
@@ -345,10 +276,6 @@ namespace FoxTunes
             {
                 this.HoldInterval.ValueChanged -= this.OnValueChanged;
             }
-            if (this.UpdateInterval != null)
-            {
-                this.UpdateInterval.ValueChanged -= this.OnValueChanged;
-            }
         }
 
         private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, PeakRendererData rendererData)
@@ -356,6 +283,7 @@ namespace FoxTunes
             var valueElements = rendererData.ValueElements;
             var rmsElements = rendererData.RmsElements;
             var peakElements = rendererData.PeakElements;
+            var orientation = rendererData.Orientation;
 
             BitmapHelper.Clear(valueRenderInfo);
 
@@ -382,9 +310,19 @@ namespace FoxTunes
                     }
                     if (peakElements != null)
                     {
-                        if (peakElements[a].Y >= valueElements[a].Y)
+                        if (orientation == Orientation.Horizontal)
                         {
-                            continue;
+                            if (peakElements[a].X <= valueElements[a].Width)
+                            {
+                                continue;
+                            }
+                        }
+                        else if (orientation == Orientation.Vertical)
+                        {
+                            if (peakElements[a].Y >= valueElements[a].Y)
+                            {
+                                continue;
+                            }
                         }
                         BitmapHelper.DrawRectangle(
                             valueRenderInfo,
@@ -427,6 +365,11 @@ namespace FoxTunes
                 {
                     rms[channel] = 0;
                 }
+            }
+
+            if (count == 0)
+            {
+                return;
             }
 
             for (var position = 0; position < count; position += channels)
@@ -477,73 +420,6 @@ namespace FoxTunes
             {
                 UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Renderer.SmoothingFactor.Value, data.Orientation);
             }
-        }
-
-        private static void UpdatePeaks(PeakRendererData data)
-        {
-            var updateInterval = data.Renderer.UpdateInterval.Value;
-            var holdInterval = data.Renderer.HoldInterval.Value;
-            var duration = Convert.ToInt32(
-                Math.Min(
-                    (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
-                    updateInterval * 100
-                )
-            );
-
-            var valueElements = data.ValueElements;
-            var peakElements = data.PeakElements;
-            var holds = data.Holds;
-
-            if (data.Orientation == Orientation.Horizontal)
-            {
-
-            }
-            else if (data.Orientation == Orientation.Vertical)
-            {
-                var fast = data.Height / 4;
-                var step = data.Width / data.Channels;
-                for (int a = 0; a < valueElements.Length; a++)
-                {
-                    if (valueElements[a].Y < peakElements[a].Y)
-                    {
-                        peakElements[a].X = a * step;
-                        peakElements[a].Width = step;
-                        peakElements[a].Height = 1;
-                        peakElements[a].Y = valueElements[a].Y;
-                        holds[a] = holdInterval + ROLLOFF_INTERVAL;
-                    }
-                    else if (valueElements[a].Y > peakElements[a].Y && peakElements[a].Y < data.Height - 1)
-                    {
-                        if (holds[a] > 0)
-                        {
-                            if (holds[a] < holdInterval)
-                            {
-                                var distance = 1 - ((float)holds[a] / holdInterval);
-                                var increment = fast * (distance * distance * distance);
-                                if (peakElements[a].Y < data.Height - increment)
-                                {
-                                    peakElements[a].Y += (int)Math.Round(increment);
-                                }
-                                else if (peakElements[a].Y < data.Height - 1)
-                                {
-                                    peakElements[a].Y = data.Height - 1;
-                                }
-                            }
-                            holds[a] -= duration;
-                        }
-                        else if (peakElements[a].Y < data.Height - fast)
-                        {
-                            peakElements[a].Y += fast;
-                        }
-                        else if (peakElements[a].Y < data.Height - 1)
-                        {
-                            peakElements[a].Y = data.Height - 1;
-                        }
-                    }
-                }
-            }
-
-            data.LastUpdated = DateTime.UtcNow;
         }
 
         public static PeakRendererData Create(PeakRenderer renderer, int width, int height, Orientation orientation)
@@ -629,12 +505,12 @@ namespace FoxTunes
 
                 if (format == OutputStreamFormat.Short)
                 {
-                    this.Samples16 = this.Renderer.Output.GetBuffer<short>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval.Value));
+                    this.Samples16 = this.Renderer.Output.GetBuffer<short>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
                     this.Samples32 = new float[this.Samples16.Length];
                 }
                 else if (format == OutputStreamFormat.Float)
                 {
-                    this.Samples32 = this.Renderer.Output.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval.Value));
+                    this.Samples32 = this.Renderer.Output.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
                 }
 
                 this.Values = new float[channels];
@@ -654,6 +530,11 @@ namespace FoxTunes
 
             public void Clear()
             {
+                if (this.Samples16 != null)
+                {
+                    Array.Clear(this.Samples16, 0, this.Samples16.Length);
+                }
+                Array.Clear(this.Samples32, 0, this.Samples32.Length);
                 this.SampleCount = 0;
             }
         }
