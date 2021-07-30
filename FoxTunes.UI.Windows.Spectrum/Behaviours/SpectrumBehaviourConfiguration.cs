@@ -75,8 +75,6 @@ namespace FoxTunes
 
         public const string FFT_32768_OPTION = "GGGG7106-4174-4A1E-9590-B1798B4187A3";
 
-        public const string AMPLITUDE_ELEMENT = "HHHH7D69-3C36-44EB-8960-4147A148F31A";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
@@ -92,8 +90,7 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth", path: "Advanced"))
                 .WithElement(new IntegerConfigurationElement(SMOOTH_FACTOR_ELEMENT, "Smooth Factor", path: "Advanced").WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)).DependsOn(SECTION, SMOOTH_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval", path: "Advanced").WithValidationRule(new IntegerValidationRule(1, 100)))
-                .WithElement(new SelectionConfigurationElement(FFT_SIZE_ELEMENT, "FFT Size", path: "Advanced").WithOptions(GetFFTOptions()))
-                .WithElement(new IntegerConfigurationElement(AMPLITUDE_ELEMENT, "Amplitude", path: "Advanced").WithValue(5).WithValidationRule(new IntegerValidationRule(1, 10))
+                .WithElement(new SelectionConfigurationElement(FFT_SIZE_ELEMENT, "FFT Size", path: "Advanced").WithOptions(GetFFTOptions())
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
                 SECTION,
