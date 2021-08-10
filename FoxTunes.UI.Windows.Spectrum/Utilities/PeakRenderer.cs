@@ -387,19 +387,14 @@ namespace FoxTunes
 
             for (var channel = 0; channel < channels; channel++)
             {
-                var dB = Math.Min(Math.Max((float)(20 * Math.Log10(values[channel])), DB_MIN), DB_MAX);
-                values[channel] = 1.0f - (Math.Abs(dB) / Math.Abs(DB_MIN));
+                values[channel] = ToDecibelFixed(values[channel]);
             }
 
             if (doRms)
             {
                 for (var channel = 0; channel < channels; channel++)
                 {
-                    var value = Convert.ToSingle(
-                        Math.Sqrt(rms[channel] / (count / channels))
-                    );
-                    var dB = Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
-                    rms[channel] = 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
+                    rms[channel] = ToDecibelFixed(Convert.ToSingle(Math.Sqrt(rms[channel] / (count / channels))));
                 }
             }
         }

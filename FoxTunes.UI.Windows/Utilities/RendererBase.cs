@@ -11,6 +11,10 @@ namespace FoxTunes
 {
     public abstract class RendererBase : Freezable, IBaseComponent, INotifyPropertyChanged, IDisposable
     {
+        public const int DB_MIN = -90;
+
+        public const int DB_MAX = 0;
+
         public const int ROLLOFF_INTERVAL = 500;
 
         protected static ILogger Logger
@@ -496,6 +500,17 @@ namespace FoxTunes
             }
         }
 
+        protected static float ToDecibel(float value)
+        {
+            return Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
+        }
+
+        protected static float ToDecibelFixed(float value)
+        {
+            var dB = ToDecibel(value);
+            return 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
+        }
+
         protected static void UpdateElementsFast(float[] values, Int32Rect[] elements, int width, int height, Orientation orientation)
         {
             if (values.Length == 0)
@@ -634,6 +649,10 @@ namespace FoxTunes
 
         protected static void UpdateElementsSmooth(Int32Rect[] elements, Int32Rect[] peaks, int[] holds, int width, int height, int interval, int duration, Orientation orientation)
         {
+            if (elements.Length == 0)
+            {
+                return;
+            }
             if (orientation == Orientation.Horizontal)
             {
                 var fast = width / 4;

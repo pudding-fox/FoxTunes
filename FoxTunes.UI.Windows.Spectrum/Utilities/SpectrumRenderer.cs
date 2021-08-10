@@ -10,10 +10,6 @@ namespace FoxTunes
 {
     public class SpectrumRenderer : VisualizationBase
     {
-        public const int DB_MIN = -90;
-
-        public const int DB_MAX = 0;
-
         public SpectrumRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Bars { get; private set; }
@@ -314,8 +310,7 @@ namespace FoxTunes
                     {
                         value = Math.Max(samples[a + c], value);
                     }
-                    var dB = Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
-                    values[b] = 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
+                    values[b] = ToDecibelFixed(value);
                 }
             }
             else
@@ -324,8 +319,7 @@ namespace FoxTunes
                 for (int a = 0; a < data.Count; a++)
                 {
                     var value = samples[a];
-                    var dB = Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
-                    values[a] = 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
+                    values[a] = ToDecibelFixed(value);
                 }
             }
         }

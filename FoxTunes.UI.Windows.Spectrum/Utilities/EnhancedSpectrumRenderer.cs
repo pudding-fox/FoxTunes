@@ -11,10 +11,6 @@ namespace FoxTunes
 {
     public class EnhancedSpectrumRenderer : VisualizationBase
     {
-        public const int DB_MIN = -90;
-
-        public const int DB_MAX = 0;
-
         public SpectrumRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Bands { get; private set; }
@@ -163,7 +159,10 @@ namespace FoxTunes
                     var colors = this.Color.ToPair(SHADE);
                     valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[0]);
                     rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[1]);
-                    crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, Colors.Red);
+                    if (this.ShowCrestFactor.Value)
+                    {
+                        crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, Colors.Red);
+                    }
                 }
                 else
                 {
@@ -236,11 +235,12 @@ namespace FoxTunes
 
         protected virtual double GetPixelWidth()
         {
-            if (this.RendererData == null)
+            var data = this.RendererData;
+            if (data == null)
             {
                 return 1;
             }
-            return this.RendererData.Bands.Length * this.RendererData.Step;
+            return data.Bands.Length * (data.Width / data.Bands.Length);
         }
 
         protected override Freezable CreateInstanceCore()
@@ -417,7 +417,7 @@ namespace FoxTunes
 
             if (value > 0)
             {
-                data.ValuePeak = Math.Max(UpdateValue(data.Values, band, value), data.ValuePeak);
+                data.ValuePeak = Math.Max(data.Values[band] = ToDecibelFixed(value), data.ValuePeak);
             }
             else
             {
@@ -428,19 +428,13 @@ namespace FoxTunes
             {
                 if (count > 0)
                 {
-                    data.RmsPeak = Math.Max(UpdateValue(data.Rms, band, Convert.ToSingle(Math.Sqrt(rms / count))), data.RmsPeak);
+                    data.RmsPeak = Math.Max(data.Rms[band] = ToDecibelFixed(Convert.ToSingle(Math.Sqrt(rms / count))), data.RmsPeak);
                 }
                 else
                 {
                     data.Rms[band] = 0;
                 }
             }
-        }
-
-        private static float UpdateValue(float[] values, int band, float value)
-        {
-            var dB = Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
-            return values[band] = 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
         }
 
         private static void UpdateElementsFast(SpectrumRendererData data)
@@ -452,20 +446,26 @@ namespace FoxTunes
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
-                UpdateCrestPointsFast(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height);
+                UpdateCrestPointsFast(data.Values, data.Rms, data.CrestPoints, data.Height);
             }
         }
 
-        private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height)
+        private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, int height)
         {
             height = height - 1;
+            var step = height / values.Length;
+            var offset = default(float);
+            for (var a = 0; a < values.Length; a++)
+            {
+                offset = Math.Max(offset, values[a] - rms[a]);
+            }
             for (var a = 0; a < values.Length; a++)
             {
                 var x = (a * step) + (step / 2);
                 var y = default(int);
                 if (values[a] > 0)
                 {
-                    y = height - Convert.ToInt32(((values[a] - rms[a]) + (1.0f - rmsPeak)) * height);
+                    y = height - Convert.ToInt32(((values[a] - rms[a]) + offset) * height);
                 }
                 else
                 {
@@ -485,21 +485,27 @@ namespace FoxTunes
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
-                UpdateCrestPointsSmooth(data.Values, data.Rms, data.CrestPoints, data.ValuePeak, data.RmsPeak, data.Step, data.Height, data.Renderer.SmoothingFactor.Value);
+                UpdateCrestPointsSmooth(data.Values, data.Rms, data.CrestPoints, data.Width, data.Height, data.Renderer.SmoothingFactor.Value);
             }
         }
 
-        private static void UpdateCrestPointsSmooth(float[] values, float[] rms, Int32Point[] elements, float valuePeak, float rmsPeak, int step, int height, int smoothing)
+        private static void UpdateCrestPointsSmooth(float[] values, float[] rms, Int32Point[] elements, int width, int height, int smoothing)
         {
             height = height - 1;
             var fast = Math.Min((float)height / smoothing, 10);
+            var step = width / values.Length;
+            var offset = default(float);
+            for (var a = 0; a < values.Length; a++)
+            {
+                offset = Math.Max(offset, values[a] - rms[a]);
+            }
             for (var a = 0; a < values.Length; a++)
             {
                 var x = (a * step) + (step / 2);
                 var y = default(int);
                 if (values[a] > 0)
                 {
-                    y = height - Convert.ToInt32(((values[a] - rms[a]) + (1.0f - rmsPeak)) * height);
+                    y = height - Convert.ToInt32(((values[a] - rms[a]) + offset) * height);
                 }
                 else
                 {
@@ -582,7 +588,6 @@ namespace FoxTunes
             {
                 data.CrestPoints = new Int32Point[bands.Length];
             }
-            data.Step = width / bands.Length;
             return data;
         }
 
@@ -613,8 +618,6 @@ namespace FoxTunes
             public float[] Rms;
 
             public float RmsPeak;
-
-            public int Step;
 
             public int Width;
 
