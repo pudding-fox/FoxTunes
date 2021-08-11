@@ -291,27 +291,29 @@ namespace FoxTunes
                 );
                 if (rmsElements != null)
                 {
-                    BitmapHelper.DrawRectangle(
-                        rmsRenderInfo,
-                        rmsElements[a].X,
-                        rmsElements[a].Y,
-                        rmsElements[a].Width,
-                        rmsElements[a].Height
-                    );
+                    if (rmsElements[a].Height > 0)
+                    {
+                        BitmapHelper.DrawRectangle(
+                            rmsRenderInfo,
+                            rmsElements[a].X,
+                            rmsElements[a].Y,
+                            rmsElements[a].Width,
+                            rmsElements[a].Height
+                        );
+                    }
                 }
                 if (peakElements != null)
                 {
-                    if (peakElements[a].Y >= valueElements[a].Y)
+                    if (peakElements[a].Y < valueElements[a].Y)
                     {
-                        continue;
+                        BitmapHelper.DrawRectangle(
+                            valueRenderInfo,
+                            peakElements[a].X,
+                            peakElements[a].Y,
+                            peakElements[a].Width,
+                            peakElements[a].Height
+                        );
                     }
-                    BitmapHelper.DrawRectangle(
-                        valueRenderInfo,
-                        peakElements[a].X,
-                        peakElements[a].Y,
-                        peakElements[a].Width,
-                        peakElements[a].Height
-                    );
                 }
             }
 

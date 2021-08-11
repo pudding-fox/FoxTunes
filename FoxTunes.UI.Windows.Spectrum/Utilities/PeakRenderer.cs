@@ -283,37 +283,45 @@ namespace FoxTunes
                     );
                     if (rmsElements != null)
                     {
-                        BitmapHelper.DrawRectangle(
-                            rmsRenderInfo,
-                            rmsElements[a].X,
-                            rmsElements[a].Y,
-                            rmsElements[a].Width,
-                            rmsElements[a].Height
-                        );
+                        if (rmsElements[a].Height > 0)
+                        {
+                            BitmapHelper.DrawRectangle(
+                                rmsRenderInfo,
+                                rmsElements[a].X,
+                                rmsElements[a].Y,
+                                rmsElements[a].Width,
+                                rmsElements[a].Height
+                            );
+                        }
                     }
                     if (peakElements != null)
                     {
                         if (orientation == Orientation.Horizontal)
                         {
-                            if (peakElements[a].X <= valueElements[a].Width)
+                            if (peakElements[a].X > valueElements[a].Width)
                             {
-                                continue;
+                                BitmapHelper.DrawRectangle(
+                                    valueRenderInfo,
+                                    peakElements[a].X,
+                                    peakElements[a].Y,
+                                    peakElements[a].Width,
+                                    peakElements[a].Height
+                                );
                             }
                         }
                         else if (orientation == Orientation.Vertical)
                         {
-                            if (peakElements[a].Y >= valueElements[a].Y)
+                            if (peakElements[a].Y < valueElements[a].Y)
                             {
-                                continue;
+                                BitmapHelper.DrawRectangle(
+                                    valueRenderInfo,
+                                    peakElements[a].X,
+                                    peakElements[a].Y,
+                                    peakElements[a].Width,
+                                    peakElements[a].Height
+                                );
                             }
                         }
-                        BitmapHelper.DrawRectangle(
-                            valueRenderInfo,
-                            peakElements[a].X,
-                            peakElements[a].Y,
-                            peakElements[a].Width,
-                            peakElements[a].Height
-                        );
                     }
                 }
             }
@@ -467,7 +475,7 @@ namespace FoxTunes
                         this.SampleCount = this.Renderer.Output.GetData(this.Samples32);
                         break;
                 }
-                return this.SampleCount > 0;
+                return this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0;
             }
 
             private void Update(int rate, int channels, OutputStreamFormat format)
