@@ -10,10 +10,6 @@ namespace FoxTunes
 {
     public class PeakRenderer : VisualizationBase
     {
-        public const int DB_MIN = -90;
-
-        public const int DB_MAX = 0;
-
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
             "Orientation",
             typeof(Orientation),

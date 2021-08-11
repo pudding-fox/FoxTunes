@@ -34,6 +34,8 @@ namespace FoxTunes.ViewModel
 
         public ILibraryBrowser LibraryBrowser { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         private bool _HasData { get; set; }
@@ -451,6 +453,7 @@ namespace FoxTunes.ViewModel
             this.PlaybackManager = this.Core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.LibraryBrowser = this.Core.Components.LibraryBrowser;
+            this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Dispatch(this.Refresh);
@@ -565,6 +568,29 @@ namespace FoxTunes.ViewModel
                     this.Bitrate = null;
                 }
             });
+        }
+
+        public void Search(string key, string value)
+        {
+            {
+                //We check whether the value was decorated by our accessors.
+                //Empty values are presented as placeholders.
+                var defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { nameof(this.Artist), ARTIST },
+                    { nameof(this.Performer), PERFORMER },
+                    { nameof(this.Album), ALBUM },
+                    { nameof(this.Genre), GENRE },
+                    { nameof(this.Year), YEAR },
+                };
+                if (defaults.ContainsKey(key) && string.Equals(defaults[key], value, StringComparison.OrdinalIgnoreCase))
+                {
+                    //Can't search for empty value.
+                    return;
+                }
+            }
+            var filter = string.Format("{0}:{1}", key, value);
+            this.LibraryHierarchyBrowser.Filter = filter;
         }
 
         protected override Freezable CreateInstanceCore()

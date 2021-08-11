@@ -397,6 +397,20 @@ namespace FoxTunes
 
         protected abstract void CreateViewBox();
 
+        protected virtual Task Clear()
+        {
+            return Windows.Invoke(() =>
+            {
+                if (!this.Bitmap.TryLock(LockTimeout))
+                {
+                    return;
+                }
+                BitmapHelper.Clear(BitmapHelper.CreateRenderInfo(this.Bitmap, this.Color));
+                this.Bitmap.AddDirtyRect(new Int32Rect(0, 0, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight));
+                this.Bitmap.Unlock();
+            });
+        }
+
         protected virtual void Dispatch(Action action)
         {
 #if NET40

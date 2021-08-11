@@ -49,7 +49,7 @@ namespace FoxTunes
             "SearchText",
             typeof(string),
             typeof(SearchBox),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnSearchTextChanged))
         );
 
         public static string GetSearchText(SearchBox source)
@@ -60,6 +60,16 @@ namespace FoxTunes
         public static void SetSearchText(SearchBox source, string value)
         {
             source.SetValue(SearchTextProperty, value);
+        }
+
+        private static void OnSearchTextChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var searchBox = sender as SearchBox;
+            if (searchBox == null)
+            {
+                return;
+            }
+            searchBox.OnSearchTextChanged();
         }
 
         public static readonly DependencyProperty IntervalProperty = DependencyProperty.Register(
@@ -141,6 +151,14 @@ namespace FoxTunes
             set
             {
                 SetSearchText(this, value);
+            }
+        }
+
+        protected virtual void OnSearchTextChanged()
+        {
+            if (!string.Equals(this.Text, this.SearchText, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Text = this.SearchText;
             }
         }
 
