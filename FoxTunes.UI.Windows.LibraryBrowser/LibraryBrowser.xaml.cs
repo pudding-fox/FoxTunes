@@ -24,6 +24,7 @@ namespace FoxTunes
             {
                 return null;
             }
+            container.ApplyTemplate();
             var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
             return listBox;
         }
