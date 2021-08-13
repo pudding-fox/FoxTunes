@@ -78,19 +78,19 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
-            yield return new ConfigurationSection(SECTION, "Spectrum")
-                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars (Basic)").WithOptions(GetBarsOptions()))
-                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, "Bands (Enhanced)").WithOptions(GetBandsOptions()))
-                .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality").WithOptions(GetQualityOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks", path: "Advanced"))
-                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, "Rms", path: "Advanced"))
-                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, "Crest Factor", path: "Advanced").WithValue(false))
-                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, "Peak Hold", path: "Advanced").WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, "High Cut", path: "Advanced").WithValue(true))
-                .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth", path: "Advanced"))
-                .WithElement(new IntegerConfigurationElement(SMOOTH_FACTOR_ELEMENT, "Smooth Factor", path: "Advanced").WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)).DependsOn(SECTION, SMOOTH_ELEMENT))
-                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval", path: "Advanced").WithValidationRule(new IntegerValidationRule(1, 100)))
-                .WithElement(new SelectionConfigurationElement(FFT_SIZE_ELEMENT, "FFT Size", path: "Advanced").WithOptions(GetFFTOptions())
+            yield return new ConfigurationSection(SECTION, Strings.SpectrumBehaviourConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bars).WithOptions(GetBarsOptions()))
+                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bands).WithOptions(GetBandsOptions()))
+                .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, Strings.SpectrumBehaviourConfiguration_Quality).WithOptions(GetQualityOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Peaks, path: Strings.General_Advanced))
+                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Rms, path: Strings.General_Advanced))
+                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.SpectrumBehaviourConfiguration_Crest, path: Strings.General_Advanced).WithValue(false))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumBehaviourConfiguration_Hold, path: Strings.General_Advanced).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, Strings.SpectrumBehaviourConfiguration_HighCut, path: Strings.General_Advanced).WithValue(true))
+                .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, Strings.SpectrumBehaviourConfiguration_Smooth, path: Strings.General_Advanced))
+                .WithElement(new IntegerConfigurationElement(SMOOTH_FACTOR_ELEMENT, Strings.SpectrumBehaviourConfiguration_SmoothFactor, path: Strings.General_Advanced).WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)).DependsOn(SECTION, SMOOTH_ELEMENT))
+                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, Strings.SpectrumBehaviourConfiguration_Interval, path: Strings.General_Advanced).WithValidationRule(new IntegerValidationRule(1, 100)))
+                .WithElement(new SelectionConfigurationElement(FFT_SIZE_ELEMENT, Strings.SpectrumBehaviourConfiguration_FFTSize, path: Strings.General_Advanced).WithOptions(GetFFTOptions())
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
                 SECTION,
@@ -280,8 +280,8 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetQualityOptions()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
-            var high = new SelectionConfigurationOption(QUALITY_HIGH_OPTION, "High");
-            var low = new SelectionConfigurationOption(QUALITY_LOW_OPTION, "Low");
+            var high = new SelectionConfigurationOption(QUALITY_HIGH_OPTION, Strings.SpectrumBehaviourConfiguration_Quality_High);
+            var low = new SelectionConfigurationOption(QUALITY_LOW_OPTION, Strings.SpectrumBehaviourConfiguration_Quality_Low);
             if (releaseType == ReleaseType.Default)
             {
                 high.Default();
