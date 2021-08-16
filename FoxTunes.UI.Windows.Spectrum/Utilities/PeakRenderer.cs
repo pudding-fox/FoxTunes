@@ -81,28 +81,28 @@ namespace FoxTunes
         {
             base.InitializeComponent(core);
             this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.PEAKS_ELEMENT
+                PeakMeterBehaviourConfiguration.SECTION,
+                PeakMeterBehaviourConfiguration.PEAKS
              );
             this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.RMS_ELEMENT
+                PeakMeterBehaviourConfiguration.SECTION,
+                PeakMeterBehaviourConfiguration.RMS
             );
             this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.SMOOTH_ELEMENT
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
             );
             this.SmoothingFactor = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
             );
             this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.HOLD_ELEMENT
+               PeakMeterBehaviourConfiguration.SECTION,
+               PeakMeterBehaviourConfiguration.HOLD
             );
             this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.INTERVAL_ELEMENT
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
             ).ConnectValue(value => this.UpdateInterval = value);
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
@@ -224,7 +224,7 @@ namespace FoxTunes
             }
             catch (Exception exception)
             {
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update Visualization data, disabling: {0}", exception.Message);
             }
         }
 

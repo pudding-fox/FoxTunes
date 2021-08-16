@@ -69,7 +69,7 @@ namespace FoxTunes
                     this.Timer.Stop();
                 }
             }
-            if (!PlaybackStateNotifier.IsPlaying)
+            if (!PlaybackStateNotifier.IsPlaying && !PlaybackStateNotifier.IsPaused)
             {
                 var task = this.Clear();
             }

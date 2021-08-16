@@ -147,40 +147,19 @@
   <data name="SpectrumBehaviourConfiguration.Crest" xml:space="preserve">
     <value>Show Crest Factor</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.FFTSize" xml:space="preserve">
-    <value>FFT Size</value>
-  </data>
   <data name="SpectrumBehaviourConfiguration.HighCut" xml:space="preserve">
     <value>High Cut</value>
   </data>
   <data name="SpectrumBehaviourConfiguration.Hold" xml:space="preserve">
     <value>Hold Duration</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Interval" xml:space="preserve">
-    <value>Update Interval</value>
-  </data>
   <data name="SpectrumBehaviourConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
-  </data>
-  <data name="SpectrumBehaviourConfiguration.Quality" xml:space="preserve">
-    <value>Quality</value>
-  </data>
-  <data name="SpectrumBehaviourConfiguration.Quality.High" xml:space="preserve">
-    <value>High</value>
-  </data>
-  <data name="SpectrumBehaviourConfiguration.Quality.Low" xml:space="preserve">
-    <value>Low</value>
   </data>
   <data name="SpectrumBehaviourConfiguration.Rms" xml:space="preserve">
     <value>Show RMS</value>
   </data>
   <data name="SpectrumBehaviourConfiguration.Section" xml:space="preserve">
     <value>Spectrum</value>
-  </data>
-  <data name="SpectrumBehaviourConfiguration.Smooth" xml:space="preserve">
-    <value>Smooth</value>
-  </data>
-  <data name="SpectrumBehaviourConfiguration.SmoothFactor" xml:space="preserve">
-    <value>Smooth Factor</value>
   </data>
 </root>

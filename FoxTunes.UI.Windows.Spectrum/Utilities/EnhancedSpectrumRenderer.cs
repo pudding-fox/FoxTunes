@@ -49,24 +49,24 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.CREST_ELEMENT
             );
             this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.SMOOTH_ELEMENT
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
             );
             this.SmoothingFactor = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
             );
             this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.HOLD_ELEMENT
             );
             this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.INTERVAL_ELEMENT
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
             ).ConnectValue(value => this.UpdateInterval = value);
             this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.FFT_SIZE_ELEMENT
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
             this.ScalingFactor.ValueChanged += this.OnValueChanged;
             this.Bands.ValueChanged += this.OnValueChanged;
@@ -100,7 +100,7 @@ namespace FoxTunes
                 this.Bitmap.PixelWidth,
                 this.Bitmap.PixelHeight,
                 SpectrumBehaviourConfiguration.GetBands(this.Bands.Value),
-                SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
+                VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value
@@ -117,7 +117,7 @@ namespace FoxTunes
                     this.Bitmap.PixelWidth,
                     this.Bitmap.PixelHeight,
                     SpectrumBehaviourConfiguration.GetBands(this.Bands.Value),
-                    SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
+                    VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                     this.ShowPeaks.Value,
                     this.ShowRms.Value,
                     this.ShowCrestFactor.Value

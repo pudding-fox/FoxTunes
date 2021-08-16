@@ -151,15 +151,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FFT Size.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_FFTSize {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.FFTSize", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to High Cut.
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_HighCut {
@@ -178,47 +169,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Update Interval.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Interval {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Interval", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Peaks {
             get {
                 return ResourceManager.GetString("SpectrumBehaviourConfiguration.Peaks", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Quality.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Quality {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Quality", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to High.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Quality_High {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Quality.High", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Low.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Quality_Low {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Quality.Low", resourceCulture);
             }
         }
         
@@ -237,24 +192,6 @@ namespace FoxTunes {
         internal static string SpectrumBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("SpectrumBehaviourConfiguration.Section", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Smooth.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Smooth {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Smooth", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Smooth Factor.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_SmoothFactor {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.SmoothFactor", resourceCulture);
             }
         }
     }
