@@ -88,6 +88,42 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mode.
+        /// </summary>
+        internal static string OscilloscopeBehaviourConfiguration_Mode {
+            get {
+                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mono.
+        /// </summary>
+        internal static string OscilloscopeBehaviourConfiguration_Mode_Mono {
+            get {
+                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Mode.Mono", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Seperate.
+        /// </summary>
+        internal static string OscilloscopeBehaviourConfiguration_Mode_Seperate {
+            get {
+                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Mode.Seperate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oscilloscope.
+        /// </summary>
+        internal static string OscilloscopeBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Orientation.
         /// </summary>
         internal static string PeakMeterBehaviourConfiguration_Orientation {
