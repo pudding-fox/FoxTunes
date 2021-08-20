@@ -13,12 +13,18 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Mode { get; private set; }
 
+        public IntegerConfigurationElement Duration { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 OscilloscopeBehaviourConfiguration.SECTION,
                 OscilloscopeBehaviourConfiguration.MODE_ELEMENT
+            );
+            this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
+                OscilloscopeBehaviourConfiguration.SECTION,
+                OscilloscopeBehaviourConfiguration.DURATION_ELEMENT
             );
             base.InitializeComponent(core);
         }

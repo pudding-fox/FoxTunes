@@ -173,6 +173,7 @@ namespace FoxTunes
             if (!success)
             {
                 //Failed to establish lock.
+                this.Start();
                 return;
             }
 
@@ -183,6 +184,8 @@ namespace FoxTunes
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
+
+            this.Start();
         }
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
@@ -190,6 +193,7 @@ namespace FoxTunes
             var data = this.RendererData;
             if (data == null)
             {
+                this.Start();
                 return;
             }
             try
@@ -235,10 +239,6 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
-            }
             if (this.ShowPeaks != null)
             {
                 this.ShowPeaks.ValueChanged -= this.OnValueChanged;

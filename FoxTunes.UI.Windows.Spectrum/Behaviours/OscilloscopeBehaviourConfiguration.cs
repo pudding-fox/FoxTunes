@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public static class OscilloscopeBehaviourConfiguration
     {
-        public const string SECTION = "A8627871-2D42-4129-874F-E067EE4DB1BD";
+        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
         public const string MODE_ELEMENT = "AAAAD149-F777-46CB-92C0-F479CEE72A91";
 
@@ -15,10 +16,17 @@ namespace FoxTunes
 
         public const string MODE_SEPERATE_OPTION = "CCCCD496-E88A-4B42-8A89-75FFB9A1CD49";
 
+        public const string DURATION_ELEMENT = "BBBBE8CC-88E9-4B66-B2FB-3577CD32D8C7";
+
+        public const int DURATION_MIN = 10;
+
+        public const int DURATION_MAX = 1000;
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, Strings.OscilloscopeBehaviourConfiguration_Section)
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Mode).WithOptions(GetModeOptions())
+            yield return new ConfigurationSection(SECTION)
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Mode, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
+                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Duration, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(100).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
             );
         }
 
@@ -38,6 +46,11 @@ namespace FoxTunes
                 case MODE_SEPERATE_OPTION:
                     return OscilloscopeRendererMode.Seperate;
             }
+        }
+
+        public static TimeSpan GetDuration(int value)
+        {
+            return TimeSpan.FromMilliseconds(value);
         }
     }
 }

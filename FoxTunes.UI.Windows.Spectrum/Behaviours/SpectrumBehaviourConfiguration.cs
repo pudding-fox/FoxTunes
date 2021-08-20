@@ -13,7 +13,7 @@ namespace FoxTunes
             }
         }
 
-        public const string SECTION = "B06236E7-F320-4D87-A1A6-9937E0B399BB";
+        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
         public const string BARS_ELEMENT = "AAAA0663-7CBF-4EE4-99C8-A0A096D4E876";
 
@@ -49,17 +49,17 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, Strings.SpectrumBehaviourConfiguration_Section)
-                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bars).WithOptions(GetBarsOptions()))
-                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bands).WithOptions(GetBandsOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Peaks, path: Strings.General_Advanced))
-                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Rms, path: Strings.General_Advanced))
-                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.SpectrumBehaviourConfiguration_Crest, path: Strings.General_Advanced).WithValue(false))
-                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumBehaviourConfiguration_Hold, path: Strings.General_Advanced).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, Strings.SpectrumBehaviourConfiguration_HighCut, path: Strings.General_Advanced).WithValue(true)
+            yield return new ConfigurationSection(SECTION)
+                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bars, path: Strings.SpectrumBehaviourConfiguration_Path).WithOptions(GetBarsOptions()))
+                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bands, path: Strings.SpectrumBehaviourConfiguration_Path).WithOptions(GetBandsOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)))
+                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)))
+                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.SpectrumBehaviourConfiguration_Crest, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(false))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, Strings.SpectrumBehaviourConfiguration_HighCut, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true)
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
-                VisualizationBehaviourConfiguration.SECTION,
+                SECTION,
                 VisualizationBehaviourConfiguration.QUALITY_ELEMENT
             ).ConnectValue(option => UpdateConfiguration(option));
         }

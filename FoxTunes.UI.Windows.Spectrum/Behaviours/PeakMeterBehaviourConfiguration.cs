@@ -14,7 +14,7 @@ namespace FoxTunes
             }
         }
 
-        public const string SECTION = "EA1C25CD-795A-4D94-880F-602906B82BC1";
+        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
         public const string ORIENTATION = "AAAAC0C6-E7E3-4EEA-B34C-FC7E267A5CCA";
 
@@ -30,14 +30,14 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, Strings.PeakMeterBehaviourConfiguration_Section)
-                .WithElement(new SelectionConfigurationElement(ORIENTATION, Strings.PeakMeterBehaviourConfiguration_Orientation).WithOptions(GetOrientationOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS, Strings.SpectrumBehaviourConfiguration_Peaks, path: Strings.General_Advanced))
-                .WithElement(new BooleanConfigurationElement(RMS, Strings.SpectrumBehaviourConfiguration_Rms, path: Strings.General_Advanced))
-                .WithElement(new IntegerConfigurationElement(HOLD, Strings.SpectrumBehaviourConfiguration_Hold, path: Strings.General_Advanced).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS)
+            yield return new ConfigurationSection(SECTION)
+                .WithElement(new SelectionConfigurationElement(ORIENTATION, Strings.PeakMeterBehaviourConfiguration_Orientation, path: Strings.PeakMeterBehaviourConfiguration_Path).WithOptions(GetOrientationOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS, Strings.SpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)))
+                .WithElement(new BooleanConfigurationElement(RMS, Strings.SpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)))
+                .WithElement(new IntegerConfigurationElement(HOLD, Strings.SpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS)
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
-                VisualizationBehaviourConfiguration.SECTION,
+                SECTION,
                 VisualizationBehaviourConfiguration.QUALITY_ELEMENT
             ).ConnectValue(option => UpdateConfiguration(option));
         }

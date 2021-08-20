@@ -61,7 +61,6 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
-            this.ScalingFactor.ValueChanged += this.OnValueChanged;
             this.Bars.ValueChanged += this.OnValueChanged;
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.HighCut.ValueChanged += this.OnValueChanged;
@@ -135,6 +134,7 @@ namespace FoxTunes
             if (!success)
             {
                 //Failed to establish lock.
+                this.Start();
                 return;
             }
 
@@ -145,6 +145,8 @@ namespace FoxTunes
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
+
+            this.Start();
         }
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
@@ -152,6 +154,7 @@ namespace FoxTunes
             var data = this.RendererData;
             if (data == null)
             {
+                this.Start();
                 return;
             }
             try
@@ -215,10 +218,6 @@ namespace FoxTunes
                     this.Timer.Dispose();
                     this.Timer = null;
                 }
-            }
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
             }
             if (this.Bars != null)
             {

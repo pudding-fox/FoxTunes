@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Mode { get; private set; }
 
+        public IntegerConfigurationElement Duration { get; private set; }
+
         public BooleanConfigurationElement Smooth { get; private set; }
 
         public IntegerConfigurationElement SmoothingFactor { get; private set; }
@@ -23,6 +25,10 @@ namespace FoxTunes
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 OscilloscopeBehaviourConfiguration.SECTION,
                 OscilloscopeBehaviourConfiguration.MODE_ELEMENT
+            );
+            this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
+                OscilloscopeBehaviourConfiguration.SECTION,
+                OscilloscopeBehaviourConfiguration.DURATION_ELEMENT
             );
             this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
@@ -37,6 +43,7 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
             ).ConnectValue(value => this.UpdateInterval = value);
             this.Mode.ValueChanged += this.OnValueChanged;
+            this.Duration.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
             this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
@@ -53,6 +60,7 @@ namespace FoxTunes
                 this,
                 this.Bitmap.PixelWidth,
                 this.Bitmap.PixelHeight,
+                OscilloscopeBehaviourConfiguration.GetDuration(this.Duration.Value),
                 OscilloscopeBehaviourConfiguration.GetMode(this.Mode.Value)
             );
             this.Viewbox = new Rect(0, 0, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
@@ -66,6 +74,7 @@ namespace FoxTunes
                     this,
                     this.Bitmap.PixelWidth,
                     this.Bitmap.PixelHeight,
+                    OscilloscopeBehaviourConfiguration.GetDuration(this.Duration.Value),
                     OscilloscopeBehaviourConfiguration.GetMode(this.Mode.Value)
                 );
             });
@@ -91,6 +100,7 @@ namespace FoxTunes
             if (!success)
             {
                 //Failed to establish lock.
+                this.Start();
                 return;
             }
 
@@ -101,6 +111,8 @@ namespace FoxTunes
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
+
+            this.Start();
         }
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
@@ -108,15 +120,20 @@ namespace FoxTunes
             var data = this.RendererData;
             if (data == null)
             {
+                this.Start();
                 return;
             }
             try
             {
-                if (!data.Update())
+                if (data.LastUpdated < DateTime.UtcNow - data.Duration)
                 {
-                    data.Clear();
+                    if (!data.Update())
+                    {
+                        data.Clear();
+                    }
+                    UpdateValues(data);
+                    data.LastUpdated = DateTime.UtcNow;
                 }
-                UpdateValues(data);
 
                 switch (data.Mode)
                 {
@@ -143,8 +160,6 @@ namespace FoxTunes
                         break;
                 }
 
-                data.LastUpdated = DateTime.UtcNow;
-
                 var task = this.Render();
             }
             catch (Exception exception)
@@ -153,84 +168,142 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateElementsFastMono(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height)
+        private static void UpdateElementsFastMono(OscilloscopeRendererDataValue[,] values, float[] peaks, Int32Point[,] elements, int width, int height)
         {
             height = height - 1;
-            var step = width / values.Length;
-            for (var a = 0; a < values.Length; a++)
+            var center = height / 2;
+            var range = width / 50;
+            var peak = peaks[0];
+            if (values.Length == 0 || peak == 0.0f)
             {
-                var x = (a * step);
+                return;
+            }
+            for (var x = 0; x < width; x++)
+            {
                 var y = default(int);
-                if (values[0, a] > 0)
+                var value = GetValue(values, 0, x, range, width);
+                if (value < 0)
                 {
-                    y = height - Convert.ToInt32((values[0, a] / peaks[0]) * height);
+                    y = center + Convert.ToInt32((Math.Abs(value) / peak) * (height / 2));
+                }
+                else if (value > 0)
+                {
+                    y = center - Convert.ToInt32((Math.Abs(value) / peak) * (height / 2));
                 }
                 else
                 {
-                    y = height;
+                    y = center;
                 }
-                elements[0, a].X = x;
-                elements[0, a].Y = y;
+                elements[0, x].X = x;
+                elements[0, x].Y = y;
             }
         }
 
-        private static void UpdateElementsFastSeperate(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int channels)
+        private static void UpdateElementsFastSeperate(OscilloscopeRendererDataValue[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int channels)
         {
-
-        }
-
-        private static void UpdateElementsSmoothMono(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int smoothing)
-        {
-            height = height - 1;
-            var fast = Math.Min((float)height / smoothing, 10);
-            var step = width / values.Length;
-            for (var a = 0; a < values.Length; a++)
+            if (values.Length == 0 || channels == 0)
             {
-                var x = (a * step) + (step / 2);
-                var y = default(int);
-                if (values[0, a] > 0)
+                return;
+            }
+            height = height / channels;
+            var range = width / 50;
+            for (var channel = 0; channel < channels; channel++)
+            {
+                var center = (height * channel) + (height / 2);
+                var peak = peaks[channel];
+                if (peak == 0.0f)
                 {
-                    y = height - Convert.ToInt32((values[0, a] / peaks[0]) * height);
+                    continue;
                 }
-                else
+                for (var x = 0; x < width; x++)
                 {
-                    y = height;
-                }
-                elements[0, a].X = x;
-                var difference = Math.Abs(elements[0, a].Y - y);
-                if (difference > 0)
-                {
-                    if (difference < fast)
+                    var y = default(int);
+                    var value = GetValue(values, channel, x, range, width);
+                    if (value < 0)
                     {
-                        if (y > elements[0, a].Y)
-                        {
-                            elements[0, a].Y++;
-                        }
-                        else if (y < elements[0, a].Y)
-                        {
-                            elements[0, a].Y--;
-                        }
+                        y = center + Convert.ToInt32((Math.Abs(value) / peak) * (height / 2));
+                    }
+                    else if (value > 0)
+                    {
+                        y = center - Convert.ToInt32((Math.Abs(value) / peak) * (height / 2));
                     }
                     else
                     {
-                        var distance = (float)difference / height;
-                        var increment = Math.Sqrt(1 - Math.Pow(distance - 1, 2));
-                        var smoothed = Math.Min(Math.Max(fast * increment, 1), fast);
-                        if (y > elements[0, a].Y)
-                        {
-                            elements[0, a].Y = (int)Math.Min(elements[0, a].Y + smoothed, height);
-                        }
-                        else if (y < elements[0, a].Y)
-                        {
-                            elements[0, a].Y = (int)Math.Max(elements[0, a].Y - smoothed, 1);
-                        }
+                        y = center;
                     }
+                    elements[channel, x].X = x;
+                    elements[channel, x].Y = y;
                 }
             }
         }
 
-        private static void UpdateElementsSmoothSeperate(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int channels, int smoothing)
+        private static void UpdateElementsSmoothMono(OscilloscopeRendererDataValue[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int smoothing)
         {
+            if (values.Length == 0 || peaks[0] == 0.0f)
+            {
+                return;
+            }
+            height = height / 2;
+            var center = height;
+            var range = width / 50;
+            var peak = peaks[0];
+            for (var x = 0; x < width; x++)
+            {
+                var y = default(int);
+                var value = GetValue(values, 0, x, range, width);
+                if (value < 0)
+                {
+                    y = center + Convert.ToInt32((Math.Abs(value) / peak) * height);
+                }
+                else if (value > 0)
+                {
+                    y = center - Convert.ToInt32((Math.Abs(value) / peak) * height);
+                }
+                else
+                {
+                    y = center;
+                }
+                elements[0, x].X = x;
+                Animate(ref elements[0, x].Y, y, center - height, center + height, smoothing);
+            }
+        }
+
+        private static void UpdateElementsSmoothSeperate(OscilloscopeRendererDataValue[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int channels, int smoothing)
+        {
+            height = (height / channels) / 2;
+            var range = width / 50;
+            if (values.Length == 0)
+            {
+                return;
+            }
+            for (var channel = 0; channel < channels; channel++)
+            {
+                var center = ((height * 2) * channel) + height;
+                var peak = peaks[channel];
+                if (peak == 0.0f)
+                {
+                    continue;
+                }
+                for (var x = 0; x < width; x++)
+                {
+                    var y = default(int);
+                    var value = GetValue(values, channel, x, range, width);
+                    if (value < 0)
+                    {
+                        y = center + Convert.ToInt32((Math.Abs(value) / peak) * height);
+                    }
+                    else if (value > 0)
+                    {
+                        y = center - Convert.ToInt32((Math.Abs(value) / peak) * height);
+                    }
+                    else
+                    {
+                        y = center;
+                    }
+                    elements[channel, x].X = x;
+                    Animate(ref elements[channel, x].Y, y, center - height, center + height, smoothing);
+                }
+            }
         }
 
         protected override Freezable CreateInstanceCore()
@@ -249,10 +322,6 @@ namespace FoxTunes
                     this.Timer.Dispose();
                     this.Timer = null;
                 }
-            }
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
             }
             if (this.Smooth != null)
             {
@@ -285,10 +354,10 @@ namespace FoxTunes
 
         private static void RenderMono(BitmapHelper.RenderInfo info, Int32Point[,] elements, int width)
         {
-            for (var a = 0; a < width - 1; a++)
+            for (var x = 0; x < width - 1; x++)
             {
-                var point1 = elements[0, a];
-                var point2 = elements[0, a + 1];
+                var point1 = elements[0, x];
+                var point2 = elements[0, x + 1];
                 BitmapHelper.DrawLine(
                     info,
                     point1.X,
@@ -301,12 +370,12 @@ namespace FoxTunes
 
         private static void RenderSeperate(BitmapHelper.RenderInfo info, Int32Point[,] elements, int channels, int width)
         {
-            for (var a = 0; a < channels; a++)
+            for (var channel = 0; channel < channels; channel++)
             {
-                for (var b = 0; b < width - 1; b++)
+                for (var x = 0; x < width - 1; x++)
                 {
-                    var point1 = elements[a, b];
-                    var point2 = elements[a, b + 1];
+                    var point1 = elements[channel, x];
+                    var point2 = elements[channel, x + 1];
                     BitmapHelper.DrawLine(
                         info,
                         point1.X,
@@ -330,10 +399,10 @@ namespace FoxTunes
             {
                 default:
                 case OscilloscopeRendererMode.Mono:
-                    UpdateValuesMono(data.Samples32, data.Values, data.Peaks, data.SampleCount);
+                    UpdateValuesMono(data.Samples32, data.Values, data.Peaks, data.Width, data.SampleCount);
                     break;
                 case OscilloscopeRendererMode.Seperate:
-                    UpdateValuesSeperate(data.Samples32, data.Values, data.Channels, data.SampleCount);
+                    UpdateValuesSeperate(data.Samples, data.Values, data.Peaks, data.Channels, data.Width, data.SampleCount);
                     break;
             }
         }
@@ -346,34 +415,121 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateValuesMono(float[] samples, float[,] values, float[] peaks, int count)
+        private static void UpdateValuesMono(float[] samples, OscilloscopeRendererDataValue[,] values, float[] peaks, int width, int count)
         {
-            var samplesPerValue = count / values.Length;
-            peaks[0] = 0.1f;
-            for (int a = 0, b = 0; a < count && b < values.Length; a += samplesPerValue, b++)
+            if (count == 0 || width == 0)
             {
-                var value = default(float);
-                for (var c = 0; c < samplesPerValue; c++)
+                return;
+            }
+            var samplesPerValue = count / width;
+            peaks[0] = 0.1f;
+            if (samplesPerValue > 0)
+            {
+                for (int a = 0, x = 0; a < count && x < width; a += samplesPerValue, x++)
                 {
-                    value += samples[a + c];
+                    values[0, x].Min = 0;
+                    values[0, x].Max = 0;
+                    for (var b = 0; b < samplesPerValue; b++)
+                    {
+                        var sample = samples[a + b];
+                        values[0, x].Min = Math.Min(sample, values[0, x].Min);
+                        values[0, x].Max = Math.Max(sample, values[0, x].Max);
+                    }
+                    peaks[0] = Math.Max(Math.Max(Math.Abs(values[0, x].Min), Math.Abs(values[0, x].Max)), peaks[0]);
                 }
-                values[0, b] = value / samplesPerValue;
-                peaks[0] = Math.Max(Math.Abs(values[0, b]), peaks[0]);
+            }
+            else
+            {
+                var valuesPerSample = (float)width / count;
+                for (var x = 0; x < width; x++)
+                {
+                    var sample = samples[Convert.ToInt32(x / valuesPerSample)];
+                    values[0, x].Min = Math.Min(sample, 0);
+                    values[0, x].Max = Math.Max(sample, 0);
+                    peaks[0] = Math.Max(Math.Max(Math.Abs(values[0, x].Min), Math.Abs(values[0, x].Max)), peaks[0]);
+                }
             }
         }
 
-        private static void UpdateValuesSeperate(float[] samples, float[,] values, int channels, int count)
+        private static void UpdateValuesSeperate(float[,] samples, OscilloscopeRendererDataValue[,] values, float[] peaks, int channels, int width, int count)
         {
-
+            if (channels == 0 || width == 0 || count == 0)
+            {
+                return;
+            }
+            var samplesPerValue = (count / channels) / width;
+            Array.Clear(peaks, 0, peaks.Length);
+            if (samplesPerValue > 0)
+            {
+                for (int a = 0, x = 0; a < count && x < width; a += samplesPerValue, x++)
+                {
+                    for (var channel = 0; channel < channels; channel++)
+                    {
+                        values[channel, x].Min = 0;
+                        values[channel, x].Max = 0;
+                        for (var b = 0; b < samplesPerValue; b++)
+                        {
+                            var sample = samples[channel, a + b];
+                            values[channel, x].Min = Math.Min(sample, values[channel, x].Min);
+                            values[channel, x].Max = Math.Max(sample, values[channel, x].Max);
+                        }
+                        peaks[channel] = Math.Max(Math.Max(Math.Abs(values[channel, x].Min), Math.Abs(values[channel, x].Max)), peaks[channel]);
+                    }
+                }
+            }
+            else
+            {
+                var valuesPerSample = (float)width / count;
+                for (var x = 0; x < width; x++)
+                {
+                    for (var channel = 0; channel < channels; channel++)
+                    {
+                        var sample = samples[channel, Convert.ToInt32(x / valuesPerSample)];
+                        values[channel, x].Min = Math.Min(sample, 0);
+                        values[channel, x].Max = Math.Max(sample, 0);
+                        peaks[channel] = Math.Max(Math.Max(Math.Abs(values[channel, x].Min), Math.Abs(values[channel, x].Max)), peaks[channel]);
+                    }
+                }
+            }
         }
 
-        public static OscilloscopeRendererData Create(OscilloscopeRenderer renderer, int width, int height, OscilloscopeRendererMode mode)
+        private static float GetValue(OscilloscopeRendererDataValue[,] values, int channel, int index, int range, int width)
+        {
+            var start = default(int);
+            var end = default(int);
+            if (index > range)
+            {
+                start = index - range;
+            }
+            else
+            {
+                start = 0;
+            }
+            if (index + range < width)
+            {
+                end = index + range;
+            }
+            else
+            {
+                end = width - 1;
+            }
+            var value = default(float);
+            for (var a = start; a < end; a++)
+            {
+                value += values[channel, a].Min + values[channel, a].Max;
+            }
+            value /= (end - start);
+            return value;
+        }
+
+        public static OscilloscopeRendererData Create(OscilloscopeRenderer renderer, int width, int height, TimeSpan duration, OscilloscopeRendererMode mode)
         {
             var data = new OscilloscopeRendererData()
             {
                 Renderer = renderer,
                 Width = width,
                 Height = height,
+                Duration = duration,
                 Mode = mode
             };
             return data;
@@ -397,15 +553,19 @@ namespace FoxTunes
 
             public float[] Samples32;
 
+            public float[,] Samples;
+
             public int SampleCount;
 
-            public float[,] Values;
+            public OscilloscopeRendererDataValue[,] Values;
 
             public float[] Peaks;
 
             public Int32Point[,] Elements;
 
             public DateTime LastUpdated;
+
+            public TimeSpan Duration;
 
             public OscilloscopeRendererMode Mode;
 
@@ -428,7 +588,27 @@ namespace FoxTunes
                         this.SampleCount = this.Renderer.Output.GetData(this.Samples32) / sizeof(float);
                         break;
                 }
-                return this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0;
+                if (this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0)
+                {
+                    switch (this.Mode)
+                    {
+                        case OscilloscopeRendererMode.Mono:
+                            //Nothing to do.
+                            break;
+                        case OscilloscopeRendererMode.Seperate:
+                            for (int a = 0, b = 0; a < this.SampleCount; a += this.Channels, b++)
+                            {
+                                for (var channel = 0; channel < this.Channels; channel++)
+                                {
+                                    this.Samples[channel, b] = this.Samples32[a + channel];
+                                }
+                            }
+                            this.SampleCount /= this.Channels;
+                            break;
+                    }
+                    return true;
+                }
+                return false;
             }
 
             private void Update(int rate, int channels, OutputStreamFormat format)
@@ -457,16 +637,33 @@ namespace FoxTunes
                 {
                     default:
                     case OscilloscopeRendererMode.Mono:
-                        this.Values = new float[1, this.Width];
-                        this.Elements = new Int32Point[1, this.Width];
+                        this.Values = new OscilloscopeRendererDataValue[1, this.Width];
+                        this.Elements = CreateElements(1, this.Width, this.Height);
                         this.Peaks = new float[1];
                         break;
                     case OscilloscopeRendererMode.Seperate:
-                        this.Values = new float[this.Channels, this.Width];
-                        this.Elements = new Int32Point[this.Channels, this.Width];
+                        this.Samples = new float[this.Channels, this.Samples32.Length];
+                        this.Values = new OscilloscopeRendererDataValue[this.Channels, this.Width];
+                        this.Elements = CreateElements(this.Channels, this.Width, this.Height);
                         this.Peaks = new float[this.Channels];
                         break;
                 }
+            }
+
+            private Int32Point[,] CreateElements(int channels, int width, int height)
+            {
+                height = height / channels;
+                var elements = new Int32Point[channels, width];
+                for (var channel = 0; channel < channels; channel++)
+                {
+                    var center = (height * channel) + (height / 2);
+                    for (var x = 0; x < width; x++)
+                    {
+                        elements[channel, x].X = x;
+                        elements[channel, x].Y = center;
+                    }
+                }
+                return elements;
             }
 
             public void Clear()
@@ -475,9 +672,19 @@ namespace FoxTunes
                 {
                     Array.Clear(this.Samples16, 0, this.Samples16.Length);
                 }
-                Array.Clear(this.Samples32, 0, this.Samples32.Length);
+                if (this.Samples32 != null)
+                {
+                    Array.Clear(this.Samples32, 0, this.Samples32.Length);
+                }
                 this.SampleCount = 0;
             }
+        }
+
+        public struct OscilloscopeRendererDataValue
+        {
+            public float Min;
+
+            public float Max;
         }
     }
 

@@ -68,7 +68,6 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
-            this.ScalingFactor.ValueChanged += this.OnValueChanged;
             this.Bands.ValueChanged += this.OnValueChanged;
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
@@ -162,6 +161,7 @@ namespace FoxTunes
             if (!success)
             {
                 //Failed to establish lock.
+                this.Start();
                 return;
             }
 
@@ -172,6 +172,8 @@ namespace FoxTunes
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
+
+            this.Start();
         }
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
@@ -179,6 +181,7 @@ namespace FoxTunes
             var data = this.RendererData;
             if (data == null)
             {
+                this.Start();
                 return;
             }
             try
@@ -237,10 +240,6 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
-            }
             if (this.ShowPeaks != null)
             {
                 this.ShowPeaks.ValueChanged -= this.OnValueChanged;
@@ -441,6 +440,10 @@ namespace FoxTunes
 
         private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, int width, int height)
         {
+            if (values.Length == 0)
+            {
+                return;
+            }
             height = height - 1;
             var step = width / values.Length;
             var offset = default(float);
@@ -480,8 +483,11 @@ namespace FoxTunes
 
         private static void UpdateCrestPointsSmooth(float[] values, float[] rms, Int32Point[] elements, int width, int height, int smoothing)
         {
+            if (values.Length == 0)
+            {
+                return;
+            }
             height = height - 1;
-            var fast = Math.Min((float)height / smoothing, 10);
             var step = width / values.Length;
             var offset = default(float);
             for (var a = 0; a < values.Length; a++)
@@ -501,35 +507,7 @@ namespace FoxTunes
                     y = height;
                 }
                 elements[a].X = x;
-                var difference = Math.Abs(elements[a].Y - y);
-                if (difference > 0)
-                {
-                    if (difference < fast)
-                    {
-                        if (y > elements[a].Y)
-                        {
-                            elements[a].Y++;
-                        }
-                        else if (y < elements[a].Y)
-                        {
-                            elements[a].Y--;
-                        }
-                    }
-                    else
-                    {
-                        var distance = (float)difference / height;
-                        var increment = Math.Sqrt(1 - Math.Pow(distance - 1, 2));
-                        var smoothed = Math.Min(Math.Max(fast * increment, 1), fast);
-                        if (y > elements[a].Y)
-                        {
-                            elements[a].Y = (int)Math.Min(elements[a].Y + smoothed, height);
-                        }
-                        else if (y < elements[a].Y)
-                        {
-                            elements[a].Y = (int)Math.Max(elements[a].Y - smoothed, 1);
-                        }
-                    }
-                }
+                Animate(ref elements[a].Y, y, 1, height, smoothing);
             }
         }
 
@@ -567,15 +545,15 @@ namespace FoxTunes
             {
                 data.Rms = new float[bands.Length];
                 data.RmsElements = new Int32Rect[bands.Length];
+                if (showCrest)
+                {
+                    data.CrestPoints = new Int32Point[bands.Length];
+                }
             }
             if (showPeaks)
             {
                 data.PeakElements = new Int32Rect[bands.Length];
                 data.Holds = new int[bands.Length];
-            }
-            if (showCrest)
-            {
-                data.CrestPoints = new Int32Point[bands.Length];
             }
             return data;
         }
