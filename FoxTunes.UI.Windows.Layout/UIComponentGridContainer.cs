@@ -12,7 +12,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for UIComponentGridContainer.xaml
     /// </summary>
-    [UIComponent("C1BD2AF7-ACF8-4710-99A3-AB5F34C46A90", "Horizontal Grid")]
+    [UIComponent("C1BD2AF7-ACF8-4710-99A3-AB5F34C46A90", "Horizontal Grid", role: UIComponentRole.Container)]
     public partial class UIComponentGridContainer : UIComponentPanel
     {
         const string ADD = "AAAA";

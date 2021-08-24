@@ -367,6 +367,96 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container.
+        /// </summary>
+        public static string UIComponentRole_Container {
+            get {
+                return ResourceManager.GetString("UIComponentRole.Container", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DSP.
+        /// </summary>
+        public static string UIComponentRole_DSP {
+            get {
+                return ResourceManager.GetString("UIComponentRole.DSP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Info.
+        /// </summary>
+        public static string UIComponentRole_Info {
+            get {
+                return ResourceManager.GetString("UIComponentRole.Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launcher.
+        /// </summary>
+        public static string UIComponentRole_Launcher {
+            get {
+                return ResourceManager.GetString("UIComponentRole.Launcher", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Library.
+        /// </summary>
+        public static string UIComponentRole_Library {
+            get {
+                return ResourceManager.GetString("UIComponentRole.Library", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other.
+        /// </summary>
+        public static string UIComponentRole_None {
+            get {
+                return ResourceManager.GetString("UIComponentRole.None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playback.
+        /// </summary>
+        public static string UIComponentRole_Playback {
+            get {
+                return ResourceManager.GetString("UIComponentRole.Playback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlist.
+        /// </summary>
+        public static string UIComponentRole_Playlist {
+            get {
+                return ResourceManager.GetString("UIComponentRole.Playlist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System.
+        /// </summary>
+        public static string UIComponentRole_System {
+            get {
+                return ResourceManager.GetString("UIComponentRole.System", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visualization.
+        /// </summary>
+        public static string UIComponentRole_Visualization {
+            get {
+                return ResourceManager.GetString("UIComponentRole.Visualization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to FFT Size.
         /// </summary>
         public static string VisualizationBehaviourConfiguration_FFTSize {

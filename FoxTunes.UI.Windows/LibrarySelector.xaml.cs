@@ -3,7 +3,7 @@
     /// <summary>
     /// Interaction logic for LibrarySelector.xaml
     /// </summary>
-    [UIComponent("3ACC518E-9A7C-4ACD-8299-318C8BBB2D47", "Library Selector")]
+    [UIComponent("3ACC518E-9A7C-4ACD-8299-318C8BBB2D47", "Library Selector", role: UIComponentRole.Library)]
     public partial class LibrarySelector : UIComponentBase
     {
         public LibrarySelector()

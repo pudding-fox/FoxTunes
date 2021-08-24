@@ -219,6 +219,36 @@
   <data name="SettingsWindow.Title" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="UIComponentRole.Container" xml:space="preserve">
+    <value>Container</value>
+  </data>
+  <data name="UIComponentRole.DSP" xml:space="preserve">
+    <value>DSP</value>
+  </data>
+  <data name="UIComponentRole.Info" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="UIComponentRole.Launcher" xml:space="preserve">
+    <value>Launcher</value>
+  </data>
+  <data name="UIComponentRole.Library" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="UIComponentRole.None" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="UIComponentRole.Playback" xml:space="preserve">
+    <value>Playback</value>
+  </data>
+  <data name="UIComponentRole.Playlist" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="UIComponentRole.System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="UIComponentRole.Visualization" xml:space="preserve">
+    <value>Visualization</value>
+  </data>
   <data name="VisualizationBehaviourConfiguration.FFTSize" xml:space="preserve">
     <value>FFT Size</value>
   </data>

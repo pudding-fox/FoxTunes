@@ -12,7 +12,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for UIComponentHorizontalSplitContainer.xaml
     /// </summary>
-    [UIComponent("A6820FDA-E415-40C6-AEFB-A73B6FBE4C93", "Horizontal Split")]
+    [UIComponent("A6820FDA-E415-40C6-AEFB-A73B6FBE4C93", "Horizontal Split", role: UIComponentRole.Container)]
     public partial class UIComponentHorizontalSplitContainer : UIComponentPanel
     {
         const string FREEZE_TOP = "AAAA";

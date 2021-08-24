@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace FoxTunes
 {
-    [UIComponent("3451DAA4-C643-4CB2-8105-B441F0277559", "Stack Grid")]
+    [UIComponent("3451DAA4-C643-4CB2-8105-B441F0277559", "Stack Grid", role: UIComponentRole.Container)]
     public class UIComponentStackContainer : UIComponentPanel
     {
         const string ADD = "AAAA";

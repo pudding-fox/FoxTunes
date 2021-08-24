@@ -3,7 +3,7 @@
     /// <summary>
     /// Interaction logic for PeakMeter.xaml
     /// </summary>
-    [UIComponent("F8231616-9D5E-45C8-BD72-506FC5FC9C95", "Peak Meter")]
+    [UIComponent("F8231616-9D5E-45C8-BD72-506FC5FC9C95", "Peak Meter", role: UIComponentRole.Visualization)]
     public partial class PeakMeter : UIComponentBase
     {
         public PeakMeter()

@@ -7,7 +7,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for Artwork.xaml
     /// </summary>
-    [UIComponent("66C8A9E7-0891-48DD-8086-E40F72D4D030", "Artwork")]
+    [UIComponent("66C8A9E7-0891-48DD-8086-E40F72D4D030", "Artwork", role: UIComponentRole.Info)]
     public partial class Artwork : SquareUIComponentBase
     {
         public Artwork()
