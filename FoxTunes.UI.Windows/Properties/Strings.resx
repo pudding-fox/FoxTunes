@@ -138,6 +138,9 @@
   <data name="General.Search" xml:space="preserve">
     <value>Search</value>
   </data>
+  <data name="General.Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
   <data name="KeyBindingsBehaviourConfiguration.Next" xml:space="preserve">
     <value>Next</value>
   </data>

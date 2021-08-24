@@ -11,6 +11,8 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class PlaylistColumnsBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
+        const string SETTINGS = "ZZZZ";
+
         const int TIMEOUT = 1000;
 
         public PlaylistColumnsBehaviour()
@@ -25,6 +27,8 @@ namespace FoxTunes
 
         public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
 
+        public ICore Core { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -33,6 +37,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.GridViewColumnFactory = ComponentRegistry.Instance.GetComponent<PlaylistGridViewColumnFactory>();
             this.GridViewColumnFactory.PositionChanged += this.OnPositionChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnWidthChanged;
@@ -66,11 +71,21 @@ namespace FoxTunes
                         attributes: playlistColumn.Enabled ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_PLAYLIST_HEADER,
+                    SETTINGS,
+                    Strings.General_Settings,
+                    attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
+                );
             }
         }
 
         public Task InvokeAsync(IInvocationComponent component)
         {
+            if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
+            {
+                return Windows.ShowDialog<PlaylistSettingsDialog>(this.Core, Strings.General_Settings);
+            }
             var id = default(int);
             if (!int.TryParse(component.Id, out id))
             {
