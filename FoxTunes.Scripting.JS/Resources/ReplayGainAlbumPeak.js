@@ -3,9 +3,9 @@
     if (!peak) {
         return peak;
     }
-    var parsed = parseFloat(peak);
+    var parsed = NumberHelper.parseFloat(peak);
     if (isNaN(parsed)) {
         return peak;
     }
-    return parsed.toFixed(6);
+    return NumberHelper.toFixed(parsed, 6);
 })()
