@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -23,8 +24,8 @@ namespace FoxTunes
         {
             var collections = new Dictionary<MetaDataItemType, Dictionary<string, object>>()
             {
-                { MetaDataItemType.Tag, new Dictionary<string, object>() },
-                { MetaDataItemType.Property, new Dictionary<string, object>() }
+                { MetaDataItemType.Tag, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) },
+                { MetaDataItemType.Property, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) }
             };
             if (this.LibraryItem != null)
             {

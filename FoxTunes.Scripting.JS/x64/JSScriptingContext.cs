@@ -35,6 +35,10 @@ namespace FoxTunes
             this.Engine.GlobalObject.SetProperty(typeof(Publication));
             this.Engine.RegisterType<DateHelper>(memberSecurity: ScriptMemberSecurity.Locked);
             this.Engine.GlobalObject.SetProperty(typeof(DateHelper));
+            this.Engine.RegisterType<NumberHelper>(memberSecurity: ScriptMemberSecurity.Locked);
+            this.Engine.GlobalObject.SetProperty(typeof(NumberHelper));
+            //Note: Lower case to match tag, property etc.
+            this.SetValue(this.Engine.GlobalObject, "strings", StringsHelper.Strings);
             base.InitializeComponent(core);
         }
 
