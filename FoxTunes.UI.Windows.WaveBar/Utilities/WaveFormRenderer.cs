@@ -198,32 +198,6 @@ namespace FoxTunes
             }).ConfigureAwait(false);
         }
 
-        public async Task Clear()
-        {
-            var bitmap = default(WriteableBitmap);
-            var success = default(bool);
-            var info = default(BitmapHelper.RenderInfo);
-
-            await Windows.Invoke(() =>
-            {
-                bitmap = this.Bitmap;
-                success = bitmap.TryLock(LockTimeout);
-                if (!success)
-                {
-                    return;
-                }
-                info = BitmapHelper.CreateRenderInfo(bitmap, Colors.Transparent);
-            }).ConfigureAwait(false);
-
-            BitmapHelper.Clear(info);
-
-            await Windows.Invoke(() =>
-            {
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                bitmap.Unlock();
-            }).ConfigureAwait(false);
-        }
-
         public void Update()
         {
             if (this.GeneratorData != null && this.RendererData != null)

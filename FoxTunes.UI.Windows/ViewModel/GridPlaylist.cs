@@ -219,21 +219,6 @@ namespace FoxTunes.ViewModel
             await base.OnSignal(sender, signal).ConfigureAwait(false);
             switch (signal.Name)
             {
-                case CommonSignals.PlaylistUpdated:
-                    var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null && playlists.Any())
-                    {
-                        var playlist = await this.GetPlaylist().ConfigureAwait(false);
-                        if (playlist != null && playlists.Contains(playlist))
-                        {
-                            await this.ResizeColumns().ConfigureAwait(false);
-                        }
-                    }
-                    else
-                    {
-                        await this.ResizeColumns().ConfigureAwait(false);
-                    }
-                    break;
                 case CommonSignals.PlaylistColumnsUpdated:
                     var columns = signal.State as IEnumerable<PlaylistColumn>;
                     if (columns != null && columns.Any())
@@ -494,7 +479,6 @@ namespace FoxTunes.ViewModel
             await this.RefreshItems().ConfigureAwait(false);
             await this.RefreshSelectedItems().ConfigureAwait(false);
             await this.RefreshColumns(null).ConfigureAwait(false);
-            await this.ResizeColumns().ConfigureAwait(false);
         }
 
         public virtual Task RefreshSelectedItems()
@@ -524,26 +508,6 @@ namespace FoxTunes.ViewModel
         protected virtual Task RefreshColumn(PlaylistGridViewColumn column)
         {
             return Windows.Invoke(() => this.GridViewColumnFactory.Refresh(column));
-        }
-
-        protected virtual async Task ResizeColumns()
-        {
-            if (this.GridColumns == null || this.GridColumns.Count == 0)
-            {
-                await this.ReloadColumns().ConfigureAwait(false);
-            }
-            if (this.GridColumns != null)
-            {
-                foreach (var column in this.GridColumns)
-                {
-                    await this.ResizeColumn(column).ConfigureAwait(false);
-                }
-            }
-        }
-
-        protected virtual Task ResizeColumn(GridViewColumn column)
-        {
-            return Windows.Invoke(() => this.GridViewColumnFactory.Resize(column));
         }
 
         protected virtual Task RefreshColumns()
