@@ -16,5 +16,7 @@ namespace FoxTunes.Interfaces
         Task WithPipelineExclusive(BassOutputStream stream, Action<IBassStreamPipeline> action);
 
         Task FreePipeline();
+
+        event EventHandler Created;
     }
 }

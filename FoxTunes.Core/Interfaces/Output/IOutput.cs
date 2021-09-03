@@ -12,9 +12,9 @@ namespace FoxTunes.Interfaces
 
         bool IsStarted { get; }
 
-        bool ShowBuffering { get; }
-
         event AsyncEventHandler IsStartedChanged;
+
+        bool ShowBuffering { get; }
 
         Task Start();
 
@@ -39,6 +39,10 @@ namespace FoxTunes.Interfaces
         Task Shutdown();
 
         bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
+
+        bool CanGetData { get; }
+
+        event EventHandler CanGetDataChanged;
 
         T[] GetBuffer<T>(TimeSpan duration) where T : struct;
 

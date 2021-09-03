@@ -194,7 +194,6 @@ namespace FoxTunes
             renderer.OnColorChanged();
         }
 
-
         public ICore Core
         {
             get
@@ -374,7 +373,7 @@ namespace FoxTunes
         protected virtual Task CreateBitmap()
         {
             return Windows.Invoke(() =>
-           {
+            {
                var width = this.Width;
                var height = this.Height;
                if (width == 0 || double.IsNaN(width) || height == 0 || double.IsNaN(height))

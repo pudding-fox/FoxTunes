@@ -11,7 +11,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
              Foreground="{DynamicResource TextBrush}"
-             SnapsToDevicePixels="True"
              MinWidth="100"
              MinHeight="100">
     <UserControl.Resources>
@@ -23,7 +22,7 @@
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:PeakMeterBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <Grid>
+    <Windows:Visualization>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="32"></ColumnDefinition>
@@ -84,6 +83,5 @@
                 </Rectangle.Fill>
             </Rectangle>
         </Grid>
-        <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
-    </Grid>
+    </Windows:Visualization>
 </Windows:UIComponentBase>

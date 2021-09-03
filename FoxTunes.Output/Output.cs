@@ -82,6 +82,19 @@ namespace FoxTunes
 
         public abstract bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
 
+        public abstract bool CanGetData { get; }
+
+        protected virtual void OnCanGetDataChanged()
+        {
+            if (this.CanGetDataChanged == null)
+            {
+                return;
+            }
+            this.CanGetDataChanged(this, EventArgs.Empty);
+        }
+
+        public event EventHandler CanGetDataChanged;
+
         public abstract T[] GetBuffer<T>(TimeSpan duration) where T : struct;
 
         public abstract int GetData(short[] buffer);

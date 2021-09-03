@@ -33,18 +33,41 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            PlaybackStateNotifier.Notify += this.OnNotify;
             base.InitializeComponent(core);
+            this.Output.CanGetDataChanged += this.OnCanGetDataChanged;
+        }
+
+        protected virtual void OnCanGetDataChanged(object sender, EventArgs e)
+        {
+            if (this.Output.CanGetData)
+            {
+                PlaybackStateNotifier.Notify += this.OnNotify;
+            }
+            else
+            {
+                PlaybackStateNotifier.Notify -= this.OnNotify;
+            }
+            this.Update();
         }
 
         protected virtual void OnNotify(object sender, EventArgs e)
         {
-            if (PlaybackStateNotifier.IsPlaying && !this.Enabled)
+            this.Update();
+        }
+
+        protected virtual void Update()
+        {
+            var enabled = default(bool);
+            lock (this.SyncRoot)
+            {
+                enabled = this.Enabled;
+            }
+            if (PlaybackStateNotifier.IsPlaying && !enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");
                 this.Start();
             }
-            else if (!PlaybackStateNotifier.IsPlaying && this.Enabled)
+            else if (!PlaybackStateNotifier.IsPlaying && enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was stopped, stopping renderer.");
                 this.Stop();
@@ -83,6 +106,10 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            if (this.Output != null)
+            {
+                this.Output.IsStartedChanged -= this.OnCanGetDataChanged;
+            }
             PlaybackStateNotifier.Notify -= this.OnNotify;
             lock (this.SyncRoot)
             {

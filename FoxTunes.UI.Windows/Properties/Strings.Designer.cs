@@ -457,6 +457,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Visualization unavailable..
+        /// </summary>
+        public static string Visualization_Unavailable {
+            get {
+                return ResourceManager.GetString("Visualization.Unavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mixer is required for rendering, check your output settings..
+        /// </summary>
+        public static string Visualization_UnavailableDetail {
+            get {
+                return ResourceManager.GetString("Visualization.UnavailableDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to FFT Size.
         /// </summary>
         public static string VisualizationBehaviourConfiguration_FFTSize {

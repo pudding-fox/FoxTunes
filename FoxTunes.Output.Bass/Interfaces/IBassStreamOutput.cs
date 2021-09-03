@@ -12,6 +12,8 @@
 
         bool CheckFormat(int rate, int channels);
 
+        bool CanGetData { get; }
+
         int GetData(short[] buffer);
 
         int GetData(float[] buffer);

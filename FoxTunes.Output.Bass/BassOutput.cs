@@ -343,8 +343,14 @@ namespace FoxTunes
             this.PluginLoader = ComponentRegistry.Instance.GetComponent<IBassPluginLoader>();
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
+            this.PipelineManager.Created += this.OnPipelineManagerCreated;
             this.PipelineManager.Error += this.OnPipelineManagerError;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnPipelineManagerCreated(object sender, EventArgs e)
+        {
+            this.OnCanGetDataChanged();
         }
 
         protected virtual Task OnPipelineManagerError(object sender, ComponentErrorEventArgs e)
@@ -540,6 +546,22 @@ namespace FoxTunes
             return true;
         }
 
+        public override bool CanGetData
+        {
+            get
+            {
+                var result = default(bool);
+                this.PipelineManager.WithPipeline(pipeline =>
+                {
+                    if (pipeline != null)
+                    {
+                        result = pipeline.Output.CanGetData;
+                    }
+                });
+                return result;
+            }
+        }
+
         public override T[] GetBuffer<T>(TimeSpan duration)
         {
             var length = default(int);
@@ -675,6 +697,11 @@ namespace FoxTunes
             if (this.Semaphore != null)
             {
                 this.Semaphore.Dispose();
+            }
+            if (this.PipelineManager != null)
+            {
+                this.PipelineManager.Created -= this.OnPipelineManagerCreated;
+                this.PipelineManager.Error -= this.OnPipelineManagerError;
             }
         }
 

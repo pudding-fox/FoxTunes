@@ -11,6 +11,7 @@ namespace FoxTunes
     {
         private BassDirectSoundStreamOutput()
         {
+            this.Flags = BassFlags.Default;
             this.MixerChannelHandles = new HashSet<int>();
         }
 

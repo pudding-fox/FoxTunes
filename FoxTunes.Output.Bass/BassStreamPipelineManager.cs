@@ -188,7 +188,19 @@ namespace FoxTunes
             this.Pipeline = this.PipelineFactory.CreatePipeline(stream);
             this.Pipeline.Input.Add(stream);
             this.Pipeline.Error += this.OnError;
+            this.OnCreated();
         }
+
+        protected virtual void OnCreated()
+        {
+            if (this.Created == null)
+            {
+                return;
+            }
+            this.Created(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Created;
 
 #if NET40
         public Task FreePipeline()
