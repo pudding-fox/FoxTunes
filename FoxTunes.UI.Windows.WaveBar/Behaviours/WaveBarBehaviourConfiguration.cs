@@ -21,13 +21,18 @@ namespace FoxTunes
 
         public const string CACHE_ELEMENT = "BBBBAD4B-8BB4-47C9-9D18-2121C48115CE";
 
+        public const string CLEANUP_ELEMENT = "ZZZZ8740-576A-4456-A2CC-0B1E7DEF6913";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WaveBarBehaviourConfiguration_Section)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Mode).WithOptions(GetModeOptions()))
                 .WithElement(new IntegerConfigurationElement(RESOLUTION_ELEMENT, Strings.WaveBarBehaviourConfiguration_Resolution, path: Strings.General_Advanced).WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.WaveBarBehaviourConfiguration_RMS, path: Strings.General_Advanced).WithValue(true))
-                .WithElement(new BooleanConfigurationElement(CACHE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cache, path: Strings.General_Advanced).WithValue(true)
+                .WithElement(new BooleanConfigurationElement(CACHE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cache, path: Strings.General_Advanced).WithValue(true))
+                .WithElement(new CommandConfigurationElement(CLEANUP_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cleanup, path: Strings.General_Advanced)
+                    .WithHandler(() => WaveFormCache.Cleanup())
+                    .DependsOn(SECTION, CACHE_ELEMENT)
             );
         }
 

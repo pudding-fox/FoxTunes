@@ -119,6 +119,11 @@ namespace FoxTunes
             return Math.Abs(hashCode).ToString();
         }
 
+        public static void Cleanup()
+        {
+            FileMetaDataStore.Clear(PREFIX);
+        }
+
         public class Key : IEquatable<Key>
         {
             public Key(string fileName, long length, int resolution)
