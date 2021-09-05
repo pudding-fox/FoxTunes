@@ -173,6 +173,16 @@ namespace FoxTunes
                 this.Columns.Clear();
             }
 
+            protected override void OnDisposing()
+            {
+                if (this.ListView != null && this.ListView.ItemContainerGenerator != null)
+                {
+                    this.ListView.ItemContainerGenerator.StatusChanged -= this.OnStatusChanged;
+                }
+                this.Reset();
+                base.OnDisposing();
+            }
+
             public class AutoSizeColumn : IDisposable
             {
                 public AutoSizeColumn(AutoSizeColumnsBehaviour behaviour, FrameworkElement content)

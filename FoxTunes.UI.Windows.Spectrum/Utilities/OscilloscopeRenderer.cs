@@ -388,12 +388,6 @@ namespace FoxTunes
 
         private static void UpdateValues(OscilloscopeRendererData data)
         {
-            switch (data.Format)
-            {
-                case OutputStreamFormat.Short:
-                    UpdateValues(data.Samples16, data.Samples32, data.SampleCount);
-                    break;
-            }
             switch (data.Mode)
             {
                 default:
@@ -403,14 +397,6 @@ namespace FoxTunes
                 case OscilloscopeRendererMode.Seperate:
                     UpdateValuesSeperate(data.Samples, data.Values, data.Peaks, data.Channels, data.Width, data.SampleCount);
                     break;
-            }
-        }
-
-        private static void UpdateValues(short[] samples16, float[] samples32, int count)
-        {
-            for (var a = 0; a < count; a++)
-            {
-                samples32[a] = (float)samples16[a] / short.MaxValue;
             }
         }
 
@@ -549,6 +535,10 @@ namespace FoxTunes
                 {
                     case OutputStreamFormat.Short:
                         this.SampleCount = this.Renderer.Output.GetData(this.Samples16) / sizeof(short);
+                        for (var a = 0; a < this.SampleCount; a++)
+                        {
+                            this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
+                        }
                         break;
                     case OutputStreamFormat.Float:
                         this.SampleCount = this.Renderer.Output.GetData(this.Samples32) / sizeof(float);
@@ -562,14 +552,7 @@ namespace FoxTunes
                             //Nothing to do.
                             break;
                         case OscilloscopeRendererMode.Seperate:
-                            for (int a = 0, b = 0; a < this.SampleCount; a += this.Channels, b++)
-                            {
-                                for (var channel = 0; channel < this.Channels; channel++)
-                                {
-                                    this.Samples[channel, b] = this.Samples32[a + channel];
-                                }
-                            }
-                            this.SampleCount /= this.Channels;
+                            this.SampleCount = Deinterlace(this.Samples, this.Samples32, this.Channels, this.SampleCount);
                             break;
                     }
                     return true;
@@ -645,6 +628,10 @@ namespace FoxTunes
                 if (this.Samples32 != null)
                 {
                     Array.Clear(this.Samples32, 0, this.Samples32.Length);
+                }
+                if (this.Samples != null)
+                {
+                    Array.Clear(this.Samples, 0, this.Samples.Length);
                 }
                 this.SampleCount = 0;
             }

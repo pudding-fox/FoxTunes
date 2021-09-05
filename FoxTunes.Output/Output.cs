@@ -82,6 +82,8 @@ namespace FoxTunes
 
         public abstract bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
 
+        public abstract bool GetChannelMap(out IDictionary<int, OutputChannel> channels);
+
         public abstract bool CanGetData { get; }
 
         protected virtual void OnCanGetDataChanged()

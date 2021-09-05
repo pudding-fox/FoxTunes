@@ -374,30 +374,30 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-               var width = this.Width;
-               var height = this.Height;
-               if (width == 0 || double.IsNaN(width) || height == 0 || double.IsNaN(height))
-               {
-                   //We need proper dimentions.
-                   return;
-               }
+                var width = this.Width;
+                var height = this.Height;
+                if (width == 0 || double.IsNaN(width) || height == 0 || double.IsNaN(height))
+                {
+                    //We need proper dimentions.
+                    return;
+                }
 
-               var size = Windows.ActiveWindow.GetElementPixelSize(
-                   width * this.ScalingFactor.Value,
-                   height * this.ScalingFactor.Value
-               );
+                var size = Windows.ActiveWindow.GetElementPixelSize(
+                    width * this.ScalingFactor.Value,
+                    height * this.ScalingFactor.Value
+                );
 
-               this.Bitmap = new WriteableBitmap(
-                   Convert.ToInt32(size.Width),
-                   Convert.ToInt32(size.Height),
-                   96,
-                   96,
-                   PixelFormats.Pbgra32,
-                   null
-               );
+                this.Bitmap = new WriteableBitmap(
+                    Convert.ToInt32(size.Width),
+                    Convert.ToInt32(size.Height),
+                    96,
+                    96,
+                    PixelFormats.Pbgra32,
+                    null
+                );
 
-               this.CreateViewBox();
-           });
+                this.CreateViewBox();
+            });
         }
 
         protected abstract void CreateViewBox();
@@ -767,6 +767,18 @@ namespace FoxTunes
                     values[x, y] = value;
                 }
             }
+        }
+
+        protected static int Deinterlace(float[,] destination, float[] source, int channels, int count)
+        {
+            for (int a = 0, b = 0; a < count; a += channels, b++)
+            {
+                for (var channel = 0; channel < channels; channel++)
+                {
+                    destination[channel, b] = source[a + channel];
+                }
+            }
+            return count / channels;
         }
     }
 
