@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
@@ -8,6 +9,12 @@ namespace FoxTunes.Interfaces
 
         IEnumerable<string> Presets { get; }
 
-        void LoadPreset(string name);
+        event EventHandler PresetsChanged;
+
+        string Preset { get; set; }
+
+        event EventHandler PresetChanged;
+
+        void SavePreset(string name);
     }
 }

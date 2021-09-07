@@ -15,6 +15,9 @@
         <Binding Mode="OneWay" Path="Available" Source="{StaticResource ViewModel}"/>
     </UserControl.IsEnabled>
     <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding EqualizerVisible, Source={StaticResource ViewModel}}">
+        <ToggleButton.ContextMenu>
+            <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_EQUALIZER}}"></Windows:Menu>
+        </ToggleButton.ContextMenu>
         <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="24" Height="24">
             <Canvas Width="512" Height="512">
                 <Path Fill="{DynamicResource TextBrush}">
