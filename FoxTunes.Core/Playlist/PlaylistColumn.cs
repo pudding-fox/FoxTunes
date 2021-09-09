@@ -7,6 +7,8 @@ namespace FoxTunes
     {
         public const double WIDTH_SMALL = 100;
 
+        public const double WIDTH_MEDIUM = 100;
+
         public const double WIDTH_LARGE = 300;
 
         public PlaylistColumn()
