@@ -22,7 +22,7 @@ namespace FoxTunes {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Strings {
+    internal class Strings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace FoxTunes {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.UI.Windows.Properties.Strings", typeof(Strings).Assembly);
@@ -51,7 +51,7 @@ namespace FoxTunes {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string DefaultLayoutProvider_Description {
+        internal static string DefaultLayoutProvider_Description {
             get {
                 return ResourceManager.GetString("DefaultLayoutProvider.Description", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Default.
         /// </summary>
-        public static string DefaultLayoutProvider_Name {
+        internal static string DefaultLayoutProvider_Name {
             get {
                 return ResourceManager.GetString("DefaultLayoutProvider.Name", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Equalizer.
         /// </summary>
-        public static string EqualizerWindow_Title {
+        internal static string EqualizerWindow_Title {
             get {
                 return ResourceManager.GetString("EqualizerWindow.Title", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
-        public static string General_Advanced {
+        internal static string General_Advanced {
             get {
                 return ResourceManager.GetString("General.Advanced", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
-        public static string General_Cancel {
+        internal static string General_Cancel {
             get {
                 return ResourceManager.GetString("General.Cancel", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
-        public static string General_OK {
+        internal static string General_OK {
             get {
                 return ResourceManager.GetString("General.OK", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Search.
         /// </summary>
-        public static string General_Search {
+        internal static string General_Search {
             get {
                 return ResourceManager.GetString("General.Search", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
-        public static string General_Settings {
+        internal static string General_Settings {
             get {
                 return ResourceManager.GetString("General.Settings", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Next.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_Next {
+        internal static string KeyBindingsBehaviourConfiguration_Next {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Next", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Play.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_Play {
+        internal static string KeyBindingsBehaviourConfiguration_Play {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Play", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Previous.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_Previous {
+        internal static string KeyBindingsBehaviourConfiguration_Previous {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Previous", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Search.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_Search {
+        internal static string KeyBindingsBehaviourConfiguration_Search {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Search", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Keyboard Shortcuts.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_Section {
+        internal static string KeyBindingsBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Section", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_Settings {
+        internal static string KeyBindingsBehaviourConfiguration_Settings {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Settings", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Stop.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_Stop {
+        internal static string KeyBindingsBehaviourConfiguration_Stop {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Stop", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Toggle Mini Player.
         /// </summary>
-        public static string KeyBindingsBehaviourConfiguration_ToggleMiniPlayer {
+        internal static string KeyBindingsBehaviourConfiguration_ToggleMiniPlayer {
             get {
                 return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.ToggleMiniPlayer", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Add to collection by dropping files here..
         /// </summary>
-        public static string LibraryBase_Add {
+        internal static string LibraryBase_Add {
             get {
                 return ResourceManager.GetString("LibraryBase.Add", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string MinimalLayoutProvider_Description {
+        internal static string MinimalLayoutProvider_Description {
             get {
                 return ResourceManager.GetString("MinimalLayoutProvider.Description", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Minimal.
         /// </summary>
-        public static string MinimalLayoutProvider_Name {
+        internal static string MinimalLayoutProvider_Name {
             get {
                 return ResourceManager.GetString("MinimalLayoutProvider.Name", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Grouping.
         /// </summary>
-        public static string PlaylistGroupingBehaviourConfiguration_Enabled {
+        internal static string PlaylistGroupingBehaviourConfiguration_Enabled {
             get {
                 return ResourceManager.GetString("PlaylistGroupingBehaviourConfiguration.Enabled", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Grouping Script.
         /// </summary>
-        public static string PlaylistGroupingBehaviourConfiguration_Script {
+        internal static string PlaylistGroupingBehaviourConfiguration_Script {
             get {
                 return ResourceManager.GetString("PlaylistGroupingBehaviourConfiguration.Script", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Sorting.
         /// </summary>
-        public static string PlaylistSortingBehaviourConfiguration_Enabled {
+        internal static string PlaylistSortingBehaviourConfiguration_Enabled {
             get {
                 return ResourceManager.GetString("PlaylistSortingBehaviourConfiguration.Enabled", resourceCulture);
             }
@@ -261,7 +261,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
-        public static string ProfilesBehaviour_Delete {
+        internal static string ProfilesBehaviour_Delete {
             get {
                 return ResourceManager.GetString("ProfilesBehaviour.Delete", resourceCulture);
             }
@@ -270,7 +270,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to New.
         /// </summary>
-        public static string ProfilesBehaviour_New {
+        internal static string ProfilesBehaviour_New {
             get {
                 return ResourceManager.GetString("ProfilesBehaviour.New", resourceCulture);
             }
@@ -279,7 +279,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Profile Name.
         /// </summary>
-        public static string ProfilesBehaviour_New_Prompt {
+        internal static string ProfilesBehaviour_New_Prompt {
             get {
                 return ResourceManager.GetString("ProfilesBehaviour.New.Prompt", resourceCulture);
             }
@@ -288,7 +288,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Profiles.
         /// </summary>
-        public static string ProfilesBehaviour_Path {
+        internal static string ProfilesBehaviour_Path {
             get {
                 return ResourceManager.GetString("ProfilesBehaviour.Path", resourceCulture);
             }
@@ -297,7 +297,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
-        public static string ProfilesBehaviourConfiguration_Enabled {
+        internal static string ProfilesBehaviourConfiguration_Enabled {
             get {
                 return ResourceManager.GetString("ProfilesBehaviourConfiguration.Enabled", resourceCulture);
             }
@@ -306,7 +306,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Profiles.
         /// </summary>
-        public static string ProfilesBehaviourConfiguration_Section {
+        internal static string ProfilesBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("ProfilesBehaviourConfiguration.Section", resourceCulture);
             }
@@ -315,7 +315,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Please select a sub page..
         /// </summary>
-        public static string SettingsDialog_EmptyPage {
+        internal static string SettingsDialog_EmptyPage {
             get {
                 return ResourceManager.GetString("SettingsDialog.EmptyPage", resourceCulture);
             }
@@ -324,7 +324,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Components.
         /// </summary>
-        public static string SettingsDialog_GroupHeader {
+        internal static string SettingsDialog_GroupHeader {
             get {
                 return ResourceManager.GetString("SettingsDialog.GroupHeader", resourceCulture);
             }
@@ -333,7 +333,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Reset All.
         /// </summary>
-        public static string SettingsDialog_ResetAll {
+        internal static string SettingsDialog_ResetAll {
             get {
                 return ResourceManager.GetString("SettingsDialog.ResetAll", resourceCulture);
             }
@@ -342,7 +342,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Reset Page.
         /// </summary>
-        public static string SettingsDialog_ResetPage {
+        internal static string SettingsDialog_ResetPage {
             get {
                 return ResourceManager.GetString("SettingsDialog.ResetPage", resourceCulture);
             }
@@ -351,7 +351,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
-        public static string SettingsDialog_Save {
+        internal static string SettingsDialog_Save {
             get {
                 return ResourceManager.GetString("SettingsDialog.Save", resourceCulture);
             }
@@ -360,7 +360,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
-        public static string SettingsWindow_Title {
+        internal static string SettingsWindow_Title {
             get {
                 return ResourceManager.GetString("SettingsWindow.Title", resourceCulture);
             }
@@ -369,7 +369,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Container.
         /// </summary>
-        public static string UIComponentRole_Container {
+        internal static string UIComponentRole_Container {
             get {
                 return ResourceManager.GetString("UIComponentRole.Container", resourceCulture);
             }
@@ -378,7 +378,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to DSP.
         /// </summary>
-        public static string UIComponentRole_DSP {
+        internal static string UIComponentRole_DSP {
             get {
                 return ResourceManager.GetString("UIComponentRole.DSP", resourceCulture);
             }
@@ -387,7 +387,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Info.
         /// </summary>
-        public static string UIComponentRole_Info {
+        internal static string UIComponentRole_Info {
             get {
                 return ResourceManager.GetString("UIComponentRole.Info", resourceCulture);
             }
@@ -396,7 +396,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Launcher.
         /// </summary>
-        public static string UIComponentRole_Launcher {
+        internal static string UIComponentRole_Launcher {
             get {
                 return ResourceManager.GetString("UIComponentRole.Launcher", resourceCulture);
             }
@@ -405,7 +405,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Library.
         /// </summary>
-        public static string UIComponentRole_Library {
+        internal static string UIComponentRole_Library {
             get {
                 return ResourceManager.GetString("UIComponentRole.Library", resourceCulture);
             }
@@ -414,7 +414,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Other.
         /// </summary>
-        public static string UIComponentRole_None {
+        internal static string UIComponentRole_None {
             get {
                 return ResourceManager.GetString("UIComponentRole.None", resourceCulture);
             }
@@ -423,7 +423,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Playback.
         /// </summary>
-        public static string UIComponentRole_Playback {
+        internal static string UIComponentRole_Playback {
             get {
                 return ResourceManager.GetString("UIComponentRole.Playback", resourceCulture);
             }
@@ -432,7 +432,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Playlist.
         /// </summary>
-        public static string UIComponentRole_Playlist {
+        internal static string UIComponentRole_Playlist {
             get {
                 return ResourceManager.GetString("UIComponentRole.Playlist", resourceCulture);
             }
@@ -441,7 +441,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to System.
         /// </summary>
-        public static string UIComponentRole_System {
+        internal static string UIComponentRole_System {
             get {
                 return ResourceManager.GetString("UIComponentRole.System", resourceCulture);
             }
@@ -450,7 +450,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Visualization.
         /// </summary>
-        public static string UIComponentRole_Visualization {
+        internal static string UIComponentRole_Visualization {
             get {
                 return ResourceManager.GetString("UIComponentRole.Visualization", resourceCulture);
             }
@@ -459,7 +459,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Visualization unavailable..
         /// </summary>
-        public static string Visualization_Unavailable {
+        internal static string Visualization_Unavailable {
             get {
                 return ResourceManager.GetString("Visualization.Unavailable", resourceCulture);
             }
@@ -468,7 +468,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Mixer is required for rendering, check your output settings..
         /// </summary>
-        public static string Visualization_UnavailableDetail {
+        internal static string Visualization_UnavailableDetail {
             get {
                 return ResourceManager.GetString("Visualization.UnavailableDetail", resourceCulture);
             }
@@ -477,7 +477,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to FFT Size.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_FFTSize {
+        internal static string VisualizationBehaviourConfiguration_FFTSize {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.FFTSize", resourceCulture);
             }
@@ -486,7 +486,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Update Interval.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_Interval {
+        internal static string VisualizationBehaviourConfiguration_Interval {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.Interval", resourceCulture);
             }
@@ -495,7 +495,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Quality.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_Quality {
+        internal static string VisualizationBehaviourConfiguration_Quality {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality", resourceCulture);
             }
@@ -504,7 +504,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to High.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_Quality_High {
+        internal static string VisualizationBehaviourConfiguration_Quality_High {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality.High", resourceCulture);
             }
@@ -513,7 +513,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Low.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_Quality_Low {
+        internal static string VisualizationBehaviourConfiguration_Quality_Low {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality.Low", resourceCulture);
             }
@@ -522,7 +522,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Visualizations.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_Section {
+        internal static string VisualizationBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.Section", resourceCulture);
             }
@@ -531,7 +531,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Smooth.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_Smooth {
+        internal static string VisualizationBehaviourConfiguration_Smooth {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.Smooth", resourceCulture);
             }
@@ -540,7 +540,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Smooth Factor.
         /// </summary>
-        public static string VisualizationBehaviourConfiguration_SmoothFactor {
+        internal static string VisualizationBehaviourConfiguration_SmoothFactor {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.SmoothFactor", resourceCulture);
             }
@@ -549,7 +549,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Show Counters.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_Counters {
+        internal static string WindowsUserInterfaceConfiguration_Counters {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Counters", resourceCulture);
             }
@@ -558,7 +558,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Show Cursor Adorners.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_Cursors {
+        internal static string WindowsUserInterfaceConfiguration_Cursors {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Cursors", resourceCulture);
             }
@@ -567,7 +567,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Transparency.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_Glass {
+        internal static string WindowsUserInterfaceConfiguration_Glass {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Glass", resourceCulture);
             }
@@ -576,7 +576,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Layout.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_Layout {
+        internal static string WindowsUserInterfaceConfiguration_Layout {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Layout", resourceCulture);
             }
@@ -585,7 +585,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Marquee Interval.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_MarqueeInterval {
+        internal static string WindowsUserInterfaceConfiguration_MarqueeInterval {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.MarqueeInterval", resourceCulture);
             }
@@ -594,7 +594,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Marquee Step.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_MarqueeStep {
+        internal static string WindowsUserInterfaceConfiguration_MarqueeStep {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.MarqueeStep", resourceCulture);
             }
@@ -603,7 +603,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Scaling Factor.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_Scaling {
+        internal static string WindowsUserInterfaceConfiguration_Scaling {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Scaling", resourceCulture);
             }
@@ -612,7 +612,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Appearance.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_Section {
+        internal static string WindowsUserInterfaceConfiguration_Section {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Section", resourceCulture);
             }
@@ -621,7 +621,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Theme.
         /// </summary>
-        public static string WindowsUserInterfaceConfiguration_Theme {
+        internal static string WindowsUserInterfaceConfiguration_Theme {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Theme", resourceCulture);
             }

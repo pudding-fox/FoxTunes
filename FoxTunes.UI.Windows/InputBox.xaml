@@ -32,8 +32,8 @@
             </ContentControl.Resources>
         </ContentControl>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="70" Height="30" Margin="7,7,0,0" Click="OnOKClick" Content="{x:Static Windows:Strings.General_OK}"></Button>
-            <Button Width="70" Height="30" Margin="7,7,0,0" Click="OnCancelClick" Content="{x:Static Windows:Strings.General_Cancel}"></Button>
+            <Button Width="70" Height="30" Margin="7,7,0,0" Click="OnOKClick" Content="{x:Static ViewModel:StringResources.General_OK}"></Button>
+            <Button Width="70" Height="30" Margin="7,7,0,0" Click="OnCancelClick" Content="{x:Static ViewModel:StringResources.General_Cancel}"></Button>
         </StackPanel>
     </Grid>
 </Windows:WindowBase>
