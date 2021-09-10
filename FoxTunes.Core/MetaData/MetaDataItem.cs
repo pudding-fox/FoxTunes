@@ -133,7 +133,7 @@ namespace FoxTunes
                         );
                         foreach (var sourceMetaDataItem in source)
                         {
-                            if (names != null && names.Any() && !names.Contains(sourceMetaDataItem.Name, true))
+                            if (names != null && names.Any() && !names.Contains(sourceMetaDataItem.Name, StringComparer.OrdinalIgnoreCase))
                             {
                                 continue;
                             }
@@ -154,7 +154,7 @@ namespace FoxTunes
                         }
                         foreach (var pair in destinationMetaData)
                         {
-                            if (names != null && names.Any() && !names.Contains(pair.Value.Name, true))
+                            if (names != null && names.Any() && !names.Contains(pair.Value.Name, StringComparer.OrdinalIgnoreCase))
                             {
                                 continue;
                             }

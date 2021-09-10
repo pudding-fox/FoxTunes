@@ -991,7 +991,7 @@ namespace FoxTunes
 
             public static void Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
             {
-                if (file.TagTypes.HasFlag(TagTypes.Id3v2) && (new[] { CommonStatistics.Rating, CommonStatistics.PlayCount }).Contains(metaDataItem.Name, true))
+                if (file.TagTypes.HasFlag(TagTypes.Id3v2) && (new[] { CommonStatistics.Rating, CommonStatistics.PlayCount }).Contains(metaDataItem.Name, StringComparer.OrdinalIgnoreCase))
                 {
                     var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
                     var frames = tag.GetFrames<global::TagLib.Id3v2.PopularimeterFrame>();

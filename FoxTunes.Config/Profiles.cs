@@ -45,7 +45,7 @@ namespace FoxTunes
                     Logger.Write(typeof(Profiles), LogLevel.Warn, "Failed to read available profiles: {0}", e.Message);
                 }
             }
-            if (!profiles.Contains(Strings.Profiles_Default, true))
+            if (!profiles.Contains(Strings.Profiles_Default, StringComparer.OrdinalIgnoreCase))
             {
                 profiles.Insert(0, Strings.Profiles_Default);
             }

@@ -100,7 +100,7 @@ namespace FoxTunes
             await metaDataSource.SetMetaData(
                 playlistItem.FileName,
                 playlistItem.MetaDatas,
-                metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
+                metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, StringComparer.OrdinalIgnoreCase)
             ).ConfigureAwait(false);
 
             await this.Deschedule(playlistItem).ConfigureAwait(false);

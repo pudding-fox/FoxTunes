@@ -50,7 +50,7 @@ namespace FoxTunes
                     else
                     {
                         var keys = this.Keys.Where(
-                            key => !string.IsNullOrEmpty(key.MetaDataItemName) && names.Contains(key.MetaDataItemName, true)
+                            key => !string.IsNullOrEmpty(key.MetaDataItemName) && names.Contains(key.MetaDataItemName, StringComparer.OrdinalIgnoreCase)
                         );
                         foreach (var key in keys)
                         {
