@@ -2,15 +2,15 @@
 
 namespace FoxTunes
 {
-    public class UIComponent 
+    public class UIComponent
     {
         public const string PLACEHOLDER = "00000000-0000-0000-0000-000000000000";
 
         public UIComponent(UIComponentAttribute attribute, Type type)
         {
             this.Id = attribute.Id;
-            this.Name = attribute.Name;
-            this.Description = attribute.Description;
+            this.Name = StringResourceReader.GetString(type, nameof(this.Name)) ?? type.Name;
+            this.Description = StringResourceReader.GetString(type, nameof(this.Description)) ?? string.Empty;
             this.Role = attribute.Role;
             this.Type = type;
         }

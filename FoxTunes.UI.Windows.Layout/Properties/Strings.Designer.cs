@@ -70,6 +70,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dock.
+        /// </summary>
+        internal static string UIComponentDockContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentDockContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Horizontal Grid.
+        /// </summary>
+        internal static string UIComponentGridContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Horizontal Split.
+        /// </summary>
+        internal static string UIComponentHorizontalSplitContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentHorizontalSplitContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string UIComponentLayoutProvider_Description {
@@ -129,6 +156,24 @@ namespace FoxTunes {
         internal static string UIComponentLayoutProviderPresets_Main_2 {
             get {
                 return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stack Grid.
+        /// </summary>
+        internal static string UIComponentStackContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vertical Split.
+        /// </summary>
+        internal static string UIComponentVerticalSplitContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentVerticalSplitContainer.Name", resourceCulture);
             }
         }
     }

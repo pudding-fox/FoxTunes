@@ -117,11 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Artwork.Name" xml:space="preserve">
+    <value>Artwork</value>
+  </data>
+  <data name="BackgroundTasks.Name" xml:space="preserve">
+    <value>Background Tasks</value>
+  </data>
   <data name="DefaultLayoutProvider.Description" xml:space="preserve">
     <value />
   </data>
   <data name="DefaultLayoutProvider.Name" xml:space="preserve">
     <value>Default</value>
+  </data>
+  <data name="DefaultPlaylist.Name" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="Equalizer.Name" xml:space="preserve">
+    <value>Equalizer Launcher</value>
+  </data>
+  <data name="EqualizerDialog.Name" xml:space="preserve">
+    <value>Equalizer</value>
   </data>
   <data name="EqualizerWindow.Title" xml:space="preserve">
     <value>Equalizer</value>
@@ -140,6 +155,9 @@
   </data>
   <data name="General.Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="Info.Name" xml:space="preserve">
+    <value>Now Playing</value>
   </data>
   <data name="KeyBindingsBehaviourConfiguration.Next" xml:space="preserve">
     <value>Next</value>
@@ -168,17 +186,38 @@
   <data name="LibraryBase.Add" xml:space="preserve">
     <value>Add to collection by dropping files here.</value>
   </data>
+  <data name="LibrarySearch.Name" xml:space="preserve">
+    <value>Library Search</value>
+  </data>
+  <data name="LibrarySelector.Name" xml:space="preserve">
+    <value>Library Selector</value>
+  </data>
+  <data name="LibraryTree.Name" xml:space="preserve">
+    <value>Library Tree</value>
+  </data>
   <data name="MinimalLayoutProvider.Description" xml:space="preserve">
     <value />
   </data>
   <data name="MinimalLayoutProvider.Name" xml:space="preserve">
     <value>Minimal</value>
   </data>
+  <data name="MiniPlayer.Name" xml:space="preserve">
+    <value>Mini Player Launcher</value>
+  </data>
+  <data name="MiniPlaylist.Name" xml:space="preserve">
+    <value>Simple Playlist</value>
+  </data>
+  <data name="Playback.Name" xml:space="preserve">
+    <value>Playback Controls</value>
+  </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Grouping</value>
   </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Script" xml:space="preserve">
     <value>Grouping Script</value>
+  </data>
+  <data name="Playlists.Name" xml:space="preserve">
+    <value>Playlist Tabs</value>
   </data>
   <data name="PlaylistSortingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Sorting</value>
@@ -201,6 +240,9 @@
   <data name="ProfilesBehaviourConfiguration.Section" xml:space="preserve">
     <value>Profiles</value>
   </data>
+  <data name="Settings.Name" xml:space="preserve">
+    <value>Settings Launcher</value>
+  </data>
   <data name="SettingsDialog.EmptyPage" xml:space="preserve">
     <value>Please select a sub page.</value>
   </data>
@@ -218,6 +260,18 @@
   </data>
   <data name="SettingsWindow.Title" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="Shuffle.Name" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="StreamPosition.Name" xml:space="preserve">
+    <value>Seekbar</value>
+  </data>
+  <data name="Tempo.Name" xml:space="preserve">
+    <value>Tempo Launcher</value>
+  </data>
+  <data name="TempoDialog.Name" xml:space="preserve">
+    <value>Tempo</value>
   </data>
   <data name="UIComponentRole.Container" xml:space="preserve">
     <value>Container</value>
@@ -278,6 +332,9 @@
   </data>
   <data name="VisualizationBehaviourConfiguration.SmoothFactor" xml:space="preserve">
     <value>Smooth Factor</value>
+  </data>
+  <data name="Volume.Name" xml:space="preserve">
+    <value>Volume</value>
   </data>
   <data name="WindowsUserInterfaceConfiguration.Counters" xml:space="preserve">
     <value>Show Counters</value>

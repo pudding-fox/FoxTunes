@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EnhancedSpectrum.Name" xml:space="preserve">
+    <value>Enhanced Spectrum</value>
+  </data>
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
   </data>
@@ -125,6 +128,9 @@
   </data>
   <data name="General.Bars" xml:space="preserve">
     <value>Bars</value>
+  </data>
+  <data name="Oscilloscope.Name" xml:space="preserve">
+    <value>Oscilloscope</value>
   </data>
   <data name="OscilloscopeBehaviourConfiguration.Duration" xml:space="preserve">
     <value>Duration</value>
@@ -140,6 +146,9 @@
   </data>
   <data name="OscilloscopeBehaviourConfiguration.Path" xml:space="preserve">
     <value>Oscilloscope</value>
+  </data>
+  <data name="PeakMeter.Name" xml:space="preserve">
+    <value>Peak Meter</value>
   </data>
   <data name="PeakMeterBehaviourConfiguration.Orientation" xml:space="preserve">
     <value>Orientation</value>
@@ -179,6 +188,9 @@
   </data>
   <data name="Speakers.Unknown" xml:space="preserve">
     <value>?</value>
+  </data>
+  <data name="Spectrum.Name" xml:space="preserve">
+    <value>Spectrum</value>
   </data>
   <data name="SpectrumBehaviourConfiguration.Bands" xml:space="preserve">
     <value>Bands (Enhanced)</value>

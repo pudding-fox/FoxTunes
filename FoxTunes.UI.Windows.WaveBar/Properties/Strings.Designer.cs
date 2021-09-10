@@ -140,5 +140,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("WaveBarBehaviourConfiguration.Section", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wave Form Seekbar.
+        /// </summary>
+        internal static string WaveFormStreamPosition_Name {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPosition.Name", resourceCulture);
+            }
+        }
     }
 }

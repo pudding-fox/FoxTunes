@@ -88,6 +88,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Lyrics.
+        /// </summary>
+        internal static string Lyrics_Name {
+            get {
+                return ResourceManager.GetString("Lyrics.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto Lookup.
         /// </summary>
         internal static string LyricsBehaviourConfiguration_AutoLookup {

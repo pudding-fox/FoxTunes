@@ -10,7 +10,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for DefaultPlaylist.xaml
     /// </summary>
-    [UIComponent("12023E31-CB53-4F9C-8A5B-A0593706F37E", "Playlist", role: UIComponentRole.Playlist)]
+    [UIComponent("12023E31-CB53-4F9C-8A5B-A0593706F37E", role: UIComponentRole.Playlist)]
     public partial class DefaultPlaylist : UIComponentBase
     {
         public DefaultPlaylist()
