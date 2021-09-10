@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Window.
+        /// </summary>
+        internal static string ToolWindowBehaviour_NewWindow {
+            get {
+                return ResourceManager.GetString("ToolWindowBehaviour.NewWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string UIComponentLayoutProvider_Description {
