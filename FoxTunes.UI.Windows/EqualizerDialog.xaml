@@ -7,7 +7,7 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" MinWidth="404" MinHeight="144">
     <Windows:UIComponentBase.Resources>
         <ViewModel:Equalizer x:Key="ViewModel" Core="{Binding}"></ViewModel:Equalizer>
     </Windows:UIComponentBase.Resources>
@@ -29,7 +29,13 @@
                             <RowDefinition></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Slider Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Stretch" MinHeight="100" IsMoveToPointEnabled="True" Minimum="{Binding MinValue, Mode=OneWay}" Maximum="{Binding MaxValue, Mode=OneWay}" Value="{Binding Value}"></Slider>
+                        <Slider Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Stretch" MinHeight="100" IsMoveToPointEnabled="True" Minimum="{Binding MinValue, Mode=OneWay}" Maximum="{Binding MaxValue, Mode=OneWay}" Value="{Binding Value}">
+                            <Interactivity:Interaction.Triggers>
+                                <Interactivity:EventTrigger EventName="MouseDoubleClick">
+                                    <Interactivity:InvokeCommandAction Command="{Binding ResetValueCommand}"></Interactivity:InvokeCommandAction>
+                                </Interactivity:EventTrigger>
+                            </Interactivity:Interaction.Triggers>
+                        </Slider>
                         <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="40" Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </Grid>
                 </DataTemplate>

@@ -20,7 +20,7 @@ namespace FoxTunes
 
         private Debouncer()
         {
-            this.Actions = new HashSet<Action>();
+            this.Actions = new HashSet<Action>(ActionComparer.Instance);
         }
 
         public Debouncer(int timeout) : this()
@@ -66,25 +66,6 @@ namespace FoxTunes
                 {
                     this.Timer.Stop();
                 }
-            }
-        }
-
-        public void Wait()
-        {
-            while (true)
-            {
-                lock (SyncRoot)
-                {
-                    if (this.Timer == null || !this.Timer.Enabled)
-                    {
-                        return;
-                    }
-                    if (this.Actions.Count == 0)
-                    {
-                        return;
-                    }
-                }
-                Thread.Sleep(1000);
             }
         }
 
@@ -140,6 +121,8 @@ namespace FoxTunes
                     this.Timer = null;
                 }
             }
+            //Execute any pending actions.
+            OnElapsed(this, default(ElapsedEventArgs));
         }
 
         ~Debouncer()
@@ -153,6 +136,21 @@ namespace FoxTunes
             {
                 //Nothing can be done, never throw on GC thread.
             }
+        }
+
+        public class ActionComparer : IEqualityComparer<Action>
+        {
+            public bool Equals(Action x, Action y)
+            {
+                return x.Method.Equals(y.Method);
+            }
+
+            public int GetHashCode(Action obj)
+            {
+                return obj.Method.GetHashCode();
+            }
+
+            public static readonly IEqualityComparer<Action> Instance = new ActionComparer();
         }
     }
 }

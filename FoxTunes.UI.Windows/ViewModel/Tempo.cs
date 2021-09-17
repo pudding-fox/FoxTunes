@@ -145,6 +145,14 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ValueChanged;
 
+        public ICommand ResetValueCommand
+        {
+            get
+            {
+                return new Command(() => this.Value = 0);
+            }
+        }
+
         public int MinPitch
         {
             get
@@ -222,6 +230,14 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler PitchChanged;
 
+        public ICommand ResetPitchCommand
+        {
+            get
+            {
+                return new Command(() => this.Pitch = 0);
+            }
+        }
+
         public int MinRate
         {
             get
@@ -298,6 +314,14 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler RateChanged;
+
+        public ICommand ResetRateCommand
+        {
+            get
+            {
+                return new Command(() => this.Rate = 0);
+            }
+        }
 
         public IOutputEffects Effects { get; private set; }
 
@@ -452,6 +476,9 @@ namespace FoxTunes.ViewModel
             {
                 this.Effects.Tempo.AvailableChanged -= this.OnAvailableChanged;
                 this.Effects.Tempo.EnabledChanged -= this.OnEnabledChanged;
+                this.Effects.Tempo.ValueChanged -= this.OnValueChanged;
+                this.Effects.Tempo.PitchChanged -= this.OnPitchChanged;
+                this.Effects.Tempo.RateChanged -= this.OnRateChanged;
             }
             base.OnDisposing();
         }

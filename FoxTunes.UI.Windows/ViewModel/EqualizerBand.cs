@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -78,6 +79,14 @@ namespace FoxTunes.ViewModel
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
             this.Dispatch(this.Refresh);
+        }
+
+        public ICommand ResetValueCommand
+        {
+            get
+            {
+                return new Command(() => this.Value = 0);
+            }
         }
 
         protected virtual Task Refresh()
