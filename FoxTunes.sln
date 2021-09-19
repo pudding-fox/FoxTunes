@@ -123,7 +123,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.Snappin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Tempo", "FoxTunes.Output.Bass.Tempo\FoxTunes.Output.Bass.Tempo.csproj", "{52B51207-89D3-47C6-80EA-637E71D8FFF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass.Archive", "FoxTunes.Output.Bass.Archive\FoxTunes.Output.Bass.Archive.csproj", "{72E8C729-6E04-4005-AAF6-97A2DCA05C49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Archive", "FoxTunes.Output.Bass.Archive\FoxTunes.Output.Bass.Archive.csproj", "{72E8C729-6E04-4005-AAF6-97A2DCA05C49}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Release", "FoxTunes.Release\FoxTunes.Release.csproj", "{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -573,6 +575,14 @@ Global
 		{72E8C729-6E04-4005-AAF6-97A2DCA05C49}.Release|x64.Build.0 = Release|x64
 		{72E8C729-6E04-4005-AAF6-97A2DCA05C49}.Release|x86.ActiveCfg = Release|x86
 		{72E8C729-6E04-4005-AAF6-97A2DCA05C49}.Release|x86.Build.0 = Release|x86
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Debug|x64.Build.0 = Debug|Any CPU
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Debug|x86.Build.0 = Debug|Any CPU
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Release|x64.ActiveCfg = Release|Any CPU
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Release|x64.Build.0 = Release|Any CPU
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Release|x86.ActiveCfg = Release|Any CPU
+		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
