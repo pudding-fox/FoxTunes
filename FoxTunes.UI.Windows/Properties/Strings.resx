@@ -183,8 +183,14 @@
   <data name="KeyBindingsBehaviourConfiguration.ToggleMiniPlayer" xml:space="preserve">
     <value>Toggle Mini Player</value>
   </data>
-  <data name="LibraryBase.Add" xml:space="preserve">
+  <data name="LibraryBase.Empty" xml:space="preserve">
     <value>Add to collection by dropping files here.</value>
+  </data>
+  <data name="LibraryBase.Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="LibraryBase.Updating" xml:space="preserve">
+    <value>Updating...</value>
   </data>
   <data name="LibrarySearch.Name" xml:space="preserve">
     <value>Library Search</value>
@@ -209,6 +215,15 @@
   </data>
   <data name="Playback.Name" xml:space="preserve">
     <value>Playback Controls</value>
+  </data>
+  <data name="PlaylistBase.Empty" xml:space="preserve">
+    <value>Add to playlist by dropping files here.</value>
+  </data>
+  <data name="PlaylistBase.Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="PlaylistBase.Updating" xml:space="preserve">
+    <value>Updating...</value>
   </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Grouping</value>
