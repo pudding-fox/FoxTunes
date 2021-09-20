@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class OscilloscopeBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string CATEGORY = "15AC0D00-4359-4DC9-941D-42803AB999DE";
