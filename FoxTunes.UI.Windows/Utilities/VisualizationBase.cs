@@ -35,6 +35,7 @@ namespace FoxTunes
         {
             base.InitializeComponent(core);
             this.Output.CanGetDataChanged += this.OnCanGetDataChanged;
+            this.OnCanGetDataChanged(this, EventArgs.Empty);
         }
 
         protected virtual void OnCanGetDataChanged(object sender, EventArgs e)
