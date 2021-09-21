@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -11,6 +12,24 @@ namespace FoxTunes
             Publication.StoragePath,
             "Log.txt"
         );
+
+        public static void Open()
+        {
+            try
+            {
+                var fileName = Path.Combine(
+                    Path.GetTempPath(),
+                    string.Format("Log-{0}.txt", DateTime.Now.ToFileTimeUtc())
+                );
+                File.Copy(FileName, fileName, true);
+                Process.Start(fileName).WaitForExit();
+                File.Delete(fileName);
+            }
+            catch
+            {
+                //Nothing can be done. If we can't see the log there's no point writing to it....
+            }
+        }
 
         private static ILogger _Logger { get; set; }
 
