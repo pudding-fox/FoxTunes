@@ -8,7 +8,8 @@
         xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
         x:Class="FoxTunes.SettingsWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="{x:Static ViewModel:StringResources.SettingsWindow_Title}">
+        Title="{x:Static ViewModel:StringResources.SettingsWindow_Title}"
+        Windows:ButtonExtensions.CommandExecuted="OnCommandExecuted">
     <Windows:WindowBase.Resources>
         <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
     </Windows:WindowBase.Resources>
