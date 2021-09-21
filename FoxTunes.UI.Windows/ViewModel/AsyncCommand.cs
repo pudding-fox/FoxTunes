@@ -36,7 +36,6 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
 #if NET40
             var task = TaskEx.Run(async () =>
 #else
@@ -46,12 +45,10 @@ namespace FoxTunes.ViewModel
                 try
                 {
                     await this.Func().ConfigureAwait(false);
-                    this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 }
                 catch (Exception e)
                 {
                     Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
-                    this.OnPhase(CommandPhase.Error, this.Tag, parameter);
                 }
                 return Windows.Invoke(() => this.OnCanExecuteChanged());
             });
@@ -97,7 +94,6 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
 #if NET40
             var task = TaskEx.Run(async () =>
 #else
@@ -114,12 +110,10 @@ namespace FoxTunes.ViewModel
                     {
                         await this.Func(default(T)).ConfigureAwait(false);
                     }
-                    this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 }
                 catch (Exception e)
                 {
                     Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
-                    this.OnPhase(CommandPhase.Error, this.Tag, parameter);
                 }
                 return Windows.Invoke(() => this.OnCanExecuteChanged());
             });

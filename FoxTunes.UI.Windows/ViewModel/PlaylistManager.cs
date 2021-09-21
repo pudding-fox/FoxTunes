@@ -212,11 +212,27 @@ namespace FoxTunes.ViewModel
             throw exception;
         }
 
-        public ICommand CancelCommand
+        public ICommand ShowCommand
+        {
+            get
+            {
+                return new Command(() => this.PlaylistManagerVisible = true);
+            }
+        }
+
+        public ICommand HideCommand
         {
             get
             {
                 return new Command(() => this.PlaylistManagerVisible = false);
+            }
+        }
+
+        public ICommand ToggleCommand
+        {
+            get
+            {
+                return new Command(() => this.PlaylistManagerVisible = !this.PlaylistManagerVisible);
             }
         }
 
