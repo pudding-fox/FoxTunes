@@ -146,6 +146,17 @@ namespace FoxTunes
             Explorer.Open(fileName);
         }
 
+        public override async Task ShowSettings(string title, IEnumerable<string> sections)
+        {
+            var settings = default(ComponentSettingsDialog);
+            await global::FoxTunes.Windows.Invoke(() =>
+            {
+                settings = new ComponentSettingsDialog();
+                settings.Sections = new StringCollection(sections);
+            }).ConfigureAwait(false);
+            await global::FoxTunes.Windows.ShowDialog(this.Core, title, settings).ConfigureAwait(false);
+        }
+
         public override void Restart()
         {
             MessageBox.Show("Restart is required.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);

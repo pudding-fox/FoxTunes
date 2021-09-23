@@ -19,11 +19,14 @@ namespace FoxTunes
 
         public IMetaDataBrowser MetaDataBrowser { get; private set; }
 
+        public IUserInterface UserInterface { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryManager = core.Managers.Library;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
+            this.UserInterface = core.Components.UserInterface;
             base.InitializeComponent(core);
         }
 
@@ -35,11 +38,11 @@ namespace FoxTunes
                 {
                     if (this.PlaylistManager.SelectedPlaylist != null)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, Strings.LibraryActionsBehaviour_AppendPlaylist);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, Strings.LibraryActionsBehaviour_ReplacePlaylist);
                     }
                 }
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, RESCAN, "Rescan Files", path: "Library");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, RESCAN, Strings.LibraryActionsBehaviour_Rescan, path: Strings.LibraryActionsBehaviour_Library);
             }
         }
 

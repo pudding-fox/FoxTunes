@@ -11,12 +11,63 @@ namespace FoxTunes.ViewModel
 {
     public class ComponentSettings : ViewModelBase
     {
+        public static readonly DependencyProperty SectionsProperty = DependencyProperty.Register(
+           "Sections",
+           typeof(StringCollection),
+           typeof(ComponentSettings),
+           new PropertyMetadata(new PropertyChangedCallback(OnSectionsChanged))
+       );
+
+        public static StringCollection GetSections(ComponentSettings source)
+        {
+            return (StringCollection)source.GetValue(SectionsProperty);
+        }
+
+        public static void SetSections(ComponentSettings source, StringCollection value)
+        {
+            source.SetValue(SectionsProperty, value);
+        }
+
+        public static void OnSectionsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var componentSettings = sender as ComponentSettings;
+            if (componentSettings == null)
+            {
+                return;
+            }
+            componentSettings.OnSectionsChanged();
+        }
+
         public ComponentSettings()
         {
             this.Pages = new ObservableCollection<ComponentSettingsPage>();
         }
 
         public IConfiguration Configuration { get; private set; }
+
+        public StringCollection Sections
+        {
+            get
+            {
+                return this.GetValue(SectionsProperty) as StringCollection;
+            }
+            set
+            {
+                this.SetValue(SectionsProperty, value);
+            }
+        }
+
+        protected virtual void OnSectionsChanged()
+        {
+            this.Dispatch(this.Refresh);
+            if (this.SectionsChanged != null)
+            {
+                this.SectionsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Sections");
+        }
+
+        public event EventHandler SectionsChanged;
 
         public ObservableCollection<ComponentSettingsPage> Pages { get; private set; }
 
@@ -143,6 +194,14 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task Refresh()
         {
+            if (this.Configuration == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             return Windows.Invoke(() =>
             {
                 this.Pages.Clear();
@@ -152,6 +211,14 @@ namespace FoxTunes.ViewModel
                     {
                         //System config should not be presented to the user.
                         continue;
+                    }
+                    if (this.Sections != null)
+                    {
+                        if (!this.Sections.Contains(section.Id, StringComparer.OrdinalIgnoreCase))
+                        {
+                            //Does not match section filter.
+                            continue;
+                        }
                     }
                     var sectionMatches = this.MatchesFilter(section);
                     var elements = default(IEnumerable<ConfigurationElement>);

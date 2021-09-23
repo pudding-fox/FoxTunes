@@ -259,6 +259,51 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add To Playlist.
+        /// </summary>
+        internal static string LibraryActionsBehaviour_AppendPlaylist {
+            get {
+                return ResourceManager.GetString("LibraryActionsBehaviour.AppendPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Library.
+        /// </summary>
+        internal static string LibraryActionsBehaviour_Library {
+            get {
+                return ResourceManager.GetString("LibraryActionsBehaviour.Library", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace Playlist.
+        /// </summary>
+        internal static string LibraryActionsBehaviour_ReplacePlaylist {
+            get {
+                return ResourceManager.GetString("LibraryActionsBehaviour.ReplacePlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rescan Files.
+        /// </summary>
+        internal static string LibraryActionsBehaviour_Rescan {
+            get {
+                return ResourceManager.GetString("LibraryActionsBehaviour.Rescan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        internal static string LibraryActionsBehaviour_Settings {
+            get {
+                return ResourceManager.GetString("LibraryActionsBehaviour.Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add to collection by dropping files here..
         /// </summary>
         internal static string LibraryBase_Empty {
