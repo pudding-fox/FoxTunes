@@ -680,14 +680,31 @@ namespace FoxTunes
 #endif
         }
 
-        public bool CanHandle(string path)
+        public bool CanHandle(string path, FileActionType type)
         {
-            return Directory.Exists(path) || this.PlaybackManager.IsSupported(path);
+            if (type != FileActionType.Playlist)
+            {
+                return false;
+            }
+            if (!Directory.Exists(path) && !this.PlaybackManager.IsSupported(path))
+            {
+                return false;
+            }
+            return true;
         }
 
-        public Task Handle(IEnumerable<string> paths)
+        public Task Handle(IEnumerable<string> paths, FileActionType type)
         {
-            return this.Add(this.SelectedPlaylist, paths, false);
+            switch (type)
+            {
+                case FileActionType.Playlist:
+                    return this.Add(this.SelectedPlaylist, paths, false);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public string Checksum

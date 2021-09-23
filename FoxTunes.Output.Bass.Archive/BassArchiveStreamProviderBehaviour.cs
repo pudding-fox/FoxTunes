@@ -179,9 +179,13 @@ namespace FoxTunes
 #endif
         }
 
-        public bool CanHandle(string path)
+        public bool CanHandle(string path, FileActionType type)
         {
             if (!this.Enabled)
+            {
+                return false;
+            }
+            if (type != FileActionType.Playlist)
             {
                 return false;
             }
@@ -192,12 +196,17 @@ namespace FoxTunes
             return true;
         }
 
-        public async Task Handle(IEnumerable<string> paths)
+        public async Task Handle(IEnumerable<string> paths, FileActionType type)
         {
-            var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
-            foreach (var path in paths)
+            switch (type)
             {
-                await this.OpenArchive(playlist, path).ConfigureAwait(false);
+                case FileActionType.Playlist:
+                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    foreach (var path in paths)
+                    {
+                        await this.OpenArchive(playlist, path).ConfigureAwait(false);
+                    }
+                    break;
             }
         }
 

@@ -50,7 +50,7 @@ namespace FoxTunes
                         playlist = this.PlaylistManager.SelectedPlaylist;
                         index = this.PlaylistBrowser.GetInsertIndex(playlist);
                     }
-                    await this.RunPaths(e.Sequence).ConfigureAwait(false);
+                    await this.RunPaths(e.Sequence, FileActionType.Playlist).ConfigureAwait(false);
                     if (this.OpenMode == CommandLineParser.OpenMode.Play)
                     {
                         await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
@@ -75,14 +75,14 @@ namespace FoxTunes
             this.Queue.EnqueueRange(paths);
         }
 
-        public virtual async Task RunPaths(IEnumerable<string> paths)
+        public virtual async Task RunPaths(IEnumerable<string> paths, FileActionType type)
         {
             var handlers = new Dictionary<IFileActionHandler, IList<string>>();
             foreach (var path in paths)
             {
                 foreach (var handler in this.FileActionHandlers)
                 {
-                    if (!handler.CanHandle(path))
+                    if (!handler.CanHandle(path, type))
                     {
                         continue;
                     }
@@ -91,7 +91,7 @@ namespace FoxTunes
             }
             foreach (var pair in handlers)
             {
-                await pair.Key.Handle(pair.Value).ConfigureAwait(false);
+                await pair.Key.Handle(pair.Value, type).ConfigureAwait(false);
             }
         }
 

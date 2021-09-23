@@ -9,7 +9,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -375,7 +374,7 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    return this.FileActionHandlerManager.RunPaths(paths);
+                    return this.FileActionHandlerManager.RunPaths(paths, FileActionType.Playlist);
                 }
                 if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
                 {
@@ -392,7 +391,7 @@ namespace FoxTunes.ViewModel
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
                     var paths = ShellIDListHelper.GetData(e.Data);
-                    return this.FileActionHandlerManager.RunPaths(paths);
+                    return this.FileActionHandlerManager.RunPaths(paths, FileActionType.Playlist);
                 }
             }
             catch (Exception exception)
