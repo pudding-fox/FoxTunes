@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net40;net461</TargetFrameworks>
+    <RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
     <AssemblyName>FoxTunes.Output.Bass.ReplayGain</AssemblyName>
     <OutputPath>..\distribution\$(Platform)\</OutputPath>
     <OutputType>WinExe</OutputType>
