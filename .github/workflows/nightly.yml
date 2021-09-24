@@ -10,10 +10,6 @@ jobs:
 
   build:
 
-    strategy:
-      matrix:
-        configuration: [Debug]
-
     runs-on: windows-latest
 
     steps:
@@ -44,10 +40,10 @@ jobs:
       run: nuget restore FoxTunes.sln
 
     - name: Build x86
-      run: msbuild FoxTunes.sln /p:Configuration=Release /property:Platform=x86
+      run: msbuild FoxTunes.sln /p:Configuration=Debug /property:Platform=x86
 
     - name: Build x64
-      run: msbuild FoxTunes.sln /p:Configuration=Release /property:Platform=x64
+      run: msbuild FoxTunes.sln /p:Configuration=Debug /property:Platform=x64
 
     - name: Package
       run: |
