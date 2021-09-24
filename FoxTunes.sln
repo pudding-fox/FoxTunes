@@ -32,20 +32,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Logging", "FoxTunes.Logging\FoxTunes.Logging.csproj", "{AB1362C8-0754-496D-85E1-3C258FF250BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass", "FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj", "{676F7DD1-BF13-4317-819F-9B5D85DF18B5}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34} = {3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.DB.SQLite", "FoxTunes.DB.SQLite\FoxTunes.DB.SQLite.csproj", "{1599399A-2873-46F5-96CD-56768AFC967E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Tests", "FoxTunes.Output.Bass.Tests\FoxTunes.Output.Bass.Tests.csproj", "{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_asio_handler", "bass_asio_handler\bass_asio_handler.vcxproj", "{1DFDA520-5749-4ED7-AEE2-432C38AA9406}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Asio", "FoxTunes.Output.Bass.Asio\FoxTunes.Output.Bass.Asio.csproj", "{3E8A3809-3FBA-4024-9343-2A54DAE013CA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406} = {1DFDA520-5749-4ED7-AEE2-432C38AA9406}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Resampler", "FoxTunes.Output.Bass.Resampler\FoxTunes.Output.Bass.Resampler.csproj", "{A638A91C-BD8E-4475-A5FB-E4FCFF7BA61D}"
 EndProject
@@ -54,16 +46,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.DirectSound", "FoxTunes.Output.Bass.DirectSound\FoxTunes.Output.Bass.DirectSound.csproj", "{4EAF00DA-FE41-46ED-AFB5-3A543BCF0BF9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Dsd", "FoxTunes.Output.Bass.Dsd\FoxTunes.Output.Bass.Dsd.csproj", "{2E2722F2-8C19-4022-8E5E-36B9A9983CB3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA} = {530C8EC7-66B4-4A17-9BF4-001193151FDA}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Wasapi", "FoxTunes.Output.Bass.Wasapi\FoxTunes.Output.Bass.Wasapi.csproj", "{E334BA97-5450-4960-84DA-B7C5E09589E4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00} = {C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_wasapi_handler", "bass_wasapi_handler\bass_wasapi_handler.vcxproj", "{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Cd", "FoxTunes.Output.Bass.Cd\FoxTunes.Output.Bass.Cd.csproj", "{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}"
 EndProject
@@ -78,10 +62,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.LibraryBrowser", "FoxTunes.UI.Windows.LibraryBrowser\FoxTunes.UI.Windows.LibraryBrowser.csproj", "{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.MetaDataEditor", "FoxTunes.UI.Windows.MetaDataEditor\FoxTunes.UI.Windows.MetaDataEditor.csproj", "{B02498D9-D348-44B4-96B7-AFB02B542DB1}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_inmemory_handler", "bass_inmemory_handler\bass_inmemory_handler.vcxproj", "{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_inmemory_handler_dsd", "bass_inmemory_handler_dsd\bass_dsd_inmemory_handler.vcxproj", "{530C8EC7-66B4-4A17-9BF4-001193151FDA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Core.Windows.UWP", "FoxTunes.Core.Windows.UWP\FoxTunes.Core.Windows.UWP.csproj", "{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}"
 EndProject
@@ -271,14 +251,6 @@ Global
 		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Release|x64.Build.0 = Release|x64
 		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Release|x86.ActiveCfg = Release|x86
 		{2C0511BC-FFAA-4697-B975-D0B4AA5C7433}.Release|x86.Build.0 = Release|x86
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Debug|x64.ActiveCfg = Release|x64
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Debug|x64.Build.0 = Release|x64
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Debug|x86.ActiveCfg = Release|Win32
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Debug|x86.Build.0 = Release|Win32
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Release|x64.ActiveCfg = Release|x64
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Release|x64.Build.0 = Release|x64
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Release|x86.ActiveCfg = Release|Win32
-		{1DFDA520-5749-4ED7-AEE2-432C38AA9406}.Release|x86.Build.0 = Release|Win32
 		{3E8A3809-3FBA-4024-9343-2A54DAE013CA}.Debug|x64.ActiveCfg = Debug|x64
 		{3E8A3809-3FBA-4024-9343-2A54DAE013CA}.Debug|x64.Build.0 = Debug|x64
 		{3E8A3809-3FBA-4024-9343-2A54DAE013CA}.Debug|x86.ActiveCfg = Debug|x86
@@ -327,14 +299,6 @@ Global
 		{E334BA97-5450-4960-84DA-B7C5E09589E4}.Release|x64.Build.0 = Release|x64
 		{E334BA97-5450-4960-84DA-B7C5E09589E4}.Release|x86.ActiveCfg = Release|x86
 		{E334BA97-5450-4960-84DA-B7C5E09589E4}.Release|x86.Build.0 = Release|x86
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Debug|x64.ActiveCfg = Release|x64
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Debug|x64.Build.0 = Release|x64
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Debug|x86.ActiveCfg = Release|Win32
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Debug|x86.Build.0 = Release|Win32
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|x64.ActiveCfg = Release|x64
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|x64.Build.0 = Release|x64
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|x86.ActiveCfg = Release|Win32
-		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|x86.Build.0 = Release|Win32
 		{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}.Debug|x64.ActiveCfg = Debug|x64
 		{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}.Debug|x64.Build.0 = Debug|x64
 		{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}.Debug|x86.ActiveCfg = Debug|x86
@@ -391,22 +355,6 @@ Global
 		{B02498D9-D348-44B4-96B7-AFB02B542DB1}.Release|x64.Build.0 = Release|x64
 		{B02498D9-D348-44B4-96B7-AFB02B542DB1}.Release|x86.ActiveCfg = Release|x86
 		{B02498D9-D348-44B4-96B7-AFB02B542DB1}.Release|x86.Build.0 = Release|x86
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Debug|x64.ActiveCfg = Release|x64
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Debug|x64.Build.0 = Release|x64
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Debug|x86.ActiveCfg = Release|Win32
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Debug|x86.Build.0 = Release|Win32
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Release|x64.ActiveCfg = Release|x64
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Release|x64.Build.0 = Release|x64
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Release|x86.ActiveCfg = Release|Win32
-		{3642C858-D103-4FDA-ADA8-CA2DA9ED0F34}.Release|x86.Build.0 = Release|Win32
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Debug|x64.ActiveCfg = Release|x64
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Debug|x64.Build.0 = Release|x64
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Debug|x86.ActiveCfg = Release|Win32
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Debug|x86.Build.0 = Release|Win32
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Release|x64.ActiveCfg = Release|x64
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Release|x64.Build.0 = Release|x64
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Release|x86.ActiveCfg = Release|Win32
-		{530C8EC7-66B4-4A17-9BF4-001193151FDA}.Release|x86.Build.0 = Release|Win32
 		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|x64.ActiveCfg = Debug|x64
 		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|x64.Build.0 = Debug|x64
 		{AC1AD8D1-5808-4E54-AB96-EA778E2F218C}.Debug|x86.ActiveCfg = Debug|x86
