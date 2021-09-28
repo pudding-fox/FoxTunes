@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -97,7 +98,14 @@ namespace FoxTunes
         {
             try
             {
-                await this.MetaDataManager.Synchronize().ConfigureAwait(false);
+                if (global::FoxTunes.BackgroundTask.Active.Any())
+                {
+                    Logger.Write(this, LogLevel.Debug, "Other tasks are running, deferring.");
+                }
+                else
+                {
+                    await this.MetaDataManager.Synchronize().ConfigureAwait(false);
+                }
                 lock (SyncRoot)
                 {
                     if (this.Timer == null)

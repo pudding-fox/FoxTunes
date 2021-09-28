@@ -223,8 +223,9 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
                 }
-                this.OnSaved();
             });
+            //Configuration not technically saved *yet* but it doesn't matter.
+            this.OnSaved();
         }
 
         protected virtual void OnSaved()
