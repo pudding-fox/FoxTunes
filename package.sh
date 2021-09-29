@@ -8,6 +8,7 @@ MAKEMSIX="$(realpath ./.msix/makemsix.exe)"
 PVK2PFX="$(realpath ./.msix/pvk2pfx.exe)"
 SIGNTOOL="$(realpath ./.msix/signtool.exe)"
 
+RAIMUSOFT_CER="$(realpath ./.msix/RaimuSoft.cer)"
 RAIMUSOFT_PFX="$(realpath ./.msix/RaimuSoft.pfx)"
 
 PLATFORM="
@@ -45,6 +46,8 @@ then
 fi
 
 rm ./release/*.appx
+rm ./release/*.cer
+cp "$RAIMUSOFT_CER" "./release/SigningCert.cer"
 
 for platform in $PLATFORM
 do
