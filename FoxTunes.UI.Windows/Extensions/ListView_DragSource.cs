@@ -231,6 +231,18 @@ namespace FoxTunes
                     }
                 }
             }
+
+            protected override void OnDisposing()
+            {
+                if (this.ListView != null)
+                {
+                    this.ListView.PreviewMouseDown -= this.OnMouseDown;
+                    this.ListView.PreviewMouseUp -= this.OnMouseUp;
+                    this.ListView.MouseMove -= this.OnMouseMove;
+                    SetDraggingItems(this.ListView, null);
+                }
+                base.OnDisposing();
+            }
         }
 
         public class DraggingItemCollection

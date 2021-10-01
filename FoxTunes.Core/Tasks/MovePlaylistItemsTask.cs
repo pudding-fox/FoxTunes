@@ -32,6 +32,8 @@ namespace FoxTunes
             if (moveItems.Count > 0)
             {
                 await this.MoveItems(moveItems).ConfigureAwait(false);
+                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
+                await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
             }
             if (copyItems.Count > 0)
             {
