@@ -232,7 +232,7 @@
     <value>Commandes de lecture</value>
   </data>
   <data name="PlaylistBase.Empty" xml:space="preserve">
-    <value>Ajoutez à la liste de lecture en déposant les fichiers ici.</value>
+    <value>Ajouter des fichiers à la liste de lecture en les déposant ici</value>
   </data>
   <data name="PlaylistBase.Loading" xml:space="preserve">
     <value>Chargement...</value>
