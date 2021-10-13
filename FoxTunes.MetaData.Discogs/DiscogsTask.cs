@@ -1,0 +1,38 @@
+﻿using FoxTunes.Interfaces;
+using System;
+
+namespace FoxTunes
+{
+    public abstract class DiscogsTask : BackgroundTask
+    {
+        public const string ID = "926C84B8-2821-4462-BA4E-C1667C296847";
+
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
+
+        protected DiscogsTask() : base(ID)
+        {
+
+        }
+
+        public Discogs Discogs { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            var configuration = core.Components.Configuration;
+            var baseUrl = configuration.GetElement<TextConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.BASE_URL
+            );
+            var key = configuration.GetElement<TextConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.CONSUMER_KEY
+            );
+            var secret = configuration.GetElement<TextConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.CONSUMER_SECRET
+            );
+            this.Discogs = new Discogs(baseUrl.Value, key.Value, secret.Value);
+            base.InitializeComponent(core);
+        }
+    }
+}
