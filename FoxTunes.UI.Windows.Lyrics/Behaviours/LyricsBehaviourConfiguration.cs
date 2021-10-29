@@ -12,6 +12,8 @@ namespace FoxTunes
 
         public const string AUTO_LOOKUP_PROVIDER = "BBCC07C6-5584-4E7E-9526-EB60F9F72E49";
 
+        public const string WRITE_TAGS = "EEEE4CCA-250F-4892-9B00-CB0C22D094D3";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.LyricsBehaviourConfiguration_Section)
@@ -19,10 +21,14 @@ namespace FoxTunes
                     .WithValue(true)
                     .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(AUTO_LOOKUP, Strings.LyricsBehaviourConfiguration_AutoLookup)
-                    .WithValue(false).DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
+                    .WithValue(false)
+                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
                 .WithElement(new SelectionConfigurationElement(AUTO_LOOKUP_PROVIDER, Strings.LyricsBehaviourConfiguration_AutoLookupProvider)
                     .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
-                    .DependsOn(SECTION, AUTO_LOOKUP)
+                    .DependsOn(SECTION, AUTO_LOOKUP))
+                .WithElement(new BooleanConfigurationElement(WRITE_TAGS, Strings.LyricsBehaviourConfiguration_WriteTags)
+                    .WithValue(true)
+                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
             );
         }
     }

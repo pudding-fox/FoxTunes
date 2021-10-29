@@ -41,6 +41,8 @@ namespace FoxTunes
 
         public DoubleConfigurationElement MinConfidence { get; private set; }
 
+        public BooleanConfigurationElement WriteTags { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.LibraryManager = core.Managers.Library;
@@ -50,6 +52,10 @@ namespace FoxTunes
             this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
                 DiscogsBehaviourConfiguration.MIN_CONFIDENCE
+            );
+            this.WriteTags = this.Configuration.GetElement<BooleanConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.WRITE_TAGS
             );
             base.InitializeComponent(core);
         }
@@ -192,11 +198,11 @@ namespace FoxTunes
             }
             if (libraryItems.Any())
             {
-                await this.MetaDataManager.Save(libraryItems, true, false, names).ConfigureAwait(false);
+                await this.MetaDataManager.Save(libraryItems, this.WriteTags.Value, false, names).ConfigureAwait(false);
             }
             if (playlistItems.Any())
             {
-                await this.MetaDataManager.Save(playlistItems, true, false, names).ConfigureAwait(false);
+                await this.MetaDataManager.Save(playlistItems, this.WriteTags.Value, false, names).ConfigureAwait(false);
             }
             await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);

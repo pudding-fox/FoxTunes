@@ -144,6 +144,9 @@
   <data name="DiscogsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Discogs</value>
   </data>
+  <data name="DiscogsBehaviourConfiguration.WriteTags" xml:space="preserve">
+    <value>Write Tags</value>
+  </data>
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
   </data>
