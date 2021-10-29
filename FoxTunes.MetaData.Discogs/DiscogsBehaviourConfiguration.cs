@@ -14,6 +14,8 @@ namespace FoxTunes
 
         public const string CONSUMER_SECRET = "DDDD019F-AC8C-4C17-9127-0ADB9FE86FD0";
 
+        public const string MAX_REQUESTS = "EEEE9991-C4EC-4DDA-9315-F658BC461283";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.DiscogsBehaviourConfiguration_Section)
@@ -29,7 +31,11 @@ namespace FoxTunes
                 .WithElement(new TextConfigurationElement(CONSUMER_SECRET, Strings.DiscogsBehaviourConfiguration_ConsumerSecret)
                     .WithValue(Discogs.SECRET)
                     .DependsOn(SECTION, ENABLED)
-                    .WithFlags(ConfigurationElementFlags.Secret));
+                    .WithFlags(ConfigurationElementFlags.Secret))
+                .WithElement(new IntegerConfigurationElement(MAX_REQUESTS, Strings.DiscogsBehaviourConfiguration_MaxRequests, path: Strings.General_Advanced)
+                    .WithValue(Discogs.MAX_REQUESTS)
+                    .WithValidationRule(new IntegerValidationRule(1, 10))
+                    .DependsOn(SECTION, ENABLED));
         }
     }
 }

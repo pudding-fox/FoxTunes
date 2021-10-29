@@ -31,7 +31,11 @@ namespace FoxTunes
                 DiscogsBehaviourConfiguration.SECTION,
                 DiscogsBehaviourConfiguration.CONSUMER_SECRET
             );
-            this.Discogs = new Discogs(baseUrl.Value, key.Value, secret.Value);
+            var maxRequests = configuration.GetElement<IntegerConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.MAX_REQUESTS
+            );
+            this.Discogs = new Discogs(baseUrl.Value, key.Value, secret.Value, maxRequests.Value);
             base.InitializeComponent(core);
         }
     }
