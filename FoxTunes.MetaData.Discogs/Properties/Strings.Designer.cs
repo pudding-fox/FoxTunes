@@ -124,6 +124,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Minimum Confidence.
+        /// </summary>
+        internal static string DiscogsBehaviourConfiguration_MinConfidence {
+            get {
+                return ResourceManager.GetString("DiscogsBehaviourConfiguration.MinConfidence", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Discogs.
         /// </summary>
         internal static string DiscogsBehaviourConfiguration_Section {

@@ -37,11 +37,20 @@ namespace FoxTunes
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public DoubleConfigurationElement MinConfidence { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.LibraryManager = core.Managers.Library;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
+            this.Configuration = core.Components.Configuration;
+            this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.MIN_CONFIDENCE
+            );
             base.InitializeComponent(core);
         }
 
@@ -98,15 +107,34 @@ namespace FoxTunes
 
         protected virtual async Task<bool> Lookup(Discogs.ReleaseLookup releaseLookup)
         {
-            Logger.Write(this, LogLevel.Debug, "Fetching releases for album: {0} - {1}", releaseLookup.Artist, releaseLookup.Album);
-            var releases = await this.Discogs.GetReleases(releaseLookup.Artist, releaseLookup.Album).ConfigureAwait(false);
+            Logger.Write(this, LogLevel.Debug, "Fetching master releases for album: {0} - {1}", releaseLookup.Artist, releaseLookup.Album);
+            var releases = await this.Discogs.GetReleases(releaseLookup.Artist, releaseLookup.Album, true).ConfigureAwait(false);
+            if (!releases.Any())
+            {
+                Logger.Write(this, LogLevel.Warn, "No master releases for album: {0} - {1}, fetching others", releaseLookup.Artist, releaseLookup.Album);
+                releases = await this.Discogs.GetReleases(releaseLookup.Artist, releaseLookup.Album, false).ConfigureAwait(false);
+            }
             Logger.Write(this, LogLevel.Debug, "Ranking releases for album: {0} - {1}", releaseLookup.Artist, releaseLookup.Album);
-            //Get the top release by title similarity, then by largest available image.
-            releaseLookup.Release = releases
-                .OrderByDescending(release => release.Similarity(releaseLookup.Artist, releaseLookup.Album))
-                .ThenByDescending(release => release.CoverSize)
-                .ThenByDescending(release => release.ThumbSize)
-                .FirstOrDefault();
+            releaseLookup.Release = releases.ToDictionary(
+                //Map results to similarity
+                release => release,
+                release => release.Similarity(releaseLookup.Artist, releaseLookup.Album)
+            ).Where(
+                //Where they have the required confidence.
+                pair => pair.Value >= this.MinConfidence.Value
+            ).OrderByDescending(
+                //Order by highest confidence first.
+                pair => pair.Value
+            ).ThenByDescending(
+                //Then by largest cover image.
+                pair => pair.Key.CoverSize
+            ).ThenByDescending(
+                //Then by largest thumb size.
+                pair => pair.Key.ThumbSize
+            ).Select(
+                //Select result.
+                pair => pair.Key
+            ).FirstOrDefault();
             if (releaseLookup.Release != null)
             {
                 Logger.Write(this, LogLevel.Debug, "Best match for album {0} - {1}: {2}", releaseLookup.Artist, releaseLookup.Album, releaseLookup.Release.Url);

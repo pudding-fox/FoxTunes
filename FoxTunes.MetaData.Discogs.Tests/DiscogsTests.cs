@@ -12,7 +12,7 @@ namespace FoxTunes.MetaData.Discogs.Tests
         {
             var discogs = new global::FoxTunes.Discogs();
             discogs.InitializeComponent(this.Core);
-            var releases = await discogs.GetReleases(artist, album).ConfigureAwait(false);
+            var releases = await discogs.GetReleases(artist, album, true).ConfigureAwait(false);
             Assert.GreaterOrEqual(releases.ToArray().Length, 1);
         }
 

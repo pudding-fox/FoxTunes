@@ -138,6 +138,9 @@
   <data name="DiscogsBehaviourConfiguration.MaxRequests" xml:space="preserve">
     <value>Requests Per Second</value>
   </data>
+  <data name="DiscogsBehaviourConfiguration.MinConfidence" xml:space="preserve">
+    <value>Minimum Confidence</value>
+  </data>
   <data name="DiscogsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Discogs</value>
   </data>

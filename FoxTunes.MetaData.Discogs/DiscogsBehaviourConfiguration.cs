@@ -16,25 +16,31 @@ namespace FoxTunes
 
         public const string MAX_REQUESTS = "EEEE9991-C4EC-4DDA-9315-F658BC461283";
 
+        public const string MIN_CONFIDENCE = "FFFFDFA1-BB70-44A8-AA80-DFDD67235356";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.DiscogsBehaviourConfiguration_Section)
                 .WithElement(new BooleanConfigurationElement(ENABLED, Strings.DiscogsBehaviourConfiguration_Enabled)
                     .WithValue(false))
-                .WithElement(new TextConfigurationElement(BASE_URL, Strings.DiscogsBehaviourConfiguration_BaseUrl)
+                .WithElement(new TextConfigurationElement(BASE_URL, Strings.DiscogsBehaviourConfiguration_BaseUrl, path: Strings.General_Advanced)
                     .WithValue(Discogs.BASE_URL)
                     .DependsOn(SECTION, ENABLED))
-                .WithElement(new TextConfigurationElement(CONSUMER_KEY, Strings.DiscogsBehaviourConfiguration_ConsumerKey)
+                .WithElement(new TextConfigurationElement(CONSUMER_KEY, Strings.DiscogsBehaviourConfiguration_ConsumerKey, path: Strings.General_Advanced)
                     .WithValue(Discogs.KEY)
                     .DependsOn(SECTION, ENABLED)
                     .WithFlags(ConfigurationElementFlags.Secret))
-                .WithElement(new TextConfigurationElement(CONSUMER_SECRET, Strings.DiscogsBehaviourConfiguration_ConsumerSecret)
+                .WithElement(new TextConfigurationElement(CONSUMER_SECRET, Strings.DiscogsBehaviourConfiguration_ConsumerSecret, path: Strings.General_Advanced)
                     .WithValue(Discogs.SECRET)
                     .DependsOn(SECTION, ENABLED)
                     .WithFlags(ConfigurationElementFlags.Secret))
                 .WithElement(new IntegerConfigurationElement(MAX_REQUESTS, Strings.DiscogsBehaviourConfiguration_MaxRequests, path: Strings.General_Advanced)
                     .WithValue(Discogs.MAX_REQUESTS)
                     .WithValidationRule(new IntegerValidationRule(1, 10))
+                    .DependsOn(SECTION, ENABLED))
+                .WithElement(new DoubleConfigurationElement(MIN_CONFIDENCE, Strings.DiscogsBehaviourConfiguration_MinConfidence, path: Strings.General_Advanced)
+                    .WithValue(0.8)
+                    .WithValidationRule(new DoubleValidationRule(0, 1, 0.1))
                     .DependsOn(SECTION, ENABLED));
         }
     }
