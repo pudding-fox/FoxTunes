@@ -21,7 +21,9 @@ namespace FoxTunes
 
         public const string SET_PLAYLIST_RATING = "CCCC";
 
-        public string Id
+        #region IUIPlaylistColumnProvider
+
+        string IUIPlaylistColumnProvider.Id
         {
             get
             {
@@ -29,7 +31,7 @@ namespace FoxTunes
             }
         }
 
-        public string Name
+        string IUIPlaylistColumnProvider.Name
         {
             get
             {
@@ -37,7 +39,7 @@ namespace FoxTunes
             }
         }
 
-        public string Description
+        string IUIPlaylistColumnProvider.Description
         {
             get
             {
@@ -45,7 +47,7 @@ namespace FoxTunes
             }
         }
 
-        public DataTemplate CellTemplate
+        DataTemplate IUIPlaylistColumnProvider.CellTemplate
         {
             get
             {
@@ -53,7 +55,7 @@ namespace FoxTunes
             }
         }
 
-        public IEnumerable<string> MetaData
+        IEnumerable<string> IUIPlaylistColumnProvider.MetaData
         {
             get
             {
@@ -61,7 +63,11 @@ namespace FoxTunes
             }
         }
 
-        public string Checksum
+        #endregion
+
+        #region IDatabaseInitializer
+
+        string IDatabaseInitializer.Checksum
         {
             get
             {
@@ -69,7 +75,7 @@ namespace FoxTunes
             }
         }
 
-        public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
+        void IDatabaseInitializer.InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
         {
             //IMPORTANT: When editing this function remember to change the checksum.
             if (!type.HasFlag(DatabaseInitializeType.Playlist))
@@ -84,12 +90,14 @@ namespace FoxTunes
                     Name = "Rating",
                     Type = PlaylistColumnType.Plugin,
                     Sequence = 13,
-                    Plugin = this.Id,
+                    Plugin = ID,
                     Enabled = false
                 });
                 transaction.Commit();
             }
         }
+
+        #endregion
 
         public ILibraryManager LibraryManager { get; private set; }
 
@@ -101,6 +109,8 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public BooleanConfigurationElement MetaData { get; private set; }
+
         public BooleanConfigurationElement Popularimeter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -110,6 +120,10 @@ namespace FoxTunes
             this.RatingManager = ComponentRegistry.Instance.GetComponent<RatingManager>();
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this.Configuration = core.Components.Configuration;
+            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
+            );
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                MetaDataBehaviourConfiguration.SECTION,
                MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
@@ -121,7 +135,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Popularimeter.Value)
+                if (this.MetaData.Value && this.Popularimeter.Value)
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {

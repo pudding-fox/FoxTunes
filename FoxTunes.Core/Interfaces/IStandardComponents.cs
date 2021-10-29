@@ -34,6 +34,8 @@
 
         IMetaDataSynchronizer MetaDataSynchronizer { get; }
 
+        IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; }
+
         IPlaylistBrowser PlaylistBrowser { get; }
 
         IPlaylistCache PlaylistCache { get; }

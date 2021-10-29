@@ -120,15 +120,11 @@ namespace FoxTunes.ViewModel
             return this.Refresh();
         }
 
-        public virtual Task Refresh()
+        public virtual async Task Refresh()
         {
             if (this.PlaybackManager == null || this.LibraryBrowser == null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
             var fileName = default(string);
             var fileData = default(IFileData);
@@ -143,16 +139,16 @@ namespace FoxTunes.ViewModel
                 {
                     fileData = outputStream.PlaylistItem;
                 }
-                fileName = this.ArtworkProvider.Find(
+                fileName = await this.ArtworkProvider.Find(
                     fileData,
                     ArtworkType.FrontCover
-                );
+                ).ConfigureAwait(false);
             }
-            return Windows.Invoke(() =>
+            await Windows.Invoke(() =>
             {
                 this.FileName = fileName;
                 this.FileData = fileData;
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override Freezable CreateInstanceCore()

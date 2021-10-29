@@ -137,6 +137,14 @@ namespace FoxTunes
             }
         }
 
+        public IOnDemandMetaDataProvider OnDemandMetaDataProvider
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IOnDemandMetaDataProvider>();
+            }
+        }
+
         public IPlaylistBrowser PlaylistBrowser
         {
             get

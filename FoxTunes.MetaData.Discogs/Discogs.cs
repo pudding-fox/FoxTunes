@@ -10,7 +10,7 @@ using TinyJson;
 
 namespace FoxTunes
 {
-    public class Discogs : BaseComponent
+    public class Discogs : BaseComponent, IDisposable
     {
         public const string BASE_URL = "https://api.discogs.com";
 
@@ -158,6 +158,45 @@ namespace FoxTunes
             return request;
         }
 
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.RateLimiter != null)
+            {
+                this.RateLimiter.Dispose();
+            }
+        }
+
+        ~Discogs()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
+        }
+
         private static readonly Regex IMAGE_SIZE = new Regex(@"(\d{3,4})x(\d{3,4})");
 
         public static int ImageSize(string url)
@@ -186,6 +225,7 @@ namespace FoxTunes
             private ReleaseLookup()
             {
                 this.Id = Guid.NewGuid();
+                this.MetaData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 this._Errors = new List<string>(ERROR_CAPACITY);
             }
 
@@ -208,6 +248,8 @@ namespace FoxTunes
             public IFileData[] FileDatas { get; private set; }
 
             public Discogs.Release Release { get; set; }
+
+            public IDictionary<string, string> MetaData { get; private set; }
 
             private IList<string> _Errors { get; set; }
 

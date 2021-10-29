@@ -16,11 +16,17 @@ namespace FoxTunes
 
         const double DPIY = 96;
 
+        public static readonly string FRONT_COVER = Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover);
+
         private static readonly string PREFIX = typeof(LibraryBrowserTileProvider).Name;
 
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public ImageLoader ImageLoader { get; private set; }
+
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
+        public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -31,6 +37,8 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
@@ -84,10 +92,26 @@ namespace FoxTunes
         private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
             var fileNames = libraryHierarchyNode.MetaDatas.Where(
-                metaDataItem => metaDataItem.Type == MetaDataItemType.Image && File.Exists(metaDataItem.Value)
+                metaDataItem => string.Equals(metaDataItem.Name, FRONT_COVER, StringComparison.OrdinalIgnoreCase) && metaDataItem.Type == MetaDataItemType.Image && File.Exists(metaDataItem.Value)
             ).Select(
                 metaDataItem => metaDataItem.Value
             ).ToArray();
+            if (!fileNames.Any())
+            {
+                if (this.OnDemandMetaDataProvider.IsSourceEnabled(FRONT_COVER, MetaDataItemType.Image))
+                {
+                    //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
+                    var libraryItems = this.LibraryHierarchyBrowser.GetItems(
+                        libraryHierarchyNode,
+                        true
+                    ).ToArray();
+                    if (libraryItems.Any())
+                    {
+                        //TODO: Bad .Result
+                        fileNames = this.OnDemandMetaDataProvider.GetMetaData(libraryItems, FRONT_COVER, MetaDataItemType.Image, false).Result.ToArray();
+                    }
+                }
+            }
             switch (this.ImageMode)
             {
                 case LibraryBrowserImageMode.First:

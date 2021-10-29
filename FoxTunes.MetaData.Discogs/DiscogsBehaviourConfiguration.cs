@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public const string MIN_CONFIDENCE = "FFFFDFA1-BB70-44A8-AA80-DFDD67235356";
 
+        public const string AUTO_LOOKUP = "FFGG9A7F-90EF-42D8-827F-5638A586B398";
+
         public const string WRITE_TAGS = "GGGG4763-D42F-46E2-BB25-E225EF15CE67";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -48,6 +50,9 @@ namespace FoxTunes
                 .WithElement(new DoubleConfigurationElement(MIN_CONFIDENCE, Strings.DiscogsBehaviourConfiguration_MinConfidence, path: Strings.General_Advanced)
                     .WithValue(0.8)
                     .WithValidationRule(new DoubleValidationRule(0, 1, 0.1))
+                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
+                    .DependsOn(SECTION, ENABLED))
+                .WithElement(new BooleanConfigurationElement(AUTO_LOOKUP, Strings.DiscogsBehaviourConfiguration_AutoLookup)
                     .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
                     .DependsOn(SECTION, ENABLED))
                 .WithElement(new BooleanConfigurationElement(WRITE_TAGS, Strings.DiscogsBehaviourConfiguration_WriteTags)

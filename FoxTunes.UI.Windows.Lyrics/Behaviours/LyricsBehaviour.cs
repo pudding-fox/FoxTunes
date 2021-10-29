@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class LyricsBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
+    public class LyricsBehaviour : StandardBehaviour, IOnDemandMetaDataSource, IInvocableComponent, IConfigurableComponent
     {
         public const string CATEGORY = "BB46B834-5372-440F-B75B-57FF0E473BB4";
 
@@ -26,7 +26,7 @@ namespace FoxTunes
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
-        public IMetaDataManager MetaDataManager { get; private set; }
+        public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -43,7 +43,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = core.Managers.Playback;
-            this.MetaDataManager = core.Managers.MetaData;
+            this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -57,19 +57,6 @@ namespace FoxTunes
                 LyricsBehaviourConfiguration.SECTION,
                 LyricsBehaviourConfiguration.AUTO_LOOKUP
             );
-            this.AutoLookup.ConnectValue(value =>
-            {
-                if (value)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Enabling auto lookup.");
-                    this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-                }
-                else
-                {
-                    Logger.Write(this, LogLevel.Debug, "Disabling auto lookup.");
-                    this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
-                }
-            });
             this.AutoLookupProvider = this.Configuration.GetElement<SelectionConfigurationElement>(
                 LyricsBehaviourConfiguration.SECTION,
                 LyricsBehaviourConfiguration.AUTO_LOOKUP_PROVIDER
@@ -79,12 +66,6 @@ namespace FoxTunes
                 LyricsBehaviourConfiguration.WRITE_TAGS
             );
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
-        {
-            //Critical: Don't block in this event handler, it causes a deadlock.
-            this.Dispatch(this.Lookup);
         }
 
         public IEnumerable<IInvocationComponent> Invocations
@@ -200,20 +181,14 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Process does not indicate success: Code = {0}", process.ExitCode);
                     return;
                 }
-                if (metaDataItem == null)
-                {
-                    metaDataItem = new MetaDataItem(CommonMetaData.Lyrics, MetaDataItemType.Tag);
-                    lock (playlistItem.MetaDatas)
+                await this.OnDemandMetaDataProvider.SetMetaData(
+                    CommonMetaData.Lyrics,
+                    new OnDemandMetaDataValues(new[]
                     {
-                        playlistItem.MetaDatas.Add(metaDataItem);
-                    }
-                }
-                metaDataItem.Value = File.ReadAllText(fileName);
-                await this.MetaDataManager.Save(
-                    new[] { playlistItem },
-                    this.WriteTags.Value,
-                    false,
-                    CommonMetaData.Lyrics
+                        new OnDemandMetaDataValue(playlistItem, File.ReadAllText(fileName))
+                    }, this.WriteTags.Value),
+                    MetaDataItemType.Tag,
+                    true
                 ).ConfigureAwait(false);
             }
             finally
@@ -229,57 +204,6 @@ namespace FoxTunes
             }
         }
 
-        public Task Lookup()
-        {
-            var outputStream = this.PlaybackManager.CurrentStream;
-            if (outputStream == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var playlistItem = outputStream.PlaylistItem;
-            lock (playlistItem.MetaDatas)
-            {
-                var metaDataItem = playlistItem.MetaDatas.FirstOrDefault(
-                    element => string.Equals(element.Name, CommonMetaData.Lyrics, StringComparison.OrdinalIgnoreCase)
-                );
-                if (metaDataItem != null && !string.IsNullOrEmpty(metaDataItem.Value))
-                {
-                    Logger.Write(this, LogLevel.Debug, "Lyrics already defined for file \"{0}\", nothing to do.", playlistItem.FileName);
-#if NET40
-                    return TaskEx.FromResult(false);
-#else
-                    return Task.CompletedTask;
-#endif
-                }
-            }
-            var provider = default(LyricsProvider);
-            if (this.AutoLookupProvider.Value != null)
-            {
-                provider = this.Providers.FirstOrDefault(
-                   _provider => string.Equals(_provider.Id, this.AutoLookupProvider.Value.Id, StringComparison.OrdinalIgnoreCase)
-               );
-            }
-            if (provider == null)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to determine the preferred provider.");
-                provider = this.Providers.FirstOrDefault();
-                if (provider == null)
-                {
-                    Logger.Write(this, LogLevel.Warn, "No providers.");
-#if NET40
-                    return TaskEx.FromResult(false);
-#else
-                    return Task.CompletedTask;
-#endif
-                }
-            }
-            return this.Lookup(provider);
-        }
-
         public Task Lookup(LyricsProvider provider)
         {
             var outputStream = this.PlaybackManager.CurrentStream;
@@ -292,40 +216,13 @@ namespace FoxTunes
 #endif
             }
             var playlistItem = outputStream.PlaylistItem;
-            return this.Lookup(provider, playlistItem);
-        }
-
-        public async Task Lookup(LyricsProvider provider, PlaylistItem playlistItem)
-        {
-            Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\"..", playlistItem.FileName);
-            var result = await provider.Lookup(playlistItem).ConfigureAwait(false);
-            if (!result.Success)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to look up lyrics for file \"{0}\".", playlistItem.FileName);
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\": OK, updating meta data.", playlistItem.FileName);
-            lock (playlistItem.MetaDatas)
-            {
-                var metaDataItem = playlistItem.MetaDatas.FirstOrDefault(
-                    element => string.Equals(element.Name, CommonMetaData.Lyrics, StringComparison.OrdinalIgnoreCase)
-                );
-                if (metaDataItem == null)
-                {
-                    metaDataItem = new MetaDataItem(CommonMetaData.Lyrics, MetaDataItemType.Tag);
-                    lock (playlistItem.MetaDatas)
-                    {
-                        playlistItem.MetaDatas.Add(metaDataItem);
-                    }
-                }
-                metaDataItem.Value = result.Lyrics;
-            }
-            await this.MetaDataManager.Save(
-                new[] { playlistItem },
-                this.WriteTags.Value,
-                false,
-                CommonMetaData.Lyrics
-            ).ConfigureAwait(false);
+            return this.OnDemandMetaDataProvider.GetMetaData(
+                new[] { outputStream.PlaylistItem },
+                CommonMetaData.Lyrics,
+                MetaDataItemType.Tag,
+                true,
+                provider
+            );
         }
 
         public void Register(LyricsProvider provider)
@@ -333,9 +230,81 @@ namespace FoxTunes
             this.Providers.Add(provider);
         }
 
+        protected virtual LyricsProvider GetAutoLookupProvider()
+        {
+            var provider = default(LyricsProvider);
+            if (this.AutoLookupProvider.Value != null)
+            {
+                provider = this.Providers.FirstOrDefault(
+                   _provider => string.Equals(_provider.Id, this.AutoLookupProvider.Value.Id, StringComparison.OrdinalIgnoreCase)
+               );
+            }
+            if (provider == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to determine the preferred provider.");
+                provider = this.Providers.FirstOrDefault();
+            }
+            if (provider == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No providers.");
+            }
+            return provider;
+        }
+
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return LyricsBehaviourConfiguration.GetConfigurationSections();
         }
+
+        #region IOnDemandMetaDataSource
+
+        bool IOnDemandMetaDataSource.Enabled
+        {
+            get
+            {
+                return this.Enabled.Value && this.AutoLookup.Value;
+            }
+        }
+
+        string IOnDemandMetaDataSource.Name
+        {
+            get
+            {
+                return CommonMetaData.Lyrics;
+            }
+        }
+
+        MetaDataItemType IOnDemandMetaDataSource.Type
+        {
+            get
+            {
+                return MetaDataItemType.Tag;
+            }
+        }
+
+        async Task<OnDemandMetaDataValues> IOnDemandMetaDataSource.GetValues(IEnumerable<IFileData> fileDatas, object state = null)
+        {
+            var provider = state as LyricsProvider ?? this.GetAutoLookupProvider();
+            if (provider == null)
+            {
+                return null;
+            }
+            var values = new List<OnDemandMetaDataValue>();
+            foreach (var fileData in fileDatas)
+            {
+                Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\"..", fileData.FileName);
+                var result = await provider.Lookup(fileData).ConfigureAwait(false);
+                if (!result.Success)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to look up lyrics for file \"{0}\".", fileData.FileName);
+                    continue;
+                }
+                Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\": OK.", fileData.FileName);
+                values.Add(new OnDemandMetaDataValue(fileData, result.Lyrics));
+            }
+            return new OnDemandMetaDataValues(values, this.WriteTags.Value);
+        }
+
+        #endregion
     }
 }

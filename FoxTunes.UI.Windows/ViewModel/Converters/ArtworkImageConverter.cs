@@ -3,7 +3,6 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Forms;
 
 namespace FoxTunes.ViewModel
 {
@@ -191,10 +190,11 @@ namespace FoxTunes.ViewModel
             }
             else if (value is IFileData)
             {
+                //TODO: Bad .Result
                 fileName = Provider.Find(
                     (IFileData)value,
                     ArtworkType.FrontCover
-                );
+                ).Result;
             }
             var size = global::System.Convert.ToInt32(Math.Max(this.Width, this.Height));
             return this.ArtworkBrushFactory.Create(

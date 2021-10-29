@@ -123,6 +123,9 @@
   <data name="DiscogsBehaviour.FetchArtwork" xml:space="preserve">
     <value>Fetch Artwork</value>
   </data>
+  <data name="DiscogsBehaviourConfiguration.AutoLookup" xml:space="preserve">
+    <value>Auto Lookup</value>
+  </data>
   <data name="DiscogsBehaviourConfiguration.BaseUrl" xml:space="preserve">
     <value>Base Url</value>
   </data>
