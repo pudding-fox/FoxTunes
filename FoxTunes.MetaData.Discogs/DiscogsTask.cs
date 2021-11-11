@@ -38,5 +38,14 @@ namespace FoxTunes
             this.Discogs = new Discogs(baseUrl.Value, key.Value, secret.Value, maxRequests.Value);
             base.InitializeComponent(core);
         }
+
+        protected override void OnDisposing()
+        {
+            if (this.Discogs != null)
+            {
+                this.Discogs.Dispose();
+            }
+            base.OnDisposing();
+        }
     }
 }
