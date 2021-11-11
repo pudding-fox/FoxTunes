@@ -10,6 +10,20 @@ namespace FoxTunes.ViewModel
 {
     public class MetaDataEntry : ViewModelBase
     {
+        private static readonly string[] NUMERIC_TAGS = new[]
+        {
+            CommonMetaData.Disc,
+            CommonMetaData.DiscCount,
+            CommonMetaData.Track,
+            CommonMetaData.TrackCount,
+            CommonMetaData.Year
+        };
+
+        private static readonly string[] BOOLEAN_TAGS = new[]
+        {
+            CommonMetaData.IsCompilation
+        };
+
         public static readonly string MyPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
 
         public static readonly string NoValue = "<No Value>";
@@ -55,6 +69,8 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnNameChanged()
         {
+            this.OnIsNumericChanged();
+            this.OnIsBooleanChanged();
             if (this.NameChanged != null)
             {
                 this.NameChanged(this, EventArgs.Empty);
@@ -134,6 +150,42 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ValueChanged;
+
+        public bool IsNumeric
+        {
+            get
+            {
+                return NUMERIC_TAGS.Contains(this.Name, StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        protected virtual void OnIsNumericChanged()
+        {
+            if (this.IsNumericChanged != null)
+            {
+                this.IsNumericChanged(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler IsNumericChanged;
+
+        public bool IsBoolean
+        {
+            get
+            {
+                return BOOLEAN_TAGS.Contains(this.Name, StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        protected virtual void OnIsBooleanChanged()
+        {
+            if (this.IsBooleanChanged != null)
+            {
+                this.IsBooleanChanged(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler IsBooleanChanged;
 
         public bool HasChanges
         {

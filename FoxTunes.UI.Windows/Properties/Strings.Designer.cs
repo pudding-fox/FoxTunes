@@ -358,6 +358,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compilation.
+        /// </summary>
+        internal static string MetaDataName_IsCompilation {
+            get {
+                return ResourceManager.GetString("MetaDataName.IsCompilation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string MinimalLayoutProvider_Description {

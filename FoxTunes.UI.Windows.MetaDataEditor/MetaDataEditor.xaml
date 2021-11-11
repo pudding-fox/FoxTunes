@@ -15,6 +15,8 @@
         <LocalViewModel:MetaDataEditor x:Key="ViewModel" Core="{Binding}"></LocalViewModel:MetaDataEditor>
         <ViewModel:NegatingBooleanToVisibilityConverter x:Key="NegatingBooleanToVisibilityConverter"></ViewModel:NegatingBooleanToVisibilityConverter>
         <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Core="{Binding}" Width="100" Height="100" ShowPlaceholder="False"></ViewModel:ArtworkImageConverter>
+        <ViewModel:StringToBooleanConverter x:Key="StringToBooleanConverter"></ViewModel:StringToBooleanConverter>
+        <ViewModel:MetaDataNameConverter x:Key="MetaDataNameConverter"></ViewModel:MetaDataNameConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <SolidColorBrush x:Key="Transparent" Color="Transparent"></SolidColorBrush>
     </UserControl.Resources>
@@ -34,8 +36,40 @@
                                     <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
                                     <ColumnDefinition></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
-                                <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
-                                <TextBox Grid.Column="1" MinWidth="400" Text="{Binding Value}"></TextBox>
+                                <Label Content="{Binding Name, Converter={StaticResource MetaDataNameConverter}}" ContentStringFormat="{}{0}:"></Label>
+                                <ContentControl Grid.Column="1" MinWidth="400" Content="{Binding}">
+                                    <ContentControl.Style>
+                                        <Style TargetType="{x:Type ContentControl}">
+                                            <Setter Property="ContentTemplate">
+                                                <Setter.Value>
+                                                    <DataTemplate DataType="{x:Type LocalViewModel:MetaDataEntry}">
+                                                        <TextBox Text="{Binding Value}"></TextBox>
+                                                    </DataTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsNumeric}" Value="True">
+                                                    <Setter Property="ContentTemplate">
+                                                        <Setter.Value>
+                                                            <DataTemplate DataType="{x:Type LocalViewModel:MetaDataEntry}">
+                                                                <TextBox Text="{Binding Value}" Windows:TextBoxExtensions.IsNumeric="True"></TextBox>
+                                                            </DataTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsBoolean}" Value="True">
+                                                    <Setter Property="ContentTemplate">
+                                                        <Setter.Value>
+                                                            <DataTemplate DataType="{x:Type LocalViewModel:MetaDataEntry}">
+                                                                <CheckBox IsChecked="{Binding Value, Converter={StaticResource StringToBooleanConverter}}" IsThreeState="True" VerticalAlignment="Center"></CheckBox>
+                                                            </DataTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -73,7 +107,7 @@
                                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasMultipleValues, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.MultipleValues}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasValue, Converter={StaticResource NegatingBooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.NoValue}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                 </Grid>
-                                <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                                <TextBlock HorizontalAlignment="Center" Text="{Binding Name, Converter={StaticResource MetaDataNameConverter}}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
