@@ -16,8 +16,8 @@ namespace FoxTunes.ViewModel
                     return boolean;
                 }
             }
-            //Indeterminate.
-            return null;
+            //TODO: Indeterminate?
+            return false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

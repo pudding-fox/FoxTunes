@@ -175,6 +175,7 @@ namespace FoxTunes
                     {
                         this.Try(() => ReplayGainManager.Read(this, metaData, file), this.ErrorHandler);
                     }
+                    this.Try(() => CompilationManager.Read(this, metaData, file), this.ErrorHandler);
                     if (file is IMetaDataSource metaDataSource)
                     {
                         await this.AddAdditional(metaData, file, metaDataSource).ConfigureAwait(false);
@@ -282,54 +283,6 @@ namespace FoxTunes
             return FileTypes.AvailableTypes.ContainsKey(mimeType);
         }
 
-        protected virtual bool IsCompilation(Tag tag)
-        {
-            var isCompilation = default(bool);
-
-            //Check tags which support this.
-            if (tag is global::TagLib.Id3v2.Tag id3v2Tag)
-            {
-                isCompilation = id3v2Tag.IsCompilation;
-            }
-            else if (tag is global::TagLib.Mpeg4.AppleTag appleTag)
-            {
-                isCompilation = appleTag.IsCompilation;
-            }
-            else if (tag is global::TagLib.Ogg.XiphComment xiphComment)
-            {
-                isCompilation = xiphComment.IsCompilation;
-            }
-
-            //Check MB release type, it's innocuous so don't bother respecting READ_MUSICBRAINZ_TAGS.
-            if (string.Equals(tag.MusicBrainzReleaseType, MusicBrainzReleaseType.Compilation, StringComparison.OrdinalIgnoreCase))
-            {
-                isCompilation = true;
-            }
-
-            return isCompilation;
-        }
-
-        protected virtual void IsCompilation(Tag tag, bool isCompilation)
-        {
-            if (tag is global::TagLib.Id3v2.Tag id3v2Tag)
-            {
-                id3v2Tag.IsCompilation = isCompilation;
-            }
-            else if (tag is global::TagLib.Mpeg4.AppleTag appleTag)
-            {
-                appleTag.IsCompilation = isCompilation;
-            }
-            else if (tag is global::TagLib.Ogg.XiphComment xiphComment)
-            {
-                xiphComment.IsCompilation = isCompilation;
-            }
-
-            if (this.MusicBrainz.Value)
-            {
-                tag.MusicBrainzReleaseType = MusicBrainzReleaseType.Compilation;
-            }
-        }
-
         private void AddTags(IList<MetaDataItem> metaData, Tag tag)
         {
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Album, tag.Album), this.ErrorHandler);
@@ -356,15 +309,6 @@ namespace FoxTunes
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Year, tag.Year.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.InitialKey, tag.InitialKey), this.ErrorHandler);
-            (this).Try(() =>
-            {
-                var isCompilation = this.IsCompilation(tag);
-                if (isCompilation)
-                {
-                    this.AddTag(metaData, CommonMetaData.IsCompilation, bool.TrueString);
-                    this.AddTag(metaData, CustomMetaData.VariousArtists, bool.TrueString);
-                }
-            }, this.ErrorHandler);
 
             if (this.Extended.Value)
             {
@@ -730,14 +674,7 @@ namespace FoxTunes
             }
             else if (string.Equals(metaDataItem.Name, CommonMetaData.IsCompilation, StringComparison.OrdinalIgnoreCase))
             {
-                this.Try(() =>
-                {
-                    var isCompilation = default(bool);
-                    if (bool.TryParse(metaDataItem.Value, out isCompilation))
-                    {
-                        this.IsCompilation(tag, isCompilation);
-                    }
-                });
+                this.Try(() => CompilationManager.Write(this, metaDataItem, file), this.ErrorHandler);
             }
         }
 
@@ -1149,112 +1086,204 @@ namespace FoxTunes
                     frame.PlayCount = Convert.ToUInt64(metaDataItem.Value);
                 }
             }
+        }
 
-            private static T GetTag<T>(File file, TagTypes tagTypes) where T : Tag
+        public static class CompilationManager
+        {
+            public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, File file)
             {
-                return file.GetTag(tagTypes) as T;
+                var isCompilation = default(bool);
+
+                //Check tags which support this.
+                var id3v2Tag = default(global::TagLib.Id3v2.Tag);
+                var appleTag = default(global::TagLib.Mpeg4.AppleTag);
+                var xiphComment = default(global::TagLib.Ogg.XiphComment);
+                if (TryGetTag(file, TagTypes.Id3v2, out id3v2Tag))
+                {
+                    isCompilation = id3v2Tag.IsCompilation;
+                }
+                else if (TryGetTag(file, TagTypes.Apple, out appleTag))
+                {
+                    isCompilation = appleTag.IsCompilation;
+                }
+                else if (TryGetTag(file, TagTypes.Xiph, out xiphComment))
+                {
+                    isCompilation = xiphComment.IsCompilation;
+                }
+
+                //Check MB release type, it's innocuous so don't bother respecting READ_MUSICBRAINZ_TAGS.
+                if (string.Equals(file.Tag.MusicBrainzReleaseType, MusicBrainzReleaseType.Compilation, StringComparison.OrdinalIgnoreCase))
+                {
+                    isCompilation = true;
+                }
+
+                if (isCompilation)
+                {
+                    source.AddTag(metaData, CommonMetaData.IsCompilation, bool.TrueString);
+                    //TODO: CustomMetaData.VariousArtists should go away but scripts use it, let's keep it updated for now.
+                    source.AddTag(metaData, CustomMetaData.VariousArtists, bool.TrueString);
+                }
             }
 
-            private static string ReadCustomTag(string name, File file)
+            public static void Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
             {
-                var key = GetCustomTagName(name);
-                if (file.TagTypes.HasFlag(TagTypes.Id3v2))
+                if (string.Equals(metaDataItem.Name, CommonMetaData.IsCompilation, StringComparison.OrdinalIgnoreCase))
                 {
-                    var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
-                    if (tag != null)
+                    var isCompilation = string.Equals(metaDataItem.Value, bool.TrueString, StringComparison.OrdinalIgnoreCase);
+
+                    //Check tags which support this.
+                    var id3v2Tag = default(global::TagLib.Id3v2.Tag);
+                    var appleTag = default(global::TagLib.Mpeg4.AppleTag);
+                    var xiphComment = default(global::TagLib.Ogg.XiphComment);
+                    if (TryGetTag(file, TagTypes.Id3v2, out id3v2Tag))
                     {
-                        var frame = global::TagLib.Id3v2.PrivateFrame.Get(tag, key, false);
-                        if (frame != null && frame.PrivateData != null && frame.PrivateData.Count > 0)
+                        id3v2Tag.IsCompilation = isCompilation;
+                    }
+                    else if (TryGetTag(file, TagTypes.Apple, out appleTag))
+                    {
+                        appleTag.IsCompilation = isCompilation;
+                    }
+                    else if (TryGetTag(file, TagTypes.Xiph, out xiphComment))
+                    {
+                        xiphComment.IsCompilation = isCompilation;
+                    }
+
+                    if (source.MusicBrainz.Value)
+                    {
+                        if (isCompilation)
                         {
-                            try
-                            {
-                                //We're sort of sure that it's UTF-16.
-                                return Encoding.Unicode.GetString(frame.PrivateData.Data);
-                            }
-                            catch
-                            {
-                                //Nothing can be done, wasn't in the expected format.
-                            }
+                            file.Tag.MusicBrainzReleaseType = MusicBrainzReleaseType.Compilation;
+                        }
+                        else if (string.Equals(file.Tag.MusicBrainzReleaseType, MusicBrainzReleaseType.Compilation, StringComparison.OrdinalIgnoreCase))
+                        {
+                            //TODO: MusicBrainzReleaseType could be anything...
+                            Logger.Write(source, LogLevel.Warn, "IsCompilation value does not match MusicBrainzReleaseType.");
                         }
                     }
                 }
-                else if (file.TagTypes.HasFlag(TagTypes.Apple))
-                {
-                    var tag = GetTag<global::TagLib.Mpeg4.AppleTag>(file, TagTypes.Apple);
-                    if (tag != null)
-                    {
-                        return tag.GetDashBox("com.apple.iTunes", key);
-                    }
-                }
-                else if (file.TagTypes.HasFlag(TagTypes.Xiph))
-                {
-                    var tag = GetTag<global::TagLib.Ogg.XiphComment>(file, TagTypes.Xiph);
-                    if (tag != null)
-                    {
-                        return tag.GetFirstField(key);
-                    }
-                }
-                else if (file.TagTypes.HasFlag(TagTypes.Ape))
-                {
-                    var tag = GetTag<global::TagLib.Ape.Tag>(file, TagTypes.Ape);
-                    if (tag != null)
-                    {
-                        var item = tag.GetItem(key);
-                        if (item != null)
-                        {
-                            return item.ToStringArray().FirstOrDefault();
-                        }
-                    }
-                }
-                //Not implemented.
-                return null;
             }
+        }
 
-            private static void WriteCustomTag(string name, string value, File file)
+        private static bool HasTag(File file, TagTypes tagTypes)
+        {
+            return file.TagTypes.HasFlag(tagTypes);
+        }
+
+        private static T GetTag<T>(File file, TagTypes tagTypes) where T : Tag
+        {
+            return file.GetTag(tagTypes) as T;
+        }
+
+        private static bool TryGetTag<T>(File file, TagTypes tagTypes, out T tag) where T : Tag
+        {
+            if (!HasTag(file, tagTypes))
             {
-                var key = GetCustomTagName(name);
-                if (file.TagTypes.HasFlag(TagTypes.Id3v2))
-                {
-                    var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
-                    if (tag != null)
-                    {
-                        var frame = global::TagLib.Id3v2.PrivateFrame.Get(tag, key, true);
-                        //We're sort of sure that it's UTF-16.
-                        frame.PrivateData = Encoding.Unicode.GetBytes(value);
-                    }
-                }
-                else if (file.TagTypes.HasFlag(TagTypes.Apple))
-                {
-                    const string PREFIX = "\0\0\0\0";
-                    const string MEAN = "com.apple.iTunes";
-                    var apple = GetTag<global::TagLib.Mpeg4.AppleTag>(file, TagTypes.Apple);
-                    if (apple != null)
-                    {
-                        while (apple.GetDashBox(MEAN, key) != null)
-                        {
-                            apple.SetDashBox(MEAN, key, string.Empty);
-                        }
-                        apple.SetDashBox(PREFIX + MEAN, PREFIX + key, value);
-                    }
-                }
-                else if (file.TagTypes.HasFlag(TagTypes.Xiph))
-                {
-                    var xiph = GetTag<global::TagLib.Ogg.XiphComment>(file, TagTypes.Xiph);
-                    if (xiph != null)
-                    {
-                        xiph.SetField(key, new[] { value });
-                    }
-                }
-                else if (file.TagTypes.HasFlag(TagTypes.Ape))
-                {
-                    var ape = GetTag<global::TagLib.Ape.Tag>(file, TagTypes.Ape);
-                    if (ape != null)
-                    {
-                        ape.SetValue(key, value);
-                    }
-                }
-                //Not implemented.
+                tag = default(T);
+                return false;
             }
+            tag = GetTag<T>(file, tagTypes);
+            return tag != null;
+        }
+
+        private static string ReadCustomTag(string name, File file)
+        {
+            var key = GetCustomTagName(name);
+            if (file.TagTypes.HasFlag(TagTypes.Id3v2))
+            {
+                var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
+                if (tag != null)
+                {
+                    var frame = global::TagLib.Id3v2.PrivateFrame.Get(tag, key, false);
+                    if (frame != null && frame.PrivateData != null && frame.PrivateData.Count > 0)
+                    {
+                        try
+                        {
+                            //We're sort of sure that it's UTF-16.
+                            return Encoding.Unicode.GetString(frame.PrivateData.Data);
+                        }
+                        catch
+                        {
+                            //Nothing can be done, wasn't in the expected format.
+                        }
+                    }
+                }
+            }
+            else if (file.TagTypes.HasFlag(TagTypes.Apple))
+            {
+                var tag = GetTag<global::TagLib.Mpeg4.AppleTag>(file, TagTypes.Apple);
+                if (tag != null)
+                {
+                    return tag.GetDashBox("com.apple.iTunes", key);
+                }
+            }
+            else if (file.TagTypes.HasFlag(TagTypes.Xiph))
+            {
+                var tag = GetTag<global::TagLib.Ogg.XiphComment>(file, TagTypes.Xiph);
+                if (tag != null)
+                {
+                    return tag.GetFirstField(key);
+                }
+            }
+            else if (file.TagTypes.HasFlag(TagTypes.Ape))
+            {
+                var tag = GetTag<global::TagLib.Ape.Tag>(file, TagTypes.Ape);
+                if (tag != null)
+                {
+                    var item = tag.GetItem(key);
+                    if (item != null)
+                    {
+                        return item.ToStringArray().FirstOrDefault();
+                    }
+                }
+            }
+            //Not implemented.
+            return null;
+        }
+
+        private static void WriteCustomTag(string name, string value, File file)
+        {
+            var key = GetCustomTagName(name);
+            if (file.TagTypes.HasFlag(TagTypes.Id3v2))
+            {
+                var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
+                if (tag != null)
+                {
+                    var frame = global::TagLib.Id3v2.PrivateFrame.Get(tag, key, true);
+                    //We're sort of sure that it's UTF-16.
+                    frame.PrivateData = Encoding.Unicode.GetBytes(value);
+                }
+            }
+            else if (file.TagTypes.HasFlag(TagTypes.Apple))
+            {
+                const string PREFIX = "\0\0\0\0";
+                const string MEAN = "com.apple.iTunes";
+                var apple = GetTag<global::TagLib.Mpeg4.AppleTag>(file, TagTypes.Apple);
+                if (apple != null)
+                {
+                    while (apple.GetDashBox(MEAN, key) != null)
+                    {
+                        apple.SetDashBox(MEAN, key, string.Empty);
+                    }
+                    apple.SetDashBox(PREFIX + MEAN, PREFIX + key, value);
+                }
+            }
+            else if (file.TagTypes.HasFlag(TagTypes.Xiph))
+            {
+                var xiph = GetTag<global::TagLib.Ogg.XiphComment>(file, TagTypes.Xiph);
+                if (xiph != null)
+                {
+                    xiph.SetField(key, new[] { value });
+                }
+            }
+            else if (file.TagTypes.HasFlag(TagTypes.Ape))
+            {
+                var ape = GetTag<global::TagLib.Ape.Tag>(file, TagTypes.Ape);
+                if (ape != null)
+                {
+                    ape.SetValue(key, value);
+                }
+            }
+            //Not implemented.
         }
 
         private static string GetCustomTagName(string name)
@@ -1432,7 +1461,7 @@ namespace FoxTunes
 
         public static class MusicBrainzReleaseType
         {
-            public const string Compilation = "Compilation";
+            public const string Compilation = "compilation";
         }
     }
 }

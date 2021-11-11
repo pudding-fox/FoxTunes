@@ -364,6 +364,7 @@ namespace FoxTunes.ViewModel
                     }
                 }
             }
+            this.OriginalValue = this.Value;
             return fileDatas;
         }
 
