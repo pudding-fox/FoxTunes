@@ -23,7 +23,7 @@ namespace FoxTunes
 
         #region IUIPlaylistColumnProvider
 
-        string IUIPlaylistColumnProvider.Id
+        public string Id
         {
             get
             {
@@ -31,7 +31,7 @@ namespace FoxTunes
             }
         }
 
-        string IUIPlaylistColumnProvider.Name
+        public string Name
         {
             get
             {
@@ -39,7 +39,7 @@ namespace FoxTunes
             }
         }
 
-        string IUIPlaylistColumnProvider.Description
+        public string Description
         {
             get
             {
@@ -47,7 +47,7 @@ namespace FoxTunes
             }
         }
 
-        DataTemplate IUIPlaylistColumnProvider.CellTemplate
+        public DataTemplate CellTemplate
         {
             get
             {

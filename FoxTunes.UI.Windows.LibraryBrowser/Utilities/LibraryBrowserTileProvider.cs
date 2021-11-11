@@ -66,17 +66,9 @@ namespace FoxTunes
 
         public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
-            var id = this.GetImageId(libraryHierarchyNode, width, height);
-            if (cache)
+            try
             {
-                var fileName = default(string);
-                if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
-                {
-                    return this.ImageLoader.Load(fileName, 0, 0, true);
-                }
-            }
-            using (KeyLock.Lock(id))
-            {
+                var id = this.GetImageId(libraryHierarchyNode, width, height);
                 if (cache)
                 {
                     var fileName = default(string);
@@ -85,7 +77,23 @@ namespace FoxTunes
                         return this.ImageLoader.Load(fileName, 0, 0, true);
                     }
                 }
-                return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
+                using (KeyLock.Lock(id))
+                {
+                    if (cache)
+                    {
+                        var fileName = default(string);
+                        if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                        {
+                            return this.ImageLoader.Load(fileName, 0, 0, true);
+                        }
+                    }
+                    return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Error creating image source: {0}", e.Message);
+                return null;
             }
         }
 
