@@ -13,8 +13,6 @@ namespace FoxTunes
 
         const string DELIMITER = ",";
 
-        public static readonly object SyncRoot = new object();
-
         public static readonly string[] EXTENSIONS = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".bin" };
 
         public ArtworkProvider()
@@ -96,16 +94,9 @@ namespace FoxTunes
             {
                 return null;
             }
-            lock (SyncRoot)
+            var directoryName = Path.GetDirectoryName(path);
+            return this.Store.GetOrAdd(directoryName, type, () =>
             {
-                var directoryName = Path.GetDirectoryName(path);
-                {
-                    var fileName = default(string);
-                    if (this.Store.TryGetValue(directoryName, type, out fileName))
-                    {
-                        return fileName;
-                    }
-                }
                 var names = default(string[]);
                 switch (type)
                 {
@@ -131,7 +122,6 @@ namespace FoxTunes
                             }
                             if (info.Length <= this.MaxSize)
                             {
-                                this.Store.Add(directoryName, type, fileName);
                                 return fileName;
                             }
                         }
@@ -141,9 +131,8 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Warn, "Error locating artwork of type {0} in {1}: {2}", Enum.GetName(typeof(ArtworkType), type), path, e.Message);
                 }
-                this.Store.Add(directoryName, type, null);
-            }
-            return null;
+                return null;
+            });
         }
 
         public async Task<string> Find(IFileData fileData, ArtworkType type)
@@ -170,16 +159,10 @@ namespace FoxTunes
 
             public CappedDictionary<Key, string> Store { get; private set; }
 
-            public void Add(string path, ArtworkType type, string fileName)
+            public string GetOrAdd(string path, ArtworkType type, Func<string> factory)
             {
                 var key = new Key(path, type);
-                this.Store.Add(key, fileName);
-            }
-
-            public bool TryGetValue(string path, ArtworkType type, out string fileName)
-            {
-                var key = new Key(path, type);
-                return this.Store.TryGetValue(key, out fileName);
+                return this.Store.GetOrAdd(key, factory);
             }
 
             public void Clear()

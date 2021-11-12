@@ -35,23 +35,9 @@ namespace FoxTunes
         public static IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOption)
         {
             if (searchOption.HasFlag(SearchOption.UseSystemCache))
-            {
-                var paths = default(Lazy<IEnumerable<string>>);
-                if (Store.TryGetValue(path, searchPattern, searchOption, out paths))
-                {
-                    return paths.Value;
-                }
-                Store.Add(
-                    path,
-                    searchPattern,
-                    searchOption,
-                    new Lazy<IEnumerable<string>>(
-                        //TODO: Warning: Buffering a potentially large sequence.
-                        () => EnumerateFilesCore(path, searchPattern, searchOption).ToArray()
-                    )
-                );
-                //Second iteration will always hit cache.
-                return EnumerateFiles(path, searchPattern, searchOption);
+            {                        
+                //TODO: Warning: Buffering a potentially large sequence.
+                return Store.GetOrAdd(path, searchPattern, searchOption, () => EnumerateFilesCore(path, searchPattern, searchOption).ToArray());
             }
             return EnumerateFilesCore(path, searchPattern, searchOption);
         }
@@ -139,21 +125,15 @@ namespace FoxTunes
         {
             public Cache(int capacity)
             {
-                this.Store = new CappedDictionary<Key, Lazy<IEnumerable<string>>>(capacity);
+                this.Store = new CappedDictionary<Key, IEnumerable<string>>(capacity);
             }
 
-            public CappedDictionary<Key, Lazy<IEnumerable<string>>> Store { get; private set; }
+            public CappedDictionary<Key, IEnumerable<string>> Store { get; private set; }
 
-            public void Add(string path, string searchPattern, SearchOption searchOption, Lazy<IEnumerable<string>> paths)
+            public IEnumerable<string> GetOrAdd(string path, string searchPattern, SearchOption searchOption, Func<IEnumerable<string>> factory)
             {
                 var key = new Key(path, searchPattern, searchOption);
-                this.Store.Add(key, paths);
-            }
-
-            public bool TryGetValue(string path, string searchPattern, SearchOption searchOption, out Lazy<IEnumerable<string>> paths)
-            {
-                var key = new Key(path, searchPattern, searchOption);
-                return this.Store.TryGetValue(key, out paths);
+                return this.Store.GetOrAdd(key, factory);
             }
 
             public class Key : IEquatable<Key>

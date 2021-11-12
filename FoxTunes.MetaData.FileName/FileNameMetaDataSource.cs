@@ -3,21 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class FileNameMetaDataSource : BaseComponent, IMetaDataSource
     {
+        private static readonly string PREFIX = typeof(FileNameMetaDataSource).Name;
+
         public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
-
-        public static SemaphoreSlim Semaphore { get; private set; }
-
-        static FileNameMetaDataSource()
-        {
-            Semaphore = new SemaphoreSlim(1, 1);
-        }
 
         public FileNameMetaDataSource(IEnumerable<IFileNameMetaDataExtractor> extractors)
         {
@@ -88,7 +82,7 @@ namespace FoxTunes
                     {
                         if (this.CopyImages.Value)
                         {
-                            value = await this.ImportImage(value, value, false).ConfigureAwait(false);
+                            value = await this.ImportImage(value, value).ConfigureAwait(false);
                         }
                         result.Add(new MetaDataItem()
                         {
@@ -115,30 +109,9 @@ namespace FoxTunes
             };
         }
 
-        private async Task<string> ImportImage(string fileName, string id, bool overwrite)
+        private Task<string> ImportImage(string fileName, string id)
         {
-            var prefix = this.GetType().Name;
-            var result = default(string);
-            if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
-            {
-#if NET40
-                Semaphore.Wait();
-#else
-                await Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-                try
-                {
-                    if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
-                    {
-                        return await FileMetaDataStore.WriteAsync(prefix, id, fileName).ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    Semaphore.Release();
-                }
-            }
-            return result;
+            return FileMetaDataStore.IfNotExistsAsync(PREFIX, id, result => FileMetaDataStore.CopyAsync(PREFIX, id, fileName));
         }
 
         public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate)

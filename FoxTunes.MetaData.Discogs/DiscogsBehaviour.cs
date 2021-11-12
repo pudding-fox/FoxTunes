@@ -9,6 +9,8 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class DiscogsBehaviour : StandardBehaviour, IOnDemandMetaDataSource, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
     {
+        private static readonly string PREFIX = typeof(DiscogsBehaviour).Name;
+
         public const string LOOKUP = "LLMM";
 
         public ICore Core { get; private set; }
@@ -273,30 +275,20 @@ namespace FoxTunes
                 }
             }
 
-            protected virtual async Task<string> ImportImage(Discogs.ReleaseLookup releaseLookup, params string[] urls)
+            protected virtual Task<string> ImportImage(Discogs.ReleaseLookup releaseLookup, params string[] urls)
             {
-                var prefix = this.GetType().Name;
-                var result = default(string);
                 foreach (var url in urls)
                 {
                     if (!string.IsNullOrEmpty(url))
                     {
                         try
                         {
-                            if (FileMetaDataStore.Exists(prefix, url, out result))
+                            return FileMetaDataStore.IfNotExistsAsync(PREFIX, url, async result =>
                             {
-                                return result;
-                            }
-                            using (await KeyLock.LockAsync(url).ConfigureAwait(false))
-                            {
-                                if (FileMetaDataStore.Exists(prefix, url, out result))
-                                {
-                                    return result;
-                                }
                                 Logger.Write(this, LogLevel.Debug, "Downloading data from url: {0}", url);
                                 var data = await this.Discogs.GetData(url).ConfigureAwait(false);
-                                return await FileMetaDataStore.WriteAsync(prefix, url, data).ConfigureAwait(false);
-                            }
+                                return await FileMetaDataStore.WriteAsync(PREFIX, url, data).ConfigureAwait(false);
+                            });
                         }
                         catch (Exception e)
                         {
@@ -305,7 +297,11 @@ namespace FoxTunes
                         }
                     }
                 }
-                return null;
+#if NET40
+                return TaskEx.FromResult(string.Empty);
+#else
+                return Task.FromResult(string.Empty);
+#endif
             }
         }
     }

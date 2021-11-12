@@ -13,8 +13,6 @@ namespace FoxTunes
     {
         private static readonly string PREFIX = typeof(ImageResizer).Name;
 
-        private static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
-
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -47,17 +45,8 @@ namespace FoxTunes
 
         protected virtual string Resize(string id, Func<Image> factory, int width, int height)
         {
-            var fileName = default(string);
-            if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+            return FileMetaDataStore.IfNotExists(PREFIX, id, result =>
             {
-                return fileName;
-            }
-            using (KeyLock.Lock(id))
-            {
-                if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
-                {
-                    return fileName;
-                }
                 using (var image = new Bitmap(width, height))
                 {
                     using (var graphics = Graphics.FromImage(image))
@@ -74,7 +63,7 @@ namespace FoxTunes
                         return FileMetaDataStore.Write(PREFIX, id, stream);
                     }
                 }
-            }
+            });
         }
 
         protected virtual void Resize(Graphics graphics, Func<Image> factory, int width, int height)

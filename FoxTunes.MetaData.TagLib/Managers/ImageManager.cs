@@ -19,8 +19,6 @@ namespace FoxTunes
 
         private static readonly string PREFIX = typeof(TagLibMetaDataSource).Name;
 
-        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
-
         public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
 
         public static readonly IDictionary<ArtworkType, PictureType> ArtworkTypeMapping = new Dictionary<ArtworkType, PictureType>()
@@ -190,40 +188,23 @@ namespace FoxTunes
             return ImportImage(picture, id, overwrite);
         }
 
-        private static async Task<string> ImportImage(IPicture value, string id, bool overwrite)
+        private static Task<string> ImportImage(IPicture value, string id, bool overwrite)
         {
-            var result = default(string);
-            if (overwrite || !FileMetaDataStore.Exists(PREFIX, id, out result))
-            {
-                using (await KeyLock.LockAsync(id).ConfigureAwait(false))
-                {
-                    if (overwrite || !FileMetaDataStore.Exists(PREFIX, id, out result))
-                    {
-                        return await FileMetaDataStore.WriteAsync(PREFIX, id, value.Data.Data).ConfigureAwait(false);
-                    }
-                }
-            }
-            return result;
+            return FileMetaDataStore.IfNotExistsAsync(PREFIX, id, result => FileMetaDataStore.WriteAsync(PREFIX, id, value.Data.Data), overwrite);
         }
 
-        private static async Task<string> ImportImage(string fileName, string id, bool overwrite)
+        private static Task<string> ImportImage(string fileName, string id, bool overwrite)
         {
             if (FileMetaDataStore.Contains(fileName))
             {
-                return fileName;
+                //The file is already in the data store.
+#if NET40
+                return TaskEx.FromResult(fileName);
+#else
+                return Task.FromResult(fileName);
+#endif
             }
-            var result = default(string);
-            if (overwrite || !FileMetaDataStore.Exists(PREFIX, id, out result))
-            {
-                using (await KeyLock.LockAsync(id).ConfigureAwait(false))
-                {
-                    if (overwrite || !FileMetaDataStore.Exists(PREFIX, id, out result))
-                    {
-                        return await FileMetaDataStore.WriteAsync(PREFIX, id, fileName).ConfigureAwait(false);
-                    }
-                }
-            }
-            return result;
+            return FileMetaDataStore.IfNotExistsAsync(PREFIX, id, result => FileMetaDataStore.CopyAsync(PREFIX, id, fileName), overwrite);
         }
 
         public static async Task Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)

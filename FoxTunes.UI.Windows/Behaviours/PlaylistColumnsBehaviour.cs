@@ -123,20 +123,26 @@ namespace FoxTunes
             var columns = new List<PlaylistColumn>();
             using (var database = this.DatabaseFactory.Create())
             {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                 {
-                    var set = database.Set<PlaylistColumn>(transaction);
-                    foreach (var pair in this.Columns)
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Updating column {0} => {1}.", pair.Key.Id, pair.Key.Name);
-                        await set.AddOrUpdateAsync(pair.Key).ConfigureAwait(false);
-                        if (pair.Value)
+                        var set = database.Set<PlaylistColumn>(transaction);
+                        foreach (var pair in this.Columns)
                         {
-                            columns.Add(pair.Key);
+                            Logger.Write(this, LogLevel.Debug, "Updating column {0} => {1}.", pair.Key.Id, pair.Key.Name);
+                            await set.AddOrUpdateAsync(pair.Key).ConfigureAwait(false);
+                            if (pair.Value)
+                            {
+                                columns.Add(pair.Key);
+                            }
+                            this.Columns.TryRemove(pair.Key);
                         }
-                        this.Columns.TryRemove(pair.Key);
+                        transaction.Commit();
                     }
-                    transaction.Commit();
+                }))
+                {
+                    await task.Run().ConfigureAwait(false);
                 }
             }
             if (columns.Any())

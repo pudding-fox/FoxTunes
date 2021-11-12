@@ -370,32 +370,38 @@ namespace FoxTunes
         protected virtual async Task SortItems(IComparer<PlaylistItem> comparer, bool descending)
         {
             Logger.Write(this, LogLevel.Debug, "Sorting playlist using comparer: \"{0}\"", comparer.GetType().Name);
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
-                var set = this.Database.Set<PlaylistItem>(transaction);
-                var playlistItems = set.ToArray();
-                Array.Sort(playlistItems, comparer);
-                if (descending)
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Sort is descending, reversing sequence.");
-                    Array.Reverse(playlistItems);
+                    var set = this.Database.Set<PlaylistItem>(transaction);
+                    var playlistItems = set.ToArray();
+                    Array.Sort(playlistItems, comparer);
+                    if (descending)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Sort is descending, reversing sequence.");
+                        Array.Reverse(playlistItems);
+                    }
+                    for (var a = 0; a < playlistItems.Length; a++)
+                    {
+                        playlistItems[a].Sequence = a;
+                    }
+                    await EntityHelper<PlaylistItem>.Create(
+                        this.Database,
+                        this.Database.Tables.PlaylistItem,
+                        transaction
+                    ).UpdateAsync(
+                        playlistItems,
+                        new[] { nameof(PlaylistItem.Sequence) }
+                    ).ConfigureAwait(false);
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
                 }
-                for (var a = 0; a < playlistItems.Length; a++)
-                {
-                    playlistItems[a].Sequence = a;
-                }
-                await EntityHelper<PlaylistItem>.Create(
-                    this.Database,
-                    this.Database.Tables.PlaylistItem,
-                    transaction
-                ).UpdateAsync(
-                    playlistItems,
-                    new[] { nameof(PlaylistItem.Sequence) }
-                ).ConfigureAwait(false);
-                if (transaction.HasTransaction)
-                {
-                    transaction.Commit();
-                }
+            }))
+            {
+                await task.Run().ConfigureAwait(false); await task.Run().ConfigureAwait(false);
             }
         }
 

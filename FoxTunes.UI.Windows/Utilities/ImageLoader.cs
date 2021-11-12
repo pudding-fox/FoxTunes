@@ -62,14 +62,7 @@ namespace FoxTunes
         {
             if (cache)
             {
-                var imageSource = default(Lazy<ImageSource>);
-                if (Store.TryGetValue(fileName, width, height, out imageSource))
-                {
-                    return imageSource.Value;
-                }
-                Store.Add(fileName, width, height, new Lazy<ImageSource>(() => this.LoadCore(fileName, width, height)));
-                //Second iteration will always hit cache.
-                return this.Load(fileName, width, height, cache);
+                return this.Store.GetOrAdd(fileName, width, height, () => this.LoadCore(fileName, width, height));
             }
             return this.LoadCore(fileName, width, height);
         }
@@ -121,14 +114,7 @@ namespace FoxTunes
         {
             if (cache)
             {
-                var imageSource = default(Lazy<ImageSource>);
-                if (Store.TryGetValue(id, width, height, out imageSource))
-                {
-                    return imageSource.Value;
-                }
-                Store.Add(id, width, height, new Lazy<ImageSource>(() => this.LoadCore(factory, width, height)));
-                //Second iteration will always hit cache.
-                return this.Load(id, factory, width, height, cache);
+                return this.Store.GetOrAdd(id, width, height, () => this.LoadCore(factory, width, height));
             }
             return this.LoadCore(factory, width, height);
         }
@@ -167,21 +153,15 @@ namespace FoxTunes
         {
             public Cache(int capacity)
             {
-                this.Store = new CappedDictionary<Key, Lazy<ImageSource>>(capacity);
+                this.Store = new CappedDictionary<Key, ImageSource>(capacity);
             }
 
-            public CappedDictionary<Key, Lazy<ImageSource>> Store { get; private set; }
+            public CappedDictionary<Key, ImageSource> Store { get; private set; }
 
-            public void Add(string fileName, int width, int height, Lazy<ImageSource> imageSource)
+            public ImageSource GetOrAdd(string fileName, int width, int height, Func<ImageSource> factory)
             {
                 var key = new Key(fileName, width, height);
-                this.Store.Add(key, imageSource);
-            }
-
-            public bool TryGetValue(string fileName, int width, int height, out Lazy<ImageSource> imageSource)
-            {
-                var key = new Key(fileName, width, height);
-                return this.Store.TryGetValue(key, out imageSource);
+                return this.Store.GetOrAdd(key, factory);
             }
 
             public void Clear()

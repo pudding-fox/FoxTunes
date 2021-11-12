@@ -28,32 +28,20 @@ namespace FoxTunes
 
         public int Capacity { get; private set; }
 
-        public TValue GetOrAdd(TKey key, Func<TValue> factory)
-        {
-            lock (SyncRoot)
-            {
-                var value = default(TValue);
-                if (this.TryGetValue(key, out value))
-                {
-                    return value;
-                }
-                else
-                {
-                    value = factory();
-                }
-                this.Add(key, value);
-                return value;
-            }
-        }
-
+        [Obsolete("Please use the concurrent method: GetOrAdd(key, value)")]
         public void Add(TKey key, TValue value)
         {
-            this.Store[key] = value;
-            while (this.Keys.Count >= (this.Capacity - 1))
+            this.Store.AddOrUpdate(key, value);
+        }
+
+        public TValue GetOrAdd(TKey key, Func<TValue> factory)
+        {
+            return this.Store.GetOrAdd(key, _key =>
             {
-                this.Store.TryRemove(this.Keys.Dequeue());
-            }
-            this.Keys.Enqueue(key);
+                var value = factory();
+                this.OnAdd(key, value);
+                return value;
+            });
         }
 
         public bool TryGetValue(TKey key, out TValue value)
@@ -61,36 +49,63 @@ namespace FoxTunes
             var result = this.Store.TryGetValue(key, out value);
             if (result)
             {
-                //When a cache hit occurs, push the key to the back of queue.
-                this.Keys.Remove(key);
-                this.Keys.Enqueue(key);
+                lock (this.SyncRoot)
+                {
+                    //When a cache hit occurs, push the key to the back of queue.
+                    this.Keys.Remove(key);
+                    this.Keys.Enqueue(key);
+                }
             }
             return result;
         }
 
         public bool TryRemove(TKey key)
         {
-            var result = this.Store.TryRemove(key);
+            var value = default(TValue);
+            return this.TryRemove(key, out value);
+        }
+
+        public bool TryRemove(TKey key, out TValue value)
+        {
+            var result = this.Store.TryRemove(key, out value);
             if (result)
             {
-                this.Keys.Remove(key);
+                this.OnRemove(key, value);
             }
             return result;
         }
 
+        protected virtual void OnAdd(TKey key, TValue value)
+        {
+            lock (this.SyncRoot)
+            {
+                while (this.Keys.Count >= (this.Capacity - 1))
+                {
+                    this.Store.TryRemove(this.Keys.Dequeue());
+                }
+                this.Keys.Enqueue(key);
+            }
+        }
+
+        protected virtual void OnRemove(TKey key, TValue value)
+        {
+            lock (this.SyncRoot)
+            {
+                this.Keys.Remove(key);
+            }
+        }
+
         public void Clear()
         {
-            lock (SyncRoot)
+            this.Store.Clear();
+            lock (this.SyncRoot)
             {
-                this.Store.Clear();
                 this.Keys.Clear();
             }
         }
 
         public class Queue
         {
-            public readonly object SyncRoot = new object();
-
             public Queue(int capacity)
             {
                 this.Values = new List<TKey>(capacity);
@@ -100,40 +115,28 @@ namespace FoxTunes
 
             public void Enqueue(TKey value)
             {
-                lock (this.SyncRoot)
-                {
-                    this.Values.Add(value);
-                }
+                this.Values.Add(value);
             }
 
             public void Remove(TKey value)
             {
-                lock (this.SyncRoot)
-                {
-                    this.Values.Remove(value);
-                }
+                this.Values.Remove(value);
             }
 
             public TKey Dequeue()
             {
-                lock (this.SyncRoot)
+                if (this.Values.Count > 0)
                 {
-                    if (this.Values.Count > 0)
-                    {
-                        var value = this.Values[0];
-                        this.Values.RemoveAt(0);
-                        return value;
-                    }
-                    return default(TKey);
+                    var value = this.Values[0];
+                    this.Values.RemoveAt(0);
+                    return value;
                 }
+                return default(TKey);
             }
 
             public void Clear()
             {
-                lock (SyncRoot)
-                {
-                    this.Values.Clear();
-                }
+                this.Values.Clear();
             }
 
             public int Count
