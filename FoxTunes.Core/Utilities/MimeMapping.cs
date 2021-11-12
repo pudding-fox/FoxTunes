@@ -10,6 +10,23 @@ namespace FoxTunes
 
         public IDictionary<string, string> Mappings { get; private set; }
 
+        public bool IsImage(string mimeType)
+        {
+            if (!string.IsNullOrEmpty(mimeType))
+            {
+                if (mimeType.StartsWith("image", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                //Not sure about this but it seems to be common enough.
+                if (mimeType.Equals(DEFAULT, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public string GetMimeType(string fileName)
         {
             var mimeType = default(string);
