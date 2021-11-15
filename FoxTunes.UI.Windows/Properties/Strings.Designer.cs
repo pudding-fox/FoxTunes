@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -331,6 +331,69 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string LibraryRootsDialog_Cancel {
+            get {
+                return ResourceManager.GetString("LibraryRootsDialog.Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        internal static string LibraryRootsDialog_Delete {
+            get {
+                return ResourceManager.GetString("LibraryRootsDialog.Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Library Folders.
+        /// </summary>
+        internal static string LibraryRootsDialog_GroupHeader {
+            get {
+                return ResourceManager.GetString("LibraryRootsDialog.GroupHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        internal static string LibraryRootsDialog_New {
+            get {
+                return ResourceManager.GetString("LibraryRootsDialog.New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        internal static string LibraryRootsDialog_Path {
+            get {
+                return ResourceManager.GetString("LibraryRootsDialog.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string LibraryRootsDialog_Save {
+            get {
+                return ResourceManager.GetString("LibraryRootsDialog.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add folder to library..
+        /// </summary>
+        internal static string LibraryRootsSettings_Browse {
+            get {
+                return ResourceManager.GetString("LibraryRootsSettings.Browse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Library Search.
         /// </summary>
         internal static string LibrarySearch_Name {
@@ -345,6 +408,78 @@ namespace FoxTunes {
         internal static string LibrarySelector_Name {
             get {
                 return ResourceManager.GetString("LibrarySelector.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Cancel {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Clear {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Delete {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hierarchies.
+        /// </summary>
+        internal static string LibrarySettingsDialog_GroupHeader {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.GroupHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        internal static string LibrarySettingsDialog_New {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rescan.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Rescan {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Rescan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Reset {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Save {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Save", resourceCulture);
             }
         }
         
