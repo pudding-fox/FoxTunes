@@ -339,23 +339,19 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Sorting playlist {0} by column {1}.", this.Playlist.Name, playlistColumn.Name);
             switch (playlistColumn.Type)
             {
-                case PlaylistColumnType.Tag:
-                    return this.SortItemsByMetaData(playlistColumn.Tag, descending);
                 case PlaylistColumnType.Script:
                     return this.SortItemsByScript(playlistColumn.Script, descending);
+                case PlaylistColumnType.Plugin:
+                    return this.SortItemsByPlugin(playlistColumn.Plugin, descending);
+                case PlaylistColumnType.Tag:
+                    return this.SortItemsByTag(playlistColumn.Tag, descending);
+
             }
 #if NET40
             return TaskEx.FromResult(false);
 #else
             return Task.CompletedTask;
 #endif
-        }
-
-        protected virtual Task SortItemsByMetaData(string tag, bool descending)
-        {
-            var comparer = new PlaylistItemMetaDataComparer(tag);
-            comparer.InitializeComponent(this.Core);
-            return this.SortItems(comparer, descending);
         }
 
         protected virtual async Task SortItemsByScript(string script, bool descending)
@@ -365,6 +361,20 @@ namespace FoxTunes
                 comparer.InitializeComponent(this.Core);
                 await this.SortItems(comparer, descending).ConfigureAwait(false);
             }
+        }
+
+        protected virtual Task SortItemsByPlugin(string plugin, bool descending)
+        {
+            var comparer = new PlaylistItemPluginComparer(plugin);
+            comparer.InitializeComponent(this.Core);
+            return this.SortItems(comparer, descending);
+        }
+
+        protected virtual Task SortItemsByTag(string tag, bool descending)
+        {
+            var comparer = new PlaylistItemMetaDataComparer(tag);
+            comparer.InitializeComponent(this.Core);
+            return this.SortItems(comparer, descending);
         }
 
         protected virtual async Task SortItems(IComparer<PlaylistItem> comparer, bool descending)

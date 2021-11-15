@@ -1,19 +1,9 @@
-﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 
-namespace FoxTunes
+namespace FoxTunes.Interfaces
 {
-    public interface IUIPlaylistColumnProvider : IBaseComponent
+    public interface IUIPlaylistColumnProvider : IPlaylistColumnProvider
     {
-        string Id { get; }
-
-        string Name { get; }
-
-        string Description { get; }
-
         DataTemplate CellTemplate { get; }
-
-        IEnumerable<string> MetaData { get; }
     }
 }

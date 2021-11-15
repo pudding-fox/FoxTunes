@@ -25,6 +25,14 @@ namespace FoxTunes
             }
         }
 
+        public IPlaylistColumnManager PlaylistColumn
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IPlaylistColumnManager>();
+            }
+        }
+
         public ILibraryManager Library
         {
             get

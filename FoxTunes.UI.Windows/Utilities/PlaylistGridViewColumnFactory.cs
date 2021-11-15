@@ -42,7 +42,7 @@ namespace FoxTunes
             }
         }
 
-        public PlaylistColumnProviderManager PlaylistColumnProviderManager { get; private set; }
+        public PlaylistColumnManager PlaylistColumnProviderManager { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
@@ -50,7 +50,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistColumnProviderManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnProviderManager>();
+            this.PlaylistColumnProviderManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnManager>();
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.ScriptingContext = new Lazy<IScriptingContext>(this.ScriptingRuntime.CreateContext);
             base.InitializeComponent(core);
@@ -74,8 +74,12 @@ namespace FoxTunes
                 case PlaylistColumnType.Plugin:
                     if (!string.IsNullOrEmpty(column.Plugin))
                     {
-                        var provider = PlaylistColumnProviderManager.GetProvider(column.Plugin);
-                        if (provider != null)
+                        var provider = PlaylistColumnProviderManager.GetProvider(column.Plugin) as IUIPlaylistColumnProvider;
+                        if (provider == null)
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Playlist column plugin \"{0}\" was not found, has it been uninstalled?", column.Plugin);
+                        }
+                        else
                         {
                             gridViewColumn.CellTemplate = provider.CellTemplate;
                         }
@@ -161,7 +165,7 @@ namespace FoxTunes
                     var provider = PlaylistColumnProviderManager.GetProvider(column.PlaylistColumn.Plugin);
                     if (provider != null)
                     {
-                        return names.Any(name => provider.MetaData.Contains(name, StringComparer.OrdinalIgnoreCase));
+                        return provider.DependsOn(names);
                     }
                     break;
             }

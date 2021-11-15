@@ -6,6 +6,8 @@
 
         IPlaylistManager Playlist { get; }
 
+        IPlaylistColumnManager PlaylistColumn { get; }
+
         ILibraryManager Library { get; }
 
         IHierarchyManager Hierarchy { get; }

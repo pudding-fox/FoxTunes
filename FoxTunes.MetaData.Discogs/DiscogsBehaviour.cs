@@ -239,7 +239,7 @@ namespace FoxTunes
             }
         }
 
-        async Task<OnDemandMetaDataValues> IOnDemandMetaDataSource.GetValues(IEnumerable<IFileData> fileDatas, object state = null)
+        async Task<OnDemandMetaDataValues> IOnDemandMetaDataSource.GetValues(IEnumerable<IFileData> fileDatas, object state)
         {
             var releaseLookups = await this.FetchArtwork(fileDatas).ConfigureAwait(false);
             return this.GetMetaDataValues(releaseLookups);

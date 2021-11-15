@@ -16,6 +16,8 @@ namespace FoxTunes
     {
         public const string ID = "C0B2450C-DEDA-4D8B-8A32-5EA733F1FD45";
 
+        #region IPlaylistColumnProvider
+
         public string Id
         {
             get
@@ -40,6 +42,30 @@ namespace FoxTunes
             }
         }
 
+        public bool DependsOn(IEnumerable<string> names)
+        {
+            //ViewModel.PlaybackState tracks updates.
+            return false;
+        }
+
+        public string GetValue(PlaylistItem playlistItem)
+        {
+            var currentStream = this.PlaybackManager.CurrentStream;
+            if (currentStream != null)
+            {
+                var isPlaying = playlistItem.Id == currentStream.Id && string.Equals(playlistItem.FileName, currentStream.FileName, StringComparison.OrdinalIgnoreCase);
+                if (isPlaying)
+                {
+                    return "1";
+                }
+            }
+            return "0";
+        }
+
+        #endregion
+
+        #region IUIPlaylistColumnProvider
+
         public DataTemplate CellTemplate
         {
             get
@@ -48,13 +74,9 @@ namespace FoxTunes
             }
         }
 
-        public IEnumerable<string> MetaData
-        {
-            get
-            {
-                return Enumerable.Empty<string>();
-            }
-        }
+        #endregion
+
+        #region IDatabaseInitializer
 
         public string Checksum
         {
@@ -84,6 +106,16 @@ namespace FoxTunes
                 });
                 transaction.Commit();
             }
+        }
+
+        #endregion
+
+        public IPlaybackManager PlaybackManager { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.PlaybackManager = core.Managers.Playback;
+            base.InitializeComponent(core);
         }
 
         private static class TemplateFactory
