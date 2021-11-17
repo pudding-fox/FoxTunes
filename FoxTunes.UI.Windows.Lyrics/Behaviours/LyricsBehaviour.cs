@@ -282,7 +282,7 @@ namespace FoxTunes
             }
         }
 
-        async Task<OnDemandMetaDataValues> IOnDemandMetaDataSource.GetValues(IEnumerable<IFileData> fileDatas, object state = null)
+        async Task<OnDemandMetaDataValues> IOnDemandMetaDataSource.GetValues(IEnumerable<IFileData> fileDatas, object state)
         {
             var provider = state as LyricsProvider ?? this.GetAutoLookupProvider();
             if (provider == null)

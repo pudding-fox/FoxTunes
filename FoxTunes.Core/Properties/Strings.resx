@@ -144,6 +144,9 @@
   <data name="InputManagerConfiguration.Stop" xml:space="preserve">
     <value>Stop</value>
   </data>
+  <data name="LibraryHierarchyPopulator.Plugin" xml:space="preserve">
+    <value>Plugin</value>
+  </data>
   <data name="MetaDataBehaviourConfiguration.BackCover" xml:space="preserve">
     <value>Back Cover</value>
   </data>

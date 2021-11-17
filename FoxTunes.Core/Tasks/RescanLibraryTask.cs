@@ -76,16 +76,19 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Removing unparented file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                     return true;
                 }
-                var file = new FileInfo(libraryItem.FileName);
-                if (!file.Exists)
+                if (!string.IsNullOrEmpty(Path.GetPathRoot(libraryItem.FileName)))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Removing dead file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
-                    return true;
-                }
-                if (file.LastWriteTimeUtc > libraryItem.GetImportDate())
-                {
-                    Logger.Write(this, LogLevel.Debug, "Refreshing modified file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
-                    return true;
+                    var file = new FileInfo(libraryItem.FileName);
+                    if (!file.Exists)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Removing dead file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
+                        return true;
+                    }
+                    if (file.LastWriteTimeUtc > libraryItem.GetImportDate())
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Refreshing modified file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
+                        return true;
+                    }
                 }
                 return false;
             });

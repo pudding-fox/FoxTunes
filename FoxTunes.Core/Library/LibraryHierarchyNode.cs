@@ -157,11 +157,19 @@ namespace FoxTunes
             {
                 throw new NotImplementedException();
             }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         string IFileData.FileName
         {
             get
+            {
+                throw new NotImplementedException();
+            }
+            set
             {
                 throw new NotImplementedException();
             }

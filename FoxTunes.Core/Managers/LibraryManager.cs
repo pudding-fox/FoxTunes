@@ -5,6 +5,7 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,8 @@ namespace FoxTunes
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ILibraryHierarchyBrowser HierarchyBrowser { get; private set; }
+
+        public IPlaybackManager PlaybackManager { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -113,6 +116,7 @@ namespace FoxTunes
         {
             this.Core = core;
             this.HierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.PlaybackManager = core.Managers.Playback;
             this.DatabaseFactory = core.Factories.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
@@ -260,6 +264,33 @@ namespace FoxTunes
         }
 
         public event ReportEventHandler Report;
+
+        public bool CanHandle(string path, FileActionType type)
+        {
+            if (type != FileActionType.Library)
+            {
+                return false;
+            }
+            if (!Directory.Exists(path) && !this.PlaybackManager.IsSupported(path))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public Task Handle(IEnumerable<string> paths, FileActionType type)
+        {
+            switch (type)
+            {
+                case FileActionType.Library:
+                    return this.Add(paths);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
 
         public class LibraryManagerReport : BaseComponent, IReport
         {

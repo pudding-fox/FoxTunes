@@ -180,6 +180,29 @@ namespace FoxTunes
 
         private string[] GetPathSegments(string fileName)
         {
+            //We can't really understand paths provided by plugins.
+            //If it's a url we can organize by the scheme and absolute path.
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                var url = default(Uri);
+                if (Uri.TryCreate(fileName, UriKind.RelativeOrAbsolute, out url))
+                {
+                    fileName = Uri.UnescapeDataString(
+                        url.AbsolutePath
+                    ).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                    return new[]
+                    {
+                        Strings.LibraryHierarchyPopulator_Plugin,
+                        url.Scheme.UCFirst(),
+                        Path.GetFileName(fileName)
+                    };
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to parse library item path: {0}", fileName);
+                    return new string[] { };
+                }
+            }
             //This removes any matching library roots from the path.
             var normalized = fileName.Replace(this.Roots.Value, string.Empty, true, true);
             var segments = normalized.Split(
