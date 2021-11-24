@@ -96,11 +96,4 @@
 
   <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <PostBuildEvent>
-      call "$(VS100COMNTOOLS)..\tools\vsvars32.bat"
-      editbin /largeaddressaware $(TargetPath)
-    </PostBuildEvent>
-  </PropertyGroup>
-  
 </Project>

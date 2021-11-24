@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace FoxTunes
@@ -127,6 +128,11 @@ namespace FoxTunes
             var destination = GetDestination(target, package, element, flags);
 
             CopyFile(source, destination, flags);
+
+            if (element.Flags.HasFlag(PackageElementFlags.LargeAddressAware))
+            {
+                MakeLargeAddressAware(destination, flags);
+            }
         }
 
         private static void CopyFile(string source, string destination, ReleaseFlags flags)
@@ -175,6 +181,34 @@ namespace FoxTunes
                 Console.WriteLine("Creating satellite: {0}", destination);
                 File.Copy(fileName, Path.Combine(destinationDirectoryName, Path.GetFileName(fileName)));
             }
+        }
+
+        private static void MakeLargeAddressAware(string fileName, ReleaseFlags flags)
+        {
+            var tool = default(string);
+            if (flags.HasFlag(ReleaseFlags.PlatformX86))
+            {
+                tool = @"..\.tools\x86\editbin.exe";
+            }
+            else if (flags.HasFlag(ReleaseFlags.PlatformX64))
+            {
+                tool = @"..\.tools\x64\editbin.exe";
+            }
+            else
+            {
+                return;
+            }
+            var arguments = string.Format("/largeaddressaware \"{0}\"", fileName);
+            Console.WriteLine("Running tool: {0} {1}", tool, arguments);
+            var info = new ProcessStartInfo(tool, arguments)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            Process.Start(info).WaitForExit();
         }
 
         private static string GetSource(string target, Package package, PackageElement element, ReleaseFlags flags)
@@ -245,7 +279,7 @@ namespace FoxTunes
         {
             return new Package(new PackageElement[]
             {
-                "FoxTunes.Launcher.exe",
+                new PackageElement("FoxTunes.Launcher.exe", PackageElementFlags.LargeAddressAware),
                 "FoxTunes.Launcher.exe.config"
             });
         }
@@ -413,7 +447,7 @@ namespace FoxTunes
                         "encoders/sox_license.txt",
                         "encoders/wavpack.exe",
                         "encoders/wavpack_license.txt",
-                        "FoxTunes.Encoder.Bass.exe",
+                        new PackageElement("FoxTunes.Encoder.Bass.exe", PackageElementFlags.LargeAddressAware),
                         "FoxTunes.Encoder.Bass.exe.config"
                     },
                     PackageFlags.Default
@@ -504,7 +538,7 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "bass_replay_gain.dll",
-                        "FoxTunes.Output.Bass.ReplayGain.exe",
+                        new PackageElement("FoxTunes.Output.Bass.ReplayGain.exe", PackageElementFlags.LargeAddressAware),
                         "FoxTunes.Output.Bass.ReplayGain.exe.config",
                         "ManagedBass.ReplayGain.dll"
                     },
@@ -701,7 +735,8 @@ namespace FoxTunes
             FrameworkNET40 = 1,
             FrameworkNET461 = 2,
             PlatformX86 = 4,
-            PlatformX64 = 8
+            PlatformX64 = 8,
+            LargeAddressAware = 16
         }
     }
 }
