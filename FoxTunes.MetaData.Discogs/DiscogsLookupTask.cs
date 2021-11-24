@@ -57,7 +57,7 @@ namespace FoxTunes
             var position = 0;
             foreach (var releaseLookup in this.LookupItems)
             {
-                this.Description = string.Format("{0} - {1}", releaseLookup.Artist, releaseLookup.Album);
+                this.Description = releaseLookup.ToString();
                 this.Position = position;
                 if (this.IsCancellationRequested)
                 {
