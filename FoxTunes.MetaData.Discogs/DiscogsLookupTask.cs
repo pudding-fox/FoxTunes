@@ -64,9 +64,9 @@ namespace FoxTunes
                     releaseLookup.Status = Discogs.ReleaseLookupStatus.Cancelled;
                     continue;
                 }
-                if (string.IsNullOrEmpty(releaseLookup.Artist) || string.IsNullOrEmpty(releaseLookup.Album))
+                if (releaseLookup.Type == Discogs.ReleaseLookupType.None)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Cannot fetch releases, search requires at least an artist and album tag.");
+                    Logger.Write(this, LogLevel.Warn, "Cannot fetch releases, search requires at least artist/album or title tags.");
                     releaseLookup.AddError(Strings.LookupArtworkTask_InsufficiantData);
                     releaseLookup.Status = Discogs.ReleaseLookupStatus.Failed;
                     continue;
@@ -97,18 +97,24 @@ namespace FoxTunes
 
         protected virtual async Task<bool> Lookup(Discogs.ReleaseLookup releaseLookup)
         {
-            Logger.Write(this, LogLevel.Debug, "Fetching master releases for album: {0} - {1}", releaseLookup.Artist, releaseLookup.Album);
-            var releases = await this.Discogs.GetReleases(releaseLookup.Artist, releaseLookup.Album, true).ConfigureAwait(false);
+            var description = releaseLookup.ToString();
+            Logger.Write(this, LogLevel.Debug, "Fetching master releases: {0}", description);
+            var releases = await this.Discogs.GetReleases(releaseLookup, true).ConfigureAwait(false);
             if (!releases.Any())
             {
-                Logger.Write(this, LogLevel.Warn, "No master releases for album: {0} - {1}, fetching others", releaseLookup.Artist, releaseLookup.Album);
-                releases = await this.Discogs.GetReleases(releaseLookup.Artist, releaseLookup.Album, false).ConfigureAwait(false);
+                Logger.Write(this, LogLevel.Warn, "No master releases: {0}, fetching others", description);
+                releases = await this.Discogs.GetReleases(releaseLookup, false).ConfigureAwait(false);
+                if (!releases.Any())
+                {
+                    Logger.Write(this, LogLevel.Warn, "No releases: {0}", description);
+                    return false;
+                }
             }
-            Logger.Write(this, LogLevel.Debug, "Ranking releases for album: {0} - {1}", releaseLookup.Artist, releaseLookup.Album);
+            Logger.Write(this, LogLevel.Debug, "Ranking releases: {0}", description);
             releaseLookup.Release = releases.ToDictionary(
                 //Map results to similarity
                 release => release,
-                release => release.Similarity(releaseLookup.Artist, releaseLookup.Album)
+                release => release.Similarity(releaseLookup)
             ).Where(
                 //Where they have the required confidence.
                 pair => pair.Value >= this.MinConfidence.Value
@@ -127,12 +133,12 @@ namespace FoxTunes
             ).FirstOrDefault();
             if (releaseLookup.Release != null)
             {
-                Logger.Write(this, LogLevel.Debug, "Best match for album {0} - {1}: {2}", releaseLookup.Artist, releaseLookup.Album, releaseLookup.Release.Url);
+                Logger.Write(this, LogLevel.Debug, "Best match {0}: {1}", description, releaseLookup.Release.Url);
                 return await this.OnLookupSuccess(releaseLookup).ConfigureAwait(false);
             }
             else
             {
-                Logger.Write(this, LogLevel.Warn, "No matches for album {0} - {1}.", releaseLookup.Artist, releaseLookup.Album);
+                Logger.Write(this, LogLevel.Warn, "No matches: {0}", description);
             }
             return false;
         }

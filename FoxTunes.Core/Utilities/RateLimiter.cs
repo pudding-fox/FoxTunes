@@ -40,12 +40,27 @@ namespace FoxTunes
             var task = Task.Run(async () =>
 #endif
             {
+                try
+                {
+                    if (this.IsDisposed)
+                    {
+                        return;
+                    }
 #if NET40
-                await TaskEx.Delay(this.Interval).ConfigureAwait(false);
+                    await TaskEx.Delay(this.Interval).ConfigureAwait(false);
 #else
-                await Task.Delay(this.Interval).ConfigureAwait(false);
+                    await Task.Delay(this.Interval).ConfigureAwait(false);
 #endif
-                this.WaitHandle.Set();
+                    if (this.IsDisposed)
+                    {
+                        return;
+                    }
+                    this.WaitHandle.Set();
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
             });
         }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TinyJson;
@@ -43,32 +44,9 @@ namespace FoxTunes
 
         public RateLimiter RateLimiter { get; private set; }
 
-        public async Task<IEnumerable<Release>> GetReleases(string artist, string album, bool master)
+        public async Task<IEnumerable<Release>> GetReleases(ReleaseLookup releaseLookup, bool master)
         {
-            var url = default(string);
-            if (master)
-            {
-                url = string.Format(
-                    "{0}/database/search?type=master&artist={1}&release_title={2}",
-                    this.BaseUrl,
-                    Uri.EscapeDataString(artist),
-                    Uri.EscapeDataString(album)
-                );
-            }
-            else
-            {
-                url = string.Format(
-                    "{0}/database/search?query={1}",
-                    this.BaseUrl,
-                    Uri.EscapeDataString(
-                        string.Format(
-                            "{0} - {1}",
-                            artist,
-                            album
-                        )
-                    )
-                );
-            }
+            var url = this.GetUrl(releaseLookup, master);
             Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
             var request = this.CreateRequest(url);
             using (var response = (HttpWebResponse)request.GetResponse())
@@ -144,9 +122,56 @@ namespace FoxTunes
             }
         }
 
+        protected virtual string GetUrl(ReleaseLookup releaseLookup, bool master)
+        {
+            var builder = new StringBuilder();
+            builder.Append(this.BaseUrl);
+            builder.Append("/database/search?");
+            if (master)
+            {
+                builder.Append("type=master&");
+                builder.Append(UrlHelper.GetParameters(new Dictionary<string, string>()
+                {
+                    { "artist", releaseLookup.Artist },
+                    { "release_title", releaseLookup.Album },
+                    { "track", releaseLookup.Title }
+                }));
+            }
+            else
+            {
+                builder.Append("type=query=");
+                builder.Append(this.GetQuery(releaseLookup));
+            }
+            return builder.ToString();
+        }
+
+        protected virtual string GetQuery(ReleaseLookup releaseLookup)
+        {
+            var builder = new StringBuilder();
+            var parts = new[]
+            {
+                releaseLookup.Artist,
+                releaseLookup.Album,
+                releaseLookup.Title
+            };
+            foreach (var part in parts)
+            {
+                if (string.IsNullOrEmpty(part))
+                {
+                    continue;
+                }
+                if (builder.Length > 0)
+                {
+                    builder.Append(UrlHelper.EscapeDataString(" - "));
+                }
+                builder.Append(UrlHelper.EscapeDataString(part));
+            }
+            return builder.ToString();
+        }
+
         protected virtual HttpWebRequest CreateRequest(string url)
         {
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            var request = WebRequestFactory.Create(url);
             this.RateLimiter.Exec(() =>
             {
                 request.UserAgent = string.Format("{0}/{1} +{2}", Publication.Product, Publication.Version, Publication.HomePage);
@@ -229,12 +254,22 @@ namespace FoxTunes
                 this._Errors = new List<string>(ERROR_CAPACITY);
             }
 
-            public ReleaseLookup(string artist, string album, bool isCompilation, IFileData[] fileDatas) : this()
+            private ReleaseLookup(IFileData[] fileDatas) : this()
+            {
+                this.FileDatas = fileDatas;
+            }
+
+            public ReleaseLookup(string artist, string title, IFileData[] fileDatas) : this(fileDatas)
+            {
+                this.Artist = artist;
+                this.Title = title;
+            }
+
+            public ReleaseLookup(string artist, string album, bool isCompilation, IFileData[] fileDatas) : this(fileDatas)
             {
                 this.Artist = artist;
                 this.Album = album;
                 this.IsCompilation = isCompilation;
-                this.FileDatas = fileDatas;
             }
 
             public Guid Id { get; private set; }
@@ -243,7 +278,25 @@ namespace FoxTunes
 
             public string Album { get; private set; }
 
+            public string Title { get; private set; }
+
             public bool IsCompilation { get; private set; }
+
+            public ReleaseLookupType Type
+            {
+                get
+                {
+                    if (!string.IsNullOrEmpty(this.Artist) && !string.IsNullOrEmpty(this.Album))
+                    {
+                        return ReleaseLookupType.Album;
+                    }
+                    else if (!string.IsNullOrEmpty(this.Title))
+                    {
+                        return ReleaseLookupType.Track;
+                    }
+                    return ReleaseLookupType.None;
+                }
+            }
 
             public IFileData[] FileDatas { get; private set; }
 
@@ -272,6 +325,30 @@ namespace FoxTunes
                 }
             }
 
+            public override string ToString()
+            {
+                var builder = new StringBuilder();
+                builder.Append(Enum.GetName(typeof(ReleaseLookupType), this.Type));
+                builder.Append(": ");
+                switch (this.Type)
+                {
+                    case ReleaseLookupType.Album:
+                        builder.AppendFormat("{0} - {1}", this.Artist, this.Album);
+                        break;
+                    case ReleaseLookupType.Track:
+                        if (!string.IsNullOrEmpty(this.Artist))
+                        {
+                            builder.AppendFormat("{0} - {1}", this.Artist, this.Title);
+                        }
+                        else
+                        {
+                            builder.Append(this.Title);
+                        }
+                        break;
+                }
+                return builder.ToString();
+            }
+
             public static IEnumerable<ReleaseLookup> FromFileDatas(IEnumerable<IFileData> fileDatas)
             {
                 return fileDatas.GroupBy(fileData =>
@@ -285,29 +362,57 @@ namespace FoxTunes
                             StringComparer.OrdinalIgnoreCase
                         );
                     }
-                    var artist = default(string);
+                    var artist = metaData.GetValueOrDefault(CommonMetaData.Artist);
                     var album = metaData.GetValueOrDefault(CommonMetaData.Album);
-                    var isCompilation = string.Equals(
-                        metaData.GetValueOrDefault(CustomMetaData.VariousArtists),
-                        bool.TrueString,
-                        StringComparison.OrdinalIgnoreCase
-                    );
-                    if (isCompilation)
+                    var title = metaData.GetValueOrDefault(CommonMetaData.Title);
+                    if (!string.IsNullOrEmpty(artist) && !string.IsNullOrEmpty(album))
                     {
-                        artist = Strings.Discogs_CompilationArtist;
+                        var isCompilation = string.Equals(
+                           metaData.GetValueOrDefault(CustomMetaData.VariousArtists),
+                           bool.TrueString,
+                           StringComparison.OrdinalIgnoreCase
+                       );
+                        if (isCompilation)
+                        {
+                            artist = Strings.Discogs_CompilationArtist;
+                        }
+                        return new
+                        {
+                            Artist = artist,
+                            Album = album,
+                            Title = default(string),
+                            IsCompilation = isCompilation
+                        };
                     }
                     else
                     {
-                        artist = metaData.GetValueOrDefault(CommonMetaData.Artist);
+                        return new
+                        {
+                            Artist = artist,
+                            Album = default(string),
+                            Title = title,
+                            IsCompilation = default(bool)
+                        };
                     }
-                    return new
+                }).Select(group =>
+                {
+                    if (!string.IsNullOrEmpty(group.Key.Artist) && !string.IsNullOrEmpty(group.Key.Album))
                     {
-                        Artist = artist,
-                        Album = album,
-                        IsCompilation = isCompilation
-                    };
-                }).Select(group => new ReleaseLookup(group.Key.Artist, group.Key.Album, group.Key.IsCompilation, group.ToArray()));
+                        return new ReleaseLookup(group.Key.Artist, group.Key.Album, group.Key.IsCompilation, group.ToArray());
+                    }
+                    else
+                    {
+                        return new ReleaseLookup(group.Key.Artist, group.Key.Title, group.ToArray());
+                    }
+                });
             }
+        }
+
+        public enum ReleaseLookupType : byte
+        {
+            None,
+            Album,
+            Track
         }
 
         public enum ReleaseLookupStatus : byte
@@ -361,9 +466,25 @@ namespace FoxTunes
                 }
             }
 
-            public float Similarity(string artist, string album)
+            public float Similarity(ReleaseLookup releaseLookup)
             {
-                var title = string.Format("{0} - {1}", artist, album);
+                var title = default(string);
+                switch (releaseLookup.Type)
+                {
+                    case ReleaseLookupType.Album:
+                        title = string.Format("{0} - {1}", releaseLookup.Artist, releaseLookup.Album);
+                        break;
+                    case ReleaseLookupType.Track:
+                        if (!string.IsNullOrEmpty(releaseLookup.Artist))
+                        {
+                            title = string.Format("{0} - {1}", releaseLookup.Artist, releaseLookup.Title);
+                        }
+                        else
+                        {
+                            title = releaseLookup.Title;
+                        }
+                        break;
+                }
                 var similarity = this.Title.Similarity(title, true);
                 return similarity;
             }
