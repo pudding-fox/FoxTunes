@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,10 +6,8 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class DiscogsBehaviour : StandardBehaviour, IOnDemandMetaDataSource, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
+    public class DiscogsBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
     {
-        private static readonly string PREFIX = typeof(DiscogsBehaviour).Name;
-
         public const string LOOKUP = "LLMM";
 
         public ICore Core { get; private set; }
@@ -157,7 +154,7 @@ namespace FoxTunes
             return releaseLookups;
         }
 
-        protected virtual OnDemandMetaDataValues GetMetaDataValues(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
+        public OnDemandMetaDataValues GetMetaDataValues(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
         {
             var values = new List<OnDemandMetaDataValue>();
             foreach (var releaseLookup in releaseLookups)
@@ -212,97 +209,5 @@ namespace FoxTunes
         }
 
         public event ReportEventHandler Report;
-
-        #region IOnDemandMetaDataSource
-
-        bool IOnDemandMetaDataSource.Enabled
-        {
-            get
-            {
-                return this.Enabled.Value && this.AutoLookup.Value;
-            }
-        }
-
-        string IOnDemandMetaDataSource.Name
-        {
-            get
-            {
-                return FetchArtworkTask.FRONT_COVER;
-            }
-        }
-
-        MetaDataItemType IOnDemandMetaDataSource.Type
-        {
-            get
-            {
-                return MetaDataItemType.Image;
-            }
-        }
-
-        async Task<OnDemandMetaDataValues> IOnDemandMetaDataSource.GetValues(IEnumerable<IFileData> fileDatas, object state)
-        {
-            var releaseLookups = await this.FetchArtwork(fileDatas).ConfigureAwait(false);
-            return this.GetMetaDataValues(releaseLookups);
-        }
-
-        #endregion
-
-        public class FetchArtworkTask : DiscogsLookupTask
-        {
-            public static readonly string FRONT_COVER = Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover);
-
-            public FetchArtworkTask(Discogs.ReleaseLookup[] releaseLookups) : base(releaseLookups)
-            {
-
-            }
-
-            protected override async Task<bool> OnLookupSuccess(Discogs.ReleaseLookup releaseLookup)
-            {
-                var value = await this.ImportImage(
-                    releaseLookup,
-                    releaseLookup.Release.CoverUrl,
-                    releaseLookup.Release.ThumbUrl
-                ).ConfigureAwait(false);
-                if (!string.IsNullOrEmpty(value))
-                {
-                    releaseLookup.MetaData[FRONT_COVER] = value;
-                    return true;
-                }
-                else
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to download artwork for album {0} - {1}: Releases don't contain images or they count not be downloaded.", releaseLookup.Artist, releaseLookup.Album);
-                    return false;
-                }
-            }
-
-            protected virtual Task<string> ImportImage(Discogs.ReleaseLookup releaseLookup, params string[] urls)
-            {
-                foreach (var url in urls)
-                {
-                    if (!string.IsNullOrEmpty(url))
-                    {
-                        try
-                        {
-                            return FileMetaDataStore.IfNotExistsAsync(PREFIX, url, async result =>
-                            {
-                                Logger.Write(this, LogLevel.Debug, "Downloading data from url: {0}", url);
-                                var data = await this.Discogs.GetData(url).ConfigureAwait(false);
-                                return await FileMetaDataStore.WriteAsync(PREFIX, url, data).ConfigureAwait(false);
-                            });
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Write(this, LogLevel.Error, "Failed to download data from url \"{0}\": {1}", url, e.Message);
-                            releaseLookup.AddError(e.Message);
-                        }
-                    }
-                }
-#if NET40
-                return TaskEx.FromResult(string.Empty);
-#else
-                return Task.FromResult(string.Empty);
-#endif
-            }
-        }
     }
 }
