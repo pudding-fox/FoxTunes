@@ -439,6 +439,8 @@ namespace FoxTunes
 
         public class Release
         {
+            public static readonly string None = "none (" + Publication.Version + ")";
+
             private Release(IDictionary<string, object> data)
             {
                 const string ID = "id";

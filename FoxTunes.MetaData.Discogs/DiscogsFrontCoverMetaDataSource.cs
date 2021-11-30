@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -37,6 +39,22 @@ namespace FoxTunes
             {
                 return MetaDataItemType.Image;
             }
+        }
+
+        public bool CanGetValue(IFileData fileData)
+        {
+            lock (fileData.MetaDatas)
+            {
+                var metaDataItem = fileData.MetaDatas.FirstOrDefault(
+                    element => string.Equals(element.Name, CustomMetaData.DiscogsRelease, StringComparison.OrdinalIgnoreCase) && element.Type == MetaDataItemType.Tag
+                );
+                if (metaDataItem != null && string.Equals(metaDataItem.Value, Discogs.Release.None, StringComparison.OrdinalIgnoreCase))
+                {
+                    //We have previously attempted a lookup and it failed, don't try again (automatically).
+                    return false;
+                }
+            }
+            return true;
         }
 
         public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, object state)
