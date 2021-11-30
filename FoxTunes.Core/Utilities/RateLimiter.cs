@@ -26,7 +26,7 @@ namespace FoxTunes
 
         }
 
-        public int Interval { get; private set; }
+        public int Interval { get; set; }
 
         public AutoResetEvent WaitHandle { get; private set; }
 
