@@ -356,6 +356,7 @@ namespace FoxTunes
         public virtual void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
+            this.Output.IsStartedChanged += this.OnIsStartedChanged;
             this.Configuration = core.Components.Configuration;
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
                WindowsUserInterfaceConfiguration.SECTION,
@@ -363,6 +364,14 @@ namespace FoxTunes
             );
             this.ScalingFactor.ValueChanged += this.OnScalingFactorChanged;
             this.IsInitialized = true;
+        }
+
+        protected virtual void OnIsStartedChanged(object sender, AsyncEventArgs e)
+        {
+            if (!this.Output.IsStarted)
+            {
+                var task = this.Clear();
+            }
         }
 
         protected virtual void OnScalingFactorChanged(object sender, EventArgs e)

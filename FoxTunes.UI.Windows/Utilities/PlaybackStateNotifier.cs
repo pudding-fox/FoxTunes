@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -22,12 +21,8 @@ namespace FoxTunes
             {
                 return _IsPlaying;
             }
-            set
+            private set
             {
-                if (IsPlaying == value)
-                {
-                    return;
-                }
                 _IsPlaying = value;
                 OnIsPlayingChanged();
             }
@@ -51,12 +46,8 @@ namespace FoxTunes
             {
                 return _IsPaused;
             }
-            set
+            private set
             {
-                if (IsPaused == value)
-                {
-                    return;
-                }
                 _IsPaused = value;
                 OnIsPausedChanged();
             }
@@ -90,33 +81,43 @@ namespace FoxTunes
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40
-            var task = TaskEx.Run(() => Windows.Invoke(() => OnNotify()));
+            var task = TaskEx.Run(() => Windows.Invoke(() => Update()));
 #else
-            var task = Task.Run(() => Windows.Invoke(() => OnNotify()));
+            var task = Task.Run(() => Windows.Invoke(() => Update()));
 #endif
         }
 
         private static void OnTick(object sender, EventArgs e)
         {
-            var outputStream = PlaybackManager.CurrentStream;
             try
             {
-                if (outputStream != null)
-                {
-                    IsPlaying = outputStream.IsPlaying;
-                    IsPaused = outputStream.IsPaused;
-                }
-                else
-                {
-                    IsPlaying = false;
-                    IsPaused = false;
-                }
-                OnNotify();
+                Update();
             }
             catch
             {
                 //Nothing can be done, never throw on background thread.
             }
+        }
+
+        private static void Update()
+        {
+            var isPlaying = default(bool);
+            var isPaused = default(bool);
+            var outputStream = PlaybackManager.CurrentStream;
+            if (outputStream != null)
+            {
+                isPlaying = outputStream.IsPlaying;
+                isPaused = outputStream.IsPaused;
+            }
+            if (isPlaying != IsPlaying)
+            {
+                IsPlaying = isPlaying;
+            }
+            if (isPaused != IsPaused)
+            {
+                IsPaused = isPaused;
+            }
+            OnNotify();
         }
 
         private static void OnNotify()
