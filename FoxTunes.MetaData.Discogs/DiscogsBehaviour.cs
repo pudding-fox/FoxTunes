@@ -22,8 +22,6 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement MetaData { get; private set; }
-
         public BooleanConfigurationElement Enabled { get; private set; }
 
         public BooleanConfigurationElement AutoLookup { get; private set; }
@@ -38,10 +36,6 @@ namespace FoxTunes
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.Configuration = core.Components.Configuration;
-            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
-            );
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
                 DiscogsBehaviourConfiguration.ENABLED
@@ -61,7 +55,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.MetaData.Value && this.Enabled.Value)
+                if (this.Enabled.Value)
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {

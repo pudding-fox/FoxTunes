@@ -21,12 +21,10 @@ namespace FoxTunes
                     .WithOptions(new[] { new SelectionConfigurationOption(ChartLyricsProvider.ID, Strings.ChartLyrics) })
                     .DependsOn(SECTION, AUTO_LOOKUP))
                 .WithElement(new TextConfigurationElement(BASE_URL, Strings.ChartLyricsProviderConfiguration_BaseUrl, path: Strings.ChartLyrics)
-                    .WithValue(ChartLyricsProvider.BASE_URL)
-                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
+                    .WithValue(ChartLyricsProvider.BASE_URL))
                 .WithElement(new DoubleConfigurationElement(MIN_CONFIDENCE, Strings.ChartLyricsProviderConfiguration_MinConfidence, path: Strings.ChartLyrics)
                     .WithValue(0.8)
                     .WithValidationRule(new DoubleValidationRule(0, 1, 0.1))
-                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
             );
         }
     }

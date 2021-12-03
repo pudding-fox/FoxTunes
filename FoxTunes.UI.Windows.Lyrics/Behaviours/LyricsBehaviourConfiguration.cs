@@ -18,17 +18,13 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION, Strings.LyricsBehaviourConfiguration_Section)
                 .WithElement(new BooleanConfigurationElement(AUTO_SCROLL, Strings.LyricsBehaviourConfiguration_AutoScroll)
-                    .WithValue(true)
-                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
+                    .WithValue(true))
                 .WithElement(new BooleanConfigurationElement(AUTO_LOOKUP, Strings.LyricsBehaviourConfiguration_AutoLookup)
-                    .WithValue(false)
-                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
+                    .WithValue(false))
                 .WithElement(new SelectionConfigurationElement(AUTO_LOOKUP_PROVIDER, Strings.LyricsBehaviourConfiguration_AutoLookupProvider)
-                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
                     .DependsOn(SECTION, AUTO_LOOKUP))
                 .WithElement(new BooleanConfigurationElement(WRITE_TAGS, Strings.LyricsBehaviourConfiguration_WriteTags)
                     .WithValue(true)
-                    .DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
             );
         }
     }

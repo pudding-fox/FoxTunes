@@ -39,14 +39,6 @@ namespace FoxTunes
             ).ConnectValue(value => this.Patterns = value);
         }
 
-        public override bool Enabled
-        {
-            get
-            {
-                return base.Enabled && this.Extractors != null && this.Extractors.Any();
-            }
-        }
-
         public override IEnumerable<KeyValuePair<string, MetaDataItemType>> Supported
         {
             get
