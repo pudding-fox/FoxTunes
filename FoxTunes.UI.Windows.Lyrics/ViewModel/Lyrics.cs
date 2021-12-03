@@ -62,13 +62,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnAutoScrollChanged()
         {
+            PlaybackStateNotifier.Notify -= this.OnNotify;
             if (this.AutoScroll)
             {
                 PlaybackStateNotifier.Notify += this.OnNotify;
-            }
-            else
-            {
-                PlaybackStateNotifier.Notify -= this.OnNotify;
             }
             if (this.AutoScrollChanged != null)
             {
