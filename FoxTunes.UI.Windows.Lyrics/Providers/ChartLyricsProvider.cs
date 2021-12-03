@@ -62,14 +62,16 @@ namespace FoxTunes
                 return LyricsResult.Fail;
             }
             Logger.Write(this, LogLevel.Debug, "Got track information: Artist = \"{0}\", Song = \"{1}\".", artist, song);
+            var searchResult = default(SearchLyricResult);
+            var lyricsResult = default(GetLyricResult);
             try
             {
                 Logger.Write(this, LogLevel.Debug, "Searching for match..");
-                var searchResult = await this.Lookup(artist, song).ConfigureAwait(false);
+                searchResult = await this.Lookup(artist, song).ConfigureAwait(false);
                 if (searchResult != null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Got match, fetching lyrics..");
-                    var lyricsResult = await this.Lookup(searchResult).ConfigureAwait(false);
+                    lyricsResult = await this.Lookup(searchResult).ConfigureAwait(false);
                     if (lyricsResult != null && !string.IsNullOrEmpty(lyricsResult.Lyric))
                     {
                         Logger.Write(this, LogLevel.Debug, "Success.");
@@ -80,6 +82,18 @@ namespace FoxTunes
             catch (Exception e)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to fetch lyrics: {0}", e.Message);
+            }
+            finally
+            {
+                //Save the LyricsRelease tag (either the actual id or none).
+                if (lyricsResult != null)
+                {
+                    await this.SaveMetaData(fileData, lyricsResult.LyricId).ConfigureAwait(false);
+                }
+                else
+                {
+                    await this.SaveMetaData(fileData, this.None).ConfigureAwait(false);
+                }
             }
             return LyricsResult.Fail;
         }
