@@ -108,10 +108,12 @@ namespace FoxTunes
             var releaseLookups = await this.FetchArtwork(libraryItems).ConfigureAwait(false);
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
-                CommonMetaData.Lyrics,
-                this.GetMetaDataValues(releaseLookups),
-                MetaDataItemType.Tag,
-                true
+                new OnDemandMetaDataRequest(
+                    FetchArtworkTask.FRONT_COVER,
+                    MetaDataItemType.Tag,
+                    true
+                ),
+                this.GetMetaDataValues(releaseLookups)
             ).ConfigureAwait(false);
         }
 
@@ -129,10 +131,12 @@ namespace FoxTunes
             var releaseLookups = await this.FetchArtwork(playlistItems).ConfigureAwait(false);
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
-                CommonMetaData.Lyrics,
-                this.GetMetaDataValues(releaseLookups),
-                MetaDataItemType.Tag,
-                true
+                new OnDemandMetaDataRequest(
+                    FetchArtworkTask.FRONT_COVER,
+                    MetaDataItemType.Tag,
+                    true
+                ),
+                this.GetMetaDataValues(releaseLookups)
             ).ConfigureAwait(false);
         }
 

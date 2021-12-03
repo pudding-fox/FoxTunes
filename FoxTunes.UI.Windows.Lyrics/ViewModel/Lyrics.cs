@@ -261,9 +261,11 @@ namespace FoxTunes.ViewModel
             {
                 data = await this.OnDemandMetaDataProvider.GetMetaData(
                     outputStream.PlaylistItem,
-                    CommonMetaData.Lyrics,
-                    MetaDataItemType.Tag,
-                    false
+                    new OnDemandMetaDataRequest(
+                        CommonMetaData.Lyrics,
+                        MetaDataItemType.Tag,
+                        false
+                    )
                 ).ConfigureAwait(false);
             }
             await Windows.Invoke(() =>

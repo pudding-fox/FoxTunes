@@ -41,8 +41,13 @@ namespace FoxTunes
             }
         }
 
-        public bool CanGetValue(IFileData fileData)
+        public bool CanGetValue(IFileData fileData, OnDemandMetaDataRequest request)
         {
+            if (request.User)
+            {
+                //User requests are always processed.
+                return true;
+            }
             lock (fileData.MetaDatas)
             {
                 var metaDataItem = fileData.MetaDatas.FirstOrDefault(
@@ -57,7 +62,7 @@ namespace FoxTunes
             return true;
         }
 
-        public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, object state)
+        public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request)
         {
             var releaseLookups = await this.Behaviour.FetchArtwork(fileDatas).ConfigureAwait(false);
             return this.Behaviour.GetMetaDataValues(releaseLookups);

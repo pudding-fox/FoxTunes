@@ -56,14 +56,35 @@ namespace FoxTunes
             }
         }
 
-        public bool CanGetValue(IFileData fileData)
+        public bool CanGetValue(IFileData fileData, OnDemandMetaDataRequest request)
         {
+            var provider = request.State as LyricsProvider ?? this.GetAutoLookupProvider();
+            if (provider == null)
+            {
+                return false;
+            }
+            if (request.User)
+            {
+                //User requests are always processed.
+                return true;
+            }
+            lock (fileData.MetaDatas)
+            {
+                var metaDataItem = fileData.MetaDatas.FirstOrDefault(
+                    element => string.Equals(element.Name, CustomMetaData.DiscogsRelease, StringComparison.OrdinalIgnoreCase) && element.Type == MetaDataItemType.Tag
+                );
+                if (metaDataItem != null && string.Equals(metaDataItem.Value, provider.None, StringComparison.OrdinalIgnoreCase))
+                {
+                    //We have previously attempted a lookup and it failed, don't try again (automatically).
+                    return false;
+                }
+            }
             return true;
         }
 
-        public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, object state)
+        public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request)
         {
-            var provider = state as LyricsProvider ?? this.GetAutoLookupProvider();
+            var provider = request.State as LyricsProvider ?? this.GetAutoLookupProvider();
             if (provider == null)
             {
                 return null;

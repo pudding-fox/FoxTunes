@@ -37,36 +37,36 @@ namespace FoxTunes
             return this.GetSources(name, type).Any();
         }
 
-        public async Task<string> GetMetaData(IFileData fileData, string name, MetaDataItemType type, bool notify, object state = null)
+        public async Task<string> GetMetaData(IFileData fileData, OnDemandMetaDataRequest request)
         {
-            var values = await this.GetMetaData(new[] { fileData }, name, type, notify, state).ConfigureAwait(false);
+            var values = await this.GetMetaData(new[] { fileData }, request).ConfigureAwait(false);
             return values.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<string>> GetMetaData(IEnumerable<IFileData> fileDatas, string name, MetaDataItemType type, bool notify, object state = null)
+        public async Task<IEnumerable<string>> GetMetaData(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request)
         {
-            using (await KeyLock.LockAsync(name).ConfigureAwait(false))
+            using (await KeyLock.LockAsync(request.Name).ConfigureAwait(false))
             {
-                var values = this.GetCurrentMetaData(fileDatas, name, type);
+                var values = this.GetCurrentMetaData(fileDatas, request);
                 var queue = new HashSet<IFileData>(fileDatas.Except(values.Keys));
                 if (queue.Any())
                 {
-                    var sources = this.GetSources(name, type);
+                    var sources = this.GetSources(request.Name, request.Type);
                     foreach (var source in sources)
                     {
                         var result = await source.GetValues(
-                            queue.Where(fileData => source.CanGetValue(fileData)).ToArray(),
-                            state
+                            queue.Where(fileData => source.CanGetValue(fileData, request)).ToArray(),
+                            request
                         ).ConfigureAwait(false);
                         if (result != null && result.Values.Any())
                         {
                             foreach (var value in result.Values)
                             {
-                                this.AddMetaData(name, value, type);
+                                this.AddMetaData(request, value);
                                 values[value.FileData] = value.Value;
                                 queue.Remove(value.FileData);
                             }
-                            this.Dispatch(() => this.SaveMetaData(name, result, type, notify));
+                            this.Dispatch(() => this.SaveMetaData(request, result));
                         }
                     }
                 }
@@ -74,13 +74,13 @@ namespace FoxTunes
             }
         }
 
-        public string GetCurrentMetaData(IFileData fileData, string name, MetaDataItemType type)
+        public string GetCurrentMetaData(IFileData fileData, OnDemandMetaDataRequest request)
         {
-            var values = this.GetCurrentMetaData(new[] { fileData }, name, type);
+            var values = this.GetCurrentMetaData(new[] { fileData }, request);
             return values.Values.FirstOrDefault();
         }
 
-        public IDictionary<IFileData, string> GetCurrentMetaData(IEnumerable<IFileData> fileDatas, string name, MetaDataItemType type)
+        public IDictionary<IFileData, string> GetCurrentMetaData(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request)
         {
             var values = new Dictionary<IFileData, string>();
             foreach (var fileData in fileDatas)
@@ -88,7 +88,7 @@ namespace FoxTunes
                 lock (fileData.MetaDatas)
                 {
                     var metaDataItem = fileData.MetaDatas.FirstOrDefault(
-                         element => string.Equals(element.Name, name, StringComparison.OrdinalIgnoreCase)
+                         element => string.Equals(element.Name, request.Name, StringComparison.OrdinalIgnoreCase) && element.Type == request.Type
                     );
                     if (metaDataItem != null)
                     {
@@ -99,13 +99,13 @@ namespace FoxTunes
             return values;
         }
 
-        public Task SetMetaData(string name, OnDemandMetaDataValues result, MetaDataItemType type, bool notify)
+        public Task SetMetaData(OnDemandMetaDataRequest request, OnDemandMetaDataValues result)
         {
             foreach (var value in result.Values)
             {
-                this.AddMetaData(name, value, type);
+                this.AddMetaData(request, value);
             }
-            return this.SaveMetaData(name, result, type, notify);
+            return this.SaveMetaData(request, result);
         }
 
         protected virtual IEnumerable<IOnDemandMetaDataSource> GetSources(string name, MetaDataItemType type)
@@ -119,34 +119,34 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void AddMetaData(string name, OnDemandMetaDataValue value, MetaDataItemType type)
+        protected virtual void AddMetaData(OnDemandMetaDataRequest request, OnDemandMetaDataValue value)
         {
             lock (value.FileData.MetaDatas)
             {
                 var metaDataItem = value.FileData.MetaDatas.FirstOrDefault(
-                    element => string.Equals(element.Name, name, StringComparison.OrdinalIgnoreCase) && element.Type == type
+                    element => string.Equals(element.Name, request.Name, StringComparison.OrdinalIgnoreCase) && element.Type == request.Type
                 );
                 if (metaDataItem == null)
                 {
-                    metaDataItem = new MetaDataItem(name, type);
+                    metaDataItem = new MetaDataItem(request.Name, request.Type);
                     value.FileData.MetaDatas.Add(metaDataItem);
                 }
                 metaDataItem.Value = value.Value;
             }
         }
 
-        protected virtual async Task SaveMetaData(string name, OnDemandMetaDataValues result, MetaDataItemType type, bool notify)
+        protected virtual async Task SaveMetaData(OnDemandMetaDataRequest request, OnDemandMetaDataValues result)
         {
             var sources = result.Values.Select(value => value.FileData);
             var libraryItems = sources.OfType<LibraryItem>().ToArray();
             var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             if (libraryItems.Any())
             {
-                await this.SaveLibrary(name, libraryItems, result.Write, notify).ConfigureAwait(false);
+                await this.SaveLibrary(request.Name, libraryItems, result.Write, request.User).ConfigureAwait(false);
             }
             if (playlistItems.Any())
             {
-                await this.SavePlaylist(name, playlistItems, result.Write, notify).ConfigureAwait(false);
+                await this.SavePlaylist(request.Name, playlistItems, result.Write, request.User).ConfigureAwait(false);
             }
         }
 

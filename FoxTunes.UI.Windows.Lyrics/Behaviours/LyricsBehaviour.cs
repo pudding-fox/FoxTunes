@@ -177,13 +177,18 @@ namespace FoxTunes
                     return;
                 }
                 await this.OnDemandMetaDataProvider.SetMetaData(
-                    CommonMetaData.Lyrics,
-                    new OnDemandMetaDataValues(new[]
-                    {
-                        new OnDemandMetaDataValue(playlistItem, File.ReadAllText(fileName))
-                    }, this.WriteTags.Value),
-                    MetaDataItemType.Tag,
-                    true
+                    new OnDemandMetaDataRequest(
+                        CommonMetaData.Lyrics,
+                        MetaDataItemType.Tag,
+                        true
+                    ),
+                    new OnDemandMetaDataValues(
+                        new[]
+                        {
+                            new OnDemandMetaDataValue(playlistItem, File.ReadAllText(fileName))
+                        },
+                        this.WriteTags.Value
+                    )
                 ).ConfigureAwait(false);
             }
             finally
@@ -213,10 +218,12 @@ namespace FoxTunes
             var playlistItem = outputStream.PlaylistItem;
             return this.OnDemandMetaDataProvider.GetMetaData(
                 new[] { outputStream.PlaylistItem },
-                CommonMetaData.Lyrics,
-                MetaDataItemType.Tag,
-                true,
-                provider
+                new OnDemandMetaDataRequest(
+                    CommonMetaData.Lyrics,
+                    MetaDataItemType.Tag,
+                    true,
+                    provider
+                )
             );
         }
 
