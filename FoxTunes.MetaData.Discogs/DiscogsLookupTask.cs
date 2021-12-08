@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,6 +36,8 @@ namespace FoxTunes
 
         public DoubleConfigurationElement MinConfidence { get; private set; }
 
+        public BooleanConfigurationElement WriteTags { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
@@ -45,12 +46,15 @@ namespace FoxTunes
                 DiscogsBehaviourConfiguration.SECTION,
                 DiscogsBehaviourConfiguration.MIN_CONFIDENCE
             );
+            this.WriteTags = this.Configuration.GetElement<BooleanConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.WRITE_TAGS
+            );
             base.InitializeComponent(core);
         }
 
         protected override Task OnStarted()
         {
-            this.Name = Strings.LookupArtworkTask_Name;
             this.Position = 0;
             this.Count = this.LookupItems.Length;
             return base.OnStarted();
@@ -58,11 +62,9 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            var position = 0;
             foreach (var releaseLookup in this.LookupItems)
             {
                 this.Description = releaseLookup.ToString();
-                this.Position = position;
                 if (this.IsCancellationRequested)
                 {
                     releaseLookup.Status = Discogs.ReleaseLookupStatus.Cancelled;
@@ -71,7 +73,7 @@ namespace FoxTunes
                 if (releaseLookup.Type == Discogs.ReleaseLookupType.None)
                 {
                     Logger.Write(this, LogLevel.Warn, "Cannot fetch releases, search requires at least artist/album or title tags.");
-                    releaseLookup.AddError(Strings.LookupArtworkTask_InsufficiantData);
+                    releaseLookup.AddError(Strings.DiscogsLookupTask_InsufficiantData);
                     releaseLookup.Status = Discogs.ReleaseLookupStatus.Failed;
                     continue;
                 }
@@ -85,7 +87,7 @@ namespace FoxTunes
                     }
                     else
                     {
-                        releaseLookup.AddError(Strings.LookupArtworkTask_NotFound);
+                        releaseLookup.AddError(Strings.DiscogsLookupTask_NotFound);
                         releaseLookup.Status = Discogs.ReleaseLookupStatus.Failed;
                     }
                 }
@@ -100,7 +102,7 @@ namespace FoxTunes
                     //Save the DiscogsRelease tag (either the actual release id or none).
                     await this.SaveMetaData(releaseLookup).ConfigureAwait(false);
                 }
-                position++;
+                this.Position++;
             }
         }
 

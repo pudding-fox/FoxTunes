@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class RatingManager : StandardManager, IBackgroundTaskSource
     {
         public ICore Core { get; private set; }

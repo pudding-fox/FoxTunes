@@ -8,7 +8,9 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class DiscogsBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
     {
-        public const string LOOKUP = "LLMM";
+        public const string LOOKUP_TAGS = "LLMN";
+
+        public const string LOOKUP_ARTWORK = "LLMM";
 
         public ICore Core { get; private set; }
 
@@ -59,11 +61,13 @@ namespace FoxTunes
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, LOOKUP, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, LOOKUP_TAGS, Strings.DiscogsBehaviour_FetchTags, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, LOOKUP_ARTWORK, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
                     }
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOOKUP, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOOKUP_TAGS, Strings.DiscogsBehaviour_FetchTags, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOOKUP_ARTWORK, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
                     }
                 }
             }
@@ -73,7 +77,16 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case LOOKUP:
+                case LOOKUP_TAGS:
+                    switch (component.Category)
+                    {
+                        case InvocationComponent.CATEGORY_LIBRARY:
+                            return this.FetchTagsLibrary();
+                        case InvocationComponent.CATEGORY_PLAYLIST:
+                            return this.FetchTagsPlaylist();
+                    }
+                    break;
+                case LOOKUP_ARTWORK:
                     switch (component.Category)
                     {
                         case InvocationComponent.CATEGORY_LIBRARY:
@@ -88,6 +101,52 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public async Task FetchTagsLibrary()
+        {
+            if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
+            {
+                return;
+            }
+            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
+            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
+                this.LibraryManager.SelectedItem,
+                true
+            ).ToArray();
+            if (!libraryItems.Any())
+            {
+                return;
+            }
+            var releaseLookups = await this.FetchTags(libraryItems).ConfigureAwait(false);
+            this.OnReport(releaseLookups);
+        }
+
+        public async Task FetchTagsPlaylist()
+        {
+            if (this.PlaylistManager.SelectedItems == null)
+            {
+                return;
+            }
+            var playlistItems = this.PlaylistManager.SelectedItems.ToArray();
+            if (!playlistItems.Any())
+            {
+                return;
+            }
+            var releaseLookups = await this.FetchTags(playlistItems).ConfigureAwait(false);
+            this.OnReport(releaseLookups);
+        }
+
+        public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchTags(IEnumerable<IFileData> fileDatas)
+        {
+            var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
+            using (var task = new DiscogsFetchTagsTask(releaseLookups))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run().ConfigureAwait(false);
+            }
+            return releaseLookups;
         }
 
         public async Task FetchArtworkLibrary()
@@ -109,7 +168,7 @@ namespace FoxTunes
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
-                    FetchArtworkTask.FRONT_COVER,
+                    DiscogsFetchArtworkTask.FRONT_COVER,
                     MetaDataItemType.Tag,
                     true
                 ),
@@ -132,7 +191,7 @@ namespace FoxTunes
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
-                    FetchArtworkTask.FRONT_COVER,
+                    DiscogsFetchArtworkTask.FRONT_COVER,
                     MetaDataItemType.Tag,
                     true
                 ),
@@ -143,7 +202,7 @@ namespace FoxTunes
         public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchArtwork(IEnumerable<IFileData> fileDatas)
         {
             var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
-            using (var task = new FetchArtworkTask(releaseLookups))
+            using (var task = new DiscogsFetchArtworkTask(releaseLookups))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -162,7 +221,7 @@ namespace FoxTunes
                     continue;
                 }
                 var value = default(string);
-                if (!releaseLookup.MetaData.TryGetValue(FetchArtworkTask.FRONT_COVER, out value))
+                if (!releaseLookup.MetaData.TryGetValue(DiscogsFetchArtworkTask.FRONT_COVER, out value))
                 {
                     continue;
                 }
