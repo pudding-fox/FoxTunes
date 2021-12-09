@@ -18,8 +18,6 @@ namespace FoxTunes
 
         public IList<IOnDemandMetaDataSource> Sources { get; private set; }
 
-        public ILibraryManager LibraryManager { get; private set; }
-
         public IMetaDataManager MetaDataManager { get; private set; }
 
         public IHierarchyManager HierarchyManager { get; private set; }
@@ -27,7 +25,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Sources.AddRange(ComponentRegistry.Instance.GetComponents<IOnDemandMetaDataSource>());
-            this.LibraryManager = core.Managers.Library;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
             base.InitializeComponent(core);
@@ -138,41 +135,11 @@ namespace FoxTunes
 
         protected virtual async Task SaveMetaData(OnDemandMetaDataRequest request, OnDemandMetaDataValues result)
         {
-            var sources = result.Values.Select(value => value.FileData);
-            var libraryItems = sources.OfType<LibraryItem>().ToArray();
-            var playlistItems = sources.OfType<PlaylistItem>().ToArray();
-            if (libraryItems.Any())
+            var fileDatas = result.Values.Select(value => value.FileData).ToArray();
+            await this.MetaDataManager.Save(fileDatas, result.Write, result.Write, request.Name).ConfigureAwait(false);
+            if (request.User)
             {
-                await this.SaveLibrary(request.Name, libraryItems, result.Write, request.User).ConfigureAwait(false);
-            }
-            if (playlistItems.Any())
-            {
-                await this.SavePlaylist(request.Name, playlistItems, result.Write, request.User).ConfigureAwait(false);
-            }
-        }
-
-        protected virtual async Task SaveLibrary(string name, IEnumerable<LibraryItem> libraryItems, bool write, bool notify)
-        {
-            await this.MetaDataManager.Save(libraryItems, write, false, name).ConfigureAwait(false);
-            if (notify)
-            {
-                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
-            }
-        }
-
-        protected virtual async Task SavePlaylist(string name, IEnumerable<PlaylistItem> playlistItems, bool write, bool notify)
-        {
-            await this.MetaDataManager.Save(playlistItems, write, false, name).ConfigureAwait(false);
-            if (notify)
-            {
-                if (playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
-                {
-                    await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-                    await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                    await this.LibraryManager.SetStatus(LibraryItemStatus.None).ConfigureAwait(false);
-                }
+                await this.HierarchyManager.Refresh(fileDatas);
             }
         }
     }

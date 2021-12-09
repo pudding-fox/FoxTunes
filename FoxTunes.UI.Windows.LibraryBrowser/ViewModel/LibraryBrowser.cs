@@ -204,20 +204,34 @@ namespace FoxTunes.ViewModel
 
         public bool IsRefreshing { get; private set; }
 
-        public override async Task Refresh()
+        public override Task Refresh()
         {
-            this.IsRefreshing = true;
-            try
+            var task = new Func<Task>(async () =>
             {
-                await base.Refresh().ConfigureAwait(false);
-                await this.Synchronize(new List<LibraryBrowserFrame>()
+                this.IsRefreshing = true;
+                try
                 {
-                    new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                }).ConfigureAwait(false);
-            }
-            finally
+                    await base.Refresh().ConfigureAwait(false);
+                    if (this.Frames == null)
+                    {
+                        await this.Synchronize(new List<LibraryBrowserFrame>()
+                        {
+                            new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+                        }).ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    this.IsRefreshing = false;
+                }
+            });
+            if (this.IsInitialized && this.Items != null)
             {
-                this.IsRefreshing = false;
+                return this.Debouncer.Exec(task);
+            }
+            else
+            {
+                return task();
             }
         }
 

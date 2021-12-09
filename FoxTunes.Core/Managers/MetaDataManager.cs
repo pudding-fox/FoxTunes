@@ -19,50 +19,58 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public async Task Rescan(IEnumerable<LibraryItem> libraryItems)
+        public async Task Rescan(IEnumerable<IFileData> fileDatas)
         {
-            using (var task = new RefreshLibraryMetaDataTask(libraryItems))
+            var libraryItems = fileDatas.OfType<LibraryItem>().ToArray();
+            var playlistItems = fileDatas.OfType<PlaylistItem>().ToArray();
+            if (libraryItems.Any())
             {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-            }
-        }
-
-        public async Task Rescan(IEnumerable<PlaylistItem> playlistItems)
-        {
-            using (var task = new RefreshPlaylistMetaDataTask(playlistItems))
-            {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-            }
-        }
-
-        public async Task Save(IEnumerable<LibraryItem> libraryItems, bool write, bool report, params string[] names)
-        {
-            using (var task = new WriteLibraryMetaDataTask(libraryItems, write, names))
-            {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-                if (report && task.Errors.Any())
+                using (var task = new RefreshLibraryMetaDataTask(libraryItems))
                 {
-                    this.OnReport(libraryItems, task.Errors);
+                    task.InitializeComponent(this.Core);
+                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                }
+            }
+            if (playlistItems.Any())
+            {
+                using (var task = new RefreshPlaylistMetaDataTask(playlistItems))
+                {
+                    task.InitializeComponent(this.Core);
+                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
                 }
             }
         }
 
-        public async Task Save(IEnumerable<PlaylistItem> playlistItems, bool write, bool report, params string[] names)
+        public async Task Save(IEnumerable<IFileData> fileDatas, bool write, bool report, params string[] names)
         {
-            using (var task = new WritePlaylistMetaDataTask(playlistItems, names, write))
+            var libraryItems = fileDatas.OfType<LibraryItem>().ToArray();
+            var playlistItems = fileDatas.OfType<PlaylistItem>().ToArray();
+            if (libraryItems.Any())
             {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-                if (report && task.Errors.Any())
+                using (var task = new WriteLibraryMetaDataTask(libraryItems, write, names))
                 {
-                    this.OnReport(playlistItems, task.Errors);
+                    task.InitializeComponent(this.Core);
+                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                    if (report && task.Errors.Any())
+                    {
+                        this.OnReport(libraryItems, task.Errors);
+                    }
+                }
+            }
+            if (playlistItems.Any())
+            {
+                using (var task = new WritePlaylistMetaDataTask(playlistItems, names, write))
+                {
+                    task.InitializeComponent(this.Core);
+                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                    if (report && task.Errors.Any())
+                    {
+                        this.OnReport(playlistItems, task.Errors);
+                    }
                 }
             }
         }
@@ -77,26 +85,38 @@ namespace FoxTunes
             }
         }
 
-        public async Task<bool> Synchronize(IEnumerable<LibraryItem> libraryItems, params string[] names)
+        public async Task<bool> Synchronize(IEnumerable<IFileData> fileDatas, params string[] names)
         {
-            using (var task = new SynchronizeLibraryMetaDataTask(libraryItems, names))
+            var libraryItems = fileDatas.OfType<LibraryItem>().ToArray();
+            var playlistItems = fileDatas.OfType<PlaylistItem>().ToArray();
+            var result = true;
+            if (libraryItems.Any())
             {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-                return !task.Errors.Any();
+                using (var task = new SynchronizeLibraryMetaDataTask(libraryItems, names))
+                {
+                    task.InitializeComponent(this.Core);
+                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                    if (task.Errors.Any())
+                    {
+                        result = false;
+                    }
+                }
             }
-        }
-
-        public async Task<bool> Synchronize(IEnumerable<PlaylistItem> playlistItems, params string[] names)
-        {
-            using (var task = new SynchronizePlaylistMetaDataTask(playlistItems, names))
+            if (playlistItems.Any())
             {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-                return !task.Errors.Any();
+                using (var task = new SynchronizePlaylistMetaDataTask(playlistItems, names))
+                {
+                    task.InitializeComponent(this.Core);
+                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                    if (task.Errors.Any())
+                    {
+                        result = false;
+                    }
+                }
             }
+            return result;
         }
 
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)

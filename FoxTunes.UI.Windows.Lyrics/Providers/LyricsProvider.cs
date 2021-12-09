@@ -49,24 +49,12 @@ namespace FoxTunes
                 }
                 metaDataItem.Value = releaseId;
             }
-            if (fileData is LibraryItem libraryItem)
-            {
-                await this.MetaDataManager.Save(
-                    new[] { libraryItem },
-                    false, //These tags cannot be "written".
-                    false,
-                    new[] { CustomMetaData.LyricsRelease }
-                ).ConfigureAwait(false);
-            }
-            if (fileData is PlaylistItem playlistItem)
-            {
-                await this.MetaDataManager.Save(
-                    new[] { playlistItem },
-                    false, //These tags cannot be "written".
-                    false,
-                    new[] { CustomMetaData.LyricsRelease }
-                ).ConfigureAwait(false);
-            }
+            await this.MetaDataManager.Save(
+                new[] { fileData },
+                false, //These tags cannot be "written".
+                false,
+                new[] { CustomMetaData.LyricsRelease }
+            ).ConfigureAwait(false);
         }
     }
 }

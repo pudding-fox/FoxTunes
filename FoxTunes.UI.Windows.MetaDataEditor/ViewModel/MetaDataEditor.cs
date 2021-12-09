@@ -123,15 +123,12 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler StatusMessageChanged;
 
-        public ILibraryManager LibraryManager { get; private set; }
-
         public IMetaDataManager MetaDataManager { get; private set; }
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.LibraryManager = core.Managers.Library;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
             base.InitializeComponent(core);
@@ -188,14 +185,14 @@ namespace FoxTunes.ViewModel
         public async Task Save()
         {
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var sources = new HashSet<IFileData>();
+            var fileDatas = new HashSet<IFileData>();
             if (this.Tags != null)
             {
                 foreach (var tag in this.Tags)
                 {
                     if (tag.HasChanges)
                     {
-                        sources.AddRange(tag.Save());
+                        fileDatas.AddRange(tag.Save());
                         names.Add(tag.Name);
                     }
                 }
@@ -206,47 +203,20 @@ namespace FoxTunes.ViewModel
                 {
                     if (image.HasChanges)
                     {
-                        sources.AddRange(image.Save());
+                        fileDatas.AddRange(image.Save());
                         names.Add(image.Name);
                     }
                 }
             }
-            var libraryItems = sources.OfType<LibraryItem>().ToArray();
-            var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             await Windows.Invoke(() => this.IsSaving = true).ConfigureAwait(false);
             try
             {
-                if (libraryItems.Any())
-                {
-                    await this.SaveLibrary(libraryItems, names).ConfigureAwait(false);
-                }
-                if (playlistItems.Any())
-                {
-                    await this.SavePlaylist(playlistItems, names).ConfigureAwait(false);
-                }
+                await this.MetaDataManager.Save(fileDatas, true, true, names.ToArray()).ConfigureAwait(false);
+                await this.HierarchyManager.Refresh(fileDatas).ConfigureAwait(false);
             }
             finally
             {
                 await Windows.Invoke(() => this.IsSaving = false).ConfigureAwait(false);
-            }
-        }
-
-        protected virtual async Task SaveLibrary(IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names)
-        {
-            await this.MetaDataManager.Save(libraryItems, true, true, names.ToArray()).ConfigureAwait(false);
-            await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-            await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-            await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
-        }
-
-        protected virtual async Task SavePlaylist(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
-        {
-            await this.MetaDataManager.Save(playlistItems, true, true, names.ToArray()).ConfigureAwait(false);
-            if (playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
-            {
-                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                await this.LibraryManager.SetStatus(LibraryItemStatus.None).ConfigureAwait(false);
             }
         }
 

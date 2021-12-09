@@ -1,5 +1,6 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -65,6 +66,36 @@ namespace FoxTunes
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
+        }
+
+        public Task Refresh(IEnumerable<IFileData> fileDatas)
+        {
+            foreach (var fileData in fileDatas)
+            {
+                if (fileData is LibraryItem)
+                {
+                    return this.Refresh();
+                }
+                if (fileData is PlaylistItem playlistItem)
+                {
+                    if (playlistItem.LibraryItem_Id.HasValue)
+                    {
+                        return this.Refresh();
+                    }
+                }
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        public async Task Refresh()
+        {
+            await this.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
+            await this.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+            await this.LibraryManager.SetStatus(LibraryItemStatus.None).ConfigureAwait(false);
         }
 
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)

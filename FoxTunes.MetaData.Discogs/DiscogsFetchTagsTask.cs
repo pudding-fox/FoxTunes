@@ -39,64 +39,24 @@ namespace FoxTunes
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var fileData in releaseLookup.FileDatas)
             {
-                this.UpdateMetaData(fileData, release, names);
+                lock (fileData.MetaDatas)
+                {
+                    fileData.AddOrUpdate(metaData =>
+                    {
+                        var track = this.GetTrackDetails(fileData, metaData, release);
+                        return this.GetMetaData(fileData, release, track);
+                    }, names);
+                }
             }
             if (names.Any())
             {
-                var libraryItems = releaseLookup.FileDatas.OfType<LibraryItem>().ToArray();
-                var playlistItems = releaseLookup.FileDatas.OfType<PlaylistItem>().ToArray();
-                if (libraryItems.Any())
-                {
-                    await this.MetaDataManager.Save(
-                        libraryItems,
-                        this.WriteTags.Value,
-                        false,
-                        names.ToArray()
-                    ).ConfigureAwait(false);
-                }
-                if (playlistItems.Any())
-                {
-                    await this.MetaDataManager.Save(
-                        playlistItems,
-                        this.WriteTags.Value,
-                        false,
-                        names.ToArray()
-                    ).ConfigureAwait(false);
-                }
+                await this.MetaDataManager.Save(releaseLookup.FileDatas, this.WriteTags.Value, false, names.ToArray()).ConfigureAwait(false);
+                await this.HierarchyManager.Refresh(releaseLookup.FileDatas).ConfigureAwait(false);
             }
             return true;
         }
 
-        protected virtual void UpdateMetaData(IFileData fileData, Discogs.ReleaseDetails release, ISet<string> names)
-        {
-            lock (fileData.MetaDatas)
-            {
-                var targetMetaData = fileData.MetaDatas.ToDictionary(
-                   metaDataItem => metaDataItem.Name,
-                   StringComparer.OrdinalIgnoreCase
-               );
-                var sourceMetaData = this.GetMetaData(
-                    fileData,
-                    release,
-                    this.GetTrackDetails(fileData, targetMetaData, release),
-                    names
-                );
-                foreach (var pair in sourceMetaData)
-                {
-                    var metaDataItem = default(MetaDataItem);
-                    if (targetMetaData.TryGetValue(pair.Key, out metaDataItem))
-                    {
-                        metaDataItem.Value = pair.Value.Value;
-                    }
-                    else
-                    {
-                        fileData.MetaDatas.Add(pair.Value);
-                    }
-                }
-            }
-        }
-
-        protected virtual IDictionary<string, MetaDataItem> GetMetaData(IFileData fileData, Discogs.ReleaseDetails releaseDetails, Discogs.TrackDetails trackDetails, ISet<string> names)
+        protected virtual IEnumerable<MetaDataItem> GetMetaData(IFileData fileData, Discogs.ReleaseDetails releaseDetails, Discogs.TrackDetails trackDetails)
         {
             var artist = default(string);
             var album = default(string);
@@ -106,7 +66,6 @@ namespace FoxTunes
             var genre = default(string);
             var year = default(int);
             var isCompilation = default(bool);
-            var metaData = new Dictionary<string, MetaDataItem>(StringComparer.OrdinalIgnoreCase);
 
             if (releaseDetails.Artists.Any())
             {
@@ -144,45 +103,38 @@ namespace FoxTunes
                 year = default(int);
             }
 
+            var metaData = new List<MetaDataItem>();
             if (!string.IsNullOrEmpty(artist))
             {
-                metaData[CommonMetaData.Artist] = new MetaDataItem(CommonMetaData.Artist, MetaDataItemType.Tag) { Value = artist };
-                names.Add(CommonMetaData.Artist);
+                metaData.Add(new MetaDataItem(CommonMetaData.Artist, MetaDataItemType.Tag) { Value = artist });
             }
             if (!string.IsNullOrEmpty(album))
             {
-                metaData[CommonMetaData.Album] = new MetaDataItem(CommonMetaData.Album, MetaDataItemType.Tag) { Value = album };
-                names.Add(CommonMetaData.Album);
+                metaData.Add(new MetaDataItem(CommonMetaData.Album, MetaDataItemType.Tag) { Value = album });
             }
             if (track > 0)
             {
-                metaData[CommonMetaData.Track] = new MetaDataItem(CommonMetaData.Track, MetaDataItemType.Tag) { Value = track.ToString() };
-                names.Add(CommonMetaData.Track);
+                metaData.Add(new MetaDataItem(CommonMetaData.Track, MetaDataItemType.Tag) { Value = track.ToString() });
             }
             if (!string.IsNullOrEmpty(title))
             {
-                metaData[CommonMetaData.Title] = new MetaDataItem(CommonMetaData.Title, MetaDataItemType.Tag) { Value = title };
-                names.Add(CommonMetaData.Title);
+                metaData.Add(new MetaDataItem(CommonMetaData.Title, MetaDataItemType.Tag) { Value = title });
             }
             if (!string.IsNullOrEmpty(performer))
             {
-                metaData[CommonMetaData.Performer] = new MetaDataItem(CommonMetaData.Performer, MetaDataItemType.Tag) { Value = performer };
-                names.Add(CommonMetaData.Performer);
+                metaData.Add(new MetaDataItem(CommonMetaData.Performer, MetaDataItemType.Tag) { Value = performer });
             }
             if (!string.IsNullOrEmpty(genre))
             {
-                metaData[CommonMetaData.Genre] = new MetaDataItem(CommonMetaData.Genre, MetaDataItemType.Tag) { Value = genre };
-                names.Add(CommonMetaData.Genre);
+                metaData.Add(new MetaDataItem(CommonMetaData.Genre, MetaDataItemType.Tag) { Value = genre });
             }
             if (year > 0)
             {
-                metaData[CommonMetaData.Year] = new MetaDataItem(CommonMetaData.Year, MetaDataItemType.Tag) { Value = year.ToString() };
-                names.Add(CommonMetaData.Year);
+                metaData.Add(new MetaDataItem(CommonMetaData.Year, MetaDataItemType.Tag) { Value = year.ToString() });
             }
             if (isCompilation)
             {
-                metaData[CommonMetaData.IsCompilation] = new MetaDataItem(CommonMetaData.IsCompilation, MetaDataItemType.Tag) { Value = bool.TrueString };
-                names.Add(CommonMetaData.IsCompilation);
+                metaData.Add(new MetaDataItem(CommonMetaData.IsCompilation, MetaDataItemType.Tag) { Value = bool.TrueString });
             }
             return metaData;
         }

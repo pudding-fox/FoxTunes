@@ -32,6 +32,8 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
+        public IHierarchyManager HierarchyManager { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public DoubleConfigurationElement MinConfidence { get; private set; }
@@ -41,6 +43,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
+            this.HierarchyManager = core.Managers.Hierarchy;
             this.Configuration = core.Components.Configuration;
             this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
@@ -158,49 +161,29 @@ namespace FoxTunes
 
         protected virtual async Task SaveMetaData(Discogs.ReleaseLookup releaseLookup)
         {
+            var value = default(string);
+            if (releaseLookup.Release != null)
+            {
+                value = releaseLookup.Release.Id;
+            }
+            else
+            {
+                value = Discogs.Release.None;
+            }
             foreach (var fileData in releaseLookup.FileDatas)
             {
                 lock (fileData.MetaDatas)
                 {
-                    var metaDataItem = fileData.MetaDatas.FirstOrDefault(
-                        element => string.Equals(element.Name, CustomMetaData.DiscogsRelease, StringComparison.OrdinalIgnoreCase) && element.Type == MetaDataItemType.Tag
-                    );
-                    if (metaDataItem == null)
-                    {
-                        metaDataItem = new MetaDataItem(CustomMetaData.DiscogsRelease, MetaDataItemType.Tag);
-                        fileData.MetaDatas.Add(metaDataItem);
-                    }
-                    if (releaseLookup.Release != null)
-                    {
-                        metaDataItem.Value = releaseLookup.Release.Id;
-                    }
-                    else
-                    {
-                        metaDataItem.Value = Discogs.Release.None;
-                    }
+                    fileData.AddOrUpdate(CustomMetaData.DiscogsRelease, MetaDataItemType.Tag, value);
                 }
-                Logger.Write(this, LogLevel.Debug, "Discogs release: {0} => {1}", fileData.FileName, releaseLookup.Release.Id);
+                Logger.Write(this, LogLevel.Debug, "Discogs release: {0} => {1}", fileData.FileName, value);
             }
-            var libraryItems = releaseLookup.FileDatas.OfType<LibraryItem>().ToArray();
-            var playlistItems = releaseLookup.FileDatas.OfType<PlaylistItem>().ToArray();
-            if (libraryItems.Any())
-            {
-                await this.MetaDataManager.Save(
-                    libraryItems,
-                    false, //These tags cannot be "written".
-                    false,
-                    new[] { CustomMetaData.DiscogsRelease }
-                ).ConfigureAwait(false);
-            }
-            if (playlistItems.Any())
-            {
-                await this.MetaDataManager.Save(
-                    playlistItems,
-                    false, //These tags cannot be "written".
-                    false,
-                    new[] { CustomMetaData.DiscogsRelease }
-                ).ConfigureAwait(false);
-            }
+            await this.MetaDataManager.Save(
+                releaseLookup.FileDatas,
+                false, //These tags cannot be "written".
+                false,
+                CustomMetaData.DiscogsRelease
+            ).ConfigureAwait(false);
         }
     }
 }
