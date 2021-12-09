@@ -1,8 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -20,10 +20,21 @@ namespace FoxTunes
 
         protected virtual async Task<bool> ImportTags(Discogs.ReleaseLookup releaseLookup)
         {
-            var release = await this.Discogs.GetRelease(releaseLookup.Release).ConfigureAwait(false);
-            if (release == null)
+            var release = default(Discogs.ReleaseDetails);
+            try
             {
-                return false;
+                Logger.Write(this, LogLevel.Debug, "Fetching release details: {0}", releaseLookup.Release.ResourceUrl);
+                release = await this.Discogs.GetRelease(releaseLookup.Release).ConfigureAwait(false);
+                if (release == null)
+                {
+                    Logger.Write(this, LogLevel.Error, "Failed to fetch release details \"{0}\": Unknown error.", releaseLookup.Release.ResourceUrl);
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Failed to fetch release details \"{0}\": {1}", releaseLookup.Release.ResourceUrl, e.Message);
+                releaseLookup.AddError(e.Message);
             }
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var fileData in releaseLookup.FileDatas)
@@ -67,7 +78,7 @@ namespace FoxTunes
                 var sourceMetaData = this.GetMetaData(
                     fileData,
                     release,
-                    this.GetTrackDetails(this.GetTrackNumber(targetMetaData), this.GetTrackTitle(targetMetaData), release),
+                    this.GetTrackDetails(fileData, targetMetaData, release),
                     names
                 );
                 foreach (var pair in sourceMetaData)
@@ -176,7 +187,7 @@ namespace FoxTunes
             return metaData;
         }
 
-        protected virtual int GetTrackNumber(IDictionary<string, MetaDataItem> metaData)
+        protected virtual int GetTrackNumber(IFileData fileData, IDictionary<string, MetaDataItem> metaData)
         {
             var metaDataItem = default(MetaDataItem);
             if (metaData.TryGetValue(CommonMetaData.Track, out metaDataItem))
@@ -187,20 +198,32 @@ namespace FoxTunes
                     return track;
                 }
             }
+            Logger.Write(this, LogLevel.Warn, "No track number found: {0}", fileData.FileName);
             return default(int);
         }
 
-        protected virtual string GetTrackTitle(IDictionary<string, MetaDataItem> metaData)
+        protected virtual string GetTrackTitle(IFileData fileData, IDictionary<string, MetaDataItem> metaData)
         {
             var metaDataItem = default(MetaDataItem);
             if (metaData.TryGetValue(CommonMetaData.Title, out metaDataItem))
             {
                 return metaDataItem.Value;
             }
+            Logger.Write(this, LogLevel.Warn, "No track title found: {0}", fileData.FileName);
             return string.Empty;
         }
 
-        protected virtual Discogs.TrackDetails GetTrackDetails(int track, string title, Discogs.ReleaseDetails releaseDetails)
+        protected virtual Discogs.TrackDetails GetTrackDetails(IFileData fileData, IDictionary<string, MetaDataItem> metaData, Discogs.ReleaseDetails releaseDetails)
+        {
+            return this.GetTrackDetails(
+                fileData,
+                this.GetTrackNumber(fileData, metaData),
+                this.GetTrackTitle(fileData, metaData),
+                releaseDetails
+            );
+        }
+
+        protected virtual Discogs.TrackDetails GetTrackDetails(IFileData fileData, int track, string title, Discogs.ReleaseDetails releaseDetails)
         {
             //If no track number was provided but the release contains only one track then return it.
             if (track == default(int))
@@ -237,6 +260,7 @@ namespace FoxTunes
                     }
                 }
             }
+            Logger.Write(this, LogLevel.Warn, "No track details found: {0}", fileData.FileName);
             return default(Discogs.TrackDetails);
         }
     }
