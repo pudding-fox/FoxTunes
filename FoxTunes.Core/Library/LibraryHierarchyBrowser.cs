@@ -153,6 +153,37 @@ namespace FoxTunes
             }
         }
 
+        public LibraryHierarchyNode GetNode(LibraryHierarchy libraryHierarchy, LibraryHierarchyNode libraryHierarchyNode)
+        {
+            var libraryHierarchyNodes = new List<LibraryHierarchyNode>()
+            {
+                libraryHierarchyNode
+            };
+            while (libraryHierarchyNode.Parent != null)
+            {
+                libraryHierarchyNodes.Insert(0, libraryHierarchyNode.Parent);
+                libraryHierarchyNode = libraryHierarchyNode.Parent;
+            }
+            for (var a = 0; a < libraryHierarchyNodes.Count; a++)
+            {
+                if (a == 0)
+                {
+                    libraryHierarchyNodes[a] = this.GetNodes(libraryHierarchy).Find(libraryHierarchyNodes[a]);
+                }
+                else
+                {
+                    libraryHierarchyNodes[a] = this.GetNodes(libraryHierarchyNodes[a - 1]).Find(libraryHierarchyNodes[a]);
+                }
+                libraryHierarchyNode = libraryHierarchyNodes[a];
+                if (libraryHierarchyNode == null)
+                {
+                    //A node failed to refresh, cannot continue as we don't know what the new parent is.
+                    return null;
+                }
+            }
+            return libraryHierarchyNode;
+        }
+
         public LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy)
         {
             return this.GetNodes(libraryHierarchy, this.Filter);

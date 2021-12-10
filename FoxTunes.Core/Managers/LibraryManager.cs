@@ -141,30 +141,97 @@ namespace FoxTunes
 
         public void Refresh()
         {
-            if (this.SelectedHierarchy != null)
+            this.RefreshSelectedHierarchy();
+            this.RefreshSelectedItem();
+        }
+
+        protected virtual void RefreshSelectedHierarchy()
+        {
+            var selectedHierarchy = this.SelectedHierarchy;
+            if (selectedHierarchy != null)
             {
-                this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault(libraryHierarchy => libraryHierarchy.Id == this.SelectedHierarchy.Id);
-                if (this.SelectedHierarchy != null)
+                selectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault(libraryHierarchy => libraryHierarchy.Id == selectedHierarchy.Id);
+                if (selectedHierarchy != null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Refreshed selected hierarchy: {0} => {1}", this.SelectedHierarchy.Id, this.SelectedHierarchy.Name);
+                    Logger.Write(this, LogLevel.Debug, "Refreshed selected hierarchy: {0} => {1}", selectedHierarchy.Id, selectedHierarchy.Name);
                 }
                 else
                 {
                     Logger.Write(this, LogLevel.Debug, "Failed to refresh selected hierarchy, it was removed or disabled.");
                 }
             }
-            if (this.SelectedHierarchy == null)
+            if (selectedHierarchy == null)
             {
-                this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault();
-                if (this.SelectedHierarchy == null)
+                selectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault();
+                if (selectedHierarchy != null)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to select a hierarchy, perhaps none are enabled?");
+                    Logger.Write(this, LogLevel.Debug, "Selected first hierarchy: {0} => {1}", selectedHierarchy.Id, selectedHierarchy.Name);
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Debug, "Selected first hierarchy: {0} => {1}", this.SelectedHierarchy.Id, this.SelectedHierarchy.Name);
+                    Logger.Write(this, LogLevel.Warn, "Failed to select a hierarchy, perhaps none are enabled?");
                 }
             }
+            if (object.ReferenceEquals(this.SelectedHierarchy, selectedHierarchy))
+            {
+                return;
+            }
+            this.SelectedHierarchy = selectedHierarchy;
+        }
+
+        protected virtual void RefreshSelectedItem()
+        {
+            if (this._SelectedItem == null)
+            {
+                return;
+            }
+            var libraryHierarchies = this._SelectedItem.Keys.ToArray();
+            foreach (var libraryHierarchy in libraryHierarchies)
+            {
+                this.RefreshSelectedItem(libraryHierarchy);
+            }
+        }
+
+        protected virtual void RefreshSelectedItem(LibraryHierarchy libraryHierarchy)
+        {
+            if (this._SelectedItem == null)
+            {
+                return;
+            }
+            var selectedItem = default(LibraryHierarchyNode);
+            if (!this._SelectedItem.TryGetValue(libraryHierarchy, out selectedItem))
+            {
+                return;
+            }
+            if (selectedItem != null)
+            {
+                selectedItem = this.HierarchyBrowser.GetNode(libraryHierarchy, selectedItem);
+                if (selectedItem != null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Refreshed selected item: {0} => {1}", selectedItem.Id, selectedItem.Value);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Failed to refresh selected item, it was removed.");
+                }
+            }
+            if (selectedItem == null)
+            {
+                selectedItem = this.HierarchyBrowser.GetNodes(libraryHierarchy).FirstOrDefault();
+                if (selectedItem != null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Selected first item: {0} => {1}", selectedItem.Id, selectedItem.Value);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to select an item, perhaps none are available?");
+                }
+            }
+            if (object.ReferenceEquals(this._SelectedItem[libraryHierarchy], selectedItem))
+            {
+                return;
+            }
+            this._SelectedItem[libraryHierarchy] = selectedItem;
         }
 
         public async Task Add(IEnumerable<string> paths)

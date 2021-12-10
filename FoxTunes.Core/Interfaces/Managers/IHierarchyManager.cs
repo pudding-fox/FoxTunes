@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
@@ -10,6 +11,8 @@ namespace FoxTunes.Interfaces
         Task Build(LibraryItemStatus? status);
 
         Task Clear(LibraryItemStatus? status, bool signal);
+
+        Task Refresh(IEnumerable<IFileData> fileDatas);
     }
 
     [Flags]
