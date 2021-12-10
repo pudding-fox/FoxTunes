@@ -51,7 +51,7 @@ namespace FoxTunes
             if (names.Any())
             {
                 await this.MetaDataManager.Save(releaseLookup.FileDatas, this.WriteTags.Value, false, names.ToArray()).ConfigureAwait(false);
-                await this.HierarchyManager.Refresh(releaseLookup.FileDatas).ConfigureAwait(false);
+                await this.HierarchyManager.Refresh(releaseLookup.FileDatas, names.ToArray()).ConfigureAwait(false);
             }
             return true;
         }

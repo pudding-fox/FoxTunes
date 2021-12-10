@@ -139,7 +139,7 @@ namespace FoxTunes
             await this.MetaDataManager.Save(fileDatas, result.Write, result.Write, request.Name).ConfigureAwait(false);
             if (request.User)
             {
-                await this.HierarchyManager.Refresh(fileDatas);
+                await this.HierarchyManager.Refresh(fileDatas, request.Name);
             }
         }
     }

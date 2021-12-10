@@ -43,7 +43,7 @@ namespace FoxTunes
                 }
             }
             await this.MetaDataManager.Save(fileDatas, true, false, CommonStatistics.Rating).ConfigureAwait(false);
-            await this.HierarchyManager.Refresh(fileDatas).ConfigureAwait(false);
+            await this.HierarchyManager.Refresh(fileDatas, CommonStatistics.Rating).ConfigureAwait(false);
         }
 
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
