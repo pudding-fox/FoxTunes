@@ -27,6 +27,8 @@ namespace FoxTunes
                 { MetaDataItemType.Tag, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) },
                 { MetaDataItemType.Property, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) }
             };
+            var fileName = default(string);
+            var directoryName = default(string);
             if (this.PlaylistItem != null)
             {
                 if (this.PlaylistItem.MetaDatas != null)
@@ -49,17 +51,13 @@ namespace FoxTunes
                         }
                     }
                 }
+                fileName = this.PlaylistItem.FileName;
+                directoryName = this.PlaylistItem.DirectoryName;
             }
             this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
             this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
-            if (this.PlaylistItem != null)
-            {
-                this.ScriptingContext.SetValue("file", this.PlaylistItem.FileName);
-            }
-            else
-            {
-                this.ScriptingContext.SetValue("file", null);
-            }
+            this.ScriptingContext.SetValue("file", fileName);
+            this.ScriptingContext.SetValue("folder", directoryName);
         }
 
         [DebuggerNonUserCode]
