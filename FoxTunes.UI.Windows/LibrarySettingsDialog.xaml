@@ -25,27 +25,13 @@
         <GroupBox Grid.Row="0" Header="{x:Static ViewModel:StringResources.LibrarySettingsDialog_GroupHeader}" Padding="0,7,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition>
-                        <RowDefinition.Style>
-                            <Style TargetType="{x:Type RowDefinition}">
-                                <Setter Property="Height" Value="0"></Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding LibraryHierarchies.SelectedValue.Type, Source={StaticResource ViewModel}}" Value="{x:Static Core:LibraryHierarchyType.Script}">
-                                        <Setter Property="Height" Value="*"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </RowDefinition.Style>
-                    </RowDefinition>
-                </Grid.RowDefinitions>
-                <DockPanel Grid.Row="0">
+                <DockPanel Grid.Column="0">
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchies.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_New}"></Button>
+                        <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchies.CloneCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Clone}"></Button>
                         <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchies.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Delete}"></Button>
                     </StackPanel>
                     <ListBox 
@@ -56,71 +42,60 @@
                         Windows:ListBoxExtensions.DragDropReorderCommand="{Binding LibraryHierarchies.ExchangeCommand, Source={StaticResource ViewModel}}">
                     </ListBox>
                 </DockPanel>
-                <DockPanel Grid.Row="1">
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchyLevels.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_New}"></Button>
-                        <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchyLevels.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Delete}"></Button>
-                    </StackPanel>
-                    <ListBox 
-                        Margin="0,7,0,0" 
-                        ItemsSource="{Binding LibraryHierarchyLevels.OrderedItemsSource, Source={StaticResource ViewModel}}" 
-                        SelectedValue="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}" 
-                        DisplayMemberPath="Name"
-                        Windows:ListBoxExtensions.DragDropReorder="True"
-                        Windows:ListBoxExtensions.DragDropReorderCommand="{Binding LibraryHierarchyLevels.ExchangeCommand, Source={StaticResource ViewModel}}">
-                    </ListBox>
-                </DockPanel>
-                <DockPanel Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True">
-                    <Grid DockPanel.Dock="Top" DataContext="{Binding LibraryHierarchies.SelectedValue, Source={StaticResource ViewModel}}">
-                        <Grid.Style>
-                            <Style TargetType="{x:Type Grid}">
-                                <Setter Property="IsEnabled" Value="True"></Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding}" Value="{x:Null}">
-                                        <Setter Property="IsEnabled" Value="False"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label"></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="0" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Name}"></Label>
-                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,0,0,5"></TextBox>
-                        <Label Grid.Column="0" Grid.Row="1" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Type}"></Label>
-                        <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Type}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyTypes}}" Margin="0,0,0,5"></ComboBox>
-                        <Label Grid.Column="0" Grid.Row="2" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Enabled}"></Label>
-                        <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding Enabled}" Margin="0,0,0,5" VerticalAlignment="Center" ></CheckBox>
-                    </Grid>
-                    <Grid DockPanel.Dock="Bottom" DataContext="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}">
-                        <Grid.Style>
-                            <Style TargetType="{x:Type Grid}">
-                                <Setter Property="IsEnabled" Value="True"></Setter>
-                                <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding}" Value="{x:Null}">
-                                        <Setter Property="IsEnabled" Value="False"></Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding LibraryHierarchies.SelectedValue.Type, Source={StaticResource ViewModel}}" Value="{x:Static Core:LibraryHierarchyType.Script}">
-                                        <Setter Property="Visibility" Value="Visible"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label"></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Script}"></Label>
-                        <TextBox Grid.Column="1" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"  Text="{Binding Script}"></TextBox>
-                    </Grid>
-                </DockPanel>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition>
+                            <RowDefinition.Style>
+                                <Style TargetType="{x:Type RowDefinition}">
+                                    <Setter Property="Height" Value="0"></Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding LibraryHierarchies.SelectedValue.Type, Source={StaticResource ViewModel}}" Value="{x:Static Core:LibraryHierarchyType.Script}">
+                                            <Setter Property="Height" Value="*"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </RowDefinition.Style>
+                        </RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Column="0" Grid.Row="0" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Name}"></Label>
+                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding LibraryHierarchies.SelectedValue.Name, Source={StaticResource ViewModel}}" Margin="0,0,0,5"></TextBox>
+                    <Label Grid.Column="0" Grid.Row="1" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Type}"></Label>
+                    <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding LibraryHierarchies.SelectedValue.Type, Source={StaticResource ViewModel}}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyTypes}}" Margin="0,0,0,5"></ComboBox>
+                    <Label Grid.Column="0" Grid.Row="2" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Enabled}"></Label>
+                    <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding LibraryHierarchies.SelectedValue.Enabled, Source={StaticResource ViewModel}}" Margin="0,0,0,5" VerticalAlignment="Center" ></CheckBox>
+                    <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Header="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Levels}" Margin="4,0,0,0" Padding="0,7,0,0">
+                        <DockPanel>
+                            <DockPanel DockPanel.Dock="Left">
+                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchyLevels.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_New}"></Button>
+                                    <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchyLevels.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Delete}"></Button>
+                                </StackPanel>
+                                <ListBox 
+                                    ItemsSource="{Binding LibraryHierarchyLevels.OrderedItemsSource, Source={StaticResource ViewModel}}" 
+                                    SelectedValue="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}" 
+                                    DisplayMemberPath="Name"
+                                    Windows:ListBoxExtensions.DragDropReorder="True"
+                                    Windows:ListBoxExtensions.DragDropReorderCommand="{Binding LibraryHierarchyLevels.ExchangeCommand, Source={StaticResource ViewModel}}">
+                                </ListBox>
+                            </DockPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Script}"></Label>
+                                <TextBox Grid.Column="1" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"  Text="{Binding LibraryHierarchyLevels.SelectedValue.Script, Source={StaticResource ViewModel}}"></TextBox>
+                            </Grid>
+                        </DockPanel>
+                    </GroupBox>
+                </Grid>
             </Grid>
         </GroupBox>
         <Grid Grid.Row="1" >

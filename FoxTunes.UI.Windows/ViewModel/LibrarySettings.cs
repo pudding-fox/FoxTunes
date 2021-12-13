@@ -275,6 +275,26 @@ namespace FoxTunes.ViewModel
                     var temp = item1.Sequence;
                     item1.Sequence = item2.Sequence;
                     item2.Sequence = temp;
+                },
+                CloneHandler = item =>
+                {
+                    using (var database = this.DatabaseFactory.Create())
+                    {
+                        return database.Set<LibraryHierarchy>().Create().With(libraryHierarchy =>
+                        {
+                            libraryHierarchy.Name = string.Format("{0} (Copy)", item.Name);
+                            libraryHierarchy.Type = item.Type;
+                            libraryHierarchy.Enabled = item.Enabled;
+                            foreach (var level in item.Levels)
+                            {
+                                libraryHierarchy.Levels.Add(database.Set<LibraryHierarchyLevel>().Create().With(libraryHierarchyLevel =>
+                                {
+                                    libraryHierarchyLevel.Sequence = level.Sequence;
+                                    libraryHierarchyLevel.Script = level.Script;
+                                }));
+                            }
+                        });
+                    }
                 }
             };
             this.LibraryHierarchies.SelectedValueChanged += this.OnSelectedValueChanged;

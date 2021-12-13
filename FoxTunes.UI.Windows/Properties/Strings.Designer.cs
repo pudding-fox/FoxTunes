@@ -457,6 +457,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clone.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Clone {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Clone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         internal static string LibrarySettingsDialog_Delete {
@@ -480,6 +489,15 @@ namespace FoxTunes {
         internal static string LibrarySettingsDialog_GroupHeader {
             get {
                 return ResourceManager.GetString("LibrarySettingsDialog.GroupHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Levels.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Levels {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Levels", resourceCulture);
             }
         }
         
