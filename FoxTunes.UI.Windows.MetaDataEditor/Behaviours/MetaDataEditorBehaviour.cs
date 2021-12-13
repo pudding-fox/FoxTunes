@@ -33,11 +33,11 @@ namespace FoxTunes
             {
                 if (this.LibraryManager.SelectedItem != null)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, EDIT_METADATA, "Tag");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, EDIT_METADATA, Strings.MetaDataEditorBehaviour_Tag);
                 }
                 if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, Strings.MetaDataEditorBehaviour_Tag);
                 }
             }
         }

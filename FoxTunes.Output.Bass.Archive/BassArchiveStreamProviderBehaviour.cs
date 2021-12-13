@@ -164,7 +164,7 @@ namespace FoxTunes
             {
                 if (this.Enabled)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_ARCHIVE, "Open Archive");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_ARCHIVE, Strings.BassArchiveStreamProviderBehaviour_Open);
                 }
             }
         }

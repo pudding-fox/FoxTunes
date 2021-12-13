@@ -394,6 +394,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Crop.
+        /// </summary>
+        internal static string PlaylistActionsBehaviour_Crop {
+            get {
+                return ResourceManager.GetString("PlaylistActionsBehaviour.Crop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Locate.
+        /// </summary>
+        internal static string PlaylistActionsBehaviour_Locate {
+            get {
+                return ResourceManager.GetString("PlaylistActionsBehaviour.Locate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string PlaylistActionsBehaviour_Remove {
+            get {
+                return ResourceManager.GetString("PlaylistActionsBehaviour.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Order.
         /// </summary>
         internal static string PlaylistBehaviourConfiguration_Order {
@@ -462,6 +489,60 @@ namespace FoxTunes {
         internal static string PlaylistBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("PlaylistBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        internal static string PlaylistManager_Clear {
+            get {
+                return ResourceManager.GetString("PlaylistManager.Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        internal static string PlaylistManager_Reset {
+            get {
+                return ResourceManager.GetString("PlaylistManager.Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        internal static string PlaylistQueue_Add {
+            get {
+                return ResourceManager.GetString("PlaylistQueue.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add (Next).
+        /// </summary>
+        internal static string PlaylistQueue_AddNext {
+            get {
+                return ResourceManager.GetString("PlaylistQueue.AddNext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Queue.
+        /// </summary>
+        internal static string PlaylistQueue_Path {
+            get {
+                return ResourceManager.GetString("PlaylistQueue.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        internal static string PlaylistQueue_Reset {
+            get {
+                return ResourceManager.GetString("PlaylistQueue.Reset", resourceCulture);
             }
         }
         

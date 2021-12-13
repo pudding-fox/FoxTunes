@@ -150,6 +150,38 @@
             }
         }
 
+        public static string LibrarySettingsDialog_Name
+        {
+            get
+            {
+                return Strings.LibrarySettingsDialog_Name;
+            }
+        }
+
+        public static string LibrarySettingsDialog_Type
+        {
+            get
+            {
+                return Strings.LibrarySettingsDialog_Type;
+            }
+        }
+
+        public static string LibrarySettingsDialog_Enabled
+        {
+            get
+            {
+                return Strings.LibrarySettingsDialog_Enabled;
+            }
+        }
+
+        public static string LibrarySettingsDialog_Script
+        {
+            get
+            {
+                return Strings.LibrarySettingsDialog_Script;
+            }
+        }
+
         public static string LibraryRootsDialog_GroupHeader
         {
             get

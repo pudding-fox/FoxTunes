@@ -17,11 +17,11 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(
-                    new BooleanConfigurationElement(WRITE_TAGS, "Write Tags", path: "Replay Gain/Scanner")
+                    new BooleanConfigurationElement(WRITE_TAGS, Strings.BassReplayGainScannerBehaviourConfiguration_WriteTags, path: Strings.BassReplayGainScannerBehaviourConfiguration_Path)
                         .WithValue(true)
                         .DependsOn(SECTION, ENABLED))
                 .WithElement(
-                    new IntegerConfigurationElement(THREADS, "Background Threads", path: "Replay Gain/Scanner")
+                    new IntegerConfigurationElement(THREADS, Strings.BassReplayGainScannerBehaviourConfiguration_BackgroundThreads, path: Strings.BassReplayGainScannerBehaviourConfiguration_Path)
                         .WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32))
                         .DependsOn(SECTION, ENABLED)
                 );

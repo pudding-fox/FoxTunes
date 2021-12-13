@@ -656,11 +656,11 @@ namespace FoxTunes
                 {
                     if (this.SelectedPlaylist.Type == PlaylistType.None)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, Strings.PlaylistManager_Clear, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                     }
                     else
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Reset", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, Strings.PlaylistManager_Reset, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                     }
                 }
             }

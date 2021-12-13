@@ -23,7 +23,7 @@ namespace FoxTunes
         {
             get
             {
-                return "Scanner Output";
+                return Strings.BassReplayGainScannerReport_Title;
             }
         }
 

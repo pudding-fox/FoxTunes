@@ -122,9 +122,9 @@ namespace FoxTunes
             {
                 if (this.Enabled.Value && this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_LAST, "Add", path: "Queue", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_NEXT, "Add (Next)", path: "Queue");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_RESET, "Reset", path: "Queue");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_LAST, Strings.PlaylistQueue_Add, path: Strings.PlaylistQueue_Path, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_NEXT, Strings.PlaylistQueue_AddNext, path: Strings.PlaylistQueue_Path);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_RESET, Strings.PlaylistQueue_Reset, path: Strings.PlaylistQueue_Path);
                 }
             }
         }

@@ -117,34 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BassEncoderBehaviour.Convert" xml:space="preserve">
-    <value>Convert</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.BrowseFolder" xml:space="preserve">
-    <value>Browse Folder</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.CopyTags" xml:space="preserve">
-    <value>Copy Tags</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.Destination" xml:space="preserve">
-    <value>Destination</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.Enabled" xml:space="preserve">
-    <value>Enabled</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.Location" xml:space="preserve">
-    <value>Location</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.SourceFolder" xml:space="preserve">
-    <value>Source Folder</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.SpecificFolder" xml:space="preserve">
-    <value>Specific Folder</value>
-  </data>
-  <data name="BassEncoderBehaviourConfiguration.Threads" xml:space="preserve">
-    <value>Background Threads</value>
-  </data>
-  <data name="General.Converter" xml:space="preserve">
-    <value>Converter</value>
+  <data name="MetaDataEditorBehaviour.Tag" xml:space="preserve">
+    <value>Tag</value>
   </data>
 </root>

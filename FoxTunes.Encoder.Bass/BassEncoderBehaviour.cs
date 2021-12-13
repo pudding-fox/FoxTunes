@@ -58,14 +58,14 @@ namespace FoxTunes
                     {
                         foreach (var profile in this.Profiles)
                         {
-                            yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, ENCODE, profile, path: "Convert");
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, ENCODE, profile, path: Strings.BassEncoderBehaviour_Convert);
                         }
                     }
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
                         foreach (var profile in this.Profiles)
                         {
-                            yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, profile, path: "Convert");
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, profile, path: Strings.BassEncoderBehaviour_Convert);
                         }
                     }
                 }

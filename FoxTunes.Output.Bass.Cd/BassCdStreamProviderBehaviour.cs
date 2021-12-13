@@ -165,7 +165,7 @@ namespace FoxTunes
                 {
                     foreach (var drive in CdUtils.GetDrives())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, drive, path: "Open CD");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, drive, path: Strings.BassCdStreamProviderBehaviour_Path);
                     }
                 }
             }

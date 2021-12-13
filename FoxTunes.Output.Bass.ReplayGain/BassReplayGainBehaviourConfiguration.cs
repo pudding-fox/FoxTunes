@@ -19,17 +19,17 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var section = new ConfigurationSection(SECTION)
-                .WithElement(new BooleanConfigurationElement(ENABLED, "Enabled", path: "Replay Gain").WithValue(false))
-                .WithElement(new SelectionConfigurationElement(MODE, "Mode", path: "Replay Gain").WithOptions(GetModeOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED))
-                .WithElement(new BooleanConfigurationElement(ON_DEMAND, "On Demand", path: "Replay Gain").WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED)
+                .WithElement(new BooleanConfigurationElement(ENABLED, Strings.BassReplayGainBehaviourConfiguration_Enabled, path: Strings.BassReplayGainBehaviourConfiguration_Path).WithValue(false))
+                .WithElement(new SelectionConfigurationElement(MODE, Strings.BassReplayGainBehaviourConfiguration_Mode, path: Strings.BassReplayGainBehaviourConfiguration_Path).WithOptions(GetModeOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED))
+                .WithElement(new BooleanConfigurationElement(ON_DEMAND, Strings.BassReplayGainBehaviourConfiguration_OnDemand, path: Strings.BassReplayGainBehaviourConfiguration_Path).WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED)
             );
             yield return section;
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetModeOptions()
         {
-            yield return new SelectionConfigurationOption(MODE_ALBUM, "Prefer Album").Default();
-            yield return new SelectionConfigurationOption(MODE_TRACK, "Prefer Track");
+            yield return new SelectionConfigurationOption(MODE_ALBUM, Strings.BassReplayGainBehaviourConfiguration_PreferAlbum).Default();
+            yield return new SelectionConfigurationOption(MODE_TRACK, Strings.BassReplayGainBehaviourConfiguration_PreferTrack);
         }
 
         public static ReplayGainMode GetMode(SelectionConfigurationOption option)

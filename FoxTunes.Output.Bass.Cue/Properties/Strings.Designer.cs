@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Output.Bass.Archive.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Output.Bass.Cue.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,74 +61,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Archive.
+        ///   Looks up a localized string similar to Open CUE.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviour_Open {
+        internal static string BassCueStreamAdvisorBehaviour_Open {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviour.Open", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Buffer Size (%).
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_BufferMin {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.BufferMin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Buffer Timeout (ms).
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_BufferTimeout {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.BufferTimeout", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cleanup Temp Files.
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_Cleanup {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.Cleanup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Double Buffer.
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_DoubleBuffer {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.DoubleBuffer", resourceCulture);
+                return ResourceManager.GetString("BassCueStreamAdvisorBehaviour.Open", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_Enabled {
+        internal static string BassCueStreamAdvisorBehaviourConfiguration_Enabled {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.Enabled", resourceCulture);
+                return ResourceManager.GetString("BassCueStreamAdvisorBehaviourConfiguration.Enabled", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Read Meta Data.
+        ///   Looks up a localized string similar to CUE.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_MetaData {
+        internal static string BassCueStreamAdvisorBehaviourConfiguration_Section {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.MetaData", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Archive.
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_Section {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.Section", resourceCulture);
+                return ResourceManager.GetString("BassCueStreamAdvisorBehaviourConfiguration.Section", resourceCulture);
             }
         }
     }

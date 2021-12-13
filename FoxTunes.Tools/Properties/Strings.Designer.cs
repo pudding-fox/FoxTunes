@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Output.Bass.Archive.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Tools.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,74 +61,56 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Archive.
+        ///   Looks up a localized string similar to Tools.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviour_Open {
+        internal static string Picard_Path {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviour.Open", resourceCulture);
+                return ResourceManager.GetString("Picard.Path", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Buffer Size (%).
+        ///   Looks up a localized string similar to Picard.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_BufferMin {
+        internal static string Picard_Picard {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.BufferMin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Buffer Timeout (ms).
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_BufferTimeout {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.BufferTimeout", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cleanup Temp Files.
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_Cleanup {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.Cleanup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Double Buffer.
-        /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_DoubleBuffer {
-            get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.DoubleBuffer", resourceCulture);
+                return ResourceManager.GetString("Picard.Picard", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_Enabled {
+        internal static string PicardConfiguration_Enabled {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.Enabled", resourceCulture);
+                return ResourceManager.GetString("PicardConfiguration.Enabled", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Read Meta Data.
+        ///   Looks up a localized string similar to Location.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_MetaData {
+        internal static string PicardConfiguration_Location {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.MetaData", resourceCulture);
+                return ResourceManager.GetString("PicardConfiguration.Location", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Archive.
+        ///   Looks up a localized string similar to MusicBrainz Picard.
         /// </summary>
-        internal static string BassArchiveStreamProviderBehaviourConfiguration_Section {
+        internal static string PicardConfiguration_Path {
             get {
-                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.Section", resourceCulture);
+                return ResourceManager.GetString("PicardConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools.
+        /// </summary>
+        internal static string ToolsConfiguration_Section {
+            get {
+                return ResourceManager.GetString("ToolsConfiguration.Section", resourceCulture);
             }
         }
     }

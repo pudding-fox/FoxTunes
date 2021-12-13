@@ -1,5 +1,4 @@
-﻿using FoxTunes.Integration;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,9 +16,12 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IFileSystemBrowser FileSystemBrowser { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = core.Managers.Playlist;
+            this.FileSystemBrowser = core.Components.FileSystemBrowser;
             base.InitializeComponent(core);
         }
 
@@ -29,9 +31,9 @@ namespace FoxTunes
             {
                 if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, REMOVE_PLAYLIST_ITEMS, "Remove");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CROP_PLAYLIST_ITEMS, "Crop");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOCATE_PLAYLIST_ITEMS, "Locate");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, REMOVE_PLAYLIST_ITEMS, Strings.PlaylistActionsBehaviour_Remove);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CROP_PLAYLIST_ITEMS, Strings.PlaylistActionsBehaviour_Crop);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOCATE_PLAYLIST_ITEMS, Strings.PlaylistActionsBehaviour_Locate);
                 }
             }
         }
@@ -68,7 +70,7 @@ namespace FoxTunes
         {
             foreach (var item in this.PlaylistManager.SelectedItems)
             {
-                Explorer.Select(item.FileName);
+                this.FileSystemBrowser.Select(item.FileName);
             }
 #if NET40
             return TaskEx.FromResult(false);

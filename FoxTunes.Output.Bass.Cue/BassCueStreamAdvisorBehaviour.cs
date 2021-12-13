@@ -65,7 +65,7 @@ namespace FoxTunes
             {
                 if (this.Enabled)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CUE, "Open CUE");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CUE, Strings.BassCueStreamAdvisorBehaviour_Open);
                 }
             }
         }

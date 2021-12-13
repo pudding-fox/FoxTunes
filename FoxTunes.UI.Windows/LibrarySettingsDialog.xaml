@@ -91,11 +91,11 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="0">Name</Label>
+                        <Label Grid.Column="0" Grid.Row="0" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Name}"></Label>
                         <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,0,0,5"></TextBox>
-                        <Label Grid.Column="0" Grid.Row="1">Type</Label>
+                        <Label Grid.Column="0" Grid.Row="1" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Type}"></Label>
                         <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Type}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyTypes}}" Margin="0,0,0,5"></ComboBox>
-                        <Label Grid.Column="0" Grid.Row="2">Enabled</Label>
+                        <Label Grid.Column="0" Grid.Row="2" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Enabled}"></Label>
                         <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding Enabled}" Margin="0,0,0,5" VerticalAlignment="Center" ></CheckBox>
                     </Grid>
                     <Grid DockPanel.Dock="Bottom" DataContext="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}">
@@ -117,7 +117,7 @@
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label"></ColumnDefinition>
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" >Script</Label>
+                        <Label Grid.Column="0" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Script}"></Label>
                         <TextBox Grid.Column="1" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"  Text="{Binding Script}"></TextBox>
                     </Grid>
                 </DockPanel>
