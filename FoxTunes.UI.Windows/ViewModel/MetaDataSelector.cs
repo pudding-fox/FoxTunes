@@ -39,6 +39,8 @@ namespace FoxTunes.ViewModel
         {
             return new[]
             {
+                CommonFormats.Decibel,
+                CommonFormats.Float,
                 CommonFormats.TimeSpan
             };
         }
