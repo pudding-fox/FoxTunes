@@ -4,6 +4,6 @@
     {
         string Get(string slot);
 
-        void Add(string slot);
+        bool Resolve(string slot);
     }
 }

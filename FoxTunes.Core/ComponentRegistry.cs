@@ -83,18 +83,7 @@ namespace FoxTunes
             return this.Components.OfType<T>();
         }
 
-        public void ReplaceComponents<T>(params T[] components) where T : IBaseComponent
-        {
-            this.ReplaceComponents(components.AsEnumerable());
-        }
-
-        public void ReplaceComponents<T>(IEnumerable<T> components) where T : IBaseComponent
-        {
-            this.ForEach<T>(component => this.RemoveComponent(component));
-            this.AddComponents(components.OfType<IBaseComponent>());
-        }
-
-        private void RemoveComponent<T>(T component) where T : IBaseComponent
+        public void RemoveComponent(IBaseComponent component)
         {
             this.Components.Remove(component);
         }
