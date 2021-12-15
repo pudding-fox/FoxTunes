@@ -20,7 +20,11 @@ namespace FoxTunes
             this.Clear();
         }
 
-        private List<IBaseComponent> Components { get; set; }
+        private IDictionary<Type, IBaseComponent> ComponentsByType { get; set; }
+
+        private IDictionary<Type, ISet<IBaseComponent>> ComponentsByInterface { get; set; }
+
+        private IDictionary<string, ISet<IBaseComponent>> ComponentsBySlot { get; set; }
 
         public void AddComponents(params IBaseComponent[] components)
         {
@@ -31,7 +35,32 @@ namespace FoxTunes
         {
             foreach (var component in components)
             {
-                this.Components.Add(component);
+                this.AddComponent(component);
+            }
+        }
+
+        public void AddComponent(IBaseComponent component)
+        {
+            var componentType = component.GetType();
+            if (!this.ComponentsByType.TryAdd(componentType, component))
+            {
+                Logger.Write(typeof(ComponentRegistry), LogLevel.Warn, "Cannot register component type \"{0}\", it was already registered.", componentType.FullName);
+            }
+            foreach (var componentInterface in componentType.GetInterfaces())
+            {
+                if (!this.ComponentsByInterface.GetOrAdd(componentInterface, () => new HashSet<IBaseComponent>()).Add(component))
+                {
+                    Logger.Write(typeof(ComponentRegistry), LogLevel.Warn, "Cannot register component type \"{0}\" by interface \"{1}\", it was already registered.", componentType.FullName, componentInterface.FullName);
+                }
+            }
+            var attribute = componentType.GetCustomAttribute<ComponentAttribute>();
+            if (attribute == null || string.IsNullOrEmpty(attribute.Slot) || string.Equals(attribute.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            if (!this.ComponentsBySlot.GetOrAdd(attribute.Slot, () => new HashSet<IBaseComponent>()).Add(component))
+            {
+                Logger.Write(typeof(ComponentRegistry), LogLevel.Warn, "Cannot register component type \"{0}\" by slot \"{1}\", it was already registered.", componentType.FullName, attribute.Slot);
             }
         }
 
@@ -47,30 +76,33 @@ namespace FoxTunes
 
         public IEnumerable<IBaseComponent> GetComponents(Type type)
         {
-            foreach (var component in this.Components)
+            if (type.IsClass)
             {
-                if (type.IsAssignableFrom(component.GetType()))
+                var component = default(IBaseComponent);
+                if (this.ComponentsByType.TryGetValue(type, out component))
                 {
-                    yield return component;
+                    return new[] { component };
                 }
             }
+            if (type.IsInterface)
+            {
+                var components = default(ISet<IBaseComponent>);
+                if (this.ComponentsByInterface.TryGetValue(type, out components))
+                {
+                    return components;
+                }
+            }
+            return Enumerable.Empty<IBaseComponent>();
         }
 
         public IEnumerable<IBaseComponent> GetComponents(string slot)
         {
-            foreach (var component in this.Components)
+            var components = default(ISet<IBaseComponent>);
+            if (this.ComponentsBySlot.TryGetValue(slot, out components))
             {
-                var attribute = component.GetType().GetCustomAttribute<ComponentAttribute>();
-                if (attribute == null)
-                {
-                    continue;
-                }
-                if (!string.Equals(attribute.Slot, slot, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-                yield return component;
+                return components;
             }
+            return Enumerable.Empty<IBaseComponent>();
         }
 
         public T GetComponent<T>() where T : IBaseComponent
@@ -80,19 +112,37 @@ namespace FoxTunes
 
         public IEnumerable<T> GetComponents<T>()
         {
-            return this.Components.OfType<T>();
+            return this.GetComponents(typeof(T)).OfType<T>();
         }
 
         public void RemoveComponent(IBaseComponent component)
         {
-            this.Components.Remove(component);
+            var components = default(ISet<IBaseComponent>);
+            var componentType = component.GetType();
+            this.ComponentsByType.Remove(componentType);
+            foreach (var componentInterface in componentType.GetInterfaces())
+            {
+                if (this.ComponentsByInterface.TryGetValue(componentInterface, out components))
+                {
+                    components.Remove(component);
+                }
+            }
+            var attribute = componentType.GetCustomAttribute<ComponentAttribute>();
+            if (attribute == null || string.IsNullOrEmpty(attribute.Slot) || string.Equals(attribute.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            if (this.ComponentsBySlot.TryGetValue(attribute.Slot, out components))
+            {
+                components.Remove(component);
+            }
         }
 
         public void ForEach(Action<IBaseComponent> action)
         {
-            foreach (var component in this.Components)
+            foreach (var pair in this.ComponentsByType)
             {
-                action(component);
+                action(pair.Value);
             }
         }
 
@@ -130,7 +180,9 @@ namespace FoxTunes
 
         public void Clear()
         {
-            this.Components = new List<IBaseComponent>();
+            this.ComponentsByType = new Dictionary<Type, IBaseComponent>();
+            this.ComponentsByInterface = new Dictionary<Type, ISet<IBaseComponent>>();
+            this.ComponentsBySlot = new Dictionary<string, ISet<IBaseComponent>>(StringComparer.OrdinalIgnoreCase);
         }
 
         public static readonly IComponentRegistry Instance = new ComponentRegistry();

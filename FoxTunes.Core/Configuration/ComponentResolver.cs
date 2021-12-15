@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -94,6 +95,10 @@ namespace FoxTunes
                     }
                     Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Unloading conflicting component \"{0}\" in slot {1}: It is not the default.", component.GetType().FullName, slot);
                     ComponentRegistry.Instance.RemoveComponent(component);
+                    if (component is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
                 }
                 return true;
             }
