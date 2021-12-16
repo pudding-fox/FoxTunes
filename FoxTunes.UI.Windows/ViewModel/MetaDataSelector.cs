@@ -41,7 +41,9 @@ namespace FoxTunes.ViewModel
             {
                 CommonFormats.Decibel,
                 CommonFormats.Float,
-                CommonFormats.TimeSpan
+                CommonFormats.Integer,
+                CommonFormats.TimeSpan,
+                CommonFormats.TimeStamp
             };
         }
 

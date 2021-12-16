@@ -76,22 +76,6 @@ namespace FoxTunes
             }
         }
 
-        public string PlayCount
-        {
-            get
-            {
-                return Resources.PlayCount;
-            }
-        }
-
-        public string LastPlayed
-        {
-            get
-            {
-                return Resources.LastPlayed;
-            }
-        }
-
         public string Rating
         {
             get

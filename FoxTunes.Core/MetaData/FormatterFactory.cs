@@ -10,6 +10,10 @@ namespace FoxTunes
             {
                 return new TimeSpanFormatter(format);
             }
+            if (TimeStampFormatter.CanFormat(format))
+            {
+                return new TimeStampFormatter(format);
+            }
             if (DecibelFormatter.CanFormat(format))
             {
                 return new DecibelFormatter(format);
@@ -17,6 +21,10 @@ namespace FoxTunes
             if (FloatFormatter.CanFormat(format))
             {
                 return new FloatFormatter(format);
+            }
+            if (IntegerFormatter.CanFormat(format))
+            {
+                return new IntegerFormatter(format);
             }
             return new StringFormatter(format);
         }
@@ -83,6 +91,29 @@ namespace FoxTunes
             }
         }
 
+        public class TimeStampFormatter : FormatterBase
+        {
+            public TimeStampFormatter(string format) : base(format)
+            {
+
+            }
+
+            public override object GetValue(object value)
+            {
+                var date = DateTimeHelper.FromString(Convert.ToString(value));
+                if (date == default(DateTime))
+                {
+                    return value;
+                }
+                return date.ToShortDateString() + " " + date.ToShortTimeString();
+            }
+
+            public static bool CanFormat(string format)
+            {
+                return string.Equals(format, CommonFormats.TimeStamp, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         public class DecibelFormatter : FormatterBase
         {
             public DecibelFormatter(string format) : base(format)
@@ -138,6 +169,30 @@ namespace FoxTunes
             public static bool CanFormat(string format)
             {
                 return string.Equals(format, CommonFormats.Float, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        public class IntegerFormatter : FormatterBase
+        {
+            public IntegerFormatter(string format) : base(format)
+            {
+
+            }
+
+            public override object GetValue(object value)
+            {
+                var parsed = default(int);
+                if (!int.TryParse(Convert.ToString(value), out parsed))
+                {
+                    return value;
+                }
+
+                return parsed;
+            }
+
+            public static bool CanFormat(string format)
+            {
+                return string.Equals(format, CommonFormats.Integer, StringComparison.OrdinalIgnoreCase);
             }
         }
     }
