@@ -132,7 +132,7 @@ namespace FoxTunes
                     return value;
                 }
 
-                return parsed.ToString("0.00");
+                return parsed.ToString("0.000000");
             }
 
             public static bool CanFormat(string format)

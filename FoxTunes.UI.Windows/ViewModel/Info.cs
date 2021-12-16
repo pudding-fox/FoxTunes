@@ -495,7 +495,7 @@ namespace FoxTunes.ViewModel
                     CommonMetaData.Year,
                     CommonStatistics.Rating,
                     CommonImageTypes.FrontCover
-                }).Any())
+                }, StringComparer.OrdinalIgnoreCase).Any())
                 {
 #if NET40
                     return TaskEx.FromResult(false);
