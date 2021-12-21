@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -18,15 +14,20 @@ namespace FoxTunes
 
         public bool Descending { get; private set; }
 
-        protected override Task OnRun()
+        public int Changes { get; private set; }
+
+        protected override async Task OnRun()
         {
-            return this.SortItems(this.PlaylistColumn, this.Descending);
+            this.Changes = await this.SortItems(this.PlaylistColumn, this.Descending).ConfigureAwait(false);
         }
 
         protected override async Task OnCompleted()
         {
             await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
+            if (this.Changes != 0)
+            {
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
+            }
         }
     }
 }

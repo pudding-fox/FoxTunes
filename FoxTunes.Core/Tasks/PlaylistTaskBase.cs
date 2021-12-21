@@ -331,7 +331,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task SortItems(PlaylistColumn playlistColumn, bool descending)
+        protected virtual Task<int> SortItems(PlaylistColumn playlistColumn, bool descending)
         {
             Logger.Write(this, LogLevel.Debug, "Sorting playlist {0} by column {1}.", this.Playlist.Name, playlistColumn.Name);
             switch (playlistColumn.Type)
@@ -345,33 +345,36 @@ namespace FoxTunes
 
             }
 #if NET40
-            return TaskEx.FromResult(false);
+            return TaskEx.FromResult(0);
 #else
-            return Task.CompletedTask;
+            return Task.FromResult(0);
 #endif
         }
 
-        protected virtual async Task SortItemsByScript(string script, bool descending)
+        protected virtual async Task<int> SortItemsByScript(string script, bool descending)
         {
             using (var comparer = new PlaylistItemScriptComparer(script))
             {
                 comparer.InitializeComponent(this.Core);
                 await this.SortItems(comparer, descending).ConfigureAwait(false);
+                return comparer.Changes;
             }
         }
 
-        protected virtual Task SortItemsByPlugin(string plugin, bool descending)
+        protected virtual async Task<int> SortItemsByPlugin(string plugin, bool descending)
         {
             var comparer = new PlaylistItemPluginComparer(plugin);
             comparer.InitializeComponent(this.Core);
-            return this.SortItems(comparer, descending);
+            await this.SortItems(comparer, descending).ConfigureAwait(false);
+            return comparer.Changes;
         }
 
-        protected virtual Task SortItemsByTag(string tag, bool descending)
+        protected virtual async Task<int> SortItemsByTag(string tag, bool descending)
         {
             var comparer = new PlaylistItemMetaDataComparer(tag);
             comparer.InitializeComponent(this.Core);
-            return this.SortItems(comparer, descending);
+            await this.SortItems(comparer, descending).ConfigureAwait(false);
+            return comparer.Changes;
         }
 
         protected virtual async Task SortItems(IComparer<PlaylistItem> comparer, bool descending)
@@ -408,7 +411,7 @@ namespace FoxTunes
                 }
             }))
             {
-                await task.Run().ConfigureAwait(false); await task.Run().ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 

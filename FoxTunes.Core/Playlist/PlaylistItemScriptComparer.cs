@@ -17,6 +17,8 @@ namespace FoxTunes
 
         public IScriptingContext ScriptingContext { get; private set; }
 
+        public int Changes { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
@@ -35,11 +37,20 @@ namespace FoxTunes
         {
             var numeric1 = default(float);
             var numeric2 = default(float);
+            var result = default(int);
             if (float.TryParse(value1, out numeric1) && float.TryParse(value2, out numeric2))
             {
-                return numeric1.CompareTo(numeric2);
+                result = numeric1.CompareTo(numeric2);
             }
-            return string.Compare(value1, value2, StringComparison.OrdinalIgnoreCase);
+            else
+            {
+                result = string.Compare(value1, value2, StringComparison.OrdinalIgnoreCase);
+            }
+            if (result != 0)
+            {
+                this.Changes++;
+            }
+            return result;
         }
 
         protected virtual string GetValue(PlaylistItem playlistItem)
