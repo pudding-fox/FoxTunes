@@ -622,7 +622,10 @@
                             </DoubleAnimationUsingKeyFrames>
                         </Storyboard>
                     </ControlTemplate.Resources>
-                    <Grid SnapsToDevicePixels="true" Margin="1,1,1,1">
+                    <Grid SnapsToDevicePixels="true" Margin="1,0,1,0">
+                        <!-- This empty textblock ensures that the item height is initially correct. -->
+                        <!-- This prevents re-measuring as the list data is "hydrated". -->
+                        <TextBlock/>
                         <Rectangle x:Name="Background" IsHitTestVisible="True" Opacity="0.25" Fill="Transparent" RadiusX="1" RadiusY="1"/>
                         <Rectangle x:Name="HoverRectangle" IsHitTestVisible="False" Opacity="0" Fill="{DynamicResource NormalBrush}" RadiusX="1" RadiusY="1"/>
                         <Rectangle x:Name="SelectedRectangle" IsHitTestVisible="False" Opacity="0" Fill="{DynamicResource SelectedBackgroundBrush}" RadiusX="1" RadiusY="1"/>
