@@ -89,6 +89,15 @@ namespace FoxTunes
             {
                 this.Dispatch(() => RatingManager.SetRating(playlistItems, rating));
             }
+
+            protected override void OnDisposing()
+            {
+                if (this.Rating != null)
+                {
+                    this.Rating.ValueChanged -= this.OnValueChanged;
+                }
+                base.OnDisposing();
+            }
         }
     }
 }

@@ -21,9 +21,11 @@
         <Border.Style>
             <Style TargetType="{x:Type Border}">
                 <Setter Property="Background" Value="{DynamicResource NormalBrush}"></Setter>
+                <Setter Property="Windows:GlassLabel.IsGlassEnabled" Value="False"></Setter>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding ExtendGlass.Value, Source={StaticResource ViewModel}}" Value="True">
                         <Setter Property="Background" Value="#3FFFFFFF"></Setter>
+                        <Setter Property="Windows:GlassLabel.IsGlassEnabled" Value="True"></Setter>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
