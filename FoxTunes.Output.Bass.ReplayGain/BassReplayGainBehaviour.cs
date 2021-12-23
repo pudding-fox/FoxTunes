@@ -50,6 +50,8 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -82,7 +84,7 @@ namespace FoxTunes
                 this.Output.Loaded += this.OnLoaded;
                 this.Output.Unloaded += this.OnUnloaded;
             }
-            if (BassStreamPipelineFactory != null)
+            if (this.BassStreamPipelineFactory != null)
             {
                 this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             }
@@ -362,7 +364,7 @@ namespace FoxTunes
                 this.Output.Loaded -= this.OnLoaded;
                 this.Output.Unloaded -= this.OnUnloaded;
             }
-            if (BassStreamPipelineFactory != null)
+            if (this.BassStreamPipelineFactory != null)
             {
                 this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
             }
