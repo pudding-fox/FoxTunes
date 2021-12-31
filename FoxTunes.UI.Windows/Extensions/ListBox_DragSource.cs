@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -110,20 +111,18 @@ namespace FoxTunes
                 this.ListBox.PreviewMouseDown += this.OnMouseDown;
                 this.ListBox.PreviewMouseUp += this.OnMouseUp;
                 this.ListBox.MouseMove += this.OnMouseMove;
+                this.ListBox.PreviewTouchDown += this.OnTouchDown;
+                this.ListBox.PreviewTouchUp += this.OnTouchUp;
+                this.ListBox.TouchMove += this.OnTouchMove;
             }
 
             public Point DragStartPosition { get; private set; }
 
             public ListBox ListBox { get; private set; }
 
-            protected virtual bool ShouldInitializeDrag(object source, Point position)
+            protected virtual bool ShouldInitializeDrag(Point position)
             {
                 if (this.DragStartPosition.Equals(default(Point)))
-                {
-                    return false;
-                }
-                var dependencyObject = source as DependencyObject;
-                if (dependencyObject == null || dependencyObject.FindAncestor<ListBoxItem>() == null)
                 {
                     return false;
                 }
@@ -147,7 +146,17 @@ namespace FoxTunes
                 this.DragStartPosition = e.GetPosition(this.ListBox);
             }
 
+            protected virtual void OnTouchDown(object sender, TouchEventArgs e)
+            {
+                this.DragStartPosition = e.GetTouchPoint(this.ListBox).Position;
+            }
+
             protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
+            {
+                this.DragStartPosition = default(Point);
+            }
+
+            protected virtual void OnTouchUp(object sender, TouchEventArgs e)
             {
                 this.DragStartPosition = default(Point);
             }
@@ -158,17 +167,52 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var selectedItem = this.ListBox.SelectedItem;
-                if (selectedItem == null)
+                var dependencyObject = e.OriginalSource as DependencyObject;
+                if (dependencyObject == null || dependencyObject.FindAncestor<ListBoxItem>() == null)
                 {
                     return;
                 }
-                var position = e.GetPosition(this.ListBox);
-                if (this.ShouldInitializeDrag(e.OriginalSource, position))
+                this.TryInitializeDrag(e.GetPosition(this.ListBox));
+            }
+
+            protected virtual void OnTouchMove(object sender, TouchEventArgs e)
+            {
+                var position = e.GetTouchPoint(this.ListBox).Position;
+                var result = VisualTreeHelper.HitTest(this.ListBox, position);
+                if (result != null && result.VisualHit is DependencyObject dependencyObject && dependencyObject.FindAncestor<ListBoxItem>() != null)
+                {
+                    this.TryInitializeDrag(position);
+                }
+            }
+
+            protected virtual bool TryInitializeDrag(Point position)
+            {
+                var selectedItem = this.ListBox.SelectedItem;
+                if (selectedItem == null)
+                {
+                    return false;
+                }
+                if (this.ShouldInitializeDrag(position))
                 {
                     this.DragStartPosition = default(Point);
                     this.ListBox.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
+                    return true;
                 }
+                return false;
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.ListBox != null)
+                {
+                    this.ListBox.PreviewMouseDown -= this.OnMouseDown;
+                    this.ListBox.PreviewMouseUp -= this.OnMouseUp;
+                    this.ListBox.MouseMove -= this.OnMouseMove;
+                    this.ListBox.PreviewTouchDown -= this.OnTouchDown;
+                    this.ListBox.PreviewTouchUp -= this.OnTouchUp;
+                    this.ListBox.TouchMove -= this.OnTouchMove;
+                }
+                base.OnDisposing();
             }
         }
     }
