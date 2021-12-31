@@ -42,7 +42,7 @@
                 <Windows:LibrarySearch DockPanel.Dock="Bottom"></Windows:LibrarySearch>
                 <Windows:LibraryTree></Windows:LibraryTree>
             </DockPanel>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4"></GridSplitter>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
             <Windows:DefaultPlaylist Grid.Column="2"></Windows:DefaultPlaylist>
             <Windows:BackgroundTasks Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Windows:BackgroundTasks>
         </Grid>
