@@ -99,11 +99,18 @@ namespace FoxTunes
                         {
                             if (task.IsFaulted)
                             {
-                                pair.Value.SetException(task.Exception);
+                                var exception = task.Exception.Unwrap();
+                                if (!pair.Value.TrySetException(exception))
+                                {
+                                    Logger.Write(typeof(AsyncDebouncer), LogLevel.Warn, "Failed to propagate exception: {0}", exception.Message);
+                                }
                             }
                             else
                             {
-                                pair.Value.SetResult(true);
+                                if (!pair.Value.TrySetResult(true))
+                                {
+                                    Logger.Write(typeof(AsyncDebouncer), LogLevel.Warn, "Failed to propagate result.");
+                                }
                             }
                         });
                     }
