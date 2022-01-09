@@ -209,6 +209,7 @@ namespace FoxTunes
 
         public static async Task Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
         {
+            //TODO: Always writing embedded images regardless of settings.
             var index = default(int);
             var pictures = new List<IPicture>(file.Tag.Pictures);
             if (HasImage(metaDataItem.Name, file.Tag, pictures, out index))
