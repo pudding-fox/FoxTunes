@@ -76,15 +76,11 @@ namespace FoxTunes
 
         protected virtual object GetValue(InternalHandle target)
         {
-            if (target.IsString || target.IsStringObject)
+            if (target.IsUndefined)
             {
-                return target.AsString;
+                return null;
             }
-            if (target.IsNumber || target.IsNumberObject)
-            {
-                return target.AsInt32;
-            }
-            return null;
+            return target.LastValue;
         }
 
         [DebuggerNonUserCode]
@@ -111,8 +107,21 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            this.Context.Dispose();
-            this.Engine.Dispose();
+            if (this.Scripts != null)
+            {
+                foreach (var pair in this.Scripts)
+                {
+                    pair.Value.Dispose();
+                }
+            }
+            if (this.Context != null)
+            {
+                this.Context.Dispose();
+            }
+            if (this.Engine != null)
+            {
+                this.Engine.Dispose();
+            }
             base.OnDisposing();
         }
     }
