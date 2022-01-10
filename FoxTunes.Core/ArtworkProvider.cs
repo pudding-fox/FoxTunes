@@ -88,6 +88,33 @@ namespace FoxTunes
                 .ToArray();
         }
 
+        public string GetFileName(string path, string extension, ArtworkType type)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
+            {
+                return null;
+            }
+            var directoryName = Path.GetDirectoryName(path);
+            var names = default(string[]);
+            switch (type)
+            {
+                case ArtworkType.FrontCover:
+                    names = this.Front;
+                    break;
+                case ArtworkType.BackCover:
+                    names = this.Back;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            var name = names.FirstOrDefault();
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "cover";
+            }
+            return Path.Combine(directoryName, string.Concat(name, ".", extension.TrimStart('.')));
+        }
+
         public string Find(string path, ArtworkType type)
         {
             if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
@@ -152,6 +179,16 @@ namespace FoxTunes
             return this.Find(fileData.FileName, type);
         }
 
+        public void Reset(string path, ArtworkType type)
+        {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
+            {
+                return;
+            }
+            var directoryName = Path.GetDirectoryName(path);
+            this.Store.TryRemove(directoryName, type);
+        }
+
         public class Cache
         {
             public Cache(int capacity)
@@ -165,6 +202,12 @@ namespace FoxTunes
             {
                 var key = new Key(path, type);
                 return this.Store.GetOrAdd(key, factory);
+            }
+
+            public bool TryRemove(string path, ArtworkType type)
+            {
+                var key = new Key(path, type);
+                return this.Store.TryRemove(key);
             }
 
             public void Clear()
