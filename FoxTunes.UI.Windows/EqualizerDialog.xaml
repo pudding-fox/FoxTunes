@@ -44,12 +44,6 @@
         <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal">
             <CheckBox HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Enabled, Source={StaticResource ViewModel}}" Margin="0,0,3,0">Enabled</CheckBox>
         </StackPanel>
-        <ComboBox Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" ItemsSource="{Binding Presets, Source={StaticResource ViewModel}}" SelectedValue="{Binding Preset, Source={StaticResource ViewModel}}" IsEnabled="{Binding Enabled, Source={StaticResource ViewModel}}" MinWidth="150">
-            <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="SelectionChanged">
-                    <Interactivity:InvokeCommandAction Command="{Binding LoadPresetCommand, Source={StaticResource ViewModel}}"></Interactivity:InvokeCommandAction>
-                </Interactivity:EventTrigger>
-            </Interactivity:Interaction.Triggers>
-        </ComboBox>
+        <ComboBox Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" ItemsSource="{Binding Presets, Source={StaticResource ViewModel}}" SelectedValue="{Binding Preset, Source={StaticResource ViewModel}}" IsEnabled="{Binding Enabled, Source={StaticResource ViewModel}}" MinWidth="150"></ComboBox>
     </Grid>
 </Windows:UIComponentBase>
