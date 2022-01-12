@@ -121,7 +121,19 @@ namespace FoxTunes
 
         public static void Cleanup()
         {
-            FileMetaDataStore.Clear(PREFIX);
+            try
+            {
+                var instance = ComponentRegistry.Instance.GetComponent<WaveFormCache>();
+                if (instance != null)
+                {
+                    instance.Store.Clear();
+                }
+                FileMetaDataStore.Clear(PREFIX);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(WaveFormCache), LogLevel.Warn, "Failed to clear caches: {0}", e.Message);
+            }
         }
 
         public class Key : IEquatable<Key>
