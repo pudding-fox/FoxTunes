@@ -19,6 +19,8 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
         public IFileSystemBrowser FileSystemBrowser { get; private set; }
 
         public IBassOutput Output { get; private set; }
@@ -45,6 +47,7 @@ namespace FoxTunes
             this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
             this.PlaylistManager = core.Managers.Playlist;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -109,7 +112,21 @@ namespace FoxTunes
                     var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
                     foreach (var path in paths)
                     {
-                        await this.OpenCue(playlist, path).ConfigureAwait(false);
+                        await this.AddCueToPlaylist(playlist, path).ConfigureAwait(false);
+                    }
+                    break;
+            }
+        }
+
+        public async Task Handle(IEnumerable<string> paths, int index, FileActionType type)
+        {
+            switch (type)
+            {
+                case FileActionType.Playlist:
+                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    foreach (var path in paths)
+                    {
+                        await this.AddCueToPlaylist(playlist, index, path).ConfigureAwait(false);
                     }
                     break;
             }
@@ -138,12 +155,18 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.OpenCue(this.PlaylistManager.SelectedPlaylist, result.Paths.FirstOrDefault());
+            return this.AddCueToPlaylist(this.PlaylistManager.SelectedPlaylist, result.Paths.FirstOrDefault());
         }
 
-        public async Task OpenCue(Playlist playlist, string fileName)
+        public Task AddCueToPlaylist(Playlist playlist, string fileName)
         {
-            using (var task = new AddCueToPlaylistTask(playlist, fileName))
+            var index = this.PlaylistBrowser.GetInsertIndex(playlist);
+            return this.AddCueToPlaylist(playlist, index, fileName);
+        }
+
+        public async Task AddCueToPlaylist(Playlist playlist, int index, string fileName)
+        {
+            using (var task = new AddCueToPlaylistTask(playlist, index, fileName))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -200,16 +223,12 @@ namespace FoxTunes
 
         private class AddCueToPlaylistTask : PlaylistTaskBase
         {
-            public AddCueToPlaylistTask(Playlist playlist, string fileName) : base(playlist)
+            public AddCueToPlaylistTask(Playlist playlist, int sequence, string fileName) : base(playlist, sequence)
             {
                 this.FileName = fileName;
             }
 
             public string FileName { get; private set; }
-
-            public IPlaylistManager PlaylistManager { get; private set; }
-
-            public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
             public CueSheetParser Parser { get; private set; }
 
@@ -217,8 +236,6 @@ namespace FoxTunes
 
             public override void InitializeComponent(ICore core)
             {
-                this.PlaylistManager = core.Managers.Playlist;
-                this.PlaylistBrowser = core.Components.PlaylistBrowser;
                 this.Parser = new CueSheetParser();
                 this.Parser.InitializeComponent(core);
                 this.Factory = new CueSheetPlaylistItemFactory();
@@ -229,13 +246,10 @@ namespace FoxTunes
             protected override async Task OnRun()
             {
                 var cueSheet = this.Parser.Parse(this.FileName);
-                var playlist = this.PlaylistManager.SelectedPlaylist;
                 var playlistItems = await this.Factory.Create(cueSheet).ConfigureAwait(false);
                 using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                 {
-                    //Always append for now.
-                    this.Sequence = this.PlaylistBrowser.GetInsertIndex(playlist);
-                    await this.AddPlaylistItems(playlist, playlistItems).ConfigureAwait(false);
+                    await this.AddPlaylistItems(playlistItems).ConfigureAwait(false);
                     await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
                     await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
                 }))
@@ -245,7 +259,7 @@ namespace FoxTunes
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
             }
 
-            private async Task AddPlaylistItems(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
+            protected override async Task AddPlaylistItems(IEnumerable<PlaylistItem> playlistItems)
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
@@ -254,7 +268,7 @@ namespace FoxTunes
                     foreach (var playlistItem in playlistItems)
                     {
                         Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
-                        playlistItem.Playlist_Id = playlist.Id;
+                        playlistItem.Playlist_Id = this.Playlist.Id;
                         playlistItem.Sequence = this.Sequence + position;
                         playlistItem.Status = PlaylistItemStatus.Import;
                         await set.AddAsync(playlistItem).ConfigureAwait(false);
