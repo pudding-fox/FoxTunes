@@ -85,6 +85,14 @@ CREATE TABLE [LibraryHierarchyItem_LibraryItem] (
 	[LibraryItem_Id] INTEGER NOT NULL
 );
 
+CREATE TABLE [MetaDataProviders] (
+	[Id] INTEGER PRIMARY KEY NOT NULL,
+	[Name] TEXT NOT NULL COLLATE NOCASE,
+	[Type] bigint NOT NULL,
+	[Script] text NULL COLLATE NOCASE,
+	[Enabled] bit NOT NULL
+);
+
 CREATE INDEX [IDX_LibraryHierarchies_1] ON [LibraryHierarchies](
 	[Enabled]
 );

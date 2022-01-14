@@ -6,7 +6,6 @@ namespace FoxTunes
     [Component("679D9459-BBCE-4D95-BB65-DD20C335719C", ComponentSlots.MetaData, @default: true)]
     public class TagLibMetaDataSourceFactory : MetaDataSourceFactory
     {
-
         public BooleanConfigurationElement Extended { get; private set; }
 
         public BooleanConfigurationElement MusicBrainz { get; private set; }
@@ -111,7 +110,7 @@ namespace FoxTunes
             }
         }
 
-        public override IMetaDataSource Create()
+        public override IMetaDataSource OnCreate()
         {
             var source = new TagLibMetaDataSource();
             source.InitializeComponent(this.Core);

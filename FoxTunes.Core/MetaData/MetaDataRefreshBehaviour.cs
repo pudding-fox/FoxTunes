@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public ILibraryManager LibraryManager { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -29,6 +31,7 @@ namespace FoxTunes
             this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
             this.UserInterface = core.Components.UserInterface;
             this.LibraryManager = core.Managers.Library;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Monitor();
             this.Enable();
@@ -37,12 +40,17 @@ namespace FoxTunes
 
         public void Enable()
         {
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration.Saved += this.OnSaved;
             Logger.Write(this, LogLevel.Info, "Enabled.");
         }
 
         public void Disable()
         {
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
+            }
             if (this.Configuration != null)
             {
                 this.Configuration.Saved -= this.OnSaved;
@@ -80,6 +88,20 @@ namespace FoxTunes
             this.Elements[element] = element.GetPersistentValue();
         }
 
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.MetaDataProvidersUpdated:
+                    return this.Refresh();
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
         protected virtual void OnSaved(object sender, EventArgs e)
         {
             if (!this.LibraryHierarchyCache.HasItems)
@@ -102,7 +124,7 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Info, "Configuration was changed, updating meta data.");
-            this.Refresh();
+            var task = this.Refresh();
         }
 
         public Task Refresh()

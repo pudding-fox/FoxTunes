@@ -288,8 +288,56 @@
   <data name="LibraryTree.Name" xml:space="preserve">
     <value>Library Tree</value>
   </data>
+  <data name="MetaDataItemType.CustomTag" xml:space="preserve">
+    <value>Tag (Custom)</value>
+  </data>
+  <data name="MetaDataItemType.Document" xml:space="preserve">
+    <value>Document</value>
+  </data>
+  <data name="MetaDataItemType.Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="MetaDataItemType.Property" xml:space="preserve">
+    <value>Property</value>
+  </data>
+  <data name="MetaDataItemType.Statistic" xml:space="preserve">
+    <value>Statistic</value>
+  </data>
+  <data name="MetaDataItemType.Tag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
   <data name="MetaDataName.IsCompilation" xml:space="preserve">
     <value>Compilation</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.GroupHeader" xml:space="preserve">
+    <value>Meta Data</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Script" xml:space="preserve">
+    <value>Script</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Type" xml:space="preserve">
+    <value>Type</value>
   </data>
   <data name="MinimalLayoutProvider.Description" xml:space="preserve">
     <value />

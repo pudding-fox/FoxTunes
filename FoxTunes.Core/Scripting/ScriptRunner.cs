@@ -22,11 +22,15 @@ namespace FoxTunes
 
         public virtual void Prepare()
         {
-            var collections = new Dictionary<MetaDataItemType, Dictionary<string, object>>()
+            var tags = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var documents = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var collections = new Dictionary<MetaDataItemType, IDictionary<string, object>>()
             {
-                { MetaDataItemType.Tag, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) },
-                { MetaDataItemType.Property, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) },
-                { MetaDataItemType.Document, new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) }
+                { MetaDataItemType.Tag, tags },
+                { MetaDataItemType.Property, properties },
+                { MetaDataItemType.Document, documents },
+                { MetaDataItemType.CustomTag, tags },
             };
             var fileName = default(string);
             var directoryName = default(string);
@@ -40,23 +44,44 @@ namespace FoxTunes
                         {
                             continue;
                         }
-                        var key = item.Name.ToLower();
-                        if (collections[item.Type].ContainsKey(key))
+                        var key = this.GetKey(item);
+                        var collection = collections[item.Type];
+                        if (collection.ContainsKey(key))
                         {
                             //Not sure what to do. Doesn't happen often.
                             continue;
                         }
-                        collections[item.Type].Add(key, this.GetValue(item));
+                        collection.Add(key, this.GetValue(item));
                     }
                 }
                 fileName = this.Item.FileName;
                 directoryName = this.Item.DirectoryName;
             }
-            this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
-            this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
-            this.ScriptingContext.SetValue("document", collections[MetaDataItemType.Document]);
+            this.ScriptingContext.SetValue("tag", tags);
+            this.ScriptingContext.SetValue("property", properties);
+            this.ScriptingContext.SetValue("document", documents);
             this.ScriptingContext.SetValue("file", fileName);
             this.ScriptingContext.SetValue("folder", directoryName);
+        }
+
+        public string GetKey(MetaDataItem item)
+        {
+            var name = item.Name;
+            switch (item.Type)
+            {
+                case MetaDataItemType.Document:
+                    var parts = name.Split(new[] { ':' }, 2);
+                    if (parts.Length != 2)
+                    {
+                        //Expected MimeType:Data.
+                    }
+                    else
+                    {
+                        name = parts[1];
+                    }
+                    break;
+            }
+            return name.ToLower();
         }
 
         public object GetValue(MetaDataItem item)

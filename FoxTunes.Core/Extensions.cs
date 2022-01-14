@@ -529,5 +529,14 @@ namespace FoxTunes
             var distance = subject.Distance(value, false);
             return (1.0f - ((float)distance / (float)Math.Max(subject.Length, value.Length)));
         }
+
+        public static IList<T> AsList<T>(this IEnumerable<T> sequence)
+        {
+            if (sequence is IList<T> list)
+            {
+                return list;
+            }
+            return sequence.ToList();
+        }
     }
 }

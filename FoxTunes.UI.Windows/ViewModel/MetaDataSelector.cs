@@ -1,35 +1,30 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Windows.Data;
 
 namespace FoxTunes.ViewModel
 {
     public static class MetaDataSelector
     {
-        public static readonly IMetaDataSourceFactory Factory = ComponentRegistry.Instance.GetComponent<IMetaDataSourceFactory>();
+        public static readonly IMetaDataSourceFactory SourceFactory = ComponentRegistry.Instance.GetComponent<IMetaDataSourceFactory>();
 
-        public static readonly IEnumerable<MetaDataElement> Elements = GetElements();
+        public static readonly IMetaDataDecoratorFactory DecoratorFactory = ComponentRegistry.Instance.GetComponent<IMetaDataDecoratorFactory>();
 
-        private static IEnumerable<MetaDataElement> GetElements()
+        public static readonly IValueConverter Converter = new EnumConverter();
+
+        public static IEnumerable<MetaDataElement> Elements
         {
-            var supported = Factory.Supported.ToArray();
-            var elements = Enumerable.Empty<MetaDataElement>();
-            elements = elements.Concat(GetElements(CommonMetaData.Lookup.Keys, MetaDataItemType.Tag, supported));
-            elements = elements.Concat(GetElements(CommonProperties.Lookup.Keys, MetaDataItemType.Property, supported));
-            elements = elements.Concat(GetElements(CommonStatistics.Lookup.Keys, MetaDataItemType.Statistic, supported));
-            return elements.ToArray();
-        }
-
-        private static IEnumerable<MetaDataElement> GetElements(IEnumerable<string> names, MetaDataItemType type, IEnumerable<KeyValuePair<string, MetaDataItemType>> supported)
-        {
-            foreach (var name in names)
+            get
             {
-                if (!supported.Any(element => string.Equals(element.Key, name, StringComparison.OrdinalIgnoreCase) && element.Value == type))
+                var supported = SourceFactory.Supported;
+                if (DecoratorFactory.CanCreate)
                 {
-                    continue;
+                    supported = supported.Concat(DecoratorFactory.Supported);
                 }
-                yield return new MetaDataElement(name, type);
+                return supported.Select(element => new MetaDataElement(element.Key, element.Value)).ToArray();
             }
         }
 
@@ -52,7 +47,9 @@ namespace FoxTunes.ViewModel
             public MetaDataElement(string name, MetaDataItemType type)
             {
                 this.Name = name;
-                this.Type = Enum.GetName(typeof(MetaDataItemType), type);
+                this.Type = Convert.ToString(
+                    Converter.Convert(type, typeof(string), null, CultureInfo.InvariantCulture)
+                );
             }
 
             public string Name { get; private set; }

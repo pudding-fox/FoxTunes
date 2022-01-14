@@ -12,6 +12,8 @@
 
         public const string MetaDataUpdated = "MetaDataUpdated";
 
+        public const string MetaDataProvidersUpdated = "MetaDataProvidersUpdated";
+
         public const string SettingsUpdated = "SettingsUpdated";
 
         public const string ImagesUpdated = "ImagesUpdated";

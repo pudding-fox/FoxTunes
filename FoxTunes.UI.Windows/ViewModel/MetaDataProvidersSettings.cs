@@ -10,56 +10,32 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class PlaylistSettings : ViewModelBase
+    public class MetaDataProvidersSettings : ViewModelBase
     {
-        public IPlaylistColumnManager PlaylistColumnProviderManager { get; private set; }
-
-        public IPlaylistBrowser PlaylistBrowser { get; private set; }
-
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public IMetaDataProviderManager MetaDataProviderManager { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        private CollectionManager<PlaylistColumn> _PlaylistColumns { get; set; }
+        private CollectionManager<MetaDataProvider> _MetaDataProviders { get; set; }
 
-        public CollectionManager<PlaylistColumn> PlaylistColumns
+        public CollectionManager<MetaDataProvider> MetaDataProviders
         {
             get
             {
-                return this._PlaylistColumns;
+                return this._MetaDataProviders;
             }
             set
             {
-                this._PlaylistColumns = value;
-                this.OnPlaylistColumnsChanged();
+                this._MetaDataProviders = value;
+                this.OnMetaDataProvidersChanged();
             }
         }
 
-        protected virtual void OnPlaylistColumnsChanged()
+        protected virtual void OnMetaDataProvidersChanged()
         {
-            this.OnPropertyChanged("PlaylistColumns");
-        }
-
-        private ObservableCollection<IPlaylistColumnProvider> _PlaylistColumnProviders { get; set; }
-
-        public ObservableCollection<IPlaylistColumnProvider> PlaylistColumnProviders
-        {
-            get
-            {
-                return this._PlaylistColumnProviders;
-            }
-            set
-            {
-                this._PlaylistColumnProviders = value;
-                this.OnPlaylistColumnProvidersChanged();
-            }
-        }
-
-        protected virtual void OnPlaylistColumnProvidersChanged()
-        {
-            this.OnPropertyChanged("PlaylistColumnProviders");
+            this.OnPropertyChanged("MetaDataProviders");
         }
 
         public bool IsSaving
@@ -67,8 +43,7 @@ namespace FoxTunes.ViewModel
             get
             {
                 return global::FoxTunes.BackgroundTask.Active
-                    .OfType<PlaylistTaskBase>()
-                    .Any();
+                    .Any(task => task is PlaylistTaskBase || task is LibraryTaskBase);
             }
         }
 
@@ -102,9 +77,9 @@ namespace FoxTunes.ViewModel
                     {
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
-                            var playlistColumns = database.Set<PlaylistColumn>(transaction);
-                            playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns.ItemsSource));
-                            playlistColumns.AddOrUpdate(this.PlaylistColumns.ItemsSource);
+                            var metaDataProviders = database.Set<MetaDataProvider>(transaction);
+                            metaDataProviders.Remove(metaDataProviders.Except(this.MetaDataProviders.ItemsSource));
+                            metaDataProviders.AddOrUpdate(this.MetaDataProviders.ItemsSource);
                             transaction.Commit();
                         }
 #if NET40
@@ -117,7 +92,7 @@ namespace FoxTunes.ViewModel
                         await task.Run().ConfigureAwait(false);
                     }
                 }
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated)).ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataProvidersUpdated)).ConfigureAwait(false);
                 return;
             }
             catch (Exception e)
@@ -157,7 +132,7 @@ namespace FoxTunes.ViewModel
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    core.InitializeDatabase(database, DatabaseInitializeType.Playlist);
+                    core.InitializeDatabase(database, DatabaseInitializeType.MetaData);
 #if NET40
                     return TaskEx.FromResult(false);
 #else
@@ -168,44 +143,32 @@ namespace FoxTunes.ViewModel
                     await task.Run().ConfigureAwait(false);
                 }
             }
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataProvidersUpdated)).ConfigureAwait(false);
         }
 
         public override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.PlaylistColumnProviderManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnManager>();
-            this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
-            this.PlaylistManager = this.Core.Managers.Playlist;
+            this.MetaDataProviderManager = core.Managers.MetaDataProvider;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.PlaylistColumns = new CollectionManager<PlaylistColumn>()
+            this.MetaDataProviders = new CollectionManager<MetaDataProvider>(CollectionManagerFlags.AllowEmptyCollection)
             {
                 ItemFactory = () =>
                 {
                     using (var database = this.DatabaseFactory.Create())
                     {
-                        return database.Set<PlaylistColumn>().Create().With(playlistColumn =>
+                        return database.Set<MetaDataProvider>().Create().With(metaDataProvider =>
                         {
-                            playlistColumn.Name = "New";
-                            playlistColumn.Type = PlaylistColumnType.Tag;
-                            playlistColumn.Script = "'New'";
-                            playlistColumn.Enabled = true;
+                            metaDataProvider.Name = "New";
+                            metaDataProvider.Type = MetaDataProviderType.Script;
+                            metaDataProvider.Script = "'New'";
+                            metaDataProvider.Enabled = true;
                         });
                     }
-                },
-                ExchangeHandler = (item1, item2) =>
-                {
-                    var temp = item1.Sequence;
-                    item1.Sequence = item2.Sequence;
-                    item2.Sequence = temp;
                 }
             };
-            this.PlaylistColumnProviders = new ObservableCollection<IPlaylistColumnProvider>(
-                this.PlaylistColumnProviderManager.Providers
-            );
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
@@ -221,11 +184,11 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.SettingsUpdated:
                     return this.Refresh();
-                case CommonSignals.PlaylistColumnsUpdated:
-                    var columns = signal.State as IEnumerable<PlaylistColumn>;
-                    if (columns != null && columns.Any())
+                case CommonSignals.MetaDataProvidersUpdated:
+                    var metaDataProviders = signal.State as IEnumerable<MetaDataProvider>;
+                    if (metaDataProviders != null && metaDataProviders.Any())
                     {
-                        this.PlaylistColumns.Refresh();
+                        this.MetaDataProviders.Refresh();
                     }
                     else
                     {
@@ -244,8 +207,8 @@ namespace FoxTunes.ViewModel
         {
             return Windows.Invoke(() =>
             {
-                this.PlaylistColumns.ItemsSource = new ObservableCollection<PlaylistColumn>(
-                    this.PlaylistBrowser.GetColumns()
+                this.MetaDataProviders.ItemsSource = new ObservableCollection<MetaDataProvider>(
+                    this.MetaDataProviderManager.GetProviders()
                 );
             });
         }
@@ -253,16 +216,12 @@ namespace FoxTunes.ViewModel
         protected override void OnDisposing()
         {
             global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
-            if (this.SignalEmitter != null)
-            {
-                this.SignalEmitter.Signal -= this.OnSignal;
-            }
             base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()
         {
-            return new PlaylistSettings();
+            return new MetaDataProvidersSettings();
         }
     }
 }

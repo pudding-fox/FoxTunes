@@ -114,11 +114,13 @@ namespace FoxTunes
         public override bool Confirm(string message)
         {
             var result = default(bool);
-            if (ActiveWindow != null)
+            //TODO: Bad .Result().
+            var window = GetActiveWindow().Result;
+            if (window != null)
             {
                 //TODO: This is the only MessageBox provided with a Window.
                 //TODO: Bad .Wait().
-                global::FoxTunes.Windows.Invoke(() => result = MessageBox.Show(ActiveWindow, message, "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK).Wait();
+                global::FoxTunes.Windows.Invoke(() => result = MessageBox.Show(window, message, "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK).Wait();
             }
             else
             {
@@ -231,15 +233,17 @@ namespace FoxTunes
             }
         }
 
-        public static Window ActiveWindow
+        public async Task<Window> GetActiveWindow()
         {
-            get
+            var activeWindow = default(Window);
+            await global::FoxTunes.Windows.Invoke(() =>
             {
                 //Try and get the focused window, fall back to one of the "main" windows.
-                return Application.Current.Windows.OfType<Window>().FirstOrDefault(
+                activeWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(
                     window => window.IsActive
                 ) ?? global::FoxTunes.Windows.ActiveWindow;
-            }
+            }).ConfigureAwait(false);
+            return activeWindow;
         }
     }
 }

@@ -238,6 +238,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual bool Validate(LibraryBrowserFrame frame)
         {
+            if (frame.Items == null)
+            {
+                return false;
+            }
             if (object.ReferenceEquals(frame.ItemsSource, LibraryHierarchyNode.Empty))
             {
                 //Root frame.

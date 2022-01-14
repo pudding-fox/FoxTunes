@@ -20,6 +20,7 @@
         </ObjectDataProvider>
         <CollectionViewSource x:Key="MetaDataElements" Source="{x:Static ViewModel:MetaDataSelector.Elements}">
             <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Type"></scm:SortDescription>
                 <scm:SortDescription PropertyName="Name"></scm:SortDescription>
             </CollectionViewSource.SortDescriptions>
             <CollectionViewSource.GroupDescriptions>

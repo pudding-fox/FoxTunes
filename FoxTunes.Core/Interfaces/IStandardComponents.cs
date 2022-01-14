@@ -32,6 +32,8 @@
 
         IMetaDataCache MetaDataCache { get; }
 
+        IMetaDataProviderCache MetaDataProviderCache { get; }
+
         IMetaDataSynchronizer MetaDataSynchronizer { get; }
 
         IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; }

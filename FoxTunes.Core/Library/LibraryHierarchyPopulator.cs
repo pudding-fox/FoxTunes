@@ -285,12 +285,18 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            foreach (var context in this.Contexts.Values)
+            if (this.Contexts != null)
             {
-                context.Dispose();
+                foreach (var context in this.Contexts.Values)
+                {
+                    context.Dispose();
+                }
+                this.Contexts.Dispose();
             }
-            this.Contexts.Dispose();
-            this.Writer.Dispose();
+            if (this.Writer != null)
+            {
+                this.Writer.Dispose();
+            }
             base.OnDisposing();
         }
     }

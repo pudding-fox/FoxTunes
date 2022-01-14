@@ -245,5 +245,85 @@
                 return Strings.LibraryRootsDialog_Delete;
             }
         }
+
+        public static string MetaDataProvidersSettingsDialog_GroupHeader
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_GroupHeader;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_New
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_New;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Delete
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Delete;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Name
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Name;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Type
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Type;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Enabled
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Enabled;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Script
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Script;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Save
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Save;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Cancel
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Cancel;
+            }
+        }
+
+        public static string MetaDataProvidersSettingsDialog_Reset
+        {
+            get
+            {
+                return Strings.MetaDataProvidersSettingsDialog_Reset;
+            }
+        }
     }
 }

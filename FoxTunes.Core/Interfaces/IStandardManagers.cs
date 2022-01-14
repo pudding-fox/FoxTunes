@@ -14,6 +14,8 @@
 
         IMetaDataManager MetaData { get; }
 
+        IMetaDataProviderManager MetaDataProvider { get; }
+
         IFileActionHandlerManager FileActionHandler { get; }
     }
 }

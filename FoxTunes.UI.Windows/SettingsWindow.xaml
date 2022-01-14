@@ -29,5 +29,8 @@
         <TabItem Header="File Types">
             <Windows:AssociationsDialog></Windows:AssociationsDialog>
         </TabItem>
+        <TabItem Header="Meta Data">
+            <Windows:MetaDataProvidersSettingsDialog></Windows:MetaDataProvidersSettingsDialog>
+        </TabItem>
     </TabControl>
 </Windows:WindowBase>

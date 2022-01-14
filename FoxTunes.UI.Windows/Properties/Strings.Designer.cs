@@ -574,11 +574,155 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tag (Custom).
+        /// </summary>
+        internal static string MetaDataItemType_CustomTag {
+            get {
+                return ResourceManager.GetString("MetaDataItemType.CustomTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Document.
+        /// </summary>
+        internal static string MetaDataItemType_Document {
+            get {
+                return ResourceManager.GetString("MetaDataItemType.Document", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image.
+        /// </summary>
+        internal static string MetaDataItemType_Image {
+            get {
+                return ResourceManager.GetString("MetaDataItemType.Image", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property.
+        /// </summary>
+        internal static string MetaDataItemType_Property {
+            get {
+                return ResourceManager.GetString("MetaDataItemType.Property", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Statistic.
+        /// </summary>
+        internal static string MetaDataItemType_Statistic {
+            get {
+                return ResourceManager.GetString("MetaDataItemType.Statistic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tag.
+        /// </summary>
+        internal static string MetaDataItemType_Tag {
+            get {
+                return ResourceManager.GetString("MetaDataItemType.Tag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compilation.
         /// </summary>
         internal static string MetaDataName_IsCompilation {
             get {
                 return ResourceManager.GetString("MetaDataName.IsCompilation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Cancel {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Delete {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Enabled {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meta Data.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_GroupHeader {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.GroupHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Name {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_New {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Reset {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Save {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Script {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Script", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        internal static string MetaDataProvidersSettingsDialog_Type {
+            get {
+                return ResourceManager.GetString("MetaDataProvidersSettingsDialog.Type", resourceCulture);
             }
         }
         

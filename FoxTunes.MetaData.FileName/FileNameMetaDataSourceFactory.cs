@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -53,7 +52,7 @@ namespace FoxTunes
             }
         }
 
-        public override IMetaDataSource Create()
+        public override IMetaDataSource OnCreate()
         {
             var source = new FileNameMetaDataSource(this.Extractors);
             source.InitializeComponent(this.Core);
