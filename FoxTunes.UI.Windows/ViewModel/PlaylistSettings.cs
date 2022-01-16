@@ -14,11 +14,15 @@ namespace FoxTunes.ViewModel
     {
         public IPlaylistColumnManager PlaylistColumnProviderManager { get; private set; }
 
+        public IMetaDataSourceFactory SourceFactory { get; private set; }
+
+        public IMetaDataDecoratorFactory DecoratorFactory { get; private set; }
+
+        public IDatabaseFactory DatabaseFactory { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
-
-        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -60,6 +64,49 @@ namespace FoxTunes.ViewModel
         protected virtual void OnPlaylistColumnProvidersChanged()
         {
             this.OnPropertyChanged("PlaylistColumnProviders");
+        }
+
+        public IEnumerable<SupportedMetaData> SupportedMetaData
+        {
+            get
+            {
+                if (this.SourceFactory == null)
+                {
+                    return Enumerable.Empty<SupportedMetaData>();
+                }
+                var supported = this.SourceFactory.Supported;
+                if (this.DecoratorFactory.CanCreate)
+                {
+                    supported = supported.Concat(this.DecoratorFactory.Supported);
+                }
+                return supported.Select(element => new SupportedMetaData(element.Key, element.Value)).ToArray();
+            }
+        }
+
+        protected virtual void OnSupportedMetaDataChanged()
+        {
+            if (this.SupportedMetaDataChanged != null)
+            {
+                this.SupportedMetaDataChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SupportedMetaData");
+        }
+
+        public event EventHandler SupportedMetaDataChanged;
+
+        public IEnumerable<string> SupportedFormats
+        {
+            get
+            {
+                return new[]
+                {
+                    CommonFormats.Decibel,
+                    CommonFormats.Float,
+                    CommonFormats.Integer,
+                    CommonFormats.TimeSpan,
+                    CommonFormats.TimeStamp
+                };
+            }
         }
 
         public bool IsSaving
@@ -179,6 +226,8 @@ namespace FoxTunes.ViewModel
             this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.DatabaseFactory = this.Core.Factories.Database;
+            this.SourceFactory = this.Core.Factories.MetaDataSource;
+            this.DecoratorFactory = this.Core.Factories.MetaDataDecorator;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.PlaylistColumns = new CollectionManager<PlaylistColumn>()
@@ -247,6 +296,7 @@ namespace FoxTunes.ViewModel
                 this.PlaylistColumns.ItemsSource = new ObservableCollection<PlaylistColumn>(
                     this.PlaylistBrowser.GetColumns()
                 );
+                this.OnSupportedMetaDataChanged();
             });
         }
 
@@ -263,6 +313,44 @@ namespace FoxTunes.ViewModel
         protected override Freezable CreateInstanceCore()
         {
             return new PlaylistSettings();
+        }
+    }
+
+    public class SupportedMetaData
+    {
+        public SupportedMetaData(string name, MetaDataItemType type) : this(GetSequence(type), name, type)
+        {
+
+        }
+
+        public SupportedMetaData(int sequence, string name, MetaDataItemType type)
+        {
+            this.Sequence = sequence;
+            this.Name = name;
+            this.Type = type;
+        }
+
+        public int Sequence { get; private set; }
+
+        public string Name { get; private set; }
+
+        public MetaDataItemType Type { get; private set; }
+
+        private static int GetSequence(MetaDataItemType type)
+        {
+            switch (type)
+            {
+                case MetaDataItemType.Tag:
+                    return 0;
+                case MetaDataItemType.CustomTag:
+                    return 1;
+                case MetaDataItemType.Property:
+                    return 2;
+                case MetaDataItemType.Statistic:
+                    return 3;
+                default:
+                    return 10;
+            }
         }
     }
 }

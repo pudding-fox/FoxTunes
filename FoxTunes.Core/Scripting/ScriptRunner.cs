@@ -73,7 +73,7 @@ namespace FoxTunes
                     var parts = name.Split(new[] { ':' }, 2);
                     if (parts.Length != 2)
                     {
-                        //Expected MimeType:Data.
+                        //Expected document:Name.
                     }
                     else
                     {
