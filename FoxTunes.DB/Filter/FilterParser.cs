@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,39 +12,53 @@ namespace FoxTunes
     {
         public FilterParser()
         {
-            this.Providers = new List<IFilterParserProvider>();
+            this.Providers = new Lazy<IList<IFilterParserProvider>>(
+                () => ComponentRegistry.Instance.GetComponents<IFilterParserProvider>().ToList()
+            );
+            this.Store = new ConcurrentDictionary<string, IFilterParserResult>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public IList<IFilterParserProvider> Providers { get; private set; }
+        public Lazy<IList<IFilterParserProvider>> Providers { get; private set; }
 
-        public void Register(IFilterParserProvider provider)
-        {
-            this.Providers.Add(provider);
-        }
+        public ConcurrentDictionary<string, IFilterParserResult> Store { get; private set; }
 
         public bool TryParse(string filter, out IFilterParserResult result)
         {
-            var groups = new List<IFilterParserResultGroup>();
-            while (!string.IsNullOrEmpty(filter))
+            result = this.Store.GetOrAdd(filter, () =>
             {
                 var success = default(bool);
-                foreach (var provider in this.Providers)
+                var groups = new List<IFilterParserResultGroup>();
+                while (!string.IsNullOrWhiteSpace(filter))
                 {
-                    var group = default(IFilterParserResultGroup);
-                    if (provider.TryParse(ref filter, out group))
+                    foreach (var provider in this.Providers.Value)
                     {
-                        groups.Add(group);
-                        success = true;
+                        var currentGroups = default(IEnumerable<IFilterParserResultGroup>);
+                        if (provider.TryParse(ref filter, out currentGroups))
+                        {
+                            groups.AddRange(currentGroups);
+                            success = true;
+                            break;
+                        }
+                    }
+                    if (!success)
+                    {
                         break;
                     }
                 }
-                if (!success)
+                if (!success && !string.IsNullOrWhiteSpace(filter))
                 {
-                    break;
+                    Logger.Write(this, LogLevel.Warn, "Failed to parse filter: {0}", filter.Trim());
                 }
-            }
-            result = new FilterParserResult(groups);
-            return string.IsNullOrEmpty(filter);
+                if (groups.Any())
+                {
+                    return new FilterParserResult(groups);
+                }
+                else
+                {
+                    return null;
+                }
+            });
+            return result != null;
         }
 
         public bool AppliesTo(string filter, IEnumerable<string> names)
@@ -101,36 +116,29 @@ namespace FoxTunes
                 base.InitializeComponent(core);
             }
 
-            public override bool TryParse(ref string filter, out IFilterParserResultGroup result)
+            public override bool TryParse(ref string filter, out IFilterParserResultGroup group)
             {
-                if (string.IsNullOrEmpty(filter))
+                if (string.IsNullOrWhiteSpace(filter))
                 {
-                    result = default(IFilterParserResultGroup);
+                    group = default(IFilterParserResultGroup);
                     return false;
                 }
-                result = this.Parse(filter);
+                group = this.Parse(filter);
                 this.OnParsed(ref filter, 0, filter.Length);
                 return true;
             }
 
             protected virtual IFilterParserResultGroup Parse(string filter)
             {
-                if (string.IsNullOrEmpty(filter))
-                {
-                    filter = FilterParserResultEntry.UNBOUNDED_WILDCARD;
-                }
-                else
-                {
-                    filter = string.Format(
-                        "{0}{1}{0}",
-                        FilterParserResultEntry.UNBOUNDED_WILDCARD,
-                        filter.Trim()
-                    );
-                }
+                var pattern = string.Format(
+                    "{0}{1}{0}",
+                    FilterParserResultEntry.UNBOUNDED_WILDCARD,
+                    filter.Trim()
+                );
                 var entries = this.SearchNames.Select(
-                    name => new FilterParserResultEntry(name, FilterParserEntryOperator.Match, filter)
+                    name => new FilterParserResultEntry(name, FilterParserEntryOperator.Match, pattern)
                 ).ToArray();
-                return new FilterParserResultGroup(entries, FilterParserGroupOperator.Or);
+                return new FilterParserResultGroup(entries);
             }
         }
 
@@ -155,7 +163,7 @@ namespace FoxTunes
                     FilterParserResultEntry.LESS_EQUAL,
                     FilterParserResultEntry.LESS,
                     FilterParserResultEntry.EQUAL
-                }.Select(element => "(?:" + Regex.Escape(element) + ")"));
+                }.Select(element => "(" + Regex.Escape(element) + ")"));
                 this.Regex = new Regex(
                     "^(?:(?<" + ENTRY + ">(?<" + NAME + ">[a-z]+)\\s*(?<" + OPERATOR + ">" + operators + ")\\s*(?<" + VALUE + ">.+?)))+$",
                     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture
@@ -164,22 +172,26 @@ namespace FoxTunes
 
             public Regex Regex { get; private set; }
 
-            public override bool TryParse(ref string filter, out IFilterParserResultGroup result)
+            public override bool TryParse(ref string filter, out IEnumerable<IFilterParserResultGroup> groups)
             {
+                if (string.IsNullOrWhiteSpace(filter))
+                {
+                    groups = default(IEnumerable<IFilterParserResultGroup>);
+                    return false;
+                }
                 var match = this.Regex.Match(filter);
                 if (!match.Success)
                 {
-                    result = default(IFilterParserResultGroup);
+                    groups = default(IEnumerable<IFilterParserResultGroup>);
                     return false;
                 }
-                result = this.Parse(match);
+                groups = this.Parse(match);
                 this.OnParsed(ref filter, match.Index, match.Length);
                 return true;
             }
 
-            protected virtual IFilterParserResultGroup Parse(Match match)
+            protected virtual IEnumerable<IFilterParserResultGroup> Parse(Match match)
             {
-                var entries = new List<IFilterParserResultEntry>();
                 for (int a = 0, b = match.Groups[ENTRY].Captures.Count; a < b; a++)
                 {
                     var name = match.Groups[NAME].Captures[a].Value.Trim();
@@ -197,9 +209,8 @@ namespace FoxTunes
                             );
                             break;
                     }
-                    entries.Add(new FilterParserResultEntry(name, @operator, value));
+                    yield return new FilterParserResultGroup(new FilterParserResultEntry(name, @operator, value));
                 }
-                return new FilterParserResultGroup(entries, FilterParserGroupOperator.And);
             }
         }
 
@@ -221,6 +232,11 @@ namespace FoxTunes
 
             public override bool TryParse(ref string filter, out IFilterParserResultGroup result)
             {
+                if (string.IsNullOrWhiteSpace(filter))
+                {
+                    result = default(IFilterParserResultGroup);
+                    return false;
+                }
                 var match = this.Regex.Match(filter);
                 if (!match.Success)
                 {
@@ -235,12 +251,8 @@ namespace FoxTunes
             protected virtual IFilterParserResultGroup Parse(Match match)
             {
                 var entries = new List<IFilterParserResultEntry>();
-                var rating = match.Groups[RATING];
-                if (rating != null)
-                {
-                    entries.Add(new FilterParserResultEntry(CommonStatistics.Rating, FilterParserEntryOperator.Equal, rating.Value));
-                }
-                return new FilterParserResultGroup(entries, FilterParserGroupOperator.And);
+                var value = match.Groups[RATING].Value;
+                return new FilterParserResultGroup(new FilterParserResultEntry(CommonStatistics.Rating, FilterParserEntryOperator.Equal, value));
             }
         }
     }
@@ -314,15 +326,17 @@ namespace FoxTunes
 
     public class FilterParserResultGroup : IFilterParserResultGroup
     {
-        public FilterParserResultGroup(IEnumerable<IFilterParserResultEntry> entries, FilterParserGroupOperator @operator)
+        public FilterParserResultGroup(IFilterParserResultEntry entry)
+        {
+            this.Entries = new[] { entry };
+        }
+
+        public FilterParserResultGroup(IEnumerable<IFilterParserResultEntry> entries)
         {
             this.Entries = entries;
-            this.Operator = @operator;
         }
 
         public IEnumerable<IFilterParserResultEntry> Entries { get; private set; }
-
-        public FilterParserGroupOperator Operator { get; private set; }
 
         public virtual bool Equals(IFilterParserResultGroup other)
         {
@@ -335,10 +349,6 @@ namespace FoxTunes
                 return true;
             }
             if (!Enumerable.SequenceEqual(this.Entries, other.Entries))
-            {
-                return false;
-            }
-            if (this.Operator != other.Operator)
             {
                 return false;
             }
@@ -359,7 +369,6 @@ namespace FoxTunes
                 {
                     hashCode += entry.GetHashCode();
                 }
-                hashCode += this.Operator.GetHashCode();
             }
             return hashCode;
         }

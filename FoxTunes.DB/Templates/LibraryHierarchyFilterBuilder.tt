@@ -40,16 +40,7 @@ AND EXISTS
 			}
 			else
 			{
-				switch (group.Operator)
-				{
-					default:
-					case	FilterParserGroupOperator.And:
-#> AND <#
-					break;
-					case FilterParserGroupOperator.Or:
 #> OR <#
-					break;
-				}
 			}
 			var numeric = default(int);
 			var isNumeric = NumericOperators.Contains(entry.Operator) && int.TryParse(entry.Value, out numeric);

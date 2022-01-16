@@ -472,6 +472,9 @@ namespace FoxTunes
                 case PlaylistType.Dynamic:
                     behaviour = ComponentRegistry.Instance.GetComponent<DynamicPlaylistBehaviour>();
                     break;
+                case PlaylistType.Smart:
+                    behaviour = ComponentRegistry.Instance.GetComponent<SmartPlaylistBehaviour>();
+                    break;
             }
             if (behaviour != null)
             {

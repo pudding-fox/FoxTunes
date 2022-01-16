@@ -273,6 +273,8 @@ namespace FoxTunes
             if (this.Stream.IsValueCreated)
             {
                 this.Stream.Value.Flush();
+                //Close the log file.
+                this.Stream.Value.Dispose();
             }
         }
 

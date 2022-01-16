@@ -318,6 +318,11 @@ namespace FoxTunes
             return value;
         }
 
+        public static TValue GetOrAdd<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> sequence, TKey key, Func<TValue> factory)
+        {
+            return sequence.GetOrAdd(key, _key => factory());
+        }
+
         public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> sequence, TKey key, Func<TKey, TValue> factory)
         {
             var value = default(TValue);
@@ -329,6 +334,7 @@ namespace FoxTunes
             sequence.Add(key, value);
             return value;
         }
+
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> sequence, TKey key)
         {
