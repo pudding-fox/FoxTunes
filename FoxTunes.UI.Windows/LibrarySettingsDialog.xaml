@@ -115,8 +115,8 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding ClearCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Clear}"></Button>
                 <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding RescanCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Rescan}"></Button>
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Save}"></Button>
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Cancel}"></Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Windows:ButtonExtensions.Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Windows:ButtonExtensions.CommandBehaviour="{x:Static Windows:ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Save}"></Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Windows:ButtonExtensions.Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Windows:ButtonExtensions.CommandBehaviour="{x:Static Windows:ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS}" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Cancel}"></Button>
             </StackPanel>
         </Grid>
     </Grid>
