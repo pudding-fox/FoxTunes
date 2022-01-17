@@ -68,7 +68,6 @@ namespace FoxTunes
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    var position = 0;
                     foreach (var libraryHierarchyNode in this.LibraryHierarchyNodes)
                     {
                         if (this.IsCancellationRequested)
@@ -77,7 +76,7 @@ namespace FoxTunes
                         }
                         this.Description = libraryHierarchyNode.Value;
                         await this.AddPlaylistItems(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist(this.Filter, this.Sort.Value), libraryHierarchyNode, transaction).ConfigureAwait(false);
-                        this.Position = ++position;
+                        this.Position++;
                     }
                     if (transaction.HasTransaction)
                     {

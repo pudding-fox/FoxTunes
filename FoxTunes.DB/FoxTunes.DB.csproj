@@ -88,6 +88,19 @@
       </Compile>
   </ItemGroup>
 
+	<ItemGroup>
+		<None Update="Templates\LibraryFilterBuilder.tt">
+			<Generator>TextTemplatingFilePreprocessor</Generator>
+			<LastGenOutput>LibraryFilterBuilder.cs</LastGenOutput>
+			<CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+		</None>
+		<Compile Update="Templates\LibraryFilterBuilder.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LibraryFilterBuilder.tt</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>

@@ -12,6 +12,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery AddPlaylistMetaDataItem { get; }
 
+        IDatabaseQuery AddSearchToPlaylist(string filter, string sort, int limit);
+
         IDatabaseQuery ClearLibraryMetaDataItems { get; }
 
         IDatabaseQuery ClearPlaylistMetaDataItems { get; }

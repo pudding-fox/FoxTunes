@@ -478,7 +478,7 @@ namespace FoxTunes
             }
             if (behaviour != null)
             {
-                await behaviour.Refresh(playlist).ConfigureAwait(false);
+                await behaviour.Refresh(playlist, true).ConfigureAwait(false);
             }
             else
             {

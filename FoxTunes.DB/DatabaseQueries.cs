@@ -70,6 +70,8 @@ namespace FoxTunes
             }
         }
 
+        public abstract IDatabaseQuery AddSearchToPlaylist(string filter, string sort, int limit);
+
         public IDatabaseQuery ClearLibraryMetaDataItems
         {
             get

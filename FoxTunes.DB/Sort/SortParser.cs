@@ -1,6 +1,7 @@
 ﻿using FoxTunes.DB.Sort;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,29 +12,33 @@ namespace FoxTunes
     {
         public SortParser()
         {
-            this.Providers = new List<ISortParserProvider>();
+            this.Providers = new Lazy<IList<ISortParserProvider>>(
+                () => ComponentRegistry.Instance.GetComponents<ISortParserProvider>().ToList()
+            );
+            this.Store = new ConcurrentDictionary<string, ISortParserResult>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public IList<ISortParserProvider> Providers { get; private set; }
+        public Lazy<IList<ISortParserProvider>> Providers { get; private set; }
 
-        public void Register(ISortParserProvider provider)
-        {
-            this.Providers.Add(provider);
-        }
+        public ConcurrentDictionary<string, ISortParserResult> Store { get; private set; }
 
         public bool TryParse(string sort, out ISortParserResult result)
         {
-            var expressions = new List<ISortParserResultExpression>();
-            if (!string.IsNullOrEmpty(sort))
+            result = this.Store.GetOrAdd(sort, () =>
             {
+                if (string.IsNullOrEmpty(sort))
+                {
+                    return null;
+                }
                 var lines = sort.Split(new[]
                 {
                     Environment.NewLine
                 }, StringSplitOptions.RemoveEmptyEntries);
+                var success = default(bool);
+                var expressions = new List<ISortParserResultExpression>();
                 foreach (var line in lines)
                 {
-                    var success = default(bool);
-                    foreach (var provider in this.Providers)
+                    foreach (var provider in this.Providers.Value)
                     {
                         var expression = default(ISortParserResultExpression);
                         if (provider.TryParse(line, out expression))
@@ -45,13 +50,19 @@ namespace FoxTunes
                     }
                     if (!success)
                     {
-                        result = default(ISortParserResult);
-                        return false;
+                        Logger.Write(this, LogLevel.Warn, "Failed to parse sort: {0}", line.Trim());
                     }
                 }
-            }
-            result = new SortParserResult(expressions);
-            return true;
+                if (expressions.Any())
+                {
+                    return new SortParserResult(expressions);
+                }
+                else
+                {
+                    return null;
+                }
+            });
+            return result != null;
         }
 
         [Component("EEB65782-C66C-46F8-9F58-BA0E5A16194F", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
@@ -161,6 +172,27 @@ namespace FoxTunes
         }
     }
 
+    [Component("E878EB41-D752-4818-A185-9CEC69980CDD", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentDependency(Slot = ComponentSlots.Database)]
+    public class RandomSortParserProvider : SortParserProvider
+    {
+        public override bool TryParse(string sort, out ISortParserResultExpression expression)
+        {
+            var names = new[]
+            {
+                "random",
+                Strings.RandomSortParserProvider_Random
+            };
+            if (names.Contains(sort, StringComparer.OrdinalIgnoreCase))
+            {
+                expression = new SortParserResultExpression(SortParserResultOperator.Random);
+                return true;
+            }
+            expression = default(ISortParserResultExpression);
+            return false;
+        }
+    }
+
     public class SortParserResult : ISortParserResult
     {
         public SortParserResult(IEnumerable<ISortParserResultExpression> expressions)
@@ -169,6 +201,14 @@ namespace FoxTunes
         }
 
         public IEnumerable<ISortParserResultExpression> Expressions { get; private set; }
+
+        public bool IsRandom
+        {
+            get
+            {
+                return this.Expressions.All(expression => expression.Operator == SortParserResultOperator.Random);
+            }
+        }
 
         public virtual bool Equals(ISortParserResult other)
         {
@@ -233,6 +273,11 @@ namespace FoxTunes
         public SortParserResultExpression(string name)
         {
             this.Name = name;
+        }
+
+        public SortParserResultExpression(SortParserResultOperator @operator)
+        {
+            this.Operator = @operator;
         }
 
         public SortParserResultExpression(string name, SortParserResultOperator @operator) : this(name)

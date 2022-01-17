@@ -11,17 +11,9 @@ namespace FoxTunes.DB.Sort
         {
             { nameof(CommonMetaData), CommonMetaData.Lookup },
             { nameof(CustomMetaData), CustomMetaData.Lookup },
-            { nameof(CommonProperties), CommonProperties.Lookup }
+            { nameof(CommonProperties), CommonProperties.Lookup },
+            { nameof(CommonStatistics), CommonStatistics.Lookup }
         };
-
-        public ISortParser SortParser { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.SortParser = core.Components.SortParser;
-            this.SortParser.Register(this);
-            base.InitializeComponent(core);
-        }
 
         public abstract bool TryParse(string sort, out ISortParserResultExpression expression);
 

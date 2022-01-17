@@ -43,7 +43,7 @@ namespace FoxTunes
                     await this.Refresh(names).ConfigureAwait(false);
                     break;
                 case CommonSignals.HierarchiesUpdated:
-                    await this.Refresh().ConfigureAwait(false);
+                    await this.Refresh(false).ConfigureAwait(false);
                     break;
             }
             await base.OnSignal(sender, signal).ConfigureAwait(false);
@@ -64,16 +64,16 @@ namespace FoxTunes
                         continue;
                     }
                 }
-                await this.Refresh(playlist).ConfigureAwait(false);
+                await this.Refresh(playlist, false).ConfigureAwait(false);
             }
         }
 
-        public override Task Refresh(Playlist playlist)
+        public override Task Refresh(Playlist playlist, bool force)
         {
-            return this.Refresh(playlist, playlist.Filter);
+            return this.Refresh(playlist, playlist.Filter, force);
         }
 
-        protected virtual async Task Refresh(Playlist playlist, string filter)
+        protected virtual async Task Refresh(Playlist playlist, string filter, bool force)
         {
             var libraryHierarchy = this.LibraryManager.SelectedHierarchy;
             if (libraryHierarchy == null || LibraryHierarchy.Empty.Equals(libraryHierarchy))

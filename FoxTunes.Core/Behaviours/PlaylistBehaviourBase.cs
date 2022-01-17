@@ -46,7 +46,7 @@ namespace FoxTunes
                     }
                     else
                     {
-                        this.Dispatch(this.Refresh);
+                        this.Dispatch(() => this.Refresh(true));
                     }
                     break;
             }
@@ -57,15 +57,15 @@ namespace FoxTunes
 #endif
         }
 
-        protected virtual async Task Refresh()
+        protected virtual async Task Refresh(bool force)
         {
             foreach (var playlist in this.GetPlaylists())
             {
-                await this.Refresh(playlist).ConfigureAwait(false);
+                await this.Refresh(playlist, force).ConfigureAwait(false);
             }
         }
 
-        public abstract Task Refresh(Playlist playlist);
+        public abstract Task Refresh(Playlist playlist, bool force);
 
         protected virtual async Task Update(Playlist playlist)
         {
