@@ -5,16 +5,11 @@ namespace FoxTunes
 {
     public static class DateTimeHelper
     {
+        public static readonly string NEVER = ToString(new DateTime(1990, 01, 01));
+
         public static string ToString(DateTime value)
         {
-            if (value.TimeOfDay == TimeSpan.Zero)
-            {
-                return value.ToString(Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                return value.ToString(Constants.DATE_TIME_FORMAT, CultureInfo.InvariantCulture);
-            }
+            return value.ToString(Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
         }
 
         public static DateTime FromString(string value)
@@ -23,11 +18,11 @@ namespace FoxTunes
             {
                 return default(DateTime);
             }
-            var date = default(DateTime);
-            if (DateTime.TryParseExact(value, Constants.DATE_TIME_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out date))
+            if (string.Equals(value, NEVER, StringComparison.OrdinalIgnoreCase))
             {
-                return date;
+                return default(DateTime);
             }
+            var date = default(DateTime);
             if (DateTime.TryParseExact(value, Constants.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out date))
             {
                 return date;

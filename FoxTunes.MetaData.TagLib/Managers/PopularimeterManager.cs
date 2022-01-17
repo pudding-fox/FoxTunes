@@ -7,8 +7,6 @@ namespace FoxTunes
 {
     public static class PopularimeterManager
     {
-        public static readonly string NEVER = DateTimeHelper.ToString(new DateTime(1990, 01, 01));
-
         public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, File file)
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -62,7 +60,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    result.Add(CommonStatistics.LastPlayed, NEVER);
+                    result.Add(CommonStatistics.LastPlayed, DateTimeHelper.NEVER);
                 }
             }
             //Copy our informations back to the meta data collection.
