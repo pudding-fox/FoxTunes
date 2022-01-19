@@ -24,7 +24,7 @@ CREATE TABLE [Playlists](
 	[Sequence] INTEGER NOT NULL,
 	[Name] nvarchar(4000) NOT NULL,
 	[Type] bigint NOT NULL,
-	[Filter] nvarchar(4000) NULL,
+	[Config] nvarchar(4000) NULL,
 	[Enabled] bit NOT NULL);
 
 CREATE TABLE [PlaylistItems](

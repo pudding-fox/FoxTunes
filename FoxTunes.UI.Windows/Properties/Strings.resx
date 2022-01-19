@@ -363,6 +363,18 @@
   <data name="PlaylistBase.Updating" xml:space="preserve">
     <value>Updating...</value>
   </data>
+  <data name="PlaylistConfigDialog.Count" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="PlaylistConfigDialog.Expression" xml:space="preserve">
+    <value>Expression</value>
+  </data>
+  <data name="PlaylistConfigDialog.MinAge" xml:space="preserve">
+    <value>Min Age (Days)</value>
+  </data>
+  <data name="PlaylistConfigDialog.MinRating" xml:space="preserve">
+    <value>Min Rating</value>
+  </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Grouping</value>
   </data>

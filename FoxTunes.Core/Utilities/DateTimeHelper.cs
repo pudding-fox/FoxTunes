@@ -12,6 +12,11 @@ namespace FoxTunes
             return value.ToString(Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
         }
 
+        public static string ToShortString(DateTime value)
+        {
+            return value.ToString(Constants.SHORT_DATE_FORMAT, CultureInfo.InvariantCulture);
+        }
+
         public static DateTime FromString(string value)
         {
             if (string.IsNullOrEmpty(value))

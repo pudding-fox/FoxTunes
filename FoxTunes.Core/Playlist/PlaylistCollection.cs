@@ -35,7 +35,7 @@ namespace FoxTunes
                     this[index].Sequence = playlist.Sequence;
                     this[index].Name = playlist.Name;
                     this[index].Type = playlist.Type;
-                    this[index].Filter = playlist.Filter;
+                    this[index].Config = playlist.Config;
                     this[index].Enabled = playlist.Enabled;
                 }
             }

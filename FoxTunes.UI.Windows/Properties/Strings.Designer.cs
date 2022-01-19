@@ -799,6 +799,42 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Count.
+        /// </summary>
+        internal static string PlaylistConfigDialog_Count {
+            get {
+                return ResourceManager.GetString("PlaylistConfigDialog.Count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression.
+        /// </summary>
+        internal static string PlaylistConfigDialog_Expression {
+            get {
+                return ResourceManager.GetString("PlaylistConfigDialog.Expression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Min Age (Days).
+        /// </summary>
+        internal static string PlaylistConfigDialog_MinAge {
+            get {
+                return ResourceManager.GetString("PlaylistConfigDialog.MinAge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Min Rating.
+        /// </summary>
+        internal static string PlaylistConfigDialog_MinRating {
+            get {
+                return ResourceManager.GetString("PlaylistConfigDialog.MinRating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Grouping.
         /// </summary>
         internal static string PlaylistGroupingBehaviourConfiguration_Enabled {

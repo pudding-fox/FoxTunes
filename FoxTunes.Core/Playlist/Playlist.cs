@@ -97,31 +97,31 @@ namespace FoxTunes
 
         public event EventHandler TypeChanged;
 
-        private string _Filter { get; set; }
+        private string _Config { get; set; }
 
-        public string Filter
+        public string Config
         {
             get
             {
-                return this._Filter;
+                return this._Config;
             }
             set
             {
-                this._Filter = value;
-                this.OnFilterChanged();
+                this._Config = value;
+                this.OnConfigChanged();
             }
         }
 
-        protected virtual void OnFilterChanged()
+        protected virtual void OnConfigChanged()
         {
-            if (this.FilterChanged != null)
+            if (this.ConfigChanged != null)
             {
-                this.FilterChanged(this, EventArgs.Empty);
+                this.ConfigChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Filter");
+            this.OnPropertyChanged("Config");
         }
 
-        public event EventHandler FilterChanged;
+        public event EventHandler ConfigChanged;
 
         private bool _Enabled { get; set; }
 

@@ -346,6 +346,16 @@ namespace FoxTunes
             return value;
         }
 
+        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> sequence, TKey key, TValue defaultValue)
+        {
+            var value = default(TValue);
+            if (!sequence.TryGetValue(key, out value))
+            {
+                value = defaultValue;
+            }
+            return value;
+        }
+
         public static void Shuffle<T>(this IList<T> sequence)
         {
             var random = new Random(unchecked((int)DateTime.Now.Ticks));
@@ -543,6 +553,16 @@ namespace FoxTunes
                 return list;
             }
             return sequence.ToList();
+        }
+
+        public static Stream ToStream(this string value)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(value);
+            writer.Flush();
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream;
         }
     }
 }
