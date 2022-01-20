@@ -364,7 +364,7 @@
     <value>Updating...</value>
   </data>
   <data name="PlaylistConfigDialog.Count" xml:space="preserve">
-    <value>Count</value>
+    <value>Tracks</value>
   </data>
   <data name="PlaylistConfigDialog.Expression" xml:space="preserve">
     <value>Expression</value>
@@ -380,6 +380,12 @@
   </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Script" xml:space="preserve">
     <value>Grouping Script</value>
+  </data>
+  <data name="PlaylistManager.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="PlaylistManager.Save" xml:space="preserve">
+    <value>Save</value>
   </data>
   <data name="Playlists.Name" xml:space="preserve">
     <value>Playlist Tabs</value>

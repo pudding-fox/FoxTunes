@@ -106,7 +106,7 @@ namespace FoxTunes
                 {
                     Name = "Rating",
                     Type = PlaylistColumnType.Plugin,
-                    Sequence = 13,
+                    Sequence = 100,
                     Plugin = ID,
                     Enabled = false
                 });

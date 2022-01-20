@@ -212,6 +212,19 @@ namespace FoxTunes.ViewModel
             throw exception;
         }
 
+        public ICommand CancelCommand
+        {
+            get
+            {
+                return new Command(this.Cancel);
+            }
+        }
+
+        public void Cancel()
+        {
+            this.Dispatch(this.Refresh);
+        }
+
         public ICommand ShowCommand
         {
             get

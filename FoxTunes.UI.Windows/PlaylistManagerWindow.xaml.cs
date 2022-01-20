@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 
 namespace FoxTunes
@@ -37,6 +38,14 @@ namespace FoxTunes
             get
             {
                 return "4CFF69B2-62F8-4689-BC02-6FD843E73BBC";
+            }
+        }
+
+        protected virtual void OnCommandExecuted(object sender, ButtonExtensions.CommandExecutedEventArgs e)
+        {
+            if (string.Equals(e.Behaviour, ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Close();
             }
         }
 
