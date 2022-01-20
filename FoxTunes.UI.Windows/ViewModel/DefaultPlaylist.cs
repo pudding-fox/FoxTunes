@@ -7,6 +7,8 @@ namespace FoxTunes.ViewModel
 {
     public class DefaultPlaylist : GridPlaylist
     {
+        public Playlist CurrentPlaylist { get; private set; }
+
         protected override Task<Playlist> GetPlaylist()
         {
             var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
@@ -47,6 +49,12 @@ namespace FoxTunes.ViewModel
 #endif
             }
             return this.Refresh();
+        }
+
+        public override Task Refresh()
+        {
+            this.CurrentPlaylist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+            return base.Refresh();
         }
 
         protected override void OnDisposing()

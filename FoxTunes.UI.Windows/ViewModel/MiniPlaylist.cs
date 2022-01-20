@@ -18,6 +18,8 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public Playlist CurrentPlaylist { get; private set; }
+
         public IScriptingContext ScriptingContext { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -78,10 +80,11 @@ namespace FoxTunes.ViewModel
 
         protected override Task<Playlist> GetPlaylist()
         {
+            var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
 #if NET40
-            return TaskEx.FromResult(this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist);
+            return TaskEx.FromResult(playlist);
 #else
-            return Task.FromResult(this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist);
+            return Task.FromResult(playlist);
 #endif
         }
 
@@ -101,16 +104,12 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnCurrentPlaylistChanged(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            var task = this.RefreshIfRequired();
         }
 
         protected virtual void OnSelectedPlaylistChanged(object sender, EventArgs e)
         {
-            if (this.PlaylistManager.CurrentPlaylist != null)
-            {
-                return;
-            }
-            var task = this.Refresh();
+            var task = this.RefreshIfRequired();
         }
 
         protected virtual void OnCurrentItemChanged(object sender, EventArgs e)
@@ -119,8 +118,23 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.RefreshSelectedItem);
         }
 
+        protected virtual Task RefreshIfRequired()
+        {
+            var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+            if (object.ReferenceEquals(this.CurrentPlaylist, playlist))
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            return this.Refresh();
+        }
+
         public virtual async Task Refresh()
         {
+            this.CurrentPlaylist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
             await this.RefreshItems().ConfigureAwait(false);
             await this.RefreshSelectedItem().ConfigureAwait(false);
         }
