@@ -75,12 +75,12 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
-            this.LibraryManager = this.Core.Managers.Library;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.LibraryManager = core.Managers.Library;
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             var task = this.Refresh();
             base.InitializeComponent(core);

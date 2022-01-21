@@ -28,6 +28,8 @@ namespace FoxTunes
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement EnabledElement { get; private set; }
@@ -53,6 +55,7 @@ namespace FoxTunes
             this.Output.Free += this.OnFree;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Configuration = core.Components.Configuration;
             this.EnabledElement = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -174,7 +177,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                await this.OnError(e).ConfigureAwait(false);
+                await this.ErrorEmitter.Send(e).ConfigureAwait(false);
                 return;
             }
             if (playlistItem != null)
@@ -196,7 +199,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    await this.OnError(e).ConfigureAwait(false);
+                    await this.ErrorEmitter.Send(e).ConfigureAwait(false);
                 }
             }
         }

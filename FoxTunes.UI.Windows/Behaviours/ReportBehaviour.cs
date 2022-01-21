@@ -6,8 +6,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ReportBehaviour : StandardBehaviour, IDisposable
     {
-        public ICore Core { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             ComponentRegistry.Instance.ForEach(component =>
@@ -17,7 +15,6 @@ namespace FoxTunes
                     (component as IReportSource).Report += this.OnReport;
                 }
             });
-            this.Core = core;
             base.InitializeComponent(core);
         }
 
@@ -27,7 +24,6 @@ namespace FoxTunes
             {
                 var window = new ReportWindow()
                 {
-                    DataContext = this.Core,
                     Source = e.Report,
                     ShowActivated = true,
                     Owner = Windows.ActiveWindow,

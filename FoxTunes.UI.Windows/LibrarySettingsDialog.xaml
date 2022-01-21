@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
-        <ViewModel:LibrarySettings x:Key="ViewModel" Core="{Binding}"/>
+        <ViewModel:LibrarySettings x:Key="ViewModel"/>
         <ObjectDataProvider x:Key="LibraryHierarchyTypes" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="Core:LibraryHierarchyType"/>

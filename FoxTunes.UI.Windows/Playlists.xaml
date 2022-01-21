@@ -9,9 +9,9 @@
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              x:Class="FoxTunes.Playlists" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
+             d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
     <Windows:UIComponentBase.Resources>
-        <ViewModel:Playlists x:Key="ViewModel" Core="{Binding}"></ViewModel:Playlists>
+        <ViewModel:Playlists x:Key="ViewModel"></ViewModel:Playlists>
     </Windows:UIComponentBase.Resources>
     <Windows:UIComponentBase.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLISTS}}"></Windows:Menu>
@@ -39,10 +39,7 @@
         <Windows:TabControlExtensions.Template>
             <DataTemplate DataType="{x:Type Core:Playlist}">
                 <Grid>
-                    <Grid.Resources>
-                        <ViewModel:Wrapper x:Key="Playlist" Value="{Binding}"></ViewModel:Wrapper>
-                    </Grid.Resources>
-                    <Windows:TabPlaylist DataContext="{Binding DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Playlists}}}" Playlist="{Binding Value, Source={StaticResource Playlist}}"></Windows:TabPlaylist>
+                    <Windows:TabPlaylist Playlist="{Binding}"></Windows:TabPlaylist>
                 </Grid>
             </DataTemplate>
         </Windows:TabControlExtensions.Template>

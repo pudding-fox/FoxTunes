@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IMetaDataSource : IBaseComponent
+    public interface IMetaDataSource : IBaseComponent, IInitializable
     {
         IEnumerable<string> GetWarnings(string fileName);
 

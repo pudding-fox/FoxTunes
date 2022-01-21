@@ -11,7 +11,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}"
              MinWidth="80">
     <UserControl.Resources>
-        <ViewModel:StreamPosition x:Key="ViewModel" Core="{Binding}"></ViewModel:StreamPosition>
+        <ViewModel:StreamPosition x:Key="ViewModel"></ViewModel:StreamPosition>
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
             <Setter Property="FontSize" Value="20"></Setter>

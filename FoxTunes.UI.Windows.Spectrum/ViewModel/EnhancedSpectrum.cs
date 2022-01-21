@@ -47,7 +47,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler BandsChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             core.Components.Configuration.GetElement<SelectionConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,

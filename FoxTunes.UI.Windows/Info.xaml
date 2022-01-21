@@ -9,7 +9,7 @@
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <ViewModel:Info x:Key="ViewModel" Core="{Binding}"></ViewModel:Info>
+        <ViewModel:Info x:Key="ViewModel"></ViewModel:Info>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Windows:UIComponentBase.IsComponentEnabled>

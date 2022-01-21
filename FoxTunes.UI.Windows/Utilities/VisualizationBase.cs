@@ -8,15 +8,6 @@ namespace FoxTunes
     {
         public readonly object SyncRoot = new object();
 
-        public global::System.Timers.Timer Timer;
-
-        public VisualizationBase()
-        {
-            this.Timer = new global::System.Timers.Timer();
-            this.Timer.AutoReset = false;
-            this.Timer.Elapsed += this.OnElapsed;
-        }
-
         public bool Enabled { get; private set; }
 
         public int UpdateInterval
@@ -31,8 +22,13 @@ namespace FoxTunes
             }
         }
 
+        protected global::System.Timers.Timer Timer { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.Timer = new global::System.Timers.Timer();
+            this.Timer.AutoReset = false;
+            this.Timer.Elapsed += this.OnElapsed;
             PlaybackStateNotifier.IsPlayingChanged += this.OnIsPlayingChanged;
             base.InitializeComponent(core);
             this.Update();

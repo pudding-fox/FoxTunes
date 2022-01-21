@@ -25,38 +25,6 @@ namespace FoxTunes
             }
         }
 
-        public static readonly DependencyProperty CoreProperty = DependencyProperty.Register(
-            "Core",
-            typeof(ICore),
-            typeof(RendererBase),
-            new PropertyMetadata(new PropertyChangedCallback(OnCoreChanged))
-        );
-
-        public static ICore GetCore(RendererBase source)
-        {
-            return (ICore)source.GetValue(CoreProperty);
-        }
-
-        public static void SetCore(RendererBase source, ICore value)
-        {
-            source.SetValue(CoreProperty, value);
-        }
-
-        public static void OnCoreChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var renderer = sender as RendererBase;
-            if (renderer == null)
-            {
-                return;
-            }
-            if (renderer.Core != null && !renderer.IsInitialized)
-            {
-                renderer.InitializeComponent(renderer.Core);
-            }
-            renderer.OnCoreChanged();
-        }
-
-
         public static readonly Duration LockTimeout = new Duration(TimeSpan.FromMilliseconds(1));
 
         public static readonly DependencyProperty BitmapProperty = DependencyProperty.Register(
@@ -194,29 +162,10 @@ namespace FoxTunes
             renderer.OnColorChanged();
         }
 
-        public ICore Core
+        public RendererBase()
         {
-            get
-            {
-                return this.GetValue(CoreProperty) as ICore;
-            }
-            set
-            {
-                this.SetValue(CoreProperty, value);
-            }
+            this.InitializeComponent(Core.Instance);
         }
-
-        protected virtual void OnCoreChanged()
-        {
-            if (this.CoreChanged != null)
-            {
-                this.CoreChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Core");
-        }
-
-        public event EventHandler CoreChanged;
-
 
         public WriteableBitmap Bitmap
         {
@@ -255,10 +204,7 @@ namespace FoxTunes
 
         protected virtual void OnWidthChanged()
         {
-            if (this.IsInitialized)
-            {
-                var task = this.CreateBitmap();
-            }
+            var task = this.CreateBitmap();
             if (this.WidthChanged != null)
             {
                 this.WidthChanged(this, EventArgs.Empty);
@@ -282,10 +228,7 @@ namespace FoxTunes
 
         protected virtual void OnHeightChanged()
         {
-            if (this.IsInitialized)
-            {
-                var task = this.CreateBitmap();
-            }
+            var task = this.CreateBitmap();
             if (this.HeightChanged != null)
             {
                 this.HeightChanged(this, EventArgs.Empty);
@@ -332,10 +275,6 @@ namespace FoxTunes
 
         protected virtual void OnColorChanged()
         {
-            if (this.IsInitialized)
-            {
-                var task = this.CreateBitmap();
-            }
             if (this.ColorChanged != null)
             {
                 this.ColorChanged(this, EventArgs.Empty);
@@ -351,8 +290,6 @@ namespace FoxTunes
 
         public DoubleConfigurationElement ScalingFactor { get; private set; }
 
-        public bool IsInitialized { get; private set; }
-
         public virtual void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
@@ -363,7 +300,6 @@ namespace FoxTunes
                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
             this.ScalingFactor.ValueChanged += this.OnScalingFactorChanged;
-            this.IsInitialized = true;
         }
 
         protected virtual void OnIsStartedChanged(object sender, AsyncEventArgs e)
@@ -464,34 +400,6 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual Task OnError(string message, Exception exception)
-        {
-            Logger.Write(this, LogLevel.Error, message, exception);
-            if (Error == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return Error(this, new ComponentErrorEventArgs(message, exception));
-        }
-
-        event ComponentErrorEventHandler IBaseComponent.Error
-        {
-            add
-            {
-                Error += value;
-            }
-            remove
-            {
-                Error -= value;
-            }
-        }
-
-        public static event ComponentErrorEventHandler Error;
 
         public bool IsDisposed { get; private set; }
 

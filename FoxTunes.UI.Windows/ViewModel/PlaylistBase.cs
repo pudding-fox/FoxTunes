@@ -169,17 +169,17 @@ namespace FoxTunes.ViewModel
 
         protected abstract Task<Playlist> GetPlaylist();
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.DatabaseFactory = this.Core.Factories.Database;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.DatabaseFactory = core.Factories.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaylistBrowser.StateChanged += this.OnStateChanged;
-            this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaybackManager = this.Core.Managers.Playback;
+            this.ScriptingRuntime = core.Components.ScriptingRuntime;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.PlaybackManager = core.Managers.Playback;
             //TODO: Bad .Wait().
             this.RefreshStatus().Wait();
             base.InitializeComponent(core);

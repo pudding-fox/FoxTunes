@@ -12,7 +12,7 @@
         Topmost="True"
         Loaded="OnLoaded">
     <Windows:WindowBase.Resources>
-        <ViewModel:InputBox x:Key="ViewModel" Core="{Binding}"></ViewModel:InputBox>
+        <ViewModel:InputBox x:Key="ViewModel"></ViewModel:InputBox>
     </Windows:WindowBase.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>

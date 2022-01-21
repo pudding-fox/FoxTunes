@@ -8,7 +8,7 @@
              xmlns:LocalWindows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
+             d:DesignHeight="300" d:DesignWidth="300" 
              Foreground="{DynamicResource TextBrush}"
              MinWidth="80"
              MinHeight="30">
@@ -22,7 +22,7 @@
         <Rectangle>
             <Rectangle.Resources>
                 <LocalWindows:SpectrumRenderer x:Key="Renderer"
-                    Core="{Binding}"                                  
+                                                     
                     Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}" 
                     Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}" 
                     Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}"></LocalWindows:SpectrumRenderer>

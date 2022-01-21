@@ -39,6 +39,8 @@ namespace FoxTunes
 
         public IOutputVolume Volume { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Volume = core.Components.OutputEffects.Volume;
@@ -47,6 +49,7 @@ namespace FoxTunes
                 this.Volume.EnabledChanged += this.OnVolumeEnabledChanged;
                 this.Volume.ValueChanged += this.OnVolumeValueChanged;
             }
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             base.InitializeComponent(core);
         }
 

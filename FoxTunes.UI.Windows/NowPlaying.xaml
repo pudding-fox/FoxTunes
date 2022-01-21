@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" >
     <UserControl.Resources>
-        <ViewModel:NowPlaying x:Key="ViewModel" Core="{Binding}"></ViewModel:NowPlaying>
+        <ViewModel:NowPlaying x:Key="ViewModel"></ViewModel:NowPlaying>
         <ViewModel:TimeSpanConverter x:Key="TimeSpanConverter"></ViewModel:TimeSpanConverter>
     </UserControl.Resources>
     <Windows:Marquee Interval="{Binding MarqueeInterval.Value, Converter={StaticResource TimeSpanConverter}, Source={StaticResource ViewModel}}" Step="{Binding MarqueeStep.Value, Source={StaticResource ViewModel}}">

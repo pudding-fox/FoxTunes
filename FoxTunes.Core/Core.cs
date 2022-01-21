@@ -7,10 +7,13 @@ namespace FoxTunes
 {
     public class Core : BaseComponent, ICore
     {
+        public static ICore Instance { get; private set; }
+
         public static bool IsShuttingDown { get; set; }
 
         private Core()
         {
+            Instance = this;
             ComponentRegistry.Instance.Clear();
             IsShuttingDown = false;
         }
@@ -133,7 +136,7 @@ namespace FoxTunes
 
         protected virtual void InitializeComponents()
         {
-            ComponentRegistry.Instance.ForEach(component =>
+            ComponentRegistry.Instance.ForEach<IInitializable>(component =>
             {
                 try
                 {
@@ -196,6 +199,7 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to dispose component {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
+            Instance = null;
         }
 
         ~Core()

@@ -243,7 +243,6 @@ namespace FoxTunes.ViewModel
                     invocation.Source = this.Source;
 
                     var item = new MenuItem(component, invocation);
-                    item.Core = this.Core;
                     if (string.IsNullOrEmpty(invocation.Path))
                     {
                         items.Add(item);

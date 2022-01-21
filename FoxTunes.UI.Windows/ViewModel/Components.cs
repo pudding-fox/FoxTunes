@@ -43,18 +43,13 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler EnabledChanged;
 
-        public override void InitializeComponent(ICore core)
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
+        protected override void InitializeComponent(ICore core)
         {
-            ComponentRegistry.Instance.ForEach(component =>
-            {
-                component.Error += this.OnError;
-                if (component is IBackgroundTaskSource)
-                {
-                    (component as IBackgroundTaskSource).BackgroundTask += this.OnBackgroundTask;
-                }
-            });
-            ViewModelBase.Error += this.OnError;
-            UIComponentBase.Error += this.OnError;
+            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask += this.OnBackgroundTask);
+            this.ErrorEmitter = core.Components.ErrorEmitter;
+            this.ErrorEmitter.Error += this.OnError;
             base.InitializeComponent(core);
         }
 
@@ -127,15 +122,11 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            ComponentRegistry.Instance.ForEach(component =>
+            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask -= this.OnBackgroundTask);
+            if (this.ErrorEmitter != null)
             {
-                component.Error -= this.OnError;
-                if (component is IBackgroundTaskSource)
-                {
-                    (component as IBackgroundTaskSource).BackgroundTask -= this.OnBackgroundTask;
-                }
-            });
-            ViewModelBase.Error -= this.OnError;
+                this.ErrorEmitter.Error -= this.OnError;
+            }
             base.OnDisposing();
         }
 

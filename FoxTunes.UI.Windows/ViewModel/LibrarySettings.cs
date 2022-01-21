@@ -19,6 +19,8 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         private CollectionManager<LibraryHierarchy> _LibraryHierarchies { get; set; }
 
         public CollectionManager<LibraryHierarchy> LibraryHierarchies
@@ -147,7 +149,7 @@ namespace FoxTunes.ViewModel
             {
                 exception = e;
             }
-            await this.OnError("Save", exception).ConfigureAwait(false);
+            await this.ErrorEmitter.Send("Save", exception).ConfigureAwait(false);
             throw exception;
         }
 
@@ -209,13 +211,11 @@ namespace FoxTunes.ViewModel
 
         public async Task Reset()
         {
-            var core = default(ICore);
-            await Windows.Invoke(() => core = this.Core).ConfigureAwait(false);
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    core.InitializeDatabase(database, DatabaseInitializeType.Library);
+                    Core.Instance.InitializeDatabase(database, DatabaseInitializeType.Library);
 #if NET40
                     return TaskEx.FromResult(false);
 #else
@@ -230,14 +230,15 @@ namespace FoxTunes.ViewModel
             await this.HierarchyManager.Build(null).ConfigureAwait(false);
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.LibraryManager = this.Core.Managers.Library;
-            this.HierarchyManager = this.Core.Managers.Hierarchy;
-            this.DatabaseFactory = this.Core.Factories.Database;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.LibraryManager = core.Managers.Library;
+            this.HierarchyManager = core.Managers.Hierarchy;
+            this.DatabaseFactory = core.Factories.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.LibraryHierarchyLevels = new CollectionManager<LibraryHierarchyLevel>()
             {
                 ItemFactory = () =>

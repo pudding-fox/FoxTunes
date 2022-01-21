@@ -7,7 +7,7 @@ using System.Windows.Controls;
 
 namespace FoxTunes
 {
-    public abstract class UIComponentBase : UserControl, IUIComponent
+    public abstract class UIComponentBase : UserControl, IUIComponent, IObservable
     {
         protected static ILogger Logger
         {
@@ -44,6 +44,16 @@ namespace FoxTunes
             componentBase.OnIsComponentEnabledChanged();
         }
 
+        protected UIComponentBase()
+        {
+            this.InitializeComponent(Core.Instance);
+        }
+
+        protected virtual void InitializeComponent(ICore core)
+        {
+            //Nothing to do.
+        }
+
         protected virtual bool IsHostedIn<T>() where T : Window
         {
             var window = Window.GetWindow(this);
@@ -77,11 +87,6 @@ namespace FoxTunes
 
         public event EventHandler IsComponentEnabledChanged;
 
-        public virtual void InitializeComponent(ICore core)
-        {
-            //Nothing to do.
-        }
-
         protected virtual void Dispatch(Func<Task> function)
         {
 #if NET40
@@ -112,33 +117,5 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual Task OnError(string message, Exception exception)
-        {
-            Logger.Write(this, LogLevel.Error, message, exception);
-            if (Error == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return Error(this, new ComponentErrorEventArgs(message, exception));
-        }
-
-        event ComponentErrorEventHandler IBaseComponent.Error
-        {
-            add
-            {
-                Error += value;
-            }
-            remove
-            {
-                Error -= value;
-            }
-        }
-
-        public static event ComponentErrorEventHandler Error;
     }
 }

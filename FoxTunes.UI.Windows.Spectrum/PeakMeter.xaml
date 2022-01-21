@@ -9,13 +9,13 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
+             d:DesignHeight="300" d:DesignWidth="300" 
              Foreground="{DynamicResource TextBrush}"
              MinWidth="100"
              MinHeight="100">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-        <LocalViewModel:PeakMeter x:Key="ViewModel" Core="{Binding}"></LocalViewModel:PeakMeter>
+        <LocalViewModel:PeakMeter x:Key="ViewModel"></LocalViewModel:PeakMeter>
         <LocalWindows:TextAxisLabelProvider x:Key="Levels" Values="{Binding Levels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
         <LocalWindows:TextAxisLabelProvider x:Key="Channels" Values="{Binding Channels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
     </UserControl.Resources>
@@ -72,7 +72,6 @@
             <Rectangle Grid.Column="1" Grid.Row="0">
                 <Rectangle.Resources>
                     <LocalWindows:PeakRenderer x:Key="Renderer"
-                        Core="{Binding}"                                  
                         Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
                         Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
                         Orientation="{Binding Orientation, Source={StaticResource ViewModel}}"

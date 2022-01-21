@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IDatabaseTables : IBaseComponent
+    public interface IDatabaseTables : IBaseComponent, IInitializable
     {
         ITableConfig MetaDataItem { get; }
 

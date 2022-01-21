@@ -26,7 +26,6 @@ namespace FoxTunes.ViewModel
                 if (value)
                 {
                     this.SignalEmitter.Send(new Signal(this, CommonSignals.SettingsUpdated));
-                    Windows.SettingsWindow.DataContext = this.Core;
                     Windows.SettingsWindow.Show();
                 }
                 else if (Windows.IsSettingsWindowCreated)
@@ -71,9 +70,9 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 

@@ -59,9 +59,9 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT

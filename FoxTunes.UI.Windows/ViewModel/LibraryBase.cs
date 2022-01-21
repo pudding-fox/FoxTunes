@@ -268,21 +268,21 @@ namespace FoxTunes.ViewModel
             return this.Refresh();
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.LibraryHierarchyBrowser.StateChanged += this.OnStateChanged;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.DatabaseFactory = this.Core.Factories.Database;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.DatabaseFactory = core.Factories.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.LibraryManager = this.Core.Managers.Library;
+            this.LibraryManager = core.Managers.Library;
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
-            this.FileActionHandlerManager = this.Core.Managers.FileActionHandler;
-            this.Configuration = this.Core.Components.Configuration;
+            this.FileActionHandlerManager = core.Managers.FileActionHandler;
+            this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.SHOW_CURSOR_ADORNERS_ELEMENT

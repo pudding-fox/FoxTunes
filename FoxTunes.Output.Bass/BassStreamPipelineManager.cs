@@ -187,7 +187,6 @@ namespace FoxTunes
         {
             this.Pipeline = this.PipelineFactory.CreatePipeline(stream);
             this.Pipeline.Input.Add(stream);
-            this.Pipeline.Error += this.OnError;
             this.OnCreated();
         }
 
@@ -242,7 +241,6 @@ namespace FoxTunes
             if (this.Pipeline != null)
             {
                 Logger.Write(this, LogLevel.Debug, "Shutting down the pipeline.");
-                this.Pipeline.Error -= this.OnError;
                 this.Pipeline.Dispose();
                 this.Pipeline = null;
             }

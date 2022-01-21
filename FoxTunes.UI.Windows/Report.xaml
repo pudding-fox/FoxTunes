@@ -8,9 +8,9 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="600">
     <UserControl.Resources>
-        <ViewModel:Report x:Key="ViewModel" Core="{Binding}"></ViewModel:Report>
+        <ViewModel:Report x:Key="ViewModel"></ViewModel:Report>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>

@@ -9,13 +9,13 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
+             d:DesignHeight="300" d:DesignWidth="300" 
              Foreground="{DynamicResource TextBrush}"
              MinWidth="180"
              MinHeight="90">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-        <LocalViewModel:EnhancedSpectrum x:Key="ViewModel" Core="{Binding}"></LocalViewModel:EnhancedSpectrum>
+        <LocalViewModel:EnhancedSpectrum x:Key="ViewModel"></LocalViewModel:EnhancedSpectrum>
         <LocalWindows:TextAxisLabelProvider x:Key="Levels" Values="{Binding Levels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
         <LocalWindows:TextAxisLabelProvider x:Key="Bands" Values="{Binding Bands, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
     </UserControl.Resources>
@@ -41,8 +41,7 @@
                 </TextBlock>
                 <Rectangle Grid.Column="1" Grid.Row="0">
                     <Rectangle.Resources>
-                        <LocalWindows:EnhancedSpectrumRenderer x:Key="Renderer"
-                        Core="{Binding}"                                  
+                        <LocalWindows:EnhancedSpectrumRenderer x:Key="Renderer"             
                         Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
                         Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
                         Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:EnhancedSpectrum}}}"></LocalWindows:EnhancedSpectrumRenderer>

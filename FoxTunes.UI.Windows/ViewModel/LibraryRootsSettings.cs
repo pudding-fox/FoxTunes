@@ -21,6 +21,8 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         private CollectionManager<LibraryRoot> _LibraryRoots { get; set; }
 
         public CollectionManager<LibraryRoot> LibraryRoots
@@ -105,7 +107,7 @@ namespace FoxTunes.ViewModel
             {
                 exception = e;
             }
-            await this.OnError("Save", exception).ConfigureAwait(false);
+            await this.ErrorEmitter.Send("Save", exception).ConfigureAwait(false);
             throw exception;
         }
 
@@ -122,15 +124,16 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.Refresh);
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.LibraryManager = this.Core.Managers.Library;
-            this.HierarchyManager = this.Core.Managers.Hierarchy;
-            this.DatabaseFactory = this.Core.Factories.Database;
-            this.FileSystemBrowser = this.Core.Components.FileSystemBrowser;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.LibraryManager = core.Managers.Library;
+            this.HierarchyManager = core.Managers.Hierarchy;
+            this.DatabaseFactory = core.Factories.Database;
+            this.FileSystemBrowser = core.Components.FileSystemBrowser;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.LibraryRoots = new CollectionManager<LibraryRoot>()
             {
                 ItemFactory = () =>

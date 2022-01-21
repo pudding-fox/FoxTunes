@@ -169,7 +169,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ImageModeChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<DoubleConfigurationElement>(

@@ -53,9 +53,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler EnabledChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration = core.Components.Configuration;
             this.Order = this.Configuration.GetElement<SelectionConfigurationElement>(
                 PlaylistBehaviourConfiguration.SECTION,
                 PlaylistBehaviourConfiguration.ORDER_ELEMENT

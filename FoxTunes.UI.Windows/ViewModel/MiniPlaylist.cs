@@ -88,7 +88,7 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();

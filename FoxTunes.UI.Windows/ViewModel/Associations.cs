@@ -10,11 +10,6 @@ namespace FoxTunes.ViewModel
 {
     public class Associations : ViewModelBase
     {
-        public Associations()
-        {
-            this.FileAssociations = new ObservableCollection<Association>();
-        }
-
         public IOutput Output { get; private set; }
 
         public ObservableCollection<Association> FileAssociations { get; private set; }
@@ -39,9 +34,10 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.Output = this.Core.Components.Output;
+            this.FileAssociations = new ObservableCollection<Association>();
+            this.Output = core.Components.Output;
             this.Refresh();
             base.InitializeComponent(core);
         }

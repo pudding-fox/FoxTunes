@@ -270,11 +270,11 @@ namespace FoxTunes.ViewModel
             return this.PlaylistManager.SelectedPlaylist;
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.Configuration = this.Core.Components.Configuration;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.Configuration = core.Components.Configuration;
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
               MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.SHOW_ARTWORK_ELEMENT

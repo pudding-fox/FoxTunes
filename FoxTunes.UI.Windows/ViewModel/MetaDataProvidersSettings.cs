@@ -18,6 +18,8 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         private CollectionManager<MetaDataProvider> _MetaDataProviders { get; set; }
 
         public CollectionManager<MetaDataProvider> MetaDataProviders
@@ -99,7 +101,7 @@ namespace FoxTunes.ViewModel
             {
                 exception = e;
             }
-            await this.OnError("Save", exception).ConfigureAwait(false);
+            await this.ErrorEmitter.Send("Save", exception).ConfigureAwait(false);
             throw exception;
         }
 
@@ -126,13 +128,11 @@ namespace FoxTunes.ViewModel
 
         public async Task Reset()
         {
-            var core = default(ICore);
-            await Windows.Invoke(() => core = this.Core).ConfigureAwait(false);
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    core.InitializeDatabase(database, DatabaseInitializeType.MetaData);
+                    Core.Instance.InitializeDatabase(database, DatabaseInitializeType.MetaData);
 #if NET40
                     return TaskEx.FromResult(false);
 #else
@@ -146,13 +146,14 @@ namespace FoxTunes.ViewModel
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataProvidersUpdated)).ConfigureAwait(false);
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.MetaDataProviderManager = core.Managers.MetaDataProvider;
-            this.DatabaseFactory = this.Core.Factories.Database;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.DatabaseFactory = core.Factories.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.MetaDataProviders = new CollectionManager<MetaDataProvider>(CollectionManagerFlags.AllowEmptyCollection)
             {
                 ItemFactory = () =>

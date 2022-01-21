@@ -185,9 +185,9 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration = core.Components.Configuration;
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
@@ -231,7 +231,6 @@ namespace FoxTunes.ViewModel
                         continue;
                     }
                     var page = new ComponentSettingsPage(section.Name, elements);
-                    page.InitializeComponent(this.Core);
                     this.Pages.Add(page);
                 }
                 this.SelectedPage = this.Pages.FirstOrDefault();

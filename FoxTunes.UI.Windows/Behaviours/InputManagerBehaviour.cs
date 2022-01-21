@@ -23,6 +23,8 @@ namespace FoxTunes
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public TextConfigurationElement Play { get; private set; }
@@ -35,13 +37,11 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Playback = new global::FoxTunes.ViewModel.Playback(false)
-            {
-                Core = core
-            };
+            this.Playback = new global::FoxTunes.ViewModel.Playback(false);
             this.InputManager = ComponentRegistry.Instance.GetComponent<IInputManager>();
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Configuration = core.Components.Configuration;
             this.Play = this.Configuration.GetElement<TextConfigurationElement>(
                 InputManagerConfiguration.SECTION,
@@ -121,7 +121,7 @@ namespace FoxTunes
             }
             else
             {
-                this.OnError(string.Format("Failed to register input hook {0}", keys));
+                this.ErrorEmitter.Send(string.Format("Failed to register input hook {0}", keys));
             }
         }
 

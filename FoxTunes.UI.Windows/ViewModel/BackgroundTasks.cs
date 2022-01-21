@@ -54,7 +54,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);

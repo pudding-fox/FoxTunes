@@ -33,6 +33,8 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -43,6 +45,7 @@ namespace FoxTunes
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Refresh();
             base.InitializeComponent(core);
         }
@@ -444,7 +447,7 @@ namespace FoxTunes
             {
                 exception = e;
             }
-            await this.OnError(exception).ConfigureAwait(false);
+            await this.ErrorEmitter.Send(exception).ConfigureAwait(false);
         }
 
         public Task Play(Playlist playlist, int sequence)

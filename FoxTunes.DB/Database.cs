@@ -1,10 +1,8 @@
 ﻿#pragma warning disable 612, 618
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System;
 using System.ComponentModel;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -63,31 +61,5 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnError(string message)
-        {
-            this.OnError(new Exception(message));
-        }
-
-        protected virtual void OnError(Exception exception)
-        {
-            this.OnError(exception.Message, exception);
-        }
-
-        protected virtual Task OnError(string message, Exception exception)
-        {
-            Logger.Write(this, LogLevel.Error, message, exception);
-            if (this.Error == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return this.Error(this, new ComponentErrorEventArgs(message, exception));
-        }
-
-        public event ComponentErrorEventHandler Error;
     }
 }

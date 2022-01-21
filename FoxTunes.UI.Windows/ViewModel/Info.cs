@@ -446,15 +446,15 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler BitrateChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.LibraryManager = this.Core.Managers.Library;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaybackManager = this.Core.Managers.Playback;
+            this.LibraryManager = core.Managers.Library;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-            this.LibraryBrowser = this.Core.Components.LibraryBrowser;
-            this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.LibraryBrowser = core.Components.LibraryBrowser;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);

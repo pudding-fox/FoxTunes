@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public abstract class ViewModelBase : Freezable, IBaseComponent, INotifyPropertyChanged, IDisposable
+    public abstract class ViewModelBase : Freezable, IBaseComponent, IObservable, IDisposable
     {
         protected static ILogger Logger
         {
@@ -16,63 +16,17 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public static readonly DependencyProperty CoreProperty = DependencyProperty.Register(
-            "Core",
-            typeof(ICore),
-            typeof(ViewModelBase),
-            new PropertyMetadata(new PropertyChangedCallback(OnCoreChanged))
-        );
-
-        public static ICore GetCore(ViewModelBase source)
+        protected ViewModelBase(bool initialize = true)
         {
-            return (ICore)source.GetValue(CoreProperty);
-        }
-
-        public static void SetCore(ViewModelBase source, ICore value)
-        {
-            source.SetValue(CoreProperty, value);
-        }
-
-        public static void OnCoreChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var viewModel = sender as ViewModelBase;
-            if (viewModel == null)
+            if (initialize)
             {
-                return;
-            }
-            if (viewModel.Core != null && !viewModel.IsInitialized)
-            {
-                viewModel.InitializeComponent(viewModel.Core);
-            }
-            viewModel.OnCoreChanged();
-        }
-
-        public ICore Core
-        {
-            get
-            {
-                return this.GetValue(CoreProperty) as ICore;
-            }
-            set
-            {
-                this.SetValue(CoreProperty, value);
+                this.InitializeComponent(Core.Instance);
             }
         }
 
-        protected virtual void OnCoreChanged()
-        {
-            if (this.CoreChanged != null)
-            {
-                this.CoreChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Core");
-        }
+        protected bool IsInitialized { get; private set; }
 
-        public event EventHandler CoreChanged;
-
-        public bool IsInitialized { get; private set; }
-
-        public virtual void InitializeComponent(ICore core)
+        protected virtual void InitializeComponent(ICore core)
         {
             this.IsInitialized = true;
         }
@@ -116,34 +70,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual Task OnError(string message, Exception exception)
-        {
-            Logger.Write(this, LogLevel.Error, message, exception);
-            if (Error == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return Error(this, new ComponentErrorEventArgs(message, exception));
-        }
-
-        event ComponentErrorEventHandler IBaseComponent.Error
-        {
-            add
-            {
-                Error += value;
-            }
-            remove
-            {
-                Error -= value;
-            }
-        }
-
-        public static event ComponentErrorEventHandler Error;
 
         public bool IsDisposed { get; private set; }
 

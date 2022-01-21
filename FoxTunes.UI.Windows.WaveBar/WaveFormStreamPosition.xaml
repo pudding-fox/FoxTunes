@@ -15,10 +15,10 @@
              MinWidth="80"
              MinHeight="30">
     <UserControl.Resources>
-        <ViewModel:StreamPosition x:Key="ViewModel" Core="{Binding}"></ViewModel:StreamPosition>
+        <ViewModel:StreamPosition x:Key="ViewModel"></ViewModel:StreamPosition>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
         <LocalWindows:WaveFormRenderer x:Key="Renderer" 
-            Core="{Binding}" 
+            
             Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:WaveFormStreamPosition}}}" 
             Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:WaveFormStreamPosition}}}" 
             Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:WaveFormStreamPosition}}}"></LocalWindows:WaveFormRenderer>

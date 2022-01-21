@@ -8,9 +8,9 @@
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="500" d:DesignWidth="700">
     <UserControl.Resources>
-        <ViewModel:MetaDataProvidersSettings x:Key="ViewModel" Core="{Binding}"></ViewModel:MetaDataProvidersSettings>
+        <ViewModel:MetaDataProvidersSettings x:Key="ViewModel"></ViewModel:MetaDataProvidersSettings>
         <ObjectDataProvider x:Key="MetaDataProviderTypes" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="Core:MetaDataProviderType"/>

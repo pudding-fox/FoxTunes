@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -20,6 +22,7 @@ namespace FoxTunes
             this.Output.IsStartedChanged += this.OnIsStartedChanged;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             base.InitializeComponent(core);
         }
 
@@ -52,7 +55,7 @@ namespace FoxTunes
                 }
                 if (exception != null)
                 {
-                    await this.OnError(exception).ConfigureAwait(false);
+                    await this.ErrorEmitter.Send(exception).ConfigureAwait(false);
                 }
             }
         }

@@ -134,7 +134,7 @@ namespace FoxTunes.ViewModel
             }).ConfigureAwait(false);
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistManager.SelectedPlaylistChanged += this.OnSelectedPlaylistChanged;

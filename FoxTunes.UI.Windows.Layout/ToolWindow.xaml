@@ -10,7 +10,7 @@
         x:Class="FoxTunes.ToolWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <Window.Resources>
-        <LocalViewModel:ToolWindow x:Key="ViewModel" Core="{Binding}"></LocalViewModel:ToolWindow>
+        <LocalViewModel:ToolWindow x:Key="ViewModel"></LocalViewModel:ToolWindow>
     </Window.Resources>
     <Window.Topmost>
         <Binding Path="AlwaysOnTop" Source="{StaticResource ViewModel}"/>

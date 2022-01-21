@@ -574,7 +574,6 @@ namespace FoxTunes
                 var window = new DialogWindow<T>(content)
                 {
                     Owner = ActiveWindow,
-                    DataContext = core,
                     Topmost = true,
                     Title = title
                 };
@@ -591,7 +590,6 @@ namespace FoxTunes
                 var window = new DialogWindow<T>(content)
                 {
                     Owner = ActiveWindow,
-                    DataContext = core,
                     Topmost = true,
                     Title = title
                 };

@@ -7,7 +7,7 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" d:DesignHeight="30" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Focusable="False" MouseDown="OnMouseDown">
     <UserControl.Resources>
-        <ViewModel:Titlebar x:Key="ViewModel" Core="{Binding}" Window="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+        <ViewModel:Titlebar x:Key="ViewModel" Window="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
         <ViewModel:WindowStateConverter x:Key="WindowStateConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">

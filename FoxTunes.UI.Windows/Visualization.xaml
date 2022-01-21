@@ -7,13 +7,13 @@
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="300" d:DesignWidth="300"
              SnapsToDevicePixels="True">
     <Windows:UIComponentBase.Template>
         <ControlTemplate TargetType="{x:Type Windows:UIComponentBase}">
             <Grid>
                 <Grid.Resources>
-                    <ViewModel:Visualization x:Key="ViewModel" Core="{Binding}"></ViewModel:Visualization>
+                    <ViewModel:Visualization x:Key="ViewModel"></ViewModel:Visualization>
                 </Grid.Resources>
                 <Grid.ToolTip>
                     <Binding Path="StatusMessageDetail" Source="{StaticResource ViewModel}"/>

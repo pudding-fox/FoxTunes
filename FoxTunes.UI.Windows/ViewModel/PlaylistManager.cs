@@ -18,6 +18,8 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         private CollectionManager<Playlist> _Playlists { get; set; }
 
         public CollectionManager<Playlist> Playlists
@@ -38,13 +40,14 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Playlists");
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.DatabaseFactory = this.Core.Factories.Database;
-            this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.DatabaseFactory = core.Factories.Database;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Playlists = new CollectionManager<Playlist>()
             {
                 ItemFactory = () => new Playlist()
@@ -126,7 +129,6 @@ namespace FoxTunes.ViewModel
             {
                 if (value)
                 {
-                    Windows.PlaylistManagerWindow.DataContext = this.Core;
                     Windows.PlaylistManagerWindow.Show();
                 }
                 else if (Windows.IsPlaylistManagerWindowCreated)
@@ -208,7 +210,7 @@ namespace FoxTunes.ViewModel
             {
                 exception = e;
             }
-            await this.OnError("Save", exception).ConfigureAwait(false);
+            await this.ErrorEmitter.Send("Save", exception).ConfigureAwait(false);
             throw exception;
         }
 
