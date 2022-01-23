@@ -441,6 +441,10 @@ namespace FoxTunes.ViewModel
 
         protected override void Dispose(bool disposing)
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             if (this.LibraryHierarchyBrowser != null)
             {

@@ -157,6 +157,8 @@ namespace FoxTunes
                 this.Timer.Dispose();
                 this.Timer = null;
             }
+            //Execute any pending actions.
+            this.OnElapsed(this, default(ElapsedEventArgs));
         }
 
         ~AsyncDebouncer()

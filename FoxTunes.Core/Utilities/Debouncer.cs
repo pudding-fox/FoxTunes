@@ -122,7 +122,7 @@ namespace FoxTunes
                 }
             }
             //Execute any pending actions.
-            OnElapsed(this, default(ElapsedEventArgs));
+            this.OnElapsed(this, default(ElapsedEventArgs));
         }
 
         ~Debouncer()

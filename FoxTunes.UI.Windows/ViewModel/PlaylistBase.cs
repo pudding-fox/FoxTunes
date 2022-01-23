@@ -258,6 +258,10 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             if (this.PlaylistBrowser != null)
             {
