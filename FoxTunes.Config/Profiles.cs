@@ -49,7 +49,7 @@ namespace FoxTunes
             {
                 profiles.Insert(0, Strings.Profiles_Default);
             }
-            Logger.Write(typeof(Profiles), LogLevel.Warn, "Available profiles: {0}", string.Join(", ", profiles));
+            Logger.Write(typeof(Profiles), LogLevel.Debug, "Available profiles: {0}", string.Join(", ", profiles));
             return profiles;
         });
 
