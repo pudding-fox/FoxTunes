@@ -24,6 +24,10 @@ namespace FoxTunes
                 var providers = this.MetaDataProviderManager.GetProviders();
                 foreach (var provider in providers)
                 {
+                    if (!provider.Enabled)
+                    {
+                        continue;
+                    }
                     yield return new KeyValuePair<string, MetaDataItemType>(provider.Name, MetaDataItemType.CustomTag);
                 }
             }
@@ -34,7 +38,7 @@ namespace FoxTunes
             get
             {
                 var providers = this.MetaDataProviderManager.GetProviders();
-                return providers.Any();
+                return providers.Any(provider => provider.Enabled);
             }
         }
 
