@@ -13,9 +13,12 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
+        public IReportEmitter ReportEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.ReportEmitter = core.Components.ReportEmitter;
             base.InitializeComponent(core);
         }
 
@@ -140,32 +143,15 @@ namespace FoxTunes
         {
             var report = new MetaDataManagerReport<LibraryItem>(libraryItems, errors);
             report.InitializeComponent(this.Core);
-            this.OnReport(report);
+            this.ReportEmitter.Send(report);
         }
 
         protected virtual void OnReport(IEnumerable<PlaylistItem> playlistItems, IDictionary<PlaylistItem, IList<string>> errors)
         {
             var report = new MetaDataManagerReport<PlaylistItem>(playlistItems, errors);
             report.InitializeComponent(this.Core);
-            this.OnReport(report);
+            this.ReportEmitter.Send(report);
         }
-
-        protected virtual Task OnReport(IReport Report)
-        {
-            if (this.Report == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new ReportEventArgs(Report);
-            this.Report(this, e);
-            return e.Complete();
-        }
-
-        public event ReportEventHandler Report;
 
         public class MetaDataManagerReport<T> : BaseComponent, IReport where T : IFileData
         {

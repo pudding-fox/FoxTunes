@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class DiscogsBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
+    public class DiscogsBehaviour : StandardBehaviour, IBackgroundTaskSource, IInvocableComponent, IConfigurableComponent
     {
         public const string LOOKUP_TAGS = "LLMN";
 
@@ -21,6 +21,8 @@ namespace FoxTunes
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
+
+        public IReportEmitter ReportEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -37,6 +39,7 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
+            this.ReportEmitter = core.Components.ReportEmitter;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
@@ -253,18 +256,7 @@ namespace FoxTunes
         {
             var report = new ReleaseLookupReport(releaseLookups);
             report.InitializeComponent(this.Core);
-            this.OnReport(report);
+            this.ReportEmitter.Send(report);
         }
-
-        protected virtual void OnReport(IReport report)
-        {
-            if (this.Report == null)
-            {
-                return;
-            }
-            this.Report(this, new ReportEventArgs(report));
-        }
-
-        public event ReportEventHandler Report;
     }
 }

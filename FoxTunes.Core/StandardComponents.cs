@@ -201,6 +201,14 @@ namespace FoxTunes
             }
         }
 
+        public IReportEmitter ReportEmitter
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IReportEmitter>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }

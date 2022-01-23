@@ -49,5 +49,7 @@
         IFilterParser FilterParser { get; }
 
         ISortParser SortParser { get; }
+
+        IReportEmitter ReportEmitter { get; }
     }
 }
