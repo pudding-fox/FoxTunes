@@ -250,7 +250,7 @@ namespace FoxTunes.ViewModel
                     }
                     var path = invocation.Path.Split(global::System.IO.Path.DirectorySeparatorChar, global::System.IO.Path.AltDirectorySeparatorChar);
                     var children = this.GetItem(items, invocation, path).Children;
-                    if (item.Separator)
+                    if (item.Separator && children.LastOrDefault() != null)
                     {
                         children.Add(null);
                     }

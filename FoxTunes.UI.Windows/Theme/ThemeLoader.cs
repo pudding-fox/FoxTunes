@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -58,9 +59,12 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void EnsureTheme()
+        public Task EnsureTheme()
         {
-            var theme = this.Theme;
+            return Windows.Invoke(() =>
+            {
+                var theme = this.Theme;
+            });
         }
     }
 }

@@ -80,7 +80,6 @@ namespace FoxTunes
                     Windows.Invoke(() => Windows.MiniWindow.Topmost = value);
                 }
             });
-
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
@@ -90,7 +89,7 @@ namespace FoxTunes
                 //TODO: This code is actually responsible for creating the main application window, 
                 //TODO: It should really be WindowsUserInterface.Show().
                 //Ensure resources are loaded.
-                ThemeLoader.EnsureTheme();
+                await ThemeLoader.EnsureTheme().ConfigureAwait(false);
                 if (value)
                 {
                     await this.Enable().ConfigureAwait(false);
