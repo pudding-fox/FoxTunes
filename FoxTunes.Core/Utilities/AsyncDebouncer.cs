@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace FoxTunes
 
         private AsyncDebouncer()
         {
-            this.Tasks = new ConcurrentDictionary<Func<Task>, TaskCompletionSource<bool>>();
+            this.Tasks = new ConcurrentDictionary<Func<Task>, TaskCompletionSource<bool>>(FuncComparer<Task>.Instance);
         }
 
         public AsyncDebouncer(int timeout) : this()
@@ -172,6 +173,21 @@ namespace FoxTunes
             {
                 //Nothing can be done, never throw on GC thread.
             }
+        }
+
+        public class FuncComparer<T> : IEqualityComparer<Func<T>>
+        {
+            public bool Equals(Func<T> x, Func<T> y)
+            {
+                return x.Method.Equals(y.Method);
+            }
+
+            public int GetHashCode(Func<T> obj)
+            {
+                return obj.Method.GetHashCode();
+            }
+
+            public static readonly IEqualityComparer<Func<T>> Instance = new FuncComparer<T>();
         }
     }
 }
