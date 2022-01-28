@@ -10,6 +10,15 @@ namespace FoxTunes.ViewModel
 {
     public class Playlists : ViewModelBase
     {
+        const int TIMEOUT = 100;
+
+        public Playlists()
+        {
+            this.Debouncer = new AsyncDebouncer(TIMEOUT);
+        }
+
+        public AsyncDebouncer Debouncer { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
@@ -116,22 +125,44 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public virtual async Task Reload(IEnumerable<Playlist> playlists)
+        public virtual Task Refresh(IEnumerable<Playlist> playlists)
         {
-            await this.RefreshItems(playlists).ConfigureAwait(false);
-            await Windows.Invoke(() =>
+            var task = new Func<Task>(async () =>
             {
-                this.OnSelectedItemChanged();
-            }).ConfigureAwait(false);
+                await this.RefreshItems(playlists).ConfigureAwait(false);
+                await Windows.Invoke(() =>
+                {
+                    this.OnSelectedItemChanged();
+                }).ConfigureAwait(false);
+            });
+            if (this.IsInitialized && this.Items != null)
+            {
+                return this.Debouncer.Exec(task);
+            }
+            else
+            {
+                return task();
+            }
         }
 
-        public virtual async Task Reload()
+        public virtual Task Refresh()
         {
-            await this.RefreshItems().ConfigureAwait(false);
-            await Windows.Invoke(() =>
+            var task = new Func<Task>(async () =>
             {
-                this.OnSelectedItemChanged();
-            }).ConfigureAwait(false);
+                await this.RefreshItems().ConfigureAwait(false);
+                await Windows.Invoke(() =>
+                {
+                    this.OnSelectedItemChanged();
+                }).ConfigureAwait(false);
+            });
+            if (this.IsInitialized && this.Items != null)
+            {
+                return this.Debouncer.Exec(task);
+            }
+            else
+            {
+                return task();
+            }
         }
 
         protected override void InitializeComponent(ICore core)
@@ -142,7 +173,7 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             //TODO: Bad .Wait().
-            this.Reload().Wait();
+            this.Refresh().Wait();
             base.InitializeComponent(core);
         }
 
@@ -154,11 +185,11 @@ namespace FoxTunes.ViewModel
                     var playlists = signal.State as IEnumerable<Playlist>;
                     if (playlists != null && playlists.Any())
                     {
-                        return this.Reload(playlists);
+                        return this.Refresh(playlists);
                     }
                     else
                     {
-                        return this.Reload();
+                        return this.Refresh();
                     }
             }
 #if NET40
@@ -324,6 +355,10 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             if (this.PlaylistManager != null)
             {
                 this.PlaylistManager.SelectedPlaylistChanged -= this.OnSelectedPlaylistChanged;

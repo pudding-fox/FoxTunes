@@ -167,6 +167,22 @@ namespace FoxTunes.ViewModel
             }).ConfigureAwait(false);
         }
 
+        public virtual Task Refresh()
+        {
+            var task = new Func<Task>(async () =>
+            {
+                await this.RefreshItems().ConfigureAwait(false);
+            });
+            if (this.IsInitialized && this.Items != null)
+            {
+                return this.Debouncer.Exec(task);
+            }
+            else
+            {
+                return task();
+            }
+        }
+
         protected abstract Task<Playlist> GetPlaylist();
 
         protected override void InitializeComponent(ICore core)
@@ -201,12 +217,12 @@ namespace FoxTunes.ViewModel
                         var playlist = await this.GetPlaylist().ConfigureAwait(false);
                         if (playlist == null || playlists.Contains(playlist))
                         {
-                            await this.RefreshItems().ConfigureAwait(false);
+                            await this.Refresh().ConfigureAwait(false);
                         }
                     }
                     else
                     {
-                        await this.RefreshItems().ConfigureAwait(false);
+                        await this.Refresh().ConfigureAwait(false);
                     }
                     break;
             }
@@ -223,37 +239,22 @@ namespace FoxTunes.ViewModel
             await this.RefreshItems(playlist).ConfigureAwait(false);
         }
 
-        protected virtual Task RefreshItems(Playlist playlist)
+        protected virtual async Task RefreshItems(Playlist playlist)
         {
-            var task = new Func<Task>(async () =>
+            if (playlist == null)
             {
-                var items = default(PlaylistItem[]);
-                if (playlist != null)
-                {
-                    items = this.PlaylistBrowser.GetItems(playlist);
-                }
-                else
-                {
-                    items = new PlaylistItem[] { };
-                }
-                if (this.Items == null)
-                {
-                    await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);
-                }
-                else
-                {
-                    await Windows.Invoke(this.Items.Reset(items)).ConfigureAwait(false);
-                }
-                await this.RefreshStatus().ConfigureAwait(false);
-            });
-            if (this.IsInitialized && this.Items != null)
+                return;
+            }
+            var items = this.PlaylistBrowser.GetItems(playlist);
+            if (this.Items == null)
             {
-                return this.Debouncer.Exec(task);
+                await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);
             }
             else
             {
-                return task();
+                await Windows.Invoke(this.Items.Reset(items)).ConfigureAwait(false);
             }
+            await this.RefreshStatus().ConfigureAwait(false);
         }
 
         protected override void OnDisposing()
