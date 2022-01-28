@@ -77,6 +77,10 @@ namespace FoxTunes.ViewModel
         {
             get
             {
+                if (this._SelectedPage == null)
+                {
+                    return ComponentSettingsPage.Empty;
+                }
                 return this._SelectedPage;
             }
             set
@@ -85,33 +89,13 @@ namespace FoxTunes.ViewModel
                 {
                     return;
                 }
-                this.OnSelectedPageChanging();
                 this._SelectedPage = value;
                 this.OnSelectedPageChanged();
             }
         }
 
-        protected virtual void OnSelectedPageChanging()
-        {
-            if (this.SelectedPage != null)
-            {
-                this.SelectedPage.IsSelected = false;
-            }
-            if (this.SelectedPageChanging != null)
-            {
-                this.SelectedPageChanging(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanging("SelectedPage");
-        }
-
-        public event EventHandler SelectedPageChanging;
-
         protected virtual void OnSelectedPageChanged()
         {
-            if (this.SelectedPage != null)
-            {
-                this.SelectedPage.IsSelected = true;
-            }
             if (this.SelectedPageChanged != null)
             {
                 this.SelectedPageChanged(this, EventArgs.Empty);

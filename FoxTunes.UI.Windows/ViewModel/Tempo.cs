@@ -336,8 +336,7 @@ namespace FoxTunes.ViewModel
                 this.Effects.Tempo.PitchChanged += this.OnPitchChanged;
                 this.Effects.Tempo.RateChanged += this.OnRateChanged;
             }
-            //TODO: Bad .Wait().
-            this.Refresh().Wait();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 

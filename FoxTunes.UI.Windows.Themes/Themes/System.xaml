@@ -10,10 +10,8 @@
     <SolidColorBrush x:Key="NormalBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
     <SolidColorBrush x:Key="NormalBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
     <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
-
     <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
     <SolidColorBrush x:Key="SolidBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
-
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF9BDDFB"/>
 
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>

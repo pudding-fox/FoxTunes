@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -21,7 +24,7 @@ namespace FoxTunes
             {
                 return;
             }
-            tabControl.ContentTemplate = ContentManager.CreateContentTemplate();
+            tabControl.ContentTemplate = TemplateFactory.Template;
         }
 
         public static VirtualizationMode GetVirtualizationMode(TabControl source)
@@ -196,21 +199,28 @@ namespace FoxTunes
 
                 return contentManager;
             }
+        }
 
-            public static DataTemplate CreateContentTemplate()
+        private static class TemplateFactory
+        {
+            private static Lazy<DataTemplate> _Template = new Lazy<DataTemplate>(GetTemplate);
+
+            public static DataTemplate Template
             {
-                const string xaml = "<DataTemplate><Border Windows:TabControlExtensions.InternalTabControl=\"{Binding RelativeSource={RelativeSource AncestorType=TabControl}}\"/></DataTemplate>";
+                get
+                {
+                    return _Template.Value;
+                }
+            }
 
-                var context = new ParserContext();
-
-                context.XamlTypeMapper = new XamlTypeMapper(new string[0]);
-                context.XamlTypeMapper.AddMappingProcessingInstruction("Windows", typeof(TabControlExtensions).Namespace, typeof(TabControlExtensions).Assembly.FullName);
-
-                context.XmlnsDictionary.Add("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
-                context.XmlnsDictionary.Add("Windows", "Windows");
-
-                var template = (DataTemplate)XamlReader.Parse(xaml, context);
-                return template;
+            private static DataTemplate GetTemplate()
+            {
+                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(Resources.TabContent)))
+                {
+                    var template = (DataTemplate)XamlReader.Load(stream);
+                    template.Seal();
+                    return template;
+                }
             }
         }
 

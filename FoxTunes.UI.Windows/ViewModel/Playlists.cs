@@ -172,8 +172,7 @@ namespace FoxTunes.ViewModel
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            //TODO: Bad .Wait().
-            this.Refresh().Wait();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 

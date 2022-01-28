@@ -8,7 +8,7 @@
 
     <!-- When editing this style remember to also edit ExpressionDark.xaml -->
     <Style TargetType="{x:Type ListView}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+        <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource ListBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Foreground" Value="#FF042271" />
@@ -25,11 +25,6 @@
                             <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         </ScrollViewer>
                     </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Background" TargetName="Border" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -109,10 +104,10 @@
                         </Trigger>
                         <Trigger Property="IsSelected" Value="true">
                             <Trigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource SelectedOff}" x:Name="SelectedOff_BeginStoryboard"/>
+                                <BeginStoryboard Storyboard="{StaticResource SelectedOff}"/>
                             </Trigger.ExitActions>
                             <Trigger.EnterActions>
-                                <BeginStoryboard Storyboard="{StaticResource SelectedOn}" x:Name="SelectedOn_BeginStoryboard"/>
+                                <BeginStoryboard Storyboard="{StaticResource SelectedOn}"/>
                             </Trigger.EnterActions>
                         </Trigger>
                         <Trigger Property="Windows:ListViewItemExtensions.IsDragging" Value="true">
@@ -121,7 +116,7 @@
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource HoverOff}" x:Name="HoverOff_BeginStoryboard"/>
+                                <BeginStoryboard Storyboard="{StaticResource HoverOff}"/>
                             </MultiTrigger.ExitActions>
                             <MultiTrigger.EnterActions>
                                 <BeginStoryboard Storyboard="{StaticResource HoverOn}"/>

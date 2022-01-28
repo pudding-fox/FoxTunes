@@ -211,5 +211,7 @@ namespace FoxTunes.ViewModel
         {
             return new ComponentSettingsPage();
         }
+
+        public static readonly ComponentSettingsPage Empty = new ComponentSettingsPage();
     }
 }

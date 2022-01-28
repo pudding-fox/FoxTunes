@@ -300,9 +300,7 @@ namespace FoxTunes.ViewModel
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.SHOW_CURSOR_ADORNERS_ELEMENT
             ).ConnectValue(value => this.ShowCursorAdorners = value);
-            //TODO: Bad .Wait().
-            this.Refresh().Wait();
-            this.RefreshStatus().Wait();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 
