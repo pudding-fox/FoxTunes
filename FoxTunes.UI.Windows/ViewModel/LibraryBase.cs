@@ -117,7 +117,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.LibraryManager == null)
+                if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
                 {
                     return LibraryHierarchyNode.Empty;
                 }
