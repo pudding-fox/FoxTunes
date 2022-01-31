@@ -28,11 +28,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Images\Adamantine_Artwork.png" />
     <None Remove="Images\ExpressionDark_Artwork.png" />
     <None Remove="Images\System_Artwork.png" />
   </ItemGroup>
 
   <ItemGroup>
+	<EmbeddedResource Include="Images\Adamantine_Artwork.png">
+		<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</EmbeddedResource>
     <EmbeddedResource Include="Images\ExpressionDark_Artwork.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
