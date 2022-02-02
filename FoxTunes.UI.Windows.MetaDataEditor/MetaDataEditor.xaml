@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
+             xmlns:LocalWindows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
@@ -37,7 +38,7 @@
                                     <ColumnDefinition></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <Label Content="{Binding Name, Converter={StaticResource MetaDataNameConverter}}" ContentStringFormat="{}{0}:"></Label>
-                                <ContentControl Grid.Column="1" MinWidth="400" Content="{Binding}">
+                                <ContentControl Grid.Column="1" MinWidth="300" Content="{Binding}">
                                     <ContentControl.Style>
                                         <Style TargetType="{x:Type ContentControl}">
                                             <Setter Property="ContentTemplate">
@@ -104,8 +105,8 @@
                                 </StackPanel.ContextMenu>
                                 <Grid Width="100" Height="100">
                                     <Rectangle DataContext="{Binding Value, Converter={StaticResource ArtworkImageConverter}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}"></Rectangle>
-                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasMultipleValues, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.MultipleValues}" Foreground="{DynamicResource TextBrush}"></TextBlock>
-                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasValue, Converter={StaticResource NegatingBooleanToVisibilityConverter}}" Text="{x:Static LocalViewModel:MetaDataEntry.NoValue}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasMultipleValues, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static LocalWindows:StringResources.MetaDataEntry_MultipleValues}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasValue, Converter={StaticResource NegatingBooleanToVisibilityConverter}}" Text="{x:Static LocalWindows:StringResources.MetaDataEntry_NoValue}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                 </Grid>
                                 <TextBlock HorizontalAlignment="Center" Text="{Binding Name, Converter={StaticResource MetaDataNameConverter}}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                             </StackPanel>
