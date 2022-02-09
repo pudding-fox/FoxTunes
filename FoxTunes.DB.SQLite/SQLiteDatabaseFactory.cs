@@ -58,6 +58,7 @@ namespace FoxTunes
             var exception = default(Exception);
             if (File.Exists(SQLiteDatabase.FileName))
             {
+                SQLiteConnection.ClearAllPools();
                 File.Delete(SQLiteDatabase.FileName);
             }
             database.Provider.CreateDatabase(SQLiteDatabase.FileName);
