@@ -71,6 +71,8 @@ namespace FoxTunes
             }
         }
 
+        public bool IsEnded { get; private set; }
+
         public virtual void RegisterSyncHandlers()
         {
             this.Syncs = new int[]
@@ -114,6 +116,7 @@ namespace FoxTunes
 
         protected virtual void OnEnded()
         {
+            this.IsEnded = true;
             if (this.Ended != null)
             {
                 this.Ended(this, EventArgs.Empty);

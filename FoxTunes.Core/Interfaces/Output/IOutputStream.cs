@@ -27,6 +27,8 @@ namespace FoxTunes.Interfaces
 
         bool IsStopped { get; }
 
+        bool IsEnded { get; }
+
         Task Play();
 
         Task Pause();
