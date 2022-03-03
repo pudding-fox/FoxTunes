@@ -7,7 +7,7 @@ x64
 
 TARGET="
 net40
-net461
+net462
 "
 
 if [ -z "$1" ]
@@ -30,12 +30,18 @@ cd "./release"
 "./FoxTunes.Release.exe" "$version"
 cd ..
 
-rm ./release/*.zip
+rm -f ./release/*.zip
 
 for platform in $PLATFORM
 do
 	for target in $TARGET
 	do
+
+		if [ ! -d "./release/$platform/$target" ]
+		then
+			echo "Source was not built: ${platform}/${target}"
+			continue
+		fi
 
 		cd "./release/$platform/$target/Main"
 

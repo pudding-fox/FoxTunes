@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net462</TargetFrameworks>
     <AssemblyName>FoxTunes.Core.Windows.UWP</AssemblyName>
     <OutputPath>..\distribution\$(Platform)\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>

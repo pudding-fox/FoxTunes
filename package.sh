@@ -16,7 +16,7 @@ x86
 "
 
 TARGET="
-net461
+net462
 "
 
 if [ -z "$1" ]
@@ -45,8 +45,8 @@ then
 	cd ..
 fi
 
-rm ./release/*.appx
-rm ./release/*.cer
+rm -f ./release/*.appx
+rm -f ./release/*.cer
 cp "$RAIMUSOFT_CER" "./release/SigningCert.cer"
 
 for platform in $PLATFORM
