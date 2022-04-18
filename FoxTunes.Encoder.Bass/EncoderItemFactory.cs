@@ -84,7 +84,15 @@ namespace FoxTunes
 
         public EncoderItem Create(IFileData[] fileDatas, IFileData fileData, string profile)
         {
-            var outputFileName = this.GetOutputFileName(fileDatas, fileData, profile);
+            var outputFileName = default(string);
+            if (RawProfile.IsRawProfile(profile))
+            {
+                outputFileName = Path.Combine(Path.GetTempPath(), string.Format("{0}-{1}.bin", profile, Math.Abs(fileData.FileName.GetHashCode())));
+            }
+            else
+            {
+                outputFileName = this.GetOutputFileName(fileDatas, fileData, profile);
+            }
             return EncoderItem.Create(fileData.FileName, outputFileName, fileData.MetaDatas, profile);
         }
 

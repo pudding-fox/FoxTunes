@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using System.IO;
 
 namespace FoxTunes
 {
@@ -31,6 +32,19 @@ namespace FoxTunes
 
         public void CopyTo(ProcessWriter writer, CancellationToken cancellationToken)
         {
+            this.CopyTo(writer.Write, cancellationToken);
+            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing process input.", this.Stream.ChannelHandle);
+            writer.Close();
+        }
+
+        public void CopyTo(FileStream stream, CancellationToken cancellationToken)
+        {
+            this.CopyTo((buffer, length) => stream.Write(buffer, 0, length), cancellationToken);
+            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}.", this.Stream.ChannelHandle);
+        }
+
+        public void CopyTo(Writer writer, CancellationToken cancellationToken)
+        {
             Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from channel {0} with {1} byte buffer.", this.Stream.ChannelHandle, BUFFER_SIZE);
             var length = default(int);
             var buffer = new byte[BUFFER_SIZE];
@@ -46,16 +60,16 @@ namespace FoxTunes
                     case BASS_ERROR_UNKNOWN:
                         break;
                 }
-                writer.Write(buffer, length);
+                writer(buffer, length);
                 this.Update();
             }
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing process input.", this.Stream.ChannelHandle);
-            writer.Close();
         }
 
         protected virtual void Update()
         {
             this.EncoderItem.Progress = (int)((this.Stream.Position / (double)this.Stream.Length) * EncoderItem.PROGRESS_COMPLETE);
         }
+
+        public delegate void Writer(byte[] data, int length);
     }
 }

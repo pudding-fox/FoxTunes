@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Encoder.Bass.Tests
 {
@@ -16,8 +16,15 @@ namespace FoxTunes.Encoder.Bass.Tests
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
             foreach (var profile in profiles)
             {
-                await behaviour.Encode(TestInfo.PlaylistItems, profile).ConfigureAwait(false);
+                await behaviour.Encode(TestInfo.PlaylistItems, profile, true).ConfigureAwait(false);
             }
+        }
+
+        [Test]
+        public async Task CanEncodePlaylistItems_PCM16()
+        {
+            var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
+            await behaviour.Encode(TestInfo.PlaylistItems, RawProfile.PCM16, true).ConfigureAwait(false);
         }
     }
 }

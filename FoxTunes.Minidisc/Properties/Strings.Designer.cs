@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Minidisc.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Minidisc.Bass.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,33 @@ namespace FoxTunes {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Erasing disc.
+        /// </summary>
+        internal static string EraseMinidiscTask_Name {
+            get {
+                return ResourceManager.GetString("EraseMinidiscTask.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The disc will be erased, are you sure?.
+        /// </summary>
+        internal static string MinidiscBehaviour_ConfirmEraseDisc {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.ConfirmEraseDisc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The disc will be written, are you sure?.
+        /// </summary>
+        internal static string MinidiscBehaviour_ConfirmWriteDisc {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.ConfirmWriteDisc", resourceCulture);
             }
         }
         
@@ -79,7 +106,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Send To Disc.
+        ///   Looks up a localized string similar to Send To Disc ({0}).
         /// </summary>
         internal static string MinidiscBehaviour_SendToDisc {
             get {
@@ -124,6 +151,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        internal static string MinidiscReport_Close {
+            get {
+                return ResourceManager.GetString("MinidiscReport.Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Format.
         /// </summary>
         internal static string MinidiscReport_Format {
@@ -151,11 +187,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Opening Minidisc.
+        ///   Looks up a localized string similar to Write.
+        /// </summary>
+        internal static string MinidiscReport_Write {
+            get {
+                return ResourceManager.GetString("MinidiscReport.Write", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading disc.
         /// </summary>
         internal static string OpenMinidiscTask_Name {
             get {
                 return ResourceManager.GetString("OpenMinidiscTask.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writing disc.
+        /// </summary>
+        internal static string WriteMinidiscTask_Name {
+            get {
+                return ResourceManager.GetString("WriteMinidiscTask.Name", resourceCulture);
             }
         }
     }

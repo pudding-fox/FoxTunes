@@ -2,9 +2,9 @@
 
 namespace FoxTunes
 {
-    public class TestCore : Core
+    public class HeadlessCore : Core
     {
-        public TestCore() : base(GetSetup())
+        public HeadlessCore() : base(GetSetup())
         {
 
         }

@@ -145,13 +145,20 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
             try
             {
-                if (flags.HasFlag(BassFlags.Float))
+                if (RawProfile.IsRawProfile(settings.Name))
                 {
-                    this.EncodeWithResampler(encoderItem, stream, settings);
+                    this.EncodeRaw(encoderItem, stream, settings);
                 }
                 else
                 {
-                    this.Encode(encoderItem, stream, settings);
+                    if (flags.HasFlag(BassFlags.Float))
+                    {
+                        this.EncodeWithResampler(encoderItem, stream, settings);
+                    }
+                    else
+                    {
+                        this.Encode(encoderItem, stream, settings);
+                    }
                 }
             }
             finally
@@ -276,6 +283,25 @@ namespace FoxTunes
             resamplerReader.Close();
             resamplerWriter.Close();
             encoderWriter.Close();
+        }
+
+        protected virtual void EncodeRaw(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        {
+            var channelReader = new ChannelReader(encoderItem, stream);
+            var fileStream = File.OpenWrite(encoderItem.OutputFileName);
+            var thread = new Thread(() =>
+            {
+                this.Try(() => RawProfile.CopyTo(channelReader, fileStream, settings, this.CancellationToken), this.GetErrorHandler(encoderItem));
+            })
+            {
+                Name = string.Format("ChannelReader(\"{0}\", {1})", encoderItem.InputFileName, stream.ChannelHandle),
+                IsBackground = true
+            };
+            Logger.Write(this, LogLevel.Debug, "Starting background thread for file \"{0}\".", encoderItem.InputFileName);
+            thread.Start();
+            Logger.Write(this, LogLevel.Debug, "Completing background thread for file \"{0}\".", encoderItem.InputFileName);
+            this.Join(thread);
+            fileStream.Close();
         }
 
         public void Update()

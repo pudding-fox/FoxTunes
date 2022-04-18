@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EraseMinidiscTask.Name" xml:space="preserve">
+    <value>Erasing disc</value>
+  </data>
+  <data name="MinidiscBehaviour.ConfirmEraseDisc" xml:space="preserve">
+    <value>The disc will be erased, are you sure?</value>
+  </data>
+  <data name="MinidiscBehaviour.ConfirmWriteDisc" xml:space="preserve">
+    <value>The disc will be written, are you sure?</value>
+  </data>
   <data name="MinidiscBehaviour.EraseDisc" xml:space="preserve">
     <value>Erase Disc</value>
   </data>
@@ -124,7 +133,7 @@
     <value>Minidisc</value>
   </data>
   <data name="MinidiscBehaviour.SendToDisc" xml:space="preserve">
-    <value>Send To Disc</value>
+    <value>Send To Disc ({0})</value>
   </data>
   <data name="MinidiscBehaviour.ViewDisc" xml:space="preserve">
     <value>View Disc</value>
@@ -138,6 +147,9 @@
   <data name="MinidiscReport.Action" xml:space="preserve">
     <value>Action</value>
   </data>
+  <data name="MinidiscReport.Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
   <data name="MinidiscReport.Format" xml:space="preserve">
     <value>Format</value>
   </data>
@@ -147,7 +159,13 @@
   <data name="MinidiscReport.Time" xml:space="preserve">
     <value>Time</value>
   </data>
+  <data name="MinidiscReport.Write" xml:space="preserve">
+    <value>Write</value>
+  </data>
   <data name="OpenMinidiscTask.Name" xml:space="preserve">
-    <value>Opening Minidisc</value>
+    <value>Reading disc</value>
+  </data>
+  <data name="WriteMinidiscTask.Name" xml:space="preserve">
+    <value>Writing disc</value>
   </data>
 </root>
