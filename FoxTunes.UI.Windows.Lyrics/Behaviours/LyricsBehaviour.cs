@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class LyricsBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string CATEGORY = "BB46B834-5372-440F-B75B-57FF0E473BB4";

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IFileSystemBrowser : IStandardComponent
+    public interface IFileSystemBrowser : IBaseComponent //TODO: Technically this is a required interface (IStandardComponent).
     {
         void Select(string fileName);
 

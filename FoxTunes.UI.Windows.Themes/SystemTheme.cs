@@ -6,7 +6,7 @@ using System.Windows;
 namespace FoxTunes
 {
     [Component(ID, ComponentSlots.None)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     [ComponentRelease(ReleaseType.Minimal)]
     public class SystemTheme : ThemeBase
     {

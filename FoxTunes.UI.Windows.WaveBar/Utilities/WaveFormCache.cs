@@ -4,7 +4,7 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class WaveFormCache : StandardComponent
     {
         const int CACHE_SIZE = 4;

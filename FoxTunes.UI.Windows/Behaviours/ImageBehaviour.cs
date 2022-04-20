@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class ImageBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         const string REFRESH_IMAGES = "ZAAA";

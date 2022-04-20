@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using System.IO;
 
 namespace FoxTunes
 {
@@ -37,10 +36,11 @@ namespace FoxTunes
             writer.Close();
         }
 
-        public void CopyTo(FileStream stream, CancellationToken cancellationToken)
+        public void CopyTo(IBassEncoderWriter writer, CancellationToken cancellationToken)
         {
-            this.CopyTo((buffer, length) => stream.Write(buffer, 0, length), cancellationToken);
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}.", this.Stream.ChannelHandle);
+            this.CopyTo(writer.Write, cancellationToken);
+            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing writer input.", this.Stream.ChannelHandle);
+            writer.Close();
         }
 
         public void CopyTo(Writer writer, CancellationToken cancellationToken)

@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
-using System.IO;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -17,21 +17,17 @@ namespace FoxTunes
 
         public abstract string Name { get; }
 
-        public string Executable { get; protected set; }
-
-        public virtual string Directory
-        {
-            get
-            {
-                return Path.GetDirectoryName(this.Executable);
-            }
-        }
-
         public abstract string Extension { get; }
 
         public abstract IBassEncoderFormat Format { get; }
 
-        public abstract string GetArguments(EncoderItem encoderItem, IBassStream stream);
+        public virtual BassEncoderSettingsFlags Flags
+        {
+            get
+            {
+                return BassEncoderSettingsFlags.None;
+            }
+        }
 
         public virtual int GetDepth(EncoderItem encoderItem, IBassStream stream)
         {
@@ -63,6 +59,28 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Using user defined bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, this.Format.Depth);
             return this.Format.Depth;
+        }
+
+        public virtual int GetRate(EncoderItem encoderItem, IBassStream stream)
+        {
+            var sampleRates = this.Format.SampleRates;
+            if (sampleRates == null || !sampleRates.Any())
+            {
+                return OutputRate.PCM_44100;
+            }
+            var channelInfo = default(ChannelInfo);
+            if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
+            {
+                throw new NotImplementedException();
+            }
+            foreach (var sampleRate in sampleRates)
+            {
+                if (sampleRate >= channelInfo.Frequency)
+                {
+                    return sampleRate;
+                }
+            }
+            return sampleRates.LastOrDefault();
         }
 
         public virtual long GetLength(EncoderItem encoderItem, IBassStream stream)

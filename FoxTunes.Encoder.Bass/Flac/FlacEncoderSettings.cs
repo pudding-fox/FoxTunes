@@ -6,14 +6,17 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public class FlacEncoderSettings : BassEncoderSettings, IStandardComponent, IConfigurableComponent
+    public class FlacEncoderSettings : BassEncoderTool, IStandardComponent, IConfigurableComponent
     {
-        public FlacEncoderSettings()
+        public override string Executable
         {
-            var directory = Path.GetDirectoryName(
-                typeof(FlacEncoderSettings).Assembly.Location
-            );
-            this.Executable = Path.Combine(directory, "Encoders\\flac.exe");
+            get
+            {
+                var directory = Path.GetDirectoryName(
+                    typeof(FlacEncoderSettings).Assembly.Location
+                );
+                return Path.Combine(directory, "Encoders\\flac.exe");
+            }
         }
 
         public override string Name
@@ -36,7 +39,10 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(this.Depth);
+                return new BassEncoderFormat(
+                    this.Depth, 
+                    OutputRate.PCM //I'm not sure which sample rates FLAC actually supports.
+                );
             }
         }
 

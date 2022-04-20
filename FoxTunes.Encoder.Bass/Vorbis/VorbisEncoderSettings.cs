@@ -6,14 +6,17 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public class VorbisEncoderSettings : BassEncoderSettings, IStandardComponent, IConfigurableComponent
+    public class VorbisEncoderSettings : BassEncoderTool, IStandardComponent, IConfigurableComponent
     {
-        public VorbisEncoderSettings()
+        public override string Executable
         {
-            var directory = Path.GetDirectoryName(
-                typeof(VorbisEncoderSettings).Assembly.Location
-            );
-            this.Executable = Path.Combine(directory, "Encoders\\oggenc2.exe");
+            get
+            {
+                var directory = Path.GetDirectoryName(
+                    typeof(VorbisEncoderSettings).Assembly.Location
+                );
+                return Path.Combine(directory, "Encoders\\oggenc2.exe");
+            }
         }
 
         public override string Name
@@ -36,7 +39,15 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(DEPTH_16);
+                return new BassEncoderFormat(
+                    DEPTH_16,
+                    OutputRate.PCM_44100,
+                    OutputRate.PCM_48000,
+                    OutputRate.PCM_88200,
+                    OutputRate.PCM_96000,
+                    OutputRate.PCM_176400,
+                    OutputRate.PCM_192000
+                );
             }
         }
 

@@ -4,6 +4,7 @@ namespace FoxTunes
 {
     public static class OutputRate
     {
+        public const int PCM_32000 = 32000;
         public const int PCM_44100 = 44100;
         public const int PCM_48000 = 48000;
         public const int PCM_88200 = 88200;

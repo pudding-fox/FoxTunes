@@ -185,7 +185,12 @@ namespace FoxTunes
         {
             var fileNames = new List<string>();
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
-            var encoderItems = await behaviour.Encode(fileDatas, RawProfile.PCM16, false).ConfigureAwait(false);
+            var encoderItems = await behaviour.Encode(
+                fileDatas,
+                new BassEncoderOutputPath.Fixed(Path.Combine(Path.GetTempPath(), string.Format("MD-{0}", DateTime.UtcNow.ToFileTimeUtc()))),
+                Wav_16_44100_Settings.NAME,
+                false
+            ).ConfigureAwait(false);
             foreach (var encoderItem in encoderItems)
             {
                 if (encoderItem.Status != EncoderItemStatus.Complete)

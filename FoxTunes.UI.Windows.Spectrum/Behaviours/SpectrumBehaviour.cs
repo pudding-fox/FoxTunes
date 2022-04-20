@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class SpectrumBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string BASIC_CATEGORY = "3DF40656-FDD5-4B98-A25C-66DDFFD66CA0";

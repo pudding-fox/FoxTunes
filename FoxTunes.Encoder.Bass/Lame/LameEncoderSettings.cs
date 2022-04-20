@@ -6,14 +6,17 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public class LameEncoderSettings : BassEncoderSettings, IStandardComponent, IConfigurableComponent
+    public class LameEncoderSettings : BassEncoderTool, IStandardComponent, IConfigurableComponent
     {
-        public LameEncoderSettings()
+        public override string Executable
         {
-            var directory = Path.GetDirectoryName(
-                typeof(LameEncoderSettings).Assembly.Location
-            );
-            this.Executable = Path.Combine(directory, "Encoders\\lame.exe");
+            get
+            {
+                var directory = Path.GetDirectoryName(
+                    typeof(LameEncoderSettings).Assembly.Location
+                );
+                return Path.Combine(directory, "Encoders\\lame.exe");
+            }
         }
 
         public override string Name
@@ -36,7 +39,12 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(DEPTH_16);
+                return new BassEncoderFormat(
+                    DEPTH_16,
+                    OutputRate.PCM_32000,
+                    OutputRate.PCM_44100,
+                    OutputRate.PCM_48000
+                );
             }
         }
 

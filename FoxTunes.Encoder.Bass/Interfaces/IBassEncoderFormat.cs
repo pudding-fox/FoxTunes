@@ -5,5 +5,7 @@
         bool AutoDepth { get; }
 
         int Depth { get; }
+
+        int[] SampleRates { get; }
     }
 }

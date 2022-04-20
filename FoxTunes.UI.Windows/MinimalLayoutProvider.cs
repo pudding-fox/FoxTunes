@@ -3,7 +3,7 @@ using System;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     [ComponentRelease(ReleaseType.Minimal)]
     public class MinimalLayoutProvider : UILayoutProviderBase
     {

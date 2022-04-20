@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class LayoutManager : StandardComponent
     {
         public static readonly Type PLACEHOLDER = typeof(object);
@@ -31,11 +31,11 @@ namespace FoxTunes
 
         public LayoutManager()
         {
-            this.Providers = new HashSet<IUILayoutProvider>();
+            this.Providers = new List<IUILayoutProvider>();
             Instance = this;
         }
 
-        public HashSet<IUILayoutProvider> Providers { get; private set; }
+        public IList<IUILayoutProvider> Providers { get; private set; }
 
         private IUILayoutProvider _Provider { get; set; }
 
@@ -90,6 +90,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Providers.AddRange(ComponentRegistry.Instance.GetComponents<IUILayoutProvider>());
             this.Configuration = core.Components.Configuration;
             this.Layout = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -118,12 +119,6 @@ namespace FoxTunes
         public UIComponent GetComponent(string id)
         {
             return this.Components.FirstOrDefault(component => string.Equals(component.Id, id, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public void Register(IUILayoutProvider layoutProvider)
-        {
-            this.Providers.Add(layoutProvider);
-            this.UpdateProvider();
         }
 
         public UIComponentBase Load(UILayoutTemplate template)

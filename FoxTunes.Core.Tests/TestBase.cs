@@ -5,22 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [TestFixture]
-    public abstract class TestBase : TestBase<HeadlessCore>
-    {
-        protected TestBase() : this(DEFAULT)
-        {
-
-        }
-
-        protected TestBase(long configuration) : base(configuration)
-        {
-
-        }
-    }
-
-    public abstract class TestBase<TCore>
-        where TCore : Core, new()
+    public abstract class TestBase
     {
         public const long DEFAULT = 0;
 
@@ -61,13 +46,18 @@ namespace FoxTunes
 
         public long Configuration { get; private set; }
 
+        public ICoreSetup Setup { get; private set; }
+
         public ICore Core { get; private set; }
 
         [SetUp]
         public virtual void SetUp()
         {
-            this.Core = new TCore();
+            ComponentResolver.Slots.Add(ComponentSlots.UserInterface, TestUserInterface.ID);
+            this.Setup = CoreSetup.Default;
+            this.Core = new Core(this.Setup);
             this.Core.Load();
+            Assert.IsTrue(CoreValidator.Instance.Validate(this.Core));
             if (this.Core.Factories.Database.Test() != DatabaseTestResult.OK)
             {
                 this.Core.Factories.Database.Initialize();
@@ -82,6 +72,7 @@ namespace FoxTunes
         [TearDown]
         public virtual void TearDown()
         {
+            ComponentResolver.Slots.Remove(ComponentSlots.Database);
             this.Core.Dispose();
             this.Core = null;
         }

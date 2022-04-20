@@ -16,10 +16,6 @@ namespace FoxTunes
 
         public IBassEncoderSettings CreateSettings(string name)
         {
-            if (RawProfile.IsRawProfile(name))
-            {
-                return new RawProfile(name);
-            }
             Logger.Write(this, LogLevel.Debug, "Creating settings for profile: {0}", name);
             var format = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>().FirstOrDefault(
                 settings => string.Equals(settings.Name, name, StringComparison.OrdinalIgnoreCase)

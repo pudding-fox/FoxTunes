@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -107,6 +108,11 @@ namespace FoxTunes
 
         private void Add(string slot, string id, string name, bool @default)
         {
+            if (!File.Exists(FILE_NAME))
+            {
+                Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Config file \"{0}\" does not exist, cannot add resolution.", FILE_NAME);
+                return;
+            }
             var document = XDocument.Load(FILE_NAME);
             var appSettings = document.Root.Element("appSettings");
             if (appSettings == null)

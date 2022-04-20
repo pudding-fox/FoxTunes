@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -145,20 +146,31 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
             try
             {
-                if (RawProfile.IsRawProfile(settings.Name))
+                if (settings is IBassEncoderTool)
                 {
-                    this.EncodeRaw(encoderItem, stream, settings);
-                }
-                else
-                {
-                    if (flags.HasFlag(BassFlags.Float))
+                    if (this.ShouldResample(encoderItem, stream, settings))
                     {
-                        this.EncodeWithResampler(encoderItem, stream, settings);
+                        this.EncodeWithResampler(encoderItem, stream, settings as IBassEncoderTool);
                     }
                     else
                     {
-                        this.Encode(encoderItem, stream, settings);
+                        this.Encode(encoderItem, stream, settings as IBassEncoderTool);
                     }
+                }
+                else if (settings is IBassEncoderHandler)
+                {
+                    if (this.ShouldResample(encoderItem, stream, settings))
+                    {
+                        this.EncodeWithResampler(encoderItem, stream, settings as IBassEncoderHandler);
+                    }
+                    else
+                    {
+                        this.Encode(encoderItem, stream, settings as IBassEncoderHandler);
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
             }
             finally
@@ -181,7 +193,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void Encode(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        protected virtual void Encode(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
             using (var encoderProcess = this.CreateEncoderProcess(encoderItem, stream, settings))
             {
@@ -212,10 +224,9 @@ namespace FoxTunes
             thread.Start();
             Logger.Write(this, LogLevel.Debug, "Completing background thread for file \"{0}\".", encoderItem.InputFileName);
             this.Join(thread);
-            encoderWriter.Close();
         }
 
-        protected virtual void EncodeWithResampler(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        protected virtual void EncodeWithResampler(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
             using (var resamplerProcess = this.CreateResamplerProcess(encoderItem, stream, new SoxEncoderSettings(settings)))
             {
@@ -280,18 +291,15 @@ namespace FoxTunes
             {
                 this.Join(thread);
             }
-            resamplerReader.Close();
-            resamplerWriter.Close();
-            encoderWriter.Close();
         }
 
-        protected virtual void EncodeRaw(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        protected virtual void Encode(EncoderItem encoderItem, IBassStream stream, IBassEncoderHandler settings)
         {
             var channelReader = new ChannelReader(encoderItem, stream);
-            var fileStream = File.OpenWrite(encoderItem.OutputFileName);
+            var encoderWriter = settings.GetWriter(encoderItem, stream);
             var thread = new Thread(() =>
             {
-                this.Try(() => RawProfile.CopyTo(channelReader, fileStream, settings, this.CancellationToken), this.GetErrorHandler(encoderItem));
+                this.Try(() => channelReader.CopyTo(encoderWriter, this.CancellationToken), this.GetErrorHandler(encoderItem));
             })
             {
                 Name = string.Format("ChannelReader(\"{0}\", {1})", encoderItem.InputFileName, stream.ChannelHandle),
@@ -301,7 +309,46 @@ namespace FoxTunes
             thread.Start();
             Logger.Write(this, LogLevel.Debug, "Completing background thread for file \"{0}\".", encoderItem.InputFileName);
             this.Join(thread);
-            fileStream.Close();
+        }
+
+        protected virtual void EncodeWithResampler(EncoderItem encoderItem, IBassStream stream, IBassEncoderHandler settings)
+        {
+            using (var resamplerProcess = this.CreateResamplerProcess(encoderItem, stream, new SoxEncoderSettings(settings)))
+            {
+                var channelReader = new ChannelReader(encoderItem, stream);
+                var resamplerReader = new ProcessReader(resamplerProcess);
+                var resamplerWriter = new ProcessWriter(resamplerProcess);
+                var encoderWriter = settings.GetWriter(encoderItem, stream);
+                var threads = new[]
+                {
+                    new Thread(() =>
+                    {
+                        this.Try(() => channelReader.CopyTo(resamplerWriter,this.CancellationToken), this.GetErrorHandler(encoderItem));
+                    })
+                    {
+                        Name = string.Format("ChannelReader(\"{0}\", {1})", encoderItem.InputFileName, stream.ChannelHandle),
+                        IsBackground = true
+                    },
+                    new Thread(() =>
+                    {
+                        this.Try(() => resamplerReader.CopyTo(encoderWriter,this.CancellationToken), this.GetErrorHandler(encoderItem));
+                    })
+                    {
+                        Name = string.Format("ProcessReader(\"{0}\", {1})", encoderItem.InputFileName, resamplerProcess.Id),
+                        IsBackground = true
+                    }
+                };
+                Logger.Write(this, LogLevel.Debug, "Starting background threads for file \"{0}\".", encoderItem.InputFileName);
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                }
+                Logger.Write(this, LogLevel.Debug, "Completing background threads for file \"{0}\".", encoderItem.InputFileName);
+                foreach (var thread in threads)
+                {
+                    this.Join(thread);
+                }
+            }
         }
 
         public void Update()
@@ -387,7 +434,7 @@ namespace FoxTunes
             return stream;
         }
 
-        protected virtual Process CreateResamplerProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        protected virtual Process CreateResamplerProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
             Logger.Write(this, LogLevel.Debug, "Creating resampler process for file \"{0}\".", encoderItem.InputFileName);
             var arguments = settings.GetArguments(encoderItem, stream);
@@ -405,7 +452,7 @@ namespace FoxTunes
             return process;
         }
 
-        protected virtual Process CreateEncoderProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        protected virtual Process CreateEncoderProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
             Logger.Write(this, LogLevel.Debug, "Creating encoder process for file \"{0}\".", encoderItem.InputFileName);
             var arguments = settings.GetArguments(encoderItem, stream);
@@ -464,7 +511,12 @@ namespace FoxTunes
 
         protected virtual bool ShouldDecodeFloat(EncoderItem encoderItem, IBassEncoderSettings settings)
         {
-            if (encoderItem.BitsPerSample == 1)
+            if (encoderItem.BitsPerSample == 0)
+            {
+                Logger.Write(this, LogLevel.Debug, "Suggesting high quality mode for file \"{0}\": Unknown bit depth.", encoderItem.InputFileName);
+                return true;
+            }
+            else if (encoderItem.BitsPerSample == 1)
             {
                 Logger.Write(this, LogLevel.Debug, "Suggesting high quality mode for file \"{0}\": dsd.", encoderItem.InputFileName);
                 return true;
@@ -475,6 +527,30 @@ namespace FoxTunes
                 return true;
             }
             Logger.Write(this, LogLevel.Debug, "Suggesting standard quality mode for file \"{0}\": <=16 bit.", encoderItem.InputFileName);
+            return false;
+        }
+
+        protected virtual bool ShouldResample(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        {
+            var channelInfo = default(ChannelInfo);
+            if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
+            {
+                throw new NotImplementedException();
+            }
+            if (channelInfo.Flags.HasFlag(BassFlags.Float))
+            {
+                Logger.Write(this, LogLevel.Debug, "Resampling required for format.");
+                return true;
+            }
+            var sampleRates = settings.Format.SampleRates;
+            if (sampleRates != null && sampleRates.Length > 0)
+            {
+                if (!sampleRates.Contains(channelInfo.Frequency))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Resampling required for rate.");
+                    return true;
+                }
+            }
             return false;
         }
 

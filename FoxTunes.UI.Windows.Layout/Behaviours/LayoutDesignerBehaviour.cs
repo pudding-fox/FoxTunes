@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class LayoutDesignerBehaviour : StandardBehaviour, IInvocableComponent, IBackgroundTaskSource, IDisposable
     {
         public const string DESIGN = "AAAA";

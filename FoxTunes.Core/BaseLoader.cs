@@ -55,14 +55,18 @@ namespace FoxTunes
                 {
                     foreach (var dependency in dependencies)
                     {
-                        if (!string.IsNullOrEmpty(dependency.Id))
-                        {
-                            throw new NotImplementedException();
-                        }
                         if (!string.IsNullOrEmpty(dependency.Slot))
                         {
                             var id = ComponentResolver.Instance.Get(dependency.Slot);
-                            if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
+                            if (!string.IsNullOrEmpty(dependency.Id))
+                            {
+                                if (!string.Equals(id, dependency.Id, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Missing dependency \"{1}\".", type.FullName, dependency.Id);
+                                    return false;
+                                }
+                            }
+                            else if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
                             {
                                 Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Missing dependency \"{1}\".", type.FullName, dependency.Slot);
                                 return false;

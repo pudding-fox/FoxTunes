@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class LibraryBrowserTileProvider : StandardComponent, IDisposable
     {
         const double DPIX = 96;

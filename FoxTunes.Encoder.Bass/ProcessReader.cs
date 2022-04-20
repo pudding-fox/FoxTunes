@@ -24,6 +24,20 @@ namespace FoxTunes
 
         public void CopyTo(ProcessWriter writer, CancellationToken cancellationToken)
         {
+            this.CopyTo(writer.Write, cancellationToken);
+            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from process {0}, closing process input.", this.Process.Id);
+            writer.Close();
+        }
+
+        public void CopyTo(IBassEncoderWriter writer, CancellationToken cancellationToken)
+        {
+            this.CopyTo(writer.Write, cancellationToken);
+            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from process {0}, closing writer input.", this.Process.Id);
+            writer.Close();
+        }
+
+        public void CopyTo(Writer writer, CancellationToken cancellationToken)
+        {
             Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from process {0} with {1} byte buffer.", this.Process.Id, BUFFER_SIZE);
             var length = default(int);
             var buffer = new byte[BUFFER_SIZE];
@@ -39,16 +53,11 @@ namespace FoxTunes
                     {
                         break;
                     }
-                    writer.Write(buffer, length);
+                    writer(buffer, length);
                 }
             }
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from process {0}, closing process input.", this.Process.Id);
-            writer.Close();
         }
 
-        public void Close()
-        {
-            this.Process.StandardOutput.Close();
-        }
+        public delegate void Writer(byte[] data, int length);
     }
 }

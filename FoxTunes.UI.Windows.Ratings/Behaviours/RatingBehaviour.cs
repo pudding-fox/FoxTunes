@@ -12,7 +12,7 @@ using System.Windows.Markup;
 namespace FoxTunes
 {
     [Component(ID, ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class RatingBehaviour : StandardBehaviour, IInvocableComponent, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
         public const string ID = "2681C239-1291-4018-ACED-4933CC395FF6";

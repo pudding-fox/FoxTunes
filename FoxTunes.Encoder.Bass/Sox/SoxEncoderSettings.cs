@@ -5,19 +5,27 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public class SoxEncoderSettings : BassEncoderSettings
+    public class SoxEncoderSettings : BassEncoderTool
     {
         private SoxEncoderSettings()
         {
-            var directory = Path.GetDirectoryName(
-                typeof(SoxEncoderSettings).Assembly.Location
-            );
-            this.Executable = Path.Combine(directory, "Encoders\\sox.exe");
+
         }
 
         public SoxEncoderSettings(IBassEncoderSettings settings) : this()
         {
             this.Settings = settings;
+        }
+
+        public override string Executable
+        {
+            get
+            {
+                var directory = Path.GetDirectoryName(
+                    typeof(SoxEncoderSettings).Assembly.Location
+                );
+                return Path.Combine(directory, "Encoders\\sox.exe");
+            }
         }
 
         public IBassEncoderSettings Settings { get; }
@@ -54,24 +62,35 @@ namespace FoxTunes
                 throw new NotImplementedException();
             }
             var depth = this.Settings.GetDepth(encoderItem, stream);
+            if (depth == 0)
+            {
+                depth = DEPTH_16;
+            }
+            var rate = this.Settings.GetRate(encoderItem, stream);
+            if (rate == 0)
+            {
+                rate = OutputRate.PCM_44100;
+            }
             if (channelInfo.Flags.HasFlag(BassFlags.Float))
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Resampling file \"{0}\" from 32 bit float to {1} bit integer.", encoderItem.InputFileName, depth);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Resampling file \"{0}\": Depth 32 bit floating point -> {1} bit integer, Rate {2}Hz -> {3}Hz", encoderItem.InputFileName, depth, channelInfo.Frequency, rate);
                 return string.Format(
-                    "-t raw -e floating-point --bits 32 -r {0} -c {1} - -t raw -e signed-integer --bits {2} -r {0} -c {1} -",
+                    "-t raw -e floating-point --bits 32 -r {0} -c {1} - -t raw -e signed-integer --bits {2} -r {3} -c {1} -",
                     channelInfo.Frequency,
                     channelInfo.Channels,
-                    depth
+                    depth,
+                    rate
                 );
             }
             else
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Resampling file \"{0}\" from 16 bit integer to {1} bit integer.", encoderItem.InputFileName, depth);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Resampling file \"{0}\": Depth 16 bit integer -> {1} bit integer, Rate {2}Hz -> {3}Hz", encoderItem.InputFileName, depth, channelInfo.Frequency, rate);
                 return string.Format(
-                    "-t raw -e signed-integer --bits 16 -r {0} -c {1} - -t raw -e signed-integer --bits {2} -r {0} -c {1} -",
+                    "-t raw -e signed-integer --bits 16 -r {0} -c {1} - -t raw -e signed-integer --bits {2} -r {3} -c {1} -",
                     channelInfo.Frequency,
                     channelInfo.Channels,
-                    depth
+                    depth,
+                    rate
                 );
             }
         }

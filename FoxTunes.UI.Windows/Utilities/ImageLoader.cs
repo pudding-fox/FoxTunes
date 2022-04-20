@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class ImageLoader : StandardComponent, IConfigurableComponent
     {
         public ImageResizer ImageResizer { get; private set; }
