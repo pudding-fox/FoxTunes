@@ -12,6 +12,18 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
+			<HintPath>..\lib\net40\ManagedBass.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
+			<HintPath>..\lib\ManagedBass.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
