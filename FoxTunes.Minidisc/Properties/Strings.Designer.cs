@@ -151,6 +151,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        internal static string MinidiscReport_Add {
+            get {
+                return ResourceManager.GetString("MinidiscReport.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close.
         /// </summary>
         internal static string MinidiscReport_Close {
@@ -174,6 +183,15 @@ namespace FoxTunes {
         internal static string MinidiscReport_Name {
             get {
                 return ResourceManager.GetString("MinidiscReport.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        internal static string MinidiscReport_None {
+            get {
+                return ResourceManager.GetString("MinidiscReport.None", resourceCulture);
             }
         }
         

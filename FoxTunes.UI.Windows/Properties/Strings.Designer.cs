@@ -979,6 +979,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        internal static string Report_Close {
+            get {
+                return ResourceManager.GetString("Report.Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings Launcher.
         /// </summary>
         internal static string Settings_Name {

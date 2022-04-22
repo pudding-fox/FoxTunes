@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -106,10 +107,65 @@ namespace FoxTunes.ViewModel
             this.Source.Action(this.SelectedRow.Id);
         }
 
+        public string ActionableDescription
+        {
+            get
+            {
+                if (this.Source is IActionable actionable)
+                {
+                    return actionable.Description;
+                }
+                return Strings.Report_Close;
+            }
+        }
+
+        protected virtual void OnActionableDescriptionChanged()
+        {
+            if (this.ActionableDescriptionChanged != null)
+            {
+                this.ActionableDescriptionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ActionableDescription");
+        }
+
+        public event EventHandler ActionableDescriptionChanged;
+
+        public ICommand ActionableCommand
+        {
+            get
+            {
+                return new AsyncCommand(() =>
+                {
+                    if (this.Source is IActionable actionable)
+                    {
+                        return actionable.Task;
+                    }
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                     return Task.CompletedTask;
+#endif
+                });
+            }
+        }
+
+        protected virtual void OnActionableCommandChanged()
+        {
+            if (this.ActionableCommandChanged != null)
+            {
+                this.ActionableCommandChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ActionableCommand");
+        }
+
+        public event EventHandler ActionableCommandChanged;
+
         protected virtual void Refresh()
         {
             this.GridViewColumnFactory = new ReportGridViewColumnFactory(this.Source);
             this.OnGridColumnsChanged();
+            this.OnActionableDescriptionChanged();
+            this.OnActionableCommandChanged();
         }
 
         protected override Freezable CreateInstanceCore()
