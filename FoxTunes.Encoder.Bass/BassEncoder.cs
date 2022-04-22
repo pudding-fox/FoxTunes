@@ -522,9 +522,14 @@ namespace FoxTunes
             {
                 throw new NotImplementedException();
             }
-            if (channelInfo.Flags.HasFlag(BassFlags.Float))
+            if (channelInfo.Flags.HasFlag(BassFlags.Float) && settings.Format.BinaryFormat != BassEncoderBinaryFormat.FloatingPoint)
             {
-                Logger.Write(this, LogLevel.Debug, "Resampling required for format.");
+                Logger.Write(this, LogLevel.Debug, "Resampling required for binary format.");
+                return true;
+            }
+            if (settings.Format.BinaryEndian != BassEncoderBinaryEndian.Little)
+            {
+                Logger.Write(this, LogLevel.Debug, "Resampling required for binary endian.");
                 return true;
             }
             var sampleRates = settings.Format.SampleRates;

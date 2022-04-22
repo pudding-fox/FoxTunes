@@ -12,7 +12,7 @@ namespace FoxTunes.MetaData.TagLib.Tests
     {
         public override void SetUp()
         {
-            ComponentResolver.Slots.Add(ComponentSlots.MetaData, "679D9459-BBCE-4D95-BB65-DD20C335719C");
+            ComponentResolver.Slots[ComponentSlots.MetaData] = "679D9459-BBCE-4D95-BB65-DD20C335719C";
             base.SetUp();
         }
 

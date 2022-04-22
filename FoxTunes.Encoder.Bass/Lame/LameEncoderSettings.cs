@@ -39,12 +39,7 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(
-                    DEPTH_16,
-                    OutputRate.PCM_32000,
-                    OutputRate.PCM_44100,
-                    OutputRate.PCM_48000
-                );
+                return new BassEncoderFormat(BassEncoderBinaryFormat.SignedInteger, BassEncoderBinaryEndian.Little, DEPTH_16);
             }
         }
 
@@ -68,7 +63,7 @@ namespace FoxTunes
             }
             return string.Format(
                 "--silent -r --little-endian --signed -s {0} -m {1} --bitwidth {2} - --cbr -b {3} \"{4}\"",
-                channelInfo.Frequency,
+                this.GetRate(encoderItem, stream),
                 this.GetStereoMode(channelInfo.Channels),
                 this.GetDepth(encoderItem, stream),
                 this.Bitrate,

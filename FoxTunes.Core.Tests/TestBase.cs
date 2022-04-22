@@ -53,7 +53,7 @@ namespace FoxTunes
         [SetUp]
         public virtual void SetUp()
         {
-            ComponentResolver.Slots.Add(ComponentSlots.UserInterface, TestUserInterface.ID);
+            ComponentResolver.Slots[ComponentSlots.UserInterface] = TestUserInterface.ID;
             this.Setup = CoreSetup.Default;
             this.Core = new Core(this.Setup);
             this.Core.Load();

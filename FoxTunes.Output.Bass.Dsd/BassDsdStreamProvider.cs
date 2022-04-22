@@ -49,19 +49,6 @@ namespace FoxTunes
             return true;
         }
 
-        public override IBassStream CreateBasicStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
-        {
-            flags |= BassFlags.DSDRaw;
-            var fileName = this.GetFileName(playlistItem, advice);
-            var channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
-            if (channelHandle != 0 && !this.IsFormatSupported(playlistItem, channelHandle))
-            {
-                this.FreeStream(playlistItem, channelHandle);
-                channelHandle = 0;
-            }
-            return this.CreateInteractiveStream(channelHandle, advice, flags);
-        }
-
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             flags |= BassFlags.DSDRaw;

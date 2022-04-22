@@ -1,12 +1,27 @@
-﻿namespace FoxTunes
+﻿using System.Linq;
+
+namespace FoxTunes
 {
     public class BassEncoderFormat : IBassEncoderFormat
     {
-        public BassEncoderFormat(int depth, params int[] sampleRates)
+        public BassEncoderFormat(BassEncoderBinaryFormat binaryFormat, BassEncoderBinaryEndian binaryEndian, int depth, params int[] sampleRates)
         {
+            this.BinaryFormat = binaryFormat;
+            this.BinaryEndian = binaryEndian;
             this.Depth = depth;
-            this.SampleRates = sampleRates;
+            if (sampleRates != null && sampleRates.Any())
+            {
+                this.SampleRates = sampleRates;
+            }
+            else
+            {
+                this.SampleRates = OutputRate.PCM;
+            }
         }
+
+        public BassEncoderBinaryFormat BinaryFormat { get; private set; }
+
+        public BassEncoderBinaryEndian BinaryEndian { get; private set; }
 
         public bool AutoDepth
         {
