@@ -29,7 +29,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Actions.UpdatedDisc.Title;
+                return string.Format("{0} ({1}%)", this.Actions.UpdatedDisc.Title, this.Actions.UpdatedDisc.GetCapacity().PercentUsed);
             }
         }
 

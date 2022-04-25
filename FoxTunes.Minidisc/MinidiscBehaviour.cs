@@ -140,7 +140,7 @@ namespace FoxTunes
                 return;
             }
             var fileNames = await this.GetWaveFiles(playlistItems).ConfigureAwait(false);
-            if (!fileNames.Any())
+            if (fileNames == null || fileNames.Count == 0)
             {
                 return;
             }
@@ -152,9 +152,14 @@ namespace FoxTunes
             var device = task.Device;
             var currentDisc = task.Disc;
             var updatedDisc = currentDisc.Clone();
-            foreach (var fileName in fileNames)
+            if (this.IsUntitled(updatedDisc))
             {
-                updatedDisc.Tracks.Add(fileName, compression);
+                updatedDisc.Title = this.GetTitle(playlistItems);
+            }
+            foreach (var pair in fileNames)
+            {
+                var track = updatedDisc.Tracks.Add(pair.Value, compression);
+                track.Name = this.GetName(pair.Key);
             }
             var toolManager = new ToolManager();
             var formatManager = new FormatManager(toolManager);
@@ -181,9 +186,9 @@ namespace FoxTunes
             this.ReportEmitter.Send(report);
         }
 
-        public async Task<string[]> GetWaveFiles(IFileData[] fileDatas)
+        public async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas)
         {
-            var fileNames = new List<string>();
+            var fileNames = new Dictionary<IFileData, string>();
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
             var encoderItems = await behaviour.Encode(
                 fileDatas,
@@ -199,11 +204,33 @@ namespace FoxTunes
                     var report = new BassEncoderReport(encoderItems);
                     report.InitializeComponent(this.Core);
                     await this.ReportEmitter.Send(report).ConfigureAwait(false);
-                    return new string[] { };
+                    return null;
                 }
-                fileNames.Add(encoderItem.OutputFileName);
+                var fileData = fileDatas.FirstOrDefault(_fileData => string.Equals(_fileData.FileName, encoderItem.InputFileName, StringComparison.OrdinalIgnoreCase));
+                if (fileData == null)
+                {
+                    //TODO: Warn.
+                    continue;
+                }
+                fileNames.Add(fileData, encoderItem.OutputFileName);
             }
-            return fileNames.ToArray();
+            return fileNames;
+        }
+
+        public bool IsUntitled(IDisc disc)
+        {
+            const string UNTITLED = "<Untitled>";
+            return string.IsNullOrEmpty(disc.Title) || string.Equals(disc.Title, UNTITLED, StringComparison.OrdinalIgnoreCase)
+        }
+
+        public string GetTitle(IEnumerable<IFileData> fileDatas)
+        {
+
+        }
+
+        public string GetName(IFileData fileData)
+        {
+
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
