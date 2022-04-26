@@ -88,6 +88,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The disc capacity is exceeded ({0}%), are you sure?.
+        /// </summary>
+        internal static string MinidiscBehaviour_ConfirmWriteDiscWithoutCapacity {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.ConfirmWriteDiscWithoutCapacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Erase Disc.
         /// </summary>
         internal static string MinidiscBehaviour_EraseDisc {
