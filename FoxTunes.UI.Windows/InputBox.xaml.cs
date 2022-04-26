@@ -55,7 +55,7 @@ namespace FoxTunes
             this.DialogResult = false;
         }
 
-        public static string ShowDialog(string prompt, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None)
+        public static string ShowDialog(string prompt, string value, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None)
         {
             var instance = new InputBox()
             {
@@ -67,6 +67,10 @@ namespace FoxTunes
             {
                 viewModel.Prompt = prompt;
                 viewModel.Flags = flags;
+                if (!string.IsNullOrEmpty(value) && viewModel.Result != null)
+                {
+                    viewModel.Result.SetResult(value);
+                }
                 if (instance.ShowDialog().GetValueOrDefault())
                 {
                     return viewModel.Result.GetResult();

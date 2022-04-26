@@ -115,11 +115,47 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Set Title.
+        /// </summary>
+        internal static string MinidiscBehaviour_SetDiscTitle {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.SetDiscTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View Disc.
         /// </summary>
         internal static string MinidiscBehaviour_ViewDisc {
             get {
                 return ResourceManager.GetString("MinidiscBehaviour.ViewDisc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        internal static string MinidiscBehaviourConfiguration_Advanced {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviourConfiguration.Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cleanup Temp Files.
+        /// </summary>
+        internal static string MinidiscBehaviourConfiguration_Cleanup {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviourConfiguration.Cleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disc Title Script.
+        /// </summary>
+        internal static string MinidiscBehaviourConfiguration_DiscTitleScript {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviourConfiguration.DiscTitleScript", resourceCulture);
             }
         }
         
@@ -138,6 +174,15 @@ namespace FoxTunes {
         internal static string MinidiscBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("MinidiscBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Track Name Script.
+        /// </summary>
+        internal static string MinidiscBehaviourConfiguration_TrackNameScript {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviourConfiguration.TrackNameScript", resourceCulture);
             }
         }
         

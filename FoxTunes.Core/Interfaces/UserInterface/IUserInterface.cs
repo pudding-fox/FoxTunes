@@ -20,6 +20,8 @@ namespace FoxTunes.Interfaces
 
         string Prompt(string message, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None);
 
+        string Prompt(string message, string value, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None);
+
         void SelectInShell(string fileName);
 
         void OpenInShell(string fileName);

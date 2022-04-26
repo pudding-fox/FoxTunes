@@ -84,6 +84,28 @@ namespace FoxTunes
             }
             return encoderItem;
         }
+
+        public static bool WasSkipped(EncoderItem encoderItem)
+        {
+            if (encoderItem.Status != EncoderItemStatus.Failed)
+            {
+                return false;
+            }
+            if (encoderItem.Errors == null)
+            {
+                return false;
+            }
+            var errors = encoderItem.Errors.ToArray();
+            if (errors.Length != 1 || string.IsNullOrEmpty(errors[0]))
+            {
+                return false;
+            }
+            if (!errors[0].Contains("already exists", true))
+            {
+                return false;
+            }
+            return true;
+        }
     }
 
     public enum EncoderItemStatus : byte

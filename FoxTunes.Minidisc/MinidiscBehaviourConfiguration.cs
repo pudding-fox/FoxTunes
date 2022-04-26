@@ -12,10 +12,15 @@ namespace FoxTunes
 
         public const string TRACK_NAME_SCRIPT = "CCCC3251-B5B6-4A66-AE94-68EA093BC93D";
 
+        public const string CLEANUP = "ZZZZ5B81-7D48-444D-93F4-B3CF133E9383";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.MinidiscBehaviourConfiguration_Section)
-                .WithElement(new BooleanConfigurationElement(ENABLED, Strings.MinidiscBehaviourConfiguration_Enabled).WithValue(false)
+                .WithElement(new BooleanConfigurationElement(ENABLED, Strings.MinidiscBehaviourConfiguration_Enabled).WithValue(false))
+                .WithElement(new TextConfigurationElement(DISC_TITLE_SCRIPT, Strings.MinidiscBehaviourConfiguration_DiscTitleScript, path: Strings.MinidiscBehaviourConfiguration_Advanced).WithValue(Resources.DiscTitle))
+                .WithElement(new TextConfigurationElement(TRACK_NAME_SCRIPT, Strings.MinidiscBehaviourConfiguration_TrackNameScript, path: Strings.MinidiscBehaviourConfiguration_Advanced).WithValue(Resources.TrackName))
+                .WithElement(new CommandConfigurationElement(CLEANUP, Strings.MinidiscBehaviourConfiguration_Cleanup).WithHandler(() => MinidiscBehaviour.Cleanup())
             );
         }
     }

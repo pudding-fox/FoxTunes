@@ -134,7 +134,15 @@ namespace FoxTunes
         {
             var result = default(string);
             //TODO: Bad .Wait().
-            global::FoxTunes.Windows.Invoke(() => result = InputBox.ShowDialog(message, flags)).Wait();
+            global::FoxTunes.Windows.Invoke(() => result = InputBox.ShowDialog(message, string.Empty, flags)).Wait();
+            return result;
+        }
+
+        public override string Prompt(string message, string value, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None)
+        {
+            var result = default(string);
+            //TODO: Bad .Wait().
+            global::FoxTunes.Windows.Invoke(() => result = InputBox.ShowDialog(message, value, flags)).Wait();
             return result;
         }
 
