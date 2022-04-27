@@ -132,12 +132,12 @@ namespace FoxTunes
             {
                 return false;
             }
-            return await this.SetDiscTitle(title).ConfigureAwait(false);
+            return await this.SetDiscTitle(task.Device, title).ConfigureAwait(false);
         }
 
-        public async Task<bool> SetDiscTitle(string title)
+        public async Task<bool> SetDiscTitle(IDevice device, string title)
         {
-            using (var task = new SetDiscTitleTask(title))
+            using (var task = new SetDiscTitleTask(device, title))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -148,11 +148,21 @@ namespace FoxTunes
 
         public async Task<bool> EraseDisc()
         {
+            var task = await this.OpenDisc().ConfigureAwait(false);
+            if (task.Disc == null)
+            {
+                return false;
+            }
             if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmEraseDisc))
             {
                 return false;
             }
-            using (var task = new EraseMinidiscTask())
+            return await this.EraseDisc(task.Device).ConfigureAwait(false);
+        }
+
+        public async Task<bool> EraseDisc(IDevice device)
+        {
+            using (var task = new EraseMinidiscTask(device))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -166,6 +176,7 @@ namespace FoxTunes
             var percentUsed = actions.UpdatedDisc.GetCapacity().PercentUsed;
             if (percentUsed > 100)
             {
+                Logger.Write(this, LogLevel.Warn, "The disc capactiy will be exceeded: {0}", percentUsed);
                 if (!this.UserInterface.Confirm(string.Format(Strings.MinidiscBehaviour_ConfirmWriteDiscWithoutCapacity, percentUsed)))
                 {
                     return false;
@@ -212,12 +223,26 @@ namespace FoxTunes
             {
                 if (this.IsUntitled(updatedDisc))
                 {
-                    updatedDisc.Title = this.GetTitle(scriptingContext, playlistItems);
+                    var title = this.GetTitle(scriptingContext, playlistItems);
+                    if (!string.Equals(updatedDisc.Title, title, StringComparison.OrdinalIgnoreCase))
+                    {
+                        updatedDisc.Title = title;
+                        Logger.Write(this, LogLevel.Debug, "Setting the disc title: {0}", updatedDisc.Title);
+                    }
+                    else
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Keeping existing disc title: {0}", updatedDisc.Title);
+                    }
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Keeping existing disc title: {0}", updatedDisc.Title);
                 }
                 foreach (var pair in fileNames)
                 {
                     var track = updatedDisc.Tracks.Add(pair.Value, compression);
                     track.Name = this.GetName(scriptingContext, pair.Key);
+                    Logger.Write(this, LogLevel.Debug, "Adding track \"{0}\": Name: {1}, Compression: {2}", pair.Value, track.Name, Enum.GetName(typeof(Compression), compression));
                 }
             }
             var toolManager = new ToolManager();
@@ -247,19 +272,31 @@ namespace FoxTunes
 
         public async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas)
         {
+            Logger.Write(this, LogLevel.Debug, "Preparing WAVE files..");
             var fileNames = new Dictionary<IFileData, string>();
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
+            if (behaviour == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "The encoder was not found, cannot continue.");
+                return null;
+            }
+            Logger.Write(this, LogLevel.Debug, "Encoding {0} items: WAVE 16 bit, 44.1kHz.", fileDatas.Length);
             var encoderItems = await behaviour.Encode(
                 fileDatas,
                 new BassEncoderOutputPath.Fixed(TempPath),
                 Wav_16_44100_Settings.NAME,
                 false
             ).ConfigureAwait(false);
+            Logger.Write(this, LogLevel.Debug, "Encoder completed.");
             foreach (var encoderItem in encoderItems)
             {
-                if (encoderItem.Status != EncoderItemStatus.Complete && !EncoderItem.WasSkipped(encoderItem))
+                if (EncoderItem.WasSkipped(encoderItem))
                 {
-                    //If something went wrong then present the conversion log.
+                    Logger.Write(this, LogLevel.Warn, "Encoder skipped \"{0}\": Re-using existing file: \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
+                }
+                else if (encoderItem.Status != EncoderItemStatus.Complete)
+                {
+                    Logger.Write(this, LogLevel.Warn, "At least one file failed to encode, aborting.");
                     var report = new BassEncoderReport(encoderItems);
                     report.InitializeComponent(this.Core);
                     await this.ReportEmitter.Send(report).ConfigureAwait(false);
@@ -271,8 +308,10 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to determine input file for encoder item: {0}", encoderItem.InputFileName);
                     continue;
                 }
+                Logger.Write(this, LogLevel.Warn, "Encoded \"{0}\": \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
                 fileNames.Add(fileData, encoderItem.OutputFileName);
             }
+            Logger.Write(this, LogLevel.Debug, "Encoded {0} items.", fileNames.Count);
             return fileNames;
         }
 
@@ -333,6 +372,12 @@ namespace FoxTunes
 
         public static void Cleanup()
         {
+            if (!Directory.Exists(TempPath))
+            {
+                //Nothing to do.
+                return;
+            }
+            Logger.Write(typeof(MinidiscBehaviour), LogLevel.Debug, "Cleaning up temp files: {0}", TempPath);
             try
             {
                 Directory.Delete(TempPath, true);

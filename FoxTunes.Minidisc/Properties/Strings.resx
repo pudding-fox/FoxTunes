@@ -192,4 +192,10 @@
   <data name="MinidiscBehaviour.ConfirmWriteDiscWithoutCapacity" xml:space="preserve">
     <value>The disc capacity is exceeded ({0}%), are you sure?</value>
   </data>
+  <data name="MinidiscActionTask.Encoding" xml:space="preserve">
+    <value>Encoding..</value>
+  </data>
+  <data name="MinidiscActionTask.Transferring" xml:space="preserve">
+    <value>Transferring..</value>
+  </data>
 </root>

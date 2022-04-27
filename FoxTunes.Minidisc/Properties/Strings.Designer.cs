@@ -70,6 +70,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Encoding...
+        /// </summary>
+        internal static string MinidiscActionTask_Encoding {
+            get {
+                return ResourceManager.GetString("MinidiscActionTask.Encoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transferring...
+        /// </summary>
+        internal static string MinidiscActionTask_Transferring {
+            get {
+                return ResourceManager.GetString("MinidiscActionTask.Transferring", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The disc will be erased, are you sure?.
         /// </summary>
         internal static string MinidiscBehaviour_ConfirmEraseDisc {
