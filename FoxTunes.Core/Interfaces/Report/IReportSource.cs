@@ -7,5 +7,5 @@ namespace FoxTunes.Interfaces
         event ReportEventHandler Report;
     }
 
-    public delegate Task ReportEventHandler(object sender, IReport report);
+    public delegate Task ReportEventHandler(object sender, IReportComponent report);
 }

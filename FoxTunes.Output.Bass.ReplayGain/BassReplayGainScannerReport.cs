@@ -4,22 +4,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassReplayGainScannerReport : BaseComponent, IReport
+    public class BassReplayGainScannerReport : ReportComponent
     {
-        public BassReplayGainScannerReport(IEnumerable<IFileData> fileDatas, IEnumerable<ScannerItem> scannerItems)
+        public BassReplayGainScannerReport(IFileData[] fileDatas, ScannerItem[] scannerItems)
         {
             this.FileDatas = fileDatas.ToDictionary(fileData => fileData.FileName, StringComparer.OrdinalIgnoreCase);
-            this.ScannerItems = scannerItems.ToDictionary(scannerItem => Guid.NewGuid());
+            this.ScannerItems = scannerItems;
         }
 
         public Dictionary<string, IFileData> FileDatas { get; private set; }
 
-        public Dictionary<Guid, ScannerItem> ScannerItems { get; private set; }
+        public ScannerItem[] ScannerItems { get; private set; }
 
-        public string Title
+        public override string Title
         {
             get
             {
@@ -27,13 +28,13 @@ namespace FoxTunes
             }
         }
 
-        public string Description
+        public override string Description
         {
             get
             {
                 return string.Join(
                     Environment.NewLine,
-                    this.ScannerItems.Values.Select(
+                    this.ScannerItems.Select(
                         scannerItem => this.GetDescription(scannerItem)
                     )
                 );
@@ -59,7 +60,7 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public string[] Headers
+        public override string[] Headers
         {
             get
             {
@@ -76,30 +77,14 @@ namespace FoxTunes
             }
         }
 
-        public IEnumerable<IReportRow> Rows
+        public override IEnumerable<IReportComponentRow> Rows
         {
             get
             {
-                return this.ScannerItems.Select(element =>
+                return this.ScannerItems.Select(scannerItem =>
                 {
-                    return new ReportRow(element.Key, this.FileDatas[element.Value.FileName], element.Value);
+                    return new BassReplayGainScannerReportRow(this, this.FileDatas[scannerItem.FileName], scannerItem);
                 });
-            }
-        }
-
-        public Action<Guid> Action
-        {
-            get
-            {
-                return key =>
-                {
-                    var scannerItem = default(ScannerItem);
-                    if (!this.ScannerItems.TryGetValue(key, out scannerItem) || !File.Exists(scannerItem.FileName))
-                    {
-                        return;
-                    }
-                    this.FileSystemBrowser.Select(scannerItem.FileName);
-                };
             }
         }
 
@@ -111,22 +96,22 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public class ReportRow : IReportRow
+        public class BassReplayGainScannerReportRow : ReportComponentRow
         {
-            public ReportRow(Guid id, IFileData fileData, ScannerItem scannerItem)
+            public BassReplayGainScannerReportRow(BassReplayGainScannerReport report, IFileData fileData, ScannerItem scannerItem)
             {
-                this.Id = id;
+                this.Report = report;
                 this.FileData = fileData;
                 this.ScannerItem = scannerItem;
             }
 
-            public Guid Id { get; private set; }
+            public BassReplayGainScannerReport Report { get; private set; }
 
             public IFileData FileData { get; private set; }
 
             public ScannerItem ScannerItem { get; private set; }
 
-            public string[] Values
+            public override string[] Values
             {
                 get
                 {
@@ -203,6 +188,12 @@ namespace FoxTunes
                         status
                     };
                 }
+            }
+
+            public override Task<bool> Action()
+            {
+                this.Report.FileSystemBrowser.Select(this.ScannerItem.FileName);
+                return base.Action();
             }
         }
     }

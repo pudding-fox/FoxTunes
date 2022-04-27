@@ -246,7 +246,7 @@ namespace FoxTunes
 
         protected virtual void OnReport(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
         {
-            var report = new ReleaseLookupReport(releaseLookups);
+            var report = new ReleaseLookupReport(releaseLookups.ToArray());
             report.InitializeComponent(this.Core);
             this.ReportEmitter.Send(report);
         }

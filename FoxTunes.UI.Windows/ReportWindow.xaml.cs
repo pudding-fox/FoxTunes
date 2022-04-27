@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -71,7 +72,7 @@ namespace FoxTunes
             }
         }
 
-        public IReport Source
+        public IReportComponent Source
         {
             get
             {
@@ -79,7 +80,7 @@ namespace FoxTunes
                 {
                     return viewModel.Source;
                 }
-                return default(IReport);
+                return default(IReportComponent);
             }
             set
             {
@@ -90,9 +91,12 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnClose(object sender, RoutedEventArgs e)
+        protected virtual void OnCommandExecuted(object sender, ButtonExtensions.CommandExecutedEventArgs e)
         {
-            this.Close();
+            if (string.Equals(e.Behaviour, ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Close();
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)

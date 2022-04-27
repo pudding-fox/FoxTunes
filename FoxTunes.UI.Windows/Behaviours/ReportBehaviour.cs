@@ -16,7 +16,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual Task OnReport(object sender, IReport report)
+        protected virtual Task OnReport(object sender, IReportComponent report)
         {
             return Windows.Invoke(() =>
             {

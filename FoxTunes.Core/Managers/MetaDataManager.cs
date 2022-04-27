@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -125,33 +124,33 @@ namespace FoxTunes
             return result;
         }
 
-        protected virtual void OnReport(IEnumerable<LibraryItem> libraryItems, IDictionary<LibraryItem, IList<string>> errors)
+        protected virtual void OnReport(LibraryItem[] libraryItems, IDictionary<LibraryItem, IList<string>> errors)
         {
             var report = new MetaDataManagerReport<LibraryItem>(libraryItems, errors);
             report.InitializeComponent(this.Core);
             this.ReportEmitter.Send(report);
         }
 
-        protected virtual void OnReport(IEnumerable<PlaylistItem> playlistItems, IDictionary<PlaylistItem, IList<string>> errors)
+        protected virtual void OnReport(PlaylistItem[] playlistItems, IDictionary<PlaylistItem, IList<string>> errors)
         {
             var report = new MetaDataManagerReport<PlaylistItem>(playlistItems, errors);
             report.InitializeComponent(this.Core);
             this.ReportEmitter.Send(report);
         }
 
-        public class MetaDataManagerReport<T> : BaseComponent, IReport where T : IFileData
+        public class MetaDataManagerReport<T> : ReportComponent where T : IFileData
         {
-            public MetaDataManagerReport(IEnumerable<T> sequence, IDictionary<T, IList<string>> errors)
+            public MetaDataManagerReport(T[] sequence, IDictionary<T, IList<string>> errors)
             {
-                this.Sequence = sequence.ToDictionary(encoderItem => Guid.NewGuid());
+                this.Sequence = sequence;
                 this.Errors = errors;
             }
 
-            public IDictionary<Guid, T> Sequence { get; private set; }
+            public T[] Sequence { get; private set; }
 
             public IDictionary<T, IList<string>> Errors { get; private set; }
 
-            public string Title
+            public override string Title
             {
                 get
                 {
@@ -159,13 +158,13 @@ namespace FoxTunes
                 }
             }
 
-            public string Description
+            public override string Description
             {
                 get
                 {
                     return string.Join(
                         Environment.NewLine,
-                        this.Sequence.Values.Select(
+                        this.Sequence.Select(
                             element => this.GetDescription(element)
                         )
                     );
@@ -192,7 +191,7 @@ namespace FoxTunes
                 return builder.ToString();
             }
 
-            public string[] Headers
+            public override string[] Headers
             {
                 get
                 {
@@ -204,27 +203,11 @@ namespace FoxTunes
                 }
             }
 
-            public IEnumerable<IReportRow> Rows
+            public override IEnumerable<IReportComponentRow> Rows
             {
                 get
                 {
-                    return this.Sequence.Select(element => new ReportRow(element.Key, element.Value, this.Errors));
-                }
-            }
-
-            public Action<Guid> Action
-            {
-                get
-                {
-                    return key =>
-                    {
-                        var element = default(T);
-                        if (!this.Sequence.TryGetValue(key, out element) || !File.Exists(element.FileName))
-                        {
-                            return;
-                        }
-                        this.FileSystemBrowser.Select(element.FileName);
-                    };
+                    return this.Sequence.Select(element => new MetaDataManagerReportRow(this, element, this.Errors));
                 }
             }
 
@@ -236,22 +219,22 @@ namespace FoxTunes
                 base.InitializeComponent(core);
             }
 
-            public class ReportRow : IReportRow
+            public class MetaDataManagerReportRow : ReportComponentRow
             {
-                public ReportRow(Guid id, T element, IDictionary<T, IList<string>> errors)
+                public MetaDataManagerReportRow(MetaDataManagerReport<T> report, T element, IDictionary<T, IList<string>> errors)
                 {
-                    this.Id = id;
+                    this.Report = report;
                     this.Element = element;
                     this.Errors = errors;
                 }
 
-                public Guid Id { get; private set; }
+                public MetaDataManagerReport<T> Report { get; private set; }
 
                 public T Element { get; private set; }
 
                 public IDictionary<T, IList<string>> Errors { get; private set; }
 
-                public string[] Values
+                public override string[] Values
                 {
                     get
                     {
@@ -263,6 +246,12 @@ namespace FoxTunes
                                 "OK"
                         };
                     }
+                }
+
+                public override Task<bool> Action()
+                {
+                    this.Report.FileSystemBrowser.Select(this.Element.FileName);
+                    return base.Action();
                 }
             }
         }

@@ -5,12 +5,12 @@ namespace FoxTunes
 {
     public class ReportSource : StandardComponent, IReportEmitter
     {
-        public Task Send(IReport report)
+        public Task Send(IReportComponent report)
         {
             return this.OnReport(report);
         }
 
-        protected virtual Task OnReport(IReport report)
+        protected virtual Task OnReport(IReportComponent report)
         {
             if (this.Report == null)
             {

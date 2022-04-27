@@ -3,17 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class ReleaseLookupReport : BaseComponent, IReport
+    public class ReleaseLookupReport : ReportComponent
     {
-        public ReleaseLookupReport(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
+        public ReleaseLookupReport(Discogs.ReleaseLookup[] releaseLookups)
         {
-            this.LookupItems = releaseLookups.ToDictionary(releaseLookup => Guid.NewGuid());
+            this.ReleaseLookups = releaseLookups;
         }
 
-        public Dictionary<Guid, Discogs.ReleaseLookup> LookupItems { get; private set; }
+        public Discogs.ReleaseLookup[] ReleaseLookups { get; private set; }
 
         public IUserInterface UserInterface { get; private set; }
 
@@ -23,7 +24,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public string Title
+        public override string Title
         {
             get
             {
@@ -31,13 +32,13 @@ namespace FoxTunes
             }
         }
 
-        public string Description
+        public override string Description
         {
             get
             {
                 return string.Join(
                     Environment.NewLine,
-                    this.LookupItems.Values.Select(
+                    this.ReleaseLookups.Select(
                         releaseLookup => this.GetDescription(releaseLookup)
                     )
                 );
@@ -63,58 +64,41 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public string[] Headers
+        public override string[] Headers
         {
             get
             {
                 return new[]
                 {
-                        Strings.ReleaseLookupReport_Album,
-                        Strings.ReleaseLookupReport_Artist,
-                        Strings.ReleaseLookupReport_Status,
-                        Strings.ReleaseLookupReport_Release
-                    };
-            }
-        }
-
-        public IEnumerable<IReportRow> Rows
-        {
-            get
-            {
-                return this.LookupItems.Select(element => new ReportRow(element.Key, element.Value));
-            }
-        }
-
-        public Action<Guid> Action
-        {
-            get
-            {
-                return key =>
-                {
-                    var releaseLookup = default(Discogs.ReleaseLookup);
-                    if (!this.LookupItems.TryGetValue(key, out releaseLookup) || releaseLookup.Release == null)
-                    {
-                        return;
-                    }
-                    var url = new Uri(new Uri("https://www.discogs.com"), releaseLookup.Release.Url).ToString();
-                    this.UserInterface.OpenInShell(url);
+                    Strings.ReleaseLookupReport_Album,
+                    Strings.ReleaseLookupReport_Artist,
+                    Strings.ReleaseLookupReport_Status,
+                    Strings.ReleaseLookupReport_Release
                 };
             }
         }
 
-        public class ReportRow : IReportRow
+        public override IEnumerable<IReportComponentRow> Rows
         {
-            public ReportRow(Guid id, Discogs.ReleaseLookup releaseLookup)
+            get
             {
-                this.Id = id;
+                return this.ReleaseLookups.Select(releaseLookup => new ReleaseLookupReportRow(this, releaseLookup));
+            }
+        }
+
+        public class ReleaseLookupReportRow : ReportComponentRow
+        {
+            public ReleaseLookupReportRow(ReleaseLookupReport report, Discogs.ReleaseLookup releaseLookup)
+            {
+                this.Report = report;
                 this.ReleaseLookup = releaseLookup;
             }
 
-            public Guid Id { get; private set; }
+            public ReleaseLookupReport Report { get; private set; }
 
             public Discogs.ReleaseLookup ReleaseLookup { get; private set; }
 
-            public string[] Values
+            public override string[] Values
             {
                 get
                 {
@@ -125,12 +109,19 @@ namespace FoxTunes
                     }
                     return new[]
                     {
-                            this.ReleaseLookup.Artist,
-                            this.ReleaseLookup.Album,
-                            Enum.GetName(typeof(Discogs.ReleaseLookupStatus), this.ReleaseLookup.Status),
-                            url
-                        };
+                        this.ReleaseLookup.Artist,
+                        this.ReleaseLookup.Album,
+                        Enum.GetName(typeof(Discogs.ReleaseLookupStatus), this.ReleaseLookup.Status),
+                        url
+                    };
                 }
+            }
+
+            public override Task<bool> Action()
+            {
+                var url = new Uri(new Uri("https://www.discogs.com"), this.ReleaseLookup.Release.Url).ToString();
+                this.Report.UserInterface.OpenInShell(url);
+                return base.Action();
             }
         }
     }

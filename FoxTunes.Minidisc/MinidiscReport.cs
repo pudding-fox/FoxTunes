@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class MinidiscReport : BaseComponent, IReport, IActionable
+    public class MinidiscReport : ReportComponent
     {
         public MinidiscReport(MinidiscBehaviour behaviour, IDevice device, IActions actions)
         {
             this.Behaviour = behaviour;
             this.Device = device;
             this.Actions = actions;
-            this.Tracks = actions.UpdatedDisc.Tracks.ToDictionary(track => Guid.NewGuid());
         }
 
         public MinidiscBehaviour Behaviour { get; private set; }
@@ -23,9 +22,7 @@ namespace FoxTunes
 
         public IActions Actions { get; private set; }
 
-        public Dictionary<Guid, ITrack> Tracks { get; private set; }
-
-        public string Title
+        public override string Title
         {
             get
             {
@@ -33,7 +30,7 @@ namespace FoxTunes
             }
         }
 
-        public string Description
+        public override string Description
         {
             get
             {
@@ -41,7 +38,7 @@ namespace FoxTunes
             }
         }
 
-        public string[] Headers
+        public override string[] Headers
         {
             get
             {
@@ -55,28 +52,15 @@ namespace FoxTunes
             }
         }
 
-        public IEnumerable<IReportRow> Rows
+        public override IEnumerable<IReportComponentRow> Rows
         {
             get
             {
-                return this.Tracks.Select(element => new ReportRow(element.Key, element.Value));
+                return this.Actions.UpdatedDisc.Tracks.Select(track => new MinidiscReportRow(track));
             }
         }
 
-        public Action<Guid> Action
-        {
-            get
-            {
-                return key =>
-                {
-                    //Nothing to do.
-                };
-            }
-        }
-
-        #region IActionable
-
-        string IActionable.Description
+        public override string ActionName
         {
             get
             {
@@ -84,61 +68,50 @@ namespace FoxTunes
                 {
                     return Strings.MinidiscReport_Write;
                 }
-                else
-                {
-                    return Strings.MinidiscReport_Close;
-                }
+                return string.Empty;
             }
         }
 
-        Task<bool> IActionable.Task
+        public override Task<bool> Action()
         {
-            get
+            if (this.Actions.Count > 0)
             {
-                if (this.Actions.Count > 0)
-                {
 #if NET40
-                    return TaskEx.Run(async () =>
+                return TaskEx.Run(async () =>
 #else
-                    return Task.Run(async () =>
+                return Task.Run(async () =>
 #endif
+                {
+                    var success = await this.Behaviour.WriteDisc(this.Device, this.Actions).ConfigureAwait(false);
+                    if (!success)
                     {
-                        var success = await this.Behaviour.WriteDisc(this.Device, this.Actions).ConfigureAwait(false);
-                        if (!success)
-                        {
-                            //If disc was not written then show this report again.
-                            await this.Behaviour.ReportEmitter.Send(this).ConfigureAwait(false);
-                            return false;
-                        }
-                        return true;
-                    });
-                }
-                else
-                {
+                        //If disc was not written then show this report again.
+                        await this.Behaviour.ReportEmitter.Send(this).ConfigureAwait(false);
+                        return false;
+                    }
+                    return true;
+                });
+            }
+            else
+            {
 #if NET40
-                    return TaskEx.FromResult(true);
+                return TaskEx.FromResult(true);
 #else
-                    return Task.FromResult(true);
+                return Task.FromResult(true);
 #endif
-                }
             }
         }
 
-        #endregion
-
-        public class ReportRow : IReportRow
+        public class MinidiscReportRow : ReportComponentRow
         {
-            public ReportRow(Guid id, ITrack track)
+            public MinidiscReportRow(ITrack track)
             {
-                this.Id = id;
                 this.Track = track;
             }
 
-            public Guid Id { get; private set; }
-
             public ITrack Track { get; private set; }
 
-            public string[] Values
+            public override string[] Values
             {
                 get
                 {

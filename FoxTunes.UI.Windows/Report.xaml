@@ -24,7 +24,7 @@
                         SelectedValue="{Binding SelectedRow, Source={StaticResource ViewModel}}">
                     <Interactivity:Interaction.Triggers>
                         <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type ListViewItem}">
-                            <Interactivity:InvokeCommandAction Command="{Binding ActionCommand, Source={StaticResource ViewModel}}" />
+                            <Interactivity:InvokeCommandAction Command="{Binding RowActionCommand, Source={StaticResource ViewModel}}" />
                         </Windows:FilteredEventTrigger>
                     </Interactivity:Interaction.Triggers>
                     <ListView.View>
