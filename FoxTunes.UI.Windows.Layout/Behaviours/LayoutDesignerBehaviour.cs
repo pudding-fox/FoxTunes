@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class LayoutDesignerBehaviour : StandardBehaviour, IInvocableComponent, IBackgroundTaskSource, IDisposable
+    public class LayoutDesignerBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         public const string DESIGN = "AAAA";
 
@@ -65,6 +65,8 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             Windows.ShuttingDown += this.OnShuttingDown;
@@ -72,6 +74,7 @@ namespace FoxTunes
             ToolWindowBehaviour.ToolWindowManagerWindowCreated += this.OnToolWindowManagerWindowCreated;
             ToolWindowBehaviour.ToolWindowManagerWindowClosed += this.OnToolWindowManagerWindowClosed;
             this.Core = core;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             base.InitializeComponent(core);
         }
 
@@ -108,9 +111,8 @@ namespace FoxTunes
         {
             this.DesignerTask = new LayoutDesignerBehaviourTask(this);
             this.DesignerTask.InitializeComponent(this.Core);
-            this.OnBackgroundTask(this.DesignerTask);
+            var task = this.BackgroundTaskEmitter.Send(this.DesignerTask);
             this.Dispatch(this.DesignerTask.Run);
-
             foreach (var root in UIComponentRoot.Active)
             {
                 this.ShowDesignerOverlay(root);
@@ -168,17 +170,6 @@ namespace FoxTunes
             return Task.CompletedTask;
 #endif
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         public bool IsDisposed { get; private set; }
 

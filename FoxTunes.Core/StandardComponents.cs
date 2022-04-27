@@ -209,6 +209,14 @@ namespace FoxTunes
             }
         }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IBackgroundTaskEmitter>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }

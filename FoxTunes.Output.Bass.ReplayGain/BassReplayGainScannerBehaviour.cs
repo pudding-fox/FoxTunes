@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassReplayGainScannerBehaviour : StandardBehaviour, IBackgroundTaskSource, IInvocableComponent, IConfigurableComponent
+    public class BassReplayGainScannerBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string SCAN_TRACKS = "HHHH";
 
@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public IReportEmitter ReportEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -46,6 +48,7 @@ namespace FoxTunes
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.SignalEmitter = core.Components.SignalEmitter;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -178,7 +181,7 @@ namespace FoxTunes
             using (var task = new ScanTask(this, fileDatas, mode))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 this.OnReport(fileDatas, task.ScannerItems);
             }
@@ -263,17 +266,6 @@ namespace FoxTunes
                names.ToArray()
             ).ConfigureAwait(false);
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         protected virtual void OnReport(IFileData[] fileDatas, ScannerItem[] scannerItems)
         {

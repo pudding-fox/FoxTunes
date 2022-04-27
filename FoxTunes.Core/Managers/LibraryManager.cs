@@ -46,6 +46,8 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public IReportEmitter ReportEmitter { get; private set; }
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
@@ -122,6 +124,7 @@ namespace FoxTunes
             this.DatabaseFactory = core.Factories.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Refresh();
             base.InitializeComponent(core);
@@ -242,7 +245,7 @@ namespace FoxTunes
             using (var task = new AddPathsToLibraryTask(paths))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 this.OnReport(task.Warnings);
             }
@@ -253,7 +256,7 @@ namespace FoxTunes
             using (var task = new ClearLibraryTask(status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -263,7 +266,7 @@ namespace FoxTunes
             using (var task = new RescanLibraryTask(force))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 this.OnReport(task.Warnings);
             }
@@ -274,7 +277,7 @@ namespace FoxTunes
             using (var task = new UpdateLibraryTask(status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -284,27 +287,10 @@ namespace FoxTunes
             using (var task = new UpdateLibraryTask(items, status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
-
-        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new BackgroundTaskEventArgs(backgroundTask);
-            this.BackgroundTask(this, e);
-            return e.Complete();
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         protected virtual void OnReport(IDictionary<LibraryItem, IList<string>> warnings)
         {

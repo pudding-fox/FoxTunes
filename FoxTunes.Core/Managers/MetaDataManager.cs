@@ -13,11 +13,14 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public IReportEmitter ReportEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             base.InitializeComponent(core);
         }
@@ -31,7 +34,7 @@ namespace FoxTunes
                 using (var task = new RefreshLibraryMetaDataTask(libraryItems))
                 {
                     task.InitializeComponent(this.Core);
-                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                 }
             }
@@ -40,7 +43,7 @@ namespace FoxTunes
                 using (var task = new RefreshPlaylistMetaDataTask(playlistItems))
                 {
                     task.InitializeComponent(this.Core);
-                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                 }
             }
@@ -55,7 +58,7 @@ namespace FoxTunes
                 using (var task = new WriteLibraryMetaDataTask(libraryItems, write, names))
                 {
                     task.InitializeComponent(this.Core);
-                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                     if (report && task.Errors.Any())
                     {
@@ -68,7 +71,7 @@ namespace FoxTunes
                 using (var task = new WritePlaylistMetaDataTask(playlistItems, names, write))
                 {
                     task.InitializeComponent(this.Core);
-                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                     if (report && task.Errors.Any())
                     {
@@ -83,7 +86,7 @@ namespace FoxTunes
             using (var task = new SynchronizeMetaDataTask())
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -98,7 +101,7 @@ namespace FoxTunes
                 using (var task = new SynchronizeLibraryMetaDataTask(libraryItems, names))
                 {
                     task.InitializeComponent(this.Core);
-                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                     if (task.Errors.Any())
                     {
@@ -111,7 +114,7 @@ namespace FoxTunes
                 using (var task = new SynchronizePlaylistMetaDataTask(playlistItems, names))
                 {
                     task.InitializeComponent(this.Core);
-                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                     if (task.Errors.Any())
                     {
@@ -121,23 +124,6 @@ namespace FoxTunes
             }
             return result;
         }
-
-        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new BackgroundTaskEventArgs(backgroundTask);
-            this.BackgroundTask(this, e);
-            return e.Complete();
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         protected virtual void OnReport(IEnumerable<LibraryItem> libraryItems, IDictionary<LibraryItem, IList<string>> errors)
         {

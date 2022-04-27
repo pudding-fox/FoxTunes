@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class StatisticsManager : StandardManager, IBackgroundTaskSource
+    public class StatisticsManager : StandardManager
     {
         public ICore Core { get; private set; }
+
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             base.InitializeComponent(core);
         }
 
@@ -19,26 +22,9 @@ namespace FoxTunes
             using (var task = new UpdatePlaylistPlayCountTask(playlistItem))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
-
-        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new BackgroundTaskEventArgs(backgroundTask);
-            this.BackgroundTask(this, e);
-            return e.Complete();
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
     }
 }

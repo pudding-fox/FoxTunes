@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class DiscogsBehaviour : StandardBehaviour, IBackgroundTaskSource, IInvocableComponent, IConfigurableComponent
+    public class DiscogsBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string LOOKUP_TAGS = "LLMN";
 
@@ -21,6 +21,8 @@ namespace FoxTunes
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
+
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IReportEmitter ReportEmitter { get; private set; }
 
@@ -39,6 +41,7 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -146,7 +149,7 @@ namespace FoxTunes
             using (var task = new DiscogsFetchTagsTask(releaseLookups))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
             return releaseLookups;
@@ -208,7 +211,7 @@ namespace FoxTunes
             using (var task = new DiscogsFetchArtworkTask(releaseLookups))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
             return releaseLookups;
@@ -240,17 +243,6 @@ namespace FoxTunes
         {
             return DiscogsBehaviourConfiguration.GetConfigurationSections();
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         protected virtual void OnReport(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
         {

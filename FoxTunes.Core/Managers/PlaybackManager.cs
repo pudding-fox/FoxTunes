@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public IErrorEmitter ErrorEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -22,6 +24,7 @@ namespace FoxTunes
             this.Output.IsStartedChanged += this.OnIsStartedChanged;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ErrorEmitter = core.Components.ErrorEmitter;
             base.InitializeComponent(core);
         }
@@ -161,7 +164,7 @@ namespace FoxTunes
             using (var task = new LoadOutputStreamTask(playlistItem, immediate))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -184,7 +187,7 @@ namespace FoxTunes
             using (var task = new UnloadOutputStreamTask(outputStream))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -198,23 +201,6 @@ namespace FoxTunes
             await this.SetCurrentStream(null).ConfigureAwait(false);
             await this.Output.Shutdown().ConfigureAwait(false);
         }
-
-        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new BackgroundTaskEventArgs(backgroundTask);
-            this.BackgroundTask(this, e);
-            return e.Complete();
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         protected override async void OnDisposing()
         {

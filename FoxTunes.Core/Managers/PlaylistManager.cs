@@ -33,6 +33,8 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public IErrorEmitter ErrorEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -45,6 +47,7 @@ namespace FoxTunes
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Refresh();
             base.InitializeComponent(core);
@@ -216,7 +219,7 @@ namespace FoxTunes
             using (var task = new AddPlaylistTask(playlist))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -226,7 +229,7 @@ namespace FoxTunes
             using (var task = new AddPlaylistTask(playlist, paths))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -236,7 +239,7 @@ namespace FoxTunes
             using (var task = new AddPlaylistTask(playlist, libraryHierarchyNode))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -246,7 +249,7 @@ namespace FoxTunes
             using (var task = new AddPlaylistTask(playlist, playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -256,7 +259,7 @@ namespace FoxTunes
             using (var task = new RemovePlaylistTask(playlist))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -274,7 +277,7 @@ namespace FoxTunes
             using (var task = new AddPathsToPlaylistTask(playlist, index, paths, clear))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -292,7 +295,7 @@ namespace FoxTunes
             using (var task = new AddLibraryHierarchyNodeToPlaylistTask(playlist, index, libraryHierarchyNode, clear))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -310,7 +313,7 @@ namespace FoxTunes
             using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, index, libraryHierarchyNodes, this.LibraryHierarchyBrowser.Filter, clear))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -328,7 +331,7 @@ namespace FoxTunes
             using (var task = new MovePlaylistItemsTask(playlist, index, playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -338,7 +341,7 @@ namespace FoxTunes
             using (var task = new RemoveItemsFromPlaylistTask(playlist, playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -360,7 +363,7 @@ namespace FoxTunes
             using (var task = new RemoveItemsFromPlaylistTask(playlist, playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -488,7 +491,7 @@ namespace FoxTunes
                 using (var task = new ClearPlaylistTask(playlist))
                 {
                     task.InitializeComponent(this.Core);
-                    await this.OnBackgroundTask(task).ConfigureAwait(false);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                 }
             }
@@ -499,7 +502,7 @@ namespace FoxTunes
             using (var task = new SortPlaylistTask(playlist, playlistColumn, descending))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 return task.Changes;
             }
@@ -637,23 +640,6 @@ namespace FoxTunes
         }
 
         public event EventHandler SelectedItemsChanged;
-
-        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new BackgroundTaskEventArgs(backgroundTask);
-            this.BackgroundTask(this, e);
-            return e.Complete();
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         public IEnumerable<IInvocationComponent> Invocations
         {

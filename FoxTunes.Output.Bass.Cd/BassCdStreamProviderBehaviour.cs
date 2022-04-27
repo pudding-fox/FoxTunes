@@ -12,13 +12,15 @@ namespace FoxTunes
 {
     [Component("C051C82C-3391-4DDC-B856-C4BDEA86ADDC", null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IDisposable
+    public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";
 
         public ICore Core { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
+
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -95,6 +97,7 @@ namespace FoxTunes
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
             this.PlaylistManager = core.Managers.Playlist;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.DoorMonitor = ComponentRegistry.Instance.GetComponent<CdDoorMonitor>();
             this.DoorMonitor.StateChanged += this.OnStateChanged;
             this.Configuration = core.Components.Configuration;
@@ -200,21 +203,10 @@ namespace FoxTunes
             using (var task = new AddCdToPlaylistTask(playlist, drive, this.CdLookup, this.CdLookupHost))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         public bool IsDisposed { get; private set; }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassEncoderBehaviour : StandardBehaviour, IBackgroundTaskSource, IInvocableComponent, IConfigurableComponent
+    public class BassEncoderBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string ENCODE = "GGGG";
 
@@ -18,6 +18,8 @@ namespace FoxTunes
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IReportEmitter ReportEmitter { get; private set; }
 
@@ -35,6 +37,7 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>()
                 .Where(settings => !settings.Flags.HasFlag(BassEncoderSettingsFlags.Internal))
@@ -173,7 +176,7 @@ namespace FoxTunes
             using (var task = new EncodeTask(this, fileDatas, encoderItems))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 if (report)
                 {
@@ -182,17 +185,6 @@ namespace FoxTunes
                 return task.EncoderItems;
             }
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         protected virtual void OnReport(EncoderItem[] encoderItems)
         {
