@@ -97,7 +97,21 @@ namespace FoxTunes
             {
                 if (this.Actions.Count > 0)
                 {
-                    return this.Behaviour.WriteDisc(this.Device, this.Actions);
+#if NET40
+                    return TaskEx.Run(async () =>
+#else
+                    return Task.Run(async () =>
+#endif
+                    {
+                        var success = await this.Behaviour.WriteDisc(this.Device, this.Actions).ConfigureAwait(false);
+                        if (!success)
+                        {
+                            //If disc was not written then show this report again.
+                            await this.Behaviour.ReportEmitter.Send(this).ConfigureAwait(false);
+                            return false;
+                        }
+                        return true;
+                    });
                 }
                 else
                 {

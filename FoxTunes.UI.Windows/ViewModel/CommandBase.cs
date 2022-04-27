@@ -6,6 +6,8 @@ namespace FoxTunes.ViewModel
 {
     public abstract class CommandBase : ICommand
     {
+        protected static readonly IErrorEmitter ErrorEmitter = ComponentRegistry.Instance.GetComponent<IErrorEmitter>();
+
         protected static ILogger Logger
         {
             get

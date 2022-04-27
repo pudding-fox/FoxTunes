@@ -198,4 +198,13 @@
   <data name="MinidiscActionTask.Transferring" xml:space="preserve">
     <value>Transferring..</value>
   </data>
+  <data name="MinidiscBehaviour.NoDisc" xml:space="preserve">
+    <value>No device was found or the disc could not be read.</value>
+  </data>
+  <data name="MinidiscTask.NoDisc" xml:space="preserve">
+    <value>No device was found or the disc could not be read.</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
+  </data>
 </root>

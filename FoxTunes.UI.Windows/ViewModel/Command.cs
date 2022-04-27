@@ -47,6 +47,7 @@ namespace FoxTunes.ViewModel
             catch (Exception e)
             {
                 Logger.Write(typeof(Command), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                var task = ErrorEmitter.Send(string.Format("Failed to execute command: {0}", e.Message), e);
             }
             this.OnCanExecuteChanged();
         }
@@ -110,6 +111,7 @@ namespace FoxTunes.ViewModel
             catch (Exception e)
             {
                 Logger.Write(typeof(Command), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                var task = ErrorEmitter.Send(string.Format("Failed to execute command: {0}", e.Message), e);
             }
             this.OnCanExecuteChanged();
         }

@@ -12,6 +12,8 @@ namespace FoxTunes
     {
         public const string COMMAND_BEHAVIOUR_DISMISS = "ButtonExtensions.Dismiss";
 
+        private static readonly IErrorEmitter ErrorEmitter = ComponentRegistry.Instance.GetComponent<IErrorEmitter>();
+
         private static readonly ConditionalWeakTable<Button, CommandBehaviour> CommandBehaviours = new ConditionalWeakTable<Button, CommandBehaviour>();
 
         public static readonly DependencyProperty CommandProperty = DependencyProperty.RegisterAttached(
@@ -170,6 +172,7 @@ namespace FoxTunes
                     catch (Exception e)
                     {
                         Logger.Write(typeof(CommandBehaviour), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                        var task = ErrorEmitter.Send(string.Format("Failed to execute command: {0}", e.Message), e);
                     }
                 });
             }

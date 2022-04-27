@@ -117,6 +117,7 @@ namespace FoxTunes
             var task = await this.OpenDisc().ConfigureAwait(false);
             if (task.Disc == null)
             {
+                this.UserInterface.Warn(Strings.MinidiscBehaviour_NoDisc);
                 return;
             }
             var actions = new Actions(task.Device, task.Disc, task.Disc, Actions.None);
@@ -128,11 +129,13 @@ namespace FoxTunes
             var task = await this.OpenDisc().ConfigureAwait(false);
             if (task.Disc == null)
             {
+                this.UserInterface.Warn(Strings.MinidiscBehaviour_NoDisc);
                 return false;
             }
             var title = this.UserInterface.Prompt(Strings.MinidiscBehaviour_SetDiscTitle, task.Disc.Title);
             if (string.IsNullOrEmpty(title))
             {
+                //Operation cancelled.
                 return false;
             }
             return await this.SetDiscTitle(task.Device, title).ConfigureAwait(false);
@@ -154,6 +157,7 @@ namespace FoxTunes
             var task = await this.OpenDisc().ConfigureAwait(false);
             if (task.Disc == null)
             {
+                this.UserInterface.Warn(Strings.MinidiscBehaviour_NoDisc);
                 return false;
             }
             if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmEraseDisc))
@@ -217,6 +221,7 @@ namespace FoxTunes
             var task = await this.OpenDisc().ConfigureAwait(false);
             if (task.Disc == null)
             {
+                this.UserInterface.Warn(Strings.MinidiscBehaviour_NoDisc);
                 return;
             }
             var device = task.Device;

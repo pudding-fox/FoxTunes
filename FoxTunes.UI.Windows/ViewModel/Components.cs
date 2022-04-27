@@ -59,9 +59,9 @@ namespace FoxTunes.ViewModel
         protected virtual async Task OnError(object sender, ComponentErrorEventArgs e)
         {
             var component = sender as IBaseComponent;
-            if (e.Exception is AggregateException)
+            if (e.Exception is AggregateException aggregateException)
             {
-                foreach (var innerException in (e.Exception as AggregateException).InnerExceptions)
+                foreach (var innerException in aggregateException.InnerExceptions)
                 {
                     await this.Add(new ComponentError(component, e.Message, innerException)).ConfigureAwait(false);
                 }
@@ -85,9 +85,9 @@ namespace FoxTunes.ViewModel
         protected virtual async void OnFaulted(object sender, EventArgs e)
         {
             var backgroundTask = sender as IBackgroundTask;
-            if (backgroundTask.Exception is AggregateException)
+            if (backgroundTask.Exception is AggregateException aggregateException)
             {
-                foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
+                foreach (var innerException in aggregateException.InnerExceptions)
                 {
                     await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException)).ConfigureAwait(false);
                 }
