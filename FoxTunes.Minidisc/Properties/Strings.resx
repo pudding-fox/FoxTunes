@@ -147,7 +147,7 @@
   <data name="MinidiscReport.Action" xml:space="preserve">
     <value>Action</value>
   </data>
-  <data name="MinidiscReport.Add" xml:space="preserve">
+  <data name="TrackAction.Add" xml:space="preserve">
     <value>Add</value>
   </data>
   <data name="MinidiscReport.Close" xml:space="preserve">
@@ -159,7 +159,7 @@
   <data name="MinidiscReport.Name" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="MinidiscReport.None" xml:space="preserve">
+  <data name="TrackAction.None" xml:space="preserve">
     <value>None</value>
   </data>
   <data name="MinidiscReport.Time" xml:space="preserve">
@@ -204,7 +204,22 @@
   <data name="MinidiscTask.NoDisc" xml:space="preserve">
     <value>No device was found or the disc could not be read.</value>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value />
+  <data name="TrackAction.Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="MinidiscReportRow.Keep" xml:space="preserve">
+    <value>Keep</value>
+  </data>
+  <data name="MinidiscReportRow.Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Compression.LP2" xml:space="preserve">
+    <value>LP2</value>
+  </data>
+  <data name="Compression.LP4" xml:space="preserve">
+    <value>LP4</value>
+  </data>
+  <data name="Compression.None" xml:space="preserve">
+    <value>SP</value>
   </data>
 </root>

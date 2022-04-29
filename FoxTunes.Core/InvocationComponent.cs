@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -27,11 +29,15 @@ namespace FoxTunes
 
         public const string CATEGORY_EQUALIZER = "4FF5C1F1-2F36-4F3B-ADE7-73A1A7B835E4";
 
+        public const string CATEGORY_REPORT = "CD7A02FD-944C-4C8A-933F-3BB7AAB5CA49";
+
         public const byte ATTRIBUTE_NONE = 0;
 
         public const byte ATTRIBUTE_SEPARATOR = 1;
 
         public const byte ATTRIBUTE_SELECTED = 2;
+
+        public const byte ATTRIBUTE_SYSTEM = 4;
 
         public InvocationComponent(string category, string id, string name = null, string description = null, string path = null, byte attributes = 0)
         {
@@ -80,5 +86,30 @@ namespace FoxTunes
         }
 
         public event EventHandler AttributesChanged;
+    }
+
+    public static partial class Extensions
+    {
+        public static bool TryGetInvocation(this IInvocableComponent component, string id, out IInvocationComponent invocation)
+        {
+            if (component == null)
+            {
+                invocation = null;
+                return false;
+            }
+            invocation = component.Invocations.FirstOrDefault(_invocation => string.Equals(_invocation.Id, id, StringComparison.OrdinalIgnoreCase));
+            return invocation != null;
+        }
+
+        public static async Task<bool> TryInvoke(this IInvocableComponent component, string id)
+        {
+            var invocation = default(IInvocationComponent);
+            if (!component.TryGetInvocation(id, out invocation))
+            {
+                return false;
+            }
+            await component.InvokeAsync(invocation);
+            return true;
+        }
     }
 }

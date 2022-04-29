@@ -61,9 +61,16 @@ namespace FoxTunes.ViewModel
             var component = sender as IBaseComponent;
             if (e.Exception is AggregateException aggregateException)
             {
-                foreach (var innerException in aggregateException.InnerExceptions)
+                if (aggregateException.InnerExceptions.Count == 1)
                 {
-                    await this.Add(new ComponentError(component, e.Message, innerException)).ConfigureAwait(false);
+                    await this.Add(new ComponentError(component, aggregateException.InnerExceptions[0].Message, aggregateException.InnerExceptions[0])).ConfigureAwait(false);
+                }
+                else
+                {
+                    foreach (var innerException in aggregateException.InnerExceptions)
+                    {
+                        await this.Add(new ComponentError(component, innerException.Message, innerException)).ConfigureAwait(false);
+                    }
                 }
             }
             else
@@ -87,9 +94,16 @@ namespace FoxTunes.ViewModel
             var backgroundTask = sender as IBackgroundTask;
             if (backgroundTask.Exception is AggregateException aggregateException)
             {
-                foreach (var innerException in aggregateException.InnerExceptions)
+                if (aggregateException.InnerExceptions.Count == 1)
                 {
-                    await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException)).ConfigureAwait(false);
+                    await this.Add(new ComponentError(backgroundTask, aggregateException.InnerExceptions[0].Message, aggregateException.InnerExceptions[0])).ConfigureAwait(false);
+                }
+                else
+                {
+                    foreach (var innerException in aggregateException.InnerExceptions)
+                    {
+                        await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException)).ConfigureAwait(false);
+                    }
                 }
             }
             else

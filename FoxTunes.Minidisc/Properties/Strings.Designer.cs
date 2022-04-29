@@ -61,6 +61,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to LP2.
+        /// </summary>
+        internal static string Compression_LP2 {
+            get {
+                return ResourceManager.GetString("Compression.LP2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LP4.
+        /// </summary>
+        internal static string Compression_LP4 {
+            get {
+                return ResourceManager.GetString("Compression.LP4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SP.
+        /// </summary>
+        internal static string Compression_None {
+            get {
+                return ResourceManager.GetString("Compression.None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Erasing disc.
         /// </summary>
         internal static string EraseMinidiscTask_Name {
@@ -232,15 +259,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add.
-        /// </summary>
-        internal static string MinidiscReport_Add {
-            get {
-                return ResourceManager.GetString("MinidiscReport.Add", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Close.
         /// </summary>
         internal static string MinidiscReport_Close {
@@ -268,15 +286,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to None.
-        /// </summary>
-        internal static string MinidiscReport_None {
-            get {
-                return ResourceManager.GetString("MinidiscReport.None", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Time.
         /// </summary>
         internal static string MinidiscReport_Time {
@@ -291,6 +300,24 @@ namespace FoxTunes {
         internal static string MinidiscReport_Write {
             get {
                 return ResourceManager.GetString("MinidiscReport.Write", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep.
+        /// </summary>
+        internal static string MinidiscReportRow_Keep {
+            get {
+                return ResourceManager.GetString("MinidiscReportRow.Keep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string MinidiscReportRow_Remove {
+            get {
+                return ResourceManager.GetString("MinidiscReportRow.Remove", resourceCulture);
             }
         }
         
@@ -313,11 +340,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Add.
         /// </summary>
-        internal static string String1 {
+        internal static string TrackAction_Add {
             get {
-                return ResourceManager.GetString("String1", resourceCulture);
+                return ResourceManager.GetString("TrackAction.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        internal static string TrackAction_None {
+            get {
+                return ResourceManager.GetString("TrackAction.None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string TrackAction_Remove {
+            get {
+                return ResourceManager.GetString("TrackAction.Remove", resourceCulture);
             }
         }
         

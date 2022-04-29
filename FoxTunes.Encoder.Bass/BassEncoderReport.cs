@@ -125,10 +125,26 @@ namespace FoxTunes
                 }
             }
 
-            public override Task<bool> Action()
+            public override IEnumerable<IInvocationComponent> Invocations
             {
-                this.Report.FileSystemBrowser.Select(this.EncoderItem.OutputFileName);
-                return base.Action();
+                get
+                {
+                    if (File.Exists(this.EncoderItem.OutputFileName))
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, ACTIVATE, attributes: InvocationComponent.ATTRIBUTE_SYSTEM);
+                    }
+                }
+            }
+
+            public override Task InvokeAsync(IInvocationComponent component)
+            {
+                switch (component.Id)
+                {
+                    case ACTIVATE:
+                        this.Report.FileSystemBrowser.Select(this.EncoderItem.OutputFileName);
+                        break;
+                }
+                return base.InvokeAsync(component);
             }
         }
     }

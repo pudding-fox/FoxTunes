@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -21,13 +22,26 @@ namespace FoxTunes.ViewModel
             }
             set
             {
+                this.OnSourceChanging();
                 this._Source = value;
                 this.OnSourceChanged();
             }
         }
 
+        protected virtual void OnSourceChanging()
+        {
+            if (this.Source != null)
+            {
+                this.Source.RowsChanged -= this.OnRowsChanged;
+            }
+        }
+
         protected virtual void OnSourceChanged()
         {
+            if (this.Source != null)
+            {
+                this.Source.RowsChanged += this.OnRowsChanged;
+            }
             this.Refresh();
             if (this.SourceChanged != null)
             {
@@ -85,86 +99,70 @@ namespace FoxTunes.ViewModel
                 this.SelectedRowChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("SelectedRow");
-            this.OnRowActionCommandChanged();
         }
 
         public event EventHandler SelectedRowChanged;
 
-        public ICommand RowActionCommand
+        public ICommand RowActivateCommand
         {
             get
             {
-                if (this.SelectedRow == null)
-                {
-                    return CommandBase.Disabled;
-                }
-                return new AsyncCommand(this.SelectedRow.Action);
+                return new AsyncCommand(this.RowActivate);
             }
         }
 
-        protected virtual void OnRowActionCommandChanged()
+        public Task RowActivate()
         {
-            if (this.RowActionCommandChanged != null)
-            {
-                this.RowActionCommandChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("RowActionCommand");
+            return this.SelectedRow.TryInvoke(ReportComponent.ReportComponentRow.ACTIVATE);
         }
 
-        public event EventHandler RowActionCommandChanged;
-
-        public string ActionName
+        public ICommand AcceptCommand
         {
             get
             {
-                if (this.Source != null && !string.IsNullOrEmpty(this.Source.ActionName))
+                return new AsyncCommand(this.Accept);
+            }
+        }
+
+        public Task Accept()
+        {
+            return this.Source.TryInvoke(ReportComponent.ACCEPT);
+        }
+
+        public string AcceptText
+        {
+            get
+            {
+                var invocation = default(IInvocationComponent);
+                if (this.Source.TryGetInvocation(ReportComponent.ACCEPT, out invocation))
                 {
-                    return this.Source.ActionName;
+                    return invocation.Name;
                 }
                 return Strings.Report_Close;
             }
         }
 
-        protected virtual void OnActionNameChanged()
+        protected virtual void OnAcceptTextChanged()
         {
-            if (this.ActionNameChanged != null)
+            if (this.AcceptTextChanged != null)
             {
-                this.ActionNameChanged(this, EventArgs.Empty);
+                this.AcceptTextChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("ActionName");
+            this.OnPropertyChanged("AcceptText");
         }
 
-        public event EventHandler ActionNameChanged;
-
-        public ICommand ActionCommand
-        {
-            get
-            {
-                if (this.Source == null)
-                {
-                    return CommandBase.Disabled;
-                }
-                return new AsyncCommand(this.Source.Action);
-            }
-        }
-
-        protected virtual void OnActionCommandChanged()
-        {
-            if (this.ActionCommandChanged != null)
-            {
-                this.ActionCommandChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ActionCommand");
-        }
-
-        public event EventHandler ActionCommandChanged;
+        public event EventHandler AcceptTextChanged;
 
         protected virtual void Refresh()
         {
             this.GridViewColumnFactory = new ReportGridViewColumnFactory(this.Source);
             this.OnGridColumnsChanged();
-            this.OnActionNameChanged();
-            this.OnActionCommandChanged();
+            this.OnAcceptTextChanged();
+        }
+
+        protected virtual void OnRowsChanged(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(this.OnGridColumnsChanged);
         }
 
         protected override Freezable CreateInstanceCore()

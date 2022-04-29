@@ -6,7 +6,6 @@
     <ContextMenu.Resources>
         <ViewModel:Menu 
             x:Key="ViewModel" 
-            
             Category="{Binding Category, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}" 
             Components="{Binding Components, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}"
             Source="{Binding Source, RelativeSource={RelativeSource AncestorType={x:Type Windows:Menu}}}"

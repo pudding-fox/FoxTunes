@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -87,7 +88,7 @@ namespace FoxTunes
                 foreach (var viewModel in this.ViewModels)
                 {
                     viewModel.Source = value;
-                }
+                }                
             }
         }
 

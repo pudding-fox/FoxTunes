@@ -11,7 +11,15 @@
              d:DesignHeight="300" d:DesignWidth="600">
     <UserControl.Resources>
         <ViewModel:Report x:Key="ViewModel"></ViewModel:Report>
+        <ViewModel:WrapperConverter x:Key="WrapperConverter"></ViewModel:WrapperConverter>
+        <x:Array x:Key="Components" Type="ViewModel:Wrapper">
+            <ViewModel:Wrapper Value="{Binding Source, Source={StaticResource ViewModel}}"></ViewModel:Wrapper>
+            <ViewModel:Wrapper Value="{Binding SelectedRow, Source={StaticResource ViewModel}}"></ViewModel:Wrapper>
+        </x:Array>
     </UserControl.Resources>
+    <UserControl.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_REPORT}}" Components="{Binding Source={StaticResource Components},Converter={StaticResource WrapperConverter}}" ></Windows:Menu>
+    </UserControl.ContextMenu>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -21,10 +29,11 @@
                 <ListView
                         Name="ListView"
                         ItemsSource="{Binding Source.Rows, Source={StaticResource ViewModel}}"
-                        SelectedValue="{Binding SelectedRow, Source={StaticResource ViewModel}}">
+                        SelectedValue="{Binding SelectedRow, Source={StaticResource ViewModel}}"
+                        SelectionMode="Single">
                     <Interactivity:Interaction.Triggers>
                         <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type ListViewItem}">
-                            <Interactivity:InvokeCommandAction Command="{Binding RowActionCommand, Source={StaticResource ViewModel}}" />
+                            <Interactivity:InvokeCommandAction Command="{Binding RowActivateCommand, Source={StaticResource ViewModel}}" />
                         </Windows:FilteredEventTrigger>
                     </Interactivity:Interaction.Triggers>
                     <ListView.View>

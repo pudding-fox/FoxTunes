@@ -43,7 +43,7 @@ namespace FoxTunes
 
         private class NumericBehaviour : UIBehaviour
         {
-            private static readonly Regex Pattern = new Regex("[^0-9.-]+", RegexOptions.Compiled);
+            private static readonly Regex Pattern = new Regex(@"^\d+$", RegexOptions.Compiled); //TODO: Positive (or zero) integer only.
 
             public NumericBehaviour(TextBox textBox)
             {
@@ -64,6 +64,7 @@ namespace FoxTunes
 
             protected virtual void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
             {
+                //If input is not numeric then "handle" the event, this prevents the input from being registered.
                 e.Handled = !Pattern.IsMatch(e.Text);
             }
         }
