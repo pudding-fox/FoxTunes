@@ -60,7 +60,11 @@ namespace FoxTunes
                             var id = ComponentResolver.Instance.Get(dependency.Slot);
                             if (!string.IsNullOrEmpty(dependency.Id))
                             {
-                                if (!string.Equals(id, dependency.Id, StringComparison.OrdinalIgnoreCase))
+                                if (string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Logger.Write(this, LogLevel.Warn, "Component \"{0}\" depends on \"{1}\" but the slot is not configured, it will be loaded anyway.", type.FullName, dependency.Id);
+                                }
+                                else if (!string.Equals(id, dependency.Id, StringComparison.OrdinalIgnoreCase))
                                 {
                                     Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Missing dependency \"{1}\".", type.FullName, dependency.Id);
                                     return false;

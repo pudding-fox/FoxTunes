@@ -1824,7 +1824,7 @@
                         <Grid>
                             <Rectangle HorizontalAlignment="Center" Width="0.5">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush Color="{DynamicResource WhiteColor}" />
+                                    <SolidColorBrush Color="{DynamicResource TextColor}" />
                                 </Rectangle.Fill>
                             </Rectangle>
                             <Rectangle Width="10" Fill="Transparent"></Rectangle>

@@ -339,8 +339,7 @@ namespace FoxTunes
 
         public bool IsUntitled(IDisc disc)
         {
-            const string UNTITLED = "<Untitled>";
-            return string.IsNullOrEmpty(disc.Title) || string.Equals(disc.Title, UNTITLED, StringComparison.OrdinalIgnoreCase);
+            return string.IsNullOrEmpty(disc.Title) || string.Equals(disc.Title, global::MD.Net.Constants.UNTITLED, StringComparison.OrdinalIgnoreCase);
         }
 
         public string GetTitle(IScriptingContext scriptingContext, IEnumerable<IFileData> fileDatas)
@@ -357,9 +356,8 @@ namespace FoxTunes
                 }
                 else
                 {
-                    const string UNTITLED = "<Untitled>";
-                    Logger.Write(this, LogLevel.Warn, "Disc title is ambiguous, falling back to : {0}", UNTITLED);
-                    return UNTITLED;
+                    Logger.Write(this, LogLevel.Warn, "Disc title is ambiguous, falling back to : {0}", global::MD.Net.Constants.UNTITLED);
+                    return global::MD.Net.Constants.UNTITLED;
                 }
             }
             return title;

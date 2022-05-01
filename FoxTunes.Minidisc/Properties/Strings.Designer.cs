@@ -97,7 +97,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Encoding...
+        ///   Looks up a localized string similar to Encoding: {0}%.
         /// </summary>
         internal static string MinidiscActionTask_Encoding {
             get {
@@ -106,7 +106,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Transferring...
+        ///   Looks up a localized string similar to Transferring: {0}%.
         /// </summary>
         internal static string MinidiscActionTask_Transferring {
             get {

@@ -193,10 +193,10 @@
     <value>The disc capacity is exceeded ({0}%), are you sure?</value>
   </data>
   <data name="MinidiscActionTask.Encoding" xml:space="preserve">
-    <value>Encoding..</value>
+    <value>Encoding: {0}%</value>
   </data>
   <data name="MinidiscActionTask.Transferring" xml:space="preserve">
-    <value>Transferring..</value>
+    <value>Transferring: {0}%</value>
   </data>
   <data name="MinidiscBehaviour.NoDisc" xml:space="preserve">
     <value>No device was found or the disc could not be read.</value>
