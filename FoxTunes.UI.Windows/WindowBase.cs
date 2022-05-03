@@ -91,10 +91,7 @@ namespace FoxTunes
                     Instances.Add(new WeakReference<WindowBase>(this));
                 }
                 OnActiveChanged(this);
-                if (Created != null)
-                {
-                    Created(this, EventArgs.Empty);
-                }
+                OnCreated(this);
             }
             base.OnContentRendered(e);
         }
@@ -117,14 +114,28 @@ namespace FoxTunes
                 }
             }
             OnActiveChanged(this);
-            if (Destroyed != null)
-            {
-                Destroyed(this, EventArgs.Empty);
-            }
+            OnDestroyed(this);
             base.OnClosed(e);
         }
 
+        protected static void OnCreated(WindowBase sender)
+        {
+            if (Created != null)
+            {
+                Created(sender, EventArgs.Empty);
+            }
+        }
+
         public static event EventHandler Created;
+
+        protected static void OnDestroyed(WindowBase sender)
+        {
+            UIDisposer.Dispose(sender);
+            if (Destroyed != null)
+            {
+                Destroyed(sender, EventArgs.Empty);
+            }
+        }
 
         public static event EventHandler Destroyed;
 

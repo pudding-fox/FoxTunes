@@ -79,14 +79,10 @@ namespace FoxTunes
 
         private static void OnMainWindowClosed(object sender, EventArgs e)
         {
-            if (IsMainWindowCreated)
-            {
-                UIDisposer.Dispose(MainWindow);
-            }
             _MainWindow = new Lazy<Window>(() => new MainWindow());
             if (MainWindowClosed != null)
             {
-                MainWindowClosed(typeof(MainWindow), EventArgs.Empty);
+                MainWindowClosed(sender, EventArgs.Empty);
             }
             CheckShutdown();
         }
@@ -144,7 +140,7 @@ namespace FoxTunes
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
             if (MiniWindowClosed != null)
             {
-                MiniWindowClosed(typeof(MiniWindow), EventArgs.Empty);
+                MiniWindowClosed(sender, EventArgs.Empty);
             }
             CheckShutdown();
         }
@@ -195,16 +191,12 @@ namespace FoxTunes
 
         private static void OnSettingsWindowClosed(object sender, EventArgs e)
         {
-            if (IsSettingsWindowCreated)
-            {
-                UIDisposer.Dispose(SettingsWindow);
-            }
             _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
             if (SettingsWindowClosed == null)
             {
                 return;
             }
-            SettingsWindowClosed(typeof(SettingsWindow), EventArgs.Empty);
+            SettingsWindowClosed(sender, EventArgs.Empty);
         }
 
         public static event EventHandler SettingsWindowClosed;
@@ -253,16 +245,12 @@ namespace FoxTunes
 
         private static void OnEqualizerWindowClosed(object sender, EventArgs e)
         {
-            if (IsEqualizerWindowCreated)
-            {
-                UIDisposer.Dispose(EqualizerWindow);
-            }
             _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
             if (EqualizerWindowClosed == null)
             {
                 return;
             }
-            EqualizerWindowClosed(typeof(EqualizerWindow), EventArgs.Empty);
+            EqualizerWindowClosed(sender, EventArgs.Empty);
         }
 
         public static event EventHandler EqualizerWindowClosed;
@@ -311,16 +299,12 @@ namespace FoxTunes
 
         private static void OnTempoWindowClosed(object sender, EventArgs e)
         {
-            if (IsTempoWindowCreated)
-            {
-                UIDisposer.Dispose(TempoWindow);
-            }
             _TempoWindow = new Lazy<Window>(() => new TempoWindow() { Owner = ActiveWindow });
             if (TempoWindowClosed == null)
             {
                 return;
             }
-            TempoWindowClosed(typeof(TempoWindow), EventArgs.Empty);
+            TempoWindowClosed(sender, EventArgs.Empty);
         }
 
         public static event EventHandler TempoWindowClosed;
@@ -369,16 +353,12 @@ namespace FoxTunes
 
         private static void OnPlaylistManagerWindowClosed(object sender, EventArgs e)
         {
-            if (IsPlaylistManagerWindowCreated)
-            {
-                UIDisposer.Dispose(PlaylistManagerWindow);
-            }
             _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
             if (PlaylistManagerWindowClosed == null)
             {
                 return;
             }
-            PlaylistManagerWindowClosed(typeof(PlaylistManagerWindow), EventArgs.Empty);
+            PlaylistManagerWindowClosed(sender, EventArgs.Empty);
         }
 
         public static event EventHandler PlaylistManagerWindowClosed;
@@ -417,7 +397,7 @@ namespace FoxTunes
             {
                 return;
             }
-            ActiveWindowChanging(null, EventArgs.Empty);
+            ActiveWindowChanging(_ActiveWindow, EventArgs.Empty);
         }
 
         public static event EventHandler ActiveWindowChanging;
@@ -428,7 +408,7 @@ namespace FoxTunes
             {
                 return;
             }
-            ActiveWindowChanged(null, EventArgs.Empty);
+            ActiveWindowChanged(_ActiveWindow, EventArgs.Empty);
         }
 
         public static event EventHandler ActiveWindowChanged;
