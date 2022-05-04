@@ -174,6 +174,11 @@ namespace FoxTunes
                 }
             }
 
+            public IEnumerable<string> IdsByRole(UserInterfaceWindowRole role)
+            {
+                return this.Store.Where(pair => pair.Value.Role == role).Select(pair => pair.Key);
+            }
+
             public IEnumerable<WindowRegistration> RegistrationsByIds(IEnumerable<string> ids)
             {
                 return this.Store.Where(pair => ids.Contains(pair.Value.Id, StringComparer.OrdinalIgnoreCase)).Select(pair => pair.Value);

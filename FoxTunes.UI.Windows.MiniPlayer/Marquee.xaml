@@ -4,12 +4,12 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core"
-             xmlns:Windows="clr-namespace:FoxTunes" 
+             xmlns:LocalWindows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
 			 d:DesignHeight="300" d:DesignWidth="300" SizeChanged="OnSizeChanged">
     <Grid>
         <Canvas Height="{Binding ActualHeight, ElementName=TextBlock, Mode=OneWay}" ClipToBounds="True">
-            <Windows:GlassLabel x:Name="TextBlock" Content="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Marquee}}}" SizeChanged="OnSizeChanged"></Windows:GlassLabel>
+            <LocalWindows:GlassLabel x:Name="TextBlock" Content="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Marquee}}}" SizeChanged="OnSizeChanged"></LocalWindows:GlassLabel>
         </Canvas>
         <Rectangle Fill="Transparent"></Rectangle>
     </Grid>

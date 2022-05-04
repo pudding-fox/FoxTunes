@@ -16,6 +16,11 @@ namespace FoxTunes
 
         public const string QUIT = "ZZZZ";
 
+        static MiniPlayerBehaviour()
+        {
+            Windows.Registrations.Add(new Windows.WindowRegistration(MiniWindow.ID, MiniWindow.ROLE, () => new MiniWindow()));
+        }
+
         public ThemeLoader ThemeLoader { get; private set; }
 
         public ICore Core { get; private set; }

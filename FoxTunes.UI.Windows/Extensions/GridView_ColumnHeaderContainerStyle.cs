@@ -58,7 +58,7 @@ namespace FoxTunes
             private ColumnHeaderContainerStyleBehaviour()
             {
                 Windows.Registrations.AddCreated(
-                    new[] { MainWindow.ID, MiniWindow.ID },
+                    Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                     this.OnWindowCreated
                 );
             }
@@ -80,10 +80,11 @@ namespace FoxTunes
             {
                 if (Windows.ActiveWindow == null)
                 {
+                    Logger.Write(typeof(ColumnHeaderContainerStyleBehaviour), LogLevel.Warn, "Could not apply, no active window.");
                     return;
                 }
                 Windows.Registrations.RemoveCreated(
-                    new[] { MainWindow.ID, MiniWindow.ID },
+                    Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                     this.OnWindowCreated
                 );
                 this.GridView.ColumnHeaderContainerStyle = this.CreateStyle(
@@ -95,7 +96,7 @@ namespace FoxTunes
             protected override void OnDisposing()
             {
                 Windows.Registrations.RemoveCreated(
-                    new[] { MainWindow.ID, MiniWindow.ID },
+                    Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                     this.OnWindowCreated
                 );
                 base.OnDisposing();

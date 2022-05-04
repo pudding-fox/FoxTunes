@@ -16,8 +16,6 @@ namespace FoxTunes
 
         public global::FoxTunes.ViewModel.Settings _Settings { get; private set; }
 
-        public global::FoxTunes.ViewModel.MiniPlayer _MiniPlayer { get; private set; }
-
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -38,8 +36,6 @@ namespace FoxTunes
 
         public TextConfigurationElement Settings { get; private set; }
 
-        public TextConfigurationElement MiniPlayer { get; private set; }
-
         public TextConfigurationElement Search { get; private set; }
 
         public ICommand SearchCommand
@@ -57,9 +53,8 @@ namespace FoxTunes
         {
             this._Playback = new global::FoxTunes.ViewModel.Playback(false);
             this._Settings = new global::FoxTunes.ViewModel.Settings();
-            this._MiniPlayer = new global::FoxTunes.ViewModel.MiniPlayer();
             Windows.Registrations.AddCreated(
-                new[] { MainWindow.ID, MiniWindow.ID },
+                Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                 this.OnWindowCreated
             );
             this.PlaybackManager = core.Managers.Playback;
@@ -87,15 +82,11 @@ namespace FoxTunes
                 InputManagerConfiguration.SECTION,
                 KeyBindingsBehaviourConfiguration.SETTINGS_ELEMENT
             );
-            this.MiniPlayer = this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.SECTION,
-                KeyBindingsBehaviourConfiguration.MINI_PLAYER_ELEMENT
-            );
             this.Search = this.Configuration.GetElement<TextConfigurationElement>(
                 InputManagerConfiguration.SECTION,
                 KeyBindingsBehaviourConfiguration.SEARCH_ELEMENT
             );
-            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.MiniPlayer, this.Search })
+            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.Search })
             {
                 if (element == null)
                 {
@@ -121,7 +112,7 @@ namespace FoxTunes
 
         protected virtual void Update()
         {
-            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
+            foreach (var window in Windows.Registrations.WindowsByIds(Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main)))
             {
                 this.Update(window);
             }
@@ -150,10 +141,6 @@ namespace FoxTunes
             {
                 this.AddCommandBinding(window, this.Settings.Value, this._Settings.ShowCommand);
             }
-            if (this.MiniPlayer != null)
-            {
-                this.AddCommandBinding(window, this.MiniPlayer.Value, this._MiniPlayer.ToggleCommand);
-            }
             if (this.Search != null)
             {
                 this.AddCommandBinding(window, this.Search.Value, this.SearchCommand);
@@ -178,7 +165,7 @@ namespace FoxTunes
 
         protected virtual void RemoveCommandBindings()
         {
-            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
+            foreach (var window in Windows.Registrations.WindowsByIds(Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main)))
             {
                 this.RemoveCommandBindings(window);
             }
@@ -217,10 +204,10 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             Windows.Registrations.RemoveCreated(
-                new[] { MainWindow.ID, MiniWindow.ID },
+                Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                 this.OnWindowCreated
             );
-            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.MiniPlayer, this.Search })
+            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.Search })
             {
                 if (element == null)
                 {
@@ -236,10 +223,6 @@ namespace FoxTunes
             if (this._Settings != null)
             {
                 this._Settings.Dispose();
-            }
-            if (this._MiniPlayer != null)
-            {
-                this._MiniPlayer.Dispose();
             }
         }
 

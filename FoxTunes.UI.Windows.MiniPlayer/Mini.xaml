@@ -4,13 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
-             xmlns:Windows="clr-namespace:FoxTunes" 
-             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows"
+             xmlns:LocalWindows="clr-namespace:FoxTunes" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
+             xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:Mini x:Key="ViewModel"></ViewModel:Mini>
+        <LocalViewModel:Mini x:Key="ViewModel"></LocalViewModel:Mini>
         <Style x:Key="ArtworkStyle" TargetType="{x:Type Windows:Artwork}">
             <Setter Property="Visibility" Value="Visible"></Setter>
             <Style.Triggers>
@@ -19,7 +21,7 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="PlaylistStyle" TargetType="{x:Type Windows:MiniPlaylist}">
+        <Style x:Key="PlaylistStyle" TargetType="{x:Type LocalWindows:MiniPlaylist}">
             <Setter Property="Visibility" Value="Visible"></Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ShowPlaylist.Value, Source={StaticResource ViewModel}}" Value="False">
@@ -50,11 +52,11 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <StackPanel>
-        <Windows:NowPlaying x:Name="NowPlaying" Margin="0,0,0,4" ToolTipService.ShowDuration="60000">
-            <Windows:NowPlaying.ToolTip>
+        <LocalWindows:NowPlaying x:Name="NowPlaying" Margin="0,0,0,4" ToolTipService.ShowDuration="60000">
+            <LocalWindows:NowPlaying.ToolTip>
                 <Windows:PlaybackDetails></Windows:PlaybackDetails>
-            </Windows:NowPlaying.ToolTip>
-        </Windows:NowPlaying>
+            </LocalWindows:NowPlaying.ToolTip>
+        </LocalWindows:NowPlaying>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
@@ -66,13 +68,13 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <Windows:MiniPlaylist x:Name="MiniPlaylist" Style="{StaticResource PlaylistStyle}"></Windows:MiniPlaylist>
+            <LocalWindows:MiniPlaylist x:Name="MiniPlaylist" Style="{StaticResource PlaylistStyle}"></LocalWindows:MiniPlaylist>
             <Windows:Artwork x:Name="Artwork" Grid.Row="1" Style="{StaticResource ArtworkStyle}" Margin="0,0,0,2" SizeMode="ToWidth"></Windows:Artwork>
             <Windows:StreamPosition x:Name="StreamPosition" Grid.Row="2" Margin="0,0,0,2"></Windows:StreamPosition>
             <StackPanel x:Name="StackPanel" Grid.Row="3" Orientation="Horizontal">
                 <Windows:Playback Margin="0,0,2,0"></Windows:Playback>
                 <Windows:Equalizer Margin="0,0,2,0"></Windows:Equalizer>
-                <Windows:MiniPlayer></Windows:MiniPlayer>
+                <LocalWindows:MiniPlayer></LocalWindows:MiniPlayer>
             </StackPanel>
         </Grid>
     </StackPanel>
