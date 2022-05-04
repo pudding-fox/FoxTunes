@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -11,9 +10,10 @@ namespace FoxTunes.ViewModel
     {
         public Equalizer()
         {
-            Windows.EqualizerWindowCreated += this.OnEqualizerWindowCreated;
-            Windows.EqualizerWindowClosed += this.OnEqualizerWindowClosed;
+            this.WindowState = new WindowState(EqualizerWindow.ID);
         }
+
+        public WindowState WindowState { get; private set; }
 
         public bool Available
         {
@@ -139,6 +139,7 @@ namespace FoxTunes.ViewModel
 
         protected override void InitializeComponent(ICore core)
         {
+
             this.Effects = core.Components.OutputEffects;
             if (this.Effects.Equalizer != null)
             {
@@ -154,16 +155,6 @@ namespace FoxTunes.ViewModel
             }
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnEqualizerWindowCreated(object sender, EventArgs e)
-        {
-            this.OnEqualizerVisibleChanged();
-        }
-
-        protected virtual void OnEqualizerWindowClosed(object sender, EventArgs e)
-        {
-            this.OnEqualizerVisibleChanged();
         }
 
         protected virtual void OnAvailableChanged(object sender, EventArgs e)
@@ -203,59 +194,7 @@ namespace FoxTunes.ViewModel
             });
         }
 
-        public bool EqualizerVisible
-        {
-            get
-            {
-                return Windows.IsEqualizerWindowCreated;
-            }
-            set
-            {
-                if (value)
-                {
-                    Windows.EqualizerWindow.Show();
-                }
-                else if (Windows.IsEqualizerWindowCreated)
-                {
-                    Windows.EqualizerWindow.Close();
-                }
-            }
-        }
-
-        protected virtual void OnEqualizerVisibleChanged()
-        {
-            if (this.EqualizerVisibleChanged != null)
-            {
-                this.EqualizerVisibleChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("EqualizerVisible");
-        }
-
-        public event EventHandler EqualizerVisibleChanged;
-
-        public ICommand ShowCommand
-        {
-            get
-            {
-                return new Command(() => this.EqualizerVisible = true);
-            }
-        }
-
-        public ICommand HideCommand
-        {
-            get
-            {
-                return new Command(() => this.EqualizerVisible = false);
-            }
-        }
-
-        public ICommand ToggleCommand
-        {
-            get
-            {
-                return new Command(() => this.EqualizerVisible = !this.EqualizerVisible);
-            }
-        }
+        
 
         protected virtual IEnumerable<EqualizerBand> GetBands()
         {
@@ -270,8 +209,6 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            Windows.EqualizerWindowCreated -= this.OnEqualizerWindowCreated;
-            Windows.EqualizerWindowClosed -= this.OnEqualizerWindowClosed;
             if (this.Effects != null && this.Effects.Equalizer != null)
             {
                 this.Effects.Equalizer.AvailableChanged -= this.OnAvailableChanged;

@@ -159,13 +159,7 @@ namespace FoxTunes
 
         public Task ManagePlaylists()
         {
-            return Windows.Invoke(() =>
-            {
-                if (!Windows.IsPlaylistManagerWindowCreated)
-                {
-                    Windows.PlaylistManagerWindow.Show();
-                }
-            });
+            return Windows.Invoke(() => Windows.Registrations.Show(PlaylistManagerWindow.ID));
         }
 
         protected virtual Playlist CreatePlaylist()

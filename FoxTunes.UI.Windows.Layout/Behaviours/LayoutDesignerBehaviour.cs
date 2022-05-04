@@ -71,8 +71,7 @@ namespace FoxTunes
         {
             Windows.ShuttingDown += this.OnShuttingDown;
             UIComponentRoot.ActiveChanged += this.OnActiveChanged;
-            ToolWindowBehaviour.ToolWindowManagerWindowCreated += this.OnToolWindowManagerWindowCreated;
-            ToolWindowBehaviour.ToolWindowManagerWindowClosed += this.OnToolWindowManagerWindowClosed;
+            Windows.Registrations.AddIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
             this.Core = core;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             base.InitializeComponent(core);
@@ -97,14 +96,9 @@ namespace FoxTunes
             this.ShowDesignerOverlay(root);
         }
 
-        protected virtual void OnToolWindowManagerWindowCreated(object sender, EventArgs e)
+        protected virtual void OnWindowIsVisibleChanged(object sender, EventArgs e)
         {
-            this.IsDesigning = true;
-        }
-
-        protected virtual void OnToolWindowManagerWindowClosed(object sender, EventArgs e)
-        {
-            this.IsDesigning = false;
+            this.IsDesigning = Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID);
         }
 
         protected virtual void ShowDesignerOverlay()
@@ -145,7 +139,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled && !ToolWindowBehaviour.IsToolWindowManagerWindowCreated)
+                if (this.Enabled && !Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
                 {
                     yield return new InvocationComponent(
                         InvocationComponent.CATEGORY_SETTINGS,
@@ -194,8 +188,7 @@ namespace FoxTunes
             this.HideDesignerOverlay();
             Windows.ShuttingDown -= this.OnShuttingDown;
             UIComponentRoot.ActiveChanged -= this.OnActiveChanged;
-            ToolWindowBehaviour.ToolWindowManagerWindowCreated -= this.OnToolWindowManagerWindowCreated;
-            ToolWindowBehaviour.ToolWindowManagerWindowClosed -= this.OnToolWindowManagerWindowClosed;
+            Windows.Registrations.RemoveIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
         }
 
         ~LayoutDesignerBehaviour()

@@ -117,36 +117,6 @@ namespace FoxTunes.ViewModel
             });
         }
 
-        public bool ToolWindowManagerVisible
-        {
-            get
-            {
-                return ToolWindowBehaviour.IsToolWindowManagerWindowCreated;
-            }
-            set
-            {
-                if (value)
-                {
-                    ToolWindowBehaviour.ToolWindowManagerWindow.Show();
-                }
-                else if (ToolWindowBehaviour.IsToolWindowManagerWindowCreated)
-                {
-                    ToolWindowBehaviour.ToolWindowManagerWindow.Close();
-                }
-            }
-        }
-
-        protected virtual void OnToolWindowManagerVisibleChanged()
-        {
-            if (this.ToolWindowManagerVisibleChanged != null)
-            {
-                this.ToolWindowManagerVisibleChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ToolWindowManagerVisible");
-        }
-
-        public event EventHandler ToolWindowManagerVisibleChanged;
-
         public ICommand AddCommand
         {
             get
@@ -171,7 +141,7 @@ namespace FoxTunes.ViewModel
 
         public async Task Close()
         {
-            await global::FoxTunes.Windows.Invoke(() => this.ToolWindowManagerVisible = false).ConfigureAwait(false);
+            await global::FoxTunes.Windows.Invoke(() => global::FoxTunes.Windows.Registrations.Hide(ToolWindowManagerWindow.ID)).ConfigureAwait(false);
             await this.Behaviour.Refresh().ConfigureAwait(false);
         }
 

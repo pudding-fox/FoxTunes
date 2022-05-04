@@ -8,6 +8,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Linq;
 using FoxTunes.Interfaces;
+using FoxDb;
 
 #if NET40
 using Microsoft.Windows.Shell;
@@ -20,6 +21,14 @@ namespace FoxTunes
 {
     public abstract class WindowBase : Window, IUserInterfaceWindow
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         static WindowBase()
         {
             Instances = new List<WeakReference<WindowBase>>();

@@ -8,6 +8,8 @@ namespace FoxTunes
     /// </summary>
     public partial class ToolWindowManagerWindow : WindowBase
     {
+        public const string ID = "A4342D78-BE0A-4707-9180-B0D71093B074";
+
         public ToolWindowManagerWindow()
         {
             if (!global::FoxTunes.Properties.Settings.Default.ToolWindowBounds.IsEmpty())
@@ -36,7 +38,7 @@ namespace FoxTunes
         {
             get
             {
-                return "A4342D78-BE0A-4707-9180-B0D71093B074";
+                return ID;
             }
         }
 

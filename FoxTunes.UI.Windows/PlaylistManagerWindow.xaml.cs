@@ -9,6 +9,8 @@ namespace FoxTunes
     /// </summary>
     public partial class PlaylistManagerWindow : WindowBase
     {
+        public const string ID = "4CFF69B2-62F8-4689-BC02-6FD843E73BBC";
+
         public PlaylistManagerWindow()
         {
             if (!global::FoxTunes.Properties.Settings.Default.PlaylistManagerWindowBounds.IsEmpty())
@@ -37,7 +39,7 @@ namespace FoxTunes
         {
             get
             {
-                return "4CFF69B2-62F8-4689-BC02-6FD843E73BBC";
+                return ID;
             }
         }
 

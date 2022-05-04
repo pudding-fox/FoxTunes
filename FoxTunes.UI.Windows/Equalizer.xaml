@@ -14,7 +14,7 @@
     <UserControl.IsEnabled>
         <Binding Mode="OneWay" Path="Available" Source="{StaticResource ViewModel}"/>
     </UserControl.IsEnabled>
-    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding EqualizerVisible, Source={StaticResource ViewModel}}">
+    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding WindowState.Visible, Source={StaticResource ViewModel}}">
         <ToggleButton.ContextMenu>
             <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_EQUALIZER}}"></Windows:Menu>
         </ToggleButton.ContextMenu>

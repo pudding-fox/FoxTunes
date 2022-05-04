@@ -238,7 +238,7 @@ namespace FoxTunes
             get
             {
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                if (!ToolWindowBehaviour.IsToolWindowManagerWindowCreated)
+                if (!Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
                 {
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, "Done");
                 }

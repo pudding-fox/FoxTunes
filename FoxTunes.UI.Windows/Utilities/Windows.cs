@@ -1,7 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -10,397 +11,38 @@ namespace FoxTunes
 {
     public static class Windows
     {
-        static Windows()
-        {
-            Reset();
-        }
+        public static readonly WindowRegistrations Registrations = new WindowRegistrations();
 
         public static Dispatcher Dispatcher
         {
             get
             {
-                if (IsMainWindowCreated)
+                if (ActiveWindow != null)
                 {
-                    return MainWindow.Dispatcher;
-                }
-                if (IsMiniWindowCreated)
-                {
-                    return MiniWindow.Dispatcher;
+                    return ActiveWindow.Dispatcher;
                 }
                 if (Application.Current != null)
                 {
                     return Application.Current.Dispatcher;
                 }
-                return null;
+                return Dispatcher.CurrentDispatcher;
             }
         }
-
-        private static Lazy<Window> _MainWindow { get; set; }
-
-        public static bool IsMainWindowCreated
-        {
-            get
-            {
-                return _MainWindow.IsValueCreated;
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public static Window MainWindow
-        {
-            get
-            {
-                var raiseEvent = !IsMainWindowCreated;
-                try
-                {
-                    return _MainWindow.Value;
-                }
-                finally
-                {
-                    if (IsMainWindowCreated && raiseEvent)
-                    {
-                        OnMainWindowCreated();
-                    }
-                }
-            }
-        }
-
-        private static void OnMainWindowCreated()
-        {
-            MainWindow.Closed += OnMainWindowClosed;
-            if (MainWindowCreated == null)
-            {
-                return;
-            }
-            MainWindowCreated(MainWindow, EventArgs.Empty);
-        }
-
-        public static event EventHandler MainWindowCreated;
-
-        private static void OnMainWindowClosed(object sender, EventArgs e)
-        {
-            _MainWindow = new Lazy<Window>(() => new MainWindow());
-            if (MainWindowClosed != null)
-            {
-                MainWindowClosed(sender, EventArgs.Empty);
-            }
-            CheckShutdown();
-        }
-
-        public static event EventHandler MainWindowClosed;
-
-        private static Lazy<Window> _MiniWindow { get; set; }
-
-        public static bool IsMiniWindowCreated
-        {
-            get
-            {
-                return _MiniWindow.IsValueCreated;
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public static Window MiniWindow
-        {
-            get
-            {
-                var raiseEvent = !IsMiniWindowCreated;
-                try
-                {
-                    return _MiniWindow.Value;
-                }
-                finally
-                {
-                    if (IsMiniWindowCreated && raiseEvent)
-                    {
-                        OnMiniWindowCreated();
-                    }
-                }
-            }
-        }
-
-        private static void OnMiniWindowCreated()
-        {
-            MiniWindow.Closed += OnMiniWindowClosed;
-            if (MiniWindowCreated == null)
-            {
-                return;
-            }
-            MiniWindowCreated(MiniWindow, EventArgs.Empty);
-        }
-
-        public static event EventHandler MiniWindowCreated;
-
-        private static void OnMiniWindowClosed(object sender, EventArgs e)
-        {
-            if (IsMiniWindowCreated)
-            {
-                UIDisposer.Dispose(MiniWindow);
-            }
-            _MiniWindow = new Lazy<Window>(() => new MiniWindow());
-            if (MiniWindowClosed != null)
-            {
-                MiniWindowClosed(sender, EventArgs.Empty);
-            }
-            CheckShutdown();
-        }
-
-        public static event EventHandler MiniWindowClosed;
-
-        private static Lazy<Window> _SettingsWindow { get; set; }
-
-        public static bool IsSettingsWindowCreated
-        {
-            get
-            {
-                return _SettingsWindow.IsValueCreated;
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public static Window SettingsWindow
-        {
-            get
-            {
-                var raiseEvent = !IsSettingsWindowCreated;
-                try
-                {
-                    return _SettingsWindow.Value;
-                }
-                finally
-                {
-                    if (IsSettingsWindowCreated && raiseEvent)
-                    {
-                        OnSettingsWindowCreated();
-                    }
-                }
-            }
-        }
-
-        private static void OnSettingsWindowCreated()
-        {
-            SettingsWindow.Closed += OnSettingsWindowClosed;
-            if (SettingsWindowCreated == null)
-            {
-                return;
-            }
-            SettingsWindowCreated(SettingsWindow, EventArgs.Empty);
-        }
-
-        public static event EventHandler SettingsWindowCreated;
-
-        private static void OnSettingsWindowClosed(object sender, EventArgs e)
-        {
-            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
-            if (SettingsWindowClosed == null)
-            {
-                return;
-            }
-            SettingsWindowClosed(sender, EventArgs.Empty);
-        }
-
-        public static event EventHandler SettingsWindowClosed;
-
-        private static Lazy<Window> _EqualizerWindow { get; set; }
-
-        public static bool IsEqualizerWindowCreated
-        {
-            get
-            {
-                return _EqualizerWindow.IsValueCreated;
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public static Window EqualizerWindow
-        {
-            get
-            {
-                var raiseEvent = !IsEqualizerWindowCreated;
-                try
-                {
-                    return _EqualizerWindow.Value;
-                }
-                finally
-                {
-                    if (IsEqualizerWindowCreated && raiseEvent)
-                    {
-                        OnEqualizerWindowCreated();
-                    }
-                }
-            }
-        }
-
-        private static void OnEqualizerWindowCreated()
-        {
-            EqualizerWindow.Closed += OnEqualizerWindowClosed;
-            if (EqualizerWindowCreated == null)
-            {
-                return;
-            }
-            EqualizerWindowCreated(EqualizerWindow, EventArgs.Empty);
-        }
-
-        public static event EventHandler EqualizerWindowCreated;
-
-        private static void OnEqualizerWindowClosed(object sender, EventArgs e)
-        {
-            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
-            if (EqualizerWindowClosed == null)
-            {
-                return;
-            }
-            EqualizerWindowClosed(sender, EventArgs.Empty);
-        }
-
-        public static event EventHandler EqualizerWindowClosed;
-
-        private static Lazy<Window> _TempoWindow { get; set; }
-
-        public static bool IsTempoWindowCreated
-        {
-            get
-            {
-                return _TempoWindow.IsValueCreated;
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public static Window TempoWindow
-        {
-            get
-            {
-                var raiseEvent = !IsTempoWindowCreated;
-                try
-                {
-                    return _TempoWindow.Value;
-                }
-                finally
-                {
-                    if (IsTempoWindowCreated && raiseEvent)
-                    {
-                        OnTempoWindowCreated();
-                    }
-                }
-            }
-        }
-
-        private static void OnTempoWindowCreated()
-        {
-            TempoWindow.Closed += OnTempoWindowClosed;
-            if (TempoWindowCreated == null)
-            {
-                return;
-            }
-            TempoWindowCreated(TempoWindow, EventArgs.Empty);
-        }
-
-        public static event EventHandler TempoWindowCreated;
-
-        private static void OnTempoWindowClosed(object sender, EventArgs e)
-        {
-            _TempoWindow = new Lazy<Window>(() => new TempoWindow() { Owner = ActiveWindow });
-            if (TempoWindowClosed == null)
-            {
-                return;
-            }
-            TempoWindowClosed(sender, EventArgs.Empty);
-        }
-
-        public static event EventHandler TempoWindowClosed;
-
-        private static Lazy<Window> _PlaylistManagerWindow { get; set; }
-
-        public static bool IsPlaylistManagerWindowCreated
-        {
-            get
-            {
-                return _PlaylistManagerWindow.IsValueCreated;
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public static Window PlaylistManagerWindow
-        {
-            get
-            {
-                var raiseEvent = !IsPlaylistManagerWindowCreated;
-                try
-                {
-                    return _PlaylistManagerWindow.Value;
-                }
-                finally
-                {
-                    if (IsPlaylistManagerWindowCreated && raiseEvent)
-                    {
-                        OnPlaylistManagerWindowCreated();
-                    }
-                }
-            }
-        }
-
-        private static void OnPlaylistManagerWindowCreated()
-        {
-            PlaylistManagerWindow.Closed += OnPlaylistManagerWindowClosed;
-            if (PlaylistManagerWindowCreated == null)
-            {
-                return;
-            }
-            PlaylistManagerWindowCreated(PlaylistManagerWindow, EventArgs.Empty);
-        }
-
-        public static event EventHandler PlaylistManagerWindowCreated;
-
-        private static void OnPlaylistManagerWindowClosed(object sender, EventArgs e)
-        {
-            _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
-            if (PlaylistManagerWindowClosed == null)
-            {
-                return;
-            }
-            PlaylistManagerWindowClosed(sender, EventArgs.Empty);
-        }
-
-        public static event EventHandler PlaylistManagerWindowClosed;
-
-        private static Window _ActiveWindow { get; set; }
 
         public static Window ActiveWindow
         {
             get
             {
-                if (_ActiveWindow != null)
+                foreach (var window in Registrations.WindowsByRole(UserInterfaceWindowRole.Main))
                 {
-                    return _ActiveWindow;
-                }
-                if (IsMiniWindowCreated && MiniWindow.IsVisible)
-                {
-                    return MiniWindow;
-                }
-                if (IsMainWindowCreated)
-                {
-                    return MainWindow;
+                    if (window.IsVisible)
+                    {
+                        return window;
+                    }
                 }
                 return null;
             }
-            set
-            {
-                OnActiveWindowChanging();
-                _ActiveWindow = value;
-                OnActiveWindowChanged();
-            }
         }
-
-        private static void OnActiveWindowChanging()
-        {
-            if (ActiveWindowChanging == null)
-            {
-                return;
-            }
-            ActiveWindowChanging(_ActiveWindow, EventArgs.Empty);
-        }
-
-        public static event EventHandler ActiveWindowChanging;
 
         private static void OnActiveWindowChanged()
         {
@@ -408,19 +50,10 @@ namespace FoxTunes
             {
                 return;
             }
-            ActiveWindowChanged(_ActiveWindow, EventArgs.Empty);
+            ActiveWindowChanged(ActiveWindow, EventArgs.Empty);
         }
 
         public static event EventHandler ActiveWindowChanged;
-
-        private static void CheckShutdown()
-        {
-            if ((IsMainWindowCreated && MainWindow.IsVisible) || (IsMiniWindowCreated && MiniWindow.IsVisible))
-            {
-                return;
-            }
-            var task = Shutdown();
-        }
 
         public static Task Shutdown()
         {
@@ -430,46 +63,15 @@ namespace FoxTunes
                 {
                     ShuttingDown(typeof(Windows), EventArgs.Empty);
                 }
-                if (IsMiniWindowCreated)
+                foreach (var window in Registrations.Windows)
                 {
-                    MiniWindow.Close();
-                }
-                if (IsMainWindowCreated)
-                {
-                    MainWindow.Close();
-                }
-                if (IsSettingsWindowCreated)
-                {
-                    SettingsWindow.Close();
-                }
-                if (IsEqualizerWindowCreated)
-                {
-                    EqualizerWindow.Close();
-                }
-                if (IsTempoWindowCreated)
-                {
-                    TempoWindow.Close();
-                }
-                if (IsPlaylistManagerWindowCreated)
-                {
-                    PlaylistManagerWindow.Close();
+                    window.Close();
                 }
                 UIBehaviour.Shutdown();
-                Reset();
             });
         }
 
         public static event EventHandler ShuttingDown;
-
-        private static void Reset()
-        {
-            _MainWindow = new Lazy<Window>(() => new MainWindow());
-            _MiniWindow = new Lazy<Window>(() => new MiniWindow());
-            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
-            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
-            _TempoWindow = new Lazy<Window>(() => new TempoWindow() { Owner = ActiveWindow });
-            _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
-        }
 
         public static Task Invoke(Action action)
         {
@@ -543,6 +145,419 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public class WindowRegistrations
+        {
+            public WindowRegistrations()
+            {
+                this.Store = new Dictionary<string, WindowRegistration>(StringComparer.OrdinalIgnoreCase);
+                this.Callbacks = new Dictionary<string, ISet<EventHandler>>(StringComparer.OrdinalIgnoreCase);
+            }
+
+            public IDictionary<string, WindowRegistration> Store { get; private set; }
+
+            public IDictionary<string, ISet<EventHandler>> Callbacks { get; private set; }
+
+            public IEnumerable<Window> Windows
+            {
+                get
+                {
+                    foreach (var pair in this.Store)
+                    {
+                        var window = default(Window);
+                        if (pair.Value.TryGetInstance(out window))
+                        {
+                            yield return window;
+                        }
+                    }
+                }
+            }
+
+            public IEnumerable<WindowRegistration> RegistrationsByIds(IEnumerable<string> ids)
+            {
+                return this.Store.Where(pair => ids.Contains(pair.Value.Id, StringComparer.OrdinalIgnoreCase)).Select(pair => pair.Value);
+            }
+
+            public IEnumerable<WindowRegistration> RegistrationsByRole(UserInterfaceWindowRole role)
+            {
+                return this.Store.Where(pair => pair.Value.Role == role).Select(pair => pair.Value);
+            }
+
+            public IEnumerable<Window> WindowsByIds(IEnumerable<string> ids)
+            {
+                foreach (var pair in this.Store.Where(pair => ids.Contains(pair.Value.Id, StringComparer.OrdinalIgnoreCase)))
+                {
+                    var window = default(Window);
+                    if (pair.Value.TryGetInstance(out window))
+                    {
+                        yield return window;
+                    }
+                }
+            }
+
+            public IEnumerable<Window> WindowsByRole(UserInterfaceWindowRole role)
+            {
+                foreach (var pair in this.Store.Where(pair => pair.Value.Role == role))
+                {
+                    var window = default(Window);
+                    if (pair.Value.TryGetInstance(out window))
+                    {
+                        yield return window;
+                    }
+                }
+            }
+
+            public bool Add(WindowRegistration registration)
+            {
+                if (this.Store.TryAdd(registration.Id, registration))
+                {
+                    this.OnAdded(registration);
+                    return true;
+                }
+                return false;
+            }
+
+            protected virtual void OnAdded(WindowRegistration registration)
+            {
+                var callbacks = default(ISet<EventHandler>);
+                if (this.Callbacks.TryGetValue(registration.Id, out callbacks))
+                {
+                    foreach (var callback in callbacks.ToArray())
+                    {
+                        callback(registration, EventArgs.Empty);
+                    }
+                }
+            }
+
+            public bool TryGet(string id, out WindowRegistration registration)
+            {
+                return this.Store.TryGetValue(id, out registration);
+            }
+
+            public bool TryGet(string id, out Window window)
+            {
+                var registration = default(WindowRegistration);
+                if (!this.TryGet(id, out registration))
+                {
+                    window = default(Window);
+                    return false;
+                }
+                return registration.TryGetInstance(out window);
+            }
+
+            public bool IsVisible(string id)
+            {
+                var window = default(Window);
+                if (!this.TryGet(id, out window))
+                {
+                    return false;
+                }
+                return window.IsVisible;
+            }
+
+            public Window Show(string id)
+            {
+                var registration = default(WindowRegistration);
+                if (!this.TryGet(id, out registration))
+                {
+                    return default(Window);
+                }
+                var window = registration.GetInstance();
+                if (!window.IsVisible)
+                {
+                    window.Show();
+                }
+                window.BringToFront();
+                window.Activate();
+                return window;
+            }
+
+            public bool Hide(string id)
+            {
+                var window = default(Window);
+                if (!this.TryGet(id, out window))
+                {
+                    return false;
+                }
+                window.Hide();
+                return true;
+            }
+
+            public bool Close(string id)
+            {
+                var window = default(Window);
+                if (!this.TryGet(id, out window))
+                {
+                    return false;
+                }
+                window.Close();
+                return true;
+            }
+
+            public void AddCallback(IEnumerable<string> ids, EventHandler handler, bool once = false)
+            {
+                foreach (var id in ids)
+                {
+                    this.AddCallback(id, handler, once);
+                }
+            }
+
+            public void AddCallback(string id, EventHandler handler, bool once = false)
+            {
+                var registration = default(WindowRegistration);
+                if (this.TryGet(id, out registration))
+                {
+                    handler(registration, EventArgs.Empty);
+                    return;
+                }
+                if (once)
+                {
+                    handler = CreateOneTimeCallback(id, handler);
+                }
+                var callbacks = this.Callbacks.GetOrAdd(id, () => new HashSet<EventHandler>());
+                callbacks.Add(handler);
+            }
+
+            public void RemoveCallback(IEnumerable<string> ids, EventHandler handler)
+            {
+                foreach (var id in ids)
+                {
+                    this.RemoveCallback(id, handler);
+                }
+            }
+
+            public void RemoveCallback(string id, EventHandler handler)
+            {
+                var callbacks = default(ISet<EventHandler>);
+                if (!this.Callbacks.TryGetValue(id, out callbacks))
+                {
+                    return;
+                }
+                callbacks.Remove(handler);
+            }
+
+            public void AddCreated(IEnumerable<string> ids, EventHandler handler)
+            {
+                foreach (var id in ids)
+                {
+                    this.AddCreated(id, handler);
+                }
+            }
+
+            public void AddCreated(string id, EventHandler handler)
+            {
+                this.AddCallback(id, (sender, e) =>
+                {
+                    if (sender is WindowRegistration registration)
+                    {
+                        registration.Created += handler;
+                    }
+                }, true);
+            }
+
+            public void RemoveCreated(IEnumerable<string> ids, EventHandler handler)
+            {
+                foreach (var id in ids)
+                {
+                    this.RemoveCreated(id, handler);
+                }
+            }
+
+            public void RemoveCreated(string id, EventHandler handler)
+            {
+                var registration = default(WindowRegistration);
+                if (this.TryGet(id, out registration))
+                {
+                    registration.Created -= handler;
+                }
+            }
+
+            public void AddIsVisibleChanged(IEnumerable<string> ids, EventHandler handler)
+            {
+                foreach (var id in ids)
+                {
+                    this.AddIsVisibleChanged(id, handler);
+                }
+            }
+
+            public void AddIsVisibleChanged(string id, EventHandler handler)
+            {
+                this.AddCallback(id, (sender, e) =>
+                {
+                    if (sender is WindowRegistration registration)
+                    {
+                        registration.IsVisibleChanged += handler;
+                    }
+                }, true);
+            }
+
+            public void RemoveIsVisibleChanged(IEnumerable<string> ids, EventHandler handler)
+            {
+                foreach (var id in ids)
+                {
+                    this.RemoveIsVisibleChanged(id, handler);
+                }
+            }
+
+            public void RemoveIsVisibleChanged(string id, EventHandler handler)
+            {
+                var registration = default(WindowRegistration);
+                if (this.TryGet(id, out registration))
+                {
+                    registration.IsVisibleChanged -= handler;
+                }
+            }
+
+            public void AddClosed(IEnumerable<string> ids, EventHandler handler)
+            {
+                foreach (var id in ids)
+                {
+                    this.AddClosed(id, handler);
+                }
+            }
+
+            public void AddClosed(string id, EventHandler handler)
+            {
+                this.AddCallback(id, (sender, e) =>
+                {
+                    if (sender is WindowRegistration registration)
+                    {
+                        registration.Closed += handler;
+                    }
+                }, true);
+            }
+
+            public void RemoveClosed(IEnumerable<string> ids, EventHandler handler)
+            {
+                foreach (var id in ids)
+                {
+                    this.RemoveClosed(id, handler);
+                }
+            }
+
+            public void RemoveClosed(string id, EventHandler handler)
+            {
+                var registration = default(WindowRegistration);
+                if (this.TryGet(id, out registration))
+                {
+                    registration.Closed -= handler;
+                }
+            }
+
+            private static EventHandler CreateOneTimeCallback(string id, EventHandler handler)
+            {
+                return (sender, e) =>
+                {
+                    handler(sender, e);
+                    Registrations.RemoveCallback(id, handler);
+                };
+            }
+        }
+
+        public class WindowRegistration
+        {
+            public WindowRegistration(string id, UserInterfaceWindowRole role, Func<Window> factory)
+            {
+                this.Id = id;
+                this.Role = role;
+                this.Factory = factory;
+                this.Instance = new ResettableLazy<Window>(this.Create(Factory));
+            }
+
+            public string Id { get; private set; }
+
+            public UserInterfaceWindowRole Role { get; private set; }
+
+            public Func<Window> Factory { get; private set; }
+
+            public ResettableLazy<Window> Instance { get; private set; }
+
+            protected virtual Func<Window> Create(Func<Window> factory)
+            {
+                return () =>
+                {
+                    var window = factory();
+                    if (this.Role != UserInterfaceWindowRole.Main)
+                    {
+                        window.Owner = ActiveWindow;
+                    }
+                    window.IsVisibleChanged += this.OnIsVisibleChanged;
+                    window.Closed += this.OnClosed;
+                    this.OnCreated(factory, EventArgs.Empty);
+                    return window;
+                };
+            }
+
+            protected virtual void OnCreated(object sender, EventArgs e)
+            {
+                if (this.Created != null)
+                {
+                    this.Created(sender, e);
+                }
+            }
+
+            public event EventHandler Created;
+
+            protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+            {
+                if (this.Role == UserInterfaceWindowRole.Main)
+                {
+                    OnActiveWindowChanged();
+                }
+                if (this.IsVisibleChanged != null)
+                {
+                    this.IsVisibleChanged(sender, EventArgs.Empty);
+                }
+            }
+
+            public event EventHandler IsVisibleChanged;
+
+            protected virtual void OnClosed(object sender, EventArgs e)
+            {
+                this.Reset();
+                if (this.Closed != null)
+                {
+                    this.Closed(sender, e);
+                }
+            }
+
+            public event EventHandler Closed;
+
+            public bool IsCreated
+            {
+                get
+                {
+                    return this.Instance.IsValueCreated;
+                }
+            }
+
+            public Window GetInstance()
+            {
+                return this.Instance.Value;
+            }
+
+            public bool TryGetInstance(out Window instance)
+            {
+                if (!this.IsCreated)
+                {
+                    instance = default(Window);
+                    return false;
+                }
+                instance = this.Instance.Value;
+                return true;
+            }
+
+            public void Reset()
+            {
+                var window = default(Window);
+                if (this.TryGetInstance(out window))
+                {
+                    window.IsVisibleChanged -= this.OnIsVisibleChanged;
+                    window.Closed -= this.OnClosed;
+                }
+                this.Instance.Reset();
+            }
         }
 
         public static async Task<bool> ShowDialog<T>(ICore core, string title) where T : new()
