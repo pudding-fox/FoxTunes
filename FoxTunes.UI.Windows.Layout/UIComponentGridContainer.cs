@@ -189,40 +189,40 @@ namespace FoxTunes
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ADD,
-                    "Add"
+                    Strings.UIComponentGridContainer_Add
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     REMOVE,
-                    "Remove"
+                    Strings.UIComponentGridContainer_Remove
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     MOVE_LEFT,
-                    "Move Left",
+                    Strings.UIComponentGridContainer_MoveLeft,
                     attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     MOVE_RIGHT,
-                    "Move Right"
+                    Strings.UIComponentGridContainer_MoveRight
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ALIGN_LEFT,
-                    "Align Left",
+                    Strings.UIComponentGridContainer_AlignLeft,
                     attributes: (byte)((string.Equals(alignment, AlignLeft, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ALIGN_STRETCH,
-                    "Align Center",
+                    Strings.UIComponentGridContainer_AlignStretch,
                     attributes: string.Equals(alignment, AlignStretch, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ALIGN_RIGHT,
-                    "Align Right",
+                    Strings.UIComponentGridContainer_AlignRight,
                     attributes: string.Equals(alignment, AlignRight, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
             }

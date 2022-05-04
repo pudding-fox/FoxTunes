@@ -144,7 +144,7 @@ namespace FoxTunes
                     yield return new InvocationComponent(
                         InvocationComponent.CATEGORY_SETTINGS,
                         DESIGN,
-                        "Edit Layout",
+                        Strings.LayoutDesignerBehaviour_Design,
                         attributes: this.IsDesigning ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }

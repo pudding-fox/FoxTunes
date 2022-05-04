@@ -296,8 +296,18 @@ namespace FoxTunes
             {
                 if (this.Enabled)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    yield return new InvocationComponent(
+                        InvocationComponent.CATEGORY_SETTINGS,
+                        NEW,
+                        Strings.ToolWindowBehaviour_New,
+                        path: Strings.ToolWindowBehaviour_Path
+                    );
+                    yield return new InvocationComponent(
+                        InvocationComponent.CATEGORY_SETTINGS,
+                        MANAGE,
+                        Strings.ToolWindowBehaviour_Manage,
+                        path: Strings.ToolWindowBehaviour_Path
+                    );
                 }
             }
         }

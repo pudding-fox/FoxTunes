@@ -367,31 +367,31 @@ namespace FoxTunes
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     DOCK_TOP,
-                    "Dock Top",
+                    Strings.UIComponentDockContainer_DockTop,
                     attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Top), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     DOCK_BOTTOM,
-                    "Dock Bottom",
+                    Strings.UIComponentDockContainer_DockBottom,
                     attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Bottom), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     DOCK_LEFT,
-                    "Dock Left",
+                    Strings.UIComponentDockContainer_DockLeft,
                     attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Left), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     DOCK_RIGHT,
-                    "Dock Right",
+                    Strings.UIComponentDockContainer_DockRight,
                     attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Right), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE,
-                    "Collapsable",
+                    Strings.UIComponentDockContainer_Collapse,
                     attributes: (byte)((this.Collapse ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
             }

@@ -237,10 +237,10 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, Strings.UIComponentContainer_Clear, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                 if (!Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, "Done");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, Strings.UIComponentContainer_Exit);
                 }
             }
         }
