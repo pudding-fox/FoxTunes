@@ -15,7 +15,10 @@ namespace FoxTunes
         public DatabaseTests(long configuration)
             : base(configuration)
         {
-
+            if ((configuration & SQLSERVER) == SQLSERVER)
+            {
+                Assert.Ignore("SQLServer tests are disabled.");
+            }
         }
 
         public override void SetUp()

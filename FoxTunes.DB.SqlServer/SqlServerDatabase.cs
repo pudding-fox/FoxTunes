@@ -5,6 +5,7 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Xml.Linq;
 
 namespace FoxTunes
@@ -37,6 +38,11 @@ namespace FoxTunes
 
         private static void CreateConnectionString()
         {
+            if (!File.Exists(ComponentResolver.FILE_NAME))
+            {
+                Logger.Write(typeof(SqlServerDatabase), LogLevel.Warn, "Config file \"{0}\" does not exist, cannot add connection string.", ComponentResolver.FILE_NAME);
+                return;
+            }
             var document = XDocument.Load(ComponentResolver.FILE_NAME);
             var connectionStrings = document.Root.Element("connectionStrings");
             if (connectionStrings == null)

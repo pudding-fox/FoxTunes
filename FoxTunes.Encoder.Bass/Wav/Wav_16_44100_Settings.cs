@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class Wav_16_44100_Settings : BassEncoderHandler, IStandardComponent
     {
-        public const string NAME = "Wav (16/44.1)";
+        public const string NAME = "043426B6-7251-45EB-BD74-E46D6ED97A83";
 
         public override string Name
         {

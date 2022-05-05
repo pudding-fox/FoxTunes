@@ -142,6 +142,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The encoder component was not found, only WAV 16/44.1 is supported..
+        /// </summary>
+        internal static string MinidiscBehaviour_EncoderMissing {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.EncoderMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Erase Disc.
         /// </summary>
         internal static string MinidiscBehaviour_EraseDisc {

@@ -99,8 +99,7 @@ namespace FoxTunes
                 0,
                 new[]
                 {
-                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
-.ConfigureAwait(false)
+                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2]).ConfigureAwait(false)
                 }
             ).ConfigureAwait(false);
             this.AssertPlaylistItems(
@@ -152,7 +151,7 @@ namespace FoxTunes
                     Assert.AreEqual(fileNames.Length, query.Length);
                     for (var a = 0; a < fileNames.Length; a++)
                     {
-                        Assert.AreEqual(fileNames[a], query[a].FileName);
+                        Assert.AreEqual(fileNames[a], query[a].FileName, "Playlist item differs at index {0}.", a);
                     }
                 }
             }

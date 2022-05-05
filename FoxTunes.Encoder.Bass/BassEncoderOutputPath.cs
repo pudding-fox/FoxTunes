@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassEncoderOutputPath : BaseComponent, IBassEncoderOutputPath
+    public class BassEncoderOutputPath : BaseComponent, IEncoderOutputPath
     {
         public static readonly object SyncRoot = new object();
 
@@ -107,7 +107,7 @@ namespace FoxTunes
             return string.Equals(uri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase);
         }
 
-        public class Fixed : IBassEncoderOutputPath
+        public class Fixed : IEncoderOutputPath
         {
             public Fixed(string directoryName)
             {

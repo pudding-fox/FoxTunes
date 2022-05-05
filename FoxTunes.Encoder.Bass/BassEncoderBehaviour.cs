@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassEncoderBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
+    public class BassEncoderBehaviour : StandardBehaviour, IEncoder, IInvocableComponent, IConfigurableComponent
     {
         public const string ENCODE = "GGGG";
 
@@ -153,13 +153,36 @@ namespace FoxTunes
             return this.Encode(playlistItems, profile, true);
         }
 
-        public Task<EncoderItem[]> Encode(IFileData[] fileDatas, string profile, bool report)
+        public IEncoderOutputPath GetOutputPath()
         {
             var outputPath = new BassEncoderOutputPath();
             outputPath.InitializeComponent(this.Core);
+            return outputPath;
+        }
+
+        public IEncoderOutputPath GetOutputPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return this.GetOutputPath();
+            }
+            return new BassEncoderOutputPath.Fixed(path);
+        }
+
+        public IReportComponent GetReport(EncoderItem[] encoderItems)
+        {
+            var report = new BassEncoderReport(encoderItems);
+            report.InitializeComponent(this.Core);
+            return report;
+        }
+
+        public Task<EncoderItem[]> Encode(IFileData[] fileDatas, string profile, bool report)
+        {
+            var outputPath = this.GetOutputPath();
             return this.Encode(fileDatas, outputPath, profile, report);
         }
-        public async Task<EncoderItem[]> Encode(IFileData[] fileDatas, IBassEncoderOutputPath outputPath, string profile, bool report)
+
+        public async Task<EncoderItem[]> Encode(IFileData[] fileDatas, IEncoderOutputPath outputPath, string profile, bool report)
         {
             var factory = new EncoderItemFactory(outputPath);
             factory.InitializeComponent(this.Core);
@@ -188,8 +211,7 @@ namespace FoxTunes
 
         protected virtual void OnReport(EncoderItem[] encoderItems)
         {
-            var report = new BassEncoderReport(encoderItems);
-            report.InitializeComponent(this.Core);
+            var report = this.GetReport(encoderItems);
             this.ReportEmitter.Send(report);
         }
 

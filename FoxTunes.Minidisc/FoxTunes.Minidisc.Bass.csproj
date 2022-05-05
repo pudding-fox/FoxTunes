@@ -12,8 +12,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
-		<!-- We need the encoder to create wav files. -->
-		<ProjectReference Include="..\FoxTunes.Encoder.Bass\FoxTunes.Encoder.Bass.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
