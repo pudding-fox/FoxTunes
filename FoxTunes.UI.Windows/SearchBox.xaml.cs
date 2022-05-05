@@ -268,7 +268,7 @@ namespace FoxTunes
                     case CommonSignals.PluginInvocation:
                         switch (signal.State as string)
                         {
-                            case KeyBindingsBehaviour.SEARCH:
+                            case DefaultKeyBindingsBehaviour.SEARCH:
                                 return Windows.Invoke(() => this.TextBox.Focus());
                         }
                         break;

@@ -186,9 +186,6 @@
   <data name="KeyBindingsBehaviourConfiguration.Stop" xml:space="preserve">
     <value>Stop</value>
   </data>
-  <data name="KeyBindingsBehaviourConfiguration.ToggleMiniPlayer" xml:space="preserve">
-    <value>Toggle Mini Player</value>
-  </data>
   <data name="LibraryActionsBehaviour.AppendPlaylist" xml:space="preserve">
     <value>Add To Playlist</value>
   </data>

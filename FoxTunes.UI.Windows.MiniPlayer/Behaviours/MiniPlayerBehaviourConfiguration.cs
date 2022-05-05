@@ -21,23 +21,25 @@ namespace FoxTunes
 
         public const string DROP_COMMIT_ELEMENT = "IIIIF490-CE3D-481A-8924-B698BD443D88";
 
+
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Mini Player")
+            yield return new ConfigurationSection(SECTION, Strings.MiniPlayerBehaviourConfiguration_Section)
                 .WithElement(
-                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false).Hide())
+                    new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_Enabled).WithValue(false).Hide())
                 .WithElement(
-                    new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, "Playing Script", path: "Advanced").WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.MultiLine))
+                    new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_NowPlayingScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced).WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(
-                    new TextConfigurationElement(PLAYLIST_SCRIPT_ELEMENT, "Playlist Script", path: "Advanced").WithValue(Resources.Playlist).WithFlags(ConfigurationElementFlags.MultiLine))
+                    new TextConfigurationElement(PLAYLIST_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_PlaylistScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced).WithValue(Resources.Playlist).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(
-                    new BooleanConfigurationElement(TOPMOST_ELEMENT, "Always On Top").WithValue(false))
+                    new BooleanConfigurationElement(TOPMOST_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_Topmost).WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
+                    new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_ShowArtwork).WithValue(true))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_PLAYLIST_ELEMENT, "Show Playlist").WithValue(false))
+                    new BooleanConfigurationElement(SHOW_PLAYLIST_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_ShowPlaylist).WithValue(false))
                 .WithElement(
-                    new SelectionConfigurationElement(DROP_COMMIT_ELEMENT, "Drop Behaviour").WithOptions(GetDropBehaviourOptions())
+                    new SelectionConfigurationElement(DROP_COMMIT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_DropCommit).WithOptions(GetDropBehaviourOptions())
             );
         }
 
@@ -45,19 +47,19 @@ namespace FoxTunes
         {
             yield return new SelectionConfigurationOption(
                 Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.Append),
-                "Append"
+                Strings.MiniPlayerDropBehaviour_Append
             );
             yield return new SelectionConfigurationOption(
                 Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.AppendAndPlay),
-                "Append & Play"
+                Strings.MiniPlayerDropBehaviour_AppendAndPlay
             );
             yield return new SelectionConfigurationOption(
                 Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.Replace),
-                "Replace"
+                Strings.MiniPlayerDropBehaviour_Replace
             );
             yield return new SelectionConfigurationOption(
                 Enum.GetName(typeof(MiniPlayerDropBehaviour), MiniPlayerDropBehaviour.ReplaceAndPlay),
-                "Replace & Play"
+                Strings.MiniPlayerDropBehaviour_ReplaceAndPlay
             ).Default();
         }
 

@@ -23,6 +23,8 @@ namespace FoxTunes
 
         public ThemeLoader ThemeLoader { get; private set; }
 
+        public IKeyBindingsBehaviour KeyBindingsBehaviour { get; private set; }
+
         public ICore Core { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -56,6 +58,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            this.KeyBindingsBehaviour = ComponentRegistry.Instance.GetComponent<IKeyBindingsBehaviour>();
             this.Core = core;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -102,10 +105,10 @@ namespace FoxTunes
             {
                 if (this.Enabled.Value)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, TOPMOST, "Always On Top", attributes: this.Topmost.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_ARTWORK, "Show Artwork", attributes: this.ShowArtwork.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_PLAYLIST, "Show Playlist", attributes: this.ShowPlaylist.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, QUIT, "Quit", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, TOPMOST, this.Topmost.Name, attributes: this.Topmost.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_ARTWORK, this.ShowArtwork.Name, attributes: this.ShowArtwork.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_PLAYLIST, this.ShowPlaylist.Name, attributes: this.ShowPlaylist.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, QUIT, Strings.MiniPlayerBehaviour_Quit, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                 }
             }
         }

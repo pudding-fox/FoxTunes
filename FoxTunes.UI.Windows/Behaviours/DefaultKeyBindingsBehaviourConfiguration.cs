@@ -2,7 +2,7 @@
 
 namespace FoxTunes
 {
-    public static class KeyBindingsBehaviourConfiguration
+    public static class DefaultKeyBindingsBehaviourConfiguration
     {
         public const string SECTION = InputManagerConfiguration.SECTION;
 
@@ -15,8 +15,6 @@ namespace FoxTunes
         public const string STOP_ELEMENT = "DDDD3853-09F5-4DF7-9CDD-918B7B2A5F22";
 
         public const string SETTINGS_ELEMENT = "EEEE5C74-24D3-4C51-B50A-74EC4921FDC7";
-
-        public const string MINI_PLAYER_ELEMENT = "FFFFDF70-E0DB-4154-9567-01AE394BA476";
 
         public const string SEARCH_ELEMENT = "GGGG6849-7DA9-4BA1-9A5A-548E3D9A1E25";
 
@@ -38,9 +36,6 @@ namespace FoxTunes
                 .WithElement(
                     new TextConfigurationElement(SETTINGS_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Settings)
                         .WithValue("Alt+S"))
-                .WithElement(
-                    new TextConfigurationElement(MINI_PLAYER_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_ToggleMiniPlayer)
-                        .WithValue("Alt+M"))
                 .WithElement(
                     new TextConfigurationElement(SEARCH_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Search)
                         .WithValue("Alt+F")
