@@ -143,20 +143,40 @@ namespace FoxTunes
                 {
                     return;
                 }
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    return;
+                }
                 this.DragStartPosition = e.GetPosition(this.ListBox);
+                this.PrepareDrag(e);
             }
 
             protected virtual void OnTouchDown(object sender, TouchEventArgs e)
             {
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    return;
+                }
                 this.DragStartPosition = e.GetTouchPoint(this.ListBox).Position;
+                this.PrepareDrag(e);
+            }
+
+            protected virtual void PrepareDrag(RoutedEventArgs e)
+            {
+                //Nothing to do.
             }
 
             protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
             {
-                this.DragStartPosition = default(Point);
+                this.EndDrag();
             }
 
             protected virtual void OnTouchUp(object sender, TouchEventArgs e)
+            {
+                this.EndDrag();
+            }
+
+            protected virtual void EndDrag()
             {
                 this.DragStartPosition = default(Point);
             }
@@ -187,18 +207,18 @@ namespace FoxTunes
 
             protected virtual bool TryInitializeDrag(Point position)
             {
+                if (!this.ShouldInitializeDrag(position))
+                {
+                    return false;
+                }
                 var selectedItem = this.ListBox.SelectedItem;
                 if (selectedItem == null)
                 {
                     return false;
                 }
-                if (this.ShouldInitializeDrag(position))
-                {
-                    this.DragStartPosition = default(Point);
-                    this.ListBox.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
-                    return true;
-                }
-                return false;
+                this.DragStartPosition = default(Point);
+                this.ListBox.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
+                return true;
             }
 
             protected override void OnDisposing()
