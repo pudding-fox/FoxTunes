@@ -109,7 +109,7 @@ namespace FoxTunes
             );
             await this.Core.Managers.Playlist.Move(
                 this.Core.Managers.Playlist.SelectedPlaylist,
-                2,
+                3,
                 new[]
                 {
                     await this.GetPlaylistItem(TestInfo.AudioFileNames[2]).ConfigureAwait(false)
