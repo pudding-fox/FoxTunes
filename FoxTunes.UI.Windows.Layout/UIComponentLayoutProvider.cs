@@ -86,6 +86,7 @@ namespace FoxTunes
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
+            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
             this.Save();
         }
 

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,7 +35,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Layout != null && string.Equals(this.Layout.Value.Id, UIComponentLayoutProvider.ID);
+                return this.Layout != null && string.Equals(this.Layout.Value.Id, UIComponentLayoutProvider.ID) && !global::FoxTunes.Windows.IsShuttingDown;
             }
         }
 
@@ -60,6 +59,7 @@ namespace FoxTunes
             this.IsLoaded = true;
             if (!string.IsNullOrEmpty(this.Element.Value))
             {
+                Logger.Write(this, LogLevel.Debug, "Loading config..");
                 try
                 {
                     using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Element.Value)))
@@ -76,10 +76,15 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
                 }
             }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "No config to load.");
+            }
         }
 
         protected virtual async Task<ToolWindow> Load(ToolWindowConfiguration config)
         {
+            Logger.Write(this, LogLevel.Debug, "Loading config: {0}", config.Title);
             try
             {
                 if (!ScreenHelper.WindowBoundsVisible(new Rect(config.Left, config.Top, config.Width, config.Height)))
@@ -91,6 +96,7 @@ namespace FoxTunes
                 var window = default(ToolWindow);
                 await global::FoxTunes.Windows.Invoke(() =>
                 {
+                    Logger.Write(this, LogLevel.Debug, "Creating window: {0}", config.Title);
                     window = new ToolWindow();
                     window.Configuration = config;
                     window.ShowActivated = false;
@@ -121,16 +127,17 @@ namespace FoxTunes
 
         public event ToolWindowConfigurationEventHandler Loaded;
 
-        protected virtual async Task Show()
+        protected virtual async Task UpdateVisiblity()
         {
             foreach (var pair in this.Windows)
             {
-                await this.Show(pair.Key, pair.Value).ConfigureAwait(false);
+                await this.UpdateVisiblity(pair.Key, pair.Value).ConfigureAwait(false);
             }
         }
 
-        protected virtual Task Show(ToolWindowConfiguration config, ToolWindow window)
+        protected virtual Task UpdateVisiblity(ToolWindowConfiguration config, ToolWindow window)
         {
+            Logger.Write(this, LogLevel.Debug, "Updating visiblity: {0}", config.Title);
             var show = false;
             var id = default(string);
             if (global::FoxTunes.Windows.ActiveWindow is WindowBase activeWindow)
@@ -151,16 +158,19 @@ namespace FoxTunes
             }
             if (show)
             {
+                Logger.Write(this, LogLevel.Debug, "Showing window: {0}", config.Title);
                 return global::FoxTunes.Windows.Invoke(window.Show);
             }
             else
             {
+                Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", config.Title);
                 return global::FoxTunes.Windows.Invoke(window.Hide);
             }
         }
 
         protected virtual void Unload(ToolWindowConfiguration config, ToolWindow window)
         {
+            Logger.Write(this, LogLevel.Debug, "Unloading config: {0}", config.Title);
             this.Windows.TryGetValue(config, out window);
             if (!this.Windows.Remove(config))
             {
@@ -186,8 +196,11 @@ namespace FoxTunes
             {
                 return;
             }
-            if (!this.Windows.Keys.Any())
+            Logger.Write(this, LogLevel.Debug, "Saving config..");
+            var configs = this.Windows.Keys.ToArray();
+            if (!configs.Any())
             {
+                Logger.Write(this, LogLevel.Debug, "No config to save.");
                 this.Element.Value = null;
                 return;
             }
@@ -196,7 +209,7 @@ namespace FoxTunes
                 var value = default(string);
                 using (var stream = new MemoryStream())
                 {
-                    Serializer.Save(stream, this.Windows.Keys);
+                    Serializer.Save(stream, configs);
                     value = Encoding.Default.GetString(stream.ToArray());
                 }
                 if (string.Equals(this.Element.Value, value, StringComparison.OrdinalIgnoreCase))
@@ -205,6 +218,7 @@ namespace FoxTunes
                 }
                 this.Element.Value = value;
                 this.Configuration.Save();
+                Logger.Write(this, LogLevel.Debug, "Saved config for {0} windows.", configs.Length);
             }
             catch (Exception e)
             {
@@ -256,7 +270,7 @@ namespace FoxTunes
                     {
                         await this.Load().ConfigureAwait(false);
                     }
-                    await this.Show().ConfigureAwait(false);
+                    await this.UpdateVisiblity().ConfigureAwait(false);
                 });
             }
             else if (this.IsLoaded)
@@ -268,22 +282,22 @@ namespace FoxTunes
 
         protected virtual void OnActiveWindowChanged(object sender, EventArgs e)
         {
-            if (!this.Enabled)
+            if (this.Enabled)
             {
-                return;
-            }
-            this.Dispatch(async () =>
-            {
-                if (!this.IsLoaded)
+                this.Dispatch(async () =>
                 {
-                    await this.Load().ConfigureAwait(false);
-                }
-                await this.Show().ConfigureAwait(false);
-            });
+                    if (!this.IsLoaded)
+                    {
+                        await this.Load().ConfigureAwait(false);
+                    }
+                    await this.UpdateVisiblity().ConfigureAwait(false);
+                });
+            }
         }
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
+            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
             if (!this.IsLoaded)
             {
                 return;
@@ -341,6 +355,7 @@ namespace FoxTunes
 
         public async Task<ToolWindowConfiguration> New()
         {
+            Logger.Write(this, LogLevel.Debug, "Creating new config..");
             var configs = this.Windows.Keys;
             var config = new ToolWindowConfiguration()
             {
@@ -354,7 +369,7 @@ namespace FoxTunes
             {
                 return null;
             }
-            await this.Show(config, window).ConfigureAwait(false);
+            await this.UpdateVisiblity(config, window).ConfigureAwait(false);
             return config;
         }
 
@@ -368,9 +383,11 @@ namespace FoxTunes
             this.IsLoaded = false;
             return global::FoxTunes.Windows.Invoke(() =>
             {
+                Logger.Write(this, LogLevel.Debug, "Shutting down..");
                 global::FoxTunes.Windows.Registrations.Close(ToolWindowManagerWindow.ID);
                 foreach (var window in this.Windows.Values)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Closing window: {0}", window.Title);
                     window.Closed -= this.OnClosed;
                     window.Close();
                 }
@@ -382,7 +399,7 @@ namespace FoxTunes
         {
             foreach (var pair in this.Windows)
             {
-                await this.Show(pair.Key, pair.Value).ConfigureAwait(false);
+                await this.UpdateVisiblity(pair.Key, pair.Value).ConfigureAwait(false);
             }
         }
 

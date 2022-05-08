@@ -133,7 +133,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             BindingOperations.ClearBinding(this, WidthProperty);
             BindingOperations.ClearBinding(this, HeightProperty);

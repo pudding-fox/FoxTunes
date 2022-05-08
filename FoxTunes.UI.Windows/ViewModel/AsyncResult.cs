@@ -63,7 +63,12 @@ namespace FoxTunes.ViewModel
 
         public async Task Run()
         {
-            this.Value = await this.Task.ConfigureAwait(false);
+            var value = await this.Task.ConfigureAwait(false);
+            if (value == null)
+            {
+                return;
+            }
+            this.Value = value;
         }
 
         protected override Freezable CreateInstanceCore()

@@ -11,6 +11,8 @@ namespace FoxTunes
 {
     public static class Windows
     {
+        public static bool IsShuttingDown { get; set; }
+
         public static readonly WindowRegistrations Registrations = new WindowRegistrations();
 
         public static Dispatcher Dispatcher
@@ -58,6 +60,7 @@ namespace FoxTunes
 
         public static Task Shutdown()
         {
+            IsShuttingDown = true;
             return Invoke(() =>
             {
                 if (ShuttingDown != null)

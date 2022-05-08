@@ -10,6 +10,8 @@ namespace FoxTunes.ViewModel
     {
         public static readonly IArtworkProvider Provider = ComponentRegistry.Instance.GetComponent<IArtworkProvider>();
 
+        public static readonly ArtworkBrushFactory Factory = ComponentRegistry.Instance.GetComponent<ArtworkBrushFactory>();
+
         public static readonly DependencyProperty WidthProperty = DependencyProperty.Register(
             "Width",
             typeof(double),
@@ -160,18 +162,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowPlaceholderChanged;
 
-        public ArtworkBrushFactory ArtworkBrushFactory { get; private set; }
-
-        protected override void InitializeComponent(ICore core)
-        {
-            this.ArtworkBrushFactory = new ArtworkBrushFactory();
-            this.ArtworkBrushFactory.InitializeComponent(core);
-            base.InitializeComponent(core);
-        }
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (Provider == null || this.ArtworkBrushFactory == null)
+            if (Provider == null || Factory == null)
             {
                 return null;
             }
@@ -197,7 +190,7 @@ namespace FoxTunes.ViewModel
                 ).Result;
             }
             var size = global::System.Convert.ToInt32(Math.Max(this.Width, this.Height));
-            return this.ArtworkBrushFactory.Create(
+            return Factory.Create(
                 fileName,
                 size,
                 size

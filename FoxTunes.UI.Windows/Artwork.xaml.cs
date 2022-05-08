@@ -16,13 +16,12 @@ namespace FoxTunes
             this.OnFileNameChanged(this, EventArgs.Empty);
         }
 
-        protected override void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            base.OnSizeChanged(sender, e);
             var viewModel = this.FindResource<global::FoxTunes.ViewModel.Artwork>("ViewModel");
             if (viewModel != null)
             {
-                this.Dispatch(viewModel.Refresh);
+                viewModel.Emit();
             }
         }
 

@@ -18,6 +18,14 @@ namespace FoxTunes
 
         }
 
+        public override int CornerRadius
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
         public override ResourceDictionary GetResourceDictionary()
         {
             return new ResourceDictionary()

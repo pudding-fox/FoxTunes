@@ -151,9 +151,28 @@ namespace FoxTunes.ViewModel
             }).ConfigureAwait(false);
         }
 
+        public virtual void Emit()
+        {
+            this.OnFileNameChanged();
+            this.OnFileDataChanged();
+        }
+
         protected override Freezable CreateInstanceCore()
         {
             return new Artwork();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
+            }
+            base.Dispose(disposing);
         }
     }
 }
