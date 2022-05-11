@@ -135,4 +135,13 @@
   <data name="ExecutionStateBehaviourConfiguration.SleepSystem" xml:space="preserve">
     <value>Prevent System Sleep</value>
   </data>
+  <data name="TaskbarButtonsBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="TaskbarButtonsBehaviourConfiguration.Progress" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="TaskbarButtonsBehaviourConfiguration.Section" xml:space="preserve">
+    <value>Taskbar Buttons</value>
+  </data>
 </root>

@@ -10,6 +10,8 @@ namespace FoxTunes
 
         public const string ENABLED_ELEMENT = "AAAA5AF6-A76C-4FB9-B783-ECB772AE1E54";
 
+        public const string PROGRESS_ELEMENT = "BBBB676E-ACEA-4D5F-8B1D-B02758CAE959";
+
         public static bool IsPlatformSupported
         {
             get
@@ -33,8 +35,9 @@ namespace FoxTunes
             if (IsPlatformSupported)
             {
                 var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
-                yield return new ConfigurationSection(SECTION, "Taskbar Buttons")
-                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(releaseType == ReleaseType.Default)
+                yield return new ConfigurationSection(SECTION, Strings.TaskbarButtonsBehaviourConfiguration_Section)
+                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.TaskbarButtonsBehaviourConfiguration_Enabled).WithValue(releaseType == ReleaseType.Default))
+                    .WithElement(new BooleanConfigurationElement(PROGRESS_ELEMENT, Strings.TaskbarButtonsBehaviourConfiguration_Progress).WithValue(false).DependsOn(SECTION, ENABLED_ELEMENT)
                 );
             }
         }
