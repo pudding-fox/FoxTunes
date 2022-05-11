@@ -1,9 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -43,17 +43,53 @@ namespace FoxTunes
         public TaskbarButtonsBehaviour()
         {
             this.Callback = new HwndSourceHook(this.OnCallback);
-            this.Windows = new Dictionary<IntPtr, TaskbarButtonsWindowFlags>();
-            this.ImageLists = new Dictionary<IntPtr, IntPtr>();
+            this.Windows = new ConcurrentDictionary<IntPtr, TaskbarButtonsWindowFlags>();
+            this.ImageLists = new ConcurrentDictionary<IntPtr, IntPtr>();
         }
 
         public Timer Timer { get; private set; }
 
         public HwndSourceHook Callback { get; private set; }
 
-        public IDictionary<IntPtr, TaskbarButtonsWindowFlags> Windows { get; private set; }
+        public ConcurrentDictionary<IntPtr, TaskbarButtonsWindowFlags> Windows { get; private set; }
 
-        public IDictionary<IntPtr, IntPtr> ImageLists { get; private set; }
+        protected virtual bool HasFlags(IntPtr handle)
+        {
+            var flags = default(TaskbarButtonsWindowFlags);
+            return this.Windows.TryGetValue(handle, out flags);
+        }
+
+        protected virtual bool HasFlag(IntPtr handle, TaskbarButtonsWindowFlags flag)
+        {
+            var flags = default(TaskbarButtonsWindowFlags);
+            if (!this.Windows.TryGetValue(handle, out flags))
+            {
+                return false;
+            }
+            return flags.HasFlag(flag);
+        }
+
+        protected virtual bool AddFlag(IntPtr handle, TaskbarButtonsWindowFlags flag)
+        {
+            var flags = default(TaskbarButtonsWindowFlags);
+            if (!this.Windows.TryGetValue(handle, out flags))
+            {
+                return false;
+            }
+            return this.Windows.TryUpdate(handle, flags | flag, flags);
+        }
+
+        protected virtual bool RemoveFlag(IntPtr handle, TaskbarButtonsWindowFlags flag)
+        {
+            var flags = default(TaskbarButtonsWindowFlags);
+            if (!this.Windows.TryGetValue(handle, out flags))
+            {
+                return false;
+            }
+            return this.Windows.TryUpdate(handle, flags & ~flag, flags);
+        }
+
+        public ConcurrentDictionary<IntPtr, IntPtr> ImageLists { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -61,11 +97,17 @@ namespace FoxTunes
 
         public IUserInterface UserInterface { get; private set; }
 
+        public IArtworkProvider ArtworkProvider { get; private set; }
+
+        public ILibraryBrowser LibraryBrowser { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Enabled { get; private set; }
 
         public BooleanConfigurationElement Progress { get; private set; }
+
+        public BooleanConfigurationElement Thumbnail { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -76,6 +118,8 @@ namespace FoxTunes
                 this.UserInterface = core.Components.UserInterface;
                 this.UserInterface.WindowCreated += this.OnWindowCreated;
                 this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
+                this.ArtworkProvider = core.Components.ArtworkProvider;
+                this.LibraryBrowser = core.Components.LibraryBrowser;
                 this.Configuration = core.Components.Configuration;
                 this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                     TaskbarButtonsBehaviourConfiguration.SECTION,
@@ -91,11 +135,14 @@ namespace FoxTunes
                     {
                         this.Disable();
                     }
-                    this.Update();
                 });
                 this.Progress = this.Configuration.GetElement<BooleanConfigurationElement>(
                     TaskbarButtonsBehaviourConfiguration.SECTION,
                     TaskbarButtonsBehaviourConfiguration.PROGRESS_ELEMENT
+                );
+                this.Thumbnail = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    TaskbarButtonsBehaviourConfiguration.SECTION,
+                    TaskbarButtonsBehaviourConfiguration.THUMBNAIL_ELEMENT
                 );
             }
             else
@@ -112,29 +159,12 @@ namespace FoxTunes
                 //Only create taskbar buttons for main windows.
                 return;
             }
-            lock (SyncRoot)
-            {
-                if (this.Windows.ContainsKey(e.Window.Handle))
-                {
-                    //Uh.. Why was a window with the same handle "created" twice?
-                    return;
-                }
-                this.Windows.Add(e.Window.Handle, TaskbarButtonsWindowFlags.None);
-                this.Update();
-            }
+            this.Windows.TryAdd(e.Window.Handle, TaskbarButtonsWindowFlags.None);
         }
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
-            lock (SyncRoot)
-            {
-                if (!this.Windows.ContainsKey(e.Window.Handle))
-                {
-                    return;
-                }
-                this.Windows[e.Window.Handle] |= TaskbarButtonsWindowFlags.Destroyed;
-                this.Update();
-            }
+            this.AddFlag(e.Window.Handle, TaskbarButtonsWindowFlags.Destroyed);
         }
 
         public void Enable()
@@ -168,11 +198,11 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
+        protected virtual async void OnElapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
-                this.Update();
+                await this.Update().ConfigureAwait(false);
                 lock (SyncRoot)
                 {
                     if (this.Timer != null)
@@ -187,15 +217,11 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void Update()
+        protected virtual async Task Update()
         {
-            lock (SyncRoot)
+            foreach (var pair in this.Windows)
             {
-                foreach (var handle in this.Windows.Keys.ToArray())
-                {
-                    var flags = this.Windows[handle];
-                    var task = this.Update(handle, flags);
-                }
+                await this.Update(pair.Key, pair.Value).ConfigureAwait(false);
             }
         }
 
@@ -206,6 +232,10 @@ namespace FoxTunes
                 if (flags.HasFlag(TaskbarButtonsWindowFlags.Registered))
                 {
                     this.RemoveHook(handle);
+                }
+                if (flags.HasFlag(TaskbarButtonsWindowFlags.ImagesCreated))
+                {
+                    this.DestroyImages(handle);
                 }
                 //TODO: We should remove the window from our table but it causes issues and we're likely shutting down now.
                 return;
@@ -243,11 +273,22 @@ namespace FoxTunes
                 }
                 if (this.Progress.Value)
                 {
-                    await this.UpdateProgress(handle).ConfigureAwait(false);
+                    if (!await this.UpdateProgress(handle).ConfigureAwait(false))
+                    {
+                        return;
+                    }
+                }
+                if (this.Thumbnail.Value)
+                {
+                    if (!await this.UpdateThumbnail(handle).ConfigureAwait(false))
+                    {
+                        return;
+                    }
                 }
             }
             else
             {
+                //Although we're no longer enabled, these features can't be disabled so we must keep them updated.
                 if (flags.HasFlag(TaskbarButtonsWindowFlags.ButtonsCreated))
                 {
                     if (!await this.UpdateButtons(handle).ConfigureAwait(false))
@@ -258,6 +299,13 @@ namespace FoxTunes
                 if (flags.HasFlag(TaskbarButtonsWindowFlags.ProgressCreated))
                 {
                     if (!await this.UpdateProgress(handle).ConfigureAwait(false))
+                    {
+                        return;
+                    }
+                }
+                if (flags.HasFlag(TaskbarButtonsWindowFlags.ThumbnailCreated))
+                {
+                    if (!await this.UpdateThumbnail(handle).ConfigureAwait(false))
                     {
                         return;
                     }
@@ -276,6 +324,16 @@ namespace FoxTunes
                     this.OnButtonPressed(Convert.ToInt32(low));
                 }
             }
+            else if (msg == WindowsIconicThumbnail.WM_DWMSENDICONICTHUMBNAIL)
+            {
+                var low = (lParam.ToInt64() & 0x0000FFFF);
+                var high = (lParam.ToInt64() & 0xFFFF0000) >> 16;
+                var task = this.OnSendIconicThumbnail(hwnd, Convert.ToInt32(high), Convert.ToInt32(low));
+            }
+            else if (msg == WindowsIconicThumbnail.WM_DWMSENDICONICLIVEPREVIEWBITMAP)
+            {
+                this.OnSendIconicLivePreviewBitmap(hwnd);
+            }
             else if (msg == WM_TASKBARCREATED)
             {
                 this.OnTaskBarCreated(hwnd);
@@ -285,17 +343,13 @@ namespace FoxTunes
 
         protected virtual void OnTaskBarCreated(IntPtr handle)
         {
-            lock (SyncRoot)
+            if (this.HasFlags(handle))
             {
-                if (!this.Windows.ContainsKey(handle))
-                {
-                    //Handing an event for an unknown window?
-                    return;
-                }
-                //TODO: Should we be destroying the image list?
-                this.Windows[handle] = TaskbarButtonsWindowFlags.Registered;
-                var task = this.Update(handle, TaskbarButtonsWindowFlags.Registered);
+                //Handing an event for an unknown window?
+                return;
             }
+            //TODO: Should we be destroying the image list?
+            this.Windows[handle] = TaskbarButtonsWindowFlags.Registered;
         }
 
         protected virtual void AddHook(IntPtr handle)
@@ -305,11 +359,11 @@ namespace FoxTunes
             if (source == null)
             {
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return;
             }
             source.AddHook(this.Callback);
-            this.Windows[handle] |= TaskbarButtonsWindowFlags.Registered;
+            this.AddFlag(handle, TaskbarButtonsWindowFlags.Registered);
         }
 
         protected virtual void RemoveHook(IntPtr handle)
@@ -319,11 +373,11 @@ namespace FoxTunes
             if (source == null)
             {
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return;
             }
             source.RemoveHook(this.Callback);
-            this.Windows[handle] &= ~TaskbarButtonsWindowFlags.Registered;
+            this.RemoveFlag(handle, TaskbarButtonsWindowFlags.Registered);
         }
 
         protected virtual async Task<bool> CreateImages(IntPtr handle)
@@ -333,7 +387,7 @@ namespace FoxTunes
             if (source == null)
             {
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             var width = WindowsImageList.GetSystemMetrics(
@@ -346,23 +400,24 @@ namespace FoxTunes
             var imageList = WindowsImageList.ImageList_Create(
                 width,
                 height,
-                WindowsImageList.ILC_COLOR32,
+                WindowsImaging.ILC_COLOR32,
                 4,
                 0
             );
             if (IntPtr.Zero.Equals(imageList))
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create button image list.");
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
             {
+                //TODO: Potentially overwriting the previous value.
                 this.ImageLists[handle] = imageList;
             }
             for (var a = 0; a < 4; a++)
             {
-                using (var bitmap = this.GetImage(a, width, height))
+                using (var bitmap = this.GetButtonImage(a, width, height))
                 {
                     if (!this.AddImage(handle, imageList, bitmap, width, height))
                     {
@@ -378,78 +433,37 @@ namespace FoxTunes
             if (result != WindowsTaskbarList.HResult.Ok)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create button image list: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
             {
                 Logger.Write(this, LogLevel.Debug, "Taskbar button image list created.");
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.ImagesCreated;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.ImagesCreated);
                 return true;
             }
         }
 
         protected virtual bool AddImage(IntPtr handle, IntPtr imageList, Bitmap bitmap, int width, int height)
         {
-            var bitmapBits = default(IntPtr);
-            var bitmapInfo = new WindowsImageList.BITMAPINFO()
+            var bitmapSection = default(IntPtr);
+            if (!WindowsImaging.CreateDIBSection(bitmap, width, height, out bitmapSection))
             {
-                biSize = 40,
-                biBitCount = 32,
-                biPlanes = 1,
-                biWidth = width,
-                biHeight = height
-            };
-            var bitmapSection = WindowsImageList.CreateDIBSection(
-                IntPtr.Zero,
-                bitmapInfo,
-                0,
-                out bitmapBits,
-                IntPtr.Zero,
-                0
-            );
-            if (IntPtr.Zero.Equals(bitmapSection))
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to create DIB.");
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
-            var bitmapData = bitmap.LockBits(
-                new Rectangle(
-                    0,
-                    0,
-                    bitmap.Width,
-                    bitmap.Height
-                ),
-                ImageLockMode.ReadOnly,
-                PixelFormat.Format32bppArgb
+            var result = WindowsImageList.ImageList_Add(
+                imageList,
+                bitmapSection,
+                IntPtr.Zero
             );
+            WindowsImaging.DeleteObject(bitmapSection);
+            if (result < 0)
             {
-                var result = WindowsImageList.RtlMoveMemory(
-                    bitmapBits,
-                    bitmapData.Scan0,
-                    bitmap.Height * bitmapData.Stride
-                );
-                if (!result)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Call to RtlMoveMemory reports failure.");
-                    this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
-                    return false;
-                }
-            }
-            bitmap.UnlockBits(bitmapData);
-            {
-                var result = WindowsImageList.ImageList_Add(
-                    imageList,
-                    bitmapSection,
-                    IntPtr.Zero
-                );
-                if (result < 0)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to add image to ImageList.");
-                    this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
-                    return false;
-                }
+                Logger.Write(this, LogLevel.Warn, "Failed to add image to ImageList.");
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                return false;
             }
             return true;
         }
@@ -466,58 +480,61 @@ namespace FoxTunes
             if (!result)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to destroy image list: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
             {
                 Logger.Write(this, LogLevel.Debug, "Taskbar button image list destroyed.");
-                this.Windows[handle] &= ~TaskbarButtonsWindowFlags.ImagesCreated;
+                this.RemoveFlag(handle, TaskbarButtonsWindowFlags.ImagesCreated);
                 return true;
             }
         }
 
-        protected virtual Bitmap GetImage(int index, int width, int height)
+        protected virtual Bitmap GetButtonImage(int index, int width, int height)
         {
             var name = string.Format("FoxTunes.Core.Windows.Images.{0}.png", this.GetImageName(index));
             Logger.Write(this, LogLevel.Debug, "Creating image: {0}", name);
             using (var stream = typeof(TaskbarButtonsBehaviour).Assembly.GetManifestResourceStream(name))
             {
-                var image = (Bitmap)Bitmap.FromStream(stream);
-                if (image.Width != width || image.Height != height)
-                {
-                    try
-                    {
-                        return this.GetImage(image, width, height);
-                    }
-                    finally
-                    {
-                        image.Dispose();
-                    }
-                }
-                return image;
+                return this.GetImage(stream, width, height);
             }
         }
 
-        protected virtual Bitmap GetImage(Bitmap sourceImage, int width, int height)
+        protected virtual Bitmap GetPlaceholderImage(int width, int height)
         {
-            var resultImage = new Bitmap(width, height);
-            using (var graphics = Graphics.FromImage(resultImage))
+            var name = "FoxTunes.Core.Windows.Images.fox.ico";
+            Logger.Write(this, LogLevel.Debug, "Creating image: {0}", name);
+            using (var stream = typeof(TaskbarButtonsBehaviour).Assembly.GetManifestResourceStream(name))
             {
-                graphics.InterpolationMode = InterpolationMode.High;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                graphics.DrawImage(
-                    sourceImage,
-                    new Rectangle(
-                        0,
-                        0,
-                        width,
-                        height
-                    )
-                );
+                return this.GetImage(stream, width, height);
             }
-            return resultImage;
+        }
+
+        protected virtual Bitmap GetExternalImage(string fileName, int width, int height)
+        {
+            Logger.Write(this, LogLevel.Debug, "Creating image: {0}", fileName);
+            using (var stream = File.OpenRead(fileName))
+            {
+                return this.GetImage(stream, width, height);
+            }
+        }
+
+        protected virtual Bitmap GetImage(Stream stream, int width, int height)
+        {
+            var image = (Bitmap)Bitmap.FromStream(stream);
+            if (image.Width != width || image.Height != height)
+            {
+                try
+                {
+                    return WindowsImaging.Resize(image, width, height);
+                }
+                finally
+                {
+                    image.Dispose();
+                }
+            }
+            return image;
         }
 
         protected virtual string GetImageName(int index)
@@ -558,25 +575,22 @@ namespace FoxTunes
             if (result != WindowsTaskbarList.HResult.Ok)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create taskbar buttons: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
             {
                 Logger.Write(this, LogLevel.Debug, "Taskbar buttons created.");
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.ButtonsCreated;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.ButtonsCreated);
                 return true;
             }
         }
 
         protected virtual async Task UpdateButtons()
         {
-            lock (SyncRoot)
+            foreach (var pair in this.Windows)
             {
-                foreach (var handle in this.Windows.Keys.ToArray())
-                {
-                    var task = this.UpdateButtons(handle);
-                }
+                await this.UpdateButtons(pair.Key).ConfigureAwait(false);
             }
         }
 
@@ -601,7 +615,7 @@ namespace FoxTunes
             if (result != WindowsTaskbarList.HResult.Ok)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to update taskbar buttons: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
@@ -620,7 +634,7 @@ namespace FoxTunes
             {
                 return true;
             }
-            if (this.Windows[handle].HasFlag(TaskbarButtonsWindowFlags.ProgressCreated))
+            if (this.HasFlag(handle, TaskbarButtonsWindowFlags.ProgressCreated))
             {
                 return await this.ClearProgress(handle).ConfigureAwait(false);
             }
@@ -665,12 +679,12 @@ namespace FoxTunes
             if (result != WindowsTaskbarList.HResult.Ok)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
             {
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.ProgressCreated;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.ProgressCreated);
                 return true;
             }
         }
@@ -717,12 +731,12 @@ namespace FoxTunes
             if (result != WindowsTaskbarList.HResult.Ok)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
             {
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.ProgressCreated;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.ProgressCreated);
                 return true;
             }
         }
@@ -746,14 +760,151 @@ namespace FoxTunes
             if (result != WindowsTaskbarList.HResult.Ok)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
-                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
                 return false;
             }
             else
             {
-                this.Windows[handle] &= ~TaskbarButtonsWindowFlags.ProgressCreated;
+                this.RemoveFlag(handle, TaskbarButtonsWindowFlags.ProgressCreated);
                 return true;
             }
+        }
+
+        protected virtual async Task<bool> UpdateThumbnail(IntPtr handle)
+        {
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            if (!this.HasFlag(handle, TaskbarButtonsWindowFlags.ThumbnailCreated))
+            {
+                int forceIconicRepresentation = 1;
+                int hasIconicBitmap = 1;
+                var result = default(WindowsIconicThumbnail.HResult);
+                await this.Invoke(
+                   source.Dispatcher,
+                   () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
+                        handle,
+                        WindowsIconicThumbnail.DWM_FORCE_ICONIC_REPRESENTATION,
+                        ref forceIconicRepresentation,
+                        sizeof(int)
+                    )
+                ).ConfigureAwait(false);
+                if (result != WindowsIconicThumbnail.HResult.Ok)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_FORCE_ICONIC_REPRESENTATION: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                    return false;
+                }
+                await this.Invoke(
+                   source.Dispatcher,
+                   () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
+                        handle,
+                        WindowsIconicThumbnail.DWM_HAS_ICONIC_BITMAP,
+                        ref hasIconicBitmap,
+                        sizeof(int)
+                    )
+                ).ConfigureAwait(false);
+                if (result != WindowsIconicThumbnail.HResult.Ok)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_HAS_ICONIC_BITMAP: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                    return false;
+                }
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.ThumbnailCreated);
+            }
+            else
+            {
+                var result = default(WindowsIconicThumbnail.HResult);
+                await this.Invoke(
+                    source.Dispatcher,
+                    () => result = WindowsIconicThumbnail.DwmInvalidateIconicBitmaps(handle)
+                ).ConfigureAwait(false);
+                if (result != WindowsIconicThumbnail.HResult.Ok)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to invalidate iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        protected virtual async Task<bool> OnSendIconicThumbnail(IntPtr handle, int width, int height)
+        {
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream == null)
+            {
+                return await this.OnSendPlaceholderIconicThumbnail(handle, width, height).ConfigureAwait(false);
+            }
+            var fileData = default(IFileData);
+            if (outputStream.PlaylistItem.LibraryItem_Id.HasValue)
+            {
+                fileData = this.LibraryBrowser.Get(outputStream.PlaylistItem.LibraryItem_Id.Value);
+            }
+            else
+            {
+                fileData = outputStream.PlaylistItem;
+            }
+            var fileName = await this.ArtworkProvider.Find(fileData, ArtworkType.FrontCover);
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
+            {
+                return await this.OnSendPlaceholderIconicThumbnail(handle, width, height).ConfigureAwait(false);
+            }
+            return await this.OnSendIconicThumbnail(handle, fileName, width, height).ConfigureAwait(false);
+        }
+
+        protected virtual async Task<bool> OnSendIconicThumbnail(IntPtr handle, Bitmap bitmap, int width, int height)
+        {
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            var bitmapSection = default(IntPtr);
+            if (!WindowsImaging.CreateDIBSection(bitmap, width, -height /* This isn't a mistake, DIB is top down. */, out bitmapSection))
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                return false;
+            }
+            var result = default(WindowsIconicThumbnail.HResult);
+            await this.Invoke(
+                source.Dispatcher,
+                () => result = WindowsIconicThumbnail.DwmSetIconicThumbnail(handle, bitmapSection, 0)
+            ).ConfigureAwait(false);
+            if (result != WindowsIconicThumbnail.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to set iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                return false;
+            }
+            WindowsImaging.DeleteObject(bitmapSection);
+            return true;
+        }
+
+        protected virtual async Task<bool> OnSendIconicThumbnail(IntPtr handle, string fileName, int width, int height)
+        {
+            using (var bitmap = this.GetExternalImage(fileName, width, height))
+            {
+                return await this.OnSendIconicThumbnail(handle, bitmap, width, height).ConfigureAwait(false);
+            }
+        }
+
+        protected virtual async Task<bool> OnSendPlaceholderIconicThumbnail(IntPtr handle, int width, int height)
+        {
+            using (var bitmap = this.GetPlaceholderImage(width, height))
+            {
+                return await this.OnSendIconicThumbnail(handle, bitmap, width, height).ConfigureAwait(false);
+            }
+        }
+
+        protected virtual void OnSendIconicLivePreviewBitmap(IntPtr handle)
+        {
+            //Nothing to do.
         }
 
         protected virtual IEnumerable<WindowsTaskbarList.ThumbButton> Buttons
@@ -773,7 +924,7 @@ namespace FoxTunes
                 return new WindowsTaskbarList.ThumbButton()
                 {
                     Id = BUTTON_PREVIOUS,
-                    Tip = "Previous",
+                    Tip = Strings.TaskbarButtonsBehaviour_Previous,
                     Bitmap = 0,
                     Mask = this.ButtonMask,
                     Flags = this.ButtonFlags
@@ -789,7 +940,7 @@ namespace FoxTunes
                 return new WindowsTaskbarList.ThumbButton()
                 {
                     Id = BUTTON_PLAY_PAUSE,
-                    Tip = "Play or pause",
+                    Tip = Strings.TaskbarButtonsBehaviour_PlayPause,
                     Bitmap = outputStream != null && outputStream.IsPlaying ? 2u : 1u,
                     Mask = this.ButtonMask,
                     Flags = this.ButtonFlags
@@ -804,7 +955,7 @@ namespace FoxTunes
                 return new WindowsTaskbarList.ThumbButton()
                 {
                     Id = BUTTON_NEXT,
-                    Tip = "Next",
+                    Tip = Strings.TaskbarButtonsBehaviour_Next,
                     Bitmap = 3,
                     Mask = this.ButtonMask,
                     Flags = this.ButtonFlags
@@ -966,6 +1117,7 @@ namespace FoxTunes
         ButtonsCreated = 4,
         Error = 8,
         Destroyed = 16,
-        ProgressCreated = 32
+        ProgressCreated = 32,
+        ThumbnailCreated = 64
     }
 }

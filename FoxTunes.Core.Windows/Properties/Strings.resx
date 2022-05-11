@@ -135,6 +135,15 @@
   <data name="ExecutionStateBehaviourConfiguration.SleepSystem" xml:space="preserve">
     <value>Prevent System Sleep</value>
   </data>
+  <data name="TaskbarButtonsBehaviour.Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="TaskbarButtonsBehaviour.PlayPause" xml:space="preserve">
+    <value>Play or pause</value>
+  </data>
+  <data name="TaskbarButtonsBehaviour.Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
   <data name="TaskbarButtonsBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Enabled</value>
   </data>
@@ -143,5 +152,8 @@
   </data>
   <data name="TaskbarButtonsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Taskbar Buttons</value>
+  </data>
+  <data name="TaskbarButtonsBehaviourConfiguration.Thumbnail" xml:space="preserve">
+    <value>Thumbnail</value>
   </data>
 </root>

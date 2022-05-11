@@ -12,6 +12,8 @@ namespace FoxTunes
 
         public const string PROGRESS_ELEMENT = "BBBB676E-ACEA-4D5F-8B1D-B02758CAE959";
 
+        public const string THUMBNAIL_ELEMENT = "CCCC32FB-CC7A-43C7-8C3D-525DDDBD12AA";
+
         public static bool IsPlatformSupported
         {
             get
@@ -37,7 +39,8 @@ namespace FoxTunes
                 var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
                 yield return new ConfigurationSection(SECTION, Strings.TaskbarButtonsBehaviourConfiguration_Section)
                     .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.TaskbarButtonsBehaviourConfiguration_Enabled).WithValue(releaseType == ReleaseType.Default))
-                    .WithElement(new BooleanConfigurationElement(PROGRESS_ELEMENT, Strings.TaskbarButtonsBehaviourConfiguration_Progress).WithValue(false).DependsOn(SECTION, ENABLED_ELEMENT)
+                    .WithElement(new BooleanConfigurationElement(PROGRESS_ELEMENT, Strings.TaskbarButtonsBehaviourConfiguration_Progress).WithValue(true).DependsOn(SECTION, ENABLED_ELEMENT))
+                    .WithElement(new BooleanConfigurationElement(THUMBNAIL_ELEMENT, Strings.TaskbarButtonsBehaviourConfiguration_Thumbnail).WithValue(true).DependsOn(SECTION, ENABLED_ELEMENT)
                 );
             }
         }
