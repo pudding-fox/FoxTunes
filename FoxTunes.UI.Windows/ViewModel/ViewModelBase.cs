@@ -18,7 +18,7 @@ namespace FoxTunes.ViewModel
 
         protected ViewModelBase(bool initialize = true)
         {
-            if (initialize)
+            if (initialize && Core.Instance != null)
             {
                 this.InitializeComponent(Core.Instance);
             }
