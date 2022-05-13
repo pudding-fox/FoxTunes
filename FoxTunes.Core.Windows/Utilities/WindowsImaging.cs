@@ -10,25 +10,38 @@ namespace FoxTunes
     {
         public const int ILC_COLOR32 = 0x00000020;
 
-        public static Bitmap Resize(Bitmap sourceImage, int width, int height)
+        public static Bitmap Resize(Bitmap sourceImage, int width, int height, bool scale)
         {
+            var rectangle = default(Rectangle);
+            if (scale)
+            {
+                Scale(sourceImage.Width, sourceImage.Height, width, height, out rectangle);
+            }
+            else
+            {
+                rectangle = new Rectangle(0, 0, width, height);
+            }
             var resultImage = new Bitmap(width, height);
             using (var graphics = Graphics.FromImage(resultImage))
             {
                 graphics.InterpolationMode = InterpolationMode.High;
                 graphics.CompositingQuality = CompositingQuality.HighQuality;
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                graphics.DrawImage(
-                    sourceImage,
-                    new Rectangle(
-                        0,
-                        0,
-                        width,
-                        height
-                    )
-                );
+                graphics.DrawImage(sourceImage, rectangle);
             }
             return resultImage;
+        }
+
+        public static void Scale(int sourceWidth, int sourceHeight, int targetWidth, int targetHeight, out Rectangle rectangle)
+        {
+            var ratioX = Convert.ToSingle(targetWidth) / sourceWidth;
+            var ratioY = Convert.ToSingle(targetHeight) / sourceHeight;
+            var ratio = Math.Min(ratioX, ratioY);
+            var actualWidth = Convert.ToInt32(sourceWidth * ratio);
+            var actualHeight = Convert.ToInt32(sourceHeight * ratio);
+            var x = (targetWidth / 2) - (actualWidth / 2);
+            var y = (targetHeight / 2) - (actualHeight / 2);
+            rectangle = new Rectangle(x, y, actualWidth, actualHeight);
         }
 
         public static bool CreateDIBSection(Bitmap bitmap, int width, int height, out IntPtr bitmapSection)
