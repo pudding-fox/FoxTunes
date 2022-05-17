@@ -142,7 +142,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enabled.
+        ///   Looks up a localized string similar to Taskbar Buttons.
         /// </summary>
         internal static string TaskbarButtonsBehaviourConfiguration_Enabled {
             get {
@@ -151,29 +151,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Progress.
+        ///   Looks up a localized string similar to Taskbar Progress.
         /// </summary>
-        internal static string TaskbarButtonsBehaviourConfiguration_Progress {
+        internal static string TaskbarProgressBehaviourConfiguration_Enabled {
             get {
-                return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Progress", resourceCulture);
+                return ResourceManager.GetString("TaskbarProgressBehaviourConfiguration.Enabled", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Taskbar Buttons.
+        ///   Looks up a localized string similar to Taskbar Thumbnail.
         /// </summary>
-        internal static string TaskbarButtonsBehaviourConfiguration_Section {
+        internal static string TaskbarThumbnailBehaviourConfiguration_Enabled {
             get {
-                return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Section", resourceCulture);
+                return ResourceManager.GetString("TaskbarThumbnailBehaviourConfiguration.Enabled", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thumbnail.
+        ///   Looks up a localized string similar to Windows 7.
         /// </summary>
-        internal static string TaskbarButtonsBehaviourConfiguration_Thumbnail {
+        internal static string WindowsConfiguration_Section {
             get {
-                return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Thumbnail", resourceCulture);
+                return ResourceManager.GetString("WindowsConfiguration.Section", resourceCulture);
             }
         }
     }
