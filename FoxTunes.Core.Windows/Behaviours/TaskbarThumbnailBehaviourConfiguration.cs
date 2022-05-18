@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -13,7 +12,7 @@ namespace FoxTunes
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, Strings.WindowsConfiguration_Section)
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.TaskbarThumbnailBehaviourConfiguration_Enabled).WithValue(releaseType == ReleaseType.Default)
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.TaskbarThumbnailBehaviourConfiguration_Enabled).WithValue(false)
             );
         }
     }
