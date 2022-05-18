@@ -7,7 +7,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Interop;
-using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -141,11 +140,13 @@ namespace FoxTunes
                 //Only create taskbar thumbnail for main windows.
                 return;
             }
+            Logger.Write(this, LogLevel.Debug, "Window created: {0}", e.Window.Handle);
             this.Windows.TryAdd(e.Window.Handle, TaskbarThumbnailWindowFlags.None);
         }
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
+            Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarThumbnailWindowFlags.Destroyed);
         }
 
@@ -178,6 +179,8 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Updater disabled.");
                 }
             }
+            //Perform any cleanup.
+            var task = this.Update();
         }
 
         protected virtual async void OnElapsed(object sender, ElapsedEventArgs e)
@@ -228,6 +231,13 @@ namespace FoxTunes
                 {
                     this.AddHook(handle);
                 }
+                if (!flags.HasFlag(TaskbarThumbnailWindowFlags.ThumbnailCreated))
+                {
+                    if (!await this.SetWindowAttributes(handle, true).ConfigureAwait(false))
+                    {
+                        return;
+                    }
+                }
                 if (!await this.UpdateThumbnail(handle).ConfigureAwait(false))
                 {
                     return;
@@ -235,10 +245,9 @@ namespace FoxTunes
             }
             else
             {
-                //Although we're no longer enabled, these features can't be disabled so we must keep them updated.
                 if (flags.HasFlag(TaskbarThumbnailWindowFlags.ThumbnailCreated))
                 {
-                    if (!await this.UpdateThumbnail(handle).ConfigureAwait(false))
+                    if (!await this.SetWindowAttributes(handle, false).ConfigureAwait(false))
                     {
                         return;
                     }
@@ -256,7 +265,7 @@ namespace FoxTunes
             }
             else if (msg == WindowsIconicThumbnail.WM_DWMSENDICONICLIVEPREVIEWBITMAP)
             {
-                this.OnSendIconicLivePreviewBitmap(hwnd);
+                var task = this.OnSendIconicLivePreviewBitmap(hwnd);
             }
             else if (msg == WindowMessages.WM_TASKBARCREATED)
             {
@@ -272,7 +281,7 @@ namespace FoxTunes
                 //Handing an event for an unknown window?
                 return;
             }
-            //TODO: Should we be destroying the image list?
+            Logger.Write(this, LogLevel.Debug, "Taskbar was created: {0}", handle);
             this.Windows[handle] = TaskbarThumbnailWindowFlags.Registered;
         }
 
@@ -312,51 +321,13 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
-            if (!this.HasFlag(handle, TaskbarThumbnailWindowFlags.ThumbnailCreated))
-            {
-                int forceIconicRepresentation = 1;
-                int hasIconicBitmap = 1;
-                var result = default(WindowsIconicThumbnail.HResult);
-                await this.Invoke(
-                   source.Dispatcher,
-                   () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
-                        handle,
-                        WindowsIconicThumbnail.DWM_FORCE_ICONIC_REPRESENTATION,
-                        ref forceIconicRepresentation,
-                        sizeof(int)
-                    )
-                ).ConfigureAwait(false);
-                if (result != WindowsIconicThumbnail.HResult.Ok)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_FORCE_ICONIC_REPRESENTATION: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
-                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
-                    return false;
-                }
-                await this.Invoke(
-                   source.Dispatcher,
-                   () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
-                        handle,
-                        WindowsIconicThumbnail.DWM_HAS_ICONIC_BITMAP,
-                        ref hasIconicBitmap,
-                        sizeof(int)
-                    )
-                ).ConfigureAwait(false);
-                if (result != WindowsIconicThumbnail.HResult.Ok)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_HAS_ICONIC_BITMAP: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
-                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
-                    return false;
-                }
-                this.AddFlag(handle, TaskbarThumbnailWindowFlags.ThumbnailCreated);
-            }
             var thumbnail = await this.GetThumbnail().ConfigureAwait(false);
             if (!this.HasThumbnail(handle, thumbnail.Name))
             {
                 Logger.Write(this, LogLevel.Debug, "Iconic thumbnail: {0}", thumbnail.Name);
                 this.SetThumbnail(handle, thumbnail);
                 var result = default(WindowsIconicThumbnail.HResult);
-                await this.Invoke(
-                    source.Dispatcher,
+                await source.Invoke(
                     () => result = WindowsIconicThumbnail.DwmInvalidateIconicBitmaps(handle)
                 ).ConfigureAwait(false);
                 if (result != WindowsIconicThumbnail.HResult.Ok)
@@ -365,6 +336,58 @@ namespace FoxTunes
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
+            }
+            return true;
+        }
+
+        protected virtual async Task<bool> SetWindowAttributes(IntPtr handle, bool enable)
+        {
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            int forceIconicRepresentation = enable ? 1 : 0;
+            int hasIconicBitmap = enable ? 1 : 0;
+            var result = default(WindowsIconicThumbnail.HResult);
+            Logger.Write(this, LogLevel.Debug, "Setting window attribute {0}: DWM_FORCE_ICONIC_REPRESENTATION = {1}", handle, enable ? bool.TrueString : bool.FalseString);
+            await source.Invoke(
+                   () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
+                    handle,
+                    WindowsIconicThumbnail.DWM_FORCE_ICONIC_REPRESENTATION,
+                    ref forceIconicRepresentation,
+                    sizeof(int)
+                )
+            ).ConfigureAwait(false);
+            if (result != WindowsIconicThumbnail.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_FORCE_ICONIC_REPRESENTATION: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                return false;
+            }
+            Logger.Write(this, LogLevel.Debug, "Setting window attribute {0}: DWM_HAS_ICONIC_BITMAP = {1}", handle, enable ? bool.TrueString : bool.FalseString);
+            await source.Invoke(
+                   () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
+                    handle,
+                    WindowsIconicThumbnail.DWM_HAS_ICONIC_BITMAP,
+                    ref hasIconicBitmap,
+                    sizeof(int)
+                )
+            ).ConfigureAwait(false);
+            if (result != WindowsIconicThumbnail.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_HAS_ICONIC_BITMAP: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                return false;
+            }
+            if (enable)
+            {
+                this.AddFlag(handle, TaskbarThumbnailWindowFlags.ThumbnailCreated);
+            }
+            else
+            {
+                this.RemoveFlag(handle, TaskbarThumbnailWindowFlags.ThumbnailCreated);
             }
             return true;
         }
@@ -399,8 +422,7 @@ namespace FoxTunes
                 return false;
             }
             var result = default(WindowsIconicThumbnail.HResult);
-            await this.Invoke(
-                source.Dispatcher,
+            await source.Invoke(
                 () => result = WindowsIconicThumbnail.DwmSetIconicThumbnail(handle, bitmapSection, 0)
             ).ConfigureAwait(false);
             WindowsImaging.DeleteObject(bitmapSection);
@@ -436,30 +458,43 @@ namespace FoxTunes
             return TaskbarThumbnail.Placeholder;
         }
 
-        protected virtual void OnSendIconicLivePreviewBitmap(IntPtr handle)
+        protected virtual async Task<bool> OnSendIconicLivePreviewBitmap(IntPtr handle)
         {
-            //Nothing to do.
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            var bitmap = default(Bitmap);
+            await source.Invoke(
+                () => bitmap = source.RootVisual.ToBitmap()
+            ).ConfigureAwait(false);
+            return await this.OnSendIconicLivePreviewBitmap(handle, bitmap).ConfigureAwait(false);
         }
 
-        protected virtual Task Invoke(Dispatcher dispatcher, Action action)
+        protected virtual async Task<bool> OnSendIconicLivePreviewBitmap(IntPtr handle, Bitmap bitmap)
         {
-#if NET40
-            var source = new TaskCompletionSource<bool>();
-            dispatcher.BeginInvoke(new Action(() =>
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
             {
-                try
-                {
-                    action();
-                }
-                finally
-                {
-                    source.SetResult(false);
-                }
-            }));
-            return source.Task;
-#else
-            return dispatcher.BeginInvoke(action).Task;
-#endif
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            var bitmapSection = bitmap.GetHbitmap();
+            var offset = new WindowsIconicThumbnail.POINT();
+            var result = default(WindowsIconicThumbnail.HResult);
+            await source.Invoke(
+                () => result = WindowsIconicThumbnail.DwmSetIconicLivePreviewBitmap(handle, bitmapSection, ref offset, 0)
+            ).ConfigureAwait(false);
+            WindowsImaging.DeleteObject(bitmapSection);
+            if (result != WindowsIconicThumbnail.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to set iconic live preview: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                return false;
+            }
+            return true;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -526,19 +561,22 @@ namespace FoxTunes
 
             private static readonly CappedDictionary<string, TaskbarThumbnail> Store = new CappedDictionary<string, TaskbarThumbnail>(CAPACITY, StringComparer.OrdinalIgnoreCase);
 
-            public TaskbarThumbnail(string name, Bitmap sourceBitmap)
+            private TaskbarThumbnail()
+            {
+                this.ScaledBitmaps = new ConcurrentDictionary<Size, Bitmap>();
+            }
+
+            public TaskbarThumbnail(string name, Bitmap bitmap) : this()
             {
                 this.Name = name;
-                this.SourceBitmap = sourceBitmap;
+                this.Bitmap = bitmap;
             }
+
+            public ConcurrentDictionary<Size, Bitmap> ScaledBitmaps { get; private set; }
 
             public string Name { get; private set; }
 
-            public Bitmap SourceBitmap { get; private set; }
-
-            public Bitmap ScaledBitmap { get; private set; }
-
-            public int Count { get; set; }
+            public Bitmap Bitmap { get; private set; }
 
             public bool IsPlaceholder
             {
@@ -550,16 +588,12 @@ namespace FoxTunes
 
             public Bitmap Scale(int width, int height)
             {
-                lock (this.SourceBitmap)
+                var size = new Size(width, height);
+                return this.ScaledBitmaps.GetOrAdd(size, () =>
                 {
-                    if (this.ScaledBitmap != null && this.ScaledBitmap.Width == width && this.ScaledBitmap.Height == height)
-                    {
-                        return this.ScaledBitmap;
-                    }
                     Logger.Write(typeof(TaskbarThumbnail), LogLevel.Debug, "Resizing image {0}: {1}x{2}", this.Name, width, height);
-                    this.ScaledBitmap = WindowsImaging.Resize(this.SourceBitmap, width, height, true);
-                }
-                return this.ScaledBitmap;
+                    return WindowsImaging.Resize(this.Bitmap, width, height, true);
+                });
             }
 
             public bool IsDisposed { get; private set; }
@@ -582,13 +616,19 @@ namespace FoxTunes
 
             protected virtual void OnDisposing()
             {
-                if (this.SourceBitmap != null)
+                if (this.ScaledBitmaps != null)
                 {
-                    this.SourceBitmap.Dispose();
+                    foreach (var pair in this.ScaledBitmaps)
+                    {
+                        if (pair.Value != null)
+                        {
+                            pair.Value.Dispose();
+                        }
+                    }
                 }
-                if (this.ScaledBitmap != null)
+                if (this.Bitmap != null)
                 {
-                    this.ScaledBitmap.Dispose();
+                    this.Bitmap.Dispose();
                 }
             }
 

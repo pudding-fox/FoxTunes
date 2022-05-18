@@ -22,11 +22,21 @@ namespace FoxTunes
         public static extern HResult DwmSetIconicThumbnail(IntPtr hwnd, IntPtr hBitmap, int flags);
 
         [DllImport("dwmapi.dll", PreserveSig = true)]
+        public static extern HResult DwmSetIconicLivePreviewBitmap(IntPtr hwnd, IntPtr hBitmap, ref POINT ptClient, int flags);
+
+        [DllImport("dwmapi.dll", PreserveSig = true)]
         public static extern HResult DwmInvalidateIconicBitmaps(IntPtr hwnd);
 
         public enum HResult
         {
             Ok = 0x0000
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public class POINT
+        {
+            public int X;
+            public int Y;
         }
     }
 }
