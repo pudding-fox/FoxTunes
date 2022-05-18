@@ -763,6 +763,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Output Inactive.
+        /// </summary>
+        internal static string PlaybackDetails_NoOutput {
+            get {
+                return ResourceManager.GetString("PlaybackDetails.NoOutput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add to playlist by dropping files here..
         /// </summary>
         internal static string PlaylistBase_Empty {

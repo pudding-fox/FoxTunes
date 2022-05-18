@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <ViewModel:Settings x:Key="ViewModel"></ViewModel:Settings>
     </UserControl.Resources>
-    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" ToolTipService.ShowDuration="60000">
+    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding WindowState.Visible, Source={StaticResource ViewModel}}" ToolTipService.ShowDuration="60000">
         <ToggleButton.ToolTip>
             <Windows:PlaybackDetails></Windows:PlaybackDetails>
         </ToggleButton.ToolTip>

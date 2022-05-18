@@ -93,7 +93,7 @@ namespace FoxTunes
             }
             if (this.Settings != null)
             {
-                this.Commands.Add(this.Settings, this._Settings.ShowCommand);
+                this.Commands.Add(this.Settings, this._Settings.WindowState.ShowCommand);
                 this.Settings.ValueChanged += this.OnValueChanged;
             }
             if (this.Search != null)

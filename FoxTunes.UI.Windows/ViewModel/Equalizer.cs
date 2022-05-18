@@ -194,8 +194,6 @@ namespace FoxTunes.ViewModel
             });
         }
 
-        
-
         protected virtual IEnumerable<EqualizerBand> GetBands()
         {
             if (this.Effects != null && this.Effects.Equalizer != null)

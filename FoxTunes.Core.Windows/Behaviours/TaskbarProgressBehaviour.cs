@@ -82,8 +82,8 @@ namespace FoxTunes
             this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                TaskbarThumbnailBehaviourConfiguration.SECTION,
-                TaskbarThumbnailBehaviourConfiguration.ENABLED_ELEMENT
+                TaskbarProgressBehaviourConfiguration.SECTION,
+                TaskbarProgressBehaviourConfiguration.ENABLED_ELEMENT
             );
             this.Enabled.ConnectValue(value =>
             {

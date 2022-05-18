@@ -106,6 +106,7 @@ namespace FoxTunes
 
         public static void Shutdown()
         {
+            Logger.Write(typeof(UIBehaviour), LogLevel.Debug, "Shutting down..");
             foreach (var instance in Active)
             {
                 try

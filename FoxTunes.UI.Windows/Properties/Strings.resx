@@ -351,6 +351,9 @@
   <data name="Playback.Name" xml:space="preserve">
     <value>Playback Controls</value>
   </data>
+  <data name="PlaybackDetails.NoOutput" xml:space="preserve">
+    <value>Output Inactive</value>
+  </data>
   <data name="PlaylistBase.Empty" xml:space="preserve">
     <value>Add to playlist by dropping files here.</value>
   </data>
