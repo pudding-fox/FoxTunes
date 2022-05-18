@@ -66,15 +66,9 @@ namespace FoxTunes
             return this.Windows.TryUpdate(handle, flags & ~flag, flags);
         }
 
-        public IPlaylistManager PlaylistManager { get; private set; }
-
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IUserInterface UserInterface { get; private set; }
-
-        public IArtworkProvider ArtworkProvider { get; private set; }
-
-        public ILibraryBrowser LibraryBrowser { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -82,13 +76,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.UserInterface = core.Components.UserInterface;
             this.UserInterface.WindowCreated += this.OnWindowCreated;
             this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
-            this.ArtworkProvider = core.Components.ArtworkProvider;
-            this.LibraryBrowser = core.Components.LibraryBrowser;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 TaskbarThumbnailBehaviourConfiguration.SECTION,
