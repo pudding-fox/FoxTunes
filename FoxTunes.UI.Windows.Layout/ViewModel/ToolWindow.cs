@@ -13,11 +13,7 @@ namespace FoxTunes.ViewModel
                 {
                     return string.Empty;
                 }
-                if (string.IsNullOrEmpty(this.Configuration.Title))
-                {
-                    return GetTitle(this);
-                }
-                return this.Configuration.Title;
+                return ToolWindowConfiguration.GetTitle(this.Configuration);
             }
             set
             {
@@ -361,21 +357,6 @@ namespace FoxTunes.ViewModel
                 this.Configuration.AlwaysOnTopChanged -= this.OnAlwaysOnTopChanged;
             }
             base.OnDisposing();
-        }
-
-        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
-
-        public string GetTitle(ToolWindow instance)
-        {
-            if (instance.Component != null)
-            {
-                var component = Factory.CreateComponent(instance.Component);
-                if (component != null)
-                {
-                    return component.Name;
-                }
-            }
-            return Strings.ToolWindowBehaviour_NewWindow;
         }
     }
 }

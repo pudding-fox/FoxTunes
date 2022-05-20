@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System;
 
 namespace FoxTunes
 {
@@ -18,6 +19,12 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Bands { get; private set; }
 
+        public BooleanConfigurationElement Peaks { get; private set; }
+
+        public BooleanConfigurationElement Rms { get; private set; }
+
+        public BooleanConfigurationElement Crest { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -28,6 +35,18 @@ namespace FoxTunes
             this.Bands = this.Configuration.GetElement<SelectionConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.BANDS_ELEMENT
+            );
+            this.Peaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.PEAKS_ELEMENT
+            );
+            this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.RMS_ELEMENT
+            );
+            this.Crest = this.Configuration.GetElement<BooleanConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.CREST_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -54,20 +73,61 @@ namespace FoxTunes
                         attributes: this.Bands.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
+                yield return new InvocationComponent(
+                    BASIC_CATEGORY,
+                    this.Peaks.Id,
+                    this.Peaks.Name,
+                    attributes: (byte)((this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                );
+                yield return new InvocationComponent(
+                    ENHANCED_CATEGORY,
+                    this.Peaks.Id,
+                    this.Peaks.Name,
+                    attributes: (byte)((this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                );
+                yield return new InvocationComponent(
+                    ENHANCED_CATEGORY,
+                    this.Rms.Id,
+                    this.Rms.Name,
+                    attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    ENHANCED_CATEGORY,
+                    this.Crest.Id,
+                    this.Crest.Name,
+                    attributes: this.Crest.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
             }
         }
 
         public Task InvokeAsync(IInvocationComponent component)
         {
-            switch (component.Category)
+            if (string.Equals(component.Id, this.Peaks.Id, StringComparison.OrdinalIgnoreCase))
             {
-                case BASIC_CATEGORY:
-                    this.Bars.Value = this.Bars.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
-                    break;
-                case ENHANCED_CATEGORY:
-                    this.Bands.Value = this.Bands.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
-                    break;
+                this.Peaks.Toggle();
             }
+            else if (string.Equals(component.Id, this.Rms.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Rms.Toggle();
+            }
+            else if (string.Equals(component.Id, this.Crest.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Crest.Toggle();
+            }
+            else
+            {
+                var bars = this.Bars.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id, StringComparison.OrdinalIgnoreCase));
+                if (bars != null)
+                {
+                    this.Bars.Value = bars;
+                }
+                var bands = this.Bands.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id, StringComparison.OrdinalIgnoreCase));
+                if (bands != null)
+                {
+                    this.Bands.Value = bands;
+                }
+            }
+
             this.Configuration.Save();
 #if NET40
             return TaskEx.FromResult(false);

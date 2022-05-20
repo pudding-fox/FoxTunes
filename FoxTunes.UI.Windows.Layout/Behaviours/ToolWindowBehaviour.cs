@@ -84,7 +84,7 @@ namespace FoxTunes
 
         protected virtual async Task<ToolWindow> Load(ToolWindowConfiguration config)
         {
-            Logger.Write(this, LogLevel.Debug, "Loading config: {0}", config.Title);
+            Logger.Write(this, LogLevel.Debug, "Loading config: {0}", ToolWindowConfiguration.GetTitle(config));
             try
             {
                 if (!ScreenHelper.WindowBoundsVisible(new Rect(config.Left, config.Top, config.Width, config.Height)))
@@ -96,7 +96,7 @@ namespace FoxTunes
                 var window = default(ToolWindow);
                 await global::FoxTunes.Windows.Invoke(() =>
                 {
-                    Logger.Write(this, LogLevel.Debug, "Creating window: {0}", config.Title);
+                    Logger.Write(this, LogLevel.Debug, "Creating window: {0}", ToolWindowConfiguration.GetTitle(config));
                     window = new ToolWindow();
                     window.Configuration = config;
                     window.ShowActivated = false;
@@ -137,7 +137,7 @@ namespace FoxTunes
 
         protected virtual Task UpdateVisiblity(ToolWindowConfiguration config, ToolWindow window)
         {
-            Logger.Write(this, LogLevel.Debug, "Updating visiblity: {0}", config.Title);
+            Logger.Write(this, LogLevel.Debug, "Updating visiblity: {0}", ToolWindowConfiguration.GetTitle(config));
             var show = false;
             var id = default(string);
             if (global::FoxTunes.Windows.ActiveWindow is WindowBase activeWindow)
@@ -158,19 +158,19 @@ namespace FoxTunes
             }
             if (show)
             {
-                Logger.Write(this, LogLevel.Debug, "Showing window: {0}", config.Title);
+                Logger.Write(this, LogLevel.Debug, "Showing window: {0}", ToolWindowConfiguration.GetTitle(config));
                 return global::FoxTunes.Windows.Invoke(window.Show);
             }
             else
             {
-                Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", config.Title);
+                Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", ToolWindowConfiguration.GetTitle(config));
                 return global::FoxTunes.Windows.Invoke(window.Hide);
             }
         }
 
         protected virtual void Unload(ToolWindowConfiguration config, ToolWindow window)
         {
-            Logger.Write(this, LogLevel.Debug, "Unloading config: {0}", config.Title);
+            Logger.Write(this, LogLevel.Debug, "Unloading config: {0}", ToolWindowConfiguration.GetTitle(config));
             this.Windows.TryGetValue(config, out window);
             if (!this.Windows.Remove(config))
             {
@@ -693,6 +693,25 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
+
+        public static string GetTitle(ToolWindowConfiguration instance)
+        {
+            if (!string.IsNullOrEmpty(instance.Title))
+            {
+                return instance.Title;
+            }
+            if (instance.Component != null)
+            {
+                var component = Factory.CreateComponent(instance.Component);
+                if (component != null)
+                {
+                    return component.Name;
+                }
+            }
+            return Strings.ToolWindowBehaviour_NewWindow;
+        }
     }
 
     public delegate void ToolWindowConfigurationEventHandler(object sender, ToolWindowConfigurationEventArgs e);

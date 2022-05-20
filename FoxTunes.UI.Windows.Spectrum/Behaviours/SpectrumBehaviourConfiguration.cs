@@ -25,7 +25,7 @@ namespace FoxTunes
 
         public const string BARS_128_OPTION = "DDDD558E-7B9C-4101-992A-709B87756991";
 
-        public const string BARS_256_OPTION = "EEEEFFC1-592E-4EC6-9CCD-5182935AD12E";
+        public const string BARS_256_OPTION = "DDDD0FC1-592E-4EC6-9CCD-5182935AD12E";
 
         public const string BANDS_ELEMENT = "AABBF573-83D3-498E-BEF8-F1DB5A329B9D";
 
@@ -35,7 +35,7 @@ namespace FoxTunes
 
         public const string BANDS_21_OPTION = "CCCCC739-B777-474B-B4A8-F96375254FAC";
 
-        public const string BANDS_31_OPTION = "DDDDDA9D-0512-4F9F-903D-9AC33A9C6CFD";
+        public const string BANDS_31_OPTION = "DDDD0A9D-0512-4F9F-903D-9AC33A9C6CFD";
 
         public const string PEAKS_ELEMENT = "DDDD7FCF-8A71-4367-8F48-4F8D8C89739C";
 

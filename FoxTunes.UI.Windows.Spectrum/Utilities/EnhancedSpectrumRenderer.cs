@@ -111,6 +111,10 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
+                if (this.Bitmap == null)
+                {
+                    return;
+                }
                 this.RendererData = Create(
                     this,
                     this.Bitmap.PixelWidth,
@@ -201,7 +205,7 @@ namespace FoxTunes
                     {
                         UpdateElementsFast(data);
                     }
-                    if (this.ShowPeaks.Value)
+                    if (data.PeakElements != null)
                     {
                         var duration = Convert.ToInt32(
                             Math.Min(
@@ -209,7 +213,19 @@ namespace FoxTunes
                                 this.UpdateInterval * 100
                             )
                         );
-                        UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
+                        if (data.RmsElements != null)
+                        {
+                            var elements = new[]
+                            {
+                                data.ValueElements,
+                                data.RmsElements
+                            };
+                            UpdateElementsSmooth(elements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
+                        }
+                        else
+                        {
+                            UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
+                        }
                     }
                 }
 
@@ -303,7 +319,12 @@ namespace FoxTunes
                 }
                 if (peakElements != null)
                 {
-                    if (peakElements[a].Y < valueElements[a].Y)
+                    var max = valueElements[a].Y;
+                    if (rmsElements != null)
+                    {
+                        max = Math.Max(max, rmsElements[a].Y);
+                    }
+                    if (peakElements[a].Y < max)
                     {
                         BitmapHelper.DrawRectangle(
                             valueRenderInfo,

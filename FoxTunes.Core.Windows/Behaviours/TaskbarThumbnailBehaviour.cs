@@ -419,16 +419,16 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
-            using (var hdc = WindowsImaging.ScopedDC.Compatible())
+            using (var hdc = WindowsImaging.ScopedDC.Compatible(handle))
             {
-                if (IntPtr.Zero.Equals(hdc))
+                if (!hdc.IsValid)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
                 var bitmapSection = default(IntPtr);
-                if (!WindowsImaging.CreateDIBSection(hdc.DC, bitmap, bitmap.Width, -bitmap.Height/* This isn't a mistake, DIB is top down. */, out bitmapSection))
+                if (!WindowsImaging.CreateDIBSection(hdc.cdc, bitmap, bitmap.Width, -bitmap.Height/* This isn't a mistake, DIB is top down. */, out bitmapSection))
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
@@ -495,16 +495,16 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
-            using (var hdc = WindowsImaging.ScopedDC.Compatible())
+            using (var hdc = WindowsImaging.ScopedDC.Compatible(handle))
             {
-                if (IntPtr.Zero.Equals(hdc))
+                if (!hdc.IsValid)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
                 var bitmapSection = default(IntPtr);
-                if (!WindowsImaging.CreateDIBSection(hdc.DC, bitmap, bitmap.Width, bitmap.Height, out bitmapSection))
+                if (!WindowsImaging.CreateDIBSection(hdc.cdc, bitmap, bitmap.Width, -bitmap.Height/* This isn't a mistake, DIB is top down. */, out bitmapSection))
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
