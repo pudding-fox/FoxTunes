@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -44,7 +45,7 @@ namespace FoxTunes
             rectangle = new Rectangle(x, y, actualWidth, actualHeight);
         }
 
-        public static bool CreateDIBSection(Bitmap bitmap, int width, int height, out IntPtr bitmapSection)
+        public static bool CreateDIBSection(IntPtr hdc, Bitmap bitmap, int width, int height, out IntPtr bitmapSection)
         {
             var bitmapBits = default(IntPtr);
             var bitmapInfo = new BITMAPINFO()
@@ -56,39 +57,41 @@ namespace FoxTunes
                 biHeight = height
             };
             bitmapSection = CreateDIBSection(
-                IntPtr.Zero,
+                hdc,
                 bitmapInfo,
                 0,
                 out bitmapBits,
                 IntPtr.Zero,
                 0
             );
-            if (IntPtr.Zero.Equals(bitmapSection))
+            var result = default(bool);
+            if (!IntPtr.Zero.Equals(bitmapSection))
             {
-                return false;
+                var bitmapData = bitmap.LockBits(
+                    new Rectangle(
+                        0,
+                        0,
+                        bitmap.Width,
+                        bitmap.Height
+                    ),
+                    ImageLockMode.ReadOnly,
+                    PixelFormat.Format32bppArgb
+                );
+                result = RtlMoveMemory(
+                    bitmapBits,
+                    bitmapData.Scan0,
+                    bitmap.Height * bitmapData.Stride
+                );
+                bitmap.UnlockBits(bitmapData);
             }
-            var bitmapData = bitmap.LockBits(
-                new Rectangle(
-                    0,
-                    0,
-                    bitmap.Width,
-                    bitmap.Height
-                ),
-                ImageLockMode.ReadOnly,
-                PixelFormat.Format32bppArgb
-            );
-            var result = RtlMoveMemory(
-                bitmapBits,
-                bitmapData.Scan0,
-                bitmap.Height * bitmapData.Stride
-            );
-            if (!result)
-            {
-                return false;
-            }
-            bitmap.UnlockBits(bitmapData);
-            return true;
+            return result;
         }
+
+        [DllImport("gdi32.dll", SetLastError = true)]
+        public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteDC(IntPtr hdc);
 
         [DllImport("gdi32.dll")]
         public static extern IntPtr CreateDIBSection(IntPtr hdc, [In, MarshalAs(UnmanagedType.LPStruct)] BITMAPINFO pbmi, uint iUsage, out IntPtr ppvBits, IntPtr hSection, uint dwOffset);
@@ -115,5 +118,72 @@ namespace FoxTunes
             public Int32 biClrImportant;
             public Int32 colors;
         };
+
+        public class ScopedDC : IDisposable
+        {
+            protected static ILogger Logger
+            {
+                get
+                {
+                    return LogManager.Logger;
+                }
+            }
+
+            public ScopedDC(Func<IntPtr> factory)
+            {
+                this.DC = factory();
+            }
+
+            public IntPtr DC { get; private set; }
+
+            public bool IsDisposed { get; private set; }
+
+            public void Dispose()
+            {
+                this.Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (this.IsDisposed || !disposing)
+                {
+                    return;
+                }
+                this.OnDisposing();
+                this.IsDisposed = true;
+            }
+
+            protected virtual void OnDisposing()
+            {
+                if (!IntPtr.Zero.Equals(this.DC))
+                {
+                    DeleteDC(this.DC);
+                }
+            }
+
+            ~ScopedDC()
+            {
+                Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                try
+                {
+                    this.Dispose(true);
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on GC thread.
+                }
+            }
+
+            public static ScopedDC Compatible()
+            {
+                return Compatible(IntPtr.Zero);
+            }
+
+            public static ScopedDC Compatible(IntPtr hdc)
+            {
+                return new ScopedDC(() => CreateCompatibleDC(hdc));
+            }
+        }
     }
 }

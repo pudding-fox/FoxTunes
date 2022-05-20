@@ -112,6 +112,11 @@ namespace FoxTunes
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
+            if (e.Window.Role != UserInterfaceWindowRole.Main)
+            {
+                //Only create taskbar progress for main windows.
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarProgressWindowFlags.Destroyed);
         }

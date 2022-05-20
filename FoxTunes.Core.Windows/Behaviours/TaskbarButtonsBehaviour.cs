@@ -126,6 +126,11 @@ namespace FoxTunes
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
+            if (e.Window.Role != UserInterfaceWindowRole.Main)
+            {
+                //Only create taskbar buttons for main windows.
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarButtonsWindowFlags.Destroyed);
         }
@@ -372,18 +377,33 @@ namespace FoxTunes
 
         protected virtual bool AddImage(IntPtr handle, IntPtr imageList, Bitmap bitmap, int width, int height)
         {
-            var bitmapSection = bitmap.GetHbitmap();
-            var result = WindowsImageList.ImageList_Add(
-                imageList,
-                bitmapSection,
-                IntPtr.Zero
-            );
-            WindowsImaging.DeleteObject(bitmapSection);
-            if (result < 0)
+            using (var hdc = WindowsImaging.ScopedDC.Compatible())
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to add image to ImageList.");
-                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
-                return false;
+                if (IntPtr.Zero.Equals(hdc))
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
+                    this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                    return false;
+                }
+                var bitmapSection = default(IntPtr);
+                if (!WindowsImaging.CreateDIBSection(hdc.DC, bitmap, bitmap.Width, bitmap.Height, out bitmapSection))
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
+                    this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                    return false;
+                }
+                var result = WindowsImageList.ImageList_Add(
+                    imageList,
+                    bitmapSection,
+                    IntPtr.Zero
+                );
+                WindowsImaging.DeleteObject(bitmapSection);
+                if (result < 0)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to add image to ImageList.");
+                    this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                    return false;
+                }
             }
             return true;
         }
