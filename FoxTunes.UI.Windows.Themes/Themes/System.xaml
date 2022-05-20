@@ -12,6 +12,7 @@
     <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
     <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
     <SolidColorBrush x:Key="SolidBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
+    <SolidColorBrush x:Key="GlyphBrush" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF9BDDFB"/>
 
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>

@@ -36,7 +36,6 @@
                 <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                     <!-- System -->
                     <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                     <Setter Property="AllowDrop" Value="true" />
                     <Setter Property="Template" Value="{DynamicResource TextBoxTemplate}" />
                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -62,7 +61,6 @@
                     <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"></Setter>
                     <Setter Property="FontSize" Value="10"></Setter>
                     <!-- System -->
-                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
                     <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
