@@ -187,8 +187,6 @@ namespace FoxTunes
                     UpdateElementsSmooth(data.Elements, data.Peaks, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
                 }
 
-                data.LastUpdated = DateTime.UtcNow;
-
                 var task = this.Render();
             }
             catch (Exception exception)
@@ -251,6 +249,12 @@ namespace FoxTunes
 
             BitmapHelper.Clear(info);
 
+            if (rendererData.SampleCount == 0)
+            {
+                //No data.
+                return;
+            }
+
             for (var a = 0; a < rendererData.Count; a++)
             {
                 BitmapHelper.DrawRectangle(
@@ -303,6 +307,8 @@ namespace FoxTunes
                     values[a] = ToDecibelFixed(value);
                 }
             }
+
+            data.LastUpdated = DateTime.UtcNow;
         }
 
         public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, bool highCut)
@@ -346,6 +352,8 @@ namespace FoxTunes
 
             public float[] Samples;
 
+            public int SampleCount;
+
             public float[] Values;
 
             public int SamplesPerElement;
@@ -368,12 +376,14 @@ namespace FoxTunes
 
             public bool Update()
             {
-                return this.Output.GetData(this.Samples, this.FFTSize) > 0;
+                this.SampleCount = this.Output.GetData(this.Samples, this.FFTSize);
+                return this.SampleCount > 0;
             }
 
             public void Clear()
             {
                 Array.Clear(this.Samples, 0, this.Samples.Length);
+                this.SampleCount = 0;
             }
         }
     }
