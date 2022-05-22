@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -28,7 +29,7 @@ namespace FoxTunes
 
         public ToolWindowBehaviour()
         {
-            this.Windows = new Dictionary<ToolWindowConfiguration, ToolWindow>();
+            this.Windows = new ConcurrentDictionary<ToolWindowConfiguration, ToolWindow>();
         }
 
         public bool Enabled
@@ -49,7 +50,7 @@ namespace FoxTunes
 
         public TextConfigurationElement Element { get; private set; }
 
-        public IDictionary<ToolWindowConfiguration, ToolWindow> Windows { get; private set; }
+        public ConcurrentDictionary<ToolWindowConfiguration, ToolWindow> Windows { get; private set; }
 
         public bool IsLoaded { get; private set; }
 
@@ -156,23 +157,38 @@ namespace FoxTunes
             {
                 show = true;
             }
+            var action = default(Action);
             if (show)
             {
-                Logger.Write(this, LogLevel.Debug, "Showing window: {0}", ToolWindowConfiguration.GetTitle(config));
-                return global::FoxTunes.Windows.Invoke(window.Show);
+                action = () =>
+                {
+                    Logger.Write(this, LogLevel.Debug, "Showing window: {0}", ToolWindowConfiguration.GetTitle(config));
+                    window.Show();
+                };
             }
             else
             {
-                Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", ToolWindowConfiguration.GetTitle(config));
-                return global::FoxTunes.Windows.Invoke(window.Hide);
+                action = () =>
+                {
+                    Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", ToolWindowConfiguration.GetTitle(config));
+                    window.Hide();
+                };
             }
+            return global::FoxTunes.Windows.Invoke(() =>
+            {
+                if (!this.Enabled)
+                {
+                    return;
+                }
+                action();
+            });
         }
 
         protected virtual void Unload(ToolWindowConfiguration config, ToolWindow window)
         {
             Logger.Write(this, LogLevel.Debug, "Unloading config: {0}", ToolWindowConfiguration.GetTitle(config));
             this.Windows.TryGetValue(config, out window);
-            if (!this.Windows.Remove(config))
+            if (!this.Windows.TryRemove(config))
             {
                 return;
             }
@@ -385,11 +401,11 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Shutting down..");
                 global::FoxTunes.Windows.Registrations.Close(ToolWindowManagerWindow.ID);
-                foreach (var window in this.Windows.Values)
+                foreach (var pair in this.Windows)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Closing window: {0}", window.Title);
-                    window.Closed -= this.OnClosed;
-                    window.Close();
+                    Logger.Write(this, LogLevel.Debug, "Closing window: {0}", pair.Value.Title);
+                    pair.Value.Closed -= this.OnClosed;
+                    pair.Value.Close();
                 }
                 this.Windows.Clear();
             });

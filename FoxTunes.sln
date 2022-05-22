@@ -131,6 +131,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Minidisc.Bass", "F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.MiniPlayer", "FoxTunes.UI.Windows.MiniPlayer\FoxTunes.UI.Windows.MiniPlayer.csproj", "{22A35D2D-6C20-4B3D-BD12-F31118BD1245}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.Tests", "FoxTunes.UI.Windows.Tests\FoxTunes.UI.Windows.Tests.csproj", "{4C620023-A8FF-43CA-B044-D01FBF3D54B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -587,6 +589,14 @@ Global
 		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Release|x64.Build.0 = Release|x64
 		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Release|x86.ActiveCfg = Release|x86
 		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Release|x86.Build.0 = Release|x86
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Debug|x64.ActiveCfg = Debug|x64
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Debug|x64.Build.0 = Debug|x64
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Debug|x86.ActiveCfg = Debug|x86
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Debug|x86.Build.0 = Debug|x86
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Release|x64.ActiveCfg = Release|x64
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Release|x64.Build.0 = Release|x64
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Release|x86.ActiveCfg = Release|x86
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -648,6 +658,7 @@ Global
 		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6} = {E9BFA65B-36CD-40D3-8EAE-B5D544A1E7F5}
 		{6D8DCA45-0E00-4472-A535-DB5CB465DF1B} = {B8B91C76-F6E7-47C7-A034-E0FC5B5466F2}
 		{22A35D2D-6C20-4B3D-BD12-F31118BD1245} = {05C1FA04-4070-44A7-9DFC-38B48FEFA3C2}
+		{4C620023-A8FF-43CA-B044-D01FBF3D54B9} = {E9BFA65B-36CD-40D3-8EAE-B5D544A1E7F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9293982D-B2F3-4C86-A307-057EE1CFA115}

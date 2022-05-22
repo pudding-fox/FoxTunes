@@ -266,11 +266,11 @@ namespace FoxTunes
             }
         }
 
-        private Int32Rect GetRegion(ImageSource source, Rect region, int width, int height)
+        private global::System.Windows.Int32Rect GetRegion(ImageSource source, Rect region, int width, int height)
         {
             var scaleX = ((BitmapSource)source).PixelWidth / (double)width;
             var scaleY = ((BitmapSource)source).PixelHeight / (double)height;
-            return new Int32Rect(
+            return new global::System.Windows.Int32Rect(
                 (int)(region.X * scaleX),
                 (int)(region.Y * scaleY),
                 (int)(region.Width * scaleX),

@@ -112,7 +112,7 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
 

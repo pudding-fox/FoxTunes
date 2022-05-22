@@ -1,12 +1,12 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -163,9 +163,12 @@ namespace FoxTunes
             renderer.OnColorChanged();
         }
 
-        public RendererBase()
+        public RendererBase(bool initialize = true)
         {
-            this.InitializeComponent(Core.Instance);
+            if (initialize && Core.Instance != null)
+            {
+                this.InitializeComponent(Core.Instance);
+            }
         }
 
         public WriteableBitmap Bitmap
@@ -361,7 +364,7 @@ namespace FoxTunes
                     return;
                 }
                 BitmapHelper.Clear(BitmapHelper.CreateRenderInfo(this.Bitmap, this.Color));
-                this.Bitmap.AddDirtyRect(new Int32Rect(0, 0, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight));
+                this.Bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight));
                 this.Bitmap.Unlock();
             });
         }
@@ -521,9 +524,7 @@ namespace FoxTunes
                     elements[a].X = 0;
                     elements[a].Y = a * step;
                     elements[a].Height = step;
-                    var value = elements[a].Width;
-                    Animate(ref value, barWidth, 1, width, smoothing);
-                    elements[a].Width = value;
+                    Animate(ref elements[a].Width, barWidth, 1, width, smoothing);
                 }
             }
             else if (orientation == Orientation.Vertical)
@@ -534,9 +535,7 @@ namespace FoxTunes
                     var barHeight = Math.Max(Convert.ToInt32(values[a] * height), 1);
                     elements[a].X = a * step;
                     elements[a].Width = step;
-                    var value = elements[a].Height;
-                    Animate(ref value, barHeight, 1, height, smoothing);
-                    elements[a].Height = value;
+                    Animate(ref elements[a].Height, barHeight, 1, height, smoothing);
                     elements[a].Y = height - elements[a].Height;
                 }
             }
@@ -744,35 +743,33 @@ namespace FoxTunes
 
         protected static void Animate(ref int value, int target, int min, int max, int smoothing)
         {
-            var fast = Math.Min((float)(max - min) / smoothing, 10);
             var difference = Math.Abs(value - target);
-            if (difference > 0)
+            if (difference == 0)
             {
-                if (difference < fast)
-                {
-                    if (target > value)
-                    {
-                        value++;
-                    }
-                    else if (target < value)
-                    {
-                        value--;
-                    }
-                }
-                else
-                {
-                    var distance = (float)difference / (max - min);
-                    var increment = Math.Sqrt(1 - Math.Pow(distance - 1, 2));
-                    var smoothed = Math.Min(Math.Max(fast * increment, 1), fast);
-                    if (target > value)
-                    {
-                        value = (int)Math.Min(value + smoothed, max);
-                    }
-                    else if (target < value)
-                    {
-                        value = (int)Math.Max(value - smoothed, min);
-                    }
-                }
+                //Nothing to do.
+                return;
+            }
+
+            var distance = default(float);
+            if (target > 0)
+            {
+                distance = (float)difference / target;
+            }
+            else
+            {
+                distance = (float)difference / (max - target);
+            }
+
+            var increment = 1 - (float)Math.Pow(1 - distance, 3);
+            var fast = Math.Max(Math.Min((float)Math.Abs(max - min) / smoothing, 10), 1);
+            var smoothed = Math.Min(Math.Max((float)Math.Floor(fast * increment), 1), fast);
+            if (target > value)
+            {
+                value = (int)Math.Min(value + smoothed, max);
+            }
+            else if (target < value)
+            {
+                value = (int)Math.Max(value - smoothed, min);
             }
         }
 
