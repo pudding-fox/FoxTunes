@@ -79,13 +79,13 @@ namespace FoxTunes
                 case QUALITY_HIGH_OPTION:
                     Logger.Write(typeof(VisualizationBehaviourConfiguration), LogLevel.Debug, "Using high quality profile.");
                     smooth.Value = true;
-                    interval.Value = 20;
+                    interval.Value = 16; //60 fps.
                     fftSize.Value = fftSize.GetOption(FFT_2048_OPTION);
                     break;
                 case QUALITY_LOW_OPTION:
                     Logger.Write(typeof(VisualizationBehaviourConfiguration), LogLevel.Debug, "Using low quality profile.");
                     smooth.Value = false;
-                    interval.Value = 100;
+                    interval.Value = 100; //10 fps.
                     fftSize.Value = fftSize.GetOption(FFT_512_OPTION);
                     break;
             }

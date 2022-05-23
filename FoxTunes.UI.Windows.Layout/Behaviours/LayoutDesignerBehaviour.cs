@@ -39,6 +39,10 @@ namespace FoxTunes
             }
             set
             {
+                if (this._IsDesigning == value)
+                {
+                    return;
+                }
                 this._IsDesigning = value;
                 this.OnIsDesigningChanged();
             }
