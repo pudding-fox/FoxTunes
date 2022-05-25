@@ -87,10 +87,6 @@ namespace FoxTunes
                 {
                     return this.CreateInteractiveStream(channelHandle, advice, flags);
                 }
-                if (this.Output != null && this.Output.PlayFromMemory)
-                {
-                    Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
-                }
                 if (BassCd.FreeOld)
                 {
                     Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");

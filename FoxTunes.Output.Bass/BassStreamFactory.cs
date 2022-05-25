@@ -54,12 +54,12 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Registered bass stream provider \"{0}\".", provider.GetType().Name);
         }
 
-        public IEnumerable<IBassStreamAdvice> GetAdvice(IBassStreamProvider provider, PlaylistItem playlistItem)
+        public IEnumerable<IBassStreamAdvice> GetAdvice(IBassStreamProvider provider, PlaylistItem playlistItem, BassStreamUsageType type)
         {
             var advice = new List<IBassStreamAdvice>();
             foreach (var advisor in this.Advisors)
             {
-                advisor.Advise(provider, playlistItem, advice);
+                advisor.Advise(provider, playlistItem, advice, type);
             }
             return advice.ToArray();
         }
@@ -82,7 +82,7 @@ namespace FoxTunes
                 return BassStream.Empty;
             }
             Logger.Write(this, LogLevel.Debug, "Using bass stream provider \"{0}\".", provider.GetType().Name);
-            var advice = this.GetAdvice(provider, playlistItem).ToArray();
+            var advice = this.GetAdvice(provider, playlistItem, BassStreamUsageType.Basic).ToArray();
             var stream = provider.CreateBasicStream(playlistItem, advice, flags);
             if (stream.ChannelHandle != 0)
             {
@@ -109,7 +109,7 @@ namespace FoxTunes
                 return BassStream.Empty;
             }
             Logger.Write(this, LogLevel.Debug, "Using bass stream provider \"{0}\".", provider.GetType().Name);
-            var advice = this.GetAdvice(provider, playlistItem).ToArray();
+            var advice = this.GetAdvice(provider, playlistItem, BassStreamUsageType.Interactive).ToArray();
             var stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
             if (stream.ChannelHandle != 0)
             {

@@ -10,8 +10,6 @@ namespace FoxTunes.Interfaces
 
         bool Float { get; }
 
-        bool PlayFromMemory { get; }
-
         int BufferLength { get; }
 
         int ResamplingQuality { get; }

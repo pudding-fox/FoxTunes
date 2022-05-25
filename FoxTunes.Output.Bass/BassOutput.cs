@@ -128,23 +128,6 @@ namespace FoxTunes
             }
         }
 
-        private bool _PlayFromMemory { get; set; }
-
-        public bool PlayFromMemory
-        {
-            get
-            {
-                return this._PlayFromMemory;
-            }
-            set
-            {
-                this._PlayFromMemory = value;
-                Logger.Write(this, LogLevel.Debug, "PlayFromMemory = {0}", this.PlayFromMemory);
-                //TODO: Bad .Wait().
-                this.Shutdown().Wait();
-            }
-        }
-
         private int _BufferLength { get; set; }
 
         public int BufferLength
@@ -183,7 +166,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.PipelineManager.WithPipeline(pipeline => pipeline == null || this.PlayFromMemory);
+                return this.PipelineManager.WithPipeline(pipeline => pipeline == null);
             }
         }
 
@@ -330,10 +313,6 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.DEPTH_ELEMENT
             ).ConnectValue(value => this.Float = BassOutputConfiguration.GetFloat(value));
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                BassOutputConfiguration.PLAY_FROM_RAM_ELEMENT
-            ).ConnectValue(value => this.PlayFromMemory = value);
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.BUFFER_LENGTH_ELEMENT

@@ -83,10 +83,6 @@ namespace FoxTunes
                 //The associated entry was not found.
                 return BassStream.Empty;
             }
-            if (this.Output != null && this.Output.PlayFromMemory)
-            {
-                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
-            }
         retry:
             var channelHandle = BassZipStream.CreateStream(fileName, index, Flags: flags);
             if (channelHandle == 0)

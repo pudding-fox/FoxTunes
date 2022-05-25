@@ -334,7 +334,7 @@ namespace FoxTunes
             }
         }
 
-        public static bool ShouldCreateResampler(BassResamplerStreamComponentBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
+        public static bool ShouldCreate(BassResamplerStreamComponentBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
         {
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
