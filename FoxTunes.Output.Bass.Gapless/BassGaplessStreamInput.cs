@@ -9,24 +9,9 @@ namespace FoxTunes
 {
     public class BassGaplessStreamInput : BassStreamInput
     {
-        public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour, BassOutputStream stream)
+        public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour)
         {
             this.Behaviour = behaviour;
-            this.Channels = stream.Channels;
-            this.Flags = BassFlags.Decode;
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                this.Rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
-                this.Flags |= BassFlags.DSDRaw;
-            }
-            else
-            {
-                this.Rate = stream.Rate;
-                if (behaviour.Output.Float)
-                {
-                    this.Flags |= BassFlags.Float;
-                }
-            }
         }
 
         public override string Name
@@ -41,23 +26,26 @@ namespace FoxTunes
         {
             get
             {
+                var rate = default(int);
+                var channels = default(int);
+                var flags = default(BassFlags);
+                if (!this.GetFormat(out rate, out channels, out flags))
+                {
+                    rate = 0;
+                    channels = 0;
+                    flags = BassFlags.Default;
+                }
                 return string.Format(
                     "{0} ({1}/{2}/{3})",
                     this.Name,
-                    BassUtils.DepthDescription(this.Flags),
-                    MetaDataInfo.SampleRateDescription(this.Rate),
-                    MetaDataInfo.ChannelDescription(this.Channels)
+                    BassUtils.DepthDescription(flags),
+                    MetaDataInfo.SampleRateDescription(rate),
+                    MetaDataInfo.ChannelDescription(channels)
                 );
             }
         }
 
         public BassGaplessStreamInputBehaviour Behaviour { get; private set; }
-
-        public override int Rate { get; protected set; }
-
-        public override int Channels { get; protected set; }
-
-        public override BassFlags Flags { get; protected set; }
 
         public override int ChannelHandle { get; protected set; }
 
@@ -70,11 +58,11 @@ namespace FoxTunes
             }
         }
 
-        public override void Connect(IBassStreamComponent previous)
+        public override void Connect(BassOutputStream stream)
         {
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
-            Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", this.Rate, this.Channels);
-            this.ChannelHandle = BassGapless.StreamCreate(this.Rate, this.Channels, this.Flags);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
+            this.ChannelHandle = BassGapless.StreamCreate(stream.Rate, stream.Channels, stream.Flags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
@@ -85,17 +73,9 @@ namespace FoxTunes
         {
             var rate = default(int);
             var channels = default(int);
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
-                channels = BassUtils.GetChannelCount(stream.ChannelHandle);
-            }
-            else
-            {
-                rate = BassUtils.GetChannelPcmRate(stream.ChannelHandle);
-                channels = BassUtils.GetChannelCount(stream.ChannelHandle);
-            }
-            return this.Rate == rate && this.Channels == channels;
+            var flags = default(BassFlags);
+            this.GetFormat(out rate, out channels, out flags);
+            return rate == stream.Rate && channels == stream.Channels;
         }
 
         public override bool Contains(BassOutputStream stream)

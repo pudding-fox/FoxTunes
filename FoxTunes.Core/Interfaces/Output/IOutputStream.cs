@@ -72,6 +72,7 @@ namespace FoxTunes.Interfaces
     {
         None,
         Short,
-        Float
+        Float,
+        DSDRaw
     }
 }

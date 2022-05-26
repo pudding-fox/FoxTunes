@@ -12,19 +12,9 @@ namespace FoxTunes
         public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour, BassOutputStream stream)
         {
             this.Behaviour = behaviour;
-            this.Channels = stream.Channels;
-            this.Flags = BassFlags.Decode;
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
                 throw new InvalidOperationException("Cannot apply effects to DSD streams.");
-            }
-            else
-            {
-                this.Rate = stream.Rate;
-                if (behaviour.Output.Float)
-                {
-                    this.Flags |= BassFlags.Float;
-                }
             }
         }
 
@@ -41,25 +31,28 @@ namespace FoxTunes
         {
             get
             {
+                var rate = default(int);
+                var channels = default(int);
+                var flags = default(BassFlags);
+                if (!this.GetFormat(out rate, out channels, out flags))
+                {
+                    rate = 0;
+                    channels = 0;
+                    flags = BassFlags.Default;
+                }
                 return string.Format(
                     "{0} ({1:0.00s}/{2:0.00s}) ({3}/{4}/{5})",
                     this.Name,
                     (float)this.Behaviour.InPeriod / 1000,
                     (float)this.Behaviour.OutPeriod / 1000,
-                    BassUtils.DepthDescription(this.Flags),
-                    MetaDataInfo.SampleRateDescription(this.Rate),
-                    MetaDataInfo.ChannelDescription(this.Channels)
+                    BassUtils.DepthDescription(flags),
+                    MetaDataInfo.SampleRateDescription(rate),
+                    MetaDataInfo.ChannelDescription(channels)
                 );
             }
         }
 
         public BassCrossfadeStreamInputBehaviour Behaviour { get; private set; }
-
-        public override int Rate { get; protected set; }
-
-        public override int Channels { get; protected set; }
-
-        public override BassFlags Flags { get; protected set; }
 
         public override int ChannelHandle { get; protected set; }
 
@@ -81,11 +74,11 @@ namespace FoxTunes
             }
         }
 
-        public override void Connect(IBassStreamComponent previous)
+
+        public override void Connect(BassOutputStream stream)
         {
-            //BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
-            Logger.Write(this, LogLevel.Debug, "Creating BASS CROSSFADE stream with rate {0} and {1} channels.", this.Rate, this.Channels);
-            this.ChannelHandle = BassCrossfade.StreamCreate(this.Rate, this.Channels, this.Flags);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS CROSSFADE stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
+            this.ChannelHandle = BassCrossfade.StreamCreate(stream.Rate, stream.Channels, stream.Flags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
@@ -94,19 +87,15 @@ namespace FoxTunes
 
         public override bool CheckFormat(BassOutputStream stream)
         {
-            var rate = default(int);
-            var channels = default(int);
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
-                rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
-                channels = BassUtils.GetChannelCount(stream.ChannelHandle);
+                return false;
             }
-            else
-            {
-                rate = BassUtils.GetChannelPcmRate(stream.ChannelHandle);
-                channels = BassUtils.GetChannelCount(stream.ChannelHandle);
-            }
-            return this.Rate == rate && this.Channels == channels;
+            var rate = default(int);
+            var channels = default(int);
+            var flags = default(BassFlags);
+            this.GetFormat(out rate, out channels, out flags);
+            return rate == stream.Rate && channels == stream.Channels;
         }
 
         public override bool Contains(BassOutputStream stream)

@@ -48,10 +48,7 @@ namespace FoxTunes
                 BassOutputConfiguration.INPUT_ELEMENT
             ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassGaplessStreamInputConfiguration.INPUT_GAPLESS_OPTION, StringComparison.OrdinalIgnoreCase));
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
         }
 
@@ -75,7 +72,7 @@ namespace FoxTunes
             {
                 return;
             }
-            e.Input = new BassGaplessStreamInput(this, e.Stream);
+            e.Input = new BassGaplessStreamInput(this);
             e.Input.InitializeComponent(this.Core);
         }
 

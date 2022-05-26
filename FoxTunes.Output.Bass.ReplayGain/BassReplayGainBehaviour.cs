@@ -59,7 +59,10 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Output = ComponentRegistry.Instance.GetComponent<IBassOutput>();
+            this.Output.Loaded += this.OnLoaded;
+            this.Output.Unloaded += this.OnUnloaded;
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             this.MetaDataManager = core.Managers.MetaData;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
@@ -79,15 +82,6 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassReplayGainScannerBehaviourConfiguration.WRITE_TAGS
             ).ConnectValue(value => this.WriteTags = value);
-            if (this.Output != null)
-            {
-                this.Output.Loaded += this.OnLoaded;
-                this.Output.Unloaded += this.OnUnloaded;
-            }
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
             base.InitializeComponent(core);
         }
 

@@ -22,8 +22,8 @@ namespace FoxTunes
                 return false;
             }
             Logger.Write(this, LogLevel.Debug, "Creating memory stream for channel: {0}", channelHandle);
-            channelHandle = BassMemory.CreateStream(channelHandle, 0, 0, flags);
-            if (channelHandle == 0)
+            var memoryChannelHandle = BassMemory.CreateStream(channelHandle, 0, 0, flags);
+            if (memoryChannelHandle == 0)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 stream = null;
@@ -32,11 +32,12 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
             stream = new BassStream(
                 provider,
-                channelHandle,
+                memoryChannelHandle,
                 Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes),
                 advice,
                 flags
             );
+            provider.FreeStream(channelHandle);
             return true;
         }
     }

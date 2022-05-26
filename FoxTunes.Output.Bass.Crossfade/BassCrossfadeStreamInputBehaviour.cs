@@ -208,10 +208,7 @@ namespace FoxTunes
                 BassCrossfadeStreamInputConfiguration.STOP_ELEMENT
             ).ConnectValue(value => this.Stop = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
         }
 

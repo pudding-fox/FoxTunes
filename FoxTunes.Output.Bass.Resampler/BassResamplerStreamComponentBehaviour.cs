@@ -47,10 +47,7 @@ namespace FoxTunes
                 BassResamplerStreamComponentConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
         }
 
@@ -86,7 +83,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var component = new BassResamplerStreamComponent(this, e.Stream, e.Query);
+            var component = new BassResamplerStreamComponent(this, e.Query);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

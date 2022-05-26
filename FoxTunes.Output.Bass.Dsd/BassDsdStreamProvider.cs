@@ -3,6 +3,7 @@ using FoxTunes;
 using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.Dsd;
+using ManagedBass.Memory;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,24 +35,19 @@ namespace FoxTunes
             BassPluginLoader.AddExtensions(EXTENSIONS);
         }
 
-        public BassDsdStreamProviderBehaviour Behaviour { get; private set; }
+        public BassDsdBehaviour Behaviour { get; private set; }
 
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassDsdStreamProviderBehaviour>();
+            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassDsdBehaviour>();
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             base.InitializeComponent(core);
         }
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
-            //Unfortunately there's no way to determine whether DSD direct is enabled.
-            //if (this.Behaviour == null || !this.Behaviour.Enabled)
-            //{
-            //    return false;
-            //}
             if (!EXTENSIONS.Contains(playlistItem.FileName.GetExtension(), StringComparer.OrdinalIgnoreCase))
             {
                 return false;
@@ -66,18 +62,49 @@ namespace FoxTunes
 
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
-            flags |= BassFlags.DSDRaw;
+            var channelHandle = this.CreateDsdRawStream(playlistItem, advice, flags);
+            if (channelHandle != 0)
+            {
+                return this.CreateInteractiveStream(channelHandle, advice, flags | BassFlags.DSDRaw);
+            }
+            Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+            return base.CreateInteractiveStream(playlistItem, advice, flags);
+        }
+
+        protected virtual int CreateDsdRawStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        {
             var fileName = this.GetFileName(playlistItem, advice);
-            var channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
-            if (channelHandle != 0 && !this.IsFormatSupported(playlistItem, channelHandle))
+            var channelHandle = default(int);
+            if (this.Behaviour.Memory)
+            {
+                Logger.Write(this, LogLevel.Debug, "Creating memory stream for channel: {0}", channelHandle);
+                channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
+                if (channelHandle != 0)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                }
+            }
+            if (channelHandle == 0)
+            {
+                channelHandle = BassDsd.CreateStream(fileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
+            }
+            if (channelHandle == 0)
+            {
+                return channelHandle;
+            }
+            if (!this.IsFormatSupported(channelHandle))
             {
                 this.FreeStream(playlistItem, channelHandle);
                 channelHandle = 0;
             }
-            return this.CreateInteractiveStream(channelHandle, advice, flags);
+            return channelHandle;
         }
 
-        protected virtual bool IsFormatSupported(PlaylistItem playlistItem, int channelHandle)
+        protected virtual bool IsFormatSupported(int channelHandle)
         {
             var query = this.BassStreamPipelineFactory.QueryPipeline();
             var channels = BassUtils.GetChannelCount(channelHandle);

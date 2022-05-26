@@ -12,7 +12,6 @@ namespace FoxTunes
     {
         private BassAsioStreamOutput()
         {
-            this.Flags = BassFlags.Default;
             this.MixerChannelHandles = new HashSet<int>();
         }
 
@@ -20,13 +19,6 @@ namespace FoxTunes
             : this()
         {
             this.Behaviour = behaviour;
-            this.Rate = behaviour.Output.Rate;
-            this.Channels = BassAsioDevice.Info.Outputs;
-            this.Flags = BassFlags.Decode;
-            if (this.Behaviour.Output.Float)
-            {
-                this.Flags |= BassFlags.Float;
-            }
         }
 
         public override string Name
@@ -41,27 +33,30 @@ namespace FoxTunes
         {
             get
             {
+                var rate = default(int);
+                var channels = default(int);
+                var flags = default(BassFlags);
+                if (!this.GetFormat(out rate, out channels, out flags))
+                {
+                    rate = 0;
+                    channels = 0;
+                    flags = BassFlags.Default;
+                }
                 return string.Format(
                     "{0} ({1}/{2}/{3})",
                     this.Name,
-                    BassUtils.DepthDescription(this.Flags),
-                    MetaDataInfo.SampleRateDescription(this.Rate),
-                    MetaDataInfo.ChannelDescription(this.Channels)
+                    BassUtils.DepthDescription(flags),
+                    MetaDataInfo.SampleRateDescription(rate),
+                    MetaDataInfo.ChannelDescription(channels)
                 );
             }
         }
 
+        public HashSet<int> MixerChannelHandles { get; protected set; }
+
         public BassAsioStreamOutputBehaviour Behaviour { get; private set; }
 
-        public override int Rate { get; protected set; }
-
-        public override int Channels { get; protected set; }
-
-        public override BassFlags Flags { get; protected set; }
-
         public override int ChannelHandle { get; protected set; }
-
-        public HashSet<int> MixerChannelHandles { get; protected set; }
 
         protected override IEnumerable<int> GetMixerChannelHandles()
         {
@@ -75,11 +70,14 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            this.ConfigureASIO(previous);
-            if (this.ShouldCreateMixer(previous))
+            var rate = default(int);
+            var channels = default(int);
+            var flags = default(BassFlags);
+            this.ConfigureASIO(previous, out rate, out channels, out flags);
+            if (this.ShouldCreateMixer(previous, rate, channels, flags))
             {
-                Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
-                this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
+                Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
+                this.ChannelHandle = BassMix.CreateMixerStream(rate, channels, flags);
                 if (this.ChannelHandle == 0)
                 {
                     BassUtils.Throw();
@@ -98,48 +96,44 @@ namespace FoxTunes
             this.UpdateVolume();
         }
 
-        protected virtual void ConfigureASIO(IBassStreamComponent previous)
+        protected virtual void ConfigureASIO(IBassStreamComponent previous, out int rate, out int channels, out BassFlags flags)
         {
-            if (previous.Flags.HasFlag(BassFlags.DSDRaw))
+            previous.GetFormat(out rate, out channels, out flags);
+            if (flags.HasFlag(BassFlags.DSDRaw))
             {
-                this.Rate = previous.Rate;
-                this.Flags |= BassFlags.DSDRaw;
+                //Nothing to do.
             }
             else
             {
                 if (this.Behaviour.Output.EnforceRate)
                 {
-                    if (!BassAsioDevice.Info.SupportedRates.Contains(this.Rate))
+                    var targetRate = this.Behaviour.Output.Rate;
+                    if (!BassAsioDevice.Info.SupportedRates.Contains(targetRate))
                     {
-                        var nearestRate = BassAsioDevice.Info.GetNearestRate(this.Rate);
-                        Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
-                        this.Rate = nearestRate;
+                        var nearestRate = BassAsioDevice.Info.GetNearestRate(targetRate);
+                        Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
+                        rate = nearestRate;
                     }
                     else
                     {
-                        //Enfoced rate is supported by the device, nothing to do.
+                        rate = targetRate;
                     }
                 }
                 else
                 {
-                    if (!BassAsioDevice.Info.SupportedRates.Contains(previous.Rate))
+                    if (!BassAsioDevice.Info.SupportedRates.Contains(rate))
                     {
-                        var nearestRate = BassAsioDevice.Info.GetNearestRate(previous.Rate);
-                        Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
-                        this.Rate = nearestRate;
-                    }
-                    else
-                    {
-                        //Stream rate is supported by the device, nothing to do.
-                        this.Rate = previous.Rate;
+                        var nearestRate = BassAsioDevice.Info.GetNearestRate(rate);
+                        Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
+                        rate = nearestRate;
                     }
                 }
             }
             BassAsioDevice.Init(
                 this.Behaviour.AsioDevice,
-                this.Rate,
-                this.Channels,
-                this.Flags
+                rate,
+                channels,
+                flags
             );
         }
 
@@ -167,9 +161,9 @@ namespace FoxTunes
             return true;
         }
 
-        protected virtual bool ShouldCreateMixer(IBassStreamComponent previous)
+        protected virtual bool ShouldCreateMixer(IBassStreamComponent previous, int rate, int channels, BassFlags flags)
         {
-            if (previous.Flags.HasFlag(BassFlags.DSDRaw))
+            if (flags.HasFlag(BassFlags.DSDRaw))
             {
                 //Can't create mixer for DSD.
                 return false;
@@ -179,12 +173,15 @@ namespace FoxTunes
                 //Mixer is forced on, probably so visualizations work.
                 return true;
             }
-            else if (previous.Rate != this.Rate || previous.Channels != this.Channels)
+            var _rate = default(int);
+            var _channels = default(int);
+            var _flags = default(BassFlags);
+            previous.GetFormat(out _rate, out _channels, out _flags);
+            if (rate != _rate || channels != _channels)
             {
                 //Stream rate or channel count differs from device.
                 return true;
             }
-            //Looks like no mixer is required.
             return false;
         }
 

@@ -3,9 +3,9 @@ using ManagedBass.Memory;
 
 namespace FoxTunes
 {
-    public class BassMemoryStreamComponent : BassStreamComponent
+    public class BassDsdMemoryStreamComponent : BassStreamComponent
     {
-        public BassMemoryStreamComponent(BassMemoryBehaviour behaviour)
+        public BassDsdMemoryStreamComponent(BassDsdBehaviour behaviour)
         {
             this.Behaviour = behaviour;
         }
@@ -14,7 +14,7 @@ namespace FoxTunes
         {
             get
             {
-                return Strings.BassMemoryStreamComponent_Name;
+                return Strings.BassDsdMemoryStreamComponent_Name;
             }
         }
 
@@ -25,12 +25,12 @@ namespace FoxTunes
                 return string.Format(
                     "{0} ({1} MB)",
                     this.Name,
-                    BassMemory.Usage() / 1000000
+                    BassMemory.Dsd.Usage() / 1000000
                 );
             }
         }
 
-        public BassMemoryBehaviour Behaviour { get; private set; }
+        public BassDsdBehaviour Behaviour { get; private set; }
 
         public override int ChannelHandle { get; protected set; }
 
@@ -38,7 +38,7 @@ namespace FoxTunes
         {
             get
             {
-                return BassMemory.Usage() > 0;
+                return BassMemory.Dsd.Usage() > 0;
             }
         }
 
@@ -52,14 +52,9 @@ namespace FoxTunes
             //Nothing to do.
         }
 
-        public static bool ShouldCreate(BassMemoryBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
+        public static bool ShouldCreate(BassDsdBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
         {
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                //Only PCM.
-                return false;
-            }
-            return true;
+            return behaviour.Memory;
         }
     }
 }

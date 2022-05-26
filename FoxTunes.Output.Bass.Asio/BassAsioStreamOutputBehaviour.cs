@@ -114,11 +114,8 @@ namespace FoxTunes
                 BassAsioStreamOutputConfiguration.MIXER_ELEMENT
             ).ConnectValue(value => this.Mixer = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
+            this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
         }
 

@@ -245,11 +245,8 @@ namespace FoxTunes
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_RAW
             ).ConnectValue(value => this.Raw = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
+            this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
         }
 

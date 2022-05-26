@@ -51,11 +51,11 @@ namespace FoxTunes
             }
         }
 
-        public void Connect()
+        public void Connect(BassOutputStream stream)
         {
             var previous = (IBassStreamComponent)this.Input;
             Logger.Write(this, LogLevel.Debug, "Connecting pipeline input: \"{0}\"", this.Input.GetType().Name);
-            this.Input.Connect(previous);
+            this.Input.Connect(stream);
             foreach (var component in this.Components)
             {
                 Logger.Write(this, LogLevel.Debug, "Connecting pipeline component: \"{0}\"", component.GetType().Name);

@@ -18,7 +18,7 @@ namespace FoxTunes.Interfaces
 
         void SetPosition(int channelHandle, long value);
 
-        void FreeStream(PlaylistItem playlistItem, int channelHandle);
+        void FreeStream(int channelHandle);
     }
 
     [Flags]

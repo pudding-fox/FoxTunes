@@ -8,13 +8,7 @@ namespace FoxTunes
     [Component("1A67B4C8-7392-4487-9DDD-75E02EC4807E", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
     public class BassStreamProvider : StandardComponent, IBassStreamProvider
     {
-        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
-
-        public static readonly SyncProcedure EndProcedure = new SyncProcedure((Handle, Channel, Data, User) => Bass.ChannelStop(Handle));
-
         public IBassOutput Output { get; private set; }
-
-        public IBassStreamFactory StreamFactory { get; private set; }
 
         public IBassStreamPipelineManager PipelineManager { get; private set; }
 
@@ -29,12 +23,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
-            this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
-            if (this.StreamFactory != null)
-            {
-                this.StreamFactory.Register(this);
-            }
             base.InitializeComponent(core);
         }
 
@@ -58,13 +47,7 @@ namespace FoxTunes
                 return BassStream.Error(Bass.LastError);
             }
             var stream = default(IBassStream);
-            foreach (var advisory in advice)
-            {
-                if (advisory.Wrap(this, channelHandle, advice, flags, out stream))
-                {
-                    break;
-                }
-            }
+            this.Wrap(channelHandle, advice, flags, out stream);
             if (stream == null)
             {
                 stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
@@ -87,13 +70,7 @@ namespace FoxTunes
                 return BassStream.Error(Bass.LastError);
             }
             var stream = default(IBassStream);
-            foreach (var advisory in advice)
-            {
-                if (advisory.Wrap(this, channelHandle, advice, flags, out stream))
-                {
-                    break;
-                }
-            }
+            this.Wrap(channelHandle, advice, flags, out stream);
             if (stream == null)
             {
                 stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
@@ -114,6 +91,22 @@ namespace FoxTunes
             return playlistItem.FileName;
         }
 
+        protected virtual void Wrap(int channelHandle, IEnumerable<IBassStreamAdvice> advice, BassFlags flags, out IBassStream stream)
+        {
+            stream = default(IBassStream);
+            foreach (var advisory in advice)
+            {
+                if (advisory.Wrap(this, channelHandle, advice, flags, out stream))
+                {
+                    if (stream.ChannelHandle != channelHandle)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Stream was wrapped by advice \"{0}\": {1} => {1}", advisory.GetType().Name, channelHandle, stream.ChannelHandle);
+                        channelHandle = stream.ChannelHandle;
+                    }
+                }
+            }
+        }
+
         public virtual long GetPosition(int channelHandle)
         {
             return Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
@@ -124,7 +117,7 @@ namespace FoxTunes
             BassUtils.OK(Bass.ChannelSetPosition(channelHandle, value, PositionFlags.Bytes));
         }
 
-        public virtual void FreeStream(PlaylistItem playlistItem, int channelHandle)
+        public virtual void FreeStream(int channelHandle)
         {
             Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
             Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.

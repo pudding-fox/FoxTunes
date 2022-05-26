@@ -140,7 +140,14 @@ namespace FoxTunes
         {
             get
             {
-                return BassUtils.GetChannelPcmRate(this.ChannelHandle);
+                if (BassUtils.GetChannelDsdRaw(this.ChannelHandle))
+                {
+                    return BassUtils.GetChannelDsdRate(this.ChannelHandle);
+                }
+                else
+                {
+                    return BassUtils.GetChannelPcmRate(this.ChannelHandle);
+                }
             }
         }
 
@@ -149,6 +156,14 @@ namespace FoxTunes
             get
             {
                 return BassUtils.GetChannelCount(this.ChannelHandle);
+            }
+        }
+
+        public BassFlags Flags
+        {
+            get
+            {
+                return BassUtils.GetChannelFlags(this.ChannelHandle);
             }
         }
 

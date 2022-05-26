@@ -544,6 +544,8 @@ namespace FoxTunes
                     case OutputStreamFormat.Float:
                         this.SampleCount = this.Renderer.Output.GetData(this.Samples32) / sizeof(float);
                         break;
+                    default:
+                        throw new NotImplementedException();
                 }
                 if (this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0)
                 {
@@ -572,14 +574,17 @@ namespace FoxTunes
                 this.Channels = channels;
                 this.Format = format;
 
-                if (format == OutputStreamFormat.Short)
+                switch (format)
                 {
-                    this.Samples16 = this.Renderer.Output.GetBuffer<short>(TimeSpan.FromMilliseconds(this.Renderer.Duration.Value));
-                    this.Samples32 = new float[this.Samples16.Length];
-                }
-                else if (format == OutputStreamFormat.Float)
-                {
-                    this.Samples32 = this.Renderer.Output.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.Duration.Value));
+                    case OutputStreamFormat.Short:
+                        this.Samples16 = this.Renderer.Output.GetBuffer<short>(TimeSpan.FromMilliseconds(this.Renderer.Duration.Value));
+                        this.Samples32 = new float[this.Samples16.Length];
+                        break;
+                    case OutputStreamFormat.Float:
+                        this.Samples32 = this.Renderer.Output.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.Duration.Value));
+                        break;
+                    default:
+                        throw new NotImplementedException();
                 }
 
                 //TODO: Only realloc if required.

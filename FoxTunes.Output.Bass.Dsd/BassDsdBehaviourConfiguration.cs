@@ -2,7 +2,7 @@
 
 namespace FoxTunes
 {
-    public static class BassDsdStreamProviderBehaviourConfiguration
+    public static class BassDsdBehaviourConfiguration
     {
         public const string SECTION = BassOutputConfiguration.SECTION;
 
@@ -10,11 +10,14 @@ namespace FoxTunes
 
         public const string DSD_GAIN_ELEMENT = "BBBB4749-63C8-4866-9013-9AF01072CD2D";
 
+        public const string DSD_MEMORY_ELEMENT = "CCCCA774-0E1D-4DA4-B03F-7063B4054A8F";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(DSD_RATE_ELEMENT, "PCM Rate (Hz)", path: "DSD").WithOptions(GetRateOptions()))
-                .WithElement(new IntegerConfigurationElement(DSD_GAIN_ELEMENT, "PCM Gain (dB)", path: "DSD").WithValue(6).WithValidationRule(new IntegerValidationRule(0, 10))
+                .WithElement(new SelectionConfigurationElement(DSD_RATE_ELEMENT, Strings.BassDsdBehaviourConfiguration_Rate, path: Strings.BassDsdBehaviourConfiguration_Path).WithOptions(GetRateOptions()))
+                .WithElement(new IntegerConfigurationElement(DSD_GAIN_ELEMENT, Strings.BassDsdBehaviourConfiguration_Gain, path: Strings.BassDsdBehaviourConfiguration_Path).WithValue(6).WithValidationRule(new IntegerValidationRule(0, 10)))
+                .WithElement(new BooleanConfigurationElement(DSD_MEMORY_ELEMENT, Strings.BassDsdBehaviourConfiguration_Memory, path: Strings.BassDsdBehaviourConfiguration_Path).WithValue(false)
             );
         }
 
