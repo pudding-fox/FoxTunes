@@ -260,7 +260,14 @@ namespace FoxTunes
             {
                 parts.Add(package.Name);
             }
-            parts.Add(element.FileName);
+            if (element.Flags.HasFlag(PackageElementFlags.Flatten))
+            {
+                parts.Add(Path.GetFileName(element.FileName));
+            }
+            else
+            {
+                parts.Add(element.FileName);
+            }
             return Path.Combine(parts.ToArray());
         }
 
@@ -353,7 +360,6 @@ namespace FoxTunes
                         "addon/bass_ac3.dll",
                         "addon/bass_ape.dll",
                         "addon/bassalac.dll",
-                        "addon/bassdsd.dll",
                         "addon/bassflac.dll",
                         "addon/bassmidi.dll",
                         "addon/bassopus.dll",
@@ -362,7 +368,6 @@ namespace FoxTunes
                         "bass.dll",
                         "bass_fx.dll",
                         "bass_gapless.dll",
-                        "bass_inmemory_handler.dll",
                         "bassmix.dll",
                         "FoxTunes.Output.Bass.DirectSound.dll",
                         "FoxTunes.Output.Bass.dll",
@@ -426,9 +431,11 @@ namespace FoxTunes
                     "dsd",
                     new PackageElement[]
                     {
-                        "bass_inmemory_handler_dsd.dll",
+                        "addon/bassdsd.dll",
                         "FoxTunes.Output.Bass.Dsd.dll",
-                        "ManagedBass.Dsd.dll"
+                        "ManagedBass.Dsd.dll",
+                        new PackageElement("x86/bass_memory_dsd.dll", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_memory_dsd.dll", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
@@ -532,6 +539,17 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.UI.Windows.Lyrics.dll"
+                    },
+                    PackageFlags.Default
+                ),
+                new Package(
+                    "memory",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.Output.Bass.Memory.dll",
+                        "ManagedBass.Memory.dll",
+                        new PackageElement("x86/bass_memory.dll", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_memory.dll", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
@@ -791,7 +809,8 @@ namespace FoxTunes
             FrameworkNET462 = 2,
             PlatformX86 = 4,
             PlatformX64 = 8,
-            LargeAddressAware = 16
+            LargeAddressAware = 16,
+            Flatten = 32
         }
     }
 }
