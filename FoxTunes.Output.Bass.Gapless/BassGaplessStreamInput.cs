@@ -9,7 +9,7 @@ namespace FoxTunes
 {
     public class BassGaplessStreamInput : BassStreamInput
     {
-        public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour)
+        public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
         }

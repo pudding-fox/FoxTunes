@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public class BassResamplerStreamComponent : BassStreamComponent, IBassStreamControllable
     {
-        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, IBassStreamPipelineQueryResult query)
+        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, IBassStreamPipelineQueryResult query, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
             this.Query = query;

@@ -129,6 +129,12 @@
   <data name="BassParametricEqualizerPreset.None" xml:space="preserve">
     <value>None</value>
   </data>
+  <data name="BassParametricEqualizerStreamComponent.Name" xml:space="preserve">
+    <value>Parametric Equalizer</value>
+  </data>
+  <data name="BassParametricEqualizerStreamComponent.None" xml:space="preserve">
+    <value>none</value>
+  </data>
   <data name="BassParametricEqualizerStreamComponentConfiguration.Bandwidth" xml:space="preserve">
     <value>Bandwidth</value>
   </data>

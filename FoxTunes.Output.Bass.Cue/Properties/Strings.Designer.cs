@@ -86,5 +86,23 @@ namespace FoxTunes {
                 return ResourceManager.GetString("BassCueStreamAdvisorBehaviourConfiguration.Section", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip Silence.
+        /// </summary>
+        internal static string BassSkipSilenceStreamComponent_Name {
+            get {
+                return ResourceManager.GetString("BassSkipSilenceStreamComponent.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to none.
+        /// </summary>
+        internal static string BassSkipSilenceStreamComponent_None {
+            get {
+                return ResourceManager.GetString("BassSkipSilenceStreamComponent.None", resourceCulture);
+            }
+        }
     }
 }

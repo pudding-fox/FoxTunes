@@ -6,11 +6,18 @@ namespace FoxTunes
 {
     public abstract class BassStreamComponent : BaseComponent, IBassStreamComponent
     {
+        protected BassStreamComponent(BassFlags flags)
+        {
+            this.Flags = flags;
+        }
+
         public abstract string Name { get; }
 
         public abstract string Description { get; }
 
         public abstract int ChannelHandle { get; protected set; }
+
+        public BassFlags Flags { get; protected set; }
 
         public virtual long BufferLength
         {
@@ -33,19 +40,12 @@ namespace FoxTunes
             {
                 rate = 0;
                 channels = 0;
-                flags = BassFlags.Default;
+                flags = this.Flags;
                 return false;
             }
-            if (info.Flags.HasFlag(BassFlags.DSDRaw))
-            {
-                rate = BassUtils.GetChannelDsdRate(this.ChannelHandle);
-            }
-            else
-            {
-                rate = info.Frequency;
-            }
             channels = info.Channels;
-            flags = info.Flags;
+            rate = info.Frequency;
+            flags = info.Flags | this.Flags;
             return true;
         }
 

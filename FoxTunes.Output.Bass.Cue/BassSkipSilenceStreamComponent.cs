@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using System;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace FoxTunes
 {
     public class BassSkipSilenceStreamComponent : BassStreamComponent
     {
-        public BassSkipSilenceStreamComponent(BassSkipSilenceStreamAdvisorBehaviour behaviour)
+        public BassSkipSilenceStreamComponent(BassSkipSilenceStreamAdvisorBehaviour behaviour, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
         }
@@ -15,7 +16,7 @@ namespace FoxTunes
         {
             get
             {
-                return "SkipSilence";
+                return Strings.BassSkipSilenceStreamComponent_Name;
             }
         }
 
@@ -25,19 +26,19 @@ namespace FoxTunes
             {
                 if (!this.IsActive)
                 {
-                    return string.Format("{0} (none)", this.Name);
+                    return string.Format("{0} ({1})", this.Name, Strings.BassSkipSilenceStreamComponent_None);
                 }
                 var currentStream = this.PlaybackManager.CurrentStream as BassOutputStream;
                 if (currentStream == null)
                 {
-                    return string.Format("{0} (none)", this.Name);
+                    return string.Format("{0} ({1})", this.Name, Strings.BassSkipSilenceStreamComponent_None);
                 }
                 var advice = currentStream.Advice.OfType<BassSkipSilenceStreamAdvice>().FirstOrDefault(
                     _advice => _advice.LeadIn != TimeSpan.Zero || _advice.LeadOut != TimeSpan.Zero
                 );
                 if (advice == null)
                 {
-                    return string.Format("{0} (none)", this.Name);
+                    return string.Format("{0} ({1})", this.Name, Strings.BassSkipSilenceStreamComponent_None);
                 }
                 return string.Format(
                     "{0} ({1:0.00}s/{2:0.00}s)",

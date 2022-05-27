@@ -223,7 +223,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Cannot create input, the stream is not supported.");
                 throw new InvalidOperationException(Strings.BassCrossfadeStreamInputBehaviour_Unsupported);
             }
-            e.Input = new BassCrossfadeStreamInput(this);
+            e.Input = new BassCrossfadeStreamInput(this, e.Stream.Flags);
             e.Input.InitializeComponent(this.Core);
         }
 

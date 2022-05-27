@@ -109,7 +109,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var component = new BassDsdMemoryStreamComponent(this);
+            var component = new BassDsdMemoryStreamComponent(this, e.Stream.Flags);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

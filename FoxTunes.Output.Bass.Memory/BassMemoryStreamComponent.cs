@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using ManagedBass.Memory;
 
 namespace FoxTunes
 {
     public class BassMemoryStreamComponent : BassStreamComponent
     {
-        public BassMemoryStreamComponent(BassMemoryBehaviour behaviour)
+        public BassMemoryStreamComponent(BassMemoryBehaviour behaviour, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
         }

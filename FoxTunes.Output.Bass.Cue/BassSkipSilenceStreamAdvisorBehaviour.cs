@@ -66,7 +66,7 @@ namespace FoxTunes
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
-            var component = new BassSkipSilenceStreamComponent(this);
+            var component = new BassSkipSilenceStreamComponent(this, e.Stream.Flags);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

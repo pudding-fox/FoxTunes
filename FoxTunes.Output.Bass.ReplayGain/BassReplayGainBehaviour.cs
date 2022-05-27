@@ -112,7 +112,7 @@ namespace FoxTunes
                 //Cannot apply effects to DSD.
                 return;
             }
-            var component = new BassReplayGainStreamComponent(this, e.Stream);
+            var component = new BassReplayGainStreamComponent(this, e.Stream.Flags);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

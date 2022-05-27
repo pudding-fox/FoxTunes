@@ -306,7 +306,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var output = new BassWasapiStreamOutput(this, e.Stream);
+            var output = new BassWasapiStreamOutput(this, e.Stream.Flags);
             output.InitializeComponent(this.Core);
             e.Output = output;
         }

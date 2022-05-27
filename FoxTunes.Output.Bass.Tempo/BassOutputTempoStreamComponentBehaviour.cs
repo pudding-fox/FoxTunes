@@ -78,7 +78,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Cannot create component, the stream is not supported.");
                 return;
             }
-            var component = new BassOutputTempoStreamComponent(this);
+            var component = new BassOutputTempoStreamComponent(this, e.Stream.Flags);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

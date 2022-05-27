@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using System;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace FoxTunes
 {
     public class BassParametricEqualizerStreamComponent : BassStreamComponent
     {
-        public BassParametricEqualizerStreamComponent(BassParametricEqualizerStreamComponentBehaviour behaviour)
+        public BassParametricEqualizerStreamComponent(BassParametricEqualizerStreamComponentBehaviour behaviour, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
         }
@@ -15,7 +16,7 @@ namespace FoxTunes
         {
             get
             {
-                return "ParametricEqualizer";
+                return Strings.BassParametricEqualizerStreamComponent_Name;
             }
         }
 
@@ -25,7 +26,7 @@ namespace FoxTunes
             {
                 if (!this.IsActive)
                 {
-                    return string.Format("{0} (none)", this.Name);
+                    return string.Format("{0} ({1})", this.Name, Strings.BassParametricEqualizerStreamComponent_None);
                 }
                 var bands = string.Join(",", this.OutputEffects.Equalizer.Bands.Where(
                     band => band.Value != 0

@@ -11,6 +11,8 @@ namespace FoxTunes.Interfaces
 
         int ChannelHandle { get; }
 
+        BassFlags Flags { get; }
+
         long BufferLength { get; }
 
         bool IsActive { get; }

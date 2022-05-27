@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,11 @@ namespace FoxTunes
 {
     public abstract class BassStreamOutput : BassStreamComponent, IBassStreamOutput
     {
+        protected BassStreamOutput(BassFlags flags) : base(flags)
+        {
+
+        }
+
         public override bool IsActive
         {
             get
