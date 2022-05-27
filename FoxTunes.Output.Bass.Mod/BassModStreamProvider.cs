@@ -59,7 +59,7 @@ namespace FoxTunes
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 
-        public override void FreeStream(PlaylistItem playlistItem, int channelHandle)
+        public override void FreeStream(int channelHandle)
         {
             Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
             Bass.MusicFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.

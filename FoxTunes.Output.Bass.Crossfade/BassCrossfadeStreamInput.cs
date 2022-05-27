@@ -9,13 +9,9 @@ namespace FoxTunes
 {
     public class BassCrossfadeStreamInput : BassStreamInput, IBassStreamControllable
     {
-        public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour, BassOutputStream stream)
+        public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour)
         {
             this.Behaviour = behaviour;
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                throw new InvalidOperationException("Cannot apply effects to DSD streams.");
-            }
         }
 
 
@@ -244,5 +240,14 @@ namespace FoxTunes
         }
 
         #endregion
+
+        public static bool CanCreate(BassCrossfadeStreamInputBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
+        {
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

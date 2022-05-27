@@ -515,13 +515,13 @@ namespace FoxTunes
             }
             rate = _rate;
             channels = _channels;
-            if (_flags.HasFlag(BassFlags.Float))
-            {
-                format = OutputStreamFormat.Float;
-            }
-            else if (_flags.HasFlag(BassFlags.DSDRaw))
+            if (_flags.HasFlag(BassFlags.DSDRaw))
             {
                 format = OutputStreamFormat.DSDRaw;
+            }
+            else if (_flags.HasFlag(BassFlags.Float))
+            {
+                format = OutputStreamFormat.Float;
             }
             else
             {

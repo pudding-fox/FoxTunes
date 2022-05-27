@@ -98,7 +98,7 @@ namespace FoxTunes
             }
             if (!this.IsFormatSupported(channelHandle))
             {
-                this.FreeStream(playlistItem, channelHandle);
+                this.FreeStream(channelHandle);
                 channelHandle = 0;
             }
             return channelHandle;

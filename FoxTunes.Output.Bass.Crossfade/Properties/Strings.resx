@@ -120,4 +120,7 @@
   <data name="BassCrossfadeStreamInput.Name" xml:space="preserve">
     <value>Fading</value>
   </data>
+  <data name="BassCrossfadeStreamInputBehaviour.Unsupported" xml:space="preserve">
+    <value>Fading: The input type is unsupported.</value>
+  </data>
 </root>

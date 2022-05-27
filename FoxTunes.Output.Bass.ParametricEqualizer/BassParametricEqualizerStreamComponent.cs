@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass;
 using System;
 using System.Linq;
 
@@ -7,12 +6,8 @@ namespace FoxTunes
 {
     public class BassParametricEqualizerStreamComponent : BassStreamComponent
     {
-        public BassParametricEqualizerStreamComponent(BassParametricEqualizerStreamComponentBehaviour behaviour, BassOutputStream stream)
+        public BassParametricEqualizerStreamComponent(BassParametricEqualizerStreamComponentBehaviour behaviour)
         {
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                throw new InvalidOperationException("Cannot apply effects to DSD streams.");
-            }
             this.Behaviour = behaviour;
         }
 
@@ -193,6 +188,15 @@ namespace FoxTunes
                 band.Value > 0 ? "+" + band.Value.ToString() : band.Value.ToString(),
                 band.Center < 1000 ? band.Center.ToString() + "Hz" : band.Center.ToString() + "kHz"
             );
+        }
+
+        public static bool ShouldCreate(BassParametricEqualizerStreamComponentBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
+        {
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
