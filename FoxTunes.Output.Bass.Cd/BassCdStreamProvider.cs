@@ -28,11 +28,6 @@ namespace FoxTunes
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
-            //The behaviour is not loaded for utilities so we can't check whether it's enabled.
-            //if (this.Behaviour == null || !this.Behaviour.Enabled)
-            //{
-            //    return false;
-            //}
             var drive = default(int);
             var id = default(string);
             var track = default(int);
@@ -65,6 +60,10 @@ namespace FoxTunes
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
             }
+            if (channelHandle == 0)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create CD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+            }
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
@@ -93,6 +92,10 @@ namespace FoxTunes
                     BassCd.FreeOld = false;
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
+            }
+            if (channelHandle == 0)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create CD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }

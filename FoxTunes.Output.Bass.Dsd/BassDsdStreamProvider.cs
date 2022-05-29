@@ -63,12 +63,11 @@ namespace FoxTunes
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             var channelHandle = this.CreateDsdRawStream(playlistItem, advice, flags);
-            if (channelHandle != 0)
+            if (channelHandle == 0)
             {
-                return this.CreateInteractiveStream(channelHandle, advice, flags | BassFlags.DSDRaw);
+                Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
-            Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
-            return base.CreateInteractiveStream(playlistItem, advice, flags);
+            return this.CreateBasicStream(channelHandle, advice, flags | BassFlags.DSDRaw);
         }
 
         protected virtual int CreateDsdRawStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)

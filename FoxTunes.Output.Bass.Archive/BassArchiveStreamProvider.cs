@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.ZipStream;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -20,11 +21,6 @@ namespace FoxTunes
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
-            //The behaviour is not loaded for utilities so we can't check whether it's enabled.
-            //if (this.Behaviour == null || !this.Behaviour.Enabled)
-            //{
-            //    return false;
-            //}
             var fileName = default(string);
             var entryName = default(string);
             return ArchiveUtils.ParseUrl(playlistItem.FileName, out fileName, out entryName);
@@ -64,6 +60,7 @@ namespace FoxTunes
                         }
                         break;
                 }
+                Logger.Write(this, LogLevel.Warn, "Failed to create archive stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
@@ -102,6 +99,7 @@ namespace FoxTunes
                         }
                         break;
                 }
+                Logger.Write(this, LogLevel.Warn, "Failed to create archive stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
