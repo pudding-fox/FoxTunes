@@ -134,7 +134,7 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.ErrorEmitter = core.Components.ErrorEmitter;
-            this.LibraryRoots = new CollectionManager<LibraryRoot>()
+            this.LibraryRoots = new CollectionManager<LibraryRoot>(CollectionManagerFlags.AllowEmptyCollection)
             {
                 ItemFactory = () =>
                 {

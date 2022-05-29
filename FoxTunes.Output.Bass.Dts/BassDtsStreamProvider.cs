@@ -54,6 +54,10 @@ namespace FoxTunes
         {
             var fileName = this.GetFileName(playlistItem, advice);
             var channelHandle = BassDts.CreateStream(fileName, 0, 0, flags);
+            if (channelHandle == 0)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create DTS stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+            }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
     }
