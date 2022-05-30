@@ -1,8 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass.Dsd;
 using ManagedBass.Memory;
-using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FoxTunes
 {
@@ -10,6 +10,20 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdBehaviour : StandardBehaviour, IConfigurableComponent
     {
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassDsdBehaviour).Assembly.Location);
+            }
+        }
+
+        public BassDsdBehaviour()
+        {
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_memory_dsd.dll"));
+        }
+
         public ICore Core { get; private set; }
 
         public IBassOutput Output { get; private set; }
@@ -63,8 +77,6 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
-            this.Output.Init += this.OnInit;
-            this.Output.Free += this.OnFree;
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             this.Configuration = core.Components.Configuration;
@@ -81,26 +93,6 @@ namespace FoxTunes
                 BassDsdBehaviourConfiguration.DSD_MEMORY_ELEMENT
             ).ConnectValue(value => this.Memory = value);
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnInit(object sender, EventArgs e)
-        {
-            if (!this.Memory)
-            {
-                return;
-            }
-            BassMemory.Dsd.Init();
-            Logger.Write(this, LogLevel.Debug, "BASS MEMORY DSD Initialized.");
-        }
-
-        protected virtual void OnFree(object sender, EventArgs e)
-        {
-            if (!this.Memory)
-            {
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "Releasing BASS DSD MEMORY.");
-            BassMemory.Dsd.Free();
         }
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)

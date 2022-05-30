@@ -260,6 +260,10 @@ namespace FoxTunes
             {
                 parts.Add(package.Name);
             }
+            if (!string.IsNullOrEmpty(element.FolderName))
+            {
+                parts.Add(element.FolderName);
+            }
             if (element.Flags.HasFlag(PackageElementFlags.Flatten))
             {
                 parts.Add(Path.GetFileName(element.FileName));
@@ -434,8 +438,8 @@ namespace FoxTunes
                         "addon/bassdsd.dll",
                         "FoxTunes.Output.Bass.Dsd.dll",
                         "ManagedBass.Dsd.dll",
-                        new PackageElement("x86/bass_memory_dsd.dll", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_memory_dsd.dll", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_memory_dsd.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_memory_dsd.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
@@ -548,8 +552,8 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Memory.dll",
                         "ManagedBass.Memory.dll",
-                        new PackageElement("x86/bass_memory.dll", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_memory.dll", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_memory.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_memory.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
@@ -791,7 +795,14 @@ namespace FoxTunes
                 this.Flags = flags;
             }
 
+            public PackageElement(string fileName, string folderName, PackageElementFlags flags = PackageElementFlags.None) : this(fileName, flags)
+            {
+                this.FolderName = folderName;
+            }
+
             public string FileName { get; private set; }
+
+            public string FolderName { get; private set; }
 
             public PackageElementFlags Flags { get; private set; }
 
