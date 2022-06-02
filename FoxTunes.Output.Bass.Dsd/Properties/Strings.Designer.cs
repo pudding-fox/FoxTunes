@@ -104,5 +104,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("BassDsdMemoryStreamComponent.Name", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creating memory stream.
+        /// </summary>
+        internal static string LoadingTask_Name {
+            get {
+                return ResourceManager.GetString("LoadingTask.Name", resourceCulture);
+            }
+        }
     }
 }

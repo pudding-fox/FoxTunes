@@ -103,7 +103,31 @@ namespace FoxTunes
 
         public HashSet<BassPlugin> Plugins { get; private set; }
 
-        public bool IsLoaded { get; private set; }
+        private bool _IsLoaded { get; set; }
+
+        public bool IsLoaded
+        {
+            get
+            {
+                return this._IsLoaded;
+            }
+            private set
+            {
+                this._IsLoaded = value;
+                this.OnIsLoadedChanged();
+            }
+        }
+
+        protected virtual void OnIsLoadedChanged()
+        {
+            if (this.IsLoadedChanged != null)
+            {
+                this.IsLoadedChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsLoaded");
+        }
+
+        public event EventHandler IsLoadedChanged;
 
         public override void InitializeComponent(ICore core)
         {

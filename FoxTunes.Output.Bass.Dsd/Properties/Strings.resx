@@ -132,4 +132,7 @@
   <data name="BassDsdMemoryStreamComponent.Name" xml:space="preserve">
     <value>Memory</value>
   </data>
+  <data name="LoadingTask.Name" xml:space="preserve">
+    <value>Creating memory stream</value>
+  </data>
 </root>

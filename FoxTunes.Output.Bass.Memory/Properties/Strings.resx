@@ -126,4 +126,7 @@
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
   </data>
+  <data name="LoadingTask.Name" xml:space="preserve">
+    <value>Creating memory stream</value>
+  </data>
 </root>
