@@ -153,12 +153,16 @@ namespace FoxTunes
                 {
                     try
                     {
-                        this.Load(path);
+                        if (this.Load(path))
+                        {
+                            continue;
+                        }
                     }
                     catch (Exception e)
                     {
                         Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", path, e.Message);
                     }
+                    failures.Add(path);
                 }
                 else if (Directory.Exists(path))
                 {

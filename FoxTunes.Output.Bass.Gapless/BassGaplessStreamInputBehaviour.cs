@@ -2,6 +2,7 @@
 using ManagedBass.Gapless;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FoxTunes
 {
@@ -9,6 +10,20 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassGaplessStreamInputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassGaplessStreamInputBehaviour).Assembly.Location);
+            }
+        }
+
+        public BassGaplessStreamInputBehaviour()
+        {
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_gapless.dll"));
+        }
+
         public ICore Core { get; private set; }
 
         public IBassOutput Output { get; private set; }
@@ -40,8 +55,6 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
-            this.Output.Init += this.OnInit;
-            this.Output.Free += this.OnFree;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -50,20 +63,6 @@ namespace FoxTunes
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnInit(object sender, EventArgs e)
-        {
-            BassUtils.OK(BassGapless.Init());
-            this.IsInitialized = true;
-            Logger.Write(this, LogLevel.Debug, "BASS GAPLESS Initialized.");
-        }
-
-        protected virtual void OnFree(object sender, EventArgs e)
-        {
-            Logger.Write(this, LogLevel.Debug, "Releasing BASS GAPLESS.");
-            BassGapless.Free();
-            this.IsInitialized = false;
         }
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
@@ -101,11 +100,6 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.Output != null)
-            {
-                this.Output.Init -= this.OnInit;
-                this.Output.Free -= this.OnFree;
-            }
             if (this.BassStreamPipelineFactory != null)
             {
                 this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;

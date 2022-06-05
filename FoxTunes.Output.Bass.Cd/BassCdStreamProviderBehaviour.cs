@@ -3,9 +3,10 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.Cd;
-using ManagedBass.Gapless.Cd;
+using ManagedBass.Gapless;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -15,6 +16,20 @@ namespace FoxTunes
     public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";
+
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassCdStreamProviderBehaviour).Assembly.Location);
+            }
+        }
+
+        public BassCdStreamProviderBehaviour()
+        {
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_gapless_cd.dll"));
+        }
 
         public ICore Core { get; private set; }
 
@@ -127,10 +142,8 @@ namespace FoxTunes
             {
                 flags |= BassFlags.Float;
             }
-            BassUtils.OK(BassGaplessCd.Init());
-            BassUtils.OK(BassGaplessCd.Enable(this.Drive, flags));
+            BassUtils.OK(BassGapless.Cd.Enable(this.Drive, flags));
             this.IsInitialized = true;
-            Logger.Write(this, LogLevel.Debug, "BASS CD Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -139,8 +152,7 @@ namespace FoxTunes
             {
                 return;
             }
-            BassGaplessCd.Disable();
-            BassGaplessCd.Free();
+            BassGapless.Cd.Disable();
             //Ignoring result on purpose.
             BassCd.Release(this.Drive);
             this.IsInitialized = false;
