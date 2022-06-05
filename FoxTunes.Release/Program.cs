@@ -371,11 +371,8 @@ namespace FoxTunes
                         "addon/basswv.dll",
                         "bass.dll",
                         "bass_fx.dll",
-                        "bass_gapless.dll",
                         "bassmix.dll",
-                        "FoxTunes.Output.Bass.DirectSound.dll",
                         "FoxTunes.Output.Bass.dll",
-                        "FoxTunes.Output.Bass.Gapless.dll",
                         "ManagedBass.dll",
                         "ManagedBass.Fx.dll",
                         "ManagedBass.Gapless.dll",
@@ -387,11 +384,11 @@ namespace FoxTunes
                     "cd",
                     new PackageElement[]
                     {
-                        "bass_gapless_cd.dll",
-                        "basscd.dll",
+                        "addon/basscd.dll",
                         "FoxTunes.Output.Bass.Cd.dll",
                         "ManagedBass.Cd.dll",
-                        "ManagedBass.Gapless.Cd.dll"
+                        new PackageElement("x86/bass_gapless_cd.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_gapless_cd.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
@@ -422,6 +419,14 @@ namespace FoxTunes
                         "ManagedBass.Substream.dll"
                     },
                     PackageFlags.Default
+                ),
+                new Package(
+                    "directsound",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.Output.Bass.DirectSound.dll"
+                    },
+                    PackageFlags.Default | PackageFlags.Minimal
                 ),
                 new Package(
                     "discogs",
@@ -500,6 +505,16 @@ namespace FoxTunes
                         "FoxTunes.Output.Bass.ParametricEqualizer.dll"
                     },
                     PackageFlags.Default
+                ),
+                new Package(
+                    "gapless",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.Output.Bass.Gapless.dll",
+                        new PackageElement("x86/bass_gapless.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_gapless.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                    },
+                    PackageFlags.Default | PackageFlags.Minimal
                 ),
                 new Package(
                     "js",
