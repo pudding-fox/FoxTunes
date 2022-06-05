@@ -6,7 +6,6 @@ using ManagedBass.Dsd;
 using ManagedBass.Memory;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace FoxTunes
