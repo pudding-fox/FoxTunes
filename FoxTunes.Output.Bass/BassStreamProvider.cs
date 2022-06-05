@@ -123,7 +123,8 @@ namespace FoxTunes
 
         public virtual long GetPosition(int channelHandle)
         {
-            return Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
+            var position = Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
+            return Math.Max(position, 0);
         }
 
         public virtual void SetPosition(int channelHandle, long value)

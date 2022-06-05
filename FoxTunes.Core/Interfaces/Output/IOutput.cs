@@ -32,6 +32,8 @@ namespace FoxTunes.Interfaces
 
         Task<bool> Preempt(IOutputStream stream);
 
+        Task<bool> IsPlaying(IOutputStream stream);
+
         Task Unload(IOutputStream stream);
 
         event OutputStreamEventHandler Unloaded;
