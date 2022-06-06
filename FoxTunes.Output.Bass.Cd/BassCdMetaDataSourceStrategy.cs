@@ -13,9 +13,9 @@ namespace FoxTunes
 
         public int Drive { get; private set; }
 
-        public virtual bool InitializeComponent()
+        public virtual bool Fetch()
         {
-            return true;
+            return false;
         }
 
         public virtual IEnumerable<MetaDataItem> GetMetaDatas(int track)

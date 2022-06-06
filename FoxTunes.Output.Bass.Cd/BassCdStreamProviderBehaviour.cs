@@ -78,18 +78,24 @@ namespace FoxTunes
             }
         }
 
-        private string _CdLookupHost { get; set; }
+        private IEnumerable<string> _CdLookupHosts { get; set; }
 
-        public string CdLookupHost
+        public IEnumerable<string> CdLookupHosts
         {
             get
             {
-                return this._CdLookupHost;
+                return this._CdLookupHosts;
             }
             private set
             {
-                this._CdLookupHost = value;
-                Logger.Write(this, LogLevel.Debug, "CD Lookup Host = {0}", this.CdLookupHost);
+                this._CdLookupHosts = value;
+                if (value != null)
+                {
+                    foreach (var cdLookupHost in value)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "CD Lookup Host = {0}", cdLookupHost);
+                    }
+                }
             }
         }
 
@@ -114,7 +120,17 @@ namespace FoxTunes
             this.Configuration.GetElement<TextConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_HOST_ELEMENT
-            ).ConnectValue(value => this.CdLookupHost = value);
+            ).ConnectValue(value =>
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    this.CdLookupHosts = value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                else
+                {
+                    this.CdLookupHosts = BassCdStreamProviderBehaviourConfiguration.GetLookupHosts();
+                }
+            });
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
@@ -226,7 +242,7 @@ namespace FoxTunes
 
         public async Task OpenCd(Playlist playlist, int drive)
         {
-            using (var task = new AddCdToPlaylistTask(playlist, drive, this.CdLookup, this.CdLookupHost))
+            using (var task = new AddCdToPlaylistTask(playlist, drive, this.CdLookup, this.CdLookupHosts))
             {
                 task.InitializeComponent(this.Core);
                 await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
@@ -279,11 +295,11 @@ namespace FoxTunes
 
         private class AddCdToPlaylistTask : PlaylistTaskBase
         {
-            public AddCdToPlaylistTask(Playlist playlist, int drive, bool cdLookup, string cdLookupHost) : base(playlist)
+            public AddCdToPlaylistTask(Playlist playlist, int drive, bool cdLookup, IEnumerable<string> cdLookupHosts) : base(playlist)
             {
                 this.Drive = drive;
                 this.CdLookup = cdLookup;
-                this.CdLookupHost = cdLookupHost;
+                this.CdLookupHosts = cdLookupHosts;
             }
 
             public override bool Visible
@@ -298,7 +314,7 @@ namespace FoxTunes
 
             public bool CdLookup { get; private set; }
 
-            public string CdLookupHost { get; private set; }
+            public IEnumerable<string> CdLookupHosts { get; private set; }
 
             public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -310,7 +326,7 @@ namespace FoxTunes
             {
                 this.PlaylistManager = core.Managers.Playlist;
                 this.PlaylistBrowser = core.Components.PlaylistBrowser;
-                this.Factory = new CdPlaylistItemFactory(this.Drive, this.CdLookup, this.CdLookupHost);
+                this.Factory = new CdPlaylistItemFactory(this.Drive, this.CdLookup, this.CdLookupHosts);
                 this.Factory.InitializeComponent(core);
                 base.InitializeComponent(core);
             }

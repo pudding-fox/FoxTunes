@@ -1,4 +1,4 @@
-﻿using ManagedBass.Cd;
+﻿using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -15,14 +15,24 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "CD")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(LOOKUP_ELEMENT, "Lookup Tags")
+            yield return new ConfigurationSection(SECTION, Strings.BassCdStreamProviderBehaviourConfiguration_Section)
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.BassCdStreamProviderBehaviourConfiguration_Enabled).WithValue(false))
+                .WithElement(new BooleanConfigurationElement(LOOKUP_ELEMENT, Strings.BassCdStreamProviderBehaviourConfiguration_Lookup)
                     .WithValue(true)
                     .DependsOn(SECTION, ENABLED_ELEMENT))
-                .WithElement(new TextConfigurationElement(LOOKUP_HOST_ELEMENT, "Host")
-                    .WithValue(BassCd.CDDBServer ?? "freedb.freedb.org")
+                .WithElement(new TextConfigurationElement(LOOKUP_HOST_ELEMENT, Strings.BassCdStreamProviderBehaviourConfiguration_Host)
+                    .WithValue(string.Join(Environment.NewLine, GetLookupHosts()))
+                    .WithFlags(ConfigurationElementFlags.MultiLine)
                     .DependsOn(SECTION, ENABLED_ELEMENT).DependsOn(SECTION, LOOKUP_ELEMENT));
+        }
+
+        public static IEnumerable<string> GetLookupHosts()
+        {
+            return new[]
+            {
+                Strings.BassCdStreamProviderBehaviourConfiguration_Host1,
+                Strings.BassCdStreamProviderBehaviourConfiguration_Host2
+            };
         }
     }
 }

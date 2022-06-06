@@ -4,7 +4,7 @@ namespace FoxTunes.Interfaces
 {
     public interface IBassCdMetaDataSourceStrategy
     {
-        bool InitializeComponent();
+        bool Fetch();
 
         IEnumerable<MetaDataItem> GetMetaDatas(int track);
 

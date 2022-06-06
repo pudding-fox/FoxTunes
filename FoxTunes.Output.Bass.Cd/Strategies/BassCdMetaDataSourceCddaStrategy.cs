@@ -18,41 +18,48 @@ namespace FoxTunes
             { "DYEAR", CommonMetaData.Year }
         };
 
-        public BassCdMetaDataSourceCddaStrategy(int drive, string host)
+        public BassCdMetaDataSourceCddaStrategy(int drive, IEnumerable<string> hosts)
             : base(drive)
         {
-            if (!string.Equals(BassCd.CDDBServer, host, StringComparison.OrdinalIgnoreCase))
-            {
-                BassCd.CDDBServer = host;
-            }
+            this.Hosts = hosts;
         }
+
+        public IEnumerable<string> Hosts { get; private set; }
 
         public CddbTextParser Parser { get; private set; }
 
-        public override bool InitializeComponent()
+        public override bool Fetch()
         {
-            Logger.Write(this, LogLevel.Debug, "Querying CDDB for drive: {0}", this.Drive);
-            try
+            Logger.Write(this, LogLevel.Debug, "Querying CDDB for drive {0}...", this.Drive);
+            foreach (var host in this.Hosts)
             {
-                //The CDDB and Read must be executed together so synchronize.
-                lock (SyncRoot)
+                try
                 {
-                    var id = BassCd.GetID(this.Drive, CDID.CDDB);
-                    var sequence = BassCd.GetID(this.Drive, CDID.Read);
-                    this.Parser = new CddbTextParser(id, sequence);
+                    lock (SyncRoot)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Using CDDB host: {0}", host);
+                        if (!string.Equals(BassCd.CDDBServer, host, StringComparison.OrdinalIgnoreCase))
+                        {
+                            BassCd.CDDBServer = host;
+                        }
+                        var id = BassCd.GetID(this.Drive, CDID.CDDB);
+                        Logger.Write(this, LogLevel.Debug, "CDDB identifier is \"{0}\" for drive {1}.", id, this.Drive);
+                        var sequence = BassCd.GetID(this.Drive, CDID.Read);
+                        this.Parser = new CddbTextParser(id, sequence);
+                        if (this.Parser.Count > 0)
+                        {
+                            Logger.Write(this, LogLevel.Debug, "CDDB returned {0} records for drive {1}.", this.Parser.Count, this.Drive);
+                            return true;
+                        }
+                    }
                 }
-                if (this.Parser.Count == 0)
+                catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Debug, "CDDB did not return any information for drive: {0}", this.Drive);
-                    return false;
+                    Logger.Write(this, LogLevel.Warn, "Failed to query CDDB for drive {0}: {1}", this.Drive, e.Message);
                 }
             }
-            catch (Exception e)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to query CDDB for drive {0}: {1}", this.Drive, e.Message);
-                return false;
-            }
-            return base.InitializeComponent();
+            Logger.Write(this, LogLevel.Debug, "CDDB was empty for drive {0}.", this.Drive);
+            return base.Fetch();
         }
 
         public override IEnumerable<MetaDataItem> GetMetaDatas(int track)

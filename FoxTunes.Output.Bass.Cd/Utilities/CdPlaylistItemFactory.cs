@@ -10,18 +10,18 @@ namespace FoxTunes
 {
     public class CdPlaylistItemFactory : BaseComponent
     {
-        public CdPlaylistItemFactory(int drive, bool cdLookup, string cdLookupHost)
+        public CdPlaylistItemFactory(int drive, bool cdLookup, IEnumerable<string> cdLookupHosts)
         {
             this.Drive = drive;
             this.CdLookup = cdLookup;
-            this.CdLookupHost = cdLookupHost;
+            this.CdLookupHosts = cdLookupHosts;
         }
 
         public int Drive { get; private set; }
 
         public bool CdLookup { get; private set; }
 
-        public string CdLookupHost { get; private set; }
+        public IEnumerable<string> CdLookupHosts { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -110,15 +110,15 @@ namespace FoxTunes
         {
             if (this.CdLookup)
             {
-                var strategy = new BassCdMetaDataSourceCddaStrategy(this.Drive, this.CdLookupHost);
-                if (strategy.InitializeComponent())
+                var strategy = new BassCdMetaDataSourceCddaStrategy(this.Drive, this.CdLookupHosts);
+                if (strategy.Fetch())
                 {
                     return strategy;
                 }
             }
             {
                 var strategy = new BassCdMetaDataSourceCdTextStrategy(this.Drive);
-                if (strategy.InitializeComponent())
+                if (strategy.Fetch())
                 {
                     return strategy;
                 }

@@ -25,19 +25,20 @@ namespace FoxTunes
 
         public CdTextParser Parser { get; private set; }
 
-        public override bool InitializeComponent()
+        public override bool Fetch()
         {
-            Logger.Write(this, LogLevel.Debug, "Querying CD-TEXT for drive: {0}", this.Drive);
+            Logger.Write(this, LogLevel.Debug, "Querying CD-TEXT for drive {0}...", this.Drive);
             lock (SyncRoot)
             {
                 this.Parser = new CdTextParser(BassCd.GetIDText(this.Drive));
             }
-            if (this.Parser.Count == 0)
+            if (this.Parser.Count > 0)
             {
-                Logger.Write(this, LogLevel.Debug, "CD-TEXT did not return any information for drive: {0}", this.Drive);
-                return false;
+                Logger.Write(this, LogLevel.Debug, "CD-TEXT contains {0} records for drive {1}.", this.Parser.Count, this.Drive);
+                return true;
             }
-            return base.InitializeComponent();
+            Logger.Write(this, LogLevel.Debug, "CD-TEXT was empty for drive {0}.", this.Drive);
+            return base.Fetch();
         }
 
         public override IEnumerable<MetaDataItem> GetMetaDatas(int track)
