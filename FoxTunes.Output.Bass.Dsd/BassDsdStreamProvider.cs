@@ -39,7 +39,7 @@ namespace FoxTunes
             return true;
         }
 
-        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, bool immidiate, BassFlags flags)
         {
             var channelHandle = this.CreateDsdRawStream(playlistItem, advice, flags);
             if (channelHandle == 0)

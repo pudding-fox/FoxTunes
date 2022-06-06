@@ -66,7 +66,7 @@ namespace FoxTunes.Encoder.Bass.Tests
                         threads.ForEach(thread => thread.Join());
                         Assert.AreEqual(0, resampler.Process.ExitCode, "Encode with profile \"{0}\" failed: Process does not indicate success.", profile.Name);
                     }
-                    streamFactory.ReleaseActiveStreams();
+                    stream.Dispose();
                 }
             }
         }

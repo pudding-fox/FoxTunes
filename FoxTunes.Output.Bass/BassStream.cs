@@ -2,6 +2,7 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -51,6 +52,12 @@ namespace FoxTunes
 
         protected virtual void OnPositionChanged()
         {
+            if (this.IsEnded)
+            {
+                //Stream was resurrected.
+                this.AddSyncHandlers();
+                this.IsEnded = false;
+            }
             if (this.Position > this.Length - Bass.ChannelSeconds2Bytes(this.ChannelHandle, ENDING_THRESHOLD))
             {
                 this.OnEnding();
@@ -71,9 +78,17 @@ namespace FoxTunes
             }
         }
 
+        public bool IsPending
+        {
+            get
+            {
+                return this.Errors == Errors.Already;
+            }
+        }
+
         public bool IsEnded { get; private set; }
 
-        public virtual void RegisterSyncHandlers()
+        public virtual void AddSyncHandlers()
         {
             this.Syncs = new int[]
             {
@@ -90,6 +105,17 @@ namespace FoxTunes
                     this.OnEnded
                 ))
             };
+        }
+
+        public virtual void RemoveSyncHandlers()
+        {
+            if (this.Syncs != null)
+            {
+                foreach (var sync in this.Syncs)
+                {
+                    Bass.ChannelRemoveSync(this.ChannelHandle, sync);
+                }
+            }
         }
 
         protected virtual void OnEnding(int Handle, int Channel, int Data, IntPtr User)
@@ -116,6 +142,7 @@ namespace FoxTunes
 
         protected virtual void OnEnded()
         {
+            this.RemoveSyncHandlers();
             this.IsEnded = true;
             if (this.Ended != null)
             {
@@ -138,11 +165,60 @@ namespace FoxTunes
             this.Position = 0;
         }
 
-        public static IBassStream Error(Errors errors)
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            this.RemoveSyncHandlers();
+            if (this.Provider != null && this.ChannelHandle != 0)
+            {
+                this.Provider.FreeStream(this.ChannelHandle);
+            }
+        }
+
+        ~BassStream()
+        {
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        public static IBassStream Error(IBassStreamProvider provider, Errors errors)
         {
             return new BassStream()
             {
+                Provider = provider,
                 Errors = errors
+            };
+        }
+
+        public static IBassStream Pending(IBassStreamProvider provider)
+        {
+            return new BassStream()
+            {
+                Provider = provider,
+                Errors = Errors.Already
             };
         }
 

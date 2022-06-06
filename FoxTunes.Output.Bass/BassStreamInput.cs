@@ -7,6 +7,8 @@ namespace FoxTunes
 {
     public abstract class BassStreamInput : BassStreamComponent, IBassStreamInput
     {
+        public const int POSITION_INDETERMINATE = -1;
+
         protected BassStreamInput(BassFlags flags) : base(flags)
         {
 

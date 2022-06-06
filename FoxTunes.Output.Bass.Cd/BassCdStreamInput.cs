@@ -1,24 +1,26 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.Gapless;
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using System;
+using ManagedBass.Cd;
 
 namespace FoxTunes
 {
-    public class BassGaplessStreamInput : BassStreamInput
+    public class BassCdStreamInput : BassStreamInput
     {
-        public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour, BassFlags flags) : base(flags)
+        public BassCdStreamInput(BassCdBehaviour behaviour, int drive, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
+            this.Drive = drive;
         }
 
         public override string Name
         {
             get
             {
-                return "Gapless";
+                return "CD";
             }
         }
 
@@ -45,7 +47,9 @@ namespace FoxTunes
             }
         }
 
-        public BassGaplessStreamInputBehaviour Behaviour { get; private set; }
+        public BassCdBehaviour Behaviour { get; private set; }
+
+        public int Drive { get; private set; }
 
         public override int ChannelHandle { get; protected set; }
 
@@ -58,10 +62,27 @@ namespace FoxTunes
             }
         }
 
+        public bool SetTrack(int track, out int channelHandle)
+        {
+            channelHandle = this.Queue.FirstOrDefault();
+            if (channelHandle == 0)
+            {
+                return false;
+            }
+            if (BassCd.StreamGetTrack(channelHandle) != track)
+            {
+                Logger.Write(this, LogLevel.Debug, "Switching CD track: {0}", track);
+                BassUtils.OK(BassCd.StreamSetTrack(channelHandle, track));
+            }
+            return true;
+        }
+
         public override void Connect(BassOutputStream stream)
         {
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.RecycleStream, true));
+            BassUtils.OK(BassGapless.ChannelEnqueue(stream.ChannelHandle));
+            BassUtils.OK(BassGapless.Cd.Enable(this.Drive, stream.Flags));
             Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
             this.ChannelHandle = BassGapless.StreamCreate(stream.Rate, stream.Channels, stream.Flags);
             if (this.ChannelHandle == 0)
@@ -72,11 +93,14 @@ namespace FoxTunes
 
         public override bool CheckFormat(BassOutputStream stream)
         {
-            var rate = default(int);
-            var channels = default(int);
-            var flags = default(BassFlags);
-            this.GetFormat(out rate, out channels, out flags);
-            return rate == stream.Rate && channels == stream.Channels;
+            var drive = default(int);
+            var id = default(string);
+            var track = default(int);
+            if (!CdUtils.ParseUrl(stream.FileName, out drive, out id, out track))
+            {
+                return false;
+            }
+            return this.Drive == drive;
         }
 
         public override bool Contains(BassOutputStream stream)
@@ -86,37 +110,17 @@ namespace FoxTunes
 
         public override int Position(BassOutputStream stream)
         {
-            var count = default(int);
-            var channelHandles = BassGapless.GetChannels(out count);
-            return channelHandles.IndexOf(stream.ChannelHandle);
+            return POSITION_INDETERMINATE;
         }
 
         public override bool Add(BassOutputStream stream)
         {
-            if (this.Queue.Contains(stream.ChannelHandle))
-            {
-                Logger.Write(this, LogLevel.Debug, "Stream is already enqueued: {0}", stream.ChannelHandle);
-                return false;
-            }
-            Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", stream.ChannelHandle);
-            BassUtils.OK(BassGapless.ChannelEnqueue(stream.ChannelHandle));
-            return true;
+            return false;
         }
 
         public override bool Remove(BassOutputStream stream, Action<BassOutputStream> callBack)
         {
-            if (!this.Queue.Contains(stream.ChannelHandle))
-            {
-                Logger.Write(this, LogLevel.Debug, "Stream is not enqueued: {0}", stream.ChannelHandle);
-                return false;
-            }
-            Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", stream.ChannelHandle);
-            BassUtils.OK(BassGapless.ChannelRemove(stream.ChannelHandle));
-            if (callBack != null)
-            {
-                callBack(stream);
-            }
-            return true;
+            return false;
         }
 
         public override void Reset()
@@ -138,6 +142,8 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
                 Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
+            BassGapless.Cd.Disable();
+            BassCd.Release(this.Drive);
         }
     }
 }

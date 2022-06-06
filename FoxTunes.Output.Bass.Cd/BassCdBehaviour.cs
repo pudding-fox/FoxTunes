@@ -13,7 +13,7 @@ namespace FoxTunes
 {
     [Component("C051C82C-3391-4DDC-B856-C4BDEA86ADDC", null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
+    public class BassCdBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";
 
@@ -21,18 +21,15 @@ namespace FoxTunes
         {
             get
             {
-                return Path.GetDirectoryName(typeof(BassCdStreamProviderBehaviour).Assembly.Location);
+                return Path.GetDirectoryName(typeof(BassCdBehaviour).Assembly.Location);
             }
         }
 
-        public BassCdStreamProviderBehaviour()
+        public BassCdBehaviour()
         {
-            this.CurrentDrive = CdUtils.NO_DRIVE;
             BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
             BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_gapless_cd.dll"));
         }
-
-        public int CurrentDrive { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -103,7 +100,6 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
-            this.Output.Free += this.OnFree;
             this.PlaylistManager = core.Managers.Playlist;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.DoorMonitor = ComponentRegistry.Instance.GetComponent<CdDoorMonitor>();
@@ -136,26 +132,6 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnFree(object sender, EventArgs e)
-        {
-            if (this.CurrentDrive == CdUtils.NO_DRIVE)
-            {
-                return;
-            }
-            try
-            {
-                BassGapless.Cd.Disable();
-                //Ignoring result on purpose.
-                BassCd.Release(this.CurrentDrive);
-                Logger.Write(this, LogLevel.Debug, "Gapless CD playback was disabled.");
-            }
-            catch (Exception ex)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to disable gapless CD playback: {0}", ex.Message);
-            }
-            this.CurrentDrive = CdUtils.NO_DRIVE;
-        }
-
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
             if (!this.Enabled)
@@ -169,23 +145,8 @@ namespace FoxTunes
             {
                 return;
             }
-            var flags = BassFlags.Decode;
-            if (e.Stream.Flags.HasFlag(BassFlags.Float))
-            {
-                flags |= BassFlags.Float;
-            }
-            try
-            {
-                if (BassGapless.Cd.Enable(drive, flags))
-                {
-                    Logger.Write(this, LogLevel.Debug, "Gapless CD playback was enabled.");
-                    this.CurrentDrive = drive;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to enable gapless CD playback: {0}", ex.Message);
-            }
+            e.Input = new BassCdStreamInput(this, drive, e.Stream.Flags);
+            e.Input.InitializeComponent(this.Core);
         }
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
@@ -270,17 +231,13 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.Output != null)
-            {
-                this.Output.Free -= this.OnFree;
-            }
             if (this.BassStreamPipelineFactory != null)
             {
                 this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
             }
         }
 
-        ~BassCdStreamProviderBehaviour()
+        ~BassCdBehaviour()
         {
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try

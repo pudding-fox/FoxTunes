@@ -90,36 +90,16 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Using bass stream provider \"{0}\".", provider.GetType().Name);
                 var advice = this.GetAdvice(provider, playlistItem, BassStreamUsageType.Interactive).ToArray();
-                var stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
-                if (stream.ChannelHandle != 0)
+                var stream = provider.CreateInteractiveStream(playlistItem, advice, immidiate, flags);
+                if (!stream.IsEmpty)
                 {
                     Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
                     return stream;
                 }
-                if (stream.Errors == Errors.Already && provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
+                else if (stream.IsPending)
                 {
-                    if (immidiate)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Provider does not support multiple streams but immidiate playback was requested, releasing active streams.");
-                        if (this.ReleaseActiveStreams())
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Active streams were released, retrying.");
-                            stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
-                            if (stream.ChannelHandle != 0)
-                            {
-                                Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
-                                return stream;
-                            }
-                        }
-                        else
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Failed to release active streams.");
-                        }
-                    }
-                    else
-                    {
-                        return stream;
-                    }
+                    Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: It is not currently available.", playlistItem.FileName);
+                    return stream;
                 }
                 Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
             }
@@ -130,22 +110,6 @@ namespace FoxTunes
         public bool HasActiveStream(string fileName)
         {
             return BassOutputStream.Active.Any(stream => string.Equals(stream.FileName, fileName, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public bool ReleaseActiveStreams()
-        {
-            foreach (var stream in BassOutputStream.Active)
-            {
-                try
-                {
-                    stream.Dispose();
-                }
-                catch
-                {
-                    //Nothing can be done.
-                }
-            }
-            return !BassOutputStream.Active.Any();
         }
     }
 }

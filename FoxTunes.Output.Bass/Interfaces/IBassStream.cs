@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IBassStream
+    public interface IBassStream : IDisposable
     {
         IBassStreamProvider Provider { get; }
 
@@ -18,6 +18,8 @@ namespace FoxTunes.Interfaces
 
         bool IsEmpty { get; }
 
+        bool IsPending { get; }
+
         bool IsEnded { get; }
 
         IEnumerable<IBassStreamAdvice> Advice { get; }
@@ -30,7 +32,9 @@ namespace FoxTunes.Interfaces
 
         event EventHandler Ended;
 
-        void RegisterSyncHandlers();
+        void AddSyncHandlers();
+
+        void RemoveSyncHandlers();
 
         bool CanReset { get; }
 

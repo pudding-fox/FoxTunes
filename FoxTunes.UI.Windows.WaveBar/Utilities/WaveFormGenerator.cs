@@ -55,9 +55,9 @@ namespace FoxTunes
             );
         }
 
-        protected virtual async Task Populate(IOutputStream stream, WaveFormGeneratorData data)
+        protected virtual void Populate(IOutputStream stream, WaveFormGeneratorData data)
         {
-            using (var duplicated = await this.Output.Duplicate(stream).ConfigureAwait(false))
+            using (var duplicated = this.Output.Duplicate(stream))
             {
                 if (duplicated == null)
                 {

@@ -65,7 +65,7 @@ namespace FoxTunes
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
-        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, bool immidiate, BassFlags flags)
         {
             var fileName = default(string);
             var entryName = default(string);

@@ -26,13 +26,11 @@ namespace FoxTunes.Interfaces
 
         Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate);
 
-        Task<IOutputStream> Duplicate(IOutputStream stream);
+        IOutputStream Duplicate(IOutputStream stream);
 
         event OutputStreamEventHandler Loaded;
 
         Task<bool> Preempt(IOutputStream stream);
-
-        Task<bool> IsPlaying(IOutputStream stream);
 
         Task Unload(IOutputStream stream);
 

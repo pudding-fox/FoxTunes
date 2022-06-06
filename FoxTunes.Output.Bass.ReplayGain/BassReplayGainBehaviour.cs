@@ -134,8 +134,7 @@ namespace FoxTunes
             {
                 if (this.OnDemand)
                 {
-                    //TODO: Bad .Result
-                    using (var duplicated = this.Output.Duplicate(stream).Result as BassOutputStream)
+                    using (var duplicated = this.Output.Duplicate(stream) as BassOutputStream)
                     {
                         if (duplicated == null)
                         {

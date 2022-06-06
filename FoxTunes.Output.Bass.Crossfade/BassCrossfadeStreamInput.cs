@@ -146,14 +146,20 @@ namespace FoxTunes
             if (this.Queue.Count() == 1)
             {
                 BassUtils.OK(BassCrossfade.StreamReset(this.Behaviour.Stop));
-                callBack(stream);
+                if (callBack != null)
+                {
+                    callBack(stream);
+                }
                 return true;
             }
             //Fork so fade out doesn't block the next track being enqueued.
             this.Dispatch(() =>
             {
                 BassUtils.OK(BassCrossfade.ChannelRemove(stream.ChannelHandle));
-                callBack(stream);
+                if (callBack != null)
+                {
+                    callBack(stream);
+                }
             });
             return true;
         }
