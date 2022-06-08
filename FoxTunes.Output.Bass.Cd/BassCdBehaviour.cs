@@ -145,6 +145,11 @@ namespace FoxTunes
             {
                 return;
             }
+            if (e.Input != null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Overriding the default pipeline input: {0}", e.Input.GetType().Name);
+                e.Input.Dispose();
+            }
             e.Input = new BassCdStreamInput(this, drive, e.Stream.Flags);
             e.Input.InitializeComponent(this.Core);
         }

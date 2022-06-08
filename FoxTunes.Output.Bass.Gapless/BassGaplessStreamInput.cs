@@ -70,15 +70,6 @@ namespace FoxTunes
             }
         }
 
-        public override bool CheckFormat(BassOutputStream stream)
-        {
-            var rate = default(int);
-            var channels = default(int);
-            var flags = default(BassFlags);
-            this.GetFormat(out rate, out channels, out flags);
-            return rate == stream.Rate && channels == stream.Channels;
-        }
-
         public override bool Contains(BassOutputStream stream)
         {
             return this.Queue.Contains(stream.ChannelHandle);

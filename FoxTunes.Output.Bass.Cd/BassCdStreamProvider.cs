@@ -10,6 +10,17 @@ namespace FoxTunes
     {
         public static readonly object SyncRoot = new object();
 
+        public override IEnumerable<Type> SupportedInputs
+        {
+            get
+            {
+                return new[]
+                {
+                    typeof(BassCdStreamInput)
+                };
+            }
+        }
+
         public override BassStreamProviderFlags Flags
         {
             get
@@ -112,7 +123,13 @@ namespace FoxTunes
 
         public override void FreeStream(int channelHandle)
         {
-            //Nothing to do, CD streams are re-cycled.
+            var input = this.GetInput();
+            if (input != null)
+            {
+                //Nothing to do, CD streams are re-cycled.
+                return;
+            }
+            base.FreeStream(channelHandle);
         }
 
         protected virtual void AssertDiscId(int drive, string expected)

@@ -368,6 +368,7 @@ namespace FoxTunes
             var stream = this.StreamFactory.CreateInteractiveStream(playlistItem, immidiate, flags);
             if (stream.IsEmpty)
             {
+                Logger.Write(this, LogLevel.Debug, "Failed to load stream: {0} => {1} => {2}", playlistItem.Id, playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
                 return null;
             }
             var outputStream = new BassOutputStream(this, this.PipelineManager, stream, playlistItem);
@@ -384,6 +385,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Cannot duplicate stream for file \"{0}\" with serial provider.", stream.FileName);
                 return null;
             }
+            Logger.Write(this, LogLevel.Debug, "Duplicating stream for file \"{0}\".", stream.FileName);
             var flags = BassFlags.Default;
             if (stream.Format == OutputStreamFormat.Float)
             {
@@ -392,6 +394,7 @@ namespace FoxTunes
             var result = this.StreamFactory.CreateBasicStream(stream.PlaylistItem, flags);
             if (result.IsEmpty)
             {
+                Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\".", stream.FileName);
                 return null;
             }
             outputStream = new BassOutputStream(this, this.PipelineManager, result, stream.PlaylistItem);
@@ -457,6 +460,7 @@ namespace FoxTunes
                         if (!outputStream.IsEnded && !pipeline.Input.PreserveBuffer)
                         {
                             Logger.Write(this, LogLevel.Debug, "Track was manually skipped, clearing the playback buffer.");
+                            pipeline.Pause();
                             pipeline.ClearBuffer();
                         }
                     }

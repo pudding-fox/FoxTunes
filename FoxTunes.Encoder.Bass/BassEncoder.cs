@@ -10,54 +10,29 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassEncoder : BaseComponent, IBassEncoder
+    public class BassEncoder : BassTool, IBassEncoder
     {
-        private BassEncoder()
-        {
-            this.CancellationToken = new CancellationToken();
-        }
-
-        public BassEncoder(IEnumerable<EncoderItem> encoderItems) : this()
+        public BassEncoder(IEnumerable<EncoderItem> encoderItems)
         {
             this.EncoderItems = encoderItems;
         }
 
-        public CancellationToken CancellationToken { get; private set; }
-
-        public Process Process
-        {
-            get
-            {
-                return Process.GetCurrentProcess();
-            }
-        }
-
         public IEnumerable<EncoderItem> EncoderItems { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<IntegerConfigurationElement>(
+                BassEncoderBehaviourConfiguration.SECTION,
+                BassEncoderBehaviourConfiguration.THREADS_ELEMENT
+            ).ConnectValue(value => this.Threads = value);
+            base.InitializeComponent(core);
+        }
 
         public void Encode()
         {
-            Logger.Write(this, LogLevel.Debug, "Initializing BASS (NoSound).");
-            Bass.Init(Bass.NoSoundDevice);
-            try
+            if (this.Threads > 1)
             {
-                var threads = ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<IntegerConfigurationElement>(
-                    BassEncoderBehaviourConfiguration.SECTION,
-                    BassEncoderBehaviourConfiguration.THREADS_ELEMENT
-                );
-                this.Encode(threads.Value);
-            }
-            finally
-            {
-                Logger.Write(this, LogLevel.Debug, "Releasing BASS (NoSound).");
-                Bass.Free();
-            }
-        }
-
-        protected virtual void Encode(int threads)
-        {
-            if (threads > 1)
-            {
-                Logger.Write(this, LogLevel.Debug, "Beginning parallel encoding with {0} threads.", threads);
+                Logger.Write(this, LogLevel.Debug, "Beginning parallel encoding with {0} threads.", this.Threads);
             }
             else
             {
@@ -65,7 +40,7 @@ namespace FoxTunes
             }
             var parallelOptions = new ParallelOptions()
             {
-                MaxDegreeOfParallelism = threads
+                MaxDegreeOfParallelism = this.Threads
             };
             Parallel.ForEach(this.EncoderItems, parallelOptions, encoderItem =>
             {
@@ -144,15 +119,14 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Decoding file \"{0}\" in standaed quality mode (16 bit integer).", encoderItem.InputFileName);
             }
-            var stream = this.CreateStream(encoderItem.InputFileName, flags);
-            if (stream.IsEmpty)
+            using (var stream = this.CreateStream(encoderItem.InputFileName, flags))
             {
-                Logger.Write(this, LogLevel.Debug, "Failed to create stream for file \"{0}\": Unknown error.", encoderItem.InputFileName);
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
-            try
-            {
+                if (stream.IsEmpty)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Failed to create stream for file \"{0}\": Unknown error.", encoderItem.InputFileName);
+                    return;
+                }
+                Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
                 if (settings is IBassEncoderTool)
                 {
                     if (this.ShouldResample(encoderItem, stream, settings))
@@ -179,10 +153,6 @@ namespace FoxTunes
                 {
                     throw new NotImplementedException();
                 }
-            }
-            finally
-            {
-                stream.Provider.FreeStream(stream.ChannelHandle);
             }
             if (this.CancellationToken.IsCancellationRequested)
             {
@@ -357,84 +327,7 @@ namespace FoxTunes
             }
         }
 
-        public void Update()
-        {
-            //Nothing to do.
-        }
 
-        public void Cancel()
-        {
-            if (this.CancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-            Logger.Write(this, LogLevel.Warn, "Cancellation requested, shutting down.");
-            this.CancellationToken.Cancel();
-        }
-
-        protected virtual bool CheckInput(string fileName)
-        {
-            if (!string.IsNullOrEmpty(Path.GetPathRoot(fileName)) && !File.Exists(fileName))
-            {
-                //TODO: Bad .Result
-                if (!NetworkDrive.IsRemotePath(fileName) || !NetworkDrive.ConnectRemotePath(fileName).Result)
-                {
-                    throw new FileNotFoundException(string.Format("File not found: {0}", fileName), fileName);
-                }
-            }
-            return true;
-        }
-
-        protected virtual bool CheckOutput(string fileName)
-        {
-            var directoryName = Path.GetDirectoryName(fileName);
-            if (!string.IsNullOrEmpty(Path.GetPathRoot(directoryName)) && !Directory.Exists(directoryName))
-            {
-                //TODO: Bad .Result
-                if (!NetworkDrive.IsRemotePath(directoryName) || !NetworkDrive.ConnectRemotePath(directoryName).Result)
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(directoryName);
-                    }
-                    catch
-                    {
-                        throw new DirectoryNotFoundException(string.Format("Directory not found: {0}", directoryName));
-                    }
-                }
-            }
-            return true;
-        }
-
-        protected virtual IBassStream CreateStream(string fileName, BassFlags flags)
-        {
-            const int INTERVAL = 5000;
-            var streamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
-            var playlistItem = new PlaylistItem()
-            {
-                FileName = fileName
-            };
-        retry:
-            if (this.CancellationToken.IsCancellationRequested)
-            {
-                return BassStream.Empty;
-            }
-            var stream = streamFactory.CreateBasicStream(
-                playlistItem,
-                flags
-            );
-            if (stream.IsEmpty)
-            {
-                if (stream.Errors == Errors.Already)
-                {
-                    Logger.Write(this, LogLevel.Trace, "Failed to create decoder stream for file \"{0}\": Device is already in use.", fileName);
-                    Thread.Sleep(INTERVAL);
-                    goto retry;
-                }
-                throw new InvalidOperationException(string.Format("Failed to create decoder stream for file \"{0}\": {1}", fileName, Enum.GetName(typeof(Errors), stream.Errors)));
-            }
-            return stream;
-        }
 
         protected virtual Process CreateEncoderProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
@@ -553,86 +446,6 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Encoder background thread for file \"{0}\" error: {1}", encoderItem.InputFileName, e.Message);
                 encoderItem.AddError(e.Message);
             };
-        }
-
-        protected virtual bool Join(Thread thread)
-        {
-            const int INTERVAL = 5000;
-            while (thread.IsAlive)
-            {
-                if (thread.Join(INTERVAL))
-                {
-                    break;
-                }
-                if (this.CancellationToken.IsCancellationRequested)
-                {
-                    if (thread.Join(INTERVAL))
-                    {
-                        break;
-                    }
-                    thread.Abort();
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        protected virtual bool WaitForExit(Process process)
-        {
-            const int INTERVAL = 5000;
-            while (!process.HasExited)
-            {
-                if (process.WaitForExit(INTERVAL))
-                {
-                    break;
-                }
-                if (this.CancellationToken.IsCancellationRequested)
-                {
-                    if (process.WaitForExit(INTERVAL))
-                    {
-                        break;
-                    }
-                    process.Kill();
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            //Nothing to do.
-        }
-
-        ~BassEncoder()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
         }
     }
 }

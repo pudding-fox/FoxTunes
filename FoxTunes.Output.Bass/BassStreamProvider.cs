@@ -8,6 +8,17 @@ namespace FoxTunes
     [Component("1A67B4C8-7392-4487-9DDD-75E02EC4807E", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
     public class BassStreamProvider : StandardComponent, IBassStreamProvider
     {
+        public virtual IEnumerable<Type> SupportedInputs
+        {
+            get
+            {
+                return new[]
+                {
+                    typeof(IBassStreamInput)
+                };
+            }
+        }
+
         public IBassOutput Output { get; private set; }
 
         public IBassStreamPipelineManager PipelineManager { get; private set; }
