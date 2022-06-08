@@ -197,23 +197,23 @@ namespace FoxTunes
             {
                 return BassWasapi.IsStarted;
             }
-            protected set
-            {
-                throw new NotImplementedException();
-            }
         }
 
-        public override bool IsPaused { get; protected set; }
+        private bool _IsPaused { get; set; }
+
+        public override bool IsPaused
+        {
+            get
+            {
+                return this._IsPaused;
+            }
+        }
 
         public override bool IsStopped
         {
             get
             {
                 return !BassWasapi.IsStarted;
-            }
-            protected set
-            {
-                throw new NotImplementedException();
             }
         }
 
@@ -235,7 +235,7 @@ namespace FoxTunes
             try
             {
                 BassUtils.OK(this.StartWASAPI());
-                this.IsPaused = false;
+                this._IsPaused = false;
             }
             catch (Exception e)
             {
@@ -246,7 +246,7 @@ namespace FoxTunes
 
         public override void Pause()
         {
-            if (this.IsStopped)
+            if (!this.IsPlaying)
             {
                 return;
             }
@@ -254,7 +254,7 @@ namespace FoxTunes
             try
             {
                 BassUtils.OK(this.StopWASAPI(false));
-                this.IsPaused = true;
+                this._IsPaused = true;
             }
             catch (Exception e)
             {
@@ -277,7 +277,7 @@ namespace FoxTunes
             try
             {
                 BassUtils.OK(this.StopWASAPI(true));
-                this.IsPaused = false;
+                this._IsPaused = false;
             }
             catch (Exception e)
             {

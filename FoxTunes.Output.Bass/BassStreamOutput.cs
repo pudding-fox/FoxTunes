@@ -64,11 +64,11 @@ namespace FoxTunes
 
         public abstract bool CheckFormat(int rate, int channels);
 
-        public abstract bool IsPlaying { get; protected set; }
+        public abstract bool IsPlaying { get;  }
 
-        public abstract bool IsPaused { get; protected set; }
+        public abstract bool IsPaused { get;  }
 
-        public abstract bool IsStopped { get; protected set; }
+        public abstract bool IsStopped { get;  }
 
         public abstract int Latency { get; }
 

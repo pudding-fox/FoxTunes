@@ -60,7 +60,10 @@ namespace FoxTunes
             get
             {
                 var length = default(int);
-                BassUtils.OK(BassSox.StreamBufferLength(this.ChannelHandle, out length));
+                if (!BassSox.StreamBufferLength(this.ChannelHandle, out length))
+                {
+                    length = 0;
+                }
                 return length;
             }
             protected set

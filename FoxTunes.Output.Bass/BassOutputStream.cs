@@ -117,6 +117,7 @@ namespace FoxTunes
                     var buffer = pipeline.BufferLength;
                     if (buffer > 0)
                     {
+                        pipeline.Pause();
                         pipeline.ClearBuffer();
                     }
                 }

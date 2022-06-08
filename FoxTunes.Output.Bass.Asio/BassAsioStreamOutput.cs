@@ -191,10 +191,6 @@ namespace FoxTunes
             {
                 return BassAsio.IsStarted;
             }
-            protected set
-            {
-                throw new NotImplementedException();
-            }
         }
 
         public override bool IsPaused
@@ -203,10 +199,6 @@ namespace FoxTunes
             {
                 return BassAsio.ChannelIsActive(false, BassAsioDevice.PRIMARY_CHANNEL) == AsioChannelActive.Paused;
             }
-            protected set
-            {
-                throw new NotImplementedException();
-            }
         }
 
         public override bool IsStopped
@@ -214,10 +206,6 @@ namespace FoxTunes
             get
             {
                 return !BassAsio.IsStarted;
-            }
-            protected set
-            {
-                throw new NotImplementedException();
             }
         }
 
@@ -249,7 +237,7 @@ namespace FoxTunes
 
         public override void Pause()
         {
-            if (this.IsPaused)
+            if (!this.IsPlaying)
             {
                 return;
             }
