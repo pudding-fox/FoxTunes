@@ -8,7 +8,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassStreamPipelineManager : StandardComponent, IBassStreamPipelineManager
     {
-        const int SYNCHRONIZE_PIPELINE_TIMEOUT = 10000;
+        public const int SYNCHRONIZE_PIPELINE_TIMEOUT = 10000;
 
         public BassStreamPipelineManager()
         {
@@ -27,27 +27,23 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-#if NET40
-        public Task WithPipelineExclusive(Action<IBassStreamPipeline> action)
-#else
-        public async Task WithPipelineExclusive(Action<IBassStreamPipeline> action)
-#endif
+        public void WithPipeline(Action<IBassStreamPipeline> action)
         {
-            if (this.Semaphore == null)
-            {
+            action(this.Pipeline);
+        }
+
+        public T WithPipeline<T>(Func<IBassStreamPipeline, T> func)
+        {
+            return func(this.Pipeline);
+        }
+
 #if NET40
+
+        public Task<bool> WithPipelineExclusive(Action<IBassStreamPipeline> action, int timeout = SYNCHRONIZE_PIPELINE_TIMEOUT)
+        {
+            if (!this.Semaphore.Wait(timeout))
+            {
                 return TaskEx.FromResult(false);
-#else
-                return;
-#endif
-            }
-#if NET40
-            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
-#else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
-#endif
-            {
-                throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
             }
             try
             {
@@ -57,45 +53,41 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#endif
+            return TaskEx.FromResult(true);
         }
 
-        public void WithPipeline(Action<IBassStreamPipeline> action)
-        {
-            action(this.Pipeline);
-        }
+#else
 
-#if NET40
-        public Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func)
-#else
-        public async Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func)
-#endif
+        public async Task<bool> WithPipelineExclusive(Action<IBassStreamPipeline> action, int timeout = SYNCHRONIZE_PIPELINE_TIMEOUT)
         {
-            if (this.Semaphore == null)
+            if (!await this.Semaphore.WaitAsync(timeout).ConfigureAwait(false))
             {
-#if NET40
-                return TaskEx.FromResult(default(T));
-#else
-                return default(T);
-#endif
-            }
-#if NET40
-            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
-#else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
-#endif
-            {
-                throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
+                return false;
             }
             try
             {
-#if NET40
-                return TaskEx.FromResult(this.WithPipeline(func));
-#else
-                return this.WithPipeline(func);
+                this.WithPipeline(action);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+            return true;
+        }
+
 #endif
+
+#if NET40
+
+        public Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func, int timeout = SYNCHRONIZE_PIPELINE_TIMEOUT)
+        {
+            if (!this.Semaphore.Wait(timeout))
+            {
+                return TaskEx.FromResult(default(T));
+            }
+            try
+            {
+                return TaskEx.FromResult(this.WithPipeline(func));
             }
             finally
             {
@@ -103,24 +95,33 @@ namespace FoxTunes
             }
         }
 
-        public T WithPipeline<T>(Func<IBassStreamPipeline, T> func)
+#else
+
+        public async Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func, int timeout = SYNCHRONIZE_PIPELINE_TIMEOUT)
         {
-            return func(this.Pipeline);
+            if (!await this.Semaphore.WaitAsync(timeout).ConfigureAwait(false))
+            {
+                return default(T);
+            }
+            try
+            {
+                return this.WithPipeline(func);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
         }
 
-        public async Task WithPipelineExclusive(BassOutputStream stream, Action<IBassStreamPipeline> action)
-        {
-            if (this.Semaphore == null)
-            {
-                return;
-            }
-#if NET40
-            if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
-#else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
 #endif
+
+#if NET40
+
+        public async Task<bool> WithPipelineExclusive(BassOutputStream stream, Action<IBassStreamPipeline> action, int timeout = SYNCHRONIZE_PIPELINE_TIMEOUT)
+        {
+            if (!this.Semaphore.Wait(timeout))
             {
-                throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
+                return false;
             }
             try
             {
@@ -130,7 +131,29 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
+            return true;
         }
+
+#else
+
+        public async Task<bool> WithPipelineExclusive(BassOutputStream stream, Action<IBassStreamPipeline> action, int timeout = SYNCHRONIZE_PIPELINE_TIMEOUT)
+        {
+            if (!await this.Semaphore.WaitAsync(timeout).ConfigureAwait(false))
+            {
+                return false;
+            }
+            try
+            {
+                await this.WithPipeline(stream, action).ConfigureAwait(false);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+            return true;
+        }
+
+#endif
 
         protected virtual async Task WithPipeline(BassOutputStream stream, Action<IBassStreamPipeline> action)
         {
@@ -149,26 +172,12 @@ namespace FoxTunes
         }
 
 #if NET40
-        protected virtual Task CreatePipeline(BassOutputStream stream)
-#else
-        protected virtual async Task CreatePipeline(BassOutputStream stream)
-#endif
+
+        protected virtual Task<bool> CreatePipeline(BassOutputStream stream)
         {
-            if (this.Semaphore == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return;
-#endif
-            }
-#if NET40
             if (!this.Semaphore.Wait(SYNCHRONIZE_PIPELINE_TIMEOUT))
-#else
-            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
-#endif
             {
-                throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
+                return TaskEx.FromResult(false);
             }
             try
             {
@@ -178,16 +187,42 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#endif
+            return TaskEx.FromResult(true);
         }
+
+#else
+
+        protected virtual async Task<bool> CreatePipeline(BassOutputStream stream)
+        {
+            if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT).ConfigureAwait(false))
+            {
+                return false;
+            }
+            try
+            {
+                this.CreatePipelineCore(stream);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+            return true;
+        }
+
+#endif
 
         protected virtual void CreatePipelineCore(BassOutputStream stream)
         {
             this.Pipeline = this.PipelineFactory.CreatePipeline(stream);
-            this.Pipeline.Input.Add(stream);
+            this.Pipeline.IsStarting = true;
+            this.Pipeline.Input.Add(stream, this.OnStreamAdded);
+            this.Pipeline.IsStarting = false;
             this.OnCreated();
+        }
+
+        protected virtual void OnStreamAdded(BassOutputStream stream)
+        {
+            //Nothing to do.
         }
 
         protected virtual void OnCreated()
@@ -241,7 +276,9 @@ namespace FoxTunes
             if (this.Pipeline != null)
             {
                 Logger.Write(this, LogLevel.Debug, "Shutting down the pipeline.");
+                this.Pipeline.IsStopping = true;
                 this.Pipeline.Dispose();
+                this.Pipeline.IsStopping = false;
                 this.Pipeline = null;
             }
         }

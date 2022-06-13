@@ -31,8 +31,7 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -48,8 +47,7 @@ namespace FoxTunes
             {
                 this._WasapiDevice = value;
                 Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -65,8 +63,7 @@ namespace FoxTunes
             {
                 this._Exclusive = value;
                 Logger.Write(this, LogLevel.Debug, "Exclusive = {0}", this.Exclusive);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -90,8 +87,7 @@ namespace FoxTunes
             {
                 this._DoubleBuffer = value;
                 Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -107,8 +103,7 @@ namespace FoxTunes
             {
                 this._EventDriven = value;
                 Logger.Write(this, LogLevel.Debug, "EventDriven = {0}", this.EventDriven);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -124,8 +119,7 @@ namespace FoxTunes
             {
                 this._Async = value;
                 Logger.Write(this, LogLevel.Debug, "Async = {0}", this.Async);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -141,8 +135,7 @@ namespace FoxTunes
             {
                 this._Dither = value;
                 Logger.Write(this, LogLevel.Debug, "Dither = {0}", this.Dither);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -158,8 +151,7 @@ namespace FoxTunes
             {
                 this._Mixer = value;
                 Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -175,8 +167,7 @@ namespace FoxTunes
             {
                 this._BufferLength = value;
                 Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -192,8 +183,7 @@ namespace FoxTunes
             {
                 this._Raw = value;
                 Logger.Write(this, LogLevel.Debug, "Raw = {0}", this.Raw);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -259,6 +249,7 @@ namespace FoxTunes
             this.IsInitialized = true;
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.MixerBufferLength, this.Output.MixerBufferLength));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.SRCQuality, this.Output.ResamplingQuality));
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             //Always detect device for now.

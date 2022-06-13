@@ -11,7 +11,7 @@ namespace FoxTunes.Interfaces
 
         PlaylistItem PlaylistItem { get; }
 
-        long Position { get; set; }
+        long Position { get; }
 
         long Length { get; }
 
@@ -36,6 +36,8 @@ namespace FoxTunes.Interfaces
         Task Resume();
 
         Task Stop();
+
+        Task Seek(long position);
 
         event EventHandler Ending;
 

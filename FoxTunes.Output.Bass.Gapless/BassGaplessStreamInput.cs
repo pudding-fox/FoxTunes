@@ -63,7 +63,7 @@ namespace FoxTunes
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.RecycleStream, true));
             Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
-            this.ChannelHandle = BassGapless.StreamCreate(stream.Rate, stream.Channels, stream.Flags);
+            this.ChannelHandle = BassGapless.StreamCreate(stream.Rate, stream.Channels, stream.Flags | BassFlags.MixerNonStop);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
@@ -82,7 +82,7 @@ namespace FoxTunes
             return channelHandles.IndexOf(stream.ChannelHandle);
         }
 
-        public override bool Add(BassOutputStream stream)
+        public override bool Add(BassOutputStream stream, Action<BassOutputStream> callBack)
         {
             if (this.Queue.Contains(stream.ChannelHandle))
             {
@@ -91,6 +91,10 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", stream.ChannelHandle);
             BassUtils.OK(BassGapless.ChannelEnqueue(stream.ChannelHandle));
+            if (callBack != null)
+            {
+                callBack(stream);
+            }
             return true;
         }
 
@@ -118,7 +122,6 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
                 BassGapless.ChannelRemove(channelHandle);
             }
-            this.ClearBuffer();
         }
 
         protected override void OnDisposing()

@@ -2,16 +2,25 @@
 using ManagedBass.Crossfade;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassCrossfadeStreamInputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassCrossfadeStreamInputBehaviour).Assembly.Location);
+            }
+        }
+
         public BassCrossfadeStreamInputBehaviour()
         {
-            BassUtils.OK(BassCrossfade.Init());
-            Logger.Write(this, LogLevel.Debug, "BASS CROSSFADE Initialized.");
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_crossfade.dll"));
         }
 
         public ICore Core { get; private set; }
@@ -34,8 +43,7 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -252,8 +260,6 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            Logger.Write(this, LogLevel.Debug, "Releasing BASS CROSSFADE.");
-            BassCrossfade.Free();
             if (this.BassStreamPipelineFactory != null)
             {
                 this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;

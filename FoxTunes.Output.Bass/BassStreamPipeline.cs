@@ -43,7 +43,23 @@ namespace FoxTunes
             }
         }
 
-        public long BufferLength
+        public bool IsStarting
+        {
+            set
+            {
+                this.All.ForEach(component => component.IsStarting = value);
+            }
+        }
+
+        public bool IsStopping
+        {
+            set
+            {
+                this.All.ForEach(component => component.IsStopping = value);
+            }
+        }
+
+        public int BufferLength
         {
             get
             {
@@ -72,47 +88,47 @@ namespace FoxTunes
             this.All.ForEach(component => component.ClearBuffer());
         }
 
-        public void PreviewPlay()
+        public void PreviewPlay(IBassStreamPipeline pipeline)
         {
-            //Nothing to do.
+            this.Controllable.ForEach(component => component.PreviewPlay(pipeline));
         }
 
-        public void PreviewPause()
+        public void PreviewPause(IBassStreamPipeline pipeline)
         {
-            //Nothing to do.
+            this.Controllable.Reverse().ForEach(component => component.PreviewPause(pipeline));
         }
 
-        public void PreviewResume()
+        public void PreviewResume(IBassStreamPipeline pipeline)
         {
-            //Nothing to do.
+            this.Controllable.ForEach(component => component.PreviewResume(pipeline));
         }
 
-        public void PreviewStop()
+        public void PreviewStop(IBassStreamPipeline pipeline)
         {
-            //Nothing to do.
+            this.Controllable.Reverse().ForEach(component => component.PreviewStop(pipeline));
         }
 
         public void Play()
         {
-            this.Controllable.ForEach(component => component.PreviewPlay());
+            this.PreviewPlay(this);
             this.Controllable.ForEach(component => component.Play());
         }
 
         public void Pause()
         {
-            this.Controllable.Reverse().ForEach(component => component.PreviewPause());
+            this.PreviewPause(this);
             this.Controllable.Reverse().ForEach(component => component.Pause());
         }
 
         public void Resume()
         {
-            this.Controllable.ForEach(component => component.PreviewResume());
+            this.PreviewResume(this);
             this.Controllable.ForEach(component => component.Resume());
         }
 
         public void Stop()
         {
-            this.Controllable.Reverse().ForEach(component => component.PreviewStop());
+            this.PreviewStop(this);
             this.Controllable.Reverse().ForEach(component => component.Stop());
         }
 

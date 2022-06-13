@@ -433,7 +433,7 @@ namespace FoxTunes
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream != null && outputStream.PlaylistItem == playlistItem && outputStream.IsReady)
             {
-                outputStream.Position = 0;
+                await outputStream.Seek(0).ConfigureAwait(false);
                 if (!outputStream.IsPlaying)
                 {
                     await outputStream.Play().ConfigureAwait(false);

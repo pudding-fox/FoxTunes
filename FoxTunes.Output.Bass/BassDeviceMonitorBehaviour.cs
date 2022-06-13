@@ -189,7 +189,7 @@ namespace FoxTunes
                     {
                         if (position > 0)
                         {
-                            this.PlaybackManager.CurrentStream.Position = position;
+                            await this.PlaybackManager.CurrentStream.Seek(position).ConfigureAwait(false);
                         }
                         if (paused)
                         {

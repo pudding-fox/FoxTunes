@@ -61,6 +61,42 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Component.
+        /// </summary>
+        internal static string BassOutput_Component {
+            get {
+                return ResourceManager.GetString("BassOutput.Component", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input.
+        /// </summary>
+        internal static string BassOutput_Input {
+            get {
+                return ResourceManager.GetString("BassOutput.Input", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Latency.
+        /// </summary>
+        internal static string BassOutput_Latency {
+            get {
+                return ResourceManager.GetString("BassOutput.Latency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Output.
+        /// </summary>
+        internal static string BassOutput_Output {
+            get {
+                return ResourceManager.GetString("BassOutput.Output", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Buffer Length.
         /// </summary>
         internal static string BassOutputConfiguration_BufferLength {
@@ -102,6 +138,15 @@ namespace FoxTunes {
         internal static string BassOutputConfiguration_Input {
             get {
                 return ResourceManager.GetString("BassOutputConfiguration.Input", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mixer Buffer Length.
+        /// </summary>
+        internal static string BassOutputConfiguration_MixerBufferLength {
+            get {
+                return ResourceManager.GetString("BassOutputConfiguration.MixerBufferLength", resourceCulture);
             }
         }
         

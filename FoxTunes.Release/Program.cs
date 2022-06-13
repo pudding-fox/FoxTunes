@@ -375,7 +375,6 @@ namespace FoxTunes
                         "FoxTunes.Output.Bass.dll",
                         "ManagedBass.dll",
                         "ManagedBass.Fx.dll",
-                        "ManagedBass.Gapless.dll",
                         "ManagedBass.Mix.dll"
                     },
                     PackageFlags.Default | PackageFlags.Minimal
@@ -404,9 +403,10 @@ namespace FoxTunes
                     "crossfade",
                     new PackageElement[]
                     {
-                        "bass_crossfade.dll",
                         "FoxTunes.Output.Bass.Crossfade.dll",
-                        "ManagedBass.Crossfade.dll"
+                        "ManagedBass.Crossfade.dll",
+                        new PackageElement("x86/bass_crossfade.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_crossfade.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
@@ -511,6 +511,7 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.Output.Bass.Gapless.dll",
+                        "ManagedBass.Gapless.dll",
                         new PackageElement("x86/bass_gapless.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
                         new PackageElement("x64/bass_gapless.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },

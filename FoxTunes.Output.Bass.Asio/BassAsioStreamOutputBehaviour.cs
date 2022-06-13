@@ -34,8 +34,7 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -51,8 +50,7 @@ namespace FoxTunes
             {
                 this._AsioDevice = value;
                 Logger.Write(this, LogLevel.Debug, "ASIO Device = {0}", this.AsioDevice);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -68,8 +66,7 @@ namespace FoxTunes
             {
                 this._DsdDirect = value;
                 Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DsdDirect);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -85,8 +82,7 @@ namespace FoxTunes
             {
                 this._Mixer = value;
                 Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -128,6 +124,7 @@ namespace FoxTunes
             this.IsInitialized = true;
             BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
+            BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.MixerBufferLength, this.Output.MixerBufferLength));
             BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.SRCQuality, this.Output.ResamplingQuality));
             BassAsioUtils.OK(Bass.Init(Bass.NoSoundDevice));
             //Always detect device for now.

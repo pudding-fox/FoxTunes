@@ -135,7 +135,7 @@ namespace FoxTunes.Output.Bass.Tests
             var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false).ConfigureAwait(false);
             var quarter = outputStream.Length / 4;
             var half = outputStream.Length / 2;
-            outputStream.Position = quarter;
+            await outputStream.Seek(quarter).ConfigureAwait(false);
             await outputStream.Play().ConfigureAwait(false);
 #if NET40
             await TaskEx.Delay(1000).ConfigureAwait(false);
@@ -143,7 +143,7 @@ namespace FoxTunes.Output.Bass.Tests
             await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.IsTrue(outputStream.Position > quarter);
-            outputStream.Position = half;
+            await outputStream.Seek(half).ConfigureAwait(false);
 #if NET40
             await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
@@ -162,7 +162,7 @@ namespace FoxTunes.Output.Bass.Tests
             };
             await outputStreams[0].Play().ConfigureAwait(false);
             await this.Core.Components.Output.Preempt(outputStreams[1]).ConfigureAwait(false);
-            outputStreams[0].Position = outputStreams[0].Length - 1000;
+            await outputStreams[0].Seek(outputStreams[0].Length - 1000).ConfigureAwait(false);
 #if NET40
             await TaskEx.Delay(1000).ConfigureAwait(false);
 #else

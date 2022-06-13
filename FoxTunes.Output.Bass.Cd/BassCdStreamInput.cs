@@ -112,7 +112,7 @@ namespace FoxTunes
             return POSITION_INDETERMINATE;
         }
 
-        public override bool Add(BassOutputStream stream)
+        public override bool Add(BassOutputStream stream, Action<BassOutputStream> callBack)
         {
             return false;
         }
@@ -131,7 +131,6 @@ namespace FoxTunes
                 BassGapless.ChannelRemove(channelHandle);
                 Bass.StreamFree(channelHandle);
             }
-            this.ClearBuffer();
         }
 
         protected override void OnDisposing()

@@ -4,6 +4,7 @@ using ManagedBass.Crossfade;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace FoxTunes
 {
@@ -52,6 +53,14 @@ namespace FoxTunes
 
         public override int ChannelHandle { get; protected set; }
 
+        public override int BufferLength
+        {
+            get
+            {
+                return BassUtils.GetMixerBufferLength();
+            }
+        }
+
         public override IEnumerable<int> Queue
         {
             get
@@ -70,11 +79,10 @@ namespace FoxTunes
             }
         }
 
-
         public override void Connect(BassOutputStream stream)
         {
             Logger.Write(this, LogLevel.Debug, "Creating BASS CROSSFADE stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
-            this.ChannelHandle = BassCrossfade.StreamCreate(stream.Rate, stream.Channels, stream.Flags);
+            this.ChannelHandle = BassCrossfade.StreamCreate(stream.Rate, stream.Channels, stream.Flags | BassFlags.MixerNonStop);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
@@ -102,7 +110,7 @@ namespace FoxTunes
             return channelHandles.IndexOf(stream.ChannelHandle);
         }
 
-        public override bool Add(BassOutputStream stream)
+        public override bool Add(BassOutputStream stream, Action<BassOutputStream> callBack)
         {
             if (this.Queue.Contains(stream.ChannelHandle))
             {
@@ -110,22 +118,20 @@ namespace FoxTunes
                 return false;
             }
             Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", stream.ChannelHandle);
-            //If there's nothing in the queue then we're starting.
-            if (this.Queue.Count() == 0)
+            var flags = BassCrossfadeFlags.Default;
+            if (this.IsStarting && this.Behaviour.Start)
             {
-                var flags = default(BassCrossfadeFlags);
-                if (this.Behaviour.Start)
-                {
-                    flags = BassCrossfadeFlags.FadeIn;
-                }
-                else
-                {
-                    flags = BassCrossfadeFlags.None;
-                }
-                BassUtils.OK(BassCrossfade.ChannelEnqueue(stream.ChannelHandle, flags));
-                return true;
+                Logger.Write(this, LogLevel.Debug, "Fading in...");
+                flags = BassCrossfadeFlags.FadeIn;
             }
-            BassUtils.OK(BassCrossfade.ChannelEnqueue(stream.ChannelHandle));
+            this.Dispatch(() =>
+            {
+                BassUtils.OK(BassCrossfade.ChannelEnqueue(stream.ChannelHandle, flags));
+                if (callBack != null)
+                {
+                    callBack(stream);
+                }
+            });
             return true;
         }
 
@@ -137,21 +143,15 @@ namespace FoxTunes
                 return false;
             }
             Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", stream.ChannelHandle);
-            //If there's only one stream in the queue then we're stopping. 
-            //Block so the fade out behaviour can be applied before Reset is called.
-            if (this.Queue.Count() == 1)
+            var flags = BassCrossfadeFlags.Default;
+            if (this.IsStopping && this.Behaviour.Stop)
             {
-                BassUtils.OK(BassCrossfade.StreamReset(this.Behaviour.Stop));
-                if (callBack != null)
-                {
-                    callBack(stream);
-                }
-                return true;
+                Logger.Write(this, LogLevel.Debug, "Fading out...");
+                flags = BassCrossfadeFlags.FadeOut;
             }
-            //Fork so fade out doesn't block the next track being enqueued.
             this.Dispatch(() =>
             {
-                BassUtils.OK(BassCrossfade.ChannelRemove(stream.ChannelHandle));
+                BassUtils.OK(BassCrossfade.ChannelRemove(stream.ChannelHandle, flags));
                 if (callBack != null)
                 {
                     callBack(stream);
@@ -160,15 +160,27 @@ namespace FoxTunes
             return true;
         }
 
+        public override void ClearBuffer()
+        {
+            Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
+            Bass.ChannelSetPosition(this.ChannelHandle, 0);
+            base.ClearBuffer();
+        }
+
         public override void Reset()
         {
             Logger.Write(this, LogLevel.Debug, "Resetting the queue.");
             foreach (var channelHandle in this.Queue)
             {
                 Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
-                BassCrossfade.ChannelRemove(channelHandle);
+                var flags = BassCrossfadeFlags.Default;
+                if (this.IsStopping && this.Behaviour.Stop)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Fading out...");
+                    flags = BassCrossfadeFlags.FadeOut;
+                }
+                BassCrossfade.ChannelRemove(channelHandle, flags);
             }
-            this.ClearBuffer();
         }
 
         protected override void OnDisposing()
@@ -183,42 +195,42 @@ namespace FoxTunes
 
         #region IBassStreamControllable
 
-        public void PreviewPlay()
+        public void PreviewPlay(IBassStreamPipeline pipeline)
         {
-            //The begin/end seek hooks don't block so this doesn't really work.
-            //if (this.Behaviour.PauseSeek)
-            //{
-            //    BassCrossfade.StreamFadeIn();
-            //}
+            //Nothing to do.
         }
 
         private bool Fading { get; set; }
 
-        public void PreviewPause()
+        public void PreviewPause(IBassStreamPipeline pipeline)
         {
             if (this.Behaviour.PauseResume)
             {
+                Logger.Write(this, LogLevel.Debug, "Fading out...");
                 this.Fading = true;
                 BassCrossfade.StreamFadeOut();
+                var bufferLength = pipeline.BufferLength;
+                if (bufferLength > 0)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Buffer length is {0}ms, waiting..", bufferLength);
+                    Thread.Sleep(bufferLength);
+                }
             }
         }
 
-        public void PreviewResume()
+        public void PreviewResume(IBassStreamPipeline pipeline)
         {
             if (this.Fading || this.Behaviour.PauseResume)
             {
+                Logger.Write(this, LogLevel.Debug, "Fading in...");
                 this.Fading = false;
                 BassCrossfade.StreamFadeIn();
             }
         }
 
-        public void PreviewStop()
+        public void PreviewStop(IBassStreamPipeline pipeline)
         {
-            //The begin/end seek hooks don't block so this doesn't really work.
-            //if (this.Behaviour.PauseSeek)
-            //{
-            //    BassCrossfade.StreamFadeOut();
-            //}
+            //Nothing to do.
         }
 
         public void Play()

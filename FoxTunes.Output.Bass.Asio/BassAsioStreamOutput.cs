@@ -58,6 +58,21 @@ namespace FoxTunes
 
         public override int ChannelHandle { get; protected set; }
 
+        public override int BufferLength
+        {
+            get
+            {
+                //ASIO buffer length is small, less than 1ms. It's not worth calculating.
+                //var bufferLength = BassAsio.Info.PreferredBufferLength / (BassAsioDevice.Info.Rate * BassAsioDevice.Info.Outputs);
+                var bufferLength = 0;
+                foreach (var channelHandle in this.MixerChannelHandles)
+                {
+                    bufferLength += BassUtils.GetMixerBufferLength();
+                }
+                return bufferLength;
+            }
+        }
+
         protected override IEnumerable<int> GetMixerChannelHandles()
         {
             return this.MixerChannelHandles;
@@ -185,6 +200,16 @@ namespace FoxTunes
             return false;
         }
 
+        public override void ClearBuffer()
+        {
+            foreach (var channelHandle in this.MixerChannelHandles)
+            {
+                Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
+                Bass.ChannelSetPosition(channelHandle, 0);
+            }
+            base.ClearBuffer();
+        }
+
         public override bool IsPlaying
         {
             get
@@ -206,14 +231,6 @@ namespace FoxTunes
             get
             {
                 return !BassAsio.IsStarted;
-            }
-        }
-
-        public override int Latency
-        {
-            get
-            {
-                return BassAsio.GetLatency(false);
             }
         }
 

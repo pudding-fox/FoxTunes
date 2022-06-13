@@ -13,9 +13,13 @@ namespace FoxTunes.Interfaces
 
         BassFlags Flags { get; }
 
-        long BufferLength { get; }
+        int BufferLength { get; }
 
         bool IsActive { get; }
+
+        bool IsStarting { get; set; }
+
+        bool IsStopping { get; set; }
 
         bool GetFormat(out int rate, out int channels, out BassFlags flags);
 

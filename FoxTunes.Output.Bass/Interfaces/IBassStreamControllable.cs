@@ -2,13 +2,13 @@
 {
     public interface IBassStreamControllable
     {
-        void PreviewPlay();
+        void PreviewPlay(IBassStreamPipeline pipeline);
 
-        void PreviewPause();
+        void PreviewPause(IBassStreamPipeline pipeline);
 
-        void PreviewResume();
+        void PreviewResume(IBassStreamPipeline pipeline);
 
-        void PreviewStop();
+        void PreviewStop(IBassStreamPipeline pipeline);
 
         void Play();
 

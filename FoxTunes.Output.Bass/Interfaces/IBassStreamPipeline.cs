@@ -11,7 +11,11 @@ namespace FoxTunes.Interfaces
 
         IBassStreamOutput Output { get; }
 
-        long BufferLength { get; }
+        bool IsStarting { set; }
+
+        bool IsStopping { set; }
+
+        int BufferLength { get; }
 
         void Connect(BassOutputStream stream);
 

@@ -70,24 +70,22 @@ namespace FoxTunes
 
         public abstract bool IsStopped { get;  }
 
-        public abstract int Latency { get; }
-
-        public virtual void PreviewPlay()
+        public virtual void PreviewPlay(IBassStreamPipeline pipeline)
         {
             //Nothing to do.
         }
 
-        public virtual void PreviewPause()
+        public virtual void PreviewPause(IBassStreamPipeline pipeline)
         {
             //Nothing to do.
         }
 
-        public virtual void PreviewResume()
+        public virtual void PreviewResume(IBassStreamPipeline pipeline)
         {
             //Nothing to do.
         }
 
-        public virtual void PreviewStop()
+        public virtual void PreviewStop(IBassStreamPipeline pipeline)
         {
             //Nothing to do.
         }
