@@ -17,6 +17,8 @@ namespace FoxTunes.Interfaces
 
         int BufferLength { get; }
 
+        void InitializeComponent(IBassStreamInput input, IEnumerable<IBassStreamComponent> components, IBassStreamOutput output);
+
         void Connect(BassOutputStream stream);
 
         void ClearBuffer();

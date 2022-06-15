@@ -70,7 +70,7 @@ namespace FoxTunes
             {
                 return;
             }
-            e.Input = new BassGaplessStreamInput(this, e.Stream.Flags);
+            e.Input = new BassGaplessStreamInput(this, e.Pipeline, e.Stream.Flags);
             e.Input.InitializeComponent(this.Core);
         }
 

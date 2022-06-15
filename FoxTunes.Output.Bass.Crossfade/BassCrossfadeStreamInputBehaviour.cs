@@ -170,6 +170,19 @@ namespace FoxTunes
             }
         }
 
+        public bool Buffer
+        {
+            get
+            {
+                return BassCrossfade.Buffer;
+            }
+            set
+            {
+                BassCrossfade.Buffer = value;
+                Logger.Write(this, LogLevel.Debug, "Buffer = {0}", this.Mix);
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -215,6 +228,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassCrossfadeStreamInputConfiguration.STOP_ELEMENT
             ).ConnectValue(value => this.Stop = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassCrossfadeStreamInputConfiguration.BUFFER_ELEMENT
+            ).ConnectValue(value => this.Buffer = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
@@ -231,7 +248,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Cannot create input, the stream is not supported.");
                 throw new InvalidOperationException(Strings.BassCrossfadeStreamInputBehaviour_Unsupported);
             }
-            e.Input = new BassCrossfadeStreamInput(this, e.Stream.Flags);
+            e.Input = new BassCrossfadeStreamInput(this, e.Pipeline, e.Stream.Flags);
             e.Input.InitializeComponent(this.Core);
         }
 

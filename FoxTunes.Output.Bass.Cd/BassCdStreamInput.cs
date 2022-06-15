@@ -10,7 +10,7 @@ namespace FoxTunes
 {
     public class BassCdStreamInput : BassStreamInput
     {
-        public BassCdStreamInput(BassCdBehaviour behaviour, int drive, BassFlags flags) : base(flags)
+        public BassCdStreamInput(BassCdBehaviour behaviour, int drive, IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
             this.Drive = drive;

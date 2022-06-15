@@ -150,7 +150,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Overriding the default pipeline input: {0}", e.Input.GetType().Name);
                 e.Input.Dispose();
             }
-            e.Input = new BassCdStreamInput(this, drive, e.Stream.Flags);
+            e.Input = new BassCdStreamInput(this, drive, e.Pipeline, e.Stream.Flags);
             e.Input.InitializeComponent(this.Core);
         }
 

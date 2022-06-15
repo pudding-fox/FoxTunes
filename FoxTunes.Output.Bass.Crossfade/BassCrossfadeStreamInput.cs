@@ -10,11 +10,10 @@ namespace FoxTunes
 {
     public class BassCrossfadeStreamInput : BassStreamInput, IBassStreamControllable
     {
-        public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour, BassFlags flags) : base(flags)
+        public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour, IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
         }
-
 
         public override string Name
         {
@@ -57,7 +56,11 @@ namespace FoxTunes
         {
             get
             {
-                return BassUtils.GetMixerBufferLength();
+                if (this.Behaviour.Buffer)
+                {
+                    return BassUtils.GetMixerBufferLength();
+                }
+                return 0;
             }
         }
 
@@ -144,10 +147,17 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", stream.ChannelHandle);
             var flags = BassCrossfadeFlags.Default;
-            if (this.IsStopping && this.Behaviour.Stop)
+            if (this.Pipeline.Output.IsPlaying)
             {
-                Logger.Write(this, LogLevel.Debug, "Fading out...");
-                flags = BassCrossfadeFlags.FadeOut;
+                if (this.IsStopping && this.Behaviour.Stop)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Fading out...");
+                    flags = BassCrossfadeFlags.FadeOut;
+                }
+            }
+            else
+            {
+                flags = BassCrossfadeFlags.None;
             }
             this.Dispatch(() =>
             {
@@ -174,10 +184,17 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
                 var flags = BassCrossfadeFlags.Default;
-                if (this.IsStopping && this.Behaviour.Stop)
+                if (this.Pipeline.Output.IsPlaying)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Fading out...");
-                    flags = BassCrossfadeFlags.FadeOut;
+                    if (this.IsStopping && this.Behaviour.Stop)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Fading out...");
+                        flags = BassCrossfadeFlags.FadeOut;
+                    }
+                }
+                else
+                {
+                    flags = BassCrossfadeFlags.None;
                 }
                 BassCrossfade.ChannelRemove(channelHandle, flags);
             }
@@ -195,21 +212,21 @@ namespace FoxTunes
 
         #region IBassStreamControllable
 
-        public void PreviewPlay(IBassStreamPipeline pipeline)
+        public void PreviewPlay()
         {
             //Nothing to do.
         }
 
         private bool Fading { get; set; }
 
-        public void PreviewPause(IBassStreamPipeline pipeline)
+        public void PreviewPause()
         {
             if (this.Behaviour.PauseResume)
             {
                 Logger.Write(this, LogLevel.Debug, "Fading out...");
                 this.Fading = true;
                 BassCrossfade.StreamFadeOut();
-                var bufferLength = pipeline.BufferLength;
+                var bufferLength = this.Pipeline.BufferLength;
                 if (bufferLength > 0)
                 {
                     Logger.Write(this, LogLevel.Debug, "Buffer length is {0}ms, waiting..", bufferLength);
@@ -218,7 +235,7 @@ namespace FoxTunes
             }
         }
 
-        public void PreviewResume(IBassStreamPipeline pipeline)
+        public void PreviewResume()
         {
             if (this.Fading || this.Behaviour.PauseResume)
             {
@@ -228,7 +245,7 @@ namespace FoxTunes
             }
         }
 
-        public void PreviewStop(IBassStreamPipeline pipeline)
+        public void PreviewStop()
         {
             //Nothing to do.
         }

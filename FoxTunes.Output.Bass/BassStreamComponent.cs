@@ -6,8 +6,9 @@ namespace FoxTunes
 {
     public abstract class BassStreamComponent : BaseComponent, IBassStreamComponent
     {
-        protected BassStreamComponent(BassFlags flags)
+        protected BassStreamComponent(IBassStreamPipeline pipeline, BassFlags flags)
         {
+            this.Pipeline = pipeline;
             this.Flags = flags;
         }
 
@@ -16,6 +17,8 @@ namespace FoxTunes
         public abstract string Description { get; }
 
         public abstract int ChannelHandle { get; protected set; }
+
+        public IBassStreamPipeline Pipeline { get; private set; }
 
         public BassFlags Flags { get; protected set; }
 

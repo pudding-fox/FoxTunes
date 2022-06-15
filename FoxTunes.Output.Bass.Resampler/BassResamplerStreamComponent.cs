@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public class BassResamplerStreamComponent : BassStreamComponent, IBassStreamControllable
     {
-        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, IBassStreamPipelineQueryResult query, BassFlags flags) : base(flags)
+        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, IBassStreamPipeline pipeline, IBassStreamPipelineQueryResult query, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
             this.Query = query;
@@ -126,22 +126,24 @@ namespace FoxTunes
             }
         }
 
-        public void PreviewPlay(IBassStreamPipeline pipeline)
+        #region IBassStreamControllable
+
+        public void PreviewPlay()
         {
             //Nothing to do.
         }
 
-        public void PreviewPause(IBassStreamPipeline pipeline)
+        public void PreviewPause()
         {
             //Nothing to do.
         }
 
-        public void PreviewResume(IBassStreamPipeline pipeline)
+        public void PreviewResume()
         {
             //Nothing to do.
         }
 
-        public void PreviewStop(IBassStreamPipeline pipeline)
+        public void PreviewStop()
         {
             //Nothing to do.
         }
@@ -165,6 +167,8 @@ namespace FoxTunes
         {
             this.IsBackground = false;
         }
+
+        #endregion
 
         public BassResamplerStreamComponentConfig Config { get; private set; }
 

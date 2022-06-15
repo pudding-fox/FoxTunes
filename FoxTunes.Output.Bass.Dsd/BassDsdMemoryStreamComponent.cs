@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public class BassDsdMemoryStreamComponent : BassStreamComponent
     {
-        public BassDsdMemoryStreamComponent(BassDsdBehaviour behaviour, BassFlags flags) : base(flags)
+        public BassDsdMemoryStreamComponent(BassDsdBehaviour behaviour, IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
         }
