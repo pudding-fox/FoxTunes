@@ -56,11 +56,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Behaviour.Buffer)
-                {
-                    return BassUtils.GetMixerBufferLength();
-                }
-                return 0;
+                return BassUtils.GetMixerBufferLength();
             }
         }
 
@@ -177,6 +173,16 @@ namespace FoxTunes
             base.ClearBuffer();
         }
 
+        protected virtual void WaitForBuffer()
+        {
+            var bufferLength = this.Pipeline.BufferLength;
+            if (bufferLength > 0)
+            {
+                Logger.Write(this, LogLevel.Debug, "Buffer length is {0}ms, waiting..", bufferLength);
+                Thread.Sleep(bufferLength);
+            }
+        }
+
         public override void Reset()
         {
             Logger.Write(this, LogLevel.Debug, "Resetting the queue.");
@@ -197,6 +203,10 @@ namespace FoxTunes
                     flags = BassCrossfadeFlags.None;
                 }
                 BassCrossfade.ChannelRemove(channelHandle, flags);
+                if (flags == BassCrossfadeFlags.FadeOut)
+                {
+                    this.WaitForBuffer();
+                }
             }
         }
 
@@ -226,12 +236,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Fading out...");
                 this.Fading = true;
                 BassCrossfade.StreamFadeOut();
-                var bufferLength = this.Pipeline.BufferLength;
-                if (bufferLength > 0)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Buffer length is {0}ms, waiting..", bufferLength);
-                    Thread.Sleep(bufferLength);
-                }
+                this.WaitForBuffer();
             }
         }
 

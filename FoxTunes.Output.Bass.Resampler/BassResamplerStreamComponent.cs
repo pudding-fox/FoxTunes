@@ -391,7 +391,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.AllowAliasing), this.AllowAliasing);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.AllowAliasing, this.AllowAliasing));
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.BufferLength), this._BufferLength);
-                BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.BufferLength, this._BufferLength));
+                BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.BufferLength, this.BufferLength));
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.KeepAlive), true);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.KeepAlive, true));
             }

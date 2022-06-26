@@ -655,9 +655,10 @@ namespace FoxTunes
                     "sox",
                     new PackageElement[]
                     {
-                        "bass_sox.dll",
                         "FoxTunes.Output.Bass.Resampler.dll",
-                        "ManagedBass.Sox.dll"
+                        "ManagedBass.Sox.dll",
+                        new PackageElement("x86/bass_sox.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_sox.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
