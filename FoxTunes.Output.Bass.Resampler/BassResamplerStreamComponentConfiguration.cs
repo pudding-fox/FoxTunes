@@ -18,7 +18,9 @@ namespace FoxTunes
 
         public const string ALLOW_ALIASING_ELEMENT = "EEEE7228-F94E-4ADA-88AA-85F65CBC006A";
 
-        public const string BUFFER_LENGTH_ELEMENT = "FFFF63F8-2695-4853-89E8-ADC10D8EFC2E";
+        public const string INPUT_BUFFER_LENGTH = "EEFF4B8B1A-4B97-4971-AA4D-40ACC2C68828";
+
+        public const string PLAYBACK_BUFFER_LENGTH_ELEMENT = "FFFF63F8-2695-4853-89E8-ADC10D8EFC2E";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -28,7 +30,8 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(PHASE_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_Phase, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithOptions(GetPhaseOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(STEEP_FILTER_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_SteepFilter, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(ALLOW_ALIASING_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_AllowAliasing, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
-                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_BufferLength, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(3).WithValidationRule(new IntegerValidationRule(3, 10)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT)
+                .WithElement(new IntegerConfigurationElement(INPUT_BUFFER_LENGTH, Strings.BassResamplerStreamComponentConfiguration_InputBufferLength, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(100).WithValidationRule(new IntegerValidationRule(10, 1000)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new IntegerConfigurationElement(PLAYBACK_BUFFER_LENGTH_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_PlaybackBufferLength, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(300).WithValidationRule(new IntegerValidationRule(100, 10000)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT)
             );
         }
 
@@ -37,7 +40,7 @@ namespace FoxTunes
             var quality = default(SoxChannelQuality);
             if (!Enum.TryParse<SoxChannelQuality>(option.Id, out quality))
             {
-                return SoxChannelQuality.VeryHigh;
+                return SoxChannelQuality.Medium;
             }
             return quality;
         }
@@ -50,7 +53,8 @@ namespace FoxTunes
                 SoxChannelQuality.Low,
                 SoxChannelQuality.Medium,
                 SoxChannelQuality.High,
-                SoxChannelQuality.VeryHigh
+                SoxChannelQuality.VeryHigh,
+                SoxChannelQuality.Ultra
             };
             foreach (var value in values)
             {
@@ -58,7 +62,7 @@ namespace FoxTunes
                     Enum.GetName(typeof(SoxChannelQuality), value),
                     Enum.GetName(typeof(SoxChannelQuality), value)
                 );
-                if (SoxChannelQuality.VeryHigh.Equals(value))
+                if (SoxChannelQuality.Medium.Equals(value))
                 {
                     option.Default();
                 }

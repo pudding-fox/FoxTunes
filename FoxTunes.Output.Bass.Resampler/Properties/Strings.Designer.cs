@@ -79,20 +79,20 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Buffer Length.
-        /// </summary>
-        internal static string BassResamplerStreamComponentConfiguration_BufferLength {
-            get {
-                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.BufferLength", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         internal static string BassResamplerStreamComponentConfiguration_Enabled {
             get {
                 return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input Buffer Length.
+        /// </summary>
+        internal static string BassResamplerStreamComponentConfiguration_InputBufferLength {
+            get {
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.InputBufferLength", resourceCulture);
             }
         }
         
@@ -111,6 +111,15 @@ namespace FoxTunes {
         internal static string BassResamplerStreamComponentConfiguration_Phase {
             get {
                 return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.Phase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playback Buffer Length.
+        /// </summary>
+        internal static string BassResamplerStreamComponentConfiguration_PlaybackBufferLength {
+            get {
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.PlaybackBufferLength", resourceCulture);
             }
         }
         

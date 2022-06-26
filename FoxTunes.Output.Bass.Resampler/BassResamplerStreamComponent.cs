@@ -62,7 +62,7 @@ namespace FoxTunes
                 {
                     length = 0;
                 }
-                return length * 1000;
+                return length;
             }
         }
 
@@ -184,7 +184,7 @@ namespace FoxTunes
             if (this.ChannelHandle != 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS SOX stream: {0}", this.ChannelHandle);
-                BassUtils.OK(BassSox.StreamFree(this.ChannelHandle));
+                BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
             }
         }
 
@@ -323,32 +323,59 @@ namespace FoxTunes
 
             public event EventHandler AllowAliasingChanged;
 
-            private int _BufferLength { get; set; }
+            private int _InputBufferLength { get; set; }
 
-            public int BufferLength
+            public int InputBufferLength
             {
                 get
                 {
-                    return this._BufferLength;
+                    return this._InputBufferLength;
                 }
                 set
                 {
-                    this._BufferLength = value;
-                    this.OnBufferLengthChanged();
+                    this._InputBufferLength = value;
+                    this.OnInputBufferLengthChanged();
                 }
             }
 
-            protected virtual void OnBufferLengthChanged()
+            protected virtual void OnInputBufferLengthChanged()
             {
                 this.Configure();
-                if (this.BufferLengthChanged != null)
+                if (this.InputBufferLengthChanged != null)
                 {
-                    this.BufferLengthChanged(this, EventArgs.Empty);
+                    this.InputBufferLengthChanged(this, EventArgs.Empty);
                 }
-                this.OnPropertyChanged("BufferLength");
+                this.OnPropertyChanged("InputBufferLength");
             }
 
-            public event EventHandler BufferLengthChanged;
+            public event EventHandler InputBufferLengthChanged;
+
+            private int _PlaybackBufferLength { get; set; }
+
+            public int PlaybackBufferLength
+            {
+                get
+                {
+                    return this._PlaybackBufferLength;
+                }
+                set
+                {
+                    this._PlaybackBufferLength = value;
+                    this.OnPlaybackBufferLengthChanged();
+                }
+            }
+
+            protected virtual void OnPlaybackBufferLengthChanged()
+            {
+                this.Configure();
+                if (this.PlaybackBufferLengthChanged != null)
+                {
+                    this.PlaybackBufferLengthChanged(this, EventArgs.Empty);
+                }
+                this.OnPropertyChanged("PlaybackBufferLength");
+            }
+
+            public event EventHandler PlaybackBufferLengthChanged;
 
             public override void InitializeComponent(ICore core)
             {
@@ -371,8 +398,12 @@ namespace FoxTunes
                 ).ConnectValue(value => this.AllowAliasing = value);
                 this.Configuration.GetElement<IntegerConfigurationElement>(
                     BassOutputConfiguration.SECTION,
-                    BassResamplerStreamComponentConfiguration.BUFFER_LENGTH_ELEMENT
-                ).ConnectValue(value => this.BufferLength = value);
+                    BassResamplerStreamComponentConfiguration.INPUT_BUFFER_LENGTH
+                ).ConnectValue(value => this.InputBufferLength = value);
+                this.Configuration.GetElement<IntegerConfigurationElement>(
+                    BassOutputConfiguration.SECTION,
+                    BassResamplerStreamComponentConfiguration.PLAYBACK_BUFFER_LENGTH_ELEMENT
+                ).ConnectValue(value => this.PlaybackBufferLength = value);
                 base.InitializeComponent(core);
             }
 
@@ -390,8 +421,10 @@ namespace FoxTunes
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.SteepFilter, this.SteepFilter));
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.AllowAliasing), this.AllowAliasing);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.AllowAliasing, this.AllowAliasing));
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.BufferLength), this._BufferLength);
-                BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.BufferLength, this.BufferLength));
+                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.InputBufferLength), this.InputBufferLength);
+                BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.InputBufferLength, this.InputBufferLength));
+                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.PlaybackBufferLength), this.PlaybackBufferLength);
+                BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.PlaybackBufferLength, this.PlaybackBufferLength));
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.KeepAlive), true);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.KeepAlive, true));
             }
