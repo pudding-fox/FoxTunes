@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,9 +31,13 @@ namespace FoxTunes
 
         public Discogs.ReleaseLookup[] LookupItems { get; private set; }
 
+        public ICore Core { get; private set; }
+
         public IMetaDataManager MetaDataManager { get; private set; }
 
         public IHierarchyManager HierarchyManager { get; private set; }
+
+        public IReportEmitter ReportEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -42,8 +47,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
+            this.ReportEmitter = core.Components.ReportEmitter;
             this.Configuration = core.Components.Configuration;
             this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
@@ -124,8 +131,23 @@ namespace FoxTunes
                     return false;
                 }
             }
-            Logger.Write(this, LogLevel.Debug, "Ranking releases: {0}", description);
-            releaseLookup.Release = releases.ToDictionary(
+            Logger.Write(this, LogLevel.Debug, "Selecting releases: {0}", description);
+            releaseLookup.Release = await this.ConfirmRelease(releaseLookup, releases.ToArray()).ConfigureAwait(false);
+            if (releaseLookup.Release != null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Selected {0}: {1}", description, releaseLookup.Release.Url);
+                return await this.OnLookupSuccess(releaseLookup).ConfigureAwait(false);
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Warn, "No matches: {0}", description);
+            }
+            return false;
+        }
+
+        protected virtual async Task<Discogs.Release> ConfirmRelease(Discogs.ReleaseLookup releaseLookup, Discogs.Release[] releases)
+        {
+            releases = releases.ToDictionary(
                 //Map results to similarity
                 release => release,
                 release => release.Similarity(releaseLookup)
@@ -144,17 +166,20 @@ namespace FoxTunes
             ).Select(
                 //Select result.
                 pair => pair.Key
-            ).FirstOrDefault();
-            if (releaseLookup.Release != null)
+            ).ToArray();
+            if (releases.Length < 2)
             {
-                Logger.Write(this, LogLevel.Debug, "Best match {0}: {1}", description, releaseLookup.Release.Url);
-                return await this.OnLookupSuccess(releaseLookup).ConfigureAwait(false);
+                return releases.FirstOrDefault();
             }
-            else
+            var report = new ReleaseSelectionReport(releaseLookup, releases);
+            report.InitializeComponent(this.Core);
+            await this.ReportEmitter.Send(report).ConfigureAwait(false);
+            if (report.SelectedRelease != null)
             {
-                Logger.Write(this, LogLevel.Warn, "No matches: {0}", description);
+                return report.SelectedRelease;
             }
-            return false;
+            //Operation cancelled.
+            return null;
         }
 
         protected abstract Task<bool> OnLookupSuccess(Discogs.ReleaseLookup releaseLookup);

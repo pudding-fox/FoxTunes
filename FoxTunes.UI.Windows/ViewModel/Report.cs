@@ -94,6 +94,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnSelectedRowChanged()
         {
+            if (this.SelectedRow != null)
+            {
+                var task = this.SelectedRow.TryInvoke(ReportComponent.ReportComponentRow.SELECT);
+            }
             if (this.SelectedRowChanged != null)
             {
                 this.SelectedRowChanged(this, EventArgs.Empty);
@@ -126,7 +130,7 @@ namespace FoxTunes.ViewModel
 
         public Task Accept()
         {
-            return this.Source.TryInvoke(ReportComponent.ACCEPT);
+            return this.Source.TryInvoke(ReportComponent.ACCEPT, this.SelectedRow);
         }
 
         public string AcceptText

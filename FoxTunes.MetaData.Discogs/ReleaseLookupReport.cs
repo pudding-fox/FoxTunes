@@ -117,7 +117,6 @@ namespace FoxTunes
                 }
             }
 
-
             public override IEnumerable<IInvocationComponent> Invocations
             {
                 get

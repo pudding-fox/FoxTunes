@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -264,6 +264,51 @@ namespace FoxTunes {
         internal static string ReleaseLookupReport_Title {
             get {
                 return ResourceManager.GetString("ReleaseLookupReport.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm.
+        /// </summary>
+        internal static string ReleaseSelectionReport_Confirm {
+            get {
+                return ResourceManager.GetString("ReleaseSelectionReport.Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Id.
+        /// </summary>
+        internal static string ReleaseSelectionReport_ReleaseId {
+            get {
+                return ResourceManager.GetString("ReleaseSelectionReport.ReleaseId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Title.
+        /// </summary>
+        internal static string ReleaseSelectionReport_ReleaseTitle {
+            get {
+                return ResourceManager.GetString("ReleaseSelectionReport.ReleaseTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Url.
+        /// </summary>
+        internal static string ReleaseSelectionReport_ReleaseUrl {
+            get {
+                return ResourceManager.GetString("ReleaseSelectionReport.ReleaseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Release Selection: {0} - {1} ({2} tracks).
+        /// </summary>
+        internal static string ReleaseSelectionReport_Title {
+            get {
+                return ResourceManager.GetString("ReleaseSelectionReport.Title", resourceCulture);
             }
         }
     }

@@ -20,6 +20,8 @@ namespace FoxTunes.Interfaces
         IEnumerable<IReportComponentRow> Rows { get; }
 
         event EventHandler RowsChanged;
+
+        bool IsDialog { get; }
     }
 
     public interface IReportComponentRow : IInvocableComponent
