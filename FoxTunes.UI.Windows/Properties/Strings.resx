@@ -549,4 +549,7 @@
   <data name="WindowsUserInterfaceConfiguration.Theme" xml:space="preserve">
     <value>Theme</value>
   </data>
+  <data name="WindowsUserInterfaceConfiguration.VirtualLists" xml:space="preserve">
+    <value>Virtualizing Lists</value>
+  </data>
 </root>

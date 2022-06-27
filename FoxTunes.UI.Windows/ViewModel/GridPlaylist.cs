@@ -20,8 +20,6 @@ namespace FoxTunes.ViewModel
 
         public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
         private bool _GroupingEnabled { get; set; }
 
         public bool GroupingEnabled
@@ -190,7 +188,6 @@ namespace FoxTunes.ViewModel
             this.PlaylistSortingBehaviour = ComponentRegistry.Instance.GetComponent<PlaylistSortingBehaviour>();
             this.GridViewColumnFactory = ComponentRegistry.Instance.GetComponent<PlaylistGridViewColumnFactory>();
             this.FileActionHandlerManager = core.Managers.FileActionHandler;
-            this.Configuration = core.Components.Configuration;
 #if NET40
             //ListView grouping is too slow under net40 due to lack of virtualization.
 #else

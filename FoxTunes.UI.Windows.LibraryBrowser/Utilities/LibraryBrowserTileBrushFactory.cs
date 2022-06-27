@@ -93,7 +93,14 @@ namespace FoxTunes
                 var brush = default(ImageBrush);
                 if (this.Store.TryGetValue(libraryHierarchyNode, out brush))
                 {
-                    return AsyncResult<ImageBrush>.FromValue(brush);
+                    if (brush != null)
+                    {
+                        return AsyncResult<ImageBrush>.FromValue(brush);
+                    }
+                    else
+                    {
+                        return AsyncResult<ImageBrush>.FromValue(placeholder);
+                    }
                 }
             }
             return new AsyncResult<ImageBrush>(placeholder, this.Factory.StartNew(() =>
