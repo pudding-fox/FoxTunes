@@ -87,11 +87,17 @@ namespace FoxTunes
 
         private static Process CreateProcess(ResamplerFormat inputFormat, ResamplerFormat outputFormat)
         {
+            if (!File.Exists(FileName))
+            {
+                throw new InvalidOperationException(string.Format("A required utility was not found: {0}", FileName));
+            }
+            Logger.Write(typeof(Resampler), LogLevel.Debug, "Creating resampler process: {0} => {1}", inputFormat, outputFormat);
+            var arguments = GetArguments(inputFormat, outputFormat);
             var processStartInfo = new ProcessStartInfo()
             {
                 FileName = FileName,
                 WorkingDirectory = WorkingDirectory,
-                Arguments = GetArguments(inputFormat, outputFormat),
+                Arguments = arguments,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -107,6 +113,7 @@ namespace FoxTunes
             {
                 //Nothing can be done, probably access denied.
             }
+            Logger.Write(typeof(Resampler), LogLevel.Debug, "Created resampler process: \"{0}\" {1}", FileName, arguments);
             return process;
         }
 
@@ -180,6 +187,18 @@ namespace FoxTunes
             public int Rate { get; private set; }
 
             public int Channels { get; private set; }
+
+            public override string ToString()
+            {
+                return string.Format(
+                    "Format: {0}, Endian: {1}, Depth: {2}, Rate: {3}, Channels: {4}",
+                    Enum.GetName(typeof(BassEncoderBinaryFormat), this.Format),
+                    Enum.GetName(typeof(BassEncoderBinaryEndian), this.Endian),
+                    this.Depth,
+                    this.Rate,
+                    this.Channels
+                );
+            }
         }
     }
 }
