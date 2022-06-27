@@ -20,6 +20,8 @@ namespace FoxTunes
         int GetDepth(EncoderItem encoderItem, IBassStream stream);
 
         int GetRate(EncoderItem encoderItem, IBassStream stream);
+
+        int GetChannels(EncoderItem encoderItem, IBassStream stream);
     }
 
     [Flags]

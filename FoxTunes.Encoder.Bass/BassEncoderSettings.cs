@@ -107,5 +107,15 @@ namespace FoxTunes
             }
             return outputLength;
         }
+
+        public virtual int GetChannels(EncoderItem encoderItem, IBassStream stream)
+        {
+            var channelInfo = default(ChannelInfo);
+            if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
+            {
+                throw new NotImplementedException();
+            }
+            return channelInfo.Channels;
+        }
     }
 }

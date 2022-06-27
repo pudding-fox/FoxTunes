@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -56,37 +55,37 @@ namespace FoxTunes
 
         public override string GetArguments(EncoderItem encoderItem, IBassStream stream)
         {
-            var channelInfo = default(ChannelInfo);
-            if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
-            {
-                throw new NotImplementedException();
-            }
             return string.Format(
                 "--silent -r --little-endian --signed -s {0} -m {1} --bitwidth {2} - --cbr -b {3} \"{4}\"",
                 this.GetRate(encoderItem, stream),
-                this.GetStereoMode(channelInfo.Channels),
+                this.GetStereoMode(encoderItem, stream),
                 this.GetDepth(encoderItem, stream),
                 this.Bitrate,
                 encoderItem.OutputFileName
             );
         }
 
-        protected virtual string GetStereoMode(int channels)
+        protected virtual string GetStereoMode(EncoderItem encoderItem, IBassStream stream)
         {
-            switch (channels)
+            switch (this.GetChannels(encoderItem, stream))
             {
                 case 1:
                     return "m";
+                default:
                 case 2:
                     return "s";
-                default:
-                    throw new NotImplementedException("Cannot encode multi channel input.");
             }
         }
 
         public override int GetDepth(EncoderItem encoderItem, IBassStream stream)
         {
             return DEPTH_16;
+        }
+
+        public override int GetChannels(EncoderItem encoderItem, IBassStream stream)
+        {
+            var channels = base.GetChannels(encoderItem, stream);
+            return Math.Min(channels, 2);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
