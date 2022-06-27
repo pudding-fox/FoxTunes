@@ -175,7 +175,7 @@ namespace FoxTunes
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
                     DiscogsFetchArtworkTask.FRONT_COVER,
-                    MetaDataItemType.Tag,
+                    MetaDataItemType.Image,
                     true
                 ),
                 this.GetMetaDataValues(releaseLookups)
@@ -198,7 +198,7 @@ namespace FoxTunes
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
                     DiscogsFetchArtworkTask.FRONT_COVER,
-                    MetaDataItemType.Tag,
+                    MetaDataItemType.Image,
                     true
                 ),
                 this.GetMetaDataValues(releaseLookups)
