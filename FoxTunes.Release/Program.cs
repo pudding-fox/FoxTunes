@@ -578,7 +578,8 @@ namespace FoxTunes
                         "x86/libwinpthread-1.dll",
                         "x86/netmdcli.exe",
                         "x86/zlib1.dll"
-                    }
+                    },
+                    PackageFlags.Default
                 ),
                 new Package(
                     "miniplayer",
