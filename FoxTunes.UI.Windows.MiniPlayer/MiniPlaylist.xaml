@@ -28,7 +28,7 @@
                 Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}"
                 Background="Transparent"
                 BorderBrush="Transparent"
-                Windows:ListBoxExtensions.IsVirtualizing="{Binding IsVirtualizing, Source={StaticResource ViewModel}}">
+                Windows:FrameworkElementExtensions.IsVirtualizing="{Binding IsVirtualizing, Source={StaticResource ViewModel}}">
                 <Interactivity:Interaction.Triggers>
                     <Interactivity:EventTrigger EventName="MouseDoubleClick">
                         <Interactivity:InvokeCommandAction Command="{Binding PlaySelectedItemCommand, Source={StaticResource ViewModel}}"/>

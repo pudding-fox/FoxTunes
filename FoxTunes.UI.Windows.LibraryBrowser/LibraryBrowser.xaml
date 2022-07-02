@@ -32,7 +32,7 @@
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                     <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,3,0,0">
                         <Border Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50">
-                            <Viewbox  Stretch="Uniform">
+                            <Viewbox Stretch="Uniform">
                                 <Canvas Width="48" Height="48">
                                     <Path>
                                         <Path.Data>
@@ -127,7 +127,7 @@
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
                         Windows:ListBoxExtensions.EnsureSelectedItemVisible="True"
-                        Windows:ListBoxExtensions.IsVirtualizing="{Binding IsVirtualizing, Source={StaticResource ViewModel}}"
+                        Windows:FrameworkElementExtensions.IsVirtualizing="{Binding IsVirtualizing, Source={StaticResource ViewModel}}"
                         LocalWindows:LibraryBrowserExtensions.ItemsPanelSelector="{Binding ViewMode, Source={StaticResource ViewModel}}"
                         LocalWindows:LibraryBrowserExtensions.GridItemsPanel="{StaticResource GridItemsPanelTemplate}"
                         LocalWindows:LibraryBrowserExtensions.ListItemsPanel="{StaticResource ListItemsPanelTemplate}"

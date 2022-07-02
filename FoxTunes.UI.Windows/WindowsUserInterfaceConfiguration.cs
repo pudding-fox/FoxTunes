@@ -44,7 +44,7 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
-                    new BooleanConfigurationElement(VIRTUAL_LISTS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_VirtualLists, path: Strings.General_Advanced).WithValue(false)
+                    new BooleanConfigurationElement(VIRTUAL_LISTS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_VirtualLists, path: Strings.General_Advanced).WithValue(true)
             );
         }
 
