@@ -4,17 +4,9 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public abstract class CommandBase : ICommand
+    public abstract class CommandBase : BaseComponent, ICommand
     {
         protected static readonly IErrorEmitter ErrorEmitter = ComponentRegistry.Instance.GetComponent<IErrorEmitter>();
-
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
 
         public string Tag { get; set; }
 

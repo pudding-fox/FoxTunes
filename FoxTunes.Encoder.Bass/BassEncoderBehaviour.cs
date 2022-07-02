@@ -319,7 +319,7 @@ namespace FoxTunes
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to copy tags from \"{0}\" to \"{1}\": {2}", encoderItem.InputFileName, encoderItem.OutputFileName, e.Message);
-                    await this.ErrorEmitter.Send(e).ConfigureAwait(false);
+                    await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
                 }
             }
 

@@ -121,7 +121,7 @@ namespace FoxTunes
             }
             else
             {
-                this.ErrorEmitter.Send(string.Format("Failed to register input hook {0}", keys));
+                this.ErrorEmitter.Send(this,string.Format("Failed to register input hook {0}", keys));
             }
         }
 

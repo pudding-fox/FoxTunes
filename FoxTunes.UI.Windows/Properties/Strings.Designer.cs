@@ -340,6 +340,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The library view contains {0} items which exceeds {1} items allowed without virtualization. Please enable the &quot;Virtualizing Lists&quot; setting..
+        /// </summary>
+        internal static string LibraryBase_UnvirtualizedTooLarge {
+            get {
+                return ResourceManager.GetString("LibraryBase.UnvirtualizedTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Updating....
         /// </summary>
         internal static string LibraryBase_Updating {
@@ -786,6 +795,15 @@ namespace FoxTunes {
         internal static string PlaylistBase_Loading {
             get {
                 return ResourceManager.GetString("PlaylistBase.Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The playlist contains {0} items which exceeds {1} items allowed without virtualization. Please enable the &quot;Virtualizing Lists&quot; setting..
+        /// </summary>
+        internal static string PlaylistBase_UnvirtualizedTooLarge {
+            get {
+                return ResourceManager.GetString("PlaylistBase.UnvirtualizedTooLarge", resourceCulture);
             }
         }
         

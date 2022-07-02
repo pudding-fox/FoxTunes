@@ -246,7 +246,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                this.ErrorEmitter.Send(e);
+                this.ErrorEmitter.Send(this, e);
                 throw;
             }
         }
@@ -264,7 +264,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                this.ErrorEmitter.Send(e);
+                this.ErrorEmitter.Send(this, e);
                 throw;
             }
         }
@@ -282,7 +282,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                this.ErrorEmitter.Send(e);
+                this.ErrorEmitter.Send(this, e);
                 throw;
             }
         }
@@ -300,7 +300,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                this.ErrorEmitter.Send(e);
+                this.ErrorEmitter.Send(this, e);
                 throw;
             }
         }

@@ -57,6 +57,8 @@ namespace FoxTunes.ViewModel
 
         public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         private IConfiguration Configuration { get; set; }
 
         private LibraryHierarchyNodeCollection _Items { get; set; }
@@ -178,6 +180,8 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowCursorAdornersChanged;
 
+        public const int MAX_UNVIRTUALIZED_ITEMS = 1000;
+
         private bool _IsVirtualizing { get; set; }
 
         public bool IsVirtualizing
@@ -291,6 +295,11 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var items = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
+            if (!this.IsVirtualizing && items.Length > MAX_UNVIRTUALIZED_ITEMS)
+            {
+                await this.ErrorEmitter.Send(this, string.Format(Strings.LibraryBase_UnvirtualizedTooLarge, items.Length, MAX_UNVIRTUALIZED_ITEMS));
+                items = items.Take(MAX_UNVIRTUALIZED_ITEMS).ToArray();
+            }
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
@@ -321,6 +330,7 @@ namespace FoxTunes.ViewModel
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
             this.FileActionHandlerManager = core.Managers.FileActionHandler;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,

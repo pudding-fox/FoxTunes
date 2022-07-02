@@ -5,10 +5,10 @@ namespace FoxTunes.Interfaces
 {
     public interface IErrorEmitter : IErrorSource
     {
-        Task Send(string message);
+        Task Send(IBaseComponent source, string message);
 
-        Task Send(Exception exception);
+        Task Send(IBaseComponent source, Exception exception);
 
-        Task Send(string message, Exception exception);
+        Task Send(IBaseComponent source, string message, Exception exception);
     }
 }

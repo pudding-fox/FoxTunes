@@ -172,7 +172,7 @@ namespace FoxTunes
                     catch (Exception e)
                     {
                         Logger.Write(typeof(CommandBehaviour), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
-                        var task = ErrorEmitter.Send(string.Format("Failed to execute command: {0}", e.Message), e);
+                        var task = ErrorEmitter.Send(this, string.Format("Failed to execute command: {0}", e.Message), e);
                     }
                 });
             }

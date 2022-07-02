@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class UIBehaviour : IDisposable
+    public abstract class UIBehaviour : BaseComponent, IDisposable
     {
         static UIBehaviour()
         {
@@ -29,13 +29,6 @@ namespace FoxTunes
             }
         }
 
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
 
         protected UIBehaviour()
         {
@@ -43,15 +36,6 @@ namespace FoxTunes
             {
                 Instances.Add(new WeakReference<UIBehaviour>(this));
             }
-        }
-
-        protected virtual void Dispatch(Func<Task> function)
-        {
-#if NET40
-            var task = TaskEx.Run(function);
-#else
-            var task = Task.Run(function);
-#endif
         }
 
         public bool IsDisposed { get; private set; }

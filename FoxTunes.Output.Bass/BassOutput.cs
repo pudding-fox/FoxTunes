@@ -282,7 +282,7 @@ namespace FoxTunes
                 await this.SetIsStarted(false).ConfigureAwait(false);
                 if (exception != null)
                 {
-                    await this.ErrorEmitter.Send(exception).ConfigureAwait(false);
+                    await this.ErrorEmitter.Send(this, exception).ConfigureAwait(false);
                 }
             }
         }
