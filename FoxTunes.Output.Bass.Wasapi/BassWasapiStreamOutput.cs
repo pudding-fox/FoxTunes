@@ -314,6 +314,10 @@ namespace FoxTunes
         {
             if (this.Behaviour.Exclusive)
             {
+                if (volume != 1)
+                {
+                    this.ErrorEmitter.Send(this, Strings.BassWasapiStreamOutput_VolumeExclusive);
+                }
                 return;
             }
             if (!BassWasapi.SetVolume(WasapiVolumeTypes.Session, volume))
