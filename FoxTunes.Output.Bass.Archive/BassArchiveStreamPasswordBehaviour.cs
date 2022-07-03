@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassArchiveStreamPasswordBehaviour : StandardBehaviour
+    public class BassArchiveStreamPasswordBehaviour : StandardBehaviour, IDisposable
     {
         public static readonly object SyncRoot = new object();
 
@@ -16,17 +16,45 @@ namespace FoxTunes
         {
             this.Passwords = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             this.Handler = new Archive.GetPasswordHandler(this.GetPassword);
-            Archive.GetPassword(this.Handler);
         }
 
         public Dictionary<string, string> Passwords { get; private set; }
 
         public IUserInterface UserInterface { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.UserInterface = core.Components.UserInterface;
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassArchiveStreamProviderBehaviourConfiguration.SECTION,
+                BassArchiveStreamProviderBehaviourConfiguration.ENABLED_ELEMENT
+            ).ConnectValue(value =>
+            {
+                if (value)
+                {
+                    this.Enable();
+                    Logger.Write(this, LogLevel.Debug, "Archive password handler enabled.");
+                }
+                else
+                {
+                    this.Disable();
+                    Logger.Write(this, LogLevel.Debug, "Archive password handler disabled.");
+                }
+            });
             base.InitializeComponent(core);
+        }
+
+        public void Enable()
+        {
+            Archive.GetPassword(this.Handler);
+        }
+
+        public void Disable()
+        {
+            Archive.GetPassword(null);
         }
 
         protected virtual bool GetPassword(ref Archive.ArchivePassword password)
@@ -72,6 +100,42 @@ namespace FoxTunes
             lock (SyncRoot)
             {
                 return this.Passwords.Remove(fileName);
+            }
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            this.Disable();
+        }
+
+        ~BassArchiveStreamPasswordBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
             }
         }
     }
