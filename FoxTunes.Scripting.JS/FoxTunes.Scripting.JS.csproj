@@ -75,13 +75,13 @@
 
   <ItemGroup>
     <Reference Include="Noesis.Javascript" Condition="'$(Platform)' == 'x86'">
-      <HintPath>../lib/x86/Noesis.Javascript.dll</HintPath>
+      <HintPath>../lib/net40/Noesis.Javascript.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="V8.Net" Condition="'$(Platform)' == 'x64'">
-      <HintPath>../lib/V8.Net.dll</HintPath>
+      <HintPath>../lib/net40/V8.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
 

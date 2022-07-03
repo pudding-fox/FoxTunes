@@ -339,9 +339,10 @@ namespace FoxTunes
                     "archive",
                     new PackageElement[]
                     {
-                        "bass_zipstream.dll",
                         "FoxTunes.Output.Bass.Archive.dll",
-                        "ManagedBass.ZipStream.dll"
+                        "ManagedBass.ZipStream.dll",
+                        new PackageElement("x86/bass_zipstream.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_zipstream.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),

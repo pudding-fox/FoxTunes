@@ -14,9 +14,23 @@ namespace FoxTunes
 {
     [Component("5E1331EE-37F9-41BB-BD5E-82E9B4995B8A", null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IFileActionHandler, IDisposable
+    public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IFileActionHandler
     {
         public const string OPEN_ARCHIVE = "FGGG";
+
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassArchiveStreamProviderBehaviour).Assembly.Location);
+            }
+        }
+
+        public BassArchiveStreamProviderBehaviour()
+        {
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_zipstream.dll"));
+        }
 
         public ICore Core { get; private set; }
 
@@ -32,51 +46,55 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
-        new public bool IsInitialized { get; private set; }
-
-        private int _BufferMin { get; set; }
-
         public int BufferMin
         {
             get
             {
-                return this._BufferMin;
+                var value = default(int);
+                if (!BassZipStream.GetConfig(BassZipStreamAttribute.BufferMin, out value))
+                {
+                    value = BassZipStream.DEFAULT_BUFFER_MIN;
+                }
+                return value;
             }
             set
             {
-                this._BufferMin = value;
                 BassZipStream.SetConfig(BassZipStreamAttribute.BufferMin, value);
                 Logger.Write(this, LogLevel.Debug, "BufferMin = {0}", this.BufferMin);
             }
         }
 
-        private int _BufferTimeout { get; set; }
-
         public int BufferTimeout
         {
             get
             {
-                return this._BufferTimeout;
+                var value = default(int);
+                if (!BassZipStream.GetConfig(BassZipStreamAttribute.BufferTimeout, out value))
+                {
+                    value = BassZipStream.DEFAULT_BUFFER_TIMEOUT;
+                }
+                return value;
             }
             set
             {
-                this._BufferTimeout = value;
                 BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, value);
                 Logger.Write(this, LogLevel.Debug, "BufferTimeout = {0}", this.BufferTimeout);
             }
         }
 
-        private bool _DoubleBuffer { get; set; }
-
         public bool DoubleBuffer
         {
             get
             {
-                return this._DoubleBuffer;
+                var value = default(bool);
+                if (!BassZipStream.GetConfig(BassZipStreamAttribute.DoubleBuffer, out value))
+                {
+                    value = BassZipStream.DEFAULT_DOUBLE_BUFFER;
+                }
+                return value;
             }
             set
             {
-                this._DoubleBuffer = value;
                 BassZipStream.SetConfig(BassZipStreamAttribute.DoubleBuffer, value);
                 Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
             }
@@ -101,8 +119,6 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
-            this.Output.Init += this.OnInit;
-            this.Output.Free += this.OnFree;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
@@ -125,35 +141,6 @@ namespace FoxTunes
                 BassArchiveStreamProviderBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnInit(object sender, EventArgs e)
-        {
-            if (!this.Enabled)
-            {
-                return;
-            }
-            var flags = BassFlags.Decode;
-            if (this.Output.Float)
-            {
-                flags |= BassFlags.Float;
-            }
-            BassUtils.OK(BassZipStream.Init());
-            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.BufferMin, this.BufferMin));
-            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, this.BufferTimeout));
-            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.DoubleBuffer, this.DoubleBuffer));
-            this.IsInitialized = true;
-            Logger.Write(this, LogLevel.Debug, "BASS ZIPSTREAM Initialized.");
-        }
-
-        protected virtual void OnFree(object sender, EventArgs e)
-        {
-            if (!this.IsInitialized)
-            {
-                return;
-            }
-            BassZipStream.Free();
-            this.IsInitialized = false;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -281,46 +268,6 @@ namespace FoxTunes
                 task.InitializeComponent(this.Core);
                 await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-            }
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            if (this.Output != null)
-            {
-                this.Output.Init -= this.OnInit;
-                this.Output.Free -= this.OnFree;
-            }
-        }
-
-        ~BassArchiveStreamProviderBehaviour()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
             }
         }
 

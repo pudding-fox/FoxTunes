@@ -24,13 +24,13 @@
 
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.Mix.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.Mix.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Asio" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.Asio.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.Asio.dll</HintPath>
     </Reference>
   </ItemGroup>
 
