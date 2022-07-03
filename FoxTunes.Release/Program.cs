@@ -453,9 +453,10 @@ namespace FoxTunes
                     "dts",
                     new PackageElement[]
                     {
-                        "addon/bass_dts.dll",
                         "FoxTunes.Output.Bass.Dts.dll",
-                        "ManagedBass.Dts.dll"
+                        "ManagedBass.Dts.dll",
+                        new PackageElement("x86/bass_dts.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_dts.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
