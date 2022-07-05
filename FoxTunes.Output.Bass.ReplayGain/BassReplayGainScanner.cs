@@ -3,6 +3,7 @@ using ManagedBass;
 using ManagedBass.ReplayGain;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,9 +13,21 @@ namespace FoxTunes
     {
         const string GROUP_NONE = "None";
 
-        const string GROUP_EMPTY = "Empty";
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassReplayGainScanner).Assembly.Location);
+            }
+        }
 
-        public BassReplayGainScanner(IEnumerable<ScannerItem> scannerItems)
+        private BassReplayGainScanner()
+        {
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_replay_gain.dll"));
+        }
+
+        public BassReplayGainScanner(IEnumerable<ScannerItem> scannerItems) : this()
         {
             this.ScannerItems = scannerItems;
         }
@@ -23,7 +36,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            BassUtils.OK(BassReplayGain.Init());
             core.Components.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassReplayGainScannerBehaviourConfiguration.THREADS
@@ -298,12 +310,6 @@ namespace FoxTunes
             }
             scannerItems = items;
             scannerGroups = groups.Values;
-        }
-
-        protected override void OnDisposing()
-        {
-            BassReplayGain.Free();
-            base.OnDisposing();
         }
     }
 }

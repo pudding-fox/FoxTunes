@@ -20,9 +20,6 @@
     <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.Fx.dll</HintPath>
     </Reference>
-    <Reference Include="ManagedBass.ReplayGain" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\ManagedBass.ReplayGain.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -32,21 +29,6 @@
     <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net462'">
       <HintPath>..\lib\net462\ManagedBass.Fx.dll</HintPath>
     </Reference>
-    <Reference Include="ManagedBass.ReplayGain" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\net462\ManagedBass.ReplayGain.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-    <ItemGroup Condition="'$(Platform)' == 'x86'">
-    <None Include="..\lib\x86\bass_replay_gain.dll" Link="bass_replay_gain.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Platform)' == 'x64'">
-    <None Include="..\lib\x64\bass_replay_gain.dll" Link="bass_replay_gain.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +44,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="ManagedBass.ReplayGain" Version="0.2.0" />
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
     <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>

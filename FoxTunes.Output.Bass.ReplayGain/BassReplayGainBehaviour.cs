@@ -2,6 +2,7 @@
 using ManagedBass.ReplayGain;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -12,9 +13,18 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)] //TODO: Depends on a setting defined by BassReplayGainScannerBehaviour
     public class BassReplayGainBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassReplayGainBehaviour).Assembly.Location);
+            }
+        }
+
         public BassReplayGainBehaviour()
         {
-            BassReplayGain.Init();
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_replay_gain.dll"));
             this.Effects = new ConditionalWeakTable<BassOutputStream, ReplayGainEffect>();
         }
 
@@ -360,7 +370,6 @@ namespace FoxTunes
             {
                 this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
             }
-            BassReplayGain.Free();
         }
 
         ~BassReplayGainBehaviour()
