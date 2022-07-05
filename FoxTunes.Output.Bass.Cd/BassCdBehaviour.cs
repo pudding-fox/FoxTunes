@@ -1,7 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using ManagedBass;
 using ManagedBass.Cd;
 using ManagedBass.Gapless;
 using System;
@@ -12,7 +11,6 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [Component("C051C82C-3391-4DDC-B856-C4BDEA86ADDC", null, priority: ComponentAttribute.PRIORITY_LOW)]
-    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassCdBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";
@@ -103,7 +101,10 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.DoorMonitor = ComponentRegistry.Instance.GetComponent<CdDoorMonitor>();
-            this.DoorMonitor.StateChanged += this.OnStateChanged;
+            if (this.DoorMonitor != null)
+            {
+                this.DoorMonitor.StateChanged += this.OnStateChanged;
+            }
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
@@ -128,7 +129,10 @@ namespace FoxTunes
                 }
             });
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
             base.InitializeComponent(core);
         }
 

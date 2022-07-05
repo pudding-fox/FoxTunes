@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass.ReplayGain;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -244,6 +245,20 @@ namespace FoxTunes
 
         private class BassReplayGainScannerBehaviourStub : BaseComponent, IConfigurableComponent
         {
+            public static string Location
+            {
+                get
+                {
+                    return Path.GetDirectoryName(typeof(BassReplayGainScannerBehaviourStub).Assembly.Location);
+                }
+            }
+
+            public BassReplayGainScannerBehaviourStub()
+            {
+                BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+                BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_replay_gain.dll"));
+            }
+
             public IEnumerable<ConfigurationSection> GetConfigurationSections()
             {
                 return BassReplayGainScannerBehaviourConfiguration.GetConfigurationSections();

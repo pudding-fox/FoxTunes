@@ -2,7 +2,6 @@
 using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using ManagedBass;
 using ManagedBass.ZipStream;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,6 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [Component("5E1331EE-37F9-41BB-BD5E-82E9B4995B8A", null, priority: ComponentAttribute.PRIORITY_LOW)]
-    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IFileActionHandler
     {
         public const string OPEN_ARCHIVE = "FGGG";
@@ -22,7 +20,7 @@ namespace FoxTunes
         {
             get
             {
-                return Path.GetDirectoryName(typeof(BassArchiveStreamProviderBehaviour).Assembly.Location);
+                return Path.GetDirectoryName(typeof(BassArchiveStreamProvider).Assembly.Location);
             }
         }
 
@@ -43,8 +41,6 @@ namespace FoxTunes
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
-
-        public IBassOutput Output { get; private set; }
 
         public int BufferMin
         {
@@ -118,7 +114,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Output = core.Components.Output as IBassOutput;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;

@@ -6,8 +6,6 @@ using System.IO;
 
 namespace FoxTunes
 {
-    //This component does not technically require an output but we don't want to present anything else with DSD data.
-    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdBehaviour : StandardBehaviour, IConfigurableComponent
     {
         public static string Location
@@ -29,12 +27,11 @@ namespace FoxTunes
         {
             BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
             BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_memory_dsd.dll"));
+            //bassdsd.dll does not register all possible extensions.
             BassPluginLoader.AddExtensions(EXTENSIONS);
         }
 
         public ICore Core { get; private set; }
-
-        public IBassOutput Output { get; private set; }
 
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
@@ -84,9 +81,11 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Output = core.Components.Output as IBassOutput;
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
