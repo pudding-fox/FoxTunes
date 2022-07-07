@@ -10,7 +10,6 @@ namespace FoxTunes
     {
         static BassSkipSilenceStreamAdvice()
         {
-            BassSubstream.Init();
             BassSubstream.FreeParent = true;
         }
 

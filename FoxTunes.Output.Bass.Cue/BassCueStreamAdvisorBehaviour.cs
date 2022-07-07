@@ -1,6 +1,7 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using ManagedBass.Substream;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,25 @@ namespace FoxTunes
         public const string CUE = ".cue";
 
         public const string OPEN_CUE = "FFGG";
+
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassCueStreamAdvisorBehaviour).Assembly.Location);
+            }
+        }
+
+        public static readonly string[] EXTENSIONS = new[]
+        {
+            "dts"
+        };
+
+        public BassCueStreamAdvisorBehaviour()
+        {
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_substream.dll"));
+        }
 
         public ICore Core { get; private set; }
 

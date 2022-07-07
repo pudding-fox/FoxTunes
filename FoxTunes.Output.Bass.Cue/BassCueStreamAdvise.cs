@@ -10,7 +10,6 @@ namespace FoxTunes
     {
         static BassCueStreamAdvice()
         {
-            BassSubstream.Init();
             BassSubstream.FreeParent = true;
         }
 
