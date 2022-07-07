@@ -86,30 +86,36 @@ namespace FoxTunes
 
         protected override void CreateViewBox()
         {
+            var bitmap = this.Bitmap;
+            if (bitmap == null)
+            {
+                return;
+            }
             this.RendererData = Create(
                 this.Output,
-                this.Bitmap.PixelWidth,
-                this.Bitmap.PixelHeight,
+                bitmap.PixelWidth,
+                bitmap.PixelHeight,
                 SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.HighCut.Value
             );
-            this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
+            this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), bitmap.PixelHeight);
         }
 
         protected virtual Task RefreshBitmap()
         {
             return Windows.Invoke(() =>
             {
-                if (this.Bitmap == null)
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
                 {
                     return;
                 }
                 this.RendererData = Create(
                     this.Output,
-                    this.Bitmap.PixelWidth,
-                    this.Bitmap.PixelHeight,
+                    bitmap.PixelWidth,
+                    bitmap.PixelHeight,
                     SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                     VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                     this.ShowPeaks.Value,

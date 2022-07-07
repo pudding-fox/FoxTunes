@@ -56,28 +56,34 @@ namespace FoxTunes
 
         protected override void CreateViewBox()
         {
+            var bitmap = this.Bitmap;
+            if (bitmap == null)
+            {
+                return;
+            }
             this.RendererData = Create(
                 this,
-                this.Bitmap.PixelWidth,
-                this.Bitmap.PixelHeight,
+                bitmap.PixelWidth,
+                bitmap.PixelHeight,
                 OscilloscopeBehaviourConfiguration.GetDuration(this.Duration.Value),
                 OscilloscopeBehaviourConfiguration.GetMode(this.Mode.Value)
             );
-            this.Viewbox = new Rect(0, 0, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
+            this.Viewbox = new Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight);
         }
 
         protected virtual Task RefreshBitmap()
         {
             return Windows.Invoke(() =>
             {
-                if (this.Bitmap == null)
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
                 {
                     return;
                 }
                 this.RendererData = Create(
                     this,
-                    this.Bitmap.PixelWidth,
-                    this.Bitmap.PixelHeight,
+                    bitmap.PixelWidth,
+                    bitmap.PixelHeight,
                     OscilloscopeBehaviourConfiguration.GetDuration(this.Duration.Value),
                     OscilloscopeBehaviourConfiguration.GetMode(this.Mode.Value)
                 );
@@ -86,13 +92,17 @@ namespace FoxTunes
 
         protected virtual async Task Render()
         {
-            var bitmap = default(WriteableBitmap);
             var success = default(bool);
             var info = default(BitmapHelper.RenderInfo);
 
             await Windows.Invoke(() =>
             {
-                bitmap = this.Bitmap;
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
+                {
+                    return;
+                }
+
                 success = bitmap.TryLock(LockTimeout);
                 if (!success)
                 {
@@ -112,6 +122,12 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
+                {
+                    return;
+                }
+
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);

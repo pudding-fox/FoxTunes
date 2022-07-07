@@ -119,10 +119,15 @@ namespace FoxTunes
 
         protected override void CreateViewBox()
         {
+            var bitmap = this.Bitmap;
+            if (bitmap == null)
+            {
+                return;
+            }
             this.RendererData = Create(
                 this,
-                this.Bitmap.PixelWidth,
-                this.Bitmap.PixelHeight,
+                bitmap.PixelWidth,
+                bitmap.PixelHeight,
                 this.Orientation
             );
             this.Viewbox = new Rect(0, 0, this.RendererData.Width, this.RendererData.Height);
@@ -132,14 +137,15 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (this.Bitmap == null)
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
                 {
                     return;
                 }
                 this.RendererData = Create(
                     this,
-                    this.Bitmap.PixelWidth,
-                    this.Bitmap.PixelHeight,
+                    bitmap.PixelWidth,
+                    bitmap.PixelHeight,
                     this.Orientation
                 );
             });

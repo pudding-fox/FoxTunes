@@ -123,8 +123,13 @@ namespace FoxTunes
             }
             else
             {
-                this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
-                this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
+                {
+                    return;
+                }
+                this.RendererData = Create(this.GeneratorData, bitmap.PixelWidth, bitmap.PixelHeight);
+                this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), bitmap.PixelHeight);
             }
         }
 
