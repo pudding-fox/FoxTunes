@@ -1348,7 +1348,7 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
             <ToggleButton x:Name="Expander" Style="{DynamicResource NuclearTreeViewItemToggleButton}" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" />
-            <Border Grid.Column="1" x:Name="Selection_Border" BorderThickness="1,1,1,1">
+            <Border Grid.Column="1" BorderThickness="{TemplateBinding BorderThickness}" x:Name="Selection_Border">
                 <Grid Width="Auto" Height="Auto">
                     <Rectangle x:Name="Background" IsHitTestVisible="True" Fill="Transparent"/>
                     <Rectangle x:Name="HoverRectangle" IsHitTestVisible="False" Opacity="0" Fill="{DynamicResource NormalBrush}"/>
@@ -1376,7 +1376,7 @@
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsMouseOver" SourceName="Selection_Border" Value="True" />
-                    <Condition Property="IsSelected" Value="False" />
+                    <Condition Property="Selector.IsSelected" Value="False" />
                 </MultiTrigger.Conditions>
                 <MultiTrigger.EnterActions>
                     <BeginStoryboard Storyboard="{StaticResource HoverOn}"/>
