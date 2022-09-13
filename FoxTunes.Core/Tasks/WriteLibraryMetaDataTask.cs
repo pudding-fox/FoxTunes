@@ -124,6 +124,7 @@ namespace FoxTunes
         protected override async Task OnCompleted()
         {
             await base.OnCompleted().ConfigureAwait(false);
+            LibraryTaskBase.UpdateLibraryHierarchyNodes(this.LibraryItems, this.Names);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 

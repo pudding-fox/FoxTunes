@@ -26,12 +26,15 @@ namespace FoxTunes
 
         protected virtual void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var metaDataEntry = (e.OriginalSource as FrameworkElement).DataContext as global::FoxTunes.ViewModel.MetaDataEntry;
-            if (metaDataEntry == null || !metaDataEntry.BrowseCommand.CanExecute(null))
+            if (e.OriginalSource is FrameworkElement frameworkElement)
             {
-                return;
+                var metaDataEntry = frameworkElement.FindDataContext<global::FoxTunes.ViewModel.MetaDataEntry>();
+                if (metaDataEntry == null || !metaDataEntry.BrowseCommand.CanExecute(null))
+                {
+                    return;
+                }
+                metaDataEntry.BrowseCommand.Execute(null);
             }
-            metaDataEntry.BrowseCommand.Execute(null);
         }
     }
 }

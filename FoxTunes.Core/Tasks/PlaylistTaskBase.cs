@@ -459,7 +459,7 @@ namespace FoxTunes
                     continue;
                 }
                 var libraryItem = default(LibraryItem);
-                if (libraryCache.TryGetItem(playlistItem.LibraryItem_Id.Value, out libraryItem))
+                if (libraryCache.TryGet(playlistItem.LibraryItem_Id.Value, out libraryItem))
                 {
                     result.AddRange(MetaDataItem.Update(playlistItem, libraryItem, names));
                 }

@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -13,24 +12,11 @@ namespace FoxTunes
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             base.InitializeComponent(core);
-        }
-
-        public Task SetRating(LibraryHierarchyNode libraryHierarchyNode, byte rating)
-        {
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                libraryHierarchyNode,
-                true
-            ).ToArray();
-            return this.SetRating(libraryItems, rating);
         }
 
         public async Task SetRating(IEnumerable<IFileData> fileDatas, byte rating)

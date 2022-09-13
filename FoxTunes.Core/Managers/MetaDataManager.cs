@@ -12,6 +12,8 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IReportEmitter ReportEmitter { get; private set; }
@@ -19,6 +21,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             base.InitializeComponent(core);

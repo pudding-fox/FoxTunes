@@ -196,6 +196,10 @@ namespace FoxTunes.ViewModel
             await base.OnSignal(sender, signal).ConfigureAwait(false);
             switch (signal.Name)
             {
+                case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
+                    await this.Refresh(names).ConfigureAwait(false);
+                    break;
                 case CommonSignals.ImagesUpdated:
                     await this.Refresh().ConfigureAwait(false);
                     break;
@@ -203,6 +207,22 @@ namespace FoxTunes.ViewModel
         }
 
         public bool IsRefreshing { get; private set; }
+
+        protected virtual Task Refresh(IEnumerable<string> names)
+        {
+            if (names != null && names.Any())
+            {
+                if (!names.Contains(CommonImageTypes.FrontCover, StringComparer.OrdinalIgnoreCase))
+                {
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }
+            }
+            return this.Refresh();
+        }
 
         public override Task Refresh()
         {
@@ -212,14 +232,10 @@ namespace FoxTunes.ViewModel
                 try
                 {
                     await base.Refresh().ConfigureAwait(false);
-                    //Refresh frames only if it's the first time or some visible change has been made.
-                    if (this.Frames == null || this.Frames.Any(frame => !this.Validate(frame)))
+                    await this.Synchronize(new List<LibraryBrowserFrame>()
                     {
-                        await this.Synchronize(new List<LibraryBrowserFrame>()
-                        {
-                            new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                        }).ConfigureAwait(false);
-                    }
+                        new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+                    }).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -234,21 +250,6 @@ namespace FoxTunes.ViewModel
             {
                 return task();
             }
-        }
-
-        protected virtual bool Validate(LibraryBrowserFrame frame)
-        {
-            if (frame.Items == null)
-            {
-                return false;
-            }
-            if (object.ReferenceEquals(frame.ItemsSource, LibraryHierarchyNode.Empty))
-            {
-                //Root frame.
-                return frame.Items.SequenceEqual(this.Items);
-            }
-            //Child frame, first element is "back" button.
-            return frame.Items.Skip(1).SequenceEqual(this.LibraryHierarchyBrowser.GetNodes(frame.ItemsSource));
         }
 
         public bool IsReloading { get; private set; }

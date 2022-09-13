@@ -158,6 +158,15 @@ namespace FoxTunes.ViewModel
             );
         }
 
+        protected override void OnDisposing()
+        {
+            if (this.LibraryHierarchyBrowser != null)
+            {
+                this.LibraryHierarchyBrowser.FilterChanged -= this.OnFilterChanged;
+            }
+            base.OnDisposing();
+        }
+
         protected override Freezable CreateInstanceCore()
         {
             return new LibrarySearch();

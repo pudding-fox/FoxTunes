@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
+    //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
+    [Component("616AF223-B619-4978-B849-2C456BC3ED25", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class MetaDataProviderCache : StandardComponent, IMetaDataProviderCache, IDisposable
     {
         public Lazy<MetaDataProvider[]> Providers { get; private set; }

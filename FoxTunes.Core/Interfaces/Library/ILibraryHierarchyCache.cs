@@ -13,6 +13,8 @@ namespace FoxTunes.Interfaces
 
         LibraryHierarchyNode[] GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory);
 
+        LibraryItem[] GetItems(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryItem>> factory);
+
         void Evict(LibraryHierarchyCacheKey key);
 
         void Reset();

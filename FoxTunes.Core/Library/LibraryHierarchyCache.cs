@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -40,13 +40,15 @@ namespace FoxTunes
         {
             get
             {
-                return this.Nodes.Keys.ToArray();
+                return this.Nodes.Keys.Concat(this.Items.Keys).Distinct().ToArray();
             }
         }
 
         public Lazy<LibraryHierarchy[]> Hierarchies { get; private set; }
 
         public ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<LibraryHierarchyNode[]>> Nodes { get; private set; }
+
+        public ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<LibraryItem[]>> Items { get; private set; }
 
         public IFilterParser FilterParser { get; private set; }
 
@@ -118,16 +120,23 @@ namespace FoxTunes
             return this.Nodes.GetOrAdd(key, _key => new Lazy<LibraryHierarchyNode[]>(() => factory().ToArray())).Value;
         }
 
+        public LibraryItem[] GetItems(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryItem>> factory)
+        {
+            return this.Items.GetOrAdd(key, _key => new Lazy<LibraryItem[]>(() => factory().ToArray())).Value;
+        }
+
         public void Reset()
         {
             this.Hierarchies = null;
             this.Nodes = new ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<LibraryHierarchyNode[]>>();
+            this.Items = new ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<LibraryItem[]>>();
         }
 
         public void Evict(LibraryHierarchyCacheKey key)
         {
             Logger.Write(this, LogLevel.Debug, "Evicting cache entry: {0}", key);
             this.Nodes.TryRemove(key);
+            this.Items.TryRemove(key);
         }
 
         public bool IsDisposed { get; private set; }

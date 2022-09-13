@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -41,21 +42,40 @@ namespace FoxTunes
 #endif
         }
 
-        public bool TryGetItem(int id, out LibraryItem playlistItem)
+        public bool TryGet(int id, out LibraryItem libraryItem)
         {
             var value = default(Lazy<LibraryItem>);
             if (this.Items.TryGetValue(id, out value))
             {
-                playlistItem = value.Value;
+                libraryItem = value.Value;
                 return true;
             }
-            playlistItem = null;
+            libraryItem = null;
             return false;
         }
 
-        public LibraryItem GetItem(int id, Func<LibraryItem> factory)
+        public LibraryItem Get(int id, Func<LibraryItem> factory)
         {
             return this.Items.GetOrAdd(id, _id => new Lazy<LibraryItem>(factory)).Value;
+        }
+
+        public LibraryItem AddOrUpdate(LibraryItem libraryItem)
+        {
+            return this.Items.AddOrUpdate(libraryItem.Id, id => new Lazy<LibraryItem>(() => libraryItem), (id, existing) =>
+            {
+                this.Update(existing.Value, libraryItem);
+                return existing;
+            }).Value;
+        }
+
+        protected virtual void Update(LibraryItem existing, LibraryItem updated)
+        {
+            existing.DirectoryName = updated.DirectoryName;
+            existing.FileName = updated.FileName;
+            existing.ImportDate = updated.ImportDate;
+            existing.Status = updated.Status;
+            existing.Flags = updated.Flags;
+            existing.MetaDatas = updated.MetaDatas;
         }
 
         public void Reset()

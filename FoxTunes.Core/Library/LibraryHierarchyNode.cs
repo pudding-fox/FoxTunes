@@ -29,7 +29,7 @@ namespace FoxTunes
 
         public LibraryHierarchyNode Parent { get; set; }
 
-        private Lazy<LibraryHierarchyNode[]> _Children { get; set; }
+        private ResettableLazy<LibraryHierarchyNode[]> _Children { get; set; }
 
         public LibraryHierarchyNode[] Children
         {
@@ -68,7 +68,35 @@ namespace FoxTunes
 
         public event EventHandler ChildrenChanged;
 
-        private Lazy<MetaDataItem[]> _MetaDatas { get; set; }
+        private ResettableLazy<LibraryItem[]> _Items { get; set; }
+
+        public LibraryItem[] Items
+        {
+            get
+            {
+                if (this._Items != null)
+                {
+                    return this._Items.Value;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        protected virtual void OnItemsChanged()
+        {
+            if (this.ItemsChanged != null)
+            {
+                this.ItemsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Items");
+        }
+
+        public event EventHandler ItemsChanged;
+
+        private ResettableLazy<MetaDataItem[]> _MetaDatas { get; set; }
 
         public MetaDataItem[] MetaDatas
         {
@@ -214,13 +242,76 @@ namespace FoxTunes
             this.DatabaseFactory = core.Factories.Database;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
-            this._Children = new Lazy<LibraryHierarchyNode[]>(
-                () => this.LibraryHierarchyBrowser.GetNodes(this).ToArray()
+            this._Children = new ResettableLazy<LibraryHierarchyNode[]>(
+                () => this.LibraryHierarchyBrowser.GetNodes(this)
             );
-            this._MetaDatas = new Lazy<MetaDataItem[]>(
-                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image, Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover))
+            this._Items = new ResettableLazy<LibraryItem[]>(
+                () => this.LibraryHierarchyBrowser.GetItems(this)
+            );
+            this._MetaDatas = new ResettableLazy<MetaDataItem[]>(
+                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image, CommonImageTypes.FrontCover)
             );
             base.InitializeComponent(core);
+        }
+
+        public void RefreshChildren(HierarchyDirection direction)
+        {
+            if (direction.HasFlag(HierarchyDirection.Up) && this.Parent != null)
+            {
+                this.Parent.RefreshChildren(HierarchyDirection.Up);
+            }
+            if (this._MetaDatas.IsValueCreated)
+            {
+                this._Children.Reset();
+                this.OnChildrenChanged();
+            }
+            if (direction.HasFlag(HierarchyDirection.Down) && this._Children.IsValueCreated)
+            {
+                foreach (var libraryHierarchyNode in this._Children.Value)
+                {
+                    libraryHierarchyNode.RefreshChildren(HierarchyDirection.Down);
+                }
+            }
+        }
+
+        public void RefreshItems(HierarchyDirection direction)
+        {
+            if (direction.HasFlag(HierarchyDirection.Up) && this.Parent != null)
+            {
+                this.Parent.RefreshItems(HierarchyDirection.Up);
+            }
+            if (this._Items.IsValueCreated)
+            {
+                this._Items.Reset();
+                this.OnItemsChanged();
+            }
+            if (direction.HasFlag(HierarchyDirection.Down) && this._Children.IsValueCreated)
+            {
+                foreach (var libraryHierarchyNode in this._Children.Value)
+                {
+                    libraryHierarchyNode.RefreshItems(HierarchyDirection.Down);
+                }
+            }
+        }
+
+        public void RefreshMetaData(HierarchyDirection direction)
+        {
+            if (direction.HasFlag(HierarchyDirection.Up) && this.Parent != null)
+            {
+                this.Parent.RefreshMetaData(HierarchyDirection.Up);
+            }
+            if (this._MetaDatas.IsValueCreated)
+            {
+                this._MetaDatas.Reset();
+                this.OnMetaDatasChanged();
+            }
+            if (direction.HasFlag(HierarchyDirection.Down) && this._Children.IsValueCreated)
+            {
+                foreach (var libraryHierarchyNode in this._Children.Value)
+                {
+                    libraryHierarchyNode.RefreshMetaData(HierarchyDirection.Down);
+                }
+            }
         }
 
         public override int GetHashCode()
@@ -236,5 +327,14 @@ namespace FoxTunes
         }
 
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();
+
+        [Flags]
+        public enum HierarchyDirection : byte
+        {
+            None = 0,
+            Up = 1,
+            Down = 2,
+            Both = Up | Down
+        }
     }
 }

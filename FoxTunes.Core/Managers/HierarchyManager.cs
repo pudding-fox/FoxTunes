@@ -75,14 +75,14 @@ namespace FoxTunes
             }
         }
 
-        public Task Refresh(IEnumerable<IFileData> fileDatas, params string[] names)
+        public Task<bool> Refresh(IEnumerable<IFileData> fileDatas, params string[] names)
         {
             if (!this.RefreshRequired(fileDatas))
             {
 #if NET40
                 return TaskEx.FromResult(false);
 #else
-                return Task.CompletedTask;
+                return Task.FromResult(false);
 #endif
             }
             return this.Refresh(names);
@@ -107,15 +107,16 @@ namespace FoxTunes
             return false;
         }
 
-        public async Task Refresh(params string[] names)
+        public async Task<bool> Refresh(params string[] names)
         {
             if (!this.RefreshRequired(names))
             {
-                return;
+                return false;
             }
             await this.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
             await this.Build(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.LibraryManager.SetStatus(LibraryItemStatus.None).ConfigureAwait(false);
+            return true;
         }
 
         protected virtual bool RefreshRequired(IEnumerable<string> names)

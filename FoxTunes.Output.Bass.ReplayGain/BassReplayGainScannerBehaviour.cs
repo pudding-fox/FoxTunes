@@ -23,8 +23,6 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
         public IPlaylistCache PlaylistCache { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -45,7 +43,6 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.MetaDataManager = core.Managers.MetaData;
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
@@ -138,11 +135,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryManager.SelectedItem,
-                true
-            ).ToArray();
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
             if (!libraryItems.Any())
             {
 #if NET40
@@ -197,11 +190,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryManager.SelectedItem,
-                true
-            ).ToArray();
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
             if (!libraryItems.Any())
             {
 #if NET40

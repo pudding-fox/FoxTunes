@@ -63,6 +63,19 @@ namespace FoxTunes
             return default(DependencyObject);
         }
 
+        public static T FindDataContext<T>(this FrameworkElement element)
+        {
+            do
+            {
+                if (element.DataContext is T dataContext)
+                {
+                    return dataContext;
+                }
+                element = VisualTreeHelper.GetParent(element) as FrameworkElement;
+            } while (element != null);
+            return default(T);
+        }
+
         public static T FindResource<T>(this FrameworkElement element, object resourceKey) where T : class
         {
             return element.FindResource(resourceKey) as T;

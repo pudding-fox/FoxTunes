@@ -29,7 +29,7 @@ namespace FoxTunes
         {
             get
             {
-                return DiscogsFetchArtworkTask.FRONT_COVER;
+                return CommonImageTypes.FrontCover;
             }
         }
 
