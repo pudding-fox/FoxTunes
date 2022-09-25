@@ -18,8 +18,6 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
-        public IHierarchyManager HierarchyManager { get; private set; }
-
         public IPlaylistCache PlaylistCache { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -33,7 +31,6 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.MetaDataManager = core.Managers.MetaData;
-            this.HierarchyManager = core.Managers.Hierarchy;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -98,8 +95,7 @@ namespace FoxTunes
                 return;
             }
             await this.Open(libraryItems).ConfigureAwait(false);
-            await this.MetaDataManager.Rescan(libraryItems).ConfigureAwait(false);
-            await this.HierarchyManager.Refresh(libraryItems);
+            await this.MetaDataManager.Rescan(libraryItems, MetaDataUpdateFlags.RefreshHierarchies).ConfigureAwait(false);
         }
 
         protected virtual async Task OpenPlaylist()
@@ -118,8 +114,7 @@ namespace FoxTunes
                 return;
             }
             await this.Open(playlistItems).ConfigureAwait(false);
-            await this.MetaDataManager.Rescan(playlistItems).ConfigureAwait(false);
-            await this.HierarchyManager.Refresh(playlistItems);
+            await this.MetaDataManager.Rescan(playlistItems, MetaDataUpdateFlags.RefreshHierarchies).ConfigureAwait(false);
         }
 
         protected virtual Task Open(IEnumerable<IFileData> items)

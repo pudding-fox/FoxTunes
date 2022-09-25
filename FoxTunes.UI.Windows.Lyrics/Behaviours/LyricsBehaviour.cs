@@ -114,7 +114,7 @@ namespace FoxTunes
                     );
                     if (provider != null)
                     {
-                        return this.Lookup(provider);
+                        return this.Lookup(provider, MetaDataUpdateType.User);
                     }
 #if NET40
                     return TaskEx.FromResult(false);
@@ -176,18 +176,23 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Process does not indicate success: Code = {0}", process.ExitCode);
                     return;
                 }
+                var flags = MetaDataUpdateFlags.None;
+                if (this.WriteTags.Value)
+                {
+                    flags |= MetaDataUpdateFlags.WriteToFiles;
+                }
                 await this.OnDemandMetaDataProvider.SetMetaData(
                     new OnDemandMetaDataRequest(
                         CommonMetaData.Lyrics,
                         MetaDataItemType.Tag,
-                        true
+                        MetaDataUpdateType.User
                     ),
                     new OnDemandMetaDataValues(
                         new[]
                         {
                             new OnDemandMetaDataValue(playlistItem, File.ReadAllText(fileName))
                         },
-                        this.WriteTags.Value
+                        flags
                     )
                 ).ConfigureAwait(false);
             }
@@ -204,7 +209,7 @@ namespace FoxTunes
             }
         }
 
-        public Task Lookup(LyricsProvider provider)
+        public Task Lookup(LyricsProvider provider, MetaDataUpdateType updateType)
         {
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream == null)
@@ -221,7 +226,7 @@ namespace FoxTunes
                 new OnDemandMetaDataRequest(
                     CommonMetaData.Lyrics,
                     MetaDataItemType.Tag,
-                    true,
+                    updateType,
                     provider
                 )
             );

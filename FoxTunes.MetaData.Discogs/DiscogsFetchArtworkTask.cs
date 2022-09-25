@@ -8,9 +8,17 @@ namespace FoxTunes
     {
         private static readonly string PREFIX = typeof(DiscogsBehaviour).Name;
 
-        public DiscogsFetchArtworkTask(Discogs.ReleaseLookup[] releaseLookups) : base(releaseLookups)
+        public DiscogsFetchArtworkTask(Discogs.ReleaseLookup[] releaseLookups, MetaDataUpdateType updateType) : base(releaseLookups)
+        {
+            this.UpdateType = updateType;
+        }
+
+        public MetaDataUpdateType UpdateType { get; private set; }
+
+        protected override Task OnStarted()
         {
             this.Name = Strings.LookupArtworkTask_Name;
+            return base.OnStarted();
         }
 
         protected override async Task<bool> OnLookupSuccess(Discogs.ReleaseLookup releaseLookup)

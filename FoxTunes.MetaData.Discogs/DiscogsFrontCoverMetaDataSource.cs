@@ -43,7 +43,7 @@ namespace FoxTunes
 
         public bool CanGetValue(IFileData fileData, OnDemandMetaDataRequest request)
         {
-            if (request.User)
+            if (request.UpdateType.HasFlag(MetaDataUpdateType.User))
             {
                 //User requests are always processed.
                 return true;
@@ -64,7 +64,7 @@ namespace FoxTunes
 
         public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request)
         {
-            var releaseLookups = await this.Behaviour.FetchArtwork(fileDatas).ConfigureAwait(false);
+            var releaseLookups = await this.Behaviour.FetchArtwork(fileDatas, request.UpdateType).ConfigureAwait(false);
             return this.Behaviour.GetMetaDataValues(releaseLookups);
         }
     }

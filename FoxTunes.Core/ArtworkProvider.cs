@@ -169,7 +169,7 @@ namespace FoxTunes
                 new OnDemandMetaDataRequest(
                     Enum.GetName(typeof(ArtworkType), type),
                     MetaDataItemType.Image,
-                    false
+                    MetaDataUpdateType.System
                 )
             ).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))

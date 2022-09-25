@@ -51,9 +51,9 @@ namespace FoxTunes
             }
             await this.MetaDataManager.Save(
                 new[] { fileData },
-                false, //These tags cannot be "written".
-                false,
-                new[] { CustomMetaData.LyricsRelease }
+                new[] { CustomMetaData.LyricsRelease },
+                MetaDataUpdateType.System,
+                MetaDataUpdateFlags.None
             ).ConfigureAwait(false);
         }
     }

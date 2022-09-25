@@ -84,18 +84,18 @@ namespace FoxTunes
                     switch (component.Category)
                     {
                         case InvocationComponent.CATEGORY_LIBRARY:
-                            return this.FetchTagsLibrary();
+                            return this.FetchTagsLibrary(MetaDataUpdateType.User);
                         case InvocationComponent.CATEGORY_PLAYLIST:
-                            return this.FetchTagsPlaylist();
+                            return this.FetchTagsPlaylist(MetaDataUpdateType.User);
                     }
                     break;
                 case LOOKUP_ARTWORK:
                     switch (component.Category)
                     {
                         case InvocationComponent.CATEGORY_LIBRARY:
-                            return this.FetchArtworkLibrary();
+                            return this.FetchArtworkLibrary(MetaDataUpdateType.User);
                         case InvocationComponent.CATEGORY_PLAYLIST:
-                            return this.FetchArtworkPlaylist();
+                            return this.FetchArtworkPlaylist(MetaDataUpdateType.User);
                     }
                     break;
             }
@@ -106,7 +106,7 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task FetchTagsLibrary()
+        public async Task FetchTagsLibrary(MetaDataUpdateType updateType)
         {
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
@@ -117,11 +117,11 @@ namespace FoxTunes
             {
                 return;
             }
-            var releaseLookups = await this.FetchTags(libraryItems).ConfigureAwait(false);
+            var releaseLookups = await this.FetchTags(libraryItems, updateType).ConfigureAwait(false);
             this.OnReport(releaseLookups);
         }
 
-        public async Task FetchTagsPlaylist()
+        public async Task FetchTagsPlaylist(MetaDataUpdateType updateType)
         {
             if (this.PlaylistManager.SelectedItems == null)
             {
@@ -132,14 +132,14 @@ namespace FoxTunes
             {
                 return;
             }
-            var releaseLookups = await this.FetchTags(playlistItems).ConfigureAwait(false);
+            var releaseLookups = await this.FetchTags(playlistItems, updateType).ConfigureAwait(false);
             this.OnReport(releaseLookups);
         }
 
-        public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchTags(IEnumerable<IFileData> fileDatas)
+        public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchTags(IEnumerable<IFileData> fileDatas, MetaDataUpdateType updateType)
         {
             var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
-            using (var task = new DiscogsFetchTagsTask(releaseLookups))
+            using (var task = new DiscogsFetchTagsTask(releaseLookups, updateType))
             {
                 task.InitializeComponent(this.Core);
                 await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
@@ -148,7 +148,7 @@ namespace FoxTunes
             return releaseLookups;
         }
 
-        public async Task FetchArtworkLibrary()
+        public async Task FetchArtworkLibrary(MetaDataUpdateType updateType)
         {
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
@@ -159,19 +159,19 @@ namespace FoxTunes
             {
                 return;
             }
-            var releaseLookups = await this.FetchArtwork(libraryItems).ConfigureAwait(false);
+            var releaseLookups = await this.FetchArtwork(libraryItems, updateType).ConfigureAwait(false);
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
                     CommonImageTypes.FrontCover,
                     MetaDataItemType.Image,
-                    true
+                    updateType
                 ),
                 this.GetMetaDataValues(releaseLookups)
             ).ConfigureAwait(false);
         }
 
-        public async Task FetchArtworkPlaylist()
+        public async Task FetchArtworkPlaylist(MetaDataUpdateType updateType)
         {
             if (this.PlaylistManager.SelectedItems == null)
             {
@@ -182,22 +182,22 @@ namespace FoxTunes
             {
                 return;
             }
-            var releaseLookups = await this.FetchArtwork(playlistItems).ConfigureAwait(false);
+            var releaseLookups = await this.FetchArtwork(playlistItems, updateType).ConfigureAwait(false);
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
                     CommonImageTypes.FrontCover,
                     MetaDataItemType.Image,
-                    true
+                    updateType
                 ),
                 this.GetMetaDataValues(releaseLookups)
             ).ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchArtwork(IEnumerable<IFileData> fileDatas)
+        public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchArtwork(IEnumerable<IFileData> fileDatas, MetaDataUpdateType updateType)
         {
             var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
-            using (var task = new DiscogsFetchArtworkTask(releaseLookups))
+            using (var task = new DiscogsFetchArtworkTask(releaseLookups, updateType))
             {
                 task.InitializeComponent(this.Core);
                 await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
@@ -225,7 +225,12 @@ namespace FoxTunes
                     values.Add(new OnDemandMetaDataValue(fileData, value));
                 }
             }
-            return new OnDemandMetaDataValues(values, this.WriteTags.Value);
+            var flags = MetaDataUpdateFlags.None;
+            if (this.WriteTags.Value)
+            {
+                flags |= MetaDataUpdateFlags.WriteToFiles;
+            }
+            return new OnDemandMetaDataValues(values, flags);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

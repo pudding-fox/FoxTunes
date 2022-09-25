@@ -12,6 +12,8 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
+        public IHierarchyManager HierarchyManager { get; private set; }
+
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
@@ -21,13 +23,14 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.HierarchyManager = core.Managers.Hierarchy;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             base.InitializeComponent(core);
         }
 
-        public async Task Rescan(IEnumerable<IFileData> fileDatas)
+        public async Task Rescan(IEnumerable<IFileData> fileDatas, MetaDataUpdateFlags flags)
         {
             var libraryItems = fileDatas.OfType<LibraryItem>().ToArray();
             var playlistItems = fileDatas.OfType<PlaylistItem>().ToArray();
@@ -42,27 +45,31 @@ namespace FoxTunes
             }
             if (playlistItems.Any())
             {
-                using (var task = new RefreshPlaylistMetaDataTask(playlistItems))
+                using (var task = new RefreshPlaylistMetaDataTask(playlistItems, MetaDataUpdateType.System))
                 {
                     task.InitializeComponent(this.Core);
                     await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
                 }
             }
+            if (flags.HasFlag(MetaDataUpdateFlags.RefreshHierarchies))
+            {
+                await this.HierarchyManager.Refresh(fileDatas, Enumerable.Empty<string>()).ConfigureAwait(false);
+            }
         }
 
-        public async Task Save(IEnumerable<IFileData> fileDatas, bool write, bool report, params string[] names)
+        public async Task Save(IEnumerable<IFileData> fileDatas, IEnumerable<string> names, MetaDataUpdateType updateType, MetaDataUpdateFlags flags)
         {
             var libraryItems = fileDatas.OfType<LibraryItem>().ToArray();
             var playlistItems = fileDatas.OfType<PlaylistItem>().ToArray();
             if (libraryItems.Any())
             {
-                using (var task = new WriteLibraryMetaDataTask(libraryItems, write, names))
+                using (var task = new WriteLibraryMetaDataTask(libraryItems, names, updateType, flags))
                 {
                     task.InitializeComponent(this.Core);
                     await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
-                    if (report && task.Errors.Any())
+                    if (flags.HasFlag(MetaDataUpdateFlags.ShowReport) && task.Errors.Any())
                     {
                         this.OnReport(libraryItems, task.Errors);
                     }
@@ -70,16 +77,20 @@ namespace FoxTunes
             }
             if (playlistItems.Any())
             {
-                using (var task = new WritePlaylistMetaDataTask(playlistItems, names, write))
+                using (var task = new WritePlaylistMetaDataTask(playlistItems, names, updateType, flags))
                 {
                     task.InitializeComponent(this.Core);
                     await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                     await task.Run().ConfigureAwait(false);
-                    if (report && task.Errors.Any())
+                    if (flags.HasFlag(MetaDataUpdateFlags.ShowReport) && task.Errors.Any())
                     {
                         this.OnReport(playlistItems, task.Errors);
                     }
                 }
+            }
+            if (flags.HasFlag(MetaDataUpdateFlags.RefreshHierarchies))
+            {
+                await this.HierarchyManager.Refresh(fileDatas, names).ConfigureAwait(false);
             }
         }
 

@@ -106,7 +106,7 @@ namespace FoxTunes
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             names.AddRange(LibraryTaskBase.UpdateLibraryCache(this.LibraryCache, this.LibraryItems, null));
             names.AddRange(LibraryTaskBase.UpdatePlaylistCache(this.PlaylistCache, this.LibraryItems, null));
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, names)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, new MetaDataUpdatedSignalState(this.LibraryItems, names, MetaDataUpdateType.System))).ConfigureAwait(false);
         }
 
         private async Task WriteLibraryMetaData(LibraryItem libraryItem)

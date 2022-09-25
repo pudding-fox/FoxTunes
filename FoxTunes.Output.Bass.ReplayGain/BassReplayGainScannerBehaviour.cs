@@ -107,9 +107,9 @@ namespace FoxTunes
                     switch (component.Category)
                     {
                         case InvocationComponent.CATEGORY_LIBRARY:
-                            return this.ClearLibrary();
+                            return this.ClearLibrary(MetaDataUpdateType.User);
                         case InvocationComponent.CATEGORY_PLAYLIST:
-                            return this.ClearPlaylist();
+                            return this.ClearPlaylist(MetaDataUpdateType.User);
                     }
                     break;
             }
@@ -180,7 +180,7 @@ namespace FoxTunes
             }
         }
 
-        public Task ClearLibrary()
+        public Task ClearLibrary(MetaDataUpdateType updateType)
         {
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
@@ -199,10 +199,10 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Clear(libraryItems);
+            return this.Clear(libraryItems, updateType);
         }
 
-        public Task ClearPlaylist()
+        public Task ClearPlaylist(MetaDataUpdateType updateType)
         {
             if (this.PlaylistManager.SelectedItems == null)
             {
@@ -221,10 +221,10 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Clear(playlistItems);
+            return this.Clear(playlistItems, updateType);
         }
 
-        public async Task Clear(IFileData[] fileDatas)
+        public async Task Clear(IFileData[] fileDatas, MetaDataUpdateType updateType)
         {
             var names = new[]
             {
@@ -248,11 +248,16 @@ namespace FoxTunes
                     }
                 }
             }
+            var flags = MetaDataUpdateFlags.None;
+            if (this.WriteTags.Value)
+            {
+                flags |= MetaDataUpdateFlags.WriteToFiles;
+            }
             await this.MetaDataManager.Save(
                fileDatas,
-               this.WriteTags.Value,
-               false,
-               names.ToArray()
+               names,
+               updateType,
+               flags
             ).ConfigureAwait(false);
         }
 
@@ -407,11 +412,16 @@ namespace FoxTunes
                         .Where(scannerItem => scannerItem.Status == ScannerItemStatus.Complete)
                         .Select(scannerItem => this.GetFileData(scannerItem))
                         .ToArray();
+                    var flags = MetaDataUpdateFlags.None;
+                    if (this.Behaviour.WriteTags.Value)
+                    {
+                        flags |= MetaDataUpdateFlags.WriteToFiles;
+                    }
                     await this.Behaviour.MetaDataManager.Save(
                         fileDatas,
-                        this.Behaviour.WriteTags.Value,
-                        false,
-                        names.ToArray()
+                        names,
+                        MetaDataUpdateType.System,
+                        flags
                     ).ConfigureAwait(false);
                 }
             }

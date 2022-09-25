@@ -43,22 +43,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    if (names == null || !names.Any())
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
-                        this.Reset();
-                    }
-                    else
-                    {
-                        var keys = this.Keys.Where(
-                            key => !string.IsNullOrEmpty(key.MetaDataItemName) && names.Contains(key.MetaDataItemName, StringComparer.OrdinalIgnoreCase)
-                        );
-                        foreach (var key in keys)
-                        {
-                            this.Evict(key);
-                        }
-                    }
+                    this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
                     break;
                 case CommonSignals.HierarchiesUpdated:
                     Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
@@ -70,6 +55,25 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            if (state == null || state.Names == null || !state.Names.Any())
+            {
+                Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
+                this.Reset();
+            }
+            else
+            {
+                var keys = this.Keys.Where(
+                    key => !string.IsNullOrEmpty(key.MetaDataItemName) && state.Names.Contains(key.MetaDataItemName, StringComparer.OrdinalIgnoreCase)
+                );
+                foreach (var key in keys)
+                {
+                    this.Evict(key);
+                }
+            }
         }
 
         public MetaDataItem[] GetMetaDatas(MetaDataCacheKey key, Func<IEnumerable<MetaDataItem>> factory)

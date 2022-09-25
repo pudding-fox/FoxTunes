@@ -36,7 +36,7 @@ namespace FoxTunes
             {
                 //TODO: This is a hack. The SearchBox control listens for this signal. Nothing else uses this pattern.
                 return CommandFactory.Instance.CreateCommand(
-                    () => this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, SEARCH))
+                    () => this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, new PluginInvocationSignalState(SEARCH)))
                 );
             }
         }

@@ -62,8 +62,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    this.Reset(names);
+                    this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
                     break;
                 case CommonSignals.ImagesUpdated:
                     Logger.Write(this, LogLevel.Debug, "Images were updated, resetting cache.");
@@ -75,6 +74,18 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            if (state != null && state.Names != null)
+            {
+                this.Reset(state.Names);
+            }
+            else
+            {
+                this.Reset(Enumerable.Empty<string>());
+            }
         }
 
         public AsyncResult<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)

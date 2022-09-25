@@ -95,18 +95,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null && playlists.Any())
-                    {
-                        foreach (var playlist in playlists)
-                        {
-                            this.Queue.TryRemove(playlist);
-                        }
-                    }
-                    else
-                    {
-                        this.Queue.Clear();
-                    }
+                    this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
                     break;
             }
 #if NET40
@@ -114,6 +103,21 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnPlaylistUpdated(PlaylistUpdatedSignalState state)
+        {
+            if (state != null && state.Playlists != null && state.Playlists.Any())
+            {
+                foreach (var playlist in state.Playlists)
+                {
+                    this.Queue.TryRemove(playlist);
+                }
+            }
+            else
+            {
+                this.Queue.Clear();
+            }
         }
 
         public IEnumerable<IInvocationComponent> Invocations

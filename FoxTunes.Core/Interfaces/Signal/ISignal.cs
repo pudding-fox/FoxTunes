@@ -6,6 +6,11 @@
 
         string Name { get; }
 
-        object State { get; }
+        SignalState State { get; }
+    }
+
+    public class SignalState
+    {
+        public static readonly SignalState None = new SignalState();
     }
 }

@@ -110,19 +110,31 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    if (!string.IsNullOrEmpty(this.Filter))
-                    {
-                        if (names != null && names.Any() && !this.FilterParser.AppliesTo(this.Filter, names))
-                        {
-                            //There is a filter but the meta data update does not apply to it.
-                            //Nothing to do.
-                            break;
-                        }
-                        Logger.Write(this, LogLevel.Debug, "Meta data was updated and there is an active filter which applies to it, refreshing.");
-                        return this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
-                    }
-                    break;
+                    return this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        protected virtual Task OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            if (!string.IsNullOrEmpty(this.Filter))
+            {
+                if (state != null && state.Names.Any() && !this.FilterParser.AppliesTo(this.Filter, state.Names))
+                {
+                    //There is a filter but the meta data update does not apply to it.
+                    //Nothing to do.
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }
+                Logger.Write(this, LogLevel.Debug, "Meta data was updated and there is an active filter which applies to it, refreshing.");
+                return this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
             }
 #if NET40
             return TaskEx.FromResult(false);

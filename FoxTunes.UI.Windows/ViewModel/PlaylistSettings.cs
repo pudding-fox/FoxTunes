@@ -272,16 +272,7 @@ namespace FoxTunes.ViewModel
                 case CommonSignals.SettingsUpdated:
                     return this.Refresh();
                 case CommonSignals.PlaylistColumnsUpdated:
-                    var columns = signal.State as IEnumerable<PlaylistColumn>;
-                    if (columns != null && columns.Any())
-                    {
-                        this.PlaylistColumns.Refresh();
-                    }
-                    else
-                    {
-                        return this.Refresh();
-                    }
-                    break;
+                    return this.OnPlaylistColumnsUpdated(signal.State as PlaylistColumnsUpdatedSignalState);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -299,6 +290,18 @@ namespace FoxTunes.ViewModel
                 );
                 this.OnSupportedMetaDataChanged();
             });
+        }
+
+        protected virtual Task OnPlaylistColumnsUpdated(PlaylistColumnsUpdatedSignalState state)
+        {
+            if (state != null && state.Columns != null && state.Columns.Any())
+            {
+                return Windows.Invoke(this.PlaylistColumns.Refresh);
+            }
+            else
+            {
+                return this.Refresh();
+            }
         }
 
         protected override void OnDisposing()

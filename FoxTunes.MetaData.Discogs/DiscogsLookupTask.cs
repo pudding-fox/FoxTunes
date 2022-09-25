@@ -35,8 +35,6 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
-        public IHierarchyManager HierarchyManager { get; private set; }
-
         public IReportEmitter ReportEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -49,7 +47,6 @@ namespace FoxTunes
         {
             this.Core = core;
             this.MetaDataManager = core.Managers.MetaData;
-            this.HierarchyManager = core.Managers.Hierarchy;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Configuration = core.Components.Configuration;
             this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
@@ -205,9 +202,9 @@ namespace FoxTunes
             }
             await this.MetaDataManager.Save(
                 releaseLookup.FileDatas,
-                false, //These tags cannot be "written".
-                false,
-                CustomMetaData.DiscogsRelease
+                new[] { CustomMetaData.DiscogsRelease },
+                MetaDataUpdateType.System,
+                MetaDataUpdateFlags.None
             ).ConfigureAwait(false);
         }
     }

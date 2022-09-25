@@ -18,34 +18,34 @@ namespace FoxTunes.Interfaces
 
     public class OnDemandMetaDataRequest
     {
-        public OnDemandMetaDataRequest(string name, MetaDataItemType type, bool user, object state = null)
+        public OnDemandMetaDataRequest(string name, MetaDataItemType itemType, MetaDataUpdateType updateType, object state = null)
         {
             this.Name = name;
-            this.Type = type;
-            this.User = user;
+            this.ItemType = itemType;
+            this.UpdateType = updateType;
             this.State = state;
         }
 
         public string Name { get; private set; }
 
-        public MetaDataItemType Type { get; private set; }
+        public MetaDataItemType ItemType { get; private set; }
 
-        public bool User { get; private set; }
+        public MetaDataUpdateType UpdateType { get; private set; }
 
         public object State { get; private set; }
     }
 
     public class OnDemandMetaDataValues
     {
-        public OnDemandMetaDataValues(IEnumerable<OnDemandMetaDataValue> values, bool write)
+        public OnDemandMetaDataValues(IEnumerable<OnDemandMetaDataValue> values, MetaDataUpdateFlags flags)
         {
             this.Values = values;
-            this.Write = write;
+            this.Flags = flags;
         }
 
         public IEnumerable<OnDemandMetaDataValue> Values { get; private set; }
 
-        public bool Write { get; private set; }
+        public MetaDataUpdateFlags Flags { get; private set; }
     }
 
     public class OnDemandMetaDataValue

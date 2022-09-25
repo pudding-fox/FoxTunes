@@ -357,7 +357,7 @@ namespace FoxTunes
 
             protected override Task OnCompleted()
             {
-                return this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist }));
+                return this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new PlaylistUpdatedSignalState(this.Playlist)));
             }
         }
 

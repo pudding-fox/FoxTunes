@@ -266,10 +266,13 @@ namespace FoxTunes
                 switch (signal.Name)
                 {
                     case CommonSignals.PluginInvocation:
-                        switch (signal.State as string)
+                        if (signal.State is PluginInvocationSignalState state)
                         {
-                            case DefaultKeyBindingsBehaviour.SEARCH:
-                                return Windows.Invoke(() => this.TextBox.Focus());
+                            switch (state.Id)
+                            {
+                                case DefaultKeyBindingsBehaviour.SEARCH:
+                                    return Windows.Invoke(() => this.TextBox.Focus());
+                            }
                         }
                         break;
                 }
