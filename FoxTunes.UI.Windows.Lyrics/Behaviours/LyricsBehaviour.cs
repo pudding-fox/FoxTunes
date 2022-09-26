@@ -221,15 +221,23 @@ namespace FoxTunes
 #endif
             }
             var playlistItem = outputStream.PlaylistItem;
-            return this.OnDemandMetaDataProvider.GetMetaData(
-                new[] { outputStream.PlaylistItem },
-                new OnDemandMetaDataRequest(
-                    CommonMetaData.Lyrics,
-                    MetaDataItemType.Tag,
-                    updateType,
-                    provider
-                )
-            );
+            if (this.OnDemandMetaDataProvider.IsSourceEnabled(CommonMetaData.Lyrics, MetaDataItemType.Tag))
+            {
+                return this.OnDemandMetaDataProvider.GetMetaData(
+                    new[] { outputStream.PlaylistItem },
+                    new OnDemandMetaDataRequest(
+                        CommonMetaData.Lyrics,
+                        MetaDataItemType.Tag,
+                        updateType,
+                        provider
+                    )
+                );
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

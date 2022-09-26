@@ -22,8 +22,6 @@ namespace FoxTunes
 
         public ImageLoader ImageLoader { get; private set; }
 
-        public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
-
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -33,7 +31,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
-            this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
@@ -59,11 +56,16 @@ namespace FoxTunes
 #endif
         }
 
-        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
+        public ImageSource CreateImageSource(int id, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
+        {
+            return this.CreateImageSource(id.ToString(), metaDataItems, width, height, cache);
+        }
+
+        public ImageSource CreateImageSource(string id, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
         {
             try
             {
-                var id = this.GetImageId(libraryHierarchyNode, width, height);
+                id = this.GetImageId(id, width, height);
                 if (cache)
                 {
                     var fileName = default(string);
@@ -82,7 +84,7 @@ namespace FoxTunes
                             return this.ImageLoader.Load(fileName, 0, 0, true);
                         }
                     }
-                    return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
+                    return this.CreateImageSourceCore(id, metaDataItems, width, height, cache);
                 }
             }
             catch (Exception e)
@@ -92,32 +94,13 @@ namespace FoxTunes
             }
         }
 
-        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
+        private ImageSource CreateImageSourceCore(string id, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
         {
-            var fileNames = libraryHierarchyNode.MetaDatas.Where(
+            var fileNames = metaDataItems().Where(
                 metaDataItem => string.Equals(metaDataItem.Name, CommonImageTypes.FrontCover, StringComparison.OrdinalIgnoreCase) && metaDataItem.Type == MetaDataItemType.Image && File.Exists(metaDataItem.Value)
             ).Select(
                 metaDataItem => metaDataItem.Value
             ).ToArray();
-            if (!fileNames.Any())
-            {
-                if (this.OnDemandMetaDataProvider.IsSourceEnabled(CommonImageTypes.FrontCover, MetaDataItemType.Image))
-                {
-                    var libraryItems = libraryHierarchyNode.Items;
-                    if (libraryItems.Any())
-                    {
-                        //TODO: Bad .Result
-                        fileNames = this.OnDemandMetaDataProvider.GetMetaData(
-                            libraryItems,
-                            new OnDemandMetaDataRequest(
-                                CommonImageTypes.FrontCover,
-                                MetaDataItemType.Image,
-                                MetaDataUpdateType.System
-                            )
-                        ).Result.ToArray();
-                    }
-                }
-            }
             switch (this.ImageMode)
             {
                 case LibraryBrowserImageMode.First:
@@ -126,7 +109,7 @@ namespace FoxTunes
                         case 0:
                             return null;
                         default:
-                            return this.CreateImageSource1(libraryHierarchyNode, fileNames, width, height);
+                            return this.CreateImageSource1(id, fileNames, width, height);
                     }
                 default:
                 case LibraryBrowserImageMode.Compound:
@@ -135,23 +118,23 @@ namespace FoxTunes
                         case 0:
                             return null;
                         case 1:
-                            return this.CreateImageSource1(libraryHierarchyNode, fileNames, width, height);
+                            return this.CreateImageSource1(id, fileNames, width, height);
                         case 2:
-                            return this.CreateImageSource2(libraryHierarchyNode, fileNames, width, height, cache);
+                            return this.CreateImageSource2(id, fileNames, width, height, cache);
                         case 3:
-                            return this.CreateImageSource3(libraryHierarchyNode, fileNames, width, height, cache);
+                            return this.CreateImageSource3(id, fileNames, width, height, cache);
                         default:
-                            return this.CreateImageSource4(libraryHierarchyNode, fileNames, width, height, cache);
+                            return this.CreateImageSource4(id, fileNames, width, height, cache);
                     }
             }
         }
 
-        private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height)
+        private ImageSource CreateImageSource1(string id, string[] fileNames, int width, int height)
         {
             return this.ImageLoader.Load(fileNames[0], width, height, true);
         }
 
-        private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
+        private ImageSource CreateImageSource2(string id, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -159,10 +142,10 @@ namespace FoxTunes
                 this.DrawImage(fileNames[0], context, 0, 2, width, height);
                 this.DrawImage(fileNames[1], context, 1, 2, width, height);
             }
-            return this.Render(libraryHierarchyNode, visual, width, height, cache);
+            return this.Render(id, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
+        private ImageSource CreateImageSource3(string id, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -171,10 +154,10 @@ namespace FoxTunes
                 this.DrawImage(fileNames[1], context, 1, 3, width, height);
                 this.DrawImage(fileNames[2], context, 2, 3, width, height);
             }
-            return this.Render(libraryHierarchyNode, visual, width, height, cache);
+            return this.Render(id, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
+        private ImageSource CreateImageSource4(string id, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -184,7 +167,7 @@ namespace FoxTunes
                 this.DrawImage(fileNames[2], context, 2, 4, width, height);
                 this.DrawImage(fileNames[3], context, 3, 4, width, height);
             }
-            return this.Render(libraryHierarchyNode, visual, width, height, cache);
+            return this.Render(id, visual, width, height, cache);
         }
 
         private void DrawImage(string fileName, DrawingContext context, int position, int count, int width, int height)
@@ -269,7 +252,7 @@ namespace FoxTunes
             );
         }
 
-        private ImageSource Render(LibraryHierarchyNode libraryHierarchyNode, DrawingVisual visual, int width, int height, bool cache)
+        private ImageSource Render(string id, DrawingVisual visual, int width, int height, bool cache)
         {
             var target = new RenderTargetBitmap(width, height, DPIX, DPIY, PixelFormats.Pbgra32);
             target.Render(visual);
@@ -281,19 +264,19 @@ namespace FoxTunes
                 {
                     encoder.Save(stream);
                     stream.Seek(0, SeekOrigin.Begin);
-                    FileMetaDataStore.Write(PREFIX, this.GetImageId(libraryHierarchyNode, width, height), stream);
+                    FileMetaDataStore.Write(PREFIX, id, stream);
                 }
             }
             target.Freeze();
             return target;
         }
 
-        private string GetImageId(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private string GetImageId(string id, int width, int height)
         {
             var hashCode = default(int);
             unchecked
             {
-                hashCode = (hashCode * 29) + libraryHierarchyNode.Id.GetHashCode();
+                hashCode = (hashCode * 29) + id.GetHashCode();
                 hashCode = (hashCode * 29) + width.GetHashCode();
                 hashCode = (hashCode * 29) + height.GetHashCode();
             }

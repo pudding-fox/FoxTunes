@@ -116,25 +116,30 @@ namespace FoxTunes
             }
             return new AsyncResult<ImageBrush>(placeholder, this.Factory.StartNew(() =>
             {
+                //TODO: Bad .Result
+                var metaDataItems = new Func<MetaDataItem[]>(
+                    () => LibraryHierarchyNodeConverter.Instance.Convert(libraryHierarchyNode).Result.MetaDatas.ToArray()
+                );
                 if (cache)
                 {
                     return this.Store.GetOrAdd(
                         libraryHierarchyNode,
-                        () => this.Create(libraryHierarchyNode, width, height, true)
+                        () => this.Create(libraryHierarchyNode.Id, metaDataItems, width, height, true)
                     );
                 }
                 else
                 {
-                    return this.Create(libraryHierarchyNode, width, height, false);
+                    return this.Create(libraryHierarchyNode.Id, metaDataItems, width, height, false);
                 }
             }));
         }
 
-        protected virtual ImageBrush Create(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
+        protected virtual ImageBrush Create(int id, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
         {
             Logger.Write(this, LogLevel.Debug, "Creating brush: {0}x{1}", width, height);
             var source = this.LibraryBrowserTileProvider.CreateImageSource(
-                libraryHierarchyNode,
+                id,
+                metaDataItems,
                 width,
                 height,
                 cache
