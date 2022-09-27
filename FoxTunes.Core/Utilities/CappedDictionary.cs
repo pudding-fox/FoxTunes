@@ -34,6 +34,15 @@ namespace FoxTunes
             this.Store.AddOrUpdate(key, value);
         }
 
+        public TValue GetOrAdd(TKey key, TValue value)
+        {
+            return this.Store.GetOrAdd(key, _key =>
+            {
+                this.OnAdd(key, value);
+                return value;
+            });
+        }
+
         public TValue GetOrAdd(TKey key, Func<TValue> factory)
         {
             return this.Store.GetOrAdd(key, _key =>

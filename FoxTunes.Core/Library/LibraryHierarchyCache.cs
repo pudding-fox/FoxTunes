@@ -108,6 +108,15 @@ namespace FoxTunes
                 //The cache entry is affected by the meta data update, invalidate it.
                 this.Evict(key);
             }
+            if (state.FileDatas != null)
+            {
+                var libraryItems = state.FileDatas.OfType<LibraryItem>();
+                var libraryHierarchyNodes = libraryItems.SelectMany(libraryItem => libraryItem.Parents).Distinct();
+                foreach(var libraryHierarchyNode in libraryHierarchyNodes)
+                {
+                    libraryHierarchyNode.Refresh();
+                }
+            }
         }
 
         public LibraryHierarchy[] GetHierarchies(Func<IEnumerable<LibraryHierarchy>> factory)

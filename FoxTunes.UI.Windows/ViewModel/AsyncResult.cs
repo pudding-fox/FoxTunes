@@ -1,10 +1,11 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class AsyncResult<T> : ViewModelBase where T : class
+    public class AsyncResult<T> : ViewModelBase, IAsyncResult<T> where T : class
     {
         private AsyncResult()
         {
