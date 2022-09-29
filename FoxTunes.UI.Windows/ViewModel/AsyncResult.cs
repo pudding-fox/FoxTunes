@@ -1,11 +1,8 @@
-﻿using FoxTunes.Interfaces;
-using System;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Threading.Tasks;
 
 namespace FoxTunes.ViewModel
 {
-    public class AsyncResult<T> : ViewModelBase, IAsyncResult<T> where T : class
+    public class AsyncResult<T> : Wrapper<T> where T : class
     {
         private AsyncResult()
         {
@@ -32,49 +29,10 @@ namespace FoxTunes.ViewModel
 
         public Task<T> Task { get; private set; }
 
-        private T _Value { get; set; }
-
-        public T Value
-        {
-            get
-            {
-                return this._Value;
-            }
-            set
-            {
-                if (object.ReferenceEquals(this.Value, value))
-                {
-                    return;
-                }
-                this._Value = value;
-                this.OnValueChanged();
-            }
-        }
-
-        protected virtual void OnValueChanged()
-        {
-            if (this.ValueChanged != null)
-            {
-                this.ValueChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Value");
-        }
-
-        public event EventHandler ValueChanged;
-
         public async Task Run()
         {
             var value = await this.Task.ConfigureAwait(false);
-            if (value == null)
-            {
-                return;
-            }
-            this.Value = value;
-        }
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new AsyncResult<T>();
+            await Windows.Invoke(() => this.Value = value).ConfigureAwait(false);
         }
 
         public static AsyncResult<T> FromValue(T value)

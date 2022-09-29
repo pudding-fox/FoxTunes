@@ -8,7 +8,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
-{
+{    
+    //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
+    [Component("73C1DB7E-B4E8-495E-B358-92A859FBC787", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     [WindowsUserInterfaceDependency]
     public class LibraryBrowserTileProvider : StandardComponent, IDisposable
     {
@@ -17,8 +19,6 @@ namespace FoxTunes
         const double DPIY = 96;
 
         private static readonly string PREFIX = typeof(LibraryBrowserTileProvider).Name;
-
-        private static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public ImageLoader ImageLoader { get; private set; }
 
@@ -45,8 +45,12 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
+                case CommonSignals.MetaDataUpdated:
+                    this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
+                    break;
                 case CommonSignals.ImagesUpdated:
-                    this.Clear();
+                    Logger.Write(this, LogLevel.Debug, "Images were updated, resetting cache.");
+                    this.ClearCache();
                     break;
             }
 #if NET40
@@ -56,36 +60,43 @@ namespace FoxTunes
 #endif
         }
 
-        public ImageSource CreateImageSource(int id, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
+        protected virtual void OnMetaDataUpdated(MetaDataUpdatedSignalState state)
         {
-            return this.CreateImageSource(id.ToString(), metaDataItems, width, height, cache);
+            if (state != null && state.Names != null && state.Names.Any())
+            {
+                if (!state.Names.Contains(CommonImageTypes.FrontCover, StringComparer.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+            }
+            if (state != null && state.FileDatas != null && state.FileDatas.Any())
+            {
+                var libraryItems = state.FileDatas.OfType<LibraryItem>();
+                var libraryHierarchyNodes = libraryItems.SelectMany(libraryItem => libraryItem.Parents).Distinct();
+                foreach (var libraryHierarchyNode in libraryHierarchyNodes)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Meta data was updated for item {0}, resetting cache.", libraryHierarchyNode.Id);
+                    this.ClearCache(libraryHierarchyNode);
+                }
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
+            this.ClearCache();
         }
 
-        public ImageSource CreateImageSource(string id, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
+        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
         {
             try
             {
-                id = this.GetImageId(id, width, height);
                 if (cache)
                 {
                     var fileName = default(string);
-                    if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                    if (this.ReadFromCache(libraryHierarchyNode, width, height, out fileName))
                     {
                         return this.ImageLoader.Load(fileName, 0, 0, true);
                     }
                 }
-                using (KeyLock.Lock(id))
-                {
-                    if (cache)
-                    {
-                        var fileName = default(string);
-                        if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
-                        {
-                            return this.ImageLoader.Load(fileName, 0, 0, true);
-                        }
-                    }
-                    return this.CreateImageSourceCore(id, metaDataItems, width, height, cache);
-                }
+                return this.CreateImageSourceCore(libraryHierarchyNode, metaDataItems, width, height, cache);
             }
             catch (Exception e)
             {
@@ -94,7 +105,7 @@ namespace FoxTunes
             }
         }
 
-        private ImageSource CreateImageSourceCore(string id, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
+        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
         {
             var fileNames = metaDataItems().Where(
                 metaDataItem => string.Equals(metaDataItem.Name, CommonImageTypes.FrontCover, StringComparison.OrdinalIgnoreCase) && metaDataItem.Type == MetaDataItemType.Image && File.Exists(metaDataItem.Value)
@@ -109,7 +120,7 @@ namespace FoxTunes
                         case 0:
                             return null;
                         default:
-                            return this.CreateImageSource1(id, fileNames, width, height);
+                            return this.CreateImageSource1(libraryHierarchyNode, fileNames, width, height);
                     }
                 default:
                 case LibraryBrowserImageMode.Compound:
@@ -118,23 +129,23 @@ namespace FoxTunes
                         case 0:
                             return null;
                         case 1:
-                            return this.CreateImageSource1(id, fileNames, width, height);
+                            return this.CreateImageSource1(libraryHierarchyNode, fileNames, width, height);
                         case 2:
-                            return this.CreateImageSource2(id, fileNames, width, height, cache);
+                            return this.CreateImageSource2(libraryHierarchyNode, fileNames, width, height, cache);
                         case 3:
-                            return this.CreateImageSource3(id, fileNames, width, height, cache);
+                            return this.CreateImageSource3(libraryHierarchyNode, fileNames, width, height, cache);
                         default:
-                            return this.CreateImageSource4(id, fileNames, width, height, cache);
+                            return this.CreateImageSource4(libraryHierarchyNode, fileNames, width, height, cache);
                     }
             }
         }
 
-        private ImageSource CreateImageSource1(string id, string[] fileNames, int width, int height)
+        private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height)
         {
             return this.ImageLoader.Load(fileNames[0], width, height, true);
         }
 
-        private ImageSource CreateImageSource2(string id, string[] fileNames, int width, int height, bool cache)
+        private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -142,10 +153,10 @@ namespace FoxTunes
                 this.DrawImage(fileNames[0], context, 0, 2, width, height);
                 this.DrawImage(fileNames[1], context, 1, 2, width, height);
             }
-            return this.Render(id, visual, width, height, cache);
+            return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource3(string id, string[] fileNames, int width, int height, bool cache)
+        private ImageSource CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -154,10 +165,10 @@ namespace FoxTunes
                 this.DrawImage(fileNames[1], context, 1, 3, width, height);
                 this.DrawImage(fileNames[2], context, 2, 3, width, height);
             }
-            return this.Render(id, visual, width, height, cache);
+            return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource4(string id, string[] fileNames, int width, int height, bool cache)
+        private ImageSource CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -167,7 +178,7 @@ namespace FoxTunes
                 this.DrawImage(fileNames[2], context, 2, 4, width, height);
                 this.DrawImage(fileNames[3], context, 3, 4, width, height);
             }
-            return this.Render(id, visual, width, height, cache);
+            return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
         private void DrawImage(string fileName, DrawingContext context, int position, int count, int width, int height)
@@ -252,7 +263,7 @@ namespace FoxTunes
             );
         }
 
-        private ImageSource Render(string id, DrawingVisual visual, int width, int height, bool cache)
+        private ImageSource Render(LibraryHierarchyNode libraryHierarchyNode, DrawingVisual visual, int width, int height, bool cache)
         {
             var target = new RenderTargetBitmap(width, height, DPIX, DPIY, PixelFormats.Pbgra32);
             target.Render(visual);
@@ -264,26 +275,56 @@ namespace FoxTunes
                 {
                     encoder.Save(stream);
                     stream.Seek(0, SeekOrigin.Begin);
-                    FileMetaDataStore.Write(PREFIX, id, stream);
+                    this.WriteToCache(libraryHierarchyNode, width, height, stream);
                 }
             }
             target.Freeze();
             return target;
         }
 
-        private string GetImageId(string id, int width, int height)
+        private string GetCachePrefix(LibraryHierarchyNode libraryHierarchyNode)
         {
-            var hashCode = default(int);
-            unchecked
-            {
-                hashCode = (hashCode * 29) + id.GetHashCode();
-                hashCode = (hashCode * 29) + width.GetHashCode();
-                hashCode = (hashCode * 29) + height.GetHashCode();
-            }
-            return Math.Abs(hashCode).ToString();
+            return Path.Combine(PREFIX, libraryHierarchyNode.Id.ToString());
         }
 
-        public void Clear()
+        private string GetCacheId(int width, int height)
+        {
+            return (width * height).GetHashCode().ToString();
+        }
+
+        private bool ReadFromCache(LibraryHierarchyNode libraryHierarchyNode, int width, int height, out string fileName)
+        {
+            return FileMetaDataStore.Exists(
+                this.GetCachePrefix(libraryHierarchyNode),
+                this.GetCacheId(width, height),
+                out fileName
+            );
+        }
+
+        private void WriteToCache(LibraryHierarchyNode libraryHierarchyNode, int width, int height, Stream stream)
+        {
+            FileMetaDataStore.Write(
+                this.GetCachePrefix(libraryHierarchyNode),
+                this.GetCacheId(width, height),
+                stream
+            );
+        }
+
+        private void ClearCache(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            try
+            {
+                FileMetaDataStore.Clear(
+                    this.GetCachePrefix(libraryHierarchyNode)
+                );
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", this.GetCachePrefix(libraryHierarchyNode), e.Message);
+            }
+        }
+
+        private void ClearCache()
         {
             try
             {

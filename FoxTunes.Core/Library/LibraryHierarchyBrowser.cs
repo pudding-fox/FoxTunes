@@ -121,6 +121,15 @@ namespace FoxTunes
 
         protected virtual Task OnMetaDataUpdated(MetaDataUpdatedSignalState state)
         {
+            if (state != null && state.FileDatas != null && state.FileDatas.Any())
+            {
+                var libraryItems = state.FileDatas.OfType<LibraryItem>();
+                var libraryHierarchyNodes = libraryItems.SelectMany(libraryItem => libraryItem.Parents).Distinct();
+                foreach (var libraryHierarchyNode in libraryHierarchyNodes)
+                {
+                    libraryHierarchyNode.Refresh(state.Names);
+                }
+            }
             if (!string.IsNullOrEmpty(this.Filter))
             {
                 if (state != null && state.Names.Any() && !this.FilterParser.AppliesTo(this.Filter, state.Names))

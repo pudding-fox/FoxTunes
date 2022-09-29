@@ -59,16 +59,36 @@ namespace FoxTunes
 
         protected virtual void OnMetaDataUpdated(MetaDataUpdatedSignalState state)
         {
-            if (state == null || state.Names == null || !state.Names.Any())
+            if (state == null)
             {
                 Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
                 this.Reset();
             }
             else
             {
-                var keys = this.Keys.Where(
-                    key => !string.IsNullOrEmpty(key.MetaDataItemName) && state.Names.Contains(key.MetaDataItemName, StringComparer.OrdinalIgnoreCase)
-                );
+                var keys = this.Keys;
+                if (state.Names != null && state.Names.Any())
+                {
+                    keys = keys.Where(key => state.Names.Contains(key.MetaDataItemName, StringComparer.OrdinalIgnoreCase));
+                }
+                if (state.FileDatas != null && state.FileDatas.Any())
+                {
+                    var libraryItems = state.FileDatas.OfType<LibraryItem>();
+                    var libraryHierarchyNodes = libraryItems.SelectMany(libraryItem => libraryItem.Parents).Distinct();
+                    var playlistItems = state.FileDatas.OfType<PlaylistItem>();
+                    keys = keys.Where(key =>
+                    {
+                        if (key is LibraryMetaDataCacheKey libraryMetaDataCacheKey)
+                        {
+                            return libraryHierarchyNodes.Contains(libraryMetaDataCacheKey.LibraryHierarchyNode);
+                        }
+                        else if (key is PlaylistMetaDataCacheKey playlistMetaDataCacheKey)
+                        {
+                            return playlistItems.Intersect(playlistMetaDataCacheKey.PlaylistItems).Any();
+                        }
+                        return false;
+                    });
+                }
                 foreach (var key in keys)
                 {
                     this.Evict(key);
