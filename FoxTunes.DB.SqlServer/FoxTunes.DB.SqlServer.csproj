@@ -121,7 +121,7 @@
     <PackageReference Include="FoxDb.SqlServer" Version="0.5.0"></PackageReference>
     <PackageReference Include="FoxDb.SqlServer.2012" Version="0.5.0"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
+    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 
   <ItemGroup>
