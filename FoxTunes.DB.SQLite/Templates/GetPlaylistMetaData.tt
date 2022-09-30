@@ -33,4 +33,4 @@ for (var position = 0; position < this.Count; position++)
 	AND (@type IS NULL OR (@type & "MetaDataItems"."Type") = "MetaDataItems"."Type")
 	AND (@name IS NULL OR "MetaDataItems"."Name" = @name)
 GROUP BY "MetaDataItems"."Value"
-LIMIT 5
+LIMIT <#= this.Limit #>

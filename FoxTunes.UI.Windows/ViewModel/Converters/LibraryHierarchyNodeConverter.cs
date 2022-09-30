@@ -10,6 +10,10 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryHierarchyNodeConverter : IValueConverter
     {
+        public const int MAX_IMAGES = 4;
+
+        public static readonly ILibraryHierarchyBrowser LibraryHierarchyBrowser = ComponentRegistry.Instance.GetComponent<ILibraryHierarchyBrowser>();
+
         public static readonly IMetaDataBrowser MetaDataBrowser = ComponentRegistry.Instance.GetComponent<IMetaDataBrowser>();
 
         public static readonly IOnDemandMetaDataProvider OnDemandMetaDataProvider = ComponentRegistry.Instance.GetComponent<IOnDemandMetaDataProvider>();
@@ -25,12 +29,17 @@ namespace FoxTunes.ViewModel
 
         public async Task<IFileData> Convert(LibraryHierarchyNode libraryHierarchyNode)
         {
-            var metaDataItems = MetaDataBrowser.GetMetaDatas(libraryHierarchyNode, MetaDataItemType.Image, CommonImageTypes.FrontCover);
+            var metaDataItems = await MetaDataBrowser.GetMetaDatas(
+                libraryHierarchyNode,
+                CommonImageTypes.FrontCover,
+                MetaDataItemType.Image,
+                MAX_IMAGES
+            ).ConfigureAwait(false);
             if (!metaDataItems.Any())
             {
                 if (OnDemandMetaDataProvider.IsSourceEnabled(CommonImageTypes.FrontCover, MetaDataItemType.Image))
                 {
-                    var libraryItems = libraryHierarchyNode.Items;
+                    var libraryItems = LibraryHierarchyBrowser.GetItems(libraryHierarchyNode);
                     if (libraryItems.Any())
                     {
                         var fileNames = await OnDemandMetaDataProvider.GetMetaData(

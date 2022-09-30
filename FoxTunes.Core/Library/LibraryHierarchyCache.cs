@@ -121,12 +121,12 @@ namespace FoxTunes
 
         public LibraryHierarchyNode[] GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory)
         {
-            return this.Nodes.GetOrAdd(key, _key => new Lazy<LibraryHierarchyNode[]>(() => factory().ToArray())).Value;
+            return this.Nodes.GetOrAdd(key, () => new Lazy<LibraryHierarchyNode[]>(() => factory().ToArray())).Value;
         }
 
         public LibraryItem[] GetItems(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryItem>> factory)
         {
-            return this.Items.GetOrAdd(key, _key => new Lazy<LibraryItem[]>(() => factory().ToArray())).Value;
+            return this.Items.GetOrAdd(key, () => new Lazy<LibraryItem[]>(() => factory().ToArray())).Value;
         }
 
         public void Reset()

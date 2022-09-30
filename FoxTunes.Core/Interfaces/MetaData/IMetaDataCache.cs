@@ -20,16 +20,19 @@ namespace FoxTunes.Interfaces
 
     public abstract class MetaDataCacheKey : IEquatable<MetaDataCacheKey>
     {
-        protected MetaDataCacheKey(MetaDataItemType? metaDataItemType, string metaDataItemName, string filter)
+        protected MetaDataCacheKey(string name, MetaDataItemType type, int limit, string filter)
         {
-            this.MetaDataItemType = metaDataItemType;
-            this.MetaDataItemName = metaDataItemName;
+            this.Name = name;
+            this.Type = type;
+            this.Limit = limit;
             this.Filter = filter;
         }
 
-        public MetaDataItemType? MetaDataItemType { get; private set; }
+        public string Name { get; private set; }
 
-        public string MetaDataItemName { get; private set; }
+        public MetaDataItemType Type { get; private set; }
+
+        public int Limit { get; private set; }
 
         public string Filter { get; private set; }
 
@@ -38,14 +41,12 @@ namespace FoxTunes.Interfaces
             var hashCode = default(int);
             unchecked
             {
-                if (this.MetaDataItemType.HasValue)
+                if (!string.IsNullOrEmpty(this.Name))
                 {
-                    hashCode += this.MetaDataItemType.Value.GetHashCode();
+                    hashCode += this.Name.ToLower().GetHashCode();
                 }
-                if (!string.IsNullOrEmpty(this.MetaDataItemName))
-                {
-                    hashCode += this.MetaDataItemName.ToLower().GetHashCode();
-                }
+                hashCode += this.Type.GetHashCode();
+                hashCode += this.Limit.GetHashCode();
                 if (!string.IsNullOrEmpty(this.Filter))
                 {
                     hashCode += this.Filter.ToLower().GetHashCode();
@@ -69,11 +70,15 @@ namespace FoxTunes.Interfaces
             {
                 return true;
             }
-            if (!object.Equals(this.MetaDataItemType, other.MetaDataItemType))
+            if (!string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
-            if (!string.Equals(this.MetaDataItemName, other.MetaDataItemName, StringComparison.OrdinalIgnoreCase))
+            if (this.Type != other.Type)
+            {
+                return false;
+            }
+            if (this.Limit != other.Limit)
             {
                 return false;
             }
@@ -109,7 +114,7 @@ namespace FoxTunes.Interfaces
 
     public class LibraryMetaDataCacheKey : MetaDataCacheKey
     {
-        public LibraryMetaDataCacheKey(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName, string filter) : base(metaDataItemType, metaDataItemName, filter)
+        public LibraryMetaDataCacheKey(LibraryHierarchyNode libraryHierarchyNode, string name, MetaDataItemType type, int limit, string filter) : base(name, type, limit, filter)
         {
             this.LibraryHierarchyNode = libraryHierarchyNode;
         }
@@ -150,7 +155,7 @@ namespace FoxTunes.Interfaces
 
     public class PlaylistMetaDataCacheKey : MetaDataCacheKey
     {
-        public PlaylistMetaDataCacheKey(PlaylistItem[] playlistItems, MetaDataItemType? metaDataItemType, string metaDataItemName, string filter) : base(metaDataItemType, metaDataItemName, filter)
+        public PlaylistMetaDataCacheKey(PlaylistItem[] playlistItems, string name, MetaDataItemType type, int limit, string filter) : base(name, type, limit, filter)
         {
             this.PlaylistItems = playlistItems;
         }

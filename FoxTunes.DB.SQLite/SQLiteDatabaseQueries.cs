@@ -78,7 +78,7 @@ namespace FoxTunes
             );
         }
 
-        public override IDatabaseQuery GetLibraryHierarchyMetaData(string filter)
+        public override IDatabaseQuery GetLibraryHierarchyMetaData(string filter, int limit)
         {
             var result = default(IFilterParserResult);
             if (!string.IsNullOrEmpty(filter) && !this.FilterParser.TryParse(filter, out result))
@@ -86,7 +86,7 @@ namespace FoxTunes
                 //TODO: Warn, failed to parse filter.
                 result = null;
             }
-            var template = new GetLibraryHierarchyMetaData(this.Database, result);
+            var template = new GetLibraryHierarchyMetaData(this.Database, result, limit);
             return this.Database.QueryFactory.Create(
                 template.TransformText(),
                 new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
@@ -95,9 +95,9 @@ namespace FoxTunes
             );
         }
 
-        public override IDatabaseQuery GetPlaylistMetaData(int count)
+        public override IDatabaseQuery GetPlaylistMetaData(int count, int limit)
         {
-            var template = new GetPlaylistMetaData(this.Database, count);
+            var template = new GetPlaylistMetaData(this.Database, count, limit);
             var parameters = new List<DatabaseQueryParameter>();
             for (var position = 0; position < count; position++)
             {

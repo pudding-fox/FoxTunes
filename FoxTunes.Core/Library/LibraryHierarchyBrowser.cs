@@ -250,8 +250,7 @@ namespace FoxTunes
                         }, transaction);
                         foreach (var node in nodes)
                         {
-                            node.InitializeComponent(this.Core);
-                            yield return node;
+                            yield return this.CreateNode(libraryHierarchy, node);
                         }
                     }
                 }
@@ -260,6 +259,12 @@ namespace FoxTunes
             {
                 this.State &= ~LibraryHierarchyBrowserState.Loading;
             }
+        }
+
+        protected virtual LibraryHierarchyNode CreateNode(LibraryHierarchy parent, LibraryHierarchyNode node)
+        {
+            node.InitializeComponent(this);
+            return node;
         }
 
         protected virtual IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchyNode libraryHierarchyNode, string filter)
@@ -289,7 +294,7 @@ namespace FoxTunes
         protected virtual LibraryHierarchyNode CreateNode(LibraryHierarchyNode parent, LibraryHierarchyNode node)
         {
             node.Parent = parent;
-            node.InitializeComponent(this.Core);
+            node.InitializeComponent(this);
             return node;
         }
 

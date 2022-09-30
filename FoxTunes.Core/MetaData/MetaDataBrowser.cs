@@ -1,5 +1,7 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +11,16 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class MetaDataBrowser : StandardComponent, IMetaDataBrowser
     {
+        public MetaDataBrowser()
+        {
+            this.LibraryQueries = new ConcurrentDictionary<string, Lazy<IDatabaseQuery>>(StringComparer.OrdinalIgnoreCase);
+            this.PlaylistQueries = new ConcurrentDictionary<int, Lazy<IDatabaseQuery>>();
+        }
+
+        public ConcurrentDictionary<string, Lazy<IDatabaseQuery>> LibraryQueries { get; private set; }
+
+        public ConcurrentDictionary<int, Lazy<IDatabaseQuery>> PlaylistQueries { get; private set; }
+
         public IMetaDataCache MetaDataCache { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
@@ -23,47 +35,19 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public MetaDataItem[] GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
+        public Task<MetaDataItem[]> GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, string name, MetaDataItemType type, int limit)
         {
-            var key = new LibraryMetaDataCacheKey(libraryHierarchyNode, metaDataItemType, metaDataItemName, this.LibraryHierarchyBrowser.Filter);
-            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCore(libraryHierarchyNode, metaDataItemType, metaDataItemName));
+            var key = new LibraryMetaDataCacheKey(libraryHierarchyNode, name, type, limit, this.LibraryHierarchyBrowser.Filter);
+            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCore(libraryHierarchyNode, name, type, limit));
         }
 
-        public Task<MetaDataItem[]> GetMetaDatasAsync(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
-        {
-            var key = new LibraryMetaDataCacheKey(libraryHierarchyNode, metaDataItemType, metaDataItemName, this.LibraryHierarchyBrowser.Filter);
-            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCoreAsync(libraryHierarchyNode, metaDataItemType, metaDataItemName));
-        }
-
-        private IEnumerable<MetaDataItem> GetMetaDatasCore(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
+        private async Task<IEnumerable<MetaDataItem>> GetMetaDatasCore(LibraryHierarchyNode libraryHierarchyNode, string name, MetaDataItemType type, int limit)
         {
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    using (var reader = this.GetReader(database, libraryHierarchyNode, metaDataItemType, metaDataItemName, transaction))
-                    {
-                        foreach (var record in reader)
-                        {
-                            yield return new MetaDataItem()
-                            {
-                                Name = metaDataItemName,
-                                Type = metaDataItemType.GetValueOrDefault(),
-                                Value = record.Get<string>("Value")
-                            };
-                        }
-                    }
-                }
-            }
-        }
-
-        private async Task<IEnumerable<MetaDataItem>> GetMetaDatasCoreAsync(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    using (var reader = this.GetReader(database, libraryHierarchyNode, metaDataItemType, metaDataItemName, transaction))
+                    using (var reader = this.GetReader(database, libraryHierarchyNode, name, type, limit, transaction))
                     {
                         using (var sequence = reader.GetAsyncEnumerator())
                         {
@@ -72,8 +56,8 @@ namespace FoxTunes
                             {
                                 result.Add(new MetaDataItem()
                                 {
-                                    Name = metaDataItemName,
-                                    Type = metaDataItemType.GetValueOrDefault(),
+                                    Name = name,
+                                    Type = type,
                                     Value = sequence.Current.Get<string>("Value")
                                 });
                             }
@@ -84,76 +68,38 @@ namespace FoxTunes
             }
         }
 
-        private IDatabaseReader GetReader(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName, ITransactionSource transaction)
+        private IDatabaseReader GetReader(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, string name, MetaDataItemType type, int limit, ITransactionSource transaction)
         {
-            return database.ExecuteReader(database.Queries.GetLibraryHierarchyMetaData(this.LibraryHierarchyBrowser.Filter), (parameters, phase) =>
+            var query = this.LibraryQueries.GetOrAdd(
+                this.LibraryHierarchyBrowser.Filter,
+                () => new Lazy<IDatabaseQuery>(() => database.Queries.GetLibraryHierarchyMetaData(this.LibraryHierarchyBrowser.Filter, limit))
+            ).Value;
+            return database.ExecuteReader(query, (parameters, phase) =>
             {
                 switch (phase)
                 {
                     case DatabaseParameterPhase.Fetch:
                         parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
-                        if (metaDataItemType.HasValue)
-                        {
-                            parameters["type"] = metaDataItemType.Value;
-                        }
-                        else
-                        {
-                            parameters["type"] = null;
-                        }
-                        if (!string.IsNullOrEmpty(metaDataItemName))
-                        {
-                            parameters["name"] = metaDataItemName;
-                        }
-                        else
-                        {
-                            parameters["name"] = null;
-                        }
+                        parameters["name"] = name;
+                        parameters["type"] = type;
                         break;
                 }
             }, transaction);
         }
 
-        public MetaDataItem[] GetMetaDatas(IEnumerable<PlaylistItem> playlistItems, MetaDataItemType? metaDataItemType, string metaDataItemName)
+        public Task<MetaDataItem[]> GetMetaDatas(IEnumerable<PlaylistItem> playlistItems, string name, MetaDataItemType type, int limit)
         {
-            var key = new PlaylistMetaDataCacheKey(playlistItems.ToArray(), metaDataItemType, metaDataItemName, this.LibraryHierarchyBrowser.Filter);
-            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCore(playlistItems, metaDataItemType, metaDataItemName));
+            var key = new PlaylistMetaDataCacheKey(playlistItems.ToArray(), name, type, limit, this.LibraryHierarchyBrowser.Filter);
+            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCore(playlistItems, name, type, limit));
         }
 
-        public Task<MetaDataItem[]> GetMetaDatasAsync(IEnumerable<PlaylistItem> playlistItems, MetaDataItemType? metaDataItemType, string metaDataItemName)
-        {
-            var key = new PlaylistMetaDataCacheKey(playlistItems.ToArray(), metaDataItemType, metaDataItemName, this.LibraryHierarchyBrowser.Filter);
-            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCoreAsync(playlistItems, metaDataItemType, metaDataItemName));
-        }
-
-        private IEnumerable<MetaDataItem> GetMetaDatasCore(IEnumerable<PlaylistItem> playlistItems, MetaDataItemType? metaDataItemType, string metaDataItemName)
+        private async Task<IEnumerable<MetaDataItem>> GetMetaDatasCore(IEnumerable<PlaylistItem> playlistItems, string name, MetaDataItemType type, int limit)
         {
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    using (var reader = this.GetReader(database, playlistItems, metaDataItemType, metaDataItemName, transaction))
-                    {
-                        foreach (var record in reader)
-                        {
-                            yield return new MetaDataItem()
-                            {
-                                Name = metaDataItemName,
-                                Type = metaDataItemType.GetValueOrDefault(),
-                                Value = record.Get<string>("Value")
-                            };
-                        }
-                    }
-                }
-            }
-        }
-
-        private async Task<IEnumerable<MetaDataItem>> GetMetaDatasCoreAsync(IEnumerable<PlaylistItem> playlistItems, MetaDataItemType? metaDataItemType, string metaDataItemName)
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    using (var reader = this.GetReader(database, playlistItems, metaDataItemType, metaDataItemName, transaction))
+                    using (var reader = this.GetReader(database, playlistItems, name, type, limit, transaction))
                     {
                         using (var sequence = reader.GetAsyncEnumerator())
                         {
@@ -162,8 +108,8 @@ namespace FoxTunes
                             {
                                 result.Add(new MetaDataItem()
                                 {
-                                    Name = metaDataItemName,
-                                    Type = metaDataItemType.GetValueOrDefault(),
+                                    Name = name,
+                                    Type = type,
                                     Value = sequence.Current.Get<string>("Value")
                                 });
                             }
@@ -174,9 +120,9 @@ namespace FoxTunes
             }
         }
 
-        private IDatabaseReader GetReader(IDatabaseComponent database, IEnumerable<PlaylistItem> playlistItems, MetaDataItemType? metaDataItemType, string metaDataItemName, ITransactionSource transaction)
+        private IDatabaseReader GetReader(IDatabaseComponent database, IEnumerable<PlaylistItem> playlistItems, string name, MetaDataItemType type, int limit, ITransactionSource transaction)
         {
-            return database.ExecuteReader(database.Queries.GetPlaylistMetaData(playlistItems.Count()), (parameters, phase) =>
+            return database.ExecuteReader(database.Queries.GetPlaylistMetaData(playlistItems.Count(), limit), (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -187,22 +133,8 @@ namespace FoxTunes
                             parameters["playlistItemId" + position] = playlistItem.Id;
                             position++;
                         }
-                        if (metaDataItemType.HasValue)
-                        {
-                            parameters["type"] = metaDataItemType.Value;
-                        }
-                        else
-                        {
-                            parameters["type"] = null;
-                        }
-                        if (!string.IsNullOrEmpty(metaDataItemName))
-                        {
-                            parameters["name"] = metaDataItemName;
-                        }
-                        else
-                        {
-                            parameters["name"] = null;
-                        }
+                        parameters["name"] = name;
+                        parameters["type"] = type;
                         break;
                 }
             }, transaction);
