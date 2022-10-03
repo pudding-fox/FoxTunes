@@ -16,7 +16,7 @@ x86
 "
 
 TARGET="
-net462
+net48
 "
 
 if [ -z "$1" ]

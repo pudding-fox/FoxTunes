@@ -25,6 +25,8 @@ namespace FoxTunes
 
         const string NET462 = "net462";
 
+        const string NET48 = "net48";
+
         const string LIB = "lib";
 
         const string L10N_FR = "fr";
@@ -47,6 +49,8 @@ namespace FoxTunes
             CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
             CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
             CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
+            CreateRelease(version, ReleaseFlags.FrameworkNET48 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
+            CreateRelease(version, ReleaseFlags.FrameworkNET48 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
         }
 
         private static void CreateRelease(string version, ReleaseFlags flags)
@@ -107,13 +111,17 @@ namespace FoxTunes
         private static void AddPackageElement(string target, Package package, PackageElement element, ReleaseFlags flags)
         {
             //Filter by framework.
-            if (element.Flags.HasFlag(PackageElementFlags.FrameworkNET40) || element.Flags.HasFlag(PackageElementFlags.FrameworkNET462))
+            if (element.Flags.HasFlag(PackageElementFlags.FrameworkNET40) || element.Flags.HasFlag(PackageElementFlags.FrameworkNET462) || element.Flags.HasFlag(PackageElementFlags.FrameworkNET48))
             {
                 if (flags.HasFlag(ReleaseFlags.FrameworkNET40) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET40))
                 {
                     return;
                 }
                 if (flags.HasFlag(ReleaseFlags.FrameworkNET462) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET462))
+                {
+                    return;
+                }
+                if (flags.HasFlag(ReleaseFlags.FrameworkNET48) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET48))
                 {
                     return;
                 }
@@ -242,6 +250,10 @@ namespace FoxTunes
             {
                 parts.Add(NET462);
             }
+            if (flags.HasFlag(ReleaseFlags.FrameworkNET48))
+            {
+                parts.Add(NET48);
+            }
             return Path.Combine(parts.ToArray());
         }
 
@@ -294,6 +306,10 @@ namespace FoxTunes
             if (flags.HasFlag(ReleaseFlags.FrameworkNET462))
             {
                 parts.Add(NET462);
+            }
+            if (flags.HasFlag(ReleaseFlags.FrameworkNET48))
+            {
+                parts.Add(NET48);
             }
             return Path.Combine(parts.ToArray());
         }
@@ -739,7 +755,7 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.Core.Windows.dll",
-                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET462)
+                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET462 | PackageElementFlags.FrameworkNET48)
                     },
                     PackageFlags.Default
                 ),
@@ -761,9 +777,10 @@ namespace FoxTunes
             None = 0,
             FrameworkNET40 = 1,
             FrameworkNET462 = 2,
-            PlatformX86 = 4,
-            PlatformX64 = 8,
-            L10N_FR = 16
+            FrameworkNET48 = 4,
+            PlatformX86 = 8,
+            PlatformX64 = 16,
+            L10N_FR = 32
         }
 
         public class Package
@@ -826,10 +843,11 @@ namespace FoxTunes
             None = 0,
             FrameworkNET40 = 1,
             FrameworkNET462 = 2,
-            PlatformX86 = 4,
-            PlatformX64 = 8,
-            LargeAddressAware = 16,
-            Flatten = 32
+            FrameworkNET48 = 4,
+            PlatformX86 = 8,
+            PlatformX64 = 16,
+            LargeAddressAware = 32,
+            Flatten = 64
         }
     }
 }
