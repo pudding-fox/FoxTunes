@@ -4,6 +4,14 @@ namespace FoxTunes
 {
     public class JSCoreScripts : BaseComponent, ICoreScripts
     {
+        public string Utils
+        {
+            get
+            {
+                return Resources.Utils;
+            }
+        }
+
         public string Artist
         {
             get

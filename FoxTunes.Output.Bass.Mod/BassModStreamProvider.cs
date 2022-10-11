@@ -111,9 +111,9 @@ namespace FoxTunes
 
         public BassModStreamProvider()
         {
-            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", BassLoader.DIRECTORY_NAME_ADDON));
             //basszxtune.dll does not register all possible extensions.
-            BassPluginLoader.AddExtensions(EXTENSIONS);
+            BassLoader.AddExtensions(EXTENSIONS);
         }
 
         public override bool CanCreateStream(PlaylistItem playlistItem)

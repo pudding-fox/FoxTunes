@@ -46,6 +46,21 @@ namespace FoxTunes
                             Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);
                             return false;
                         }
+                        if (dependency.Architecture != ProcessorArchitecture.None)
+                        {
+                            var is64BitProcess = Environment.Is64BitProcess;
+                            var is34BitProcess = !is64BitProcess;
+                            if (dependency.Architecture == ProcessorArchitecture.X86 && is64BitProcess)
+                            {
+                                Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Requires platform X86.", type.FullName);
+                                return false;
+                            }
+                            if (dependency.Architecture == ProcessorArchitecture.X64 && !is34BitProcess)
+                            {
+                                Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Requires platform X64.", type.FullName);
+                                return false;
+                            }
+                        }
                     }
                 }
             }

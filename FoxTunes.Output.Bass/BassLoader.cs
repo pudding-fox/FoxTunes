@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassPluginLoader : StandardComponent, IBassPluginLoader
+    public class BassLoader : StandardComponent, IBassLoader
     {
         public const string DIRECTORY_NAME_ADDON = "Addon";
 
@@ -19,7 +19,7 @@ namespace FoxTunes
         {
             get
             {
-                return Path.GetDirectoryName(typeof(BassPluginLoader).Assembly.Location);
+                return Path.GetDirectoryName(typeof(BassLoader).Assembly.Location);
             }
         }
 
@@ -30,7 +30,7 @@ namespace FoxTunes
 
         public static readonly HashSet<string> PATHS = new HashSet<string>(new[]
         {
-            Path.Combine(Location, "Addon")
+            Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "Addon")
         }, StringComparer.OrdinalIgnoreCase);
 
         public static object SyncRoot = new object();
@@ -61,13 +61,16 @@ namespace FoxTunes
             return false;
         }
 
-        static BassPluginLoader()
+        static BassLoader()
         {
+            Loader.Load("bass.dll");
+            Loader.Load("bass_fx.dll");
+            Loader.Load("bassmix.dll");
             FxVersion = BassFx.Version;
             MixVersion = BassMix.Version;
         }
 
-        public BassPluginLoader()
+        public BassLoader()
         {
             this._Extensions = new Lazy<IEnumerable<string>>(() =>
             {
@@ -207,11 +210,11 @@ namespace FoxTunes
             var handle = Bass.PluginLoad(fileName);
             if (handle == 0)
             {
-                Logger.Write(typeof(BassPluginLoader), LogLevel.Warn, "Failed to load plugin: {0}", fileName);
+                Logger.Write(this, LogLevel.Warn, "Failed to load plugin: {0}", fileName);
                 return false;
             }
             var info = Bass.PluginGetInfo(handle);
-            Logger.Write(typeof(BassPluginLoader), LogLevel.Debug, "Plugin loaded \"{0}\": {1}", fileName, info.Version);
+            Logger.Write(this, LogLevel.Debug, "Plugin loaded \"{0}\": {1}", fileName, info.Version);
             this.Plugins.Add(new BassPlugin(
                 fileName,
                 info,
@@ -227,6 +230,9 @@ namespace FoxTunes
                 Bass.PluginFree(plugin.Handle);
             }
             this.Plugins.Clear();
+            Loader.Free("bassmix.dll");
+            Loader.Free("bass_fx.dll");
+            Loader.Free("bass.dll");
             this.IsLoaded = false;
         }
 
@@ -253,7 +259,7 @@ namespace FoxTunes
             this.Unload();
         }
 
-        ~BassPluginLoader()
+        ~BassLoader()
         {
             Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try

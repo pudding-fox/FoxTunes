@@ -70,7 +70,7 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public IBassPluginLoader PluginLoader { get; private set; }
+        public IBassLoader Loader { get; private set; }
 
         public IBassStreamFactory StreamFactory { get; private set; }
 
@@ -337,7 +337,7 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.RESAMPLE_QUALITY_ELEMENT
             ).ConnectValue(value => this.ResamplingQuality = value);
-            this.PluginLoader = ComponentRegistry.Instance.GetComponent<IBassPluginLoader>();
+            this.Loader = ComponentRegistry.Instance.GetComponent<IBassLoader>();
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             this.PipelineManager.Created += this.OnPipelineManagerCreated;
@@ -354,14 +354,14 @@ namespace FoxTunes
         {
             get
             {
-                return this.PluginLoader.Extensions;
+                return this.Loader.Extensions;
             }
         }
 
         public override bool IsSupported(string fileName)
         {
             var extension = fileName.GetExtension();
-            return this.PluginLoader.IsSupported(extension);
+            return this.Loader.IsSupported(extension);
         }
 
         public override bool IsLoaded(string fileName)

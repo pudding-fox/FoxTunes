@@ -1,11 +1,11 @@
-﻿#if X64
-using FoxTunes.Interfaces;
-using V8.Net;
+﻿using FoxTunes.Interfaces;
+using Noesis.Javascript;
 
 namespace FoxTunes
 {
-    [Component("8D4693E0-6416-4B33-9DE7-89116D15F5EA", ComponentSlots.ScriptingRuntime)]
-    [PlatformDependency(Major = 6, Minor = 1)]
+    [Component("8D4693E0-6416-4B33-9DE7-89116D15F5EA", ComponentSlots.ScriptingRuntime, @default: true)]
+    //TODO: This component (Noesis.Javascript) was unstable on amd64 platforms.
+    [PlatformDependency(Architecture = ProcessorArchitecture.X86)]
     public class JSScriptingRuntime : ScriptingRuntime
     {
         public ICore Core { get; private set; }
@@ -27,10 +27,9 @@ namespace FoxTunes
         public override IScriptingContext CreateContext()
         {
             Logger.Write(this, LogLevel.Debug, "Creating javascript scripting context.");
-            var context = new JSScriptingContext(new V8Engine());
+            var context = new JSScriptingContext(new JavascriptContext());
             context.InitializeComponent(this.Core);
             return context;
         }
     }
 }
-#endif

@@ -4,11 +4,11 @@
     <TargetFrameworks>net40;net462;net48</TargetFrameworks>
 	<RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
     <AssemblyName>FoxTunes.Launcher</AssemblyName>
-    <OutputPath>..\distribution\$(Platform)\</OutputPath>
+    <OutputPath>..\distribution\</OutputPath>
     <ApplicationIcon>Fox.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>
     <StartupObject />
-    <Platforms>x86;x64</Platforms>
+    <Platforms>AnyCPU</Platforms>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.4.0.0</AssemblyVersion>

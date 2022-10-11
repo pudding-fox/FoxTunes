@@ -17,10 +17,6 @@ namespace FoxTunes
 
         const string PLUGINS = "plugins";
 
-        const string X86 = "x86";
-
-        const string X64 = "x64";
-
         const string NET40 = "net40";
 
         const string NET462 = "net462";
@@ -45,12 +41,9 @@ namespace FoxTunes
                 version = string.Format("{0}-{1}", DateTime.UtcNow.ToString("ddmmyyyy"), NIGHTLY);
             }
             Console.WriteLine("Version: {0}", version);
-            CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET48 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET48 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
+            CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.L10N_FR);
+            CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.L10N_FR);
+            CreateRelease(version, ReleaseFlags.FrameworkNET48 | ReleaseFlags.L10N_FR);
         }
 
         private static void CreateRelease(string version, ReleaseFlags flags)
@@ -84,7 +77,7 @@ namespace FoxTunes
 
             foreach (var plugin in Plugins)
             {
-                Console.WriteLine("Installing plugins: {0}", plugin.Name);
+                Console.WriteLine("Installing plugin: {0}", plugin.Name);
 
                 if (plugin.Flags.HasFlag(PackageFlags.Default))
                 {
@@ -127,28 +120,10 @@ namespace FoxTunes
                 }
             }
 
-            //Filter by platform.
-            if (element.Flags.HasFlag(PackageElementFlags.PlatformX86) || element.Flags.HasFlag(PackageElementFlags.PlatformX64))
-            {
-                if (flags.HasFlag(ReleaseFlags.PlatformX86) && !element.Flags.HasFlag(PackageElementFlags.PlatformX86))
-                {
-                    return;
-                }
-                if (flags.HasFlag(ReleaseFlags.PlatformX64) && !element.Flags.HasFlag(PackageElementFlags.PlatformX64))
-                {
-                    return;
-                }
-            }
-
             var source = GetSource(target, package, element, flags);
             var destination = GetDestination(target, package, element, flags);
 
             CopyFile(source, destination, flags);
-
-            if (element.Flags.HasFlag(PackageElementFlags.LargeAddressAware))
-            {
-                MakeLargeAddressAware(destination, flags);
-            }
         }
 
         private static void CopyFile(string source, string destination, ReleaseFlags flags)
@@ -199,34 +174,6 @@ namespace FoxTunes
             }
         }
 
-        private static void MakeLargeAddressAware(string fileName, ReleaseFlags flags)
-        {
-            var tool = default(string);
-            if (flags.HasFlag(ReleaseFlags.PlatformX86))
-            {
-                tool = @"..\.tools\x86\editbin.exe";
-            }
-            else if (flags.HasFlag(ReleaseFlags.PlatformX64))
-            {
-                tool = @"..\.tools\x64\editbin.exe";
-            }
-            else
-            {
-                return;
-            }
-            var arguments = string.Format("/largeaddressaware \"{0}\"", fileName);
-            Console.WriteLine("Running tool: {0} {1}", tool, arguments);
-            var info = new ProcessStartInfo(tool, arguments)
-            {
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-            Process.Start(info).WaitForExit();
-        }
-
         private static string GetSource(string target, ReleaseFlags flags)
         {
             var parts = new List<string>()
@@ -234,14 +181,6 @@ namespace FoxTunes
                 "..",
                 DISTRIBUTION
             };
-            if (flags.HasFlag(ReleaseFlags.PlatformX86))
-            {
-                parts.Add(X86);
-            }
-            if (flags.HasFlag(ReleaseFlags.PlatformX64))
-            {
-                parts.Add(X64);
-            }
             if (flags.HasFlag(ReleaseFlags.FrameworkNET40))
             {
                 parts.Add(NET40);
@@ -275,9 +214,6 @@ namespace FoxTunes
             if (!string.IsNullOrEmpty(element.FolderName))
             {
                 parts.Add(element.FolderName);
-            }
-            if (element.Flags.HasFlag(PackageElementFlags.Flatten))
-            {
                 parts.Add(Path.GetFileName(element.FileName));
             }
             else
@@ -291,14 +227,6 @@ namespace FoxTunes
         private static string GetTarget(ReleaseFlags flags)
         {
             var parts = new List<string>();
-            if (flags.HasFlag(ReleaseFlags.PlatformX86))
-            {
-                parts.Add(X86);
-            }
-            if (flags.HasFlag(ReleaseFlags.PlatformX64))
-            {
-                parts.Add(X64);
-            }
             if (flags.HasFlag(ReleaseFlags.FrameworkNET40))
             {
                 parts.Add(NET40);
@@ -318,7 +246,7 @@ namespace FoxTunes
         {
             return new Package(new PackageElement[]
             {
-                new PackageElement("FoxTunes.Launcher.exe", PackageElementFlags.LargeAddressAware),
+                "FoxTunes.Launcher.exe",
                 "FoxTunes.Launcher.exe.config"
             });
         }
@@ -335,6 +263,7 @@ namespace FoxTunes
                 "FoxTunes.MetaData.dll",
                 "FoxTunes.Output.dll",
                 "FoxTunes.Scripting.dll",
+                "FoxTunes.Scripting.JS.dll",
                 "FoxTunes.UI.dll",
                 new PackageElement("Microsoft.Threading.Tasks.Extensions.Desktop.dll", PackageElementFlags.FrameworkNET40),
                 new PackageElement("Microsoft.Threading.Tasks.Extensions.dll", PackageElementFlags.FrameworkNET40),
@@ -357,8 +286,8 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Archive.dll",
                         "ManagedBass.ZipStream.dll",
-                        new PackageElement("x86/bass_zipstream.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_zipstream.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_zipstream.dll", "x86/addon"),
+                        new PackageElement("x64/bass_zipstream.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -366,8 +295,10 @@ namespace FoxTunes
                     "asio",
                     new PackageElement[]
                     {
-                        "bass_asio_handler.dll",
-                        "bassasio.dll",
+                        "x86/bass_asio_handler.dll",
+                        "x86/bassasio.dll",
+                        "x64/bass_asio_handler.dll",
+                        "x64/bassasio.dll",
                         "FoxTunes.Output.Bass.Asio.dll",
                         "ManagedBass.Asio.dll"
                     },
@@ -377,18 +308,30 @@ namespace FoxTunes
                     "bass",
                     new PackageElement[]
                     {
-                        "addon/bass_aac.dll",
-                        "addon/bass_ac3.dll",
-                        "addon/bass_ape.dll",
-                        "addon/bassalac.dll",
-                        "addon/bassflac.dll",
-                        "addon/bassmidi.dll",
-                        "addon/bassopus.dll",
-                        "addon/basswma.dll",
-                        "addon/basswv.dll",
-                        "bass.dll",
-                        "bass_fx.dll",
-                        "bassmix.dll",
+                        "x86/addon/bass_aac.dll",
+                        "x86/addon/bass_ac3.dll",
+                        "x86/addon/bass_ape.dll",
+                        "x86/addon/bassalac.dll",
+                        "x86/addon/bassflac.dll",
+                        "x86/addon/bassmidi.dll",
+                        "x86/addon/bassopus.dll",
+                        "x86/addon/basswma.dll",
+                        "x86/addon/basswv.dll",
+                        "x86/bass.dll",
+                        "x86/bass_fx.dll",
+                        "x86/bassmix.dll",
+                        "x64/addon/bass_aac.dll",
+                        "x64/addon/bass_ac3.dll",
+                        "x64/addon/bass_ape.dll",
+                        "x64/addon/bassalac.dll",
+                        "x64/addon/bassflac.dll",
+                        "x64/addon/bassmidi.dll",
+                        "x64/addon/bassopus.dll",
+                        "x64/addon/basswma.dll",
+                        "x64/addon/basswv.dll",
+                        "x64/bass.dll",
+                        "x64/bass_fx.dll",
+                        "x64/bassmix.dll",
                         "FoxTunes.Output.Bass.dll",
                         "ManagedBass.dll",
                         "ManagedBass.Fx.dll",
@@ -400,11 +343,12 @@ namespace FoxTunes
                     "cd",
                     new PackageElement[]
                     {
-                        "addon/basscd.dll",
+                        "x86/addon/basscd.dll",
+                        "x64/addon/basscd.dll",
                         "FoxTunes.Output.Bass.Cd.dll",
                         "ManagedBass.Cd.dll",
-                        new PackageElement("x86/bass_gapless_cd.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_gapless_cd.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_gapless_cd.dll", "x86/addon"),
+                        new PackageElement("x64/bass_gapless_cd.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -422,8 +366,8 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Crossfade.dll",
                         "ManagedBass.Crossfade.dll",
-                        new PackageElement("x86/bass_crossfade.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_crossfade.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_crossfade.dll", "x86/addon"),
+                        new PackageElement("x64/bass_crossfade.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -433,8 +377,8 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Cue.dll",
                         "ManagedBass.Substream.dll",
-                        new PackageElement("x86/bass_substream.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_substream.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_substream.dll", "x86/addon"),
+                        new PackageElement("x64/bass_substream.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -458,11 +402,12 @@ namespace FoxTunes
                     "dsd",
                     new PackageElement[]
                     {
-                        "addon/bassdsd.dll",
+                        "x86/addon/bassdsd.dll",
+                        "x64/addon/bassdsd.dll",
                         "FoxTunes.Output.Bass.Dsd.dll",
                         "ManagedBass.Dsd.dll",
-                        new PackageElement("x86/bass_memory_dsd.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_memory_dsd.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_memory_dsd.dll", "x86/addon"),
+                        new PackageElement("x64/bass_memory_dsd.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -472,8 +417,8 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Dts.dll",
                         "ManagedBass.Dts.dll",
-                        new PackageElement("x86/bass_dts.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_dts.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_dts.dll", "x86/addon"),
+                        new PackageElement("x64/bass_dts.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -494,7 +439,7 @@ namespace FoxTunes
                         "encoders/wavpack_license.txt",
                         "sox/LICENSE.GPL.txt",
                         "sox/sox.exe",
-                        new PackageElement("FoxTunes.Encoder.Bass.exe", PackageElementFlags.LargeAddressAware),
+                        "FoxTunes.Encoder.Bass.exe",
                         "FoxTunes.Encoder.Bass.exe.config"
                     },
                     PackageFlags.Default
@@ -517,21 +462,32 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Gapless.dll",
                         "ManagedBass.Gapless.dll",
-                        new PackageElement("x86/bass_gapless.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_gapless.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_gapless.dll", "x86/addon"),
+                        new PackageElement("x64/bass_gapless.dll", "x64/addon")
                     },
                     PackageFlags.Default | PackageFlags.Minimal
                 ),
                 new Package(
-                    "js",
+                    "noesis",
                     new PackageElement[]
                     {
-                        "FoxTunes.Scripting.JS.dll",
-                        new PackageElement("msvcp100.dll", PackageElementFlags.PlatformX86),
-                        new PackageElement("msvcr100.dll", PackageElementFlags.PlatformX86),
-                        new PackageElement("Noesis.Javascript.dll", PackageElementFlags.PlatformX86),
-                        new PackageElement("V8.Net.dll", PackageElementFlags.PlatformX64),
-                        new PackageElement("V8_Net_Proxy_x64.dll", PackageElementFlags.PlatformX64)
+                        "FoxTunes.Scripting.JS.Noesis.dll",
+                        "Noesis.Javascript.dll",
+                        "x86/msvcp100.dll",
+                        "x86/msvcr100.dll",
+                        "x64/msvcp100.dll",
+                        "x64/msvcr100.dll"
+                    },
+                    PackageFlags.Default | PackageFlags.Minimal
+                ),
+                new Package(
+                    "v8net",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.Scripting.JS.V8Net.dll",
+                        "Noesis.Javascript.dll",
+                        "x86/V8_Net_Proxy_x86.dll",
+                        "x64/V8_Net_Proxy_x64.dll"
                     },
                     PackageFlags.Default | PackageFlags.Minimal
                 ),
@@ -573,8 +529,8 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Memory.dll",
                         "ManagedBass.Memory.dll",
-                        new PackageElement("x86/bass_memory.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_memory.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_memory.dll", "x86/addon"),
+                        new PackageElement("x64/bass_memory.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -620,7 +576,8 @@ namespace FoxTunes
                     "mod",
                     new PackageElement[]
                     {
-                        "addon/basszxtune.dll",
+                        "x86/addon/basszxtune.dll",
+                        "x64/addon/basszxtune.dll",
                         "FoxTunes.Output.Bass.Mod.dll"
                     }
                 ),
@@ -636,11 +593,11 @@ namespace FoxTunes
                     "replaygain",
                     new PackageElement[]
                     {
-                        new PackageElement("FoxTunes.Output.Bass.ReplayGain.exe", PackageElementFlags.LargeAddressAware),
+                        "FoxTunes.Output.Bass.ReplayGain.exe",
                         "FoxTunes.Output.Bass.ReplayGain.exe.config",
                         "ManagedBass.ReplayGain.dll",
-                        new PackageElement("x86/bass_replay_gain.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_replay_gain.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_replay_gain.dll", "x86/addon"),
+                        new PackageElement("x64/bass_replay_gain.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -664,8 +621,8 @@ namespace FoxTunes
                     {
                         "FoxTunes.Output.Bass.Resampler.dll",
                         "ManagedBass.Sox.dll",
-                        new PackageElement("x86/bass_sox.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
-                        new PackageElement("x64/bass_sox.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
+                        new PackageElement("x86/bass_sox.dll", "x86/addon"),
+                        new PackageElement("x64/bass_sox.dll", "x64/addon")
                     },
                     PackageFlags.Default
                 ),
@@ -683,8 +640,8 @@ namespace FoxTunes
                     {
                         "FoxDb.SQLite.dll",
                         "FoxTunes.DB.SQLite.dll",
-                        new PackageElement("x86/SQLite.Interop.dll", PackageElementFlags.PlatformX86),
-                        new PackageElement("x64/SQLite.Interop.dll", PackageElementFlags.PlatformX64),
+                        "x86/SQLite.Interop.dll",
+                        "x64/SQLite.Interop.dll",
                         "System.Data.SQLite.dll"
                     },
                     PackageFlags.Default | PackageFlags.Minimal
@@ -735,8 +692,10 @@ namespace FoxTunes
                     "wasapi",
                     new PackageElement[]
                     {
-                        "bass_wasapi_handler.dll",
-                        "basswasapi.dll",
+                        "x86/bass_wasapi_handler.dll",
+                        "x86/basswasapi.dll",
+                        "x64/bass_wasapi_handler.dll",
+                        "x64/basswasapi.dll",
                         "FoxTunes.Output.Bass.Wasapi.dll",
                         "ManagedBass.Wasapi.dll"
                     },
@@ -778,8 +737,6 @@ namespace FoxTunes
             FrameworkNET40 = 1,
             FrameworkNET462 = 2,
             FrameworkNET48 = 4,
-            PlatformX86 = 8,
-            PlatformX64 = 16,
             L10N_FR = 32
         }
 
@@ -843,11 +800,7 @@ namespace FoxTunes
             None = 0,
             FrameworkNET40 = 1,
             FrameworkNET462 = 2,
-            FrameworkNET48 = 4,
-            PlatformX86 = 8,
-            PlatformX64 = 16,
-            LargeAddressAware = 32,
-            Flatten = 64
+            FrameworkNET48 = 4
         }
     }
 }

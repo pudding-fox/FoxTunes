@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>net40;net462;net48</TargetFrameworks>
     <AssemblyName>FoxTunes.MetaData.TagLib.Tests</AssemblyName>
-    <OutputPath>..\distribution\$(Platform)\</OutputPath>
+    <OutputPath>..\distribution\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <Configurations>Debug;Release</Configurations>
-    <Platforms>x86;x64</Platforms>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

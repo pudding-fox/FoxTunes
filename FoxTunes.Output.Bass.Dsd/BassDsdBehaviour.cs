@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass.Dsd;
 using ManagedBass.Memory;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -25,10 +26,10 @@ namespace FoxTunes
 
         public BassDsdBehaviour()
         {
-            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
-            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_memory_dsd.dll"));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", BassLoader.DIRECTORY_NAME_ADDON));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bass_memory_dsd.dll"));
             //bassdsd.dll does not register all possible extensions.
-            BassPluginLoader.AddExtensions(EXTENSIONS);
+            BassLoader.AddExtensions(EXTENSIONS);
         }
 
         public ICore Core { get; private set; }

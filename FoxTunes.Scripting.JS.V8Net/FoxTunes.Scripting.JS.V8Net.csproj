@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net40;net462;net48</TargetFrameworks>
-		<AssemblyName>FoxTunes.Output.Bass.Mod</AssemblyName>
+		<AssemblyName>FoxTunes.Scripting.JS.V8Net</AssemblyName>
 		<OutputPath>..\distribution\</OutputPath>
 		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
 		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
@@ -11,25 +11,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
-			<HintPath>..\lib\net40\ManagedBass.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'net48'">
-			<HintPath>..\lib\net462\ManagedBass.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\lib\x86\basszxtune.dll" Link="x86\Addon\basszxtune.dll">
+		<None Include="..\lib\x86\V8_Net_Proxy_x86.dll" Link="x86\V8_Net_Proxy_x86.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\lib\x64\basszxtune.dll" Link="x64\Addon\basszxtune.dll">
+		<None Include="..\lib\x64\V8_Net_Proxy_x64.dll" Link="x64\V8_Net_Proxy_x64.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
@@ -39,11 +27,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\FoxTunes.Output\FoxTunes.Output.csproj" />
+		<ProjectReference Include="..\FoxTunes.Scripting\FoxTunes.Scripting.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj" />
+		<ProjectReference Include="..\FoxTunes.Scripting.JS\FoxTunes.Scripting.JS.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="V8.Net">
+			<HintPath>../lib/net40/V8.Net.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>

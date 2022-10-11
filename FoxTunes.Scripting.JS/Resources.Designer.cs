@@ -247,9 +247,9 @@ namespace FoxTunes {
         ///        }
         ///        parts.pu [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string utils {
+        internal static string Utils {
             get {
-                return ResourceManager.GetString("utils", resourceCulture);
+                return ResourceManager.GetString("Utils", resourceCulture);
             }
         }
         
