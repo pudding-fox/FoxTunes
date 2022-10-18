@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public const string SEND_TO_DISC_LP4 = "FFFF";
 
+        public static readonly bool IsWindowsVista = Environment.OSVersion.Version.Major >= 6;
+
         public ICore Core { get; private set; }
 
         public MinidiscTrackFactory TrackFactory { get; private set; }
@@ -200,6 +202,18 @@ namespace FoxTunes
             if (!playlistItems.Any())
             {
                 return;
+            }
+            switch (compression)
+            {
+                case Compression.LP2:
+                case Compression.LP4:
+                    if (IsWindowsVista)
+                    {
+                        break;
+                    }
+                    //TODO: The atracdenc.exe program requires at least win 6.0 
+                    this.UserInterface.Warn(Strings.MinidiscBehaviour_UnsupportedCompression);
+                    return;
             }
             var tracks = await this.TrackFactory.GetTracks(playlistItems).ConfigureAwait(false);
             var task = await this.OpenDisc().ConfigureAwait(false);

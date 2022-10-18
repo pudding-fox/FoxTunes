@@ -196,6 +196,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compression is not supported on this platform, atracdenc.exe requires at least 6.0..
+        /// </summary>
+        internal static string MinidiscBehaviour_UnsupportedCompression {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.UnsupportedCompression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View Disc.
         /// </summary>
         internal static string MinidiscBehaviour_ViewDisc {

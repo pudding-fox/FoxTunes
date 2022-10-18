@@ -8,6 +8,8 @@ namespace FoxTunes
 {
     public class Resampler : BaseComponent, IDisposable
     {
+        public static readonly bool IsWindowsVista = Environment.OSVersion.Version.Major >= 6;
+
         public static string FileName
         {
             get

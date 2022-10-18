@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resampling is not supported on this platform, sox.exe requires at least 6.0.
+        /// </summary>
+        internal static string BassEncoder_UnsupportedResampling {
+            get {
+                return ResourceManager.GetString("BassEncoder.UnsupportedResampling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Convert.
         /// </summary>
         internal static string BassEncoderBehaviour_Convert {

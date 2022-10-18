@@ -203,6 +203,10 @@ namespace FoxTunes
 
         protected virtual void EncodeWithResampler(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
+            if (!Resampler.IsWindowsVista)
+            {
+                throw new InvalidOperationException(Strings.BassEncoder_UnsupportedResampling);
+            }
             using (var resampler = ResamplerFactory.Create(encoderItem, stream, settings))
             {
                 using (var encoderProcess = this.CreateEncoderProcess(encoderItem, stream, settings))
@@ -288,6 +292,10 @@ namespace FoxTunes
 
         protected virtual void EncodeWithResampler(EncoderItem encoderItem, IBassStream stream, IBassEncoderHandler settings)
         {
+            if (!Resampler.IsWindowsVista)
+            {
+                throw new InvalidOperationException(Strings.BassEncoder_UnsupportedResampling);
+            }
             using (var resampler = ResamplerFactory.Create(encoderItem, stream, settings))
             {
                 var channelReader = new ChannelReader(encoderItem, stream);
