@@ -25,6 +25,16 @@ namespace FoxTunes
             FileMetaDataStore.DataStoreDirectoryName
         };
 
+        public static HashSet<string> IgnoredNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "x86",
+            "x64",
+            //TODO: Translations should be better managed.
+            "fr",
+            //TODO: Coupling to some other random component?
+            "encoders"
+        };
+
         static FileSystemHelper()
         {
             Store = new Cache(CACHE_SIZE);
@@ -35,7 +45,7 @@ namespace FoxTunes
         public static IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOption)
         {
             if (searchOption.HasFlag(SearchOption.UseSystemCache))
-            {                        
+            {
                 //TODO: Warning: Buffering a potentially large sequence.
                 return Store.GetOrAdd(path, searchPattern, searchOption, () => EnumerateFilesCore(path, searchPattern, searchOption).ToArray());
             }
@@ -56,7 +66,7 @@ namespace FoxTunes
                         var directoryNames = Directory.EnumerateDirectories(path, "*", global::System.IO.SearchOption.TopDirectoryOnly);
                         if (searchOption.HasFlag(SearchOption.UseSystemExclusions))
                         {
-                            directoryNames = directoryNames.Except(IgnoredDirectories, StringComparer.OrdinalIgnoreCase);
+                            directoryNames = WithSystemExclusions(directoryNames);
                         }
                         if (searchOption.HasFlag(SearchOption.Sort))
                         {
@@ -95,6 +105,22 @@ namespace FoxTunes
                     yield return fileName;
                 }
             }
+        }
+
+        private static IEnumerable<string> WithSystemExclusions(IEnumerable<string> directoryNames)
+        {
+            return directoryNames.Where(directoryName =>
+            {
+                if (IgnoredDirectories.Contains(directoryName, StringComparer.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                if (IgnoredNames.Contains(Path.GetFileName(directoryName), StringComparer.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                return true;
+            }).ToArray();
         }
 
         public static bool IsLocalPath(string fileName)
