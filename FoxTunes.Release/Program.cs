@@ -481,13 +481,17 @@ namespace FoxTunes
                     PackageFlags.Default | PackageFlags.Minimal
                 ),
                 new Package(
-                    "v8net",
+                    "clearscript",
                     new PackageElement[]
                     {
-                        "FoxTunes.Scripting.JS.V8Net.dll",
-                        "V8.Net.dll",
-                        "x86/V8_Net_Proxy_x86.dll",
-                        "x64/V8_Net_Proxy_x64.dll"
+                        "FoxTunes.Scripting.JS.ClearScript.dll",
+                        "ClearScript.Core.dll",
+                        "ClearScript.Windows.dll",
+                        "ClearScript.Windows.Core.dll",
+                        "ClearScript.V8.dll",
+                        "ClearScript.V8.ICUData.dll",
+                        "ClearScriptV8.win-x86.dll",
+                        "ClearScriptV8.win-x64.dll"
                     },
                     PackageFlags.Default | PackageFlags.Minimal
                 ),
