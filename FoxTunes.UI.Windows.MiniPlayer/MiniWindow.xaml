@@ -17,6 +17,9 @@
         <LocalViewModel:Mini x:Key="ViewModel"></LocalViewModel:Mini>
         <ViewModel:ThemeInfo x:Key="ThemeInfo"></ViewModel:ThemeInfo>
     </Window.Resources>
+    <Window.Topmost>
+        <Binding Path="Topmost.Value" Source="{StaticResource ViewModel}"/>
+    </Window.Topmost>
     <Border Margin="8" Padding="5" CornerRadius="{Binding CornerRadius, Mode=OneWay, Source={StaticResource ThemeInfo}}" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1">
         <Border.Style>
             <Style TargetType="{x:Type Border}">
@@ -32,9 +35,6 @@
             </Style>
         </Border.Style>
         <Grid>
-            <Grid.LayoutTransform>
-                <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" />
-            </Grid.LayoutTransform>
             <LocalWindows:Mini MouseDown="OnMouseDown"></LocalWindows:Mini>
             <Windows:Components></Windows:Components>
         </Grid>

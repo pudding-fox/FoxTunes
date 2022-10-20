@@ -134,8 +134,15 @@ namespace FoxTunes
                 //Already on top.
                 return;
             }
-            this.Window.Topmost = true;
-            this.Window.Topmost = false;
+            if (!this.Window.HasBinding(global::System.Windows.Window.TopmostProperty))
+            {
+                this.Window.Topmost = true;
+                this.Window.Topmost = false;
+            }
+            else
+            {
+                //TODO: Can't use topmost hack to bring window to front, property is data bound.
+            }
         }
 
         public void SetCursor(ResizeDirection direction)

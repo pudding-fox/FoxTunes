@@ -43,6 +43,6 @@
         </Style>
     </Windows:ContextMenuExtensions.ItemContainerStyle>
     <ContextMenu.LayoutTransform>
-        <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+        <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" />
     </ContextMenu.LayoutTransform>
 </ContextMenu>
