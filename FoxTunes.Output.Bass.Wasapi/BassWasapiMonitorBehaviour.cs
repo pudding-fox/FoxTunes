@@ -9,13 +9,13 @@
 
         }
 
-        protected override bool RestartRequired(DataFlow? flow, Role? role)
+        protected override bool RestartRequired(DataFlow? flow, Role? role, string device)
         {
             if (!BassWasapiDevice.IsDefaultDevice)
             {
                 return false;
             }
-            return base.RestartRequired(flow, role);
+            return base.RestartRequired(flow, role, device);
         }
     }
 }
