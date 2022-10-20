@@ -53,6 +53,8 @@ namespace FoxTunes
             }
         }
 
+        public Window Window { get; private set; }
+
         public INotifyIcon NotifyIcon { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -200,13 +202,16 @@ namespace FoxTunes
 
         protected virtual void OnMouseLeftButtonUp(object sender, EventArgs e)
         {
-            var window = Windows.ActiveWindow;
+            var window = this.Window ?? Windows.ActiveWindow;
             if (window == null)
             {
+                Logger.Write(this, LogLevel.Warn, "No window to restore.");
                 return;
             }
+            this.Window = null;
             var task = Windows.Invoke(() =>
             {
+                Logger.Write(this, LogLevel.Debug, "Restoring window: {0}/{1}", window.GetType().Name, window.Title);
                 window.Show();
                 if (window.WindowState == WindowState.Minimized)
                 {
@@ -258,9 +263,12 @@ namespace FoxTunes
                     {
                         Logger.Write(this, LogLevel.Debug, "MinimizeToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
                         window.Hide();
+                        this.Window = window;
+                        return;
                     }
                 }
             }
+            this.Window = null;
         }
 
         protected virtual void OnClosing(object sender, CancelEventArgs e)
@@ -272,8 +280,11 @@ namespace FoxTunes
                     e.Cancel = true;
                     Logger.Write(this, LogLevel.Debug, "CloseToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
                     window.Hide();
+                    this.Window = window;
+                    return;
                 }
             }
+            this.Window = null;
         }
 
         public IEnumerable<IInvocationComponent> Invocations
