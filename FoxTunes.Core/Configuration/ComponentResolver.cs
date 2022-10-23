@@ -60,6 +60,7 @@ namespace FoxTunes
         {
             if (!Publication.IsPortable)
             {
+                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Cannot add component resolution, requires portable release.");
                 return;
             }
             foreach (var component in components)
@@ -80,6 +81,7 @@ namespace FoxTunes
                     name = component.FullName;
                 }
                 var @default = component == defaultComponent;
+                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Checking component resolution for slot {0}", slot);
                 this.Add(slot, id, name, @default);
             }
         }
@@ -100,19 +102,23 @@ namespace FoxTunes
             }
             if (appSettings.ToString().Contains(id, true))
             {
+                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component resolution already exists, nothing to do.");
                 return;
             }
             if (@default)
             {
                 appSettings.Add(new XComment(string.Format("Comment out the next element to not use component {0}.", name)));
                 appSettings.Add(new XElement("add", new XAttribute("key", slot), new XAttribute("value", id)));
+                Logger.Write(typeof(ComponentResolver), LogLevel.Info, "Component resolution for slot {0}, component {1}, state=active was added to the config file.", slot, id);
             }
             else
             {
                 appSettings.Add(new XComment(string.Format("Uncomment the next element to use component {0}.", name)));
                 appSettings.Add(new XComment(new XElement("add", new XAttribute("key", slot), new XAttribute("value", id)).ToString()));
+                Logger.Write(typeof(ComponentResolver), LogLevel.Info, "Component resolution for slot {0}, component {1}, state=comment was added to the config file.", slot, id);
             }
             document.Save(FILE_NAME);
+            Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "The config file was updated.");
         }
 
         public static readonly IComponentResolver Instance = new ComponentResolver();
