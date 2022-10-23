@@ -58,7 +58,7 @@ namespace FoxTunes
                     this.GetTitle(scriptingContext, fileNames.Keys),
                     fileNames.Select(
                         pair => new MinidiscTrack(pair.Key, pair.Value, this.GetName(scriptingContext, pair.Key))
-                    ).OrderBy(track => track.TrackName)
+                    ).OrderBy(track => track.TrackName).ToArray()
                 );
             }
         }
