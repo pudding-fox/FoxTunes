@@ -23,8 +23,6 @@ namespace FoxTunes
 
         public Debouncer Debouncer { get; private set; }
 
-       
-
         public IEnumerable<string> AvailableProfiles
         {
             get
