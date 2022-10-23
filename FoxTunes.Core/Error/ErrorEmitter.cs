@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ErrorEmitter : StandardComponent, IErrorEmitter
     {
         public Task Send(IBaseComponent source, string message)
