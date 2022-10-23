@@ -35,6 +35,10 @@ namespace FoxTunes
         {
             foreach (var component in components)
             {
+                if (component == null)
+                {
+                    continue;
+                }
                 this.AddComponent(component);
             }
         }

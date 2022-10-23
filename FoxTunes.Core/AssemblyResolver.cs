@@ -12,6 +12,14 @@ namespace FoxTunes
             FileSystemHelper.SearchOption.UseSystemCache |
             FileSystemHelper.SearchOption.UseSystemExclusions;
 
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
+            }
+        }
+
         private AssemblyResolver()
         {
 
@@ -40,7 +48,7 @@ namespace FoxTunes
         protected virtual Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
         {
             var fileName = default(string);
-            if (this.TryResolve(ComponentScanner.Instance.Location, args.Name, false, out fileName))
+            if (this.TryResolve(Location, args.Name, false, out fileName))
             {
                 return Assembly.LoadFrom(fileName);
             }
@@ -62,7 +70,7 @@ namespace FoxTunes
             //TODO: If the resolve fails for some reason a standard Assembly.Load will be attempted.
             //TODO: As we're trying to do a reflection only load this is obviously wrong.
             //TODO: It happens that the only libs that fall into this trap are framework assemblies so it's OK for now.
-            if (this.TryResolve(ComponentScanner.Instance.Location, args.Name, true, out fileName))
+            if (this.TryResolve(Location, args.Name, true, out fileName))
             {
                 var assembly = AssemblyRegistry.Instance.GetOrLoadReflectionAssembly(fileName);
                 //Load immidiate references.

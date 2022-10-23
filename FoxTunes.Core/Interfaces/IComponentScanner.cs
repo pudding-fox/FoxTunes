@@ -5,10 +5,9 @@ namespace FoxTunes.Interfaces
 {
     public interface IComponentScanner : IBaseComponent
     {
-        string Location { get; }
+        IEnumerable<Type> GetStandardComponents();
 
-        IEnumerable<string> FileNames { get; }
-
+        [Obsolete("This method has no caching, use it sparingly.")]
         IEnumerable<Type> GetComponents(Type interfaceType);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -39,6 +41,11 @@ namespace FoxTunes
                 Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Component {0} is not of the expected type {1}.", type.Name, typeof(T).Name);
                 return default(T);
             }
+        }
+
+        public IEnumerable<IBaseComponent> Activate(IEnumerable<Type> components)
+        {
+            return components.Select(this.Activate<IBaseComponent>);
         }
 
         public static readonly IComponentActivator Instance = new ComponentActivator();

@@ -14,18 +14,18 @@ namespace FoxTunes
         public ComponentPreferenceAttribute()
         {
             this.Priority = LOW;
-            this.ReleaseType = ReleaseType.Default;
+            this.ReleaseType = ReleaseType.None;
         }
 
         public ComponentPreferenceAttribute(byte priority)
         {
             this.Priority = priority;
-            this.ReleaseType = ReleaseType.Default;
+            this.ReleaseType = ReleaseType.None;
         }
 
         public ComponentPreferenceAttribute(ReleaseType releaseType)
         {
-            this.Priority = LOW;
+            this.Priority = NORMAL;
             this.ReleaseType = releaseType;
         }
 

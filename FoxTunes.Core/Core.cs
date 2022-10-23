@@ -66,9 +66,6 @@ namespace FoxTunes
             try
             {
                 this.LoadComponents();
-                this.LoadFactories();
-                this.LoadManagers();
-                this.LoadBehaviours();
                 ComponentRegistry.Instance.AddComponents(components);
                 this.LoadConfiguration();
             }
@@ -94,22 +91,7 @@ namespace FoxTunes
 
         protected virtual void LoadComponents()
         {
-            ComponentRegistry.Instance.AddComponents(ComponentLoader.Instance.Load(this));
-        }
-
-        protected virtual void LoadManagers()
-        {
-            ComponentRegistry.Instance.AddComponents(ManagerLoader.Instance.Load(this));
-        }
-
-        protected virtual void LoadFactories()
-        {
-            ComponentRegistry.Instance.AddComponents(FactoryLoader.Instance.Load(this));
-        }
-
-        protected virtual void LoadBehaviours()
-        {
-            ComponentRegistry.Instance.AddComponents(BehaviourLoader.Instance.Load(this));
+            ComponentRegistry.Instance.AddComponents(ComponentActivator.Instance.Activate(ComponentScanner.Instance.GetStandardComponents()));
         }
 
         protected virtual void LoadConfiguration()
