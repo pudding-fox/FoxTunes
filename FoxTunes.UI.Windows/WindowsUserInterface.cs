@@ -9,7 +9,9 @@ using System.Windows.Threading;
 
 namespace FoxTunes
 {
-    [Component(ID, ComponentSlots.UserInterface, priority: ComponentAttribute.PRIORITY_LOW, @default: true)]
+    [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
+    [Component(ID, ComponentSlots.UserInterface)]
     public class WindowsUserInterface : UserInterface, IConfigurableComponent, IDisposable
     {
         public const string ID = "B889313D-4F21-4794-8D16-C2FAE6A7B305";

@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Windows.Media;
 using Windows.Media.Playback;
 
@@ -49,9 +48,8 @@ namespace FoxTunes
         {
             if (IsPlatformSupported)
             {
-                var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
                 yield return new ConfigurationSection(SECTION, "Windows 10")
-                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "System Media Controls").WithValue(releaseType == ReleaseType.Default)
+                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "System Media Controls").WithValue(Publication.ReleaseType == ReleaseType.Default)
                 );
             }
         }

@@ -8,9 +8,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
-{    
+{
     //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
-    [Component("73C1DB7E-B4E8-495E-B358-92A859FBC787", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [WindowsUserInterfaceDependency]
     public class LibraryBrowserTileProvider : StandardComponent, IDisposable
     {

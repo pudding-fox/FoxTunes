@@ -65,7 +65,7 @@ namespace FoxTunes
             return result != null;
         }
 
-        [Component("EEB65782-C66C-46F8-9F58-BA0E5A16194F", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+        [ComponentPriority(ComponentPriorityAttribute.LOW)]
         [ComponentDependency(Slot = ComponentSlots.Database)]
         public class DefaultSortParserProvider : SortParserProvider
         {
@@ -88,7 +88,7 @@ namespace FoxTunes
         }
     }
 
-    [Component("A72D5D30-BD85-4FC8-A166-B9F93D65680F", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_NORMAL)]
+    [ComponentPriority(ComponentPriorityAttribute.NORMAL)]
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class NumericSortParserProvider : SortParserProvider
     {
@@ -121,7 +121,7 @@ namespace FoxTunes
         }
     }
 
-    [Component("55C94971-C5DE-44D8-B136-8F94C33A0F1D", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class BinarySortParserProvider : SortParserProvider
     {
@@ -172,7 +172,7 @@ namespace FoxTunes
         }
     }
 
-    [Component("E878EB41-D752-4818-A185-9CEC69980CDD", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class RandomSortParserProvider : SortParserProvider
     {

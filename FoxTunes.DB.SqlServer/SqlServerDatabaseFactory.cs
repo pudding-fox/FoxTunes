@@ -8,7 +8,8 @@ using System.Threading;
 
 namespace FoxTunes
 {
-    [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
+    [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database)]
     public class SqlServerDatabaseFactory : DatabaseFactory
     {
         public override DatabaseFactoryFlags Flags

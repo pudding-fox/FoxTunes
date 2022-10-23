@@ -6,9 +6,9 @@ using System.Windows;
 
 namespace FoxTunes
 {
-    [Component(ID, ComponentSlots.None)]
+    [Component(ID)]
     [WindowsUserInterfaceDependency]
-    [ComponentRelease(ReleaseType.Default)]
+    [ComponentPreference(ReleaseType.Default)]
     public class ExpressionDarkTheme : ThemeBase, IConfigurableComponent
     {
         public const string ID = "3E9EFE8C-5245-4F8B-97D1-EB47CC70E373";

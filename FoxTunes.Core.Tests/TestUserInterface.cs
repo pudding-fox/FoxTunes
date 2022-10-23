@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [Component(ID, ComponentSlots.UserInterface, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
+    [Component(ID, ComponentSlots.UserInterface)]
     public class TestUserInterface : StandardComponent, IUserInterface
     {
         public const string ID = "12A99332-F264-4D5E-824B-EA812B4DCB7A";

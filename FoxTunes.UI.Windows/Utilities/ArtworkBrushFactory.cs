@@ -10,7 +10,7 @@ using System.Windows.Media;
 namespace FoxTunes
 {
     //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
-    [Component("AA3CF53F-5358-4AD5-A3E5-0F19B1A1F8B5", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [WindowsUserInterfaceDependency]
     public class ArtworkBrushFactory : StandardFactory, IDisposable
     {

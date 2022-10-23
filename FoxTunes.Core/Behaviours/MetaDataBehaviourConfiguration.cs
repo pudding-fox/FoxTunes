@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -54,7 +53,6 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, Strings.MetaDataBehaviourConfiguration_Section)
                 .WithElement(
                     new BooleanConfigurationElement(READ_EMBEDDED_IMAGES, Strings.MetaDataBehaviourConfiguration_EmbeddedImages).WithValue(true))
@@ -75,30 +73,29 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, Strings.MetaDataBehaviourConfiguration_MusicBrainz, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_LYRICS_TAGS, Strings.MetaDataBehaviourConfiguration_Lyrics).WithValue(releaseType == ReleaseType.Default))
+                    new BooleanConfigurationElement(READ_LYRICS_TAGS, Strings.MetaDataBehaviourConfiguration_Lyrics).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_REPLAY_GAIN_TAGS, Strings.MetaDataBehaviourConfiguration_ReplayGain).WithValue(releaseType == ReleaseType.Default))
+                    new BooleanConfigurationElement(READ_REPLAY_GAIN_TAGS, Strings.MetaDataBehaviourConfiguration_ReplayGain).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(
-                    new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, Strings.MetaDataBehaviourConfiguration_Popularimeter).WithValue(releaseType == ReleaseType.Default))
+                    new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, Strings.MetaDataBehaviourConfiguration_Popularimeter).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(
                     new BooleanConfigurationElement(READ_DOCUMENTS, Strings.MetaDataBehaviourConfiguration_Documents).WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(DETECT_COMPILATIONS, Strings.MetaDataBehaviourConfiguration_DetectCompilations).WithValue(releaseType == ReleaseType.Default))
+                    new BooleanConfigurationElement(DETECT_COMPILATIONS, Strings.MetaDataBehaviourConfiguration_DetectCompilations).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(
                     new IntegerConfigurationElement(THREADS_ELEMENT, Strings.MetaDataBehaviourConfiguration_Threads, path: Strings.General_Advanced).WithValue(Math.Max(Environment.ProcessorCount, 4)).WithValidationRule(new IntegerValidationRule(1, 32)))
                 .WithElement(
                     new SelectionConfigurationElement(WRITE_ELEMENT, Strings.MetaDataBehaviourConfiguration_Write, path: Strings.General_Advanced).WithOptions(GetWriteBehaviourOptions()))
                 .WithElement(
-                    new BooleanConfigurationElement(BACKGROUND_WRITE_ELEMENT, Strings.MetaDataBehaviourConfiguration_WriteBackground, path: Strings.General_Advanced).WithValue(releaseType == ReleaseType.Default)
+                    new BooleanConfigurationElement(BACKGROUND_WRITE_ELEMENT, Strings.MetaDataBehaviourConfiguration_WriteBackground, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default)
             );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetImagesPreferenceOptions()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             {
                 var option = new SelectionConfigurationOption(IMAGES_PREFERENCE_EMBEDDED, Strings.MetaDataBehaviourConfiguration_EmbeddedImages);
-                if (releaseType == ReleaseType.Default)
+                if (Publication.ReleaseType == ReleaseType.Default)
                 {
                     option.Default();
                 }
@@ -106,7 +103,7 @@ namespace FoxTunes
             }
             {
                 var option = new SelectionConfigurationOption(IMAGES_PREFERENCE_LOOSE, Strings.MetaDataBehaviourConfiguration_LooseImages);
-                if (releaseType == ReleaseType.Minimal)
+                if (Publication.ReleaseType == ReleaseType.Minimal)
                 {
                     option.Default();
                 }

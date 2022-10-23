@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace FoxTunes
 {
-    [Component(ID, ComponentSlots.None)]
+    [Component(ID)]
     [WindowsUserInterfaceDependency]
     public class ChartLyricsProvider : LyricsProvider, IConfigurableComponent
     {

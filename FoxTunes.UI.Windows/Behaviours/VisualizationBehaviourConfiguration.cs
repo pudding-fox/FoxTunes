@@ -93,10 +93,9 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetQualityOptions()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             var high = new SelectionConfigurationOption(QUALITY_HIGH_OPTION, Strings.VisualizationBehaviourConfiguration_Quality_High);
             var low = new SelectionConfigurationOption(QUALITY_LOW_OPTION, Strings.VisualizationBehaviourConfiguration_Quality_Low);
-            if (releaseType == ReleaseType.Default)
+            if (Publication.ReleaseType == ReleaseType.Default)
             {
                 high.Default();
             }

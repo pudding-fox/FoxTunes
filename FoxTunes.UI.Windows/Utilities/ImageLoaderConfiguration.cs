@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -15,8 +14,7 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var cacheSize = default(int);
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
-            switch (releaseType)
+            switch (Publication.ReleaseType)
             {
                 case ReleaseType.Minimal:
                     cacheSize = 128;

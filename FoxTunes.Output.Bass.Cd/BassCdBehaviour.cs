@@ -2,7 +2,6 @@
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using ManagedBass.Cd;
-using ManagedBass.Gapless;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [Component("C051C82C-3391-4DDC-B856-C4BDEA86ADDC", null, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     public class BassCdBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";

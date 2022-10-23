@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [Component("5E1331EE-37F9-41BB-BD5E-82E9B4995B8A", null, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     //TODO: bass_zipstream.dll does not work on XP.
     //TODO: Unable to avoid linking to CxxFrameHandler3 which does not exist until a later version of msvcrt.dll
     [PlatformDependency(Major = 6, Minor = 0)]

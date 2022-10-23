@@ -9,7 +9,7 @@ using System.Windows.Media;
 namespace FoxTunes
 {
     //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
-    [Component("8080D985-D642-4189-901B-A84530A1F110", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [WindowsUserInterfaceDependency]
     public class LibraryBrowserTileBrushFactory : StandardFactory, IDisposable
     {

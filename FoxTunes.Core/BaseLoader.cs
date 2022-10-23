@@ -124,10 +124,10 @@ namespace FoxTunes
             {
                 return component =>
                 {
-                    var attribute = component.GetType().GetCustomAttribute<ComponentAttribute>();
+                    var attribute = component.GetType().GetCustomAttribute<ComponentPriorityAttribute>();
                     if (attribute == null)
                     {
-                        return ComponentAttribute.PRIORITY_NORMAL;
+                        return ComponentPriorityAttribute.NORMAL;
                     }
                     return attribute.Priority;
                 };

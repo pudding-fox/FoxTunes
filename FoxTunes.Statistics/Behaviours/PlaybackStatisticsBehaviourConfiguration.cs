@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -17,10 +16,9 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new BooleanConfigurationElement(ENABLED, Strings.PlaybackStatisticsBehaviourConfiguration_Enabled)
-                    .WithValue(releaseType == ReleaseType.Default))
+                    .WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(new SelectionConfigurationElement(TRIGGER, Strings.PlaybackStatisticsBehaviourConfiguration_Trigger)
                     .WithOptions(GetTriggerOptions())
                     .DependsOn(SECTION, ENABLED)
