@@ -65,10 +65,12 @@ namespace FoxTunes
             }
             catch (ReflectionTypeLoadException e)
             {
+                Logger.Write(typeof(ComponentScanner), LogLevel.Trace, "Error was handled while getting exported types for assembly {0}: {1}", fileName, e.Message);
                 return e.Types;
             }
-            catch
+            catch (Exception e)
             {
+                Logger.Write(typeof(ComponentScanner), LogLevel.Warn, "Failed to get exported types for assembly {0}: {1}", fileName, e.Message);
                 return Enumerable.Empty<Type>();
             }
         }
@@ -97,6 +99,7 @@ namespace FoxTunes
                     {
                         continue;
                     }
+                    Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Multiple components for slot {0} were found, adding resolutions.", pair.Key);
                     ComponentResolver.Instance.Add(pair.Key, pair.Value[0], pair.Value);
                 }
             }
@@ -170,6 +173,7 @@ namespace FoxTunes
                         var version = new Version(dependency.Major, dependency.Minor);
                         if (Environment.OSVersion.Version < version)
                         {
+                            Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);
                             return false;
                         }
                         if (dependency.Architecture != ProcessorArchitecture.None)
@@ -178,10 +182,12 @@ namespace FoxTunes
                             var is34BitProcess = !is64BitProcess;
                             if (dependency.Architecture == ProcessorArchitecture.X86 && is64BitProcess)
                             {
+                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform X86.", type.FullName);
                                 return false;
                             }
                             if (dependency.Architecture == ProcessorArchitecture.X64 && !is34BitProcess)
                             {
+                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform X64.", type.FullName);
                                 return false;
                             }
                         }
@@ -197,11 +203,28 @@ namespace FoxTunes
                 {
                     foreach (var dependency in dependencies)
                     {
-                        if (!string.IsNullOrEmpty(dependency.Slot))
+                        var id = ComponentResolver.Instance.Get(dependency.Slot);
+                        if (!string.IsNullOrEmpty(dependency.Slot) && !string.Equals(dependency.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
                         {
-                            var id = ComponentResolver.Instance.Get(dependency.Slot);
-                            if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
+                            if (string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
                             {
+                                //Slot is not configured.
+                            }
+                            else if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
+                            {
+                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Missing slot dependency \"{1}\".", type.FullName, dependency.Slot);
+                                return false;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(dependency.Id) && !string.Equals(dependency.Id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (string.Equals(id, dependency.Id, StringComparison.OrdinalIgnoreCase))
+                            {
+                                //Slot is configured and matches.
+                            }
+                            else
+                            {
+                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Missing component dependency \"{1}\".", type.FullName, dependency.Id);
                                 return false;
                             }
                         }
@@ -230,6 +253,7 @@ namespace FoxTunes
                 {
                     return true;
                 }
+                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Component {1} is configured for slot {1}.", type.FullName, id, component.Slot);
                 return false;
             }
 
@@ -252,6 +276,7 @@ namespace FoxTunes
                     {
                         return true;
                     }
+                    Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Slot {0} is already populated by component {1}, additional component {2} will not be loaded.", component.Slot, components[0].FullName, type.FullName);
                     return false;
                 };
             }
@@ -261,6 +286,9 @@ namespace FoxTunes
         {
             public static byte Type(Type type)
             {
+                //TODO: This is awful, basically all component loading goes through this ordering before any other sorting strategies (e.g priority)
+                //TODO: The load order is always: Components, Factories, Managers, Behaviours.
+                //TODO: I don't have the energy to fix it, removing this code causes issues with component inter-dependency during start up.
                 var interfaces = type.GetInterfaces().Select(
                     @interface => @interface.FullName
                 ).ToArray();
