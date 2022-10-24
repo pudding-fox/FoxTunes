@@ -373,5 +373,21 @@
                 return Strings.PlaylistManager_Cancel;
             }
         }
+
+        public static string PluginsDialog_Header
+        {
+            get
+            {
+                return Strings.PluginsDialog_Header;
+            }
+        }
+
+        public static string PluginsDialog_NotAvailable
+        {
+            get
+            {
+                return Strings.PluginsDialog_NotAvailable;
+            }
+        }
     }
 }

@@ -943,6 +943,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The plugin does not have a description..
+        /// </summary>
+        internal static string Plugins_NoDescription {
+            get {
+                return ResourceManager.GetString("Plugins.NoDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugins.
+        /// </summary>
+        internal static string PluginsDialog_Header {
+            get {
+                return ResourceManager.GetString("PluginsDialog.Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This feature requires is designed for the portable package..
+        /// </summary>
+        internal static string PluginsDialog_NotAvailable {
+            get {
+                return ResourceManager.GetString("PluginsDialog.NotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         internal static string ProfilesBehaviour_Delete {

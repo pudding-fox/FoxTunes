@@ -411,6 +411,15 @@
   <data name="PlaylistSortingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Sorting</value>
   </data>
+  <data name="Plugins.NoDescription" xml:space="preserve">
+    <value>The plugin does not have a description.</value>
+  </data>
+  <data name="PluginsDialog.Header" xml:space="preserve">
+    <value>Plugins</value>
+  </data>
+  <data name="PluginsDialog.NotAvailable" xml:space="preserve">
+    <value>This feature requires is designed for the portable package.</value>
+  </data>
   <data name="ProfilesBehaviour.Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
