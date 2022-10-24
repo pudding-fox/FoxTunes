@@ -414,6 +414,9 @@
   <data name="Plugins.NoDescription" xml:space="preserve">
     <value>The plugin does not have a description.</value>
   </data>
+  <data name="Plugins.RestartWarning" xml:space="preserve">
+    <value>Plugin selection was updated, restart the application to apply. If something goes wrong, delete the config file: {0}.</value>
+  </data>
   <data name="PluginsDialog.Header" xml:space="preserve">
     <value>Plugins</value>
   </data>
