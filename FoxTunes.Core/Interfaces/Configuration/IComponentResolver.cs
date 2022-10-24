@@ -10,7 +10,7 @@
 
         void Remove(string slot);
 
-        void Persist(string slot);
+        void AddConflict(string slot);
 
         void Save();
     }

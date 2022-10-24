@@ -92,6 +92,11 @@ namespace FoxTunes
                 Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Cannot save component slots.");
                 return;
             }
+            if (!this.Slots.Any(pair => pair.Value.Flags.HasFlag(ComponentSlotFlags.Modified | ComponentSlotFlags.HasConflicts)))
+            {
+                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component slots are unmodified or have no conflicts, nothing to save.");
+                return;
+            }
             Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Saving component slots from file: {0}", FileName);
             try
             {
@@ -123,7 +128,7 @@ namespace FoxTunes
 
         public void Add(string slot, string id)
         {
-            this.Slots[slot] = new ComponentSlot(id);
+            this.Slots[slot] = new ComponentSlot(id, ComponentSlotFlags.Modified);
         }
 
         public void Remove(string slot)
@@ -131,12 +136,12 @@ namespace FoxTunes
             this.Add(slot, ComponentSlots.None);
         }
 
-        public void Persist(string slot)
+        public void AddConflict(string slot)
         {
             var component = default(ComponentSlot);
             if (this.Slots.TryGetValue(slot, out component) && !string.Equals(component.Id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
             {
-                component.Persist = true;
+                component.Flags |= ComponentSlotFlags.HasConflicts;
             }
         }
 
@@ -149,11 +154,23 @@ namespace FoxTunes
                 this.Id = id;
             }
 
+            public ComponentSlot(string id, ComponentSlotFlags flags) : this(id)
+            {
+                this.Flags = flags;
+            }
+
             public string Id { get; private set; }
 
-            public bool Persist { get; set; }
+            public ComponentSlotFlags Flags { get; set; }
 
             public static readonly ComponentSlot None = new ComponentSlot(ComponentSlots.None);
+        }
+
+        public enum ComponentSlotFlags : byte
+        {
+            None,
+            Modified,
+            HasConflicts
         }
 
         public static class Serializer
@@ -205,7 +222,7 @@ namespace FoxTunes
                     writer.WriteStartElement(Publication.Product);
                     foreach (var pair in sequence)
                     {
-                        if (!pair.Value.Persist)
+                        if (!pair.Value.Flags.HasFlag(ComponentSlotFlags.HasConflicts))
                         {
                             continue;
                         }

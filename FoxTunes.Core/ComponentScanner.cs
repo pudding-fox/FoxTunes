@@ -182,7 +182,7 @@ namespace FoxTunes
                             else
                             {
                                 //We just handled an ambiguous slot, inform the resolver that it should save the resolution for next time.
-                                ComponentResolver.Instance.Persist(component.Slot);
+                                ComponentResolver.Instance.AddConflict(component.Slot);
                                 return false;
                             }
                         }
