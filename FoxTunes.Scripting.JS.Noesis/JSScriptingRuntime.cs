@@ -11,7 +11,9 @@ namespace FoxTunes
     {
         const string ID = "8D4693E0-6416-4B33-9DE7-89116D15F5EA";
 
-        public JSScriptingRuntime() : base(ID, Strings.JSScriptingRuntime_Name, Strings.JSScriptingRuntime_Description)
+        const string VERSION = "0.7.1";
+
+        public JSScriptingRuntime() : base(ID, string.Format(Strings.JSScriptingRuntime_Name, VERSION))
         {
         }
 

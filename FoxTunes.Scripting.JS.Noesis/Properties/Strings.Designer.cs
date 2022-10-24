@@ -61,16 +61,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to JavaScript support by Noesis.Javascript (V8)..
-        /// </summary>
-        internal static string JSScriptingRuntime_Description {
-            get {
-                return ResourceManager.GetString("JSScriptingRuntime.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Noesis.
+        ///   Looks up a localized string similar to Noesis.Javascript {0}.
         /// </summary>
         internal static string JSScriptingRuntime_Name {
             get {

@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Scripting.JS.ClearScript.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.DB.SQLite.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Microsoft.ClearScript {0}.
+        ///   Looks up a localized string similar to SQLite {0}.
         /// </summary>
-        internal static string JSScriptingRuntime_Name {
+        internal static string SQLiteDatabaseFactory_Name {
             get {
-                return ResourceManager.GetString("JSScriptingRuntime.Name", resourceCulture);
+                return ResourceManager.GetString("SQLiteDatabaseFactory.Name", resourceCulture);
             }
         }
     }

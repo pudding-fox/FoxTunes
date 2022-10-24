@@ -61,16 +61,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to JavaScript support by V8.Net (V8), Version {0}..
-        /// </summary>
-        internal static string JSScriptingRuntime_Description {
-            get {
-                return ResourceManager.GetString("JSScriptingRuntime.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to V8.Net.
+        ///   Looks up a localized string similar to V8.Net {0}.
         /// </summary>
         internal static string JSScriptingRuntime_Name {
             get {

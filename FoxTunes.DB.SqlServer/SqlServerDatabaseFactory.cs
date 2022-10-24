@@ -9,9 +9,16 @@ using System.Threading;
 namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.HIGH)]
-    [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database)]
+    [Component(ID, ComponentSlots.Database)]
     public class SqlServerDatabaseFactory : DatabaseFactory
     {
+        const string ID = "ECF542D9-ABB3-4E82-8045-7E13F1727695";
+
+        public SqlServerDatabaseFactory() : base(Strings.SqlServerDatabaseFactory_Name)
+        {
+
+        }
+
         public override DatabaseFactoryFlags Flags
         {
             get
