@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -111,6 +112,9 @@ namespace FoxTunes
                     .ThenBy(ComponentSorter.Preference)
                     .ThenBy(ComponentSorter.Priority)
                     .Where(ComponentFilter.IsSelected)
+                    //TODO: ComponentFilter.IsSelected actually populates the ComponentResolver so we need to flush the stream here to make sure it's done.
+                    .ToArray()
+                    .Where(ComponentFilter.HasDependencies)
                     .ToArray();
             }
             finally
@@ -131,6 +135,8 @@ namespace FoxTunes
                 .OrderBy(ComponentSorter.Type)
                 .ThenBy(ComponentSorter.Preference)
                 .ThenBy(ComponentSorter.Priority)
+                .Where(ComponentFilter.IsSelected)
+                .Where(ComponentFilter.HasDependencies)
                 .ToArray();
         }
 
@@ -192,6 +198,40 @@ namespace FoxTunes
                             {
                                 //We just handled an ambiguous slot, inform the resolver that it should save the resolution for next time.
                                 ComponentResolver.Instance.AddConflict(component.Slot);
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+
+            public static bool HasDependencies(Type type)
+            {
+                var dependencies = default(IEnumerable<ComponentDependencyAttribute>);
+                if (type.HasCustomAttributes<ComponentDependencyAttribute>(out dependencies))
+                {
+                    foreach (var dependency in dependencies)
+                    {
+                        var id = default(string);
+                        if (string.IsNullOrEmpty(dependency.Slot) || string.Equals(dependency.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+                        {
+                            //Component does not depend on slot.
+                        }
+                        else
+                        {
+                            if (!ComponentResolver.Instance.Get(dependency.Slot, out id))
+                            {
+                                //TODO: Warn, failed to determine slot status.
+                            }
+                            else if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
+                            {
+                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires slot {1}", type.FullName, dependency.Slot);
+                                return false;
+                            }
+                            else if (!string.IsNullOrEmpty(dependency.Id) && !string.Equals(dependency.Id, id, StringComparison.OrdinalIgnoreCase))
+                            {
+                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires component {1}", type.FullName, dependency.Id);
                                 return false;
                             }
                         }
