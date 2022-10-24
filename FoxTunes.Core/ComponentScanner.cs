@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 
 namespace FoxTunes
 {
-    public class ComponentScanner : BaseComponent, IComponentScanner
+    public class ComponentScanner : IComponentScanner
     {
         const FileSystemHelper.SearchOption SEARCH_OPTIONS =
             FileSystemHelper.SearchOption.Recursive |
@@ -22,9 +23,12 @@ namespace FoxTunes
             typeof(IStandardBehaviour)
         };
 
-        private ComponentScanner()
+        protected static ILogger Logger
         {
-            this._StandardComponents = new Lazy<IEnumerable<Type>>(GetAndResolveStandardComponents);
+            get
+            {
+                return LogManager.Logger;
+            }
         }
 
         public static string Location
@@ -34,6 +38,12 @@ namespace FoxTunes
                 return Path.GetDirectoryName(typeof(ComponentScanner).Assembly.Location);
             }
         }
+
+        private static Lazy<IEnumerable<Type>> _AllComponents = new Lazy<IEnumerable<Type>>(GetAllComponents);
+
+        private static Lazy<IEnumerable<Type>> _AllStandardComponents = new Lazy<IEnumerable<Type>>(GetAllStandardComponents);
+
+        private static Lazy<IEnumerable<Type>> _AllStandardResolvedComponents = new Lazy<IEnumerable<Type>>(GetAllStandardResolvedComponents);
 
         private static IEnumerable<string> GetFileNames()
         {
@@ -75,49 +85,47 @@ namespace FoxTunes
             }
         }
 
-        private static IEnumerable<Type> GetAndResolveStandardComponents()
+        private static IEnumerable<Type> GetAllComponents()
         {
-            var slots = new Dictionary<string, IList<Type>>(StringComparer.OrdinalIgnoreCase);
+            return GetFileNames()
+                .SelectMany(GetTypes)
+                .Where(ComponentFilter.IsCompatable)
+                .ToArray();
+        }
+
+        private static IEnumerable<Type> GetAllStandardComponents()
+        {
+            return _AllComponents.Value
+                .Where(ComponentFilter.IsStandardComponent)
+                .ToArray();
+        }
+
+        private static IEnumerable<Type> GetAllStandardResolvedComponents()
+        {
             try
             {
-                return GetFileNames()
-                    .SelectMany(GetTypes)
-                    .Where(ComponentFilter.IsStandardComponent)
-                    .Where(ComponentFilter.IsCompatable)
-                    .Where(ComponentFilter.IsSelected)
+                return _AllStandardComponents.Value
                     .OrderBy(ComponentSorter.Type)
                     .ThenBy(ComponentSorter.Preference)
                     .ThenBy(ComponentSorter.Priority)
-                    .Where(ComponentFilter.IsFreeSlot(slots))
+                    .Where(ComponentFilter.IsSelected)
                     .ToArray();
             }
             finally
             {
-                foreach (var pair in slots)
-                {
-                    if (pair.Value.Count <= 1)
-                    {
-                        continue;
-                    }
-                    Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Multiple components for slot {0} were found, adding resolutions.", pair.Key);
-                    ComponentResolver.Instance.Add(pair.Key, pair.Value[0], pair.Value);
-                }
+                ComponentResolver.Instance.Save();
             }
         }
 
-        private Lazy<IEnumerable<Type>> _StandardComponents { get; set; }
-
-        public IEnumerable<Type> GetStandardComponents()
+        public IEnumerable<Type> GetComponents()
         {
-            return this._StandardComponents.Value;
+            return _AllStandardResolvedComponents.Value;
         }
 
         public IEnumerable<Type> GetComponents(Type type)
         {
-            return GetFileNames()
-                .SelectMany(GetTypes)
+            return _AllComponents.Value
                 .Where(ComponentFilter.IsComponent(type))
-                .Where(ComponentFilter.IsCompatable)
                 .OrderBy(ComponentSorter.Type)
                 .ThenBy(ComponentSorter.Preference)
                 .ThenBy(ComponentSorter.Priority)
@@ -148,6 +156,41 @@ namespace FoxTunes
 
         private static class ComponentFilter
         {
+            public static bool IsSelected(Type type)
+            {
+                var component = default(ComponentAttribute);
+                if (type.HasCustomAttribute<ComponentAttribute>(out component))
+                {
+                    if (string.IsNullOrEmpty(component.Slot) || string.Equals(component.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+                    {
+                        //Component does not target slot.
+                    }
+                    else
+                    {
+                        var id = default(string);
+                        if (!ComponentResolver.Instance.Get(component.Slot, out id))
+                        {
+                            //Slot is not configured, update it.
+                            ComponentResolver.Instance.Add(component.Slot, component.Id);
+                        }
+                        else
+                        {
+                            if (string.Equals(component.Id, id, StringComparison.OrdinalIgnoreCase))
+                            {
+                                //Slot is configured for this component.
+                            }
+                            else
+                            {
+                                //We just handled an ambiguous slot, inform the resolver that it should save the resolution for next time.
+                                ComponentResolver.Instance.Persist(component.Slot);
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+
             public static Func<Type, bool> IsComponent(Type @interface)
             {
                 return type => type.IsClass && !type.IsAbstract && ImplementsInterface(type, @interface);
@@ -160,7 +203,7 @@ namespace FoxTunes
 
             public static bool IsCompatable(Type type)
             {
-                return HasPlatform(type) && HasSlots(type);
+                return HasPlatform(type);
             }
 
             public static bool HasPlatform(Type type)
@@ -194,91 +237,6 @@ namespace FoxTunes
                     }
                 }
                 return true;
-            }
-
-            public static bool HasSlots(Type type)
-            {
-                var dependencies = default(IEnumerable<ComponentDependencyAttribute>);
-                if (type.HasCustomAttributes<ComponentDependencyAttribute>(out dependencies))
-                {
-                    foreach (var dependency in dependencies)
-                    {
-                        var id = ComponentResolver.Instance.Get(dependency.Slot);
-                        if (!string.IsNullOrEmpty(dependency.Slot) && !string.Equals(dependency.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
-                            {
-                                //Slot is not configured.
-                            }
-                            else if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
-                            {
-                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Missing slot dependency \"{1}\".", type.FullName, dependency.Slot);
-                                return false;
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(dependency.Id) && !string.Equals(dependency.Id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (string.Equals(id, dependency.Id, StringComparison.OrdinalIgnoreCase))
-                            {
-                                //Slot is configured and matches.
-                            }
-                            else
-                            {
-                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Missing component dependency \"{1}\".", type.FullName, dependency.Id);
-                                return false;
-                            }
-                        }
-                    }
-                }
-                return true;
-            }
-
-            public static bool IsSelected(Type type)
-            {
-                var component = default(ComponentAttribute);
-                if (!type.HasCustomAttribute<ComponentAttribute>(out component))
-                {
-                    return true;
-                }
-                if (string.IsNullOrEmpty(component.Slot))
-                {
-                    return true;
-                }
-                var id = ComponentResolver.Instance.Get(component.Slot);
-                if (string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                if (string.Equals(id, component.Id, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Component {1} is configured for slot {1}.", type.FullName, id, component.Slot);
-                return false;
-            }
-
-            public static Func<Type, bool> IsFreeSlot(IDictionary<string, IList<Type>> slots)
-            {
-                return type =>
-                {
-                    var component = default(ComponentAttribute);
-                    if (!type.HasCustomAttribute<ComponentAttribute>(out component))
-                    {
-                        return true;
-                    }
-                    if (string.IsNullOrEmpty(component.Slot) || string.Equals(component.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                    var components = slots.GetOrAdd(component.Slot, () => new List<Type>());
-                    components.Add(type);
-                    if (components.Count == 1)
-                    {
-                        return true;
-                    }
-                    Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Slot {0} is already populated by component {1}, additional component {2} will not be loaded.", component.Slot, components[0].FullName, type.FullName);
-                    return false;
-                };
             }
         }
 

@@ -1,17 +1,15 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Reflection;
-using System.Xml.Linq;
+using System.Linq;
+using System.Text;
+using System.Xml;
 
 namespace FoxTunes
 {
     public class ComponentResolver : IComponentResolver
     {
-        public static readonly string FILE_NAME = GetFileName();
-
         protected static ILogger Logger
         {
             get
@@ -20,107 +18,206 @@ namespace FoxTunes
             }
         }
 
-        private static string GetFileName()
+        public static string Location
         {
-            var assembly = Assembly.GetEntryAssembly();
-            if (assembly == null)
+            get
             {
-                return "<No Config>";
+                return Path.GetDirectoryName(typeof(AssemblyResolver).Assembly.Location);
             }
-            return string.Format("{0}.config", assembly.Location);
         }
 
-        static ComponentResolver()
+        public static string FileName
         {
-            Slots = new Dictionary<string, string>();
+            get
+            {
+                return Path.Combine(Location, "Components.xml");
+            }
         }
 
-        public static IDictionary<string, string> Slots { get; private set; }
-
-        public string Get(string slot)
+        public ComponentResolver()
         {
-            if (string.IsNullOrEmpty(slot))
-            {
-                return ComponentSlots.None;
-            }
-            var id = default(string);
-            if (Slots.TryGetValue(slot, out id))
-            {
-                return id;
-            }
-            id = ConfigurationManager.AppSettings.Get(slot);
-            if (string.IsNullOrEmpty(id))
-            {
-                return ComponentSlots.None;
-            }
-            return id;
+            this.Load();
         }
 
-        public void Add(string slot, Type defaultComponent, IEnumerable<Type> components)
+        public IDictionary<string, ComponentSlot> Slots { get; private set; }
+
+        public bool Enabled
         {
-            if (!Publication.IsPortable)
+            get
             {
-                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Cannot add component resolution, requires portable release.");
-                return;
+                return Publication.IsPortable;
             }
-            foreach (var component in components)
+        }
+
+        public void Load()
+        {
+            this.Slots = new Dictionary<string, ComponentSlot>(StringComparer.OrdinalIgnoreCase);
+            try
             {
-                var attribute = default(ComponentAttribute);
-                if (!component.HasCustomAttribute<ComponentAttribute>(out attribute))
+                if (File.Exists(FileName))
+                {
+                    Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Loading component slots from file: {0}", FileName);
+                    using (var stream = File.OpenRead(FileName))
+                    {
+                        var pairs = Serializer.Load(stream);
+                        foreach (var pair in pairs)
+                        {
+                            if (!this.Slots.TryAdd(pair.Key, pair.Value))
+                            {
+                                continue;
+                            }
+                            Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Loaded component slot: {0} => {1}", pair.Key, pair.Value);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to load component slots: {0}", e.Message);
+            }
+            foreach (var slot in ComponentSlots.All)
+            {
+                if (!this.Slots.TryAdd(slot, ComponentSlot.None))
                 {
                     continue;
                 }
-                var id = attribute.Id;
-                if (string.IsNullOrEmpty(id))
-                {
-                    continue;
-                }
-                var name = attribute.Name;
-                if (string.IsNullOrEmpty(name))
-                {
-                    name = component.FullName;
-                }
-                var @default = component == defaultComponent;
-                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Checking component resolution for slot {0}", slot);
-                this.Add(slot, id, name, @default);
+                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component slot {0} is not configured.", slot);
             }
         }
 
-        private void Add(string slot, string id, string name, bool @default)
+        public void Save()
         {
-            if (!File.Exists(FILE_NAME))
+            if (!this.Enabled)
             {
-                Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Config file \"{0}\" does not exist, cannot add resolution.", FILE_NAME);
+                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Cannot save component slots.");
                 return;
             }
-            var document = XDocument.Load(FILE_NAME);
-            var appSettings = document.Root.Element("appSettings");
-            if (appSettings == null)
+            Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Saving component slots from file: {0}", FileName);
+            try
             {
-                appSettings = new XElement("appSettings");
-                document.Root.AddFirst(appSettings);
+                using (var stream = File.Create(FileName))
+                {
+                    Serializer.Save(stream, this.Slots);
+                }
             }
-            if (appSettings.ToString().Contains(id, true))
+            catch (Exception e)
             {
-                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component resolution already exists, nothing to do.");
-                return;
+                Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to save component slots: {0}", e.Message);
             }
-            if (@default)
+        }
+
+        public bool Get(string slot, out string id)
+        {
+            var component = default(ComponentSlot);
+            if (this.Slots.TryGetValue(slot, out component) && !string.Equals(component.Id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
             {
-                appSettings.Add(new XComment(string.Format("Comment out the next element to not use component {0}.", name)));
-                appSettings.Add(new XElement("add", new XAttribute("key", slot), new XAttribute("value", id)));
-                Logger.Write(typeof(ComponentResolver), LogLevel.Info, "Component resolution for slot {0}, component {1}, state=active was added to the config file.", slot, id);
+                id = component.Id;
+                return true;
             }
             else
             {
-                appSettings.Add(new XComment(string.Format("Uncomment the next element to use component {0}.", name)));
-                appSettings.Add(new XComment(new XElement("add", new XAttribute("key", slot), new XAttribute("value", id)).ToString()));
-                Logger.Write(typeof(ComponentResolver), LogLevel.Info, "Component resolution for slot {0}, component {1}, state=comment was added to the config file.", slot, id);
+                id = ComponentSlots.None;
+                return false;
             }
-            document.Save(FILE_NAME);
-            Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "The config file was updated.");
+        }
+
+        public void Add(string slot, string id)
+        {
+            this.Slots[slot] = new ComponentSlot(id);
+        }
+
+        public void Remove(string slot)
+        {
+            this.Add(slot, ComponentSlots.None);
+        }
+
+        public void Persist(string slot)
+        {
+            var component = default(ComponentSlot);
+            if (this.Slots.TryGetValue(slot, out component) && !string.Equals(component.Id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+            {
+                component.Persist = true;
+            }
         }
 
         public static readonly IComponentResolver Instance = new ComponentResolver();
+
+        public class ComponentSlot
+        {
+            public ComponentSlot(string id)
+            {
+                this.Id = id;
+            }
+
+            public string Id { get; private set; }
+
+            public bool Persist { get; set; }
+
+            public static readonly ComponentSlot None = new ComponentSlot(ComponentSlots.None);
+        }
+
+        public static class Serializer
+        {
+            const string Component = "Component";
+
+            const string Slot = "Slot";
+
+            const string Id = "Id";
+
+            public static IEnumerable<KeyValuePair<string, ComponentSlot>> Load(Stream stream)
+            {
+                using (var reader = new XmlTextReader(stream))
+                {
+                    reader.ReadStartElement(Publication.Product);
+                    while (reader.IsStartElement(Component))
+                    {
+                        var key = reader.GetAttribute(Slot);
+                        var value = reader.GetAttribute(Id);
+                        if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(value))
+                        {
+                            yield return new KeyValuePair<string, ComponentSlot>(key, new ComponentSlot(value));
+                        }
+                        if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, Component))
+                        {
+                            reader.ReadEndElement();
+                        }
+                        else
+                        {
+                            reader.Read();
+                        }
+                    }
+                    if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, Publication.Product))
+                    {
+                        reader.ReadEndElement();
+                    }
+                    else
+                    {
+                        reader.Read();
+                    }
+                }
+            }
+
+            public static void Save(Stream stream, IEnumerable<KeyValuePair<string, ComponentSlot>> sequence)
+            {
+                using (var writer = new XmlTextWriter(stream, Encoding.Default))
+                {
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement(Publication.Product);
+                    foreach (var pair in sequence)
+                    {
+                        if (!pair.Value.Persist)
+                        {
+                            continue;
+                        }
+                        writer.WriteStartElement(Component);
+                        writer.WriteAttributeString(Slot, pair.Key);
+                        writer.WriteAttributeString(Id, pair.Value.Id);
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                }
+            }
+        }
     }
 }

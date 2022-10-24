@@ -25,7 +25,7 @@ namespace FoxTunes
             {
                 if (!this.Setup.HasSlot(slot))
                 {
-                    ComponentResolver.Slots[slot] = ComponentSlots.Blocked;
+                    ComponentResolver.Instance.Add(slot, ComponentSlots.Blocked);
                 }
             }
         }
@@ -91,7 +91,11 @@ namespace FoxTunes
 
         protected virtual void LoadComponents()
         {
-            ComponentRegistry.Instance.AddComponents(ComponentActivator.Instance.Activate(ComponentScanner.Instance.GetStandardComponents()));
+            ComponentRegistry.Instance.AddComponents(
+                ComponentActivator.Instance.Activate(
+                    ComponentScanner.Instance.GetComponents()
+                )
+            );
         }
 
         protected virtual void LoadConfiguration()
