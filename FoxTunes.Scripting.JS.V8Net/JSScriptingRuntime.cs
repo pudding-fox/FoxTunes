@@ -1,8 +1,10 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using V8.Net;
 
 namespace FoxTunes
 {
+    [ComponentPreference(ComponentPreferenceAttribute.LOW)]
     [Component(ID, ComponentSlots.ScriptingRuntime)]
     [PlatformDependency(Major = 6, Minor = 1)]
     public class JSScriptingRuntime : ScriptingRuntime
@@ -11,6 +13,14 @@ namespace FoxTunes
 
         public JSScriptingRuntime() : base(ID, string.Format(Strings.JSScriptingRuntime_Name, V8Engine.Version))
         {
+            if (Environment.Is64BitProcess)
+            {
+                Loader.Load("V8_Net_Proxy_x64.dll");
+            }
+            else
+            {
+                Loader.Load("V8_Net_Proxy_x86.dll");
+            }
         }
 
         public ICore Core { get; private set; }

@@ -1,6 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using Microsoft.ClearScript.V8;
-using System.CodeDom;
+using System;
 
 namespace FoxTunes
 {
@@ -15,6 +15,14 @@ namespace FoxTunes
 
         public JSScriptingRuntime() : base(ID, string.Format(Strings.JSScriptingRuntime_Name, VERSION))
         {
+            if (Environment.Is64BitProcess)
+            {
+                Loader.Load("ClearScriptV8.win-x64.dll");
+            }
+            else
+            {
+                Loader.Load("ClearScriptV8.win-x86.dll");
+            }
         }
 
         public ICore Core { get; private set; }

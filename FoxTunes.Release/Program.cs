@@ -490,8 +490,8 @@ namespace FoxTunes
                         "ClearScript.Windows.Core.dll",
                         "ClearScript.V8.dll",
                         "ClearScript.V8.ICUData.dll",
-                        "ClearScriptV8.win-x86.dll",
-                        "ClearScriptV8.win-x64.dll",
+                        new PackageElement("ClearScriptV8.win-x86.dll", "x86"),
+                        new PackageElement("ClearScriptV8.win-x64.dll", "x64"),
                         "Newtonsoft.Json.dll"
                     },
                     PackageFlags.Default | PackageFlags.Minimal
