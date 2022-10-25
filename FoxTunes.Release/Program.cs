@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Xml.Linq;
 
 namespace FoxTunes
 {
@@ -89,12 +90,32 @@ namespace FoxTunes
                     AddPackage(Path.Combine(target, MINIMAL, LIB), plugin, flags);
                 }
 
-                AddPackage(Path.Combine(target, PLUGINS), plugin, flags);
+                AddPackage(Path.Combine(target, PLUGINS), plugin, flags, true);
             }
         }
 
-        private static void AddPackage(string target, Package package, ReleaseFlags flags)
+        private static void AddPackage(string target, Package package, ReleaseFlags flags, bool force = false)
         {
+            if (!force)
+            {
+                //Filter by framework.
+                if (package.Flags.HasFlag(PackageFlags.FrameworkNET40) || package.Flags.HasFlag(PackageFlags.FrameworkNET462) || package.Flags.HasFlag(PackageFlags.FrameworkNET48))
+                {
+                    if (flags.HasFlag(ReleaseFlags.FrameworkNET40) && !package.Flags.HasFlag(PackageFlags.FrameworkNET40))
+                    {
+                        return;
+                    }
+                    if (flags.HasFlag(ReleaseFlags.FrameworkNET462) && !package.Flags.HasFlag(PackageFlags.FrameworkNET462))
+                    {
+                        return;
+                    }
+                    if (flags.HasFlag(ReleaseFlags.FrameworkNET48) && !package.Flags.HasFlag(PackageFlags.FrameworkNET48))
+                    {
+                        return;
+                    }
+                }
+            }
+
             foreach (var element in package.Elements)
             {
                 AddPackageElement(target, package, element, flags);
@@ -479,7 +500,7 @@ namespace FoxTunes
                         "x64/msvcp100.dll",
                         "x64/msvcr100.dll"
                     },
-                    PackageFlags.Default | PackageFlags.Minimal
+                    PackageFlags.Default | PackageFlags.Minimal | PackageFlags.FrameworkNET40
                 ),
                 new Package(
                     "clearscript",
@@ -495,7 +516,7 @@ namespace FoxTunes
                         new PackageElement("ClearScriptV8.win-x64.dll", "x64"),
                         "Newtonsoft.Json.dll"
                     },
-                    PackageFlags.Default | PackageFlags.Minimal
+                    PackageFlags.Default | PackageFlags.Minimal | PackageFlags.FrameworkNET462 | PackageFlags.FrameworkNET48
                 ),
                 new Package(
                      "v8net",
@@ -782,7 +803,10 @@ namespace FoxTunes
         {
             None = 0,
             Default = 1,
-            Minimal = 2
+            Minimal = 2,
+            FrameworkNET40 = 4,
+            FrameworkNET462 = 8,
+            FrameworkNET48 = 16
         }
 
         public class PackageElement
