@@ -3,7 +3,7 @@ using FoxTunes.Proxies;
 
 namespace FoxTunes
 {
-    [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
+    [ComponentPreference(ComponentPreferenceAttribute.NORMAL)]
     [Component(ID, ComponentSlots.ScriptingRuntime)]
     public class JSScriptingRuntime : ScriptingRuntime
     {
