@@ -45,7 +45,19 @@ namespace FoxTunes
         {
             get
             {
-                return Publication.IsPortable;
+                return Publication.IsPortable || this.HasBlockedSlots;
+            }
+        }
+
+        public bool HasBlockedSlots
+        {
+            get
+            {
+                if (this.Slots == null)
+                {
+                    return false;
+                }
+                return this.Slots.Any(pair => pair.Value != null && string.Equals(pair.Value.Id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase));
             }
         }
 
