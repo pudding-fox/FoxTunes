@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net40;net462;net48</TargetFrameworks>
-	<RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
     <AssemblyName>FoxTunes.Launcher</AssemblyName>
     <OutputPath>..\distribution\</OutputPath>
     <ApplicationIcon>Fox.ico</ApplicationIcon>
@@ -31,5 +31,10 @@
   </ItemGroup>
 
   <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)$(TargetName).x86$(TargetExt)&quot;" />
+    <Exec Command="..\.tools\x86\corflags.exe &quot;$(TargetDir)$(TargetName).x86$(TargetExt)&quot; /32BIT+" />
+  </Target>
 
 </Project>
