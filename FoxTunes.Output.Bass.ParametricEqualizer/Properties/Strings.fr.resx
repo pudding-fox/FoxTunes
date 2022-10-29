@@ -129,4 +129,19 @@
   <data name="BassParametricEqualizerPreset.None" xml:space="preserve">
     <value>Aucun</value>
   </data>
+  <data name="BassParametricEqualizerStreamComponent.Name" xml:space="preserve">
+    <value>Égaliseur paramétrique</value>
+  </data>
+  <data name="BassParametricEqualizerStreamComponent.None" xml:space="preserve">
+    <value>aucun</value>
+  </data>
+  <data name="BassParametricEqualizerStreamComponentConfiguration.Bandwidth" xml:space="preserve">
+    <value>Bande passante</value>
+  </data>
+  <data name="BassParametricEqualizerStreamComponentConfiguration.Enabled" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="BassParametricEqualizerStreamComponentConfiguration.Path" xml:space="preserve">
+    <value>Égaliseur paramétrique</value>
+  </data>
 </root>

@@ -117,4 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="BassMemoryStreamComponent.Name" xml:space="preserve">
+    <value>Mémoire</value>
+  </data>
+  <data name="BassMemoryStreamComponentBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Jouer à partir de la mémoire</value>
+  </data>
+  <data name="General.Advanced" xml:space="preserve">
+    <value>Avancé</value>
+  </data>
+  <data name="LoadingTask.Name" xml:space="preserve">
+    <value>Création du flux en mémoire</value>
+  </data>
 </root>

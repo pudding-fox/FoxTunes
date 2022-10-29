@@ -120,4 +120,49 @@
   <data name="BassCrossfadeStreamInput.Name" xml:space="preserve">
     <value>Fading</value>
   </data>
+  <data name="BassCrossfadeStreamInputBehaviour.Unsupported" xml:space="preserve">
+    <value>Fading : le type d'entrée n'est pas pris en charge.</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Buffer" xml:space="preserve">
+    <value>Buffer</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Mix" xml:space="preserve">
+    <value>Crossfade</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Mode.Always" xml:space="preserve">
+    <value>Toujours</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Mode.Manual" xml:space="preserve">
+    <value>Manuel</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Path" xml:space="preserve">
+    <value>Fading</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Path.Advanced" xml:space="preserve">
+    <value>Fading\Avancé</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.PauseResume" xml:space="preserve">
+    <value>Pause/Reprendre</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.PeriodIn" xml:space="preserve">
+    <value>Fade In Period</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.PeriodOut" xml:space="preserve">
+    <value>Fade Out Period</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Start" xml:space="preserve">
+    <value>Commencer</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.Stop" xml:space="preserve">
+    <value>Arrêter</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.TypeIn" xml:space="preserve">
+    <value>Face In Curve</value>
+  </data>
+  <data name="BassCrossfadeStreamInputConfiguration.TypeOut" xml:space="preserve">
+    <value>Fade Out Curve</value>
+  </data>
 </root>

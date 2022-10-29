@@ -120,4 +120,7 @@
   <data name="FilterParserConfiguration.Names" xml:space="preserve">
     <value>Dans les tags</value>
   </data>
+  <data name="RandomSortParserProvider.Random" xml:space="preserve">
+    <value>Aléatoire</value>
+  </data>
 </root>
