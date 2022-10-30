@@ -146,7 +146,7 @@ namespace FoxTunes
         public void Add(string slot, string id)
         {
             var flags = ComponentSlotFlags.None;
-            if (!string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase) && !string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
             {
                 flags |= ComponentSlotFlags.Modified;
             }
