@@ -362,7 +362,7 @@ namespace FoxTunes
                 }
                 if (!string.IsNullOrEmpty(file.Tag.Album))
                 {
-                    hashCode += file.Tag.Album.ToLower().GetHashCode();
+                    hashCode += file.Tag.Album.ToLower().GetDeterministicHashCode();
                 }
                 else
                 {

@@ -112,7 +112,7 @@ namespace FoxTunes
             var hashCode = default(int);
             unchecked
             {
-                hashCode = (hashCode * 29) + stream.FileName.GetHashCode();
+                hashCode = (hashCode * 29) + stream.FileName.GetDeterministicHashCode();
                 hashCode = (hashCode * 29) + stream.Length.GetHashCode();
                 hashCode = (hashCode * 29) + resolution.GetHashCode();
             }

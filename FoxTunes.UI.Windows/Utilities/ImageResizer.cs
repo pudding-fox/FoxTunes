@@ -81,7 +81,7 @@ namespace FoxTunes
             {
                 if (!string.IsNullOrEmpty(fileName))
                 {
-                    hashCode += fileName.GetHashCode();
+                    hashCode += fileName.GetDeterministicHashCode();
                 }
                 hashCode = (hashCode * 29) + width.GetHashCode();
                 hashCode = (hashCode * 29) + height.GetHashCode();
