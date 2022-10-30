@@ -65,7 +65,7 @@ namespace FoxTunes.Launcher
                         core.Load();
                         if (!CoreValidator.Instance.Validate(core))
                         {
-                            throw new InvalidOperationException("One or more required components were not loaded.");
+                            throw new InvalidOperationException(Strings.Program_CoreValidationFailed);
                         }
                         var test = core.Factories.Database.Test();
                         if (test != DatabaseTestResult.OK)
@@ -74,23 +74,23 @@ namespace FoxTunes.Launcher
                             {
                                 if (core.Factories.Database.Flags.HasFlag(DatabaseFactoryFlags.ConfirmCreate))
                                 {
-                                    if (!core.Components.UserInterface.Confirm("The database was not found, initialize it?."))
+                                    if (!core.Components.UserInterface.Confirm(Strings.Program_CreateDatabase))
                                     {
-                                        throw new OperationCanceledException("Database initialization was cancelled.");
+                                        throw new OperationCanceledException(Strings.Program_DatabaseCreationCancelled);
                                     }
                                 }
                             }
                             else if (test == DatabaseTestResult.Mismatch)
                             {
-                                if (!core.Components.UserInterface.Confirm("The database is incompatible, delete it?."))
+                                if (!core.Components.UserInterface.Confirm(Strings.Program_DatabaseMismatch))
                                 {
-                                    throw new OperationCanceledException("Database initialization was cancelled.");
+                                    throw new OperationCanceledException(Strings.Program_DatabaseCreationCancelled);
                                 }
                             }
                             core.Factories.Database.Initialize();
                             if (core.Factories.Database.Test() != DatabaseTestResult.OK)
                             {
-                                throw new InvalidOperationException("Failed to initialize the database.");
+                                throw new InvalidOperationException(Strings.Program_DatabaseCreationFailed);
                             }
                             using (var database = core.Factories.Database.Create())
                             {

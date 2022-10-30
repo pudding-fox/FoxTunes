@@ -10,16 +10,6 @@ namespace FoxTunes.ViewModel
 {
     public class Info : ViewModelBase
     {
-        const string ARTIST = "No Artist";
-
-        const string PERFORMER = "No Performer";
-
-        const string ALBUM = "No Album";
-
-        const string GENRE = "No Genre";
-
-        const string YEAR = "No Year";
-
         const int SAMPLE_RATE = 44100;
 
         const int BITS_PER_SAMPLE = 16;
@@ -124,7 +114,7 @@ namespace FoxTunes.ViewModel
             {
                 if (string.IsNullOrEmpty(this._Artist))
                 {
-                    return ARTIST;
+                    return Strings.Info_NoArtist;
                 }
                 return this._Artist;
             }
@@ -154,7 +144,7 @@ namespace FoxTunes.ViewModel
             {
                 if (string.IsNullOrEmpty(this._Performer))
                 {
-                    return PERFORMER;
+                    return Strings.Info_NoPerformer;
                 }
                 return this._Performer;
             }
@@ -184,7 +174,7 @@ namespace FoxTunes.ViewModel
             {
                 if (string.IsNullOrEmpty(this._Album))
                 {
-                    return ALBUM;
+                    return Strings.Info_NoAlbum;
                 }
                 return this._Album;
             }
@@ -247,7 +237,7 @@ namespace FoxTunes.ViewModel
             {
                 if (string.IsNullOrEmpty(this._Genre))
                 {
-                    return GENRE;
+                    return Strings.Info_NoGenre;
                 }
                 return this._Genre;
             }
@@ -277,7 +267,7 @@ namespace FoxTunes.ViewModel
             {
                 if (string.IsNullOrEmpty(this._Year))
                 {
-                    return YEAR;
+                    return Strings.Info_NoYear;
                 }
                 return this._Year;
             }
@@ -588,11 +578,11 @@ namespace FoxTunes.ViewModel
                 //Empty values are presented as placeholders.
                 var defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    { nameof(this.Artist), ARTIST },
-                    { nameof(this.Performer), PERFORMER },
-                    { nameof(this.Album), ALBUM },
-                    { nameof(this.Genre), GENRE },
-                    { nameof(this.Year), YEAR },
+                    { nameof(this.Artist), Strings.Info_NoArtist },
+                    { nameof(this.Performer), Strings.Info_NoPerformer },
+                    { nameof(this.Album), Strings.Info_NoAlbum },
+                    { nameof(this.Genre), Strings.Info_NoGenre },
+                    { nameof(this.Year), Strings.Info_NoYear },
                 };
                 if (defaults.ContainsKey(key) && string.Equals(defaults[key], value, StringComparison.OrdinalIgnoreCase))
                 {

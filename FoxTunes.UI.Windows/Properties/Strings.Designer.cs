@@ -205,6 +205,51 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Album.
+        /// </summary>
+        internal static string Info_NoAlbum {
+            get {
+                return ResourceManager.GetString("Info.NoAlbum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Artist.
+        /// </summary>
+        internal static string Info_NoArtist {
+            get {
+                return ResourceManager.GetString("Info.NoArtist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Genre.
+        /// </summary>
+        internal static string Info_NoGenre {
+            get {
+                return ResourceManager.GetString("Info.NoGenre", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Performer.
+        /// </summary>
+        internal static string Info_NoPerformer {
+            get {
+                return ResourceManager.GetString("Info.NoPerformer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Year.
+        /// </summary>
+        internal static string Info_NoYear {
+            get {
+                return ResourceManager.GetString("Info.NoYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next.
         /// </summary>
         internal static string KeyBindingsBehaviourConfiguration_Next {
