@@ -668,10 +668,10 @@ namespace FoxTunes
                     PackageFlags.Default
                 ),
                 new Package(
-                    "spectrum",
+                    "visualizations",
                     new PackageElement[]
                     {
-                        "FoxTunes.UI.Windows.Spectrum.dll"
+                        "FoxTunes.UI.Windows.Visualizations.dll"
                     },
                     PackageFlags.Default
                 ),
