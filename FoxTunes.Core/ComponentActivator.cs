@@ -23,22 +23,30 @@ namespace FoxTunes
 
         public T Activate<T>(Type type) where T : IBaseComponent
         {
-            if (type.Assembly.ReflectionOnly)
+            try
             {
-                type = AssemblyRegistry.Instance.GetExecutableType(type);
+                if (type.Assembly.ReflectionOnly)
+                {
+                    type = AssemblyRegistry.Instance.GetExecutableType(type);
+                }
+                if (type.GetConstructor(new Type[] { }) == null)
+                {
+                    Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to locate constructor for component {0}.", type.Name);
+                    return default(T);
+                }
+                if (FastActivator.Instance.Activate(type) is T component)
+                {
+                    return component;
+                }
+                else
+                {
+                    Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Component {0} is not of the expected type {1}.", type.Name, typeof(T).Name);
+                    return default(T);
+                }
             }
-            if (type.GetConstructor(new Type[] { }) == null)
+            catch (Exception e)
             {
-                Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to locate constructor for component {0}.", type.Name);
-                return default(T);
-            }
-            if (FastActivator.Instance.Activate(type) is T component)
-            {
-                return component;
-            }
-            else
-            {
-                Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Component {0} is not of the expected type {1}.", type.Name, typeof(T).Name);
+                Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to activate component {0}: {1}.", type.Name, e.Message);
                 return default(T);
             }
         }
