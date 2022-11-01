@@ -151,7 +151,7 @@ namespace FoxTunes
 
             if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
             {
-                return path1;
+                return ".";
             }
 
             var parts1 = path1.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
