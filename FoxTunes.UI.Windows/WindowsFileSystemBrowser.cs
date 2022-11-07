@@ -34,27 +34,69 @@ namespace FoxTunes
             var result = default(BrowseResult);
             Windows.Invoke(() =>
              {
-                 var dialog = new OpenFileDialog()
+                 if (options.Flags.HasFlag(BrowseFlags.Save))
                  {
-                     Title = options.Title,
-                     Filter = GetFilter(options.Filters),
-                     Multiselect = options.Flags.HasFlag(BrowseFlags.Multiselect),
-                 };
-                 if (File.Exists(options.Path))
-                 {
-                     dialog.InitialDirectory = Path.GetDirectoryName(options.Path);
-                     dialog.FileName = options.Path;
+                     result = this.SaveFile(options);
                  }
-                 else if (Directory.Exists(options.Path))
+                 else
                  {
-                     dialog.InitialDirectory = options.Path;
+                     result = this.OpenFile(options);
                  }
-                 var window = Windows.ActiveWindow;
-                 var success = dialog.ShowDialog(window);
-                 result = new BrowseResult(dialog.FileNames, success.GetValueOrDefault());
                  //TODO: Bad .Wait().
              }).Wait();
             return result;
+        }
+
+        protected virtual BrowseResult SaveFile(BrowseOptions options)
+        {
+            //TODO: Use only WPF frameworks.
+            using (var dialog = new global::System.Windows.Forms.SaveFileDialog())
+            {
+                dialog.Title = options.Title;
+                dialog.Filter = GetFilter(options.Filters);
+                if (File.Exists(options.Path))
+                {
+                    dialog.InitialDirectory = Path.GetDirectoryName(options.Path);
+                    dialog.FileName = options.Path;
+                }
+                else if (Directory.Exists(options.Path))
+                {
+                    dialog.InitialDirectory = options.Path;
+                }
+                dialog.CheckFileExists = false;
+                dialog.CheckPathExists = false;
+                var window = Windows.ActiveWindow;
+                var success = default(bool);
+                switch (dialog.ShowDialog(new Win32Window(window.GetHandle())))
+                {
+                    case global::System.Windows.Forms.DialogResult.OK:
+                        success = true;
+                        break;
+                }
+                return new BrowseResult(new[] { dialog.FileName }, success);
+            }
+        }
+
+        protected virtual BrowseResult OpenFile(BrowseOptions options)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                Title = options.Title,
+                Filter = GetFilter(options.Filters),
+                Multiselect = options.Flags.HasFlag(BrowseFlags.Multiselect),
+            };
+            if (File.Exists(options.Path))
+            {
+                dialog.InitialDirectory = Path.GetDirectoryName(options.Path);
+                dialog.FileName = options.Path;
+            }
+            else if (Directory.Exists(options.Path))
+            {
+                dialog.InitialDirectory = options.Path;
+            }
+            var window = Windows.ActiveWindow;
+            var success = dialog.ShowDialog(window);
+            return new BrowseResult(dialog.FileNames, success.GetValueOrDefault());
         }
 
         protected virtual BrowseResult BrowseFolder(BrowseOptions options)
@@ -62,27 +104,39 @@ namespace FoxTunes
             var result = default(BrowseResult);
             Windows.Invoke(() =>
             {
-                //TODO: Use only WPF frameworks.
-                using (var dialog = new global::System.Windows.Forms.FolderBrowserDialog())
+                if (options.Flags.HasFlag(BrowseFlags.Save))
                 {
-                    dialog.Description = options.Title;
-                    if (Directory.Exists(options.Path))
-                    {
-                        dialog.SelectedPath = options.Path;
-                    }
-                    var window = Windows.ActiveWindow;
-                    var success = default(bool);
-                    switch (dialog.ShowDialog(new Win32Window(window.GetHandle())))
-                    {
-                        case global::System.Windows.Forms.DialogResult.OK:
-                            success = true;
-                            break;
-                    }
-                    result = new BrowseResult(new[] { dialog.SelectedPath }, success);
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    result = this.OpenFolder(options);
                 }
                 //TODO: Bad .Wait().
             }).Wait();
             return result;
+        }
+
+        protected virtual BrowseResult OpenFolder(BrowseOptions options)
+        {
+            //TODO: Use only WPF frameworks.
+            using (var dialog = new global::System.Windows.Forms.FolderBrowserDialog())
+            {
+                dialog.Description = options.Title;
+                if (Directory.Exists(options.Path))
+                {
+                    dialog.SelectedPath = options.Path;
+                }
+                var window = Windows.ActiveWindow;
+                var success = default(bool);
+                switch (dialog.ShowDialog(new Win32Window(window.GetHandle())))
+                {
+                    case global::System.Windows.Forms.DialogResult.OK:
+                        success = true;
+                        break;
+                }
+                return new BrowseResult(new[] { dialog.SelectedPath }, success);
+            }
         }
 
         private static string GetFilter(IEnumerable<BrowseFilter> filters)

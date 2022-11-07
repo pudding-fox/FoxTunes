@@ -70,6 +70,60 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Playlist.
+        /// </summary>
+        internal static string ExternalPlaylistBehaviour_Browse_Title {
+            get {
+                return ResourceManager.GetString("ExternalPlaylistBehaviour.Browse.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlists.
+        /// </summary>
+        internal static string ExternalPlaylistBehaviour_Browse_Type {
+            get {
+                return ResourceManager.GetString("ExternalPlaylistBehaviour.Browse.Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load From.
+        /// </summary>
+        internal static string ExternalPlaylistBehaviour_Load {
+            get {
+                return ResourceManager.GetString("ExternalPlaylistBehaviour.Load", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlist.
+        /// </summary>
+        internal static string ExternalPlaylistBehaviour_Path {
+            get {
+                return ResourceManager.GetString("ExternalPlaylistBehaviour.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save As.
+        /// </summary>
+        internal static string ExternalPlaylistBehaviour_Save {
+            get {
+                return ResourceManager.GetString("ExternalPlaylistBehaviour.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External Playlists (.pls).
+        /// </summary>
+        internal static string ExternalPlaylistBehaviourConfiguration_Enabled {
+            get {
+                return ResourceManager.GetString("ExternalPlaylistBehaviourConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
@@ -426,6 +480,15 @@ namespace FoxTunes {
         internal static string PlaylistActionsBehaviour_Remove {
             get {
                 return ResourceManager.GetString("PlaylistActionsBehaviour.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order.
+        /// </summary>
+        internal static string PlaylistBehaviour_Order {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviour.Order", resourceCulture);
             }
         }
         
