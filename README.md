@@ -87,6 +87,7 @@ It needs at least;
 * **GAPLESS** - A "true" gapless input transport: https://github.com/aidan-g/BASS_GAPLESS
 * **noesis** - Use Noesis.Javascript for scriptable elements.
 * **v8net** - Use V8.Net for scriptable elements.
+* **clearscript** - Use Microsoft.ClearScript for scriptable elements.  
 * **Layout** - A flexible layout system with various panel types. 
 * **LibraryBrowser** - An album art grid interface for the library.
 * **Logging** - Use Log4Net logging back-end. Only used for debugging.
@@ -124,6 +125,6 @@ Please help us to translate FoxTunes in your language by submitting a pull reque
 
 ## Support the project
 
-We are saving up for a signing certificate and associated costs but it is very expensive.
+~We are saving up for a signing certificate and associated costs but it is very expensive.~ it's unlikely this will ever happen but I try to update the windows store app regularly which seems to address AV false positives to some extent. 
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BW5JUK6ZUQK7S&currency_code=GBP&source=url)
