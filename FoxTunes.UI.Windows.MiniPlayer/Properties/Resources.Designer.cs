@@ -70,7 +70,7 @@ namespace FoxTunes {
         ///        parts.push(tag.disc);
         ///    }
         ///    if (tag.track) {
-        ///        parts.push(zeropad(tag.track, 2));
+        ///        parts.push(zeropad2(tag.track, tag.trackcount, 2));
         ///    }
         ///    if (tag.artist) {
         ///        parts.push(tag.artist);
@@ -84,7 +84,7 @@ namespace FoxTunes {
         ///    else {
         ///        parts.push(filename(file));
         ///    }
-        ///    if (tag.performer &amp;&amp; tag [rest of string was truncated]&quot;;.
+        ///    if (tag [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NowPlaying {
             get {
@@ -99,7 +99,7 @@ namespace FoxTunes {
         ///        parts.push(tag.disc);
         ///    }
         ///    if (tag.track) {
-        ///        parts.push(zeropad(tag.track, 2));
+        ///        parts.push(zeropad2(tag.track, tag.trackcount, 2));
         ///    }
         ///    if (tag.title) {
         ///        parts.push(tag.title);
