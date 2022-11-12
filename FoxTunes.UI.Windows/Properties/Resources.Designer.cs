@@ -63,8 +63,8 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to (function () {
         ///    var parts = [];
-        ///    if (tag.__ft_variousartists) {
-        ///        parts.push(&quot;Various Artists&quot;);
+        ///    if (tag.iscompilation || tag.__ft_variousartists) {
+        ///        parts.push(strings.general_variousartists);
         ///    }
         ///    else if (tag.artist) {
         ///        parts.push(tag.artist);

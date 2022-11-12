@@ -1,7 +1,7 @@
 ﻿(function () {
     var parts = [];
-    if (tag.__ft_variousartists) {
-        parts.push("Various Artists");
+    if (tag.iscompilation || tag.__ft_variousartists) {
+        parts.push(strings.general_variousartists);
     }
     else if (tag.artist) {
         parts.push(tag.artist);

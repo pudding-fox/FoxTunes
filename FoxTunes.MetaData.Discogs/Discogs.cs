@@ -410,11 +410,11 @@ namespace FoxTunes
                     var title = metaData.GetValueOrDefault(CommonMetaData.Title);
                     if (!string.IsNullOrEmpty(artist) && !string.IsNullOrEmpty(album))
                     {
-                        var isCompilation = string.Equals(
-                           metaData.GetValueOrDefault(CustomMetaData.VariousArtists),
-                           bool.TrueString,
-                           StringComparison.OrdinalIgnoreCase
-                       );
+                        var isCompilation = metaData.Any(new[]
+                        {
+                            CommonMetaData.IsCompilation,
+                            CustomMetaData.VariousArtists
+                        }, value => string.Equals(value, bool.TrueString, StringComparison.OrdinalIgnoreCase));
                         if (isCompilation)
                         {
                             artist = Strings.Discogs_CompilationArtist;
