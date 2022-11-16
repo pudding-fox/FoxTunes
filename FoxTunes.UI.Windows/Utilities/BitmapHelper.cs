@@ -155,11 +155,72 @@ namespace FoxTunes
             }
         }
 
+        public static void DrawDot(RenderInfo info, int x, int y)
+        {
+            //Check arguments are valid.
+            if (x < 0 || y < 0)
+            {
+#if DEBUG
+                throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
+            }
+
+            if (x >= info.Width || y >= info.Height)
+            {
+#if DEBUG
+                throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
+            }
+
+            var buffer = IntPtr.Add(info.Buffer, (x * info.BytesPerPixel) + (y * info.Stride));
+
+            memset(IntPtr.Add(buffer, 0), info.Blue, new UIntPtr(1));
+            memset(IntPtr.Add(buffer, 1), info.Green, new UIntPtr(1));
+            memset(IntPtr.Add(buffer, 2), info.Red, new UIntPtr(1));
+            memset(IntPtr.Add(buffer, 3), info.Alpha, new UIntPtr(1));
+        }
+
+        public static void ShiftLeft(RenderInfo info, int count)
+        {
+            //Check arguments are valid.
+            if (count < 0)
+            {
+#if DEBUG
+                throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
+            }
+
+            if (count >= info.Width)
+            {
+#if DEBUG
+                throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
+            }
+
+            for (var y = 0; y < info.Height; y++)
+            {
+                var source = IntPtr.Add(info.Buffer, (count * info.BytesPerPixel) + (y * info.Stride));
+                var destination = IntPtr.Add(info.Buffer, y * info.Stride);
+                memmove(destination, source, new UIntPtr((uint)((info.Width - count) * info.BytesPerPixel)));
+            }
+        }
+
         [DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern IntPtr memset(IntPtr destination, int value, UIntPtr count);
 
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         private static extern IntPtr memcpy(IntPtr destination, IntPtr source, UIntPtr count);
+
+        [DllImport("msvcrt.dll", EntryPoint = "memmove", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr memmove(IntPtr destination, IntPtr source, UIntPtr count);
 
         public static RenderInfo CreateRenderInfo(WriteableBitmap bitmap, Color color)
         {
