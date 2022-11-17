@@ -1,14 +1,25 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
     public class SpectrogramRenderer : VisualizationBase
     {
+        const double FACTOR = 262140; //4.0 * 65535.0
+
+        public Color[] ColorPalette = new KeyValuePair<int, Color>[]
+        {
+            new KeyValuePair<int, Color>(0, Colors.Black),
+            new KeyValuePair<int, Color>(25, Colors.Gray),
+            new KeyValuePair<int, Color>(100, Colors.White)
+        }.ToGradient();
+
         public SpectrogramRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
@@ -16,6 +27,10 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
+            ).ConnectValue(value => this.UpdateInterval = value);
             this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
@@ -94,7 +109,7 @@ namespace FoxTunes
                 return;
             }
 
-            Render(info, this.RendererData);
+            Render(info, this.RendererData, this.ColorPalette);
 
             await Windows.Invoke(() =>
             {
@@ -130,7 +145,12 @@ namespace FoxTunes
             }
             catch (Exception exception)
             {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data: {0}", exception.Message);
+                var task = this.Render();
+#else
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data, disabling: {0}", exception.Message);
+#endif
             }
         }
 
@@ -148,28 +168,28 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static void Render(BitmapHelper.RenderInfo info, SpectrogramRendererData data)
+        private static void Render(BitmapHelper.RenderInfo info, SpectrogramRendererData data, Color[] colors)
         {
-            //BitmapHelper.Clear(info);
-
             if (data.SampleCount == 0)
             {
                 //No data.
+                BitmapHelper.Clear(info);
                 return;
             }
 
             BitmapHelper.ShiftLeft(info, 1);
 
-            var x = info.Width - 1;
-            var red = info.Red;
-            var green = info.Green;
-            var blue = info.Blue;
+            var x = data.Width - 1;
+            var h = data.Height - 1;
             var values = data.Values;
             for (var y = 0; y < data.Height; y++)
             {
-                info.Red = (red + ((values[y] & 0xFFFFFF) >> 16)) & 0xFF;
-                info.Green = (values[y] & 0xFFFF) >> 8;
-                info.Blue = values[y] & 0xFF;
+                var value1 = (double)values[h - y] / FACTOR;
+                var value2 = Convert.ToInt32(value1 * colors.Length);
+                var color = colors[value2];
+                info.Red = color.R;
+                info.Green = color.G;
+                info.Blue = color.B;
                 BitmapHelper.DrawDot(info, x, y);
             }
         }
@@ -181,29 +201,24 @@ namespace FoxTunes
 
         private static void UpdateValues(int width, int height, float[] samples, int sampleCount, int[] values)
         {
-            float num = 0f;
-            float num2 = 0f;
-            int num3 = 0;
-            int num4 = 0;
-            double num5 = 2047d / height;
+            var num1 = 0f;
+            var num2 = 0f;
+            var num3 = 0;
+            var num4 = 0;
+            var num5 = (double)sampleCount / height;
 
-            for (int a = 1; a < sampleCount; a++)
+            Array.Clear(values, 0, values.Length);
+
+            for (var a = 1; a < sampleCount; a++)
             {
-                num3 = (int)(Math.Sqrt(samples[a]) * (double)4 * 65535.0);
-                if (num4 < num3)
-                {
-                    num4 = num3;
-                }
-
-                if (num4 < 0)
-                {
-                    num4 = 0;
-                }
-                num = (float)Math.Round((double)a / num5) - 1f;
-                if (num > num2)
+                num3 = (int)(Math.Sqrt(samples[a]) * FACTOR);
+                num4 = Math.Max(num3, num4);
+                num4 = Math.Max(num4, 0);
+                num1 = (float)Math.Round((double)a / num5) - 1f;
+                if (num1 > num2)
                 {
                     values[Convert.ToInt32(num2)] = num4;
-                    num2 = num;
+                    num2 = num1;
                     num4 = 0;
                 }
             }

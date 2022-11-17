@@ -213,6 +213,35 @@ namespace FoxTunes
             }
         }
 
+        public static void ClearDot(RenderInfo info, int x, int y)
+        {
+            //Check arguments are valid.
+            if (x < 0 || y < 0)
+            {
+#if DEBUG
+                throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
+            }
+
+            if (x >= info.Width || y >= info.Height)
+            {
+#if DEBUG
+                throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
+            }
+
+            var buffer = IntPtr.Add(info.Buffer, (x * info.BytesPerPixel) + (y * info.Stride));
+
+            memset(IntPtr.Add(buffer, 0), 0, new UIntPtr(1));
+            memset(IntPtr.Add(buffer, 1), 0, new UIntPtr(1));
+            memset(IntPtr.Add(buffer, 2), 0, new UIntPtr(1));
+            memset(IntPtr.Add(buffer, 3), 0, new UIntPtr(1));
+        }
+
         [DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern IntPtr memset(IntPtr destination, int value, UIntPtr count);
 

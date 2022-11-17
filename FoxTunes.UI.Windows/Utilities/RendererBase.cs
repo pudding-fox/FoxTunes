@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -863,6 +865,59 @@ namespace FoxTunes
                     color.Shade(contrast)
                 };
             }
+        }
+
+        public static Color[] ToGradient(this KeyValuePair<int, Color>[] colors)
+        {
+            var min = colors.Min(color => color.Key);
+            var max = colors.Max(color => color.Key);
+            var result = new Color[max];
+            for (var a = 0; a < colors.Length; a++)
+            {
+                var previousOffset = 0;
+                var previousColor = default(Color);
+                if (a == 0)
+                {
+                    previousOffset = 0;
+                    previousColor = Colors.Black;
+                }
+                else
+                {
+                    previousOffset = colors[a - 1].Key;
+                    previousColor = colors[a - 1].Value;
+                }
+                var nextOffset = 0;
+                var nextColor = default(Color);
+                if (a == colors.Length - 1)
+                {
+                    nextOffset = max;
+                    nextColor = Colors.White;
+                }
+                else
+                {
+                    nextOffset = colors[a + 1].Key;
+                    nextColor = colors[a + 1].Value;
+                }
+                var offset = colors[a].Key;
+                var color = colors[a].Value;
+                for (int b = previousOffset; b < offset; b++)
+                {
+                    result[b] = Interpolate(previousColor, color, (float)b / (offset - 1));
+                }
+            }
+            return result;
+        }
+
+        public static Color Interpolate(Color color1, Color color2, float ratio)
+        {
+            var ratio1 = 1 - ratio;
+            var ratio2 = ratio;
+            return Color.FromArgb(
+                (byte)Math.Round(color1.A * ratio1 + color2.A * ratio2),
+                (byte)Math.Round(color1.R * ratio1 + color2.R * ratio2),
+                (byte)Math.Round(color1.G * ratio1 + color2.G * ratio2),
+                (byte)Math.Round(color1.B * ratio1 + color2.B * ratio2)
+            );
         }
     }
 }
