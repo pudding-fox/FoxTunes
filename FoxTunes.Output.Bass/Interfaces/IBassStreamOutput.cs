@@ -12,10 +12,12 @@
 
         bool CanGetData { get; }
 
+        float[] GetBuffer(int fftSize, bool individual = false);
+
         int GetData(short[] buffer);
 
         int GetData(float[] buffer);
 
-        int GetData(float[] buffer, int fftSize);
+        int GetData(float[] buffer, int fftSize, bool individual = false);
     }
 }

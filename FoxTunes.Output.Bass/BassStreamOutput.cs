@@ -136,7 +136,54 @@ namespace FoxTunes
             return 0;
         }
 
-        public virtual int GetData(float[] buffer, int fftSize)
+        public virtual float[] GetBuffer(int fftSize, bool individual = false)
+        {
+            var length = default(int);
+            switch (fftSize)
+            {
+                case BassFFT.FFT256:
+                    length = BassFFT.FFT256_SIZE;
+                    break;
+                case BassFFT.FFT512:
+                    length = BassFFT.FFT512_SIZE;
+                    break;
+                case BassFFT.FFT1024:
+                    length = BassFFT.FFT1024_SIZE;
+                    break;
+                case BassFFT.FFT2048:
+                    length = BassFFT.FFT2048_SIZE;
+                    break;
+                case BassFFT.FFT4096:
+                    length = BassFFT.FFT4096_SIZE;
+                    break;
+                case BassFFT.FFT8192:
+                    length = BassFFT.FFT8192_SIZE;
+                    break;
+                case BassFFT.FFT16384:
+                    length = BassFFT.FFT16384_SIZE;
+                    break;
+                case BassFFT.FFT32768:
+                    length = BassFFT.FFT32768_SIZE;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            if (individual)
+            {
+                var rate = default(int);
+                var channels = default(int);
+                var flags = default(BassFlags);
+                if (!this.GetFormat(out rate, out channels, out flags))
+                {
+                    Logger.Write(this, LogLevel.Error, "Failed to determine channel count while creating interleaved FFT buffer.");
+                    return null;
+                }
+                length *= channels;
+            }
+            return new float[length];
+        }
+
+        public virtual int GetData(float[] buffer, int fftSize, bool individual = false)
         {
             var length = default(uint);
             switch (fftSize)
@@ -167,6 +214,10 @@ namespace FoxTunes
                     break;
                 default:
                     throw new NotImplementedException();
+            }
+            if (individual)
+            {
+                length |= BassFFT.INDIVIDUAL;
             }
             foreach (var channelHandle in this.GetMixerChannelHandles())
             {
