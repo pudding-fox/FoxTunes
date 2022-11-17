@@ -192,6 +192,9 @@
   <data name="Spectrogram.Name" xml:space="preserve">
     <value>Spectrogram</value>
   </data>
+  <data name="SpectrogramBehaviourConfiguration.ColorPalette" xml:space="preserve">
+    <value>Color Palette</value>
+  </data>
   <data name="SpectrogramBehaviourConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
   </data>
