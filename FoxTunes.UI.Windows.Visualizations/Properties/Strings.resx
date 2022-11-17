@@ -207,6 +207,15 @@
   <data name="SpectrogramBehaviourConfiguration.Path" xml:space="preserve">
     <value>Spectrogram</value>
   </data>
+  <data name="SpectrogramBehaviourConfiguration.Scale" xml:space="preserve">
+    <value>Scale</value>
+  </data>
+  <data name="SpectrogramBehaviourConfiguration.Scale.Linear" xml:space="preserve">
+    <value>Linear</value>
+  </data>
+  <data name="SpectrogramBehaviourConfiguration.Scale.Logarithmic" xml:space="preserve">
+    <value>Logarithmic</value>
+  </data>
   <data name="Spectrum.Name" xml:space="preserve">
     <value>Spectrum</value>
   </data>

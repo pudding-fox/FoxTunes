@@ -1,20 +1,22 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
     public class SpectrogramRenderer : VisualizationBase
     {
-        const double FACTOR = 262140; //4.0 * 65535.0
-
         public SpectrogramRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Mode { get; private set; }
+
+        public SelectionConfigurationElement Scale { get; private set; }
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
@@ -26,6 +28,10 @@ namespace FoxTunes
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 SpectrogramBehaviourConfiguration.SECTION,
                 SpectrogramBehaviourConfiguration.MODE_ELEMENT
+            );
+            this.Scale = this.Configuration.GetElement<SelectionConfigurationElement>(
+                SpectrogramBehaviourConfiguration.SECTION,
+                SpectrogramBehaviourConfiguration.SCALE_ELEMENT
             );
             this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                 SpectrogramBehaviourConfiguration.SECTION,
@@ -40,6 +46,7 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
             this.Mode.ValueChanged += this.OnValueChanged;
+            this.Scale.ValueChanged += this.OnValueChanged;
             this.ColorPalette.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
@@ -63,7 +70,8 @@ namespace FoxTunes
                 bitmap.PixelHeight,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
-                SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value)
+                SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value),
+                SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value)
             );
             this.Viewbox = new Rect(0, 0, this.RendererData.Width, this.RendererData.Height);
         }
@@ -83,7 +91,8 @@ namespace FoxTunes
                     bitmap.PixelHeight,
                     VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                     SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
-                    SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value)
+                    SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value),
+                    SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value)
                 );
             });
         }
@@ -179,6 +188,14 @@ namespace FoxTunes
             {
                 this.Mode.ValueChanged -= this.OnValueChanged;
             }
+            if (this.Scale != null)
+            {
+                this.Scale.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.ColorPalette != null)
+            {
+                this.ColorPalette.ValueChanged -= this.OnValueChanged;
+            }
             if (this.FFTSize != null)
             {
                 this.FFTSize.ValueChanged -= this.OnValueChanged;
@@ -216,8 +233,8 @@ namespace FoxTunes
             var colors = data.Colors;
             for (var y = 0; y < data.Height; y++)
             {
-                var value1 = (double)values[0, h - y] / FACTOR;
-                var value2 = Convert.ToInt32(value1 * colors.Length);
+                var value1 = values[0, h - y];
+                var value2 = Convert.ToInt32(value1 * (colors.Length - 1));
                 var color = colors[value2];
                 info.Red = color.R;
                 info.Green = color.G;
@@ -237,8 +254,8 @@ namespace FoxTunes
                 var offset = channel * h;
                 for (var y = 0; y < h; y++)
                 {
-                    var value1 = (double)values[channel, h - y] / FACTOR;
-                    var value2 = Convert.ToInt32(value1 * colors.Length);
+                    var value1 = values[channel, h - y];
+                    var value2 = Convert.ToInt32(value1 * (colors.Length - 1));
                     var color = colors[value2];
                     info.Red = color.R;
                     info.Green = color.G;
@@ -250,34 +267,45 @@ namespace FoxTunes
 
         private static void UpdateValues(SpectrogramRendererData data)
         {
+            var formatter = default(Func<float, float>);
+            switch (data.Scale)
+            {
+                case SpectrogramRendererScale.Linear:
+                    formatter = sample => ToDecibelFixed(sample);
+                    break;
+                default:
+                case SpectrogramRendererScale.Logarithmic:
+                    formatter = sample => 1f - (float)Math.Pow(1.0 - ToDecibelFixed(sample), 3);
+                    break;
+            }
             switch (data.Mode)
             {
                 default:
                 case SpectrogramRendererMode.Mono:
-                    UpdateValuesMono(data.Width, data.Height, data.Samples, data.Values);
+                    UpdateValuesMono(data.Width, data.Height, data.Samples, data.Values, formatter);
                     break;
                 case SpectrogramRendererMode.Seperate:
-                    UpdateValuesSeperate(data.Width, data.Height, data.Samples, data.Values, data.Channels);
+                    UpdateValuesSeperate(data.Width, data.Height, data.Samples, data.Values, data.Channels, formatter);
                     break;
             }
         }
 
-        private static void UpdateValuesMono(int width, int height, float[] samples, int[,] values)
+        private static void UpdateValuesMono(int width, int height, float[] samples, float[,] values, Func<float, float> formatter)
         {
             var num1 = 0f;
             var num2 = 0f;
-            var num3 = 0;
-            var num4 = 0;
-            var num5 = (double)samples.Length / height;
+            var num3 = 0f;
+            var num4 = 0f;
+            var num5 = (float)samples.Length / (height - 1);
 
             Array.Clear(values, 0, values.Length);
 
             for (var a = 1; a < samples.Length; a++)
             {
-                num3 = (int)(Math.Sqrt(samples[a]) * FACTOR);
+                num3 = formatter(samples[a]);
                 num4 = Math.Max(num3, num4);
                 num4 = Math.Max(num4, 0);
-                num1 = (float)Math.Round((double)a / num5) - 1f;
+                num1 = (float)a / num5;
                 if (num1 > num2)
                 {
                     values[0, Convert.ToInt32(num2)] = num4;
@@ -287,13 +315,13 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateValuesSeperate(int width, int height, float[] samples, int[,] values, int channels)
+        private static void UpdateValuesSeperate(int width, int height, float[] samples, float[,] values, int channels, Func<float, float> formatter)
         {
             var num1 = 0f;
             var num2 = 0f;
-            var num3 = 0;
-            var num4 = 0;
-            var num5 = (double)samples.Length / height;
+            var num3 = 0f;
+            var num4 = 0f;
+            var num5 = (float)samples.Length / (height - 1);
 
             Array.Clear(values, 0, values.Length);
 
@@ -302,10 +330,10 @@ namespace FoxTunes
                 num2 = 0f;
                 for (var a = channel; a < samples.Length; a += channels)
                 {
-                    num3 = (int)(Math.Sqrt(samples[a]) * FACTOR);
+                    num3 = formatter(samples[a]);
                     num4 = Math.Max(num3, num4);
                     num4 = Math.Max(num4, 0);
-                    num1 = (float)Math.Round((double)a / num5) - 1f;
+                    num1 = (float)a / num5;
                     if (num1 > num2)
                     {
                         values[channel, Convert.ToInt32(num2)] = num4;
@@ -316,7 +344,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode)
+        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale)
         {
             var data = new SpectrogramRendererData()
             {
@@ -325,7 +353,8 @@ namespace FoxTunes
                 Height = height,
                 FFTSize = fftSize,
                 Colors = colors,
-                Mode = mode
+                Mode = mode,
+                Scale = scale
             };
             return data;
         }
@@ -350,11 +379,13 @@ namespace FoxTunes
 
             public int SampleCount;
 
-            public int[,] Values;
+            public float[,] Values;
 
             public Color[] Colors;
 
             public SpectrogramRendererMode Mode;
+
+            public SpectrogramRendererScale Scale;
 
             public bool Update()
             {
@@ -398,11 +429,11 @@ namespace FoxTunes
                     default:
                     case SpectrogramRendererMode.Mono:
                         this.Samples = this.Output.GetBuffer(this.FFTSize, false);
-                        this.Values = new int[1, this.Height];
+                        this.Values = new float[1, this.Height];
                         break;
                     case SpectrogramRendererMode.Seperate:
                         this.Samples = this.Output.GetBuffer(this.FFTSize, true);
-                        this.Values = new int[this.Channels, this.Height];
+                        this.Values = new float[this.Channels, this.Height];
                         break;
                 }
             }
@@ -420,5 +451,12 @@ namespace FoxTunes
         None,
         Mono,
         Seperate
+    }
+
+    public enum SpectrogramRendererScale : byte
+    {
+        None,
+        Linear,
+        Logarithmic
     }
 }

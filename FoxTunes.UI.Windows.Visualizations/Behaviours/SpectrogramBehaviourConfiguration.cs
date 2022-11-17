@@ -19,12 +19,19 @@ namespace FoxTunes
 
         public const string MODE_SEPERATE_OPTION = "CCCC8D37-067D-4A43-8AE8-7AD000E3E176";
 
-        public const string COLOR_PALETTE_ELEMENT = "BBBBBAFC-0C99-4329-9DA2-C041E674597E";
+        public const string SCALE_ELEMENT = "BBBB3A79-02DD-4D56-A4F9-4641CF2BA1C8";
+
+        public const string SCALE_LINEAR_OPTION = "AAAA4A52-A0E5-40CA-888B-3D6A29EC0683";
+
+        public const string SCALE_LOGARITHMIC_OPTION = "BBBB5C59-8888-4734-A191-954709375BD0";
+
+        public const string COLOR_PALETTE_ELEMENT = "CCCCBAFC-0C99-4329-9DA2-C041E674597E";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Mode, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
+                .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Scale, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetScaleOptions()))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_ColorPalette, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }
@@ -47,11 +54,28 @@ namespace FoxTunes
             }
         }
 
+        private static IEnumerable<SelectionConfigurationOption> GetScaleOptions()
+        {
+            yield return new SelectionConfigurationOption(SCALE_LINEAR_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Linear);
+            yield return new SelectionConfigurationOption(SCALE_LOGARITHMIC_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Logarithmic).Default();
+        }
+
+        public static SpectrogramRendererScale GetScale(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
+            {
+                case SCALE_LINEAR_OPTION:
+                    return SpectrogramRendererScale.Linear;
+                default:
+                case SCALE_LOGARITHMIC_OPTION:
+                    return SpectrogramRendererScale.Logarithmic;
+            }
+        }
+
         public static string GetDefaultColorPalette()
         {
             var builder = new StringBuilder();
             builder.AppendLine("0:Black");
-            builder.AppendLine("25:Gray");
             builder.AppendLine("100:White");
             return builder.ToString();
         }
