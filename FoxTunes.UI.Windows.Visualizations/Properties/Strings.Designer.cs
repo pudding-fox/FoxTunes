@@ -358,6 +358,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Smoothing.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Smoothing {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Smoothing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Smoothing_Off {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Smoothing.Off", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string Spectrum_Name {
