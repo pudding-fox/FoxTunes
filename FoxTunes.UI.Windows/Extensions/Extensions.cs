@@ -6,6 +6,8 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 
 namespace FoxTunes
 {
@@ -198,6 +200,18 @@ namespace FoxTunes
         public static bool HasBinding(this DependencyObject element, DependencyProperty property)
         {
             return BindingOperations.GetBindingExpression(element, property) != null;
+        }
+
+        public static WriteableBitmap Resize(this WriteableBitmap source, Size size)
+        {
+            var visual = new DrawingVisual();
+            using (var context = visual.RenderOpen())
+            {
+                context.DrawImage(source, new Rect(0, 0, size.Width, size.Height));
+            }
+            var target = new RenderTargetBitmap((int)size.Width, (int)size.Height, source.DpiX, source.DpiY, source.Format);
+            target.Render(visual);
+            return new WriteableBitmap(target);
         }
     }
 }
