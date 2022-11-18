@@ -1,4 +1,7 @@
-﻿namespace FoxTunes.Interfaces
+﻿using ManagedBass;
+using System.Collections.Generic;
+
+namespace FoxTunes.Interfaces
 {
     public interface IBassStreamOutput : IBassStreamControllable, IBassStreamComponent
     {
@@ -12,7 +15,7 @@
 
         bool CanGetData { get; }
 
-        float[] GetBuffer(int fftSize, bool individual = false);
+        bool GetDataFormat(out int rate, out int channels, out BassFlags flags);
 
         int GetData(short[] buffer);
 

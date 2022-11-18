@@ -80,9 +80,9 @@ namespace FoxTunes
 
         public abstract Task Shutdown();
 
-        public abstract bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
+        public abstract bool GetOutputFormat(out int rate, out int channels, out OutputStreamFormat format);
 
-        public abstract bool GetChannelMap(out IDictionary<int, OutputChannel> channels);
+        public abstract bool GetOutputChannelMap(out IDictionary<int, OutputChannel> channels);
 
         public abstract bool CanGetData { get; }
 
@@ -96,6 +96,10 @@ namespace FoxTunes
         }
 
         public event EventHandler CanGetDataChanged;
+
+        public abstract bool GetDataFormat(out int rate, out int channels, out OutputStreamFormat format);
+
+        public abstract bool GetDataChannelMap(out IDictionary<int, OutputChannel> channels);
 
         public abstract T[] GetBuffer<T>(TimeSpan duration) where T : struct;
 

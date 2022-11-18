@@ -649,7 +649,7 @@ namespace FoxTunes
 
             public bool Update()
             {
-                if (!this.Renderer.Output.GetFormat(out this.Rate, out this.Channels, out this.Format))
+                if (!this.Renderer.Output.GetDataFormat(out this.Rate, out this.Channels, out this.Format))
                 {
                     return false;
                 }

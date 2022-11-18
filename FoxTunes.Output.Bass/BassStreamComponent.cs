@@ -38,8 +38,13 @@ namespace FoxTunes
 
         public virtual bool GetFormat(out int rate, out int channels, out BassFlags flags)
         {
+            return this.GetFormat(this.ChannelHandle, out rate, out channels, out flags);
+        }
+
+        public virtual bool GetFormat(int channelHandle, out int rate, out int channels, out BassFlags flags)
+        {
             var info = default(ChannelInfo);
-            if (!Bass.ChannelGetInfo(this.ChannelHandle, out info))
+            if (!Bass.ChannelGetInfo(channelHandle, out info))
             {
                 rate = 0;
                 channels = 0;

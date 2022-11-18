@@ -108,6 +108,18 @@ namespace FoxTunes
 
         protected abstract IEnumerable<int> GetMixerChannelHandles();
 
+        public virtual bool GetDataFormat(out int rate, out int channels, out BassFlags flags)
+        {
+            foreach (var channelHandle in this.GetMixerChannelHandles())
+            {
+                return this.GetFormat(channelHandle, out rate, out channels, out flags);
+            }
+            rate = 0;
+            channels = 0;
+            flags = this.Flags;
+            return false;
+        }
+
         private static readonly object ChannelDataSyncRoot = new object();
 
         public virtual int GetData(short[] buffer)
@@ -134,53 +146,6 @@ namespace FoxTunes
                 }
             }
             return 0;
-        }
-
-        public virtual float[] GetBuffer(int fftSize, bool individual = false)
-        {
-            var length = default(int);
-            switch (fftSize)
-            {
-                case BassFFT.FFT256:
-                    length = BassFFT.FFT256_SIZE;
-                    break;
-                case BassFFT.FFT512:
-                    length = BassFFT.FFT512_SIZE;
-                    break;
-                case BassFFT.FFT1024:
-                    length = BassFFT.FFT1024_SIZE;
-                    break;
-                case BassFFT.FFT2048:
-                    length = BassFFT.FFT2048_SIZE;
-                    break;
-                case BassFFT.FFT4096:
-                    length = BassFFT.FFT4096_SIZE;
-                    break;
-                case BassFFT.FFT8192:
-                    length = BassFFT.FFT8192_SIZE;
-                    break;
-                case BassFFT.FFT16384:
-                    length = BassFFT.FFT16384_SIZE;
-                    break;
-                case BassFFT.FFT32768:
-                    length = BassFFT.FFT32768_SIZE;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-            if (individual)
-            {
-                var rate = default(int);
-                var channels = default(int);
-                var flags = default(BassFlags);
-                if (!this.GetFormat(out rate, out channels, out flags))
-                {
-                    Logger.Write(this, LogLevel.Error, "Failed to determine channel count while creating interleaved FFT buffer.");
-                    return null;
-                }
-                length *= channels;
-            }
-            return new float[length];
         }
 
         public virtual int GetData(float[] buffer, int fftSize, bool individual = false)

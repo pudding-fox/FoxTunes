@@ -543,7 +543,7 @@ namespace FoxTunes
                 var rate = default(int);
                 var channels = default(int);
                 var format = default(OutputStreamFormat);
-                if (!this.Renderer.Output.GetFormat(out rate, out channels, out format))
+                if (!this.Renderer.Output.GetDataFormat(out rate, out channels, out format))
                 {
                     return false;
                 }
