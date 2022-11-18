@@ -97,7 +97,7 @@ namespace FoxTunes
                     BassUtils.Throw();
                 }
                 Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
-                BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
+                BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer | BassFlags.MixerDownMix));
                 BassUtils.OK(BassAsioHandler.StreamSet(this.ChannelHandle));
                 this.MixerChannelHandles.Add(previous.ChannelHandle);
             }
@@ -141,6 +141,11 @@ namespace FoxTunes
                         Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
                         rate = nearestRate;
                     }
+                }
+                if (BassAsioDevice.Info.Outputs < channels)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassAsioDevice.Info.Outputs);
+                    channels = BassAsioDevice.Info.Outputs;
                 }
             }
             BassAsioDevice.Init(
