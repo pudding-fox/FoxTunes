@@ -282,30 +282,29 @@ namespace FoxTunes
 
         private static void UpdateValuesMono(int width, int height, float[] samples, float[,] values, SpectrogramRendererScale scale)
         {
-            var dB = 0f;
             var num1 = 0f;
             var num2 = 0f;
             var num3 = 0f;
             var num4 = 0f;
-            var num5 = (float)samples.Length / (height - 1);
+            var num5 = (float)(samples.Length - 1) / (height - 1);
 
             Array.Clear(values, 0, values.Length);
 
-            for (var a = 1; a < samples.Length; a++)
+            for (var a = 0; a < samples.Length; a++)
             {
-                dB = ToDecibelFixed(samples[a]);
-                num1 = (float)a / num5;
                 switch (scale)
                 {
                     default:
                     case SpectrogramRendererScale.Linear:
-                        num3 = dB;
+                        num1 = (float)a / num5;
                         break;
                     case SpectrogramRendererScale.Logarithmic:
-                        //TODO: Implement me.
-                        num3 = 0f;
+                        num1 = (float)a / (samples.Length - 1);
+                        num1 = Convert.ToSingle(1 - Math.Pow(1 - num1, 5));
+                        num1 = num1 * (height - 1);
                         break;
                 }
+                num3 = ToDecibelFixed(samples[a]);
                 num4 = Math.Max(num3, num4);
                 num4 = Math.Min(num4, 1);
                 num4 = Math.Max(num4, 0);
@@ -320,7 +319,6 @@ namespace FoxTunes
 
         private static void UpdateValuesSeperate(int width, int height, float[] samples, float[,] values, int channels, SpectrogramRendererScale scale)
         {
-            var dB = 0f;
             var num1 = 0f;
             var num2 = 0f;
             var num3 = 0f;
@@ -334,19 +332,19 @@ namespace FoxTunes
                 num2 = 0f;
                 for (var a = channel; a < samples.Length; a += channels)
                 {
-                    dB = ToDecibelFixed(samples[a]);
-                    num1 = (float)a / num5;
                     switch (scale)
                     {
                         default:
                         case SpectrogramRendererScale.Linear:
-                            num3 = dB;
+                            num1 = (float)a / num5;
                             break;
                         case SpectrogramRendererScale.Logarithmic:
-                            //TODO: Implement me.
-                            num3 = 0f;
+                            num1 = (float)a / (samples.Length - 1);
+                            num1 = Convert.ToSingle(1 - Math.Pow(1 - num1, 5));
+                            num1 = num1 * (height - 1);
                             break;
                     }
+                    num3 = ToDecibelFixed(samples[a]);
                     num4 = Math.Max(num3, num4);
                     num4 = Math.Max(num4, 0);
                     if (num1 > num2)
