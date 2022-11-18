@@ -107,7 +107,7 @@ namespace FoxTunes
 
         public static event EventHandler ShuttingDown;
 
-        public static Task Invoke(Action action)
+        public static Task Invoke(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
         {
             var dispatcher = Dispatcher;
             if (dispatcher != null)
@@ -130,7 +130,7 @@ namespace FoxTunes
                         {
                             source.SetResult(false);
                         }
-                    }));
+                    }), priority);
                     return source.Task;
 #else
                     return dispatcher.BeginInvoke(action).Task;

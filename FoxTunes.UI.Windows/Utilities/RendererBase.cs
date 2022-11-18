@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -19,6 +19,8 @@ namespace FoxTunes
         public const int DB_MAX = 0;
 
         public const int ROLLOFF_INTERVAL = 500;
+
+        public const DispatcherPriority DISPATCHER_PRIORITY = DispatcherPriority.Render;
 
         protected static ILogger Logger
         {
