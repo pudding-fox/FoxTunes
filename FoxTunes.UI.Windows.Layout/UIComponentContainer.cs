@@ -167,6 +167,7 @@ namespace FoxTunes
                     Converter = this
                 }
             );
+            this.Loaded -= this.OnLoaded;
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

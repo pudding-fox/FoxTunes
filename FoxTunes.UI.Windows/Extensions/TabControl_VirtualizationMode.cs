@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -171,17 +172,38 @@ namespace FoxTunes
                 var cachedContent = GetInternalCachedContent(tabItem);
                 if (cachedContent == null)
                 {
-                    cachedContent = new ContentControl()
+                    if (item is TabItem)
                     {
-                        DataContext = item,
-                        ContentTemplate = GetTemplate(this.TabControl),
-                    };
-
-                    cachedContent.SetBinding(ContentControl.ContentProperty, new Binding());
+                        cachedContent = this.CreateContentFromTabItem((TabItem)item);
+                    }
+                    else
+                    {
+                        cachedContent = this.CreateContentFromDataContext(item);
+                    }
                     SetInternalCachedContent(tabItem, cachedContent);
                 }
 
                 return cachedContent;
+            }
+
+            protected virtual ContentControl CreateContentFromTabItem(TabItem tabItem)
+            {
+                var contentControl = new ContentControl()
+                {
+                    Content = tabItem.Content
+                };
+                return contentControl;
+            }
+
+            protected virtual ContentControl CreateContentFromDataContext(object dataContext)
+            {
+                var contentControl = new ContentControl()
+                {
+                    DataContext = dataContext,
+                    ContentTemplate = GetTemplate(this.TabControl),
+                };
+                contentControl.SetBinding(ContentControl.ContentProperty, new Binding());
+                return contentControl;
             }
 
             public static ContentManager GetContentManager(TabControl tabControl, Decorator container)
