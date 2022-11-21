@@ -177,7 +177,8 @@ namespace FoxTunes
             {
                 if (!data.Update())
                 {
-                    data.Clear();
+                    this.Start();
+                    return;
                 }
                 UpdateValues(data);
 
@@ -484,12 +485,6 @@ namespace FoxTunes
                         this.Values = new float[this.Channels, this.Height];
                         break;
                 }
-            }
-
-            public void Clear()
-            {
-                Array.Clear(this.Samples, 0, this.Samples.Length);
-                this.SampleCount = 0;
             }
         }
     }
