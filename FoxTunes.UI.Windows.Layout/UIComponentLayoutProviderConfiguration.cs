@@ -21,6 +21,7 @@ namespace FoxTunes
                     .DependsOn(SECTION, LAYOUT, UIComponentLayoutProvider.ID))
                 .WithElement(new TextConfigurationElement(MAIN_LAYOUT, Strings.UIComponentLayoutProviderConfiguration_MainLayout, path: Strings.UIComponentLayoutProviderConfiguration_Path)
                     .WithValue(Resources.Main_1)
+                    .WithFlags(ConfigurationElementFlags.MultiLine)
                     .DependsOn(SECTION, LAYOUT, UIComponentLayoutProvider.ID)
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(

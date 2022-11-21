@@ -358,6 +358,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default (With Visualizations).
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Main_3 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stack Grid.
         /// </summary>
         internal static string UIComponentStackContainer_Name {

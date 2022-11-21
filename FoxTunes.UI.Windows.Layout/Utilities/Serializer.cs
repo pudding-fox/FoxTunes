@@ -183,10 +183,10 @@ namespace FoxTunes
                         break;
                     }
                 }
-            }
-            if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, nameof(UIComponentConfiguration)))
-            {
-                reader.ReadEndElement();
+                if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, nameof(UIComponentConfiguration)))
+                {
+                    reader.ReadEndElement();
+                }
             }
             return new UIComponentConfiguration()
             {

@@ -114,8 +114,6 @@ namespace FoxTunes
         {
             get
             {
-                var container = UIComponentDesignerOverlay.Container;
-
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ADD,

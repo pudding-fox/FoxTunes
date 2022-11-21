@@ -89,6 +89,11 @@ namespace FoxTunes
 
         protected virtual async void OnElapsed(object sender, ElapsedEventArgs e)
         {
+            if (!this.IsInitialized)
+            {
+                //This can happen if debugging the startup process.
+                return;
+            }
             try
             {
                 if (global::FoxTunes.BackgroundTask.Active.Any())
