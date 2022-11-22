@@ -532,7 +532,7 @@ namespace FoxTunes
             }
             if (orientation == Orientation.Horizontal)
             {
-                var step = height / values.Length;
+                var step = Math.Max(height / values.Length, 1);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var barWidth = Math.Max(Convert.ToInt32(values[a] * width), 1);
@@ -544,7 +544,7 @@ namespace FoxTunes
             }
             else if (orientation == Orientation.Vertical)
             {
-                var step = width / values.Length;
+                var step = Math.Max(width / values.Length, 1);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var barHeight = Math.Max(Convert.ToInt32(values[a] * height), 1);
@@ -565,7 +565,7 @@ namespace FoxTunes
             if (orientation == Orientation.Horizontal)
             {
                 var fast = width / 4;
-                var step = height / elements.Length;
+                var step = Math.Max(height / elements.Length, 1);
                 for (int a = 0; a < elements.Length; a++)
                 {
                     peaks[a].Y = a * step;
@@ -609,7 +609,7 @@ namespace FoxTunes
             else if (orientation == Orientation.Vertical)
             {
                 var fast = height / 4;
-                var step = width / elements.Length;
+                var step = Math.Max(width / elements.Length, 1);
                 for (int a = 0; a < elements.Length; a++)
                 {
                     peaks[a].X = a * step;
@@ -790,13 +790,14 @@ namespace FoxTunes
 
         protected static void NoiseReduction(float[,] values, int countx, int county, int smoothing)
         {
+            var value = default(float);
             for (var y = 0; y < county; y++)
             {
+                var start = Math.Max(y - smoothing, 0);
+                var end = Math.Min(y + smoothing, county);
                 for (var x = 0; x < countx; x++)
                 {
-                    var start = Math.Max(y - smoothing, 0);
-                    var end = Math.Min(y + smoothing, county);
-                    var value = default(float);
+                    value = 0;
                     for (var a = start; a < end; a++)
                     {
                         value += values[x, a];
@@ -815,6 +816,20 @@ namespace FoxTunes
                 {
                     destination[channel, b] = source[a + channel];
                 }
+            }
+            return count / channels;
+        }
+
+        protected static int DownmixMono(float[,] destination, float[] source, int channels, int count)
+        {
+            for (int a = 0, b = 0; a < count; a += channels, b++)
+            {
+                destination[0, b] = 0f;
+                for (var channel = 0; channel < channels; channel++)
+                {
+                    destination[0, b] += source[a + channel];
+                }
+                destination[0, b] /= channels;
             }
             return count / channels;
         }

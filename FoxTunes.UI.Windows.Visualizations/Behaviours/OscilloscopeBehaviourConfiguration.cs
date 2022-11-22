@@ -18,15 +18,17 @@ namespace FoxTunes
 
         public const string DURATION_ELEMENT = "BBBBE8CC-88E9-4B66-B2FB-3577CD32D8C7";
 
-        public const int DURATION_MIN = 10;
+        public const int DURATION_MIN = 100;
 
-        public const int DURATION_MAX = 1000;
+        public const int DURATION_MAX = 800;
+
+        public const int DURATION_DEFAULT = 400;
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Mode, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
-                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Duration, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(100).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
+                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Duration, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
             );
         }
 

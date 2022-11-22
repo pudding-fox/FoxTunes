@@ -135,7 +135,7 @@ namespace FoxTunes
             });
         }
 
-        protected virtual async Task Render()
+        protected virtual async Task Render(SpectrumRendererData data)
         {
             const byte SHADE = 30;
 
@@ -181,19 +181,30 @@ namespace FoxTunes
                 return;
             }
 
-            Render(valueRenderInfo, rmsRenderInfo, crestRenderInfo, this.RendererData);
+            try
+            {
+                Render(valueRenderInfo, rmsRenderInfo, crestRenderInfo, data);
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
+#else
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum, disabling: {0}", e.Message);
+                success = false;
+#endif
+            }
 
             await Windows.Invoke(() =>
             {
-                if (!object.ReferenceEquals(this.Bitmap, bitmap))
-                {
-                    return;
-                }
-
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
+            if (!success)
+            {
+                return;
+            }
             this.Start();
         }
 
@@ -248,11 +259,16 @@ namespace FoxTunes
                     }
                 }
 
-                var task = this.Render();
+                var task = this.Render(data);
             }
             catch (Exception exception)
             {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data: {0}", exception.Message);
+                this.Start();
+#else
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
+#endif
             }
         }
 
@@ -303,18 +319,24 @@ namespace FoxTunes
             }
         }
 
-        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, BitmapHelper.RenderInfo crestRenderInfo, SpectrumRendererData rendererData)
+        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, BitmapHelper.RenderInfo crestRenderInfo, SpectrumRendererData data)
         {
-            var valueElements = rendererData.ValueElements;
-            var rmsElements = rendererData.RmsElements;
-            var crestPoints = rendererData.CrestPoints;
-            var peakElements = rendererData.PeakElements;
+            var valueElements = data.ValueElements;
+            var rmsElements = data.RmsElements;
+            var crestPoints = data.CrestPoints;
+            var peakElements = data.PeakElements;
 
             BitmapHelper.Clear(valueRenderInfo);
 
-            if (rendererData.SampleCount == 0)
+            if (data.SampleCount == 0)
             {
                 //No data.
+                return;
+            }
+
+            if (valueRenderInfo.Width != data.Width || valueRenderInfo.Height != data.Height)
+            {
+                //Bitmap does not match data.
                 return;
             }
 

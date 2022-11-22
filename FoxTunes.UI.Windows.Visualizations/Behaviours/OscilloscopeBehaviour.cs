@@ -40,14 +40,39 @@ namespace FoxTunes
                         CATEGORY,
                         option.Id,
                         option.Name,
+                        path: this.Mode.Name,
                         attributes: this.Mode.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                }
+                for (var value = OscilloscopeBehaviourConfiguration.DURATION_MIN; value <= OscilloscopeBehaviourConfiguration.DURATION_MAX; value += 100)
+                {
+                    yield return new InvocationComponent(
+                        CATEGORY,
+                        this.Duration.Id,
+                        string.Format("{0}ms", value),
+                        path: this.Duration.Name,
+                        attributes: this.Duration.Value == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                 }
             }
         }
 
         public Task InvokeAsync(IInvocationComponent component)
         {
-            this.Mode.Value = this.Mode.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            if (string.Equals(this.Mode.Name, component.Path))
+            {
+                this.Mode.Value = this.Mode.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            }
+            else if (string.Equals(this.Duration.Name, component.Path))
+            {
+                var value = default(int);
+                if (!string.IsNullOrEmpty(component.Name) && component.Name.Length > 2 && int.TryParse(component.Name.Substring(0, component.Name.Length - 2), out value))
+                {
+                    this.Duration.Value = value;
+                }
+                else
+                {
+                    this.Duration.Value = OscilloscopeBehaviourConfiguration.DURATION_DEFAULT;
+                }
+            }
             this.Configuration.Save();
 #if NET40
             return TaskEx.FromResult(false);

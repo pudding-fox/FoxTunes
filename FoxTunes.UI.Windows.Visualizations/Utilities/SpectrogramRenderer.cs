@@ -114,7 +114,7 @@ namespace FoxTunes
             return base.CreateBitmap(size);
         }
 
-        protected virtual async Task Render()
+        protected virtual async Task Render(SpectrogramRendererData data)
         {
             if (!PlaybackStateNotifier.IsPlaying)
             {
@@ -149,19 +149,30 @@ namespace FoxTunes
                 return;
             }
 
-            Render(info, this.RendererData);
+            try
+            {
+                Render(info, data);
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram: {0}", e.Message);
+#else
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram, disabling: {0}", e.Message);
+                success = false;
+#endif
+            }
 
             await Windows.Invoke(() =>
             {
-                if (!object.ReferenceEquals(this.Bitmap, bitmap))
-                {
-                    return;
-                }
-
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
+            if (!success)
+            {
+                return;
+            }
             this.Start();
         }
 
@@ -182,13 +193,13 @@ namespace FoxTunes
                 }
                 UpdateValues(data);
 
-                var task = this.Render();
+                var task = this.Render(data);
             }
             catch (Exception exception)
             {
 #if DEBUG
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data: {0}", exception.Message);
-                var task = this.Render();
+                this.Start();
 #else
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data, disabling: {0}", exception.Message);
 #endif
@@ -230,6 +241,12 @@ namespace FoxTunes
             if (data.SampleCount == 0)
             {
                 //No data.
+                return;
+            }
+
+            if (info.Width != data.Width || info.Height != data.Height)
+            {
+                //Bitmap does not match data.
                 return;
             }
 

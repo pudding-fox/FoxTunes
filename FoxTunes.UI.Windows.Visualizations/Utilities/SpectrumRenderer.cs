@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -100,6 +101,10 @@ namespace FoxTunes
                 this.ShowPeaks.Value,
                 this.HighCut.Value
             );
+            if (this.RendererData == null)
+            {
+                return;
+            }
             this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), bitmap.PixelHeight);
         }
 
@@ -124,7 +129,7 @@ namespace FoxTunes
             });
         }
 
-        protected virtual async Task Render()
+        protected virtual async Task Render(SpectrumRendererData data)
         {
             var bitmap = default(WriteableBitmap);
             var success = default(bool);
@@ -153,19 +158,30 @@ namespace FoxTunes
                 return;
             }
 
-            Render(info, this.RendererData);
+            try
+            {
+                Render(info, data);
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
+#else
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum, disabling: {0}", e.Message);
+                success = false;
+#endif
+            }
 
             await Windows.Invoke(() =>
             {
-                if (!object.ReferenceEquals(this.Bitmap, bitmap))
-                {
-                    return;
-                }
-
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
+            if (!success)
+            {
+                return;
+            }
             this.Start();
         }
 
@@ -205,11 +221,16 @@ namespace FoxTunes
                     data.LastUpdated = DateTime.UtcNow;
                 }
 
-                var task = this.Render();
+                var task = this.Render(data);
             }
             catch (Exception exception)
             {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data: {0}", exception.Message);
+                this.Start();
+#else
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
+#endif
             }
         }
 
@@ -219,7 +240,8 @@ namespace FoxTunes
             {
                 return 1;
             }
-            return this.RendererData.Count * this.RendererData.Step;
+            var step = this.RendererData.Width / this.RendererData.Count;
+            return this.RendererData.Count * step;
         }
 
         protected override Freezable CreateInstanceCore()
@@ -260,20 +282,26 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static void Render(BitmapHelper.RenderInfo info, SpectrumRendererData rendererData)
+        private static void Render(BitmapHelper.RenderInfo info, SpectrumRendererData data)
         {
-            var elements = rendererData.Elements;
-            var peaks = rendererData.Peaks;
+            var elements = data.Elements;
+            var peaks = data.Peaks;
 
             BitmapHelper.Clear(info);
 
-            if (rendererData.SampleCount == 0)
+            if (data.SampleCount == 0)
             {
                 //No data.
                 return;
             }
 
-            for (var a = 0; a < rendererData.Count; a++)
+            if (info.Width != data.Width || info.Height != data.Height)
+            {
+                //Bitmap does not match data.
+                return;
+            }
+
+            for (var a = 0; a < elements.Length; a++)
             {
                 BitmapHelper.DrawRectangle(
                     info,
@@ -304,12 +332,22 @@ namespace FoxTunes
             var samples = data.Samples;
             var values = data.Values;
 
-            if (data.SamplesPerElement > 1)
+            var samplesPerElement = data.FFTRange / data.Count;
+
+            if (samplesPerElement == 1)
             {
-                for (int a = 0, b = 0; a < data.FFTRange && b < values.Length; a += data.SamplesPerElement, b++)
+                for (int a = 0; a < data.FFTRange && a < values.Length; a++)
+                {
+                    var value = samples[a];
+                    values[a] = ToDecibelFixed(value);
+                }
+            }
+            else if (samplesPerElement > 1)
+            {
+                for (int a = 0, b = 0; a < data.FFTRange && b < values.Length; a += samplesPerElement, b++)
                 {
                     var value = default(float);
-                    for (var c = 0; c < data.SamplesPerElement; c++)
+                    for (var c = 0; c < samplesPerElement; c++)
                     {
                         value = Math.Max(samples[a + c], value);
                     }
@@ -319,7 +357,7 @@ namespace FoxTunes
             else
             {
                 //Not enough samples to fill the values, do the best we can.
-                for (int a = 0; a < data.Count; a++)
+                for (int a = 0; a < data.FFTRange && a < values.Length; a++)
                 {
                     var value = samples[a];
                     values[a] = ToDecibelFixed(value);
@@ -329,6 +367,12 @@ namespace FoxTunes
 
         public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, bool highCut)
         {
+            if (count > width)
+            {
+                //Not enough space.
+                return null;
+            }
+
             var data = new SpectrumRendererData()
             {
                 Output = output,
@@ -353,8 +397,6 @@ namespace FoxTunes
             {
                 data.FFTRange = data.Samples.Length;
             }
-            data.SamplesPerElement = Math.Max(data.FFTRange / count, 1);
-            data.Step = width / count;
             return data;
         }
 
@@ -371,10 +413,6 @@ namespace FoxTunes
             public int SampleCount;
 
             public float[] Values;
-
-            public int SamplesPerElement;
-
-            public int Step;
 
             public int Width;
 
