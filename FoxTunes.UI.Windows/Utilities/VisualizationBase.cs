@@ -73,6 +73,18 @@ namespace FoxTunes
             }
         }
 
+        protected virtual void Restart()
+        {
+            lock (this.SyncRoot)
+            {
+                if (!this.Enabled)
+                {
+                    return;
+                }
+                this.Start();
+            }
+        }
+
         public void Stop()
         {
             lock (this.SyncRoot)
