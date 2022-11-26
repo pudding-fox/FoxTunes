@@ -24,11 +24,14 @@ namespace FoxTunes
 
         public const int DURATION_DEFAULT = 400;
 
+        public const string DROP_SHADOW_ELEMENT = "CCCCFC1C-70A0-4F9C-8EB4-37D59760CEC0";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Mode, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
-                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Duration, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
+                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Duration, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10)))
+                .WithElement(new BooleanConfigurationElement(DROP_SHADOW_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_DropShadow, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(false)
             );
         }
 

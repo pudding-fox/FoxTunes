@@ -106,6 +106,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Drop Shadow.
+        /// </summary>
+        internal static string OscilloscopeBehaviourConfiguration_DropShadow {
+            get {
+                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.DropShadow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Duration.
         /// </summary>
         internal static string OscilloscopeBehaviourConfiguration_Duration {

@@ -84,6 +84,12 @@ namespace FoxTunes
             return element.FindResource(resourceKey) as T;
         }
 
+        public static bool TryFindResource<T>(this FrameworkElement element, object resourceKey, out T resource) where T : class
+        {
+            resource = element.TryFindResource(resourceKey) as T;
+            return resource != default(T);
+        }
+
         public static bool GetDataPresent<T>(this IDataObject dataObject)
         {
             foreach (var format in dataObject.GetFormats())

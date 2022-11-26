@@ -14,12 +14,7 @@
              MinHeight="30">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-    </UserControl.Resources>
-    <UserControl.ContextMenu>
-        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:OscilloscopeBehaviour.CATEGORY}}"></Windows:Menu>
-    </UserControl.ContextMenu>
-    <Windows:Visualization>
-        <Rectangle>
+        <Rectangle x:Key="Rectangle">
             <Rectangle.Resources>
                 <LocalWindows:OscilloscopeRenderer x:Key="Renderer"              
                     Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
@@ -27,8 +22,12 @@
                     Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}"></LocalWindows:OscilloscopeRenderer>
             </Rectangle.Resources>
             <Rectangle.Fill>
-                <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
+                <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"/>
             </Rectangle.Fill>
         </Rectangle>
-    </Windows:Visualization>
+    </UserControl.Resources>
+    <UserControl.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:OscilloscopeBehaviour.CATEGORY}}"></Windows:Menu>
+    </UserControl.ContextMenu>
+    <Windows:Visualization Content="{Binding Source={StaticResource Rectangle}}"></Windows:Visualization>
 </Windows:UIComponentBase>

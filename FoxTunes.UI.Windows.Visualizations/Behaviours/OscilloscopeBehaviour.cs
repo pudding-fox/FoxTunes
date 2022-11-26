@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Duration { get; private set; }
 
+        public BooleanConfigurationElement DropShadow { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -26,6 +28,10 @@ namespace FoxTunes
             this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                 OscilloscopeBehaviourConfiguration.SECTION,
                 OscilloscopeBehaviourConfiguration.DURATION_ELEMENT
+            );
+            this.DropShadow = this.Configuration.GetElement<BooleanConfigurationElement>(
+                OscilloscopeBehaviourConfiguration.SECTION,
+                OscilloscopeBehaviourConfiguration.DROP_SHADOW_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -52,6 +58,11 @@ namespace FoxTunes
                         path: this.Duration.Name,
                         attributes: this.Duration.Value == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                 }
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.DropShadow.Id,
+                    this.DropShadow.Name,
+                    attributes: this.DropShadow.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
             }
         }
 
@@ -72,6 +83,10 @@ namespace FoxTunes
                 {
                     this.Duration.Value = OscilloscopeBehaviourConfiguration.DURATION_DEFAULT;
                 }
+            }
+            else if (string.Equals(this.DropShadow.Name, component.Name))
+            {
+                this.DropShadow.Toggle();
             }
             this.Configuration.Save();
 #if NET40
