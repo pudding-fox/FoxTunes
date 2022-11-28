@@ -237,4 +237,7 @@
   <data name="TrackAction.Update" xml:space="preserve">
     <value>Update</value>
   </data>
+  <data name="MinidiscBehaviour.ConfirmWriteDiscWithoutUTOC" xml:space="preserve">
+    <value>The disc UTOC (Text) capacity is exceeded ({0}%), are you sure?</value>
+  </data>
 </root>

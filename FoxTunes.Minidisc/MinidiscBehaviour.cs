@@ -167,16 +167,29 @@ namespace FoxTunes
 
         public async Task<bool> WriteDisc(IDevice device, IDisc currentDisc, IDisc updatedDisc)
         {
-            var percentUsed = updatedDisc.GetCapacity().PercentUsed;
-            if (percentUsed > 100)
             {
-                Logger.Write(this, LogLevel.Warn, "The disc capactiy will be exceeded: {0}", percentUsed);
-                if (!this.UserInterface.Confirm(string.Format(Strings.MinidiscBehaviour_ConfirmWriteDiscWithoutCapacity, percentUsed)))
+                var percentUsed = updatedDisc.GetCapacity().PercentUsed;
+                if (percentUsed > 100)
                 {
-                    return false;
+                    Logger.Write(this, LogLevel.Warn, "The disc capactiy will be exceeded: {0}", percentUsed);
+                    if (!this.UserInterface.Confirm(string.Format(Strings.MinidiscBehaviour_ConfirmWriteDiscWithoutCapacity, percentUsed)))
+                    {
+                        return false;
+                    }
                 }
             }
-            else if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmWriteDisc))
+            {
+                var percentUsed = updatedDisc.GetUTOC().PercentUsed;
+                if (percentUsed > 100)
+                {
+                    Logger.Write(this, LogLevel.Warn, "The disc UTOC will be exceeded: {0}", percentUsed);
+                    if (!this.UserInterface.Confirm(string.Format(Strings.MinidiscBehaviour_ConfirmWriteDiscWithoutUTOC, percentUsed)))
+                    {
+                        return false;
+                    }
+                }
+            }
+            if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmWriteDisc))
             {
                 return false;
             }

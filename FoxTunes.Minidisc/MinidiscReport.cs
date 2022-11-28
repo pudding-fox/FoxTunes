@@ -40,7 +40,7 @@ namespace FoxTunes
             get
             {
                 var disc = GetUpdatedDisc(this.Disc, this.DiscTitle, this.Tracks);
-                return string.Format("{0} ({1}%)", this.DiscTitle, disc.GetCapacity().PercentUsed);
+                return string.Format("{0} (Capacity {1}%, UTOC {2}%)", this.DiscTitle, disc.GetCapacity().PercentUsed, disc.GetUTOC().PercentUsed);
             }
         }
 
@@ -88,12 +88,6 @@ namespace FoxTunes
                             break;
                     }
                 }
-                var length = this.UTOCLength;
-                if (length > UTOC_CAPACITY)
-                {
-                    builder.AppendFormat("Warning: UTOC capacity is exceeded, title data may not be written: {0} > {1}", length, UTOC_CAPACITY);
-                    builder.AppendLine();
-                }
                 return builder.ToString();
             }
         }
@@ -129,52 +123,6 @@ namespace FoxTunes
             {
                 return this.Tracks.Any(pair => pair.Value.Action != TrackAction.NONE);
             }
-        }
-
-        public const int UTOC_CAPACITY = 255;
-
-        public int UTOCLength
-        {
-            get
-            {
-                var length = 0;
-                if (!string.IsNullOrEmpty(this.DiscTitle))
-                {
-                    length += GetUTOCUsage(this.DiscTitle);
-                }
-                foreach (var pair in this.Tracks)
-                {
-                    switch (pair.Value.Action)
-                    {
-                        case TrackAction.NONE:
-                        case TrackAction.ADD:
-                            if (!string.IsNullOrEmpty(pair.Key.Name))
-                            {
-                                length += GetUTOCUsage(pair.Key.Name);
-                            }
-                            break;
-                        case TrackAction.UPDATE:
-                            if (!string.IsNullOrEmpty(pair.Value.Name))
-                            {
-                                length += GetUTOCUsage(pair.Value.Name);
-                            }
-                            break;
-                        case TrackAction.REMOVE:
-                            //Nothing to do.
-                            break;
-                    }
-                }
-                return length;
-            }
-        }
-
-        public static int GetUTOCUsage(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return 0;
-            }
-            return Convert.ToInt32(Math.Floor(Convert.ToSingle(value.Length + 7) / 7));
         }
 
         public override IEnumerable<IInvocationComponent> Invocations
