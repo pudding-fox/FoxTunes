@@ -61,21 +61,38 @@ namespace FoxTunes
                 }
                 foreach (var pair in this.Tracks)
                 {
-                    switch (pair.Value)
+                    switch (pair.Value.Action)
                     {
-                        case TrackAction.None:
+                        case TrackAction.NONE:
                             builder.AppendFormat("Keeping track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                             builder.AppendLine();
                             break;
-                        case TrackAction.Add:
+                        case TrackAction.ADD:
                             builder.AppendFormat("Adding track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                             builder.AppendLine();
                             break;
-                        case TrackAction.Remove:
+                        case TrackAction.UPDATE:
+                            if (!string.Equals(pair.Key.Name, pair.Value.Name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                builder.AppendFormat("Updating track ({0}, {1}): {2} => {3}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name, pair.Value.Name);
+                            }
+                            else
+                            {
+                                builder.AppendFormat("Keeping track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                            }
+                            builder.AppendLine();
+                            break;
+                        case TrackAction.REMOVE:
                             builder.AppendFormat("Removing track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                             builder.AppendLine();
                             break;
                     }
+                }
+                var length = this.UTOCLength;
+                if (length > UTOC_CAPACITY)
+                {
+                    builder.AppendFormat("Warning: UTOC capacity is exceeded, title data may not be written: {0} > {1}", length, UTOC_CAPACITY);
+                    builder.AppendLine();
                 }
                 return builder.ToString();
             }
@@ -110,8 +127,54 @@ namespace FoxTunes
         {
             get
             {
-                return this.Tracks.Any(pair => pair.Value != TrackAction.None);
+                return this.Tracks.Any(pair => pair.Value.Action != TrackAction.NONE);
             }
+        }
+
+        public const int UTOC_CAPACITY = 255;
+
+        public int UTOCLength
+        {
+            get
+            {
+                var length = 0;
+                if (!string.IsNullOrEmpty(this.DiscTitle))
+                {
+                    length += GetUTOCUsage(this.DiscTitle);
+                }
+                foreach (var pair in this.Tracks)
+                {
+                    switch (pair.Value.Action)
+                    {
+                        case TrackAction.NONE:
+                        case TrackAction.ADD:
+                            if (!string.IsNullOrEmpty(pair.Key.Name))
+                            {
+                                length += GetUTOCUsage(pair.Key.Name);
+                            }
+                            break;
+                        case TrackAction.UPDATE:
+                            if (!string.IsNullOrEmpty(pair.Value.Name))
+                            {
+                                length += GetUTOCUsage(pair.Value.Name);
+                            }
+                            break;
+                        case TrackAction.REMOVE:
+                            //Nothing to do.
+                            break;
+                    }
+                }
+                return length;
+            }
+        }
+
+        public static int GetUTOCUsage(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return 0;
+            }
+            return Convert.ToInt32(Math.Floor(Convert.ToSingle(value.Length + 7) / 7));
         }
 
         public override IEnumerable<IInvocationComponent> Invocations
@@ -123,6 +186,14 @@ namespace FoxTunes
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, ACCEPT, Strings.MinidiscReport_Write, attributes: InvocationComponent.ATTRIBUTE_SYSTEM);
                 }
             }
+        }
+
+        public IUserInterface UserInterface { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.UserInterface = core.Components.UserInterface;
+            base.InitializeComponent(core);
         }
 
         public override Task InvokeAsync(IInvocationComponent component)
@@ -148,16 +219,42 @@ namespace FoxTunes
             }
         }
 
-        public void Update(ITrack track, TrackAction action)
+        public void Rename(ITrack track)
         {
-            if (this.Tracks[track] == TrackAction.Add && action == TrackAction.Remove)
+            var name = this.UserInterface.Prompt(Strings.MinidiscReport_Rename, track.Name);
+            if (string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+            if (string.Equals(track.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            var current = default(TrackAction);
+            if (this.Tracks.TryGetValue(track, out current) && current.Action == TrackAction.ADD)
+            {
+                track.Name = name;
+            }
+            else
+            {
+                this.Tracks[track] = new TrackAction(track, name);
+            }
+            this.OnTitleChanged();
+            this.OnDescriptionChanged();
+            this.OnRowsChanged();
+        }
+
+        public void Update(ITrack track, byte action)
+        {
+            var current = default(TrackAction);
+            if (this.Tracks.TryGetValue(track, out current) && current.Action == TrackAction.ADD && action == TrackAction.REMOVE)
             {
                 //Cancel adding new track.
                 this.Tracks.Remove(track);
             }
             else
             {
-                this.Tracks[track] = action;
+                this.Tracks[track] = new TrackAction(track, action);
             }
             this.OnTitleChanged();
             this.OnDescriptionChanged();
@@ -166,9 +263,11 @@ namespace FoxTunes
 
         public class MinidiscReportRow : ReportComponentRow
         {
-            const string REMOVE = "AAAA";
+            const string RENAME = "AAAA";
 
-            const string KEEP = "BBBB";
+            const string REMOVE = "BBBB";
+
+            const string KEEP = "CCCC";
 
             public MinidiscReportRow(MinidiscReport report, ITrack track, TrackAction action)
             {
@@ -189,7 +288,7 @@ namespace FoxTunes
                 {
                     return new[]
                     {
-                        this.Track.Name,
+                        GetTrackName(this.Track, this.Action),
                         this.Track.Time.ToString(@"mm\:ss"),
                         GetFormatName(this.Track.Compression),
                         GetActionName(this.Action)
@@ -201,13 +300,18 @@ namespace FoxTunes
             {
                 get
                 {
-                    switch (this.Action)
+                    switch (this.Action.Action)
                     {
-                        case TrackAction.Add:
-                        case TrackAction.None:
+                        case TrackAction.NONE:
+                        case TrackAction.ADD:
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, RENAME, Strings.MinidiscReportRow_Rename);
                             yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, REMOVE, Strings.MinidiscReportRow_Remove);
                             break;
-                        case TrackAction.Remove:
+                        case TrackAction.UPDATE:
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, RENAME, Strings.MinidiscReportRow_Rename);
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, KEEP, Strings.MinidiscReportRow_Keep);
+                            break;
+                        case TrackAction.REMOVE:
                             yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, KEEP, Strings.MinidiscReportRow_Keep);
                             break;
                     }
@@ -218,11 +322,14 @@ namespace FoxTunes
             {
                 switch (component.Id)
                 {
+                    case RENAME:
+                        this.Report.Rename(this.Track);
+                        break;
                     case REMOVE:
-                        this.Report.Update(this.Track, TrackAction.Remove);
+                        this.Report.Update(this.Track, TrackAction.REMOVE);
                         break;
                     case KEEP:
-                        this.Report.Update(this.Track, TrackAction.None);
+                        this.Report.Update(this.Track, TrackAction.NONE);
                         break;
                 }
                 return base.InvokeAsync(component);
@@ -236,11 +343,11 @@ namespace FoxTunes
             {
                 if (updatedDisc.Tracks.Contains(track))
                 {
-                    actions.Add(track, TrackAction.None);
+                    actions.Add(track, new TrackAction(track, TrackAction.NONE));
                 }
                 else
                 {
-                    actions.Add(track, TrackAction.Remove);
+                    actions.Add(track, new TrackAction(track, TrackAction.REMOVE));
                 }
             }
             foreach (var track in updatedDisc.Tracks)
@@ -251,7 +358,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    actions.Add(track, TrackAction.Add);
+                    actions.Add(track, new TrackAction(track, TrackAction.ADD));
                 }
             }
             return actions;
@@ -272,22 +379,48 @@ namespace FoxTunes
             }
             foreach (var pair in tracks.OrderBy(_pair => _pair.Key.Position))
             {
-                switch (pair.Value)
+                switch (pair.Value.Action)
                 {
-                    case TrackAction.None:
+                    case TrackAction.NONE:
                         Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Keeping track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         break;
-                    case TrackAction.Add:
+                    case TrackAction.ADD:
                         Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Adding track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         updatedDisc.Tracks.Add(pair.Key);
                         break;
-                    case TrackAction.Remove:
+                    case TrackAction.UPDATE:
+                        var track = updatedDisc.Tracks.GetTrack(pair.Key);
+                        if (track == null)
+                        {
+                            Logger.Write(typeof(MinidiscReport), LogLevel.Warn, "Failed to update track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                        }
+                        else if (!string.Equals(track.Name, pair.Value.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Updating track ({0}, {1}): {2} => {3}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name, pair.Value.Name);
+                            track.Name = pair.Value.Name;
+                        }
+                        break;
+                    case TrackAction.REMOVE:
                         Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Removing track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         updatedDisc.Tracks.Remove(pair.Key);
                         break;
                 }
             }
             return updatedDisc;
+        }
+
+        public static string GetTrackName(ITrack track, TrackAction action)
+        {
+            switch (action.Action)
+            {
+                case TrackAction.UPDATE:
+                    if (!string.IsNullOrEmpty(action.Name))
+                    {
+                        return action.Name;
+                    }
+                    break;
+            }
+            return track.Name;
         }
 
         public static string GetFormatName(Compression compression)
@@ -303,8 +436,23 @@ namespace FoxTunes
 
         public static string GetActionName(TrackAction action)
         {
-            var name = Enum.GetName(typeof(TrackAction), action);
-            var localized = Strings.ResourceManager.GetString(string.Format("{0}.{1}", typeof(TrackAction).Name, name));
+            var name = default(string);
+            switch (action.Action)
+            {
+                case TrackAction.NONE:
+                    name = "TrackAction.None";
+                    break;
+                case TrackAction.ADD:
+                    name = "TrackAction.Add";
+                    break;
+                case TrackAction.UPDATE:
+                    name = "TrackAction.Update";
+                    break;
+                case TrackAction.REMOVE:
+                    name = "TrackAction.Remove";
+                    break;
+            }
+            var localized = Strings.ResourceManager.GetString(name);
             if (!string.IsNullOrEmpty(localized))
             {
                 return localized;
@@ -312,11 +460,35 @@ namespace FoxTunes
             return name;
         }
 
-        public enum TrackAction : byte
+        public class TrackAction
         {
-            None,
-            Add,
-            Remove
+            public const byte NONE = 0;
+
+            public const byte ADD = 1;
+
+            public const byte UPDATE = 2;
+
+            public const byte REMOVE = 4;
+
+            public TrackAction(ITrack track, byte action)
+            {
+                this.Track = track;
+                this.Name = track.Name;
+                this.Action = action;
+            }
+
+            public TrackAction(ITrack track, string name)
+            {
+                this.Track = track;
+                this.Name = name;
+                this.Action = UPDATE;
+            }
+
+            public ITrack Track { get; private set; }
+
+            public string Name { get; private set; }
+
+            public byte Action { get; private set; }
         }
     }
 }

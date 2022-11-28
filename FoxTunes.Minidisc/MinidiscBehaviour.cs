@@ -3,6 +3,7 @@ using MD.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -183,6 +184,10 @@ namespace FoxTunes
             var formatManager = new FormatManager(toolManager);
             var actionBuilder = new ActionBuilder(formatManager);
             var actions = actionBuilder.GetActions(device, currentDisc, updatedDisc);
+            if (!actions.Any())
+            {
+                return false;
+            }
             using (var task = new WriteMinidiscTask(device, actions))
             {
                 task.InitializeComponent(this.Core);
