@@ -24,6 +24,7 @@ namespace FoxTunes
             if (this.Device != null)
             {
                 Logger.Write(this, LogLevel.Debug, "Current device: {0}", this.Device.Name);
+                this.Name = string.Format("{0}: {1}", Strings.OpenMinidiscTask_Name, this.Device.Name);
                 Logger.Write(this, LogLevel.Debug, "Reading disc..");
                 this.Disc = this.DiscManager.GetDisc(this.Device);
                 if (this.Disc != null)

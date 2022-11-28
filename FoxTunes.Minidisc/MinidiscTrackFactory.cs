@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -57,7 +58,7 @@ namespace FoxTunes
                 return new MinidiscTrackCollection(
                     this.GetTitle(scriptingContext, fileNames.Keys),
                     fileNames.Select(
-                        pair => new MinidiscTrack(pair.Key, pair.Value, this.GetName(scriptingContext, pair.Key))
+                        (pair, index) => new MinidiscTrack(pair.Key, pair.Value, index, this.GetName(scriptingContext, pair.Key), this.GetTime(pair.Key))
                     ).OrderBy(track => track.TrackName).ToArray()
                 );
             }
@@ -74,11 +75,11 @@ namespace FoxTunes
                     var length = default(TimeSpan);
                     FormatValidator.Default.Validate(fileData.FileName, out length);
                     fileNames[fileData] = fileData.FileName;
-                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is supported.");
+                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is supported.", fileData.FileName);
                 }
                 catch
                 {
-                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is not supported, it requires conversion.");
+                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is not supported, it requires conversion.", fileData.FileName);
                 }
             }
             fileDatas = fileDatas.Except(fileNames.Keys).ToArray();
@@ -161,6 +162,28 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
+        protected virtual TimeSpan GetTime(IFileData fileData)
+        {
+            if (fileData.MetaDatas != null)
+            {
+                lock (fileData.MetaDatas)
+                {
+                    var metaDataItem = fileData.MetaDatas.FirstOrDefault(
+                         element => string.Equals(element.Name, CommonProperties.Duration, StringComparison.OrdinalIgnoreCase) && element.Type == MetaDataItemType.Property
+                    );
+                    if (metaDataItem != null)
+                    {
+                        var duration = default(int);
+                        if (int.TryParse(metaDataItem.Value, out duration))
+                        {
+                            return TimeSpan.FromMilliseconds(duration);
+                        }
+                    }
+                }
+            }
+            return TimeSpan.Zero;
+        }
+
         public static void Cleanup()
         {
             if (!Directory.Exists(TempPath))
@@ -194,18 +217,83 @@ namespace FoxTunes
 
         public class MinidiscTrack
         {
-            public MinidiscTrack(IFileData fileData, string fileName, string trackName)
+            public MinidiscTrack(IFileData fileData, string fileName, int trackNumber, string trackName, TimeSpan trackTime)
             {
                 this.FileData = fileData;
                 this.FileName = fileName;
+                this.TrackNumber = trackNumber;
                 this.TrackName = trackName;
+                this.TrackTime = trackTime;
             }
 
             public IFileData FileData { get; private set; }
 
             public string FileName { get; private set; }
 
+            public int TrackNumber { get; private set; }
+
             public string TrackName { get; private set; }
+
+            public TimeSpan TrackTime { get; private set; }
+        }
+
+        public class StringComparer : IEqualityComparer<string>
+        {
+            public static readonly char[] IGNORED = new[]
+            {
+                '?'
+            };
+
+            public bool Equals(string x, string y)
+            {
+                if (object.ReferenceEquals(x, y))
+                {
+                    return true;
+                }
+                if (x == null || y == null)
+                {
+                    return false;
+                }
+                if (x.Length != y.Length)
+                {
+                    return false;
+                }
+                for (var a = 0; a < x.Length; a++)
+                {
+                    if (IGNORED.Contains(x[a]) || IGNORED.Contains(y[a]))
+                    {
+                        continue;
+                    }
+                    if (!x[a].Equals(y[a]))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            public int GetHashCode(string obj)
+            {
+                if (!(obj is string value))
+                {
+                    return 0;
+                }
+                var hashCode = default(int);
+                unchecked
+                {
+                    for (var a = 0; a < value.Length; a++)
+                    {
+                        if (IGNORED.Contains(value[a]))
+                        {
+                            continue;
+                        }
+                        hashCode += value[a].GetHashCode();
+                    }
+                }
+                return hashCode;
+            }
+
+            public static IEqualityComparer<string> Instance = new StringComparer();
         }
     }
 }

@@ -247,22 +247,61 @@ namespace FoxTunes
                 var track = default(ITrack);
                 try
                 {
-                    track = updatedDisc.Tracks.Add(minidiscTrack.FileName, compression);
+                    if (this.TryGetTrack(updatedDisc, minidiscTrack, compression, out track))
+                    {
+                        this.UpdateTrack(updatedDisc, minidiscTrack, track, compression);
+                    }
+                    else
+                    {
+                        this.AddTrack(updatedDisc, minidiscTrack, compression);
+                    }
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Error, "Error adding track \"{0}\" to disc: {1}", minidiscTrack.FileName, e.Message);
                     errors.Add(e);
-                    continue;
                 }
-                track.Name = minidiscTrack.TrackName;
-                Logger.Write(this, LogLevel.Debug, "Adding track \"{0}\": Name: {1}, Compression: {2}", track.Location, track.Name, Enum.GetName(typeof(Compression), compression));
             }
             if (errors.Any())
             {
                 throw new AggregateException(errors);
             }
             this.Confirm(task.Device, currentDisc, updatedDisc);
+        }
+
+        protected virtual bool TryGetTrack(IDisc disc, MinidiscTrackFactory.MinidiscTrack minidiscTrack, Compression compression, out ITrack track)
+        {
+            for (var a = 0; a < disc.Tracks.Count; a++)
+            {
+                track = disc.Tracks[a];
+                if (MinidiscTrackFactory.StringComparer.Instance.Equals(track.Name, minidiscTrack.TrackName) && Convert.ToInt32(track.Time.TotalSeconds) == Convert.ToInt32(minidiscTrack.TrackTime.TotalSeconds))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Found existing track \"{0}\" at position {1}.", minidiscTrack.TrackName, minidiscTrack.TrackNumber);
+                    return true;
+                }
+            }
+            track = default(ITrack);
+            return false;
+        }
+
+        protected virtual void AddTrack(IDisc disc, MinidiscTrackFactory.MinidiscTrack minidiscTrack, Compression compression)
+        {
+            var track = default(ITrack);
+            try
+            {
+                track = disc.Tracks.Add(minidiscTrack.FileName, compression);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Error adding track \"{0}\" to disc: {1}", minidiscTrack.FileName, e.Message);
+                throw;
+            }
+            track.Name = minidiscTrack.TrackName;
+            Logger.Write(this, LogLevel.Debug, "Adding track \"{0}\": Name: {1}, Compression: {2}", track.Location, track.Name, Enum.GetName(typeof(Compression), compression));
+        }
+
+        protected virtual void UpdateTrack(IDisc updatedDisc, MinidiscTrackFactory.MinidiscTrack minidiscTrack, ITrack track, Compression compression)
+        {
+            Logger.Write(this, LogLevel.Debug, "Updating tracks is not yet implemented: {0}", minidiscTrack.FileName);
         }
 
         protected virtual async Task<OpenMinidiscTask> OpenDisc()
