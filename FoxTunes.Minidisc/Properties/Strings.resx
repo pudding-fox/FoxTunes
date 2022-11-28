@@ -240,4 +240,7 @@
   <data name="MinidiscBehaviour.ConfirmWriteDiscWithoutUTOC" xml:space="preserve">
     <value>The disc UTOC (Text) capacity is exceeded ({0}%), are you sure?</value>
   </data>
+  <data name="ValidateInputFormatsTask.Name" xml:space="preserve">
+    <value>Checking files...</value>
+  </data>
 </root>

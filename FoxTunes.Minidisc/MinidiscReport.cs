@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static FoxTunes.MinidiscTrackFactory;
 
 namespace FoxTunes
 {
@@ -287,26 +288,35 @@ namespace FoxTunes
         public static IDictionary<ITrack, TrackAction> GetActions(IDisc currentDisc, IDisc updatedDisc)
         {
             var actions = new Dictionary<ITrack, TrackAction>();
-            foreach (var track in currentDisc.Tracks)
+            foreach (var currentTrack in currentDisc.Tracks)
             {
-                if (updatedDisc.Tracks.Contains(track))
-                {
-                    actions.Add(track, new TrackAction(track, TrackAction.NONE));
-                }
-                else
-                {
-                    actions.Add(track, new TrackAction(track, TrackAction.REMOVE));
-                }
-            }
-            foreach (var track in updatedDisc.Tracks)
-            {
-                if (currentDisc.Tracks.Contains(track))
+                var updatedTrack = updatedDisc.Tracks.GetTrack(currentTrack);
+                if (updatedTrack != null)
                 {
                     //Nothing to do.
                 }
                 else
                 {
-                    actions.Add(track, new TrackAction(track, TrackAction.ADD));
+                    actions.Add(currentTrack, new TrackAction(currentTrack, TrackAction.REMOVE));
+                }
+            }
+            foreach (var updatedTrack in updatedDisc.Tracks)
+            {
+                var currentTrack = currentDisc.Tracks.GetTrack(updatedTrack);
+                if (currentTrack != null)
+                {
+                    if (!MinidiscTrackFactory.StringComparer.Instance.Equals(currentTrack.Name, updatedTrack.Name))
+                    {
+                        actions.Add(currentTrack, new TrackAction(updatedTrack, updatedTrack.Name));
+                    }
+                    else
+                    {
+                        actions.Add(currentTrack, new TrackAction(updatedTrack, TrackAction.NONE));
+                    }
+                }
+                else
+                {
+                    actions.Add(updatedTrack, new TrackAction(updatedTrack, TrackAction.ADD));
                 }
             }
             return actions;
