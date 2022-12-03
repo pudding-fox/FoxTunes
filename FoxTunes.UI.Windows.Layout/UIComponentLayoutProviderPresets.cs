@@ -35,6 +35,70 @@ namespace FoxTunes
             };
         }
 
+        public static Preset GetPresetById(IEnumerable<Preset> presets, string id)
+        {
+            return presets.FirstOrDefault(preset => string.Equals(preset.Id, id, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static Preset GetPresetByName(IEnumerable<Preset> presets, string name)
+        {
+            return presets.FirstOrDefault(preset => string.Equals(preset.Name, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static Preset GetActivePreset(string sectionId, string presetId, string layoutId, IEnumerable<Preset> presets)
+        {
+            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            var presetElement = configuration.GetElement<SelectionConfigurationElement>(
+                sectionId,
+                presetId
+            );
+            if (presetElement.Value == null)
+            {
+                //No preset selected.
+                return null;
+            }
+            var preset = GetPresetById(presets, presetElement.Value.Id);
+            if (preset == null)
+            {
+                //The selected preset was not found.
+                return null;
+            }
+            var layoutElement = configuration.GetElement<TextConfigurationElement>(
+                sectionId,
+                layoutId
+            );
+            if (!string.Equals(preset.Layout, layoutElement.Value, StringComparison.OrdinalIgnoreCase))
+            {
+                //The selected preset has been modified.
+                return null;
+            }
+            return preset;
+        }
+
+        public static bool IsLoaded(string sectionId, string presetId, string layoutId, IEnumerable<Preset> presets, Preset preset)
+        {
+            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            var presetElement = configuration.GetElement<SelectionConfigurationElement>(
+                sectionId,
+                presetId
+            );
+            if (presetElement.Value == null || !string.Equals(presetElement.Value.Id, preset.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                //Preset not selected.
+                return false;
+            }
+            var layoutElement = configuration.GetElement<TextConfigurationElement>(
+                sectionId,
+                layoutId
+            );
+            if (!string.Equals(preset.Layout, layoutElement.Value, StringComparison.OrdinalIgnoreCase))
+            {
+                //The selected preset has been modified.
+                return false;
+            }
+            return true;
+        }
+
         public static EventHandler Loader(string sectionId, string presetId, string layoutId, IEnumerable<Preset> presets)
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
@@ -53,12 +117,15 @@ namespace FoxTunes
         {
             return (sender, e) =>
             {
-                var preset = presets.FirstOrDefault(
-                    _preset => string.Equals(_preset.Id, presetElement.Value.Id, StringComparison.OrdinalIgnoreCase)
-                );
+                if (presetElement.Value == null)
+                {
+                    //No preset selected.
+                    return;
+                }
+                var preset = GetPresetById(presets, presetElement.Value.Id);
                 if (preset == null)
                 {
-                    //The slected preset was not found.
+                    //The selected preset was not found.
                     return;
                 }
                 layoutElement.Value = preset.Layout;

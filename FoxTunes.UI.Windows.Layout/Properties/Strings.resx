@@ -118,7 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LayoutDesignerBehaviour.Design" xml:space="preserve">
-    <value>Edit Layout</value>
+    <value>Edit</value>
+  </data>
+  <data name="LayoutDesignerBehaviour.Load" xml:space="preserve">
+    <value>Load Preset</value>
+  </data>
+  <data name="LayoutDesignerBehaviour.Overwrite" xml:space="preserve">
+    <value>The current layout has been modified, overwrite it?</value>
+  </data>
+  <data name="LayoutDesignerBehaviour.Path" xml:space="preserve">
+    <value>Layout</value>
   </data>
   <data name="ToolWindowBehaviour.Manage" xml:space="preserve">
     <value>Manage</value>

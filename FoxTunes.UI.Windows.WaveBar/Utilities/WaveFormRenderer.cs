@@ -182,14 +182,20 @@ namespace FoxTunes
                 //No bitmap or failed to establish lock.
                 return;
             }
-
-            Render(
-                this.RendererData,
-                waveRenderInfo,
-                powerRenderInfo,
-                this.Rms.Value,
-                WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
-            );
+            try
+            {
+                Render(
+                    data,
+                    waveRenderInfo,
+                    powerRenderInfo,
+                    this.Rms.Value,
+                    WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
+                );
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
+            }
 
             await Windows.Invoke(() =>
             {
@@ -204,14 +210,22 @@ namespace FoxTunes
             var rendererData = this.RendererData;
             if (generatorData != null && rendererData != null)
             {
-                Update(
-                    generatorData,
-                    rendererData,
-                    this.Rms.Value,
-                    WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
-                );
+                try
+                {
+                    Update(
+                        generatorData,
+                        rendererData,
+                        this.Rms.Value,
+                        WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
+                    );
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
+                    return;
+                }
+                var task = this.Render(rendererData);
             }
-            var task = this.Render(rendererData);
         }
 
         protected virtual double GetPixelWidth()
