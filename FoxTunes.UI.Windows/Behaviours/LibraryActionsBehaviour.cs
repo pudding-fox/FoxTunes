@@ -15,6 +15,10 @@ namespace FoxTunes
 
         public const string RESCAN = "ZZAB";
 
+        public const string SETTINGS = "ZZZZ";
+
+        public ICore Core { get; private set; }
+
         public ILibraryManager LibraryManager { get; private set; }
 
         public IHierarchyManager HierarchyManager { get; private set; }
@@ -27,6 +31,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryManager = core.Managers.Library;
             this.HierarchyManager = core.Managers.Hierarchy;
@@ -49,6 +54,7 @@ namespace FoxTunes
                 }
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REBUILD, Strings.LibraryActionsBehaviour_Rebuild, path: Strings.LibraryActionsBehaviour_Library);
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, RESCAN, Strings.LibraryActionsBehaviour_Rescan, path: Strings.LibraryActionsBehaviour_Library);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, SETTINGS, Strings.LibraryActionsBehaviour_Settings, path: Strings.LibraryActionsBehaviour_Library, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
             }
         }
 
@@ -64,6 +70,8 @@ namespace FoxTunes
                     return this.Rebuild();
                 case RESCAN:
                     return this.Rescan();
+                case SETTINGS:
+                    return this.Settings();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -98,6 +106,11 @@ namespace FoxTunes
         protected virtual Task Rescan()
         {
             return this.LibraryManager.Rescan(false);
+        }
+
+        protected virtual Task Settings()
+        {
+            return Windows.ShowDialog<LibrarySettingsDialog>(this.Core, Strings.General_Settings);
         }
     }
 }
