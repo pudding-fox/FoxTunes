@@ -270,18 +270,13 @@ namespace FoxTunes.ViewModel
             var items = new List<MenuItem>();
             foreach (var component in this.Components)
             {
-                if (component == null)
+                if (!this.IncludeComponent(component))
                 {
                     continue;
                 }
                 foreach (var invocation in component.Invocations)
                 {
-                    if (!string.IsNullOrEmpty(this.Category) && !string.Equals(this.Category, invocation.Category, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    if ((invocation.Attributes & InvocationComponent.ATTRIBUTE_SYSTEM) == InvocationComponent.ATTRIBUTE_SYSTEM)
+                    if (!this.IncludeInvocation(invocation))
                     {
                         continue;
                     }
@@ -305,6 +300,33 @@ namespace FoxTunes.ViewModel
                 }
             }
             return items;
+        }
+
+        protected virtual bool IncludeComponent(IInvocableComponent component)
+        {
+            if (component == null)
+            {
+                return false;
+            }
+            var categories = component.InvocationCategories.ToArray();
+            if (categories.Any() && !categories.Contains(this.Category, StringComparer.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        protected virtual bool IncludeInvocation(IInvocationComponent invocation)
+        {
+            if (!string.IsNullOrEmpty(this.Category) && !string.Equals(this.Category, invocation.Category, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            if ((invocation.Attributes & InvocationComponent.ATTRIBUTE_SYSTEM) == InvocationComponent.ATTRIBUTE_SYSTEM)
+            {
+                return false;
+            }
+            return true;
         }
 
         protected virtual MenuItem GetItem(IList<MenuItem> items, IInvocationComponent invocation, string[] path)

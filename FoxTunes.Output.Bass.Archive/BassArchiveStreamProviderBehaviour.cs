@@ -146,6 +146,14 @@ namespace FoxTunes
             return BassArchiveStreamProviderBehaviourConfiguration.GetConfigurationSections();
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_PLAYLIST;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

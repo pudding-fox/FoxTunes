@@ -360,6 +360,14 @@ namespace FoxTunes
 
         public event EventHandler CollapseChanged;
 
+        public override IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_GLOBAL;
+            }
+        }
+
         public override IEnumerable<IInvocationComponent> Invocations
         {
             get

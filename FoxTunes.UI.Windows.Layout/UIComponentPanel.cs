@@ -127,6 +127,14 @@ namespace FoxTunes
             );
         }
 
+        public virtual IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                return Enumerable.Empty<string>();
+            }
+        }
+
         public virtual IEnumerable<IInvocationComponent> Invocations
         {
             get

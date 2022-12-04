@@ -117,6 +117,14 @@ namespace FoxTunes
                 }
             }
 
+            public override IEnumerable<string> InvocationCategories
+            {
+                get
+                {
+                    yield return InvocationComponent.CATEGORY_REPORT;
+                }
+            }
+
             public override IEnumerable<IInvocationComponent> Invocations
             {
                 get

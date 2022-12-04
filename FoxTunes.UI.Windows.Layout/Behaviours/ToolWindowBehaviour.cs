@@ -331,6 +331,14 @@ namespace FoxTunes
             this.Save();
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_SETTINGS;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

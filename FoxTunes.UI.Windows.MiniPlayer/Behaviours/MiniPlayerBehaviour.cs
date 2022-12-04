@@ -99,6 +99,14 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_MINI_PLAYER;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

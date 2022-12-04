@@ -57,6 +57,14 @@ namespace FoxTunes
             this.Update(playlistColumn, false);
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_PLAYLIST_HEADER;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

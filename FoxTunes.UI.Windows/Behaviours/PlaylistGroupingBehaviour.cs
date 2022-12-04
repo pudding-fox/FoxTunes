@@ -29,6 +29,14 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_PLAYLIST_HEADER;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get
