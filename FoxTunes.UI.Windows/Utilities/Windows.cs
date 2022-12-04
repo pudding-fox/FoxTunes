@@ -695,6 +695,10 @@ namespace FoxTunes
                 {
                     this.Close();
                 }
+                else if (string.Equals(e.Behaviour, ButtonExtensions.COMMAND_BEHAVIOUR_ACCEPT, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.DialogResult = true;
+                }
             }
 
             protected override void OnClosing(CancelEventArgs e)

@@ -62,17 +62,19 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Label Grid.Column="0" Grid.Row="0">Title</Label>
+                    <Label Grid.Column="0" Grid.Row="0" Content="{x:Static Windows:StringResources.ToolWindowManager_Title}"/>
                     <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Title}" Margin="0,0,0,5"></TextBox>
-                    <Label Grid.Column="0" Grid.Row="1">Component</Label>
+                    <Label Grid.Column="0" Grid.Row="1" Content="{x:Static Windows:StringResources.ToolWindowManager_Component}"/>
                     <Windows:UIComponentSelector Grid.Column="1" Grid.Row="1" Component="{Binding Component, Mode=TwoWay}"></Windows:UIComponentSelector>
-                    <Label Grid.Column="0" Grid.Row="2">Main Window</Label>
+                    <Label Grid.Column="0" Grid.Row="2" Content="{x:Static Windows:StringResources.ToolWindowManager_MainWindow}"/>
                     <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding ShowWithMainWindow}"></CheckBox>
-                    <Label Grid.Column="0" Grid.Row="3">Mini Window</Label>
+                    <Label Grid.Column="0" Grid.Row="3" Content="{x:Static Windows:StringResources.ToolWindowManager_MiniWindow}"/>
                     <CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" IsChecked="{Binding ShowWithMiniWindow}"></CheckBox>
-                    <Label Grid.Column="0" Grid.Row="4">Always On Top</Label>
+                    <Label Grid.Column="0" Grid.Row="4" Content="{x:Static Windows:StringResources.ToolWindowManager_AlwaysOnTop}"/>
                     <CheckBox Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" IsChecked="{Binding AlwaysOnTop}"></CheckBox>
+                    <Button Grid.Column="1" Grid.Row="5" Width="120" Height="30" HorizontalAlignment="Right" Click="OnEditLayoutXMLClick" Content="{x:Static Windows:StringResources.ToolWindowManager_EditLayoutXML}"/>
                 </Grid>
             </Grid>
         </Grid>

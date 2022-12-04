@@ -97,6 +97,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string LayoutEditor_Cancel {
+            get {
+                return ResourceManager.GetString("LayoutEditor.Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string LayoutEditor_Save {
+            get {
+                return ResourceManager.GetString("LayoutEditor.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage.
         /// </summary>
         internal static string ToolWindowBehaviour_Manage {
@@ -129,6 +147,60 @@ namespace FoxTunes {
         internal static string ToolWindowBehaviour_Path {
             get {
                 return ResourceManager.GetString("ToolWindowBehaviour.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Always On Top.
+        /// </summary>
+        internal static string ToolWindowManager_AlwaysOnTop {
+            get {
+                return ResourceManager.GetString("ToolWindowManager.AlwaysOnTop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Component.
+        /// </summary>
+        internal static string ToolWindowManager_Component {
+            get {
+                return ResourceManager.GetString("ToolWindowManager.Component", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit Layout XML.
+        /// </summary>
+        internal static string ToolWindowManager_EditLayoutXML {
+            get {
+                return ResourceManager.GetString("ToolWindowManager.EditLayoutXML", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show With Main Window.
+        /// </summary>
+        internal static string ToolWindowManager_MainWindow {
+            get {
+                return ResourceManager.GetString("ToolWindowManager.MainWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show With Mini Window.
+        /// </summary>
+        internal static string ToolWindowManager_MiniWindow {
+            get {
+                return ResourceManager.GetString("ToolWindowManager.MiniWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Title.
+        /// </summary>
+        internal static string ToolWindowManager_Title {
+            get {
+                return ResourceManager.GetString("ToolWindowManager.Title", resourceCulture);
             }
         }
         

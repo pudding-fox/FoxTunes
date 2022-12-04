@@ -129,6 +129,12 @@
   <data name="LayoutDesignerBehaviour.Path" xml:space="preserve">
     <value>Layout</value>
   </data>
+  <data name="LayoutEditor.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="LayoutEditor.Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
   <data name="ToolWindowBehaviour.Manage" xml:space="preserve">
     <value>Manage</value>
   </data>
@@ -140,6 +146,24 @@
   </data>
   <data name="ToolWindowBehaviour.Path" xml:space="preserve">
     <value>Dialogs</value>
+  </data>
+  <data name="ToolWindowManager.AlwaysOnTop" xml:space="preserve">
+    <value>Always On Top</value>
+  </data>
+  <data name="ToolWindowManager.Component" xml:space="preserve">
+    <value>Component</value>
+  </data>
+  <data name="ToolWindowManager.EditLayoutXML" xml:space="preserve">
+    <value>Edit Layout XML</value>
+  </data>
+  <data name="ToolWindowManager.MainWindow" xml:space="preserve">
+    <value>Show With Main Window</value>
+  </data>
+  <data name="ToolWindowManager.MiniWindow" xml:space="preserve">
+    <value>Show With Mini Window</value>
+  </data>
+  <data name="ToolWindowManager.Title" xml:space="preserve">
+    <value>Title</value>
   </data>
   <data name="UIComponentContainer.Clear" xml:space="preserve">
     <value>Clear</value>
