@@ -46,13 +46,17 @@ namespace FoxTunes
         public void CopyTo(Writer writer, CancellationToken cancellationToken)
         {
             Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from channel {0} with {1} byte buffer.", this.Stream.ChannelHandle, BUFFER_SIZE);
-            var length = default(int);
             var buffer = new byte[BUFFER_SIZE];
-            while ((length = Bass.ChannelGetData(this.Stream.ChannelHandle, buffer, BUFFER_SIZE)) > 0)
+            while (Bass.ChannelIsActive(this.Stream.ChannelHandle) != PlaybackState.Stopped)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;
+                }
+                var length = Bass.ChannelGetData(this.Stream.ChannelHandle, buffer, BUFFER_SIZE);
+                if (length == 0)
+                {
+                    continue;
                 }
                 switch (length)
                 {
