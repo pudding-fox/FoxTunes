@@ -10,6 +10,10 @@ namespace FoxTunes.Interfaces
 
         bool Float { get; }
 
+        int UpdatePeriod { get; }
+
+        int UpdateThreads { get; }
+
         int BufferLength { get; }
 
         int MixerBufferLength { get; }

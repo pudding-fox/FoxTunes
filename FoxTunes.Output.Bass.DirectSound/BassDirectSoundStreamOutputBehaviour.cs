@@ -79,7 +79,8 @@ namespace FoxTunes
                 return;
             }
             this.IsInitialized = true;
-            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 1));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdatePeriod, this.Output.UpdatePeriod));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, this.Output.UpdateThreads));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.MixerBufferLength, this.Output.MixerBufferLength));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.SRCQuality, this.Output.ResamplingQuality));
