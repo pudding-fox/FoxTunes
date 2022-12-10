@@ -444,6 +444,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             if (this.ScalingFactor != null)
             {
                 this.ScalingFactor.ValueChanged -= this.OnScalingFactorChanged;

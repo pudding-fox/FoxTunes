@@ -144,7 +144,8 @@ namespace FoxTunes
         {
             get
             {
-                return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Playing;
+                var state = Bass.ChannelIsActive(this.ChannelHandle);
+                return state == PlaybackState.Playing || state == PlaybackState.Stalled;
             }
         }
 
