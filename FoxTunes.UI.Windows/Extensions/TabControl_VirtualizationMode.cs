@@ -1,16 +1,15 @@
 ﻿using System;
-using System.IO;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Markup;
-using System.Windows.Media;
 
 namespace FoxTunes
 {
     public partial class TabControlExtensions
     {
+        private static readonly ConditionalWeakTable<TabControl, NonVirtualizedTabControlBehaviour> NonVirtualizedTabControlBehaviours = new ConditionalWeakTable<TabControl, NonVirtualizedTabControlBehaviour>();
+
         public static readonly DependencyProperty VirtualizationModeProperty = DependencyProperty.RegisterAttached(
             "VirtualizationMode",
             typeof(VirtualizationMode),
@@ -25,7 +24,16 @@ namespace FoxTunes
             {
                 return;
             }
-            tabControl.ContentTemplate = TemplateFactory.Template;
+            if (GetVirtualizationMode(tabControl) != VirtualizationMode.Disabled)
+            {
+                return;
+            }
+            var behaviour = default(NonVirtualizedTabControlBehaviour);
+            if (!NonVirtualizedTabControlBehaviours.TryGetValue(tabControl, out behaviour))
+            {
+                behaviour = new NonVirtualizedTabControlBehaviour(tabControl);
+                NonVirtualizedTabControlBehaviours.Add(tabControl, behaviour);
+            }
         }
 
         public static VirtualizationMode GetVirtualizationMode(TabControl source)
@@ -39,10 +47,10 @@ namespace FoxTunes
         }
 
         public static readonly DependencyProperty TemplateProperty = DependencyProperty.RegisterAttached(
-            "Template",
-            typeof(DataTemplate),
-            typeof(TabControlExtensions),
-            new UIPropertyMetadata(null)
+         "Template",
+         typeof(DataTemplate),
+         typeof(TabControlExtensions),
+         new UIPropertyMetadata(null)
         );
 
         public static DataTemplate GetTemplate(TabControl source)
@@ -55,94 +63,27 @@ namespace FoxTunes
             source.SetValue(TemplateProperty, value);
         }
 
-        public static readonly DependencyProperty InternalTabControlProperty = DependencyProperty.RegisterAttached(
-            "InternalTabControl",
-            typeof(TabControl),
-            typeof(TabControlExtensions),
-            new UIPropertyMetadata(null, OnInternalTabControlChanged)
-        );
-
-        private static void OnInternalTabControlChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        public class NonVirtualizedTabControlBehaviour : UIBehaviour
         {
-            var decorator = sender as Decorator;
-            if (decorator == null)
+            private NonVirtualizedTabControlBehaviour()
             {
-                return;
+                this.Content = new ConditionalWeakTable<DependencyObject, ContentControl>();
             }
-            var tabControl = GetInternalTabControl(decorator);
-            if (tabControl == null)
-            {
-                return;
-            }
-            var contentManager = ContentManager.GetContentManager(tabControl, decorator);
-            contentManager.UpdateSelectedTab();
-        }
 
-        public static TabControl GetInternalTabControl(Decorator source)
-        {
-            return (TabControl)source.GetValue(InternalTabControlProperty);
-        }
-
-        public static void SetInternalTabControl(Decorator source, TabControl value)
-        {
-            source.SetValue(InternalTabControlProperty, value);
-        }
-
-        public static readonly DependencyProperty InternalCachedContentProperty = DependencyProperty.RegisterAttached(
-            "InternalCachedContent",
-            typeof(ContentControl),
-            typeof(TabControlExtensions),
-            new UIPropertyMetadata(null)
-        );
-
-        public static ContentControl GetInternalCachedContent(DependencyObject source)
-        {
-            return (ContentControl)source.GetValue(InternalCachedContentProperty);
-        }
-
-        public static void SetInternalCachedContent(DependencyObject source, ContentControl value)
-        {
-            source.SetValue(InternalCachedContentProperty, value);
-        }
-
-        public static readonly DependencyProperty InternalContentManagerProperty = DependencyProperty.RegisterAttached(
-            "InternalContentManager",
-            typeof(ContentManager),
-            typeof(TabControlExtensions),
-            new UIPropertyMetadata(null)
-        );
-
-        public static ContentManager GetInternalContentManager(TabControl source)
-        {
-            return (ContentManager)source.GetValue(InternalContentManagerProperty);
-        }
-
-        public static void SetInternalContentManager(TabControl source, ContentManager value)
-        {
-            source.SetValue(InternalContentManagerProperty, value);
-        }
-
-        public class ContentManager
-        {
-            public ContentManager(TabControl tabControl, Decorator decorator)
+            public NonVirtualizedTabControlBehaviour(TabControl tabControl) : this()
             {
                 this.TabControl = tabControl;
+                this.TabControl.Loaded += this.OnLoaded;
                 this.TabControl.SelectionChanged += this.OnSelectionChanged;
-                this.Decorator = decorator;
             }
+
+            public ConditionalWeakTable<DependencyObject, ContentControl> Content { get; private set; }
 
             public TabControl TabControl { get; private set; }
 
-            public Decorator Decorator { get; private set; }
-
-            public void ReplaceDecorator(Decorator decorator)
+            protected virtual void OnLoaded(object sender, RoutedEventArgs e)
             {
-                if (object.ReferenceEquals(this.Decorator, decorator))
-                {
-                    return;
-                }
-                this.Decorator.Child = null;
-                this.Decorator = decorator;
+                this.UpdateSelectedTab();
             }
 
             protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -152,7 +93,15 @@ namespace FoxTunes
 
             public void UpdateSelectedTab()
             {
-                this.Decorator.Child = this.GetCurrentContent();
+                var contentPresenter = this.TabControl.Template.FindName("PART_SelectedContentHost", this.TabControl) as ContentPresenter;
+                if (contentPresenter != null)
+                {
+                    var content = this.GetCurrentContent();
+                    if (!object.ReferenceEquals(contentPresenter.Content, content))
+                    {
+                        contentPresenter.Content = content;
+                    }
+                }
             }
 
             protected virtual ContentControl GetCurrentContent()
@@ -163,40 +112,27 @@ namespace FoxTunes
                     return null;
                 }
 
-                var tabItem = this.TabControl.ItemContainerGenerator.ContainerFromItem(item);
-                if (tabItem == null)
+                var container = this.TabControl.ItemContainerGenerator.ContainerFromItem(item);
+                if (container == null)
                 {
                     return null;
                 }
 
-                var cachedContent = GetInternalCachedContent(tabItem);
-                if (cachedContent == null)
+                var content = default(ContentControl);
+                if (!this.Content.TryGetValue(container, out content))
                 {
                     if (item is TabItem)
                     {
-                        cachedContent = this.CreateContentFromTabItem((TabItem)item);
+                        throw new InvalidOperationException("Expected data bound items.");
                     }
                     else
                     {
-                        cachedContent = this.CreateContentFromDataContext(item);
+                        content = this.CreateContentFromDataContext(item);
                     }
-                    SetInternalCachedContent(tabItem, cachedContent);
+                    this.Content.Add(container, content);
                 }
 
-                return cachedContent;
-            }
-
-            protected virtual ContentControl CreateContentFromTabItem(TabItem tabItem)
-            {
-                if (tabItem.Content is FrameworkElement element)
-                {
-                    element.Disconnect();
-                }
-                var contentControl = new ContentControl()
-                {
-                    Content = tabItem.Content
-                };
-                return contentControl;
+                return content;
             }
 
             protected virtual ContentControl CreateContentFromDataContext(object dataContext)
@@ -204,49 +140,20 @@ namespace FoxTunes
                 var contentControl = new ContentControl()
                 {
                     DataContext = dataContext,
-                    ContentTemplate = GetTemplate(this.TabControl),
+                    ContentTemplate = GetTemplate(this.TabControl)
                 };
                 contentControl.SetBinding(ContentControl.ContentProperty, new Binding());
                 return contentControl;
             }
 
-            public static ContentManager GetContentManager(TabControl tabControl, Decorator container)
+            protected override void OnDisposing()
             {
-                var contentManager = GetInternalContentManager(tabControl);
-                if (contentManager != null)
+                if (this.TabControl != null)
                 {
-                    contentManager.ReplaceDecorator(container);
+                    this.TabControl.Loaded -= this.OnLoaded;
+                    this.TabControl.SelectionChanged -= this.OnSelectionChanged;
                 }
-                else
-                {
-                    contentManager = new ContentManager(tabControl, container);
-                    SetInternalContentManager(tabControl, contentManager);
-                }
-
-                return contentManager;
-            }
-        }
-
-        private static class TemplateFactory
-        {
-            private static Lazy<DataTemplate> _Template = new Lazy<DataTemplate>(GetTemplate);
-
-            public static DataTemplate Template
-            {
-                get
-                {
-                    return _Template.Value;
-                }
-            }
-
-            private static DataTemplate GetTemplate()
-            {
-                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(Resources.TabContent)))
-                {
-                    var template = (DataTemplate)XamlReader.Load(stream);
-                    template.Seal();
-                    return template;
-                }
+                base.OnDisposing();
             }
         }
 

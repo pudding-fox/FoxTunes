@@ -25,7 +25,6 @@ namespace FoxTunes
         public UIComponentTabContainer()
         {
             this.TabControl = new TabControl();
-            TabControlExtensions.SetVirtualizationMode(this.TabControl, TabControlExtensions.VirtualizationMode.Disabled);
             this.Content = this.TabControl;
         }
 
