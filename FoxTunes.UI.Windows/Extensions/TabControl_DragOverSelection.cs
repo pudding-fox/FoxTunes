@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public partial class TabControlExtensions
     {
-        private static readonly ConditionalWeakTable<TabControl, DragOverSelectionBehaviour> DragOverSelectionBehaviours = new ConditionalWeakTable<TabControl, DragOverSelectionBehaviour>();
+        private static readonly ConditionalWeakTable<global::System.Windows.Controls.TabControl, DragOverSelectionBehaviour> DragOverSelectionBehaviours = new ConditionalWeakTable<global::System.Windows.Controls.TabControl, DragOverSelectionBehaviour>();
 
         public static readonly DependencyProperty DragOverSelectionProperty = DependencyProperty.RegisterAttached(
             "DragOverSelection",
@@ -19,7 +19,7 @@ namespace FoxTunes
 
         private static void OnDragOverSelectionChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var tabControl = sender as TabControl;
+            var tabControl = sender as global::System.Windows.Controls.TabControl;
             if (tabControl == null)
             {
                 return;
@@ -43,12 +43,12 @@ namespace FoxTunes
             }
         }
 
-        public static bool GetDragOverSelection(TabControl source)
+        public static bool GetDragOverSelection(global::System.Windows.Controls.TabControl source)
         {
             return (bool)source.GetValue(DragOverSelectionProperty);
         }
 
-        public static void SetDragOverSelection(TabControl source, bool value)
+        public static void SetDragOverSelection(global::System.Windows.Controls.TabControl source, bool value)
         {
             source.SetValue(DragOverSelectionProperty, value);
         }
@@ -62,7 +62,7 @@ namespace FoxTunes
                 this.Debouncer = new Debouncer(TIMEOUT);
             }
 
-            public DragOverSelectionBehaviour(TabControl tabControl) : this()
+            public DragOverSelectionBehaviour(global::System.Windows.Controls.TabControl tabControl) : this()
             {
                 this.TabControl = tabControl;
                 this.TabControl.DragOver += this.OnDragOver;
@@ -70,7 +70,7 @@ namespace FoxTunes
 
             public Debouncer Debouncer { get; private set; }
 
-            public TabControl TabControl { get; private set; }
+            public global::System.Windows.Controls.TabControl TabControl { get; private set; }
 
             public TabItem TabItem { get; private set; }
 

@@ -16,12 +16,10 @@
     <Windows:UIComponentBase.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLISTS}}"></Windows:Menu>
     </Windows:UIComponentBase.ContextMenu>
-    <TabControl 
+    <Windows:TabControl 
             ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" 
             SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
-            DisplayMemberPath="Name"
-            Windows:TabControlExtensions.DragOverSelection="True"
-            Windows:TabControlExtensions.VirtualizationMode="Disabled">
+            TabNamePath="Name">
         <Interactivity:Interaction.Triggers>
             <Windows:FilteredEventTrigger EventName="DragEnter" SourceType="{x:Type TabPanel}">
                 <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragEnterCommand, Source={StaticResource ViewModel}}" />
@@ -36,10 +34,10 @@
                 <Interactivity:InvokeCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
         </Interactivity:Interaction.Triggers>
-        <Windows:TabControlExtensions.Template>
+        <Windows:TabControl.ContentTemplate>
             <DataTemplate DataType="{x:Type Core:Playlist}">
                 <Windows:TabPlaylist Playlist="{Binding}"></Windows:TabPlaylist>
             </DataTemplate>
-        </Windows:TabControlExtensions.Template>
-    </TabControl>
+        </Windows:TabControl.ContentTemplate>
+    </Windows:TabControl>
 </Windows:UIComponentBase>
