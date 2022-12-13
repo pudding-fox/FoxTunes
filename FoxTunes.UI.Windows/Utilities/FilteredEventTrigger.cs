@@ -120,6 +120,7 @@ namespace FoxTunes
                         {
                             if (!this.SourceType.IsAssignableFrom(dependencyObject.GetType()))
                             {
+                                Console.WriteLine(dependencyObject.GetType().Name);
                                 return;
                             }
                         }

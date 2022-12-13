@@ -65,31 +65,31 @@ namespace FoxTunes
             source.SetValue(SelectedItemProperty, value);
         }
 
-        public static readonly DependencyProperty TabNamePathProperty = DependencyProperty.Register(
-           "TabNamePath",
+        public static readonly DependencyProperty DisplayMemberPathProperty = DependencyProperty.Register(
+           "DisplayMemberPath",
            typeof(string),
            typeof(TabControl),
-           new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnTabNamePathChanged))
+           new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnDisplayMemberPathChanged))
        );
 
-        private static void OnTabNamePathChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static void OnDisplayMemberPathChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var tabControl = sender as TabControl;
             if (tabControl == null)
             {
                 return;
             }
-            tabControl.OnTabNamePathChanged();
+            tabControl.OnDisplayMemberPathChanged();
         }
 
-        public static string GetTabNamePath(TabControl source)
+        public static string GetDisplayMemberPath(TabControl source)
         {
-            return (string)source.GetValue(TabNamePathProperty);
+            return (string)source.GetValue(DisplayMemberPathProperty);
         }
 
-        public static void SetTabNamePath(TabControl source, string value)
+        public static void SetDisplayMemberPath(TabControl source, string value)
         {
-            source.SetValue(TabNamePathProperty, value);
+            source.SetValue(DisplayMemberPathProperty, value);
         }
 
         public static readonly DependencyProperty ContentTemplateProperty = DependencyProperty.Register(
@@ -228,19 +228,19 @@ namespace FoxTunes
 
         }
 
-        public string TabNamePath
+        public string DisplayMemberPath
         {
             get
             {
-                return GetTabNamePath(this);
+                return GetDisplayMemberPath(this);
             }
             set
             {
-                SetTabNamePath(this, value);
+                SetDisplayMemberPath(this, value);
             }
         }
 
-        protected virtual void OnTabNamePathChanged()
+        protected virtual void OnDisplayMemberPathChanged()
         {
 
         }
@@ -295,7 +295,7 @@ namespace FoxTunes
             {
                 Content = contentControl,
             };
-            tabItem.SetBinding(TabItem.HeaderProperty, new Binding(this.TabNamePath)
+            tabItem.SetBinding(TabItem.HeaderProperty, new Binding(this.DisplayMemberPath)
             {
                 Source = content
             });

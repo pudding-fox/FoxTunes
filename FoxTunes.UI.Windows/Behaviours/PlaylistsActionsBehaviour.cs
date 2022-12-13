@@ -112,14 +112,14 @@ namespace FoxTunes
         public async Task AddPlaylist()
         {
             var playlist = this.CreatePlaylist();
-            await this.PlaylistManager.Add(playlist).ConfigureAwait(false);
+            await this.PlaylistManager.Create(playlist).ConfigureAwait(false);
             this.PlaylistManager.SelectedPlaylist = playlist;
         }
 
         public async Task AddPlaylist(IEnumerable<string> paths)
         {
             var playlist = this.CreatePlaylist();
-            await this.PlaylistManager.Add(playlist, paths).ConfigureAwait(false);
+            await this.PlaylistManager.Create(playlist, paths).ConfigureAwait(false);
             this.PlaylistManager.SelectedPlaylist = playlist;
         }
 
@@ -130,14 +130,14 @@ namespace FoxTunes
                 Name = libraryHierarchyNode.Value,
                 Enabled = true
             };
-            await this.PlaylistManager.Add(playlist, libraryHierarchyNode).ConfigureAwait(false);
+            await this.PlaylistManager.Create(playlist, libraryHierarchyNode).ConfigureAwait(false);
             this.PlaylistManager.SelectedPlaylist = playlist;
         }
 
         public async Task AddPlaylist(IEnumerable<PlaylistItem> playlistItems)
         {
             var playlist = this.CreatePlaylist();
-            await this.PlaylistManager.Add(playlist, playlistItems).ConfigureAwait(false);
+            await this.PlaylistManager.Create(playlist, playlistItems).ConfigureAwait(false);
             this.PlaylistManager.SelectedPlaylist = playlist;
         }
 

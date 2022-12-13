@@ -6,16 +6,23 @@ namespace FoxTunes
 {
     public class MovePlaylistItemsTask : PlaylistTaskBase
     {
-        public MovePlaylistItemsTask(Playlist playlist, int sequence, IEnumerable<PlaylistItem> playlistItems)
+        public MovePlaylistItemsTask(Playlist playlist, int sequence, IEnumerable<PlaylistItem> playlistItems, bool clear)
             : base(playlist, sequence)
         {
             this.PlaylistItems = playlistItems;
+            this.Clear = clear;
         }
 
         public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
 
+        public bool Clear { get; private set; }
+
         protected override async Task OnRun()
         {
+            if (this.Clear)
+            {
+                await this.RemoveItems(PlaylistItemStatus.None).ConfigureAwait(false);
+            }
             var moveItems = new List<PlaylistItem>();
             var copyItems = new List<PlaylistItem>();
             foreach (var playlistItem in this.PlaylistItems)

@@ -19,7 +19,7 @@
     <Windows:TabControl 
             ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" 
             SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
-            TabNamePath="Name">
+            DisplayMemberPath="Name">
         <Interactivity:Interaction.Triggers>
             <Windows:FilteredEventTrigger EventName="DragEnter" SourceType="{x:Type TabPanel}">
                 <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragEnterCommand, Source={StaticResource ViewModel}}" />
@@ -28,10 +28,13 @@
                 <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragOverCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
             <Windows:FilteredEventTrigger EventName="Drop" SourceType="{x:Type TabPanel}" ExactMatch="True">
-                <ViewModel:InvokeParameterizedCommandAction Command="{Binding DropCommand, Source={StaticResource ViewModel}}" />
+                <ViewModel:InvokeParameterizedCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
+            </Windows:FilteredEventTrigger>
+            <Windows:FilteredEventTrigger EventName="Drop" SourceType="{x:Type TabItem}">
+                <ViewModel:InvokeParameterizedCommandAction Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
             <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabPanel}" ExactMatch="True">
-                <Interactivity:InvokeCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
+                <ViewModel:InvokeParameterizedCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
         </Interactivity:Interaction.Triggers>
         <Windows:TabControl.ContentTemplate>
