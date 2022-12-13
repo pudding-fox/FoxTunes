@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,25 +45,6 @@ namespace FoxTunes
 
         private class SelectedItemBehaviour : UIBehaviour
         {
-            private static readonly PropertyInfo ItemsHost = typeof(ItemsControl).GetProperty(
-                "ItemsHost",
-                BindingFlags.Instance | BindingFlags.NonPublic
-             );
-
-            private static readonly MethodInfo EnsureGenerator = typeof(Panel).GetMethod(
-                "EnsureGenerator",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-
-#if NET40
-
-            private static readonly MethodInfo BringIndexIntoView = typeof(VirtualizingPanel).GetMethod(
-                "BringIndexIntoView",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-
-#endif
-
             public SelectedItemBehaviour(TreeView treeView)
             {
                 this.TreeView = treeView;
@@ -126,73 +106,48 @@ namespace FoxTunes
                     }
                     if (item != null)
                     {
-                        //If we had a previous item then expand it.
                         item.IsExpanded = true;
                         items = item;
                     }
                     else
                     {
-                        //Else it's the first iteration.
                         items = this.TreeView;
                     }
-                    //Try the easy method.
-                    item = items.ItemContainerGenerator.ContainerFromItem(value) as TreeViewItem;
+                    item = this.BringIntoView(items, value);
                     if (item == null)
                     {
-                        //Looks like the item hasn't been generated.
-                        //Apply any templates we might need.
-                        if (items.Template != null)
-                        {
-                            items.ApplyTemplate();
-                            var presenter = items.Template.FindName("ItemsHost", items) as ItemsPresenter;
-                            if (presenter != null)
-                            {
-                                presenter.ApplyTemplate();
-                            }
-                        }
-                        //Update the layout and get the panel.
-                        items.UpdateLayout();
-                        var panel = ItemsHost.GetValue(items, null) as VirtualizingPanel;
-                        if (panel != null)
-                        {
-                            //Enssure the ItemContainerGenerator is constructed.
-                            EnsureGenerator.Invoke(panel, null);
-                            //Get the index of the value.
-                            var index = items.Items.IndexOf(value);
-                            if (index < 0)
-                            {
-                                //There is no item corresponding to the current value.
-                                //Nothing can be done.
-                                break;
-                            }
-                            //Tell the panel to being the index into view.
-                            //This will create the item we're looking for.
-#if NET40
-                            BringIndexIntoView.Invoke(panel, new object[] { index });
-#else
-                            panel.BringIndexIntoViewPublic(index);
-#endif
-                        }
-                        //Try the easy method (again).
-                        item = items.ItemContainerGenerator.ContainerFromItem(value) as TreeViewItem;
-                        if (item == null)
-                        {
-                            //Looks like the item hasn't been generated.
-                            //Nothing can be done.
-                            break;
-                        }
+                        return;
                     }
                 } while (stack.Count > 0);
+                if (item != null && !item.IsSelected)
+                {
+                    item.IsSelected = true;
+                }
+            }
 
+            protected virtual TreeViewItem BringIntoView(ItemsControl items, object value)
+            {
+                var index = items.Items.IndexOf(value);
+                if (index < 0)
+                {
+                    return null;
+                }
+                var item = items.ItemContainerGenerator.ContainerFromItem(value) as TreeViewItem;
                 if (item != null)
                 {
-                    //Found the item, select it.
-                    item.IsSelected = true;
+                    item.BringIntoView();
                 }
                 else
                 {
-
+                    var scrollViewer = items.FindChild<ScrollViewer>();
+                    if (scrollViewer != null)
+                    {
+                        scrollViewer.ScrollToItemOffset<TreeViewItem>(index);
+                        items.UpdateLayout();
+                        item = items.ItemContainerGenerator.ContainerFromItem(value) as TreeViewItem;
+                    }
                 }
+                return item;
             }
 
             protected virtual void OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
