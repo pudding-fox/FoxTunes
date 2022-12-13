@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -122,14 +122,12 @@ namespace FoxTunes
         public TabControl()
         {
             this._TabControl = new global::System.Windows.Controls.TabControl();
+            this._TabControl.SelectionChanged += this.OnSelectionChanged;
             TabControlExtensions.SetDragOverSelection(this._TabControl, true);
-            this.Tabs = new ConditionalWeakTable<object, TabItem>();
             this.AddVisualChild(this._TabControl);
         }
 
         private global::System.Windows.Controls.TabControl _TabControl { get; set; }
-
-        public ConditionalWeakTable<object, TabItem> Tabs { get; private set; }
 
         protected override int VisualChildrenCount
         {
@@ -142,6 +140,11 @@ namespace FoxTunes
         protected override Visual GetVisualChild(int index)
         {
             return this._TabControl;
+        }
+
+        protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.UpdateSelectionSource();
         }
 
         public IEnumerable ItemsSource
@@ -167,6 +170,7 @@ namespace FoxTunes
                 collectionChanged2.CollectionChanged += this.OnCollectionChanged;
             }
             this.Reset(newValue);
+            this.UpdateSelectionTarget();
         }
 
         protected virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -187,6 +191,7 @@ namespace FoxTunes
                     this.Reset(e.NewItems);
                     break;
             }
+            this.UpdateSelectionTarget();
         }
 
         public object SelectedItem
@@ -203,7 +208,7 @@ namespace FoxTunes
 
         protected virtual void OnSelectedItemChanged()
         {
-
+            this.UpdateSelectionTarget();
         }
 
         public DataTemplate ContentTemplate
@@ -263,7 +268,7 @@ namespace FoxTunes
 
         protected virtual void Add(object element)
         {
-            this._TabControl.Items.Add(this.GetTabItem(element));
+            this._TabControl.Items.Add(this.CreateTabItem(element));
         }
 
         protected virtual void Remove(IEnumerable items)
@@ -279,41 +284,63 @@ namespace FoxTunes
             this._TabControl.Items.Remove(this.GetTabItem(element));
         }
 
-        protected virtual TabItem GetTabItem(object content)
+        protected virtual TabItem CreateTabItem(object content)
         {
-            var tabItem = default(TabItem);
-            if (!this.Tabs.TryGetValue(content, out tabItem))
+            var contentControl = new ContentControl()
             {
-                var contentControl = new ContentControl()
-                {
-                    ContentTemplate = this.ContentTemplate,
-                    Content = content
-                };
-                tabItem = new TabItem()
-                {
-                    Content = contentControl,
-                };
-                tabItem.SetBinding(TabItem.HeaderProperty, new Binding(this.TabNamePath)
-                {
-                    Source = content
-                });
-                this.Tabs.Add(content, tabItem);
-            }
-            else
+                ContentTemplate = this.ContentTemplate,
+                Content = content
+            };
+            var tabItem = new TabItem()
             {
-
-            }
+                Content = contentControl,
+            };
+            tabItem.SetBinding(TabItem.HeaderProperty, new Binding(this.TabNamePath)
+            {
+                Source = content
+            });
             return tabItem;
         }
 
-        protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        protected virtual TabItem GetTabItem(object content)
         {
-            if (this._TabControl.SelectedItem is TabItem tabItem && tabItem.Content is ContentControl contentControl)
+            foreach (var tabItem in this._TabControl.Items.Cast<TabItem>())
             {
-                if (!object.ReferenceEquals(this.SelectedItem, contentControl.Content))
+                if (this.GetContent(tabItem) == content)
                 {
-                    this.SelectedItem = contentControl.Content;
+                    return tabItem;
                 }
+            }
+            return null;
+        }
+
+        protected virtual object GetContent(TabItem tabItem)
+        {
+            if (tabItem.Content is ContentControl contentControl)
+            {
+                return contentControl.Content;
+            };
+            return null;
+        }
+
+        protected virtual void UpdateSelectionSource()
+        {
+            if (this._TabControl.SelectedItem is TabItem tabItem)
+            {
+                var content = this.GetContent(tabItem);
+                if (content != null && this.SelectedItem != content)
+                {
+                    this.SelectedItem = content;
+                }
+            }
+        }
+
+        protected virtual void UpdateSelectionTarget()
+        {
+            var tabItem = this.GetTabItem(this.SelectedItem);
+            if (tabItem != null && this._TabControl.SelectedItem != tabItem)
+            {
+                this._TabControl.SelectedItem = tabItem;
             }
         }
     }
