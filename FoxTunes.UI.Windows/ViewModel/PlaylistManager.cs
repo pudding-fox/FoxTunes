@@ -96,11 +96,7 @@ namespace FoxTunes.ViewModel
         {
             if (state != null && state.Playlists != null && state.Playlists.Any())
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return this.Refresh(state.Playlists);
             }
             else
             {
@@ -131,6 +127,15 @@ namespace FoxTunes.ViewModel
                 }
             }
             return Windows.Invoke(() => this.Playlists.ItemsSource = new ObservableCollection<Playlist>(playlists));
+        }
+
+        protected virtual Task Refresh(IEnumerable<Playlist> playlists)
+        {
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public bool PlaylistManagerVisible

@@ -8,8 +8,13 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class ArchiveItemFactory<T> : BaseComponent where T : IFileData, new()
+    public abstract class ArchiveItemFactory<T> : PopulatorBase where T : IFileData, new()
     {
+        public ArchiveItemFactory(bool reportProgress) : base(reportProgress)
+        {
+
+        }
+
         public IOutput Output { get; private set; }
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
@@ -35,6 +40,11 @@ namespace FoxTunes
 
         public async Task<T[]> Create(IEnumerable<string> paths)
         {
+            if (this.ReportProgress)
+            {
+                this.Name = Strings.ArchiveItemFactory_Name;
+            }
+
             var items = new List<T>();
             foreach (var path in paths)
             {
@@ -80,6 +90,10 @@ namespace FoxTunes
                         {
                             continue;
                         }
+                        if (this.ReportProgress)
+                        {
+                            this.Description = Path.GetFileName(entry.path);
+                        }
                         var fileName = ArchiveUtils.CreateUrl(path, entry.path);
                         var item = new T()
                         {
@@ -123,13 +137,13 @@ namespace FoxTunes
                     }
                     else
                     {
-                        //TODO: Warn.
+                        Logger.Write(this, LogLevel.Warn, "Failed to read archive entry at position {0}.", a);
                     }
                 }
             }
             else
             {
-                //TODO: Warn.
+                Logger.Write(this, LogLevel.Warn, "Failed to read archive entries.");
             }
         }
 

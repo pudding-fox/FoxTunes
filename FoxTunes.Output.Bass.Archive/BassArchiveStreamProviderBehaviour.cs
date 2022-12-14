@@ -310,7 +310,7 @@ namespace FoxTunes
                     password.Reset();
                 }
                 this.PlaylistBrowser = core.Components.PlaylistBrowser;
-                this.Factory = new ArchivePlaylistItemFactory();
+                this.Factory = new ArchivePlaylistItemFactory(this.Visible);
                 this.Factory.InitializeComponent(core);
                 base.InitializeComponent(core);
             }
@@ -346,7 +346,8 @@ namespace FoxTunes
 
             protected override async Task AddPlaylistItems(IEnumerable<string> paths, CancellationToken cancellationToken)
             {
-                var playlistItems = await this.Factory.Create(paths).ConfigureAwait(false);
+                var playlistItems = default(PlaylistItem[]);
+                await this.WithSubTask(this.Factory, async () => playlistItems = await this.Factory.Create(paths).ConfigureAwait(false)).ConfigureAwait(false);
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
                     var set = this.Database.Set<PlaylistItem>(transaction);
@@ -401,7 +402,13 @@ namespace FoxTunes
 
             public override void InitializeComponent(ICore core)
             {
-                this.Factory = new ArchiveLibraryItemFactory();
+                //Clear any cached passwords if possible.
+                var password = ComponentRegistry.Instance.GetComponent<BassArchiveStreamPasswordBehaviour>();
+                if (password != null)
+                {
+                    password.Reset();
+                }
+                this.Factory = new ArchiveLibraryItemFactory(this.Visible);
                 this.Factory.InitializeComponent(core);
                 base.InitializeComponent(core);
             }
@@ -420,7 +427,8 @@ namespace FoxTunes
 
             protected override async Task AddPaths(IEnumerable<string> paths)
             {
-                var libraryItems = await this.Factory.Create(paths).ConfigureAwait(false);
+                var libraryItems = default(LibraryItem[]);
+                await this.WithSubTask(this.Factory, async () => libraryItems = await this.Factory.Create(paths).ConfigureAwait(false)).ConfigureAwait(false);
                 using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                 {
                     await this.RemoveLibraryItems().ConfigureAwait(false);

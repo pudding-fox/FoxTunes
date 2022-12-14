@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reading archive.
+        /// </summary>
+        internal static string ArchiveItemFactory_Name {
+            get {
+                return ResourceManager.GetString("ArchiveItemFactory.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Archive.
         /// </summary>
         internal static string BassArchiveStreamProviderBehaviour_Open {

@@ -132,4 +132,7 @@
   <data name="BassSkipSilenceStreamComponent.None" xml:space="preserve">
     <value>none</value>
   </data>
+  <data name="CueSheetPlaylistItemFactory.Name" xml:space="preserve">
+    <value>Reading cue sheet</value>
+  </data>
 </root>

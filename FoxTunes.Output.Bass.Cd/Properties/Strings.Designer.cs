@@ -122,5 +122,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("BassCdStreamProviderBehaviourConfiguration.Section", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading CD.
+        /// </summary>
+        internal static string CdPlaylistItemFactory_Name {
+            get {
+                return ResourceManager.GetString("CdPlaylistItemFactory.Name", resourceCulture);
+            }
+        }
     }
 }

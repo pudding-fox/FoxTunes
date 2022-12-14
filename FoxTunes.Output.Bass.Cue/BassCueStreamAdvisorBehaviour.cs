@@ -248,6 +248,14 @@ namespace FoxTunes
                 this.FileName = fileName;
             }
 
+            public override bool Visible
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
             public string FileName { get; private set; }
 
             public CueSheetParser Parser { get; private set; }
@@ -258,7 +266,7 @@ namespace FoxTunes
             {
                 this.Parser = new CueSheetParser();
                 this.Parser.InitializeComponent(core);
-                this.Factory = new CueSheetPlaylistItemFactory();
+                this.Factory = new CueSheetPlaylistItemFactory(this.Visible);
                 this.Factory.InitializeComponent(core);
                 base.InitializeComponent(core);
             }
@@ -266,7 +274,8 @@ namespace FoxTunes
             protected override async Task OnRun()
             {
                 var cueSheet = this.Parser.Parse(this.FileName);
-                var playlistItems = await this.Factory.Create(cueSheet).ConfigureAwait(false);
+                var playlistItems = default(PlaylistItem[]);
+                await this.WithSubTask(this.Factory, async () => playlistItems = await this.Factory.Create(cueSheet).ConfigureAwait(false)).ConfigureAwait(false);
                 using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                 {
                     await this.AddPlaylistItems(playlistItems).ConfigureAwait(false);
