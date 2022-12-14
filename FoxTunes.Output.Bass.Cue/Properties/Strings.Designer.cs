@@ -113,5 +113,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("CueSheetPlaylistItemFactory.Name", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cue data file {0}.
+        /// </summary>
+        internal static string CueSheetPlaylistItemFactory_Prompt {
+            get {
+                return ResourceManager.GetString("CueSheetPlaylistItemFactory.Prompt", resourceCulture);
+            }
+        }
     }
 }

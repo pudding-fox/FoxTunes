@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace FoxTunes
 {
@@ -26,17 +24,22 @@ namespace FoxTunes
 
         public CueSheetPlaylistItemFactory(bool reportProgress) : base(reportProgress)
         {
-
+            this.DataFileNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
+
+        public IDictionary<string, string> DataFileNames { get; private set; }
 
         public IOutput Output { get; private set; }
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
+        public IFileSystemBrowser FileSystemBrowser { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            this.FileSystemBrowser = core.Components.FileSystemBrowser;
             base.InitializeComponent(core);
         }
 
@@ -153,16 +156,22 @@ namespace FoxTunes
 
         protected virtual string Resolve(string directoryName, string name)
         {
-            var fileName = Path.Combine(directoryName, name);
-            if (File.Exists(fileName))
-            {
-                return fileName;
-            }
-            Logger.Write(this, LogLevel.Warn, "Cue sheet references non existant file \"{0}\", attempting to resolve it...", fileName);
-            return this.Resolve(Directory.GetFiles(directoryName), Path.GetFileNameWithoutExtension(name));
+            return this.DataFileNames.GetOrAdd(
+                Path.Combine(directoryName, name),
+                () =>
+                {
+                    var fileName = Path.Combine(directoryName, name);
+                    if (File.Exists(fileName))
+                    {
+                        return fileName;
+                    }
+                    Logger.Write(this, LogLevel.Warn, "Cue sheet references non existant file \"{0}\", attempting to resolve it...", fileName);
+                    return this.Resolve(directoryName, Directory.GetFiles(directoryName), Path.GetFileNameWithoutExtension(name));
+                }
+            );
         }
 
-        protected virtual string Resolve(IEnumerable<string> fileNames, string name)
+        protected virtual string Resolve(string directoryName, string[] fileNames, string name)
         {
             foreach (var fileName in fileNames)
             {
@@ -177,7 +186,34 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Located a suitable file \"{0}\".", fileName);
                 return fileName;
             }
+            fileNames = fileNames.Where(fileName => this.Output.IsSupported(fileName)).ToArray();
+            if (fileNames.Length == 1)
+            {
+                var fileName = fileNames[0];
+                Logger.Write(this, LogLevel.Warn, "Only \"{0}\" is supported for playback.", fileName);
+                return fileName;
+            }
+            if (this.FileSystemBrowser != null)
+            {
+                return this.Browse(directoryName, name);
+            }
             throw new InvalidOperationException(string.Format("Cue sheet references non existant name \"{0}\".", name));
+        }
+
+        protected virtual string Browse(string directoryName, string name)
+        {
+            var options = new BrowseOptions(
+                string.Format(Strings.CueSheetPlaylistItemFactory_Prompt, name),
+                directoryName,
+                Enumerable.Empty<BrowseFilter>(),
+                BrowseFlags.File
+            );
+            var result = this.FileSystemBrowser.Browse(options);
+            if (result.Success)
+            {
+                return result.Paths.FirstOrDefault();
+            }
+            throw new InvalidOperationException(string.Format("Cue sheet references non existant name \"{0}\", manual resolution was cancelled.", name));
         }
     }
 }

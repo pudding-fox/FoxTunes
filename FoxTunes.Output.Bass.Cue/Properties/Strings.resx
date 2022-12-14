@@ -135,4 +135,7 @@
   <data name="CueSheetPlaylistItemFactory.Name" xml:space="preserve">
     <value>Reading cue sheet</value>
   </data>
+  <data name="CueSheetPlaylistItemFactory.Prompt" xml:space="preserve">
+    <value>Cue data file {0}</value>
+  </data>
 </root>
