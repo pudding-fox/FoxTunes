@@ -8,6 +8,7 @@ namespace FoxTunes.Interfaces
     {
         Task Create(Playlist playlist);
 
+        [Obsolete("Use the IFileActionHandler interface to handle paths.")]
         Task Create(Playlist playlist, IEnumerable<string> paths);
 
         Task Create(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode);
@@ -16,8 +17,10 @@ namespace FoxTunes.Interfaces
 
         Task Remove(Playlist playlist);
 
+        [Obsolete("Use the IFileActionHandler interface to handle paths.")]
         Task Add(Playlist playlist, IEnumerable<string> paths, bool clear);
 
+        [Obsolete("Use the IFileActionHandler interface to handle paths.")]
         Task Insert(Playlist playlist, int index, IEnumerable<string> paths, bool clear);
 
         Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode, bool clear);

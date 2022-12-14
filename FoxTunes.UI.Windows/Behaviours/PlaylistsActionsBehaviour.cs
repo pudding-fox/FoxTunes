@@ -52,6 +52,8 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IFileActionHandlerManager FileActionHandler { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -59,6 +61,7 @@ namespace FoxTunes
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
+            this.FileActionHandler = core.Managers.FileActionHandler;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             base.InitializeComponent(core);
         }
@@ -109,21 +112,22 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task AddPlaylist()
+        public async Task<Playlist> AddPlaylist()
         {
             var playlist = this.CreatePlaylist();
             await this.PlaylistManager.Create(playlist).ConfigureAwait(false);
             this.PlaylistManager.SelectedPlaylist = playlist;
+            return playlist;
         }
 
-        public async Task AddPlaylist(IEnumerable<string> paths)
+        public async Task<Playlist> AddPlaylist(IEnumerable<string> paths)
         {
-            var playlist = this.CreatePlaylist();
-            await this.PlaylistManager.Create(playlist, paths).ConfigureAwait(false);
-            this.PlaylistManager.SelectedPlaylist = playlist;
+            var playlist = await this.AddPlaylist().ConfigureAwait(false);
+            await this.FileActionHandler.RunPaths(paths, FileActionType.Playlist).ConfigureAwait(false);
+            return playlist;
         }
 
-        public async Task AddPlaylist(LibraryHierarchyNode libraryHierarchyNode)
+        public async Task<Playlist> AddPlaylist(LibraryHierarchyNode libraryHierarchyNode)
         {
             var playlist = new Playlist()
             {
@@ -132,13 +136,15 @@ namespace FoxTunes
             };
             await this.PlaylistManager.Create(playlist, libraryHierarchyNode).ConfigureAwait(false);
             this.PlaylistManager.SelectedPlaylist = playlist;
+            return playlist;
         }
 
-        public async Task AddPlaylist(IEnumerable<PlaylistItem> playlistItems)
+        public async Task<Playlist> AddPlaylist(IEnumerable<PlaylistItem> playlistItems)
         {
             var playlist = this.CreatePlaylist();
             await this.PlaylistManager.Create(playlist, playlistItems).ConfigureAwait(false);
             this.PlaylistManager.SelectedPlaylist = playlist;
+            return playlist;
         }
 
         public async Task RemovePlaylist()

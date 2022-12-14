@@ -254,7 +254,9 @@ namespace FoxTunes.ViewModel
             }
             var playlist = this.GetPlaylist();
             var index = this.PlaylistBrowser.GetInsertIndex(playlist);
+#pragma warning disable 612, 618
             await this.PlaylistManager.Add(playlist, paths, clear).ConfigureAwait(false);
+#pragma warning restore 612, 618
             if (play)
             {
                 await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
