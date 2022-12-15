@@ -146,6 +146,15 @@ namespace FoxTunes
             {
                 this.EnsureVisible(this.ListBox.SelectedItem);
             }
+
+            protected override void OnDisposing()
+            {
+                if (this.ListBox != null)
+                {
+                    this.ListBox.SelectionChanged -= this.OnSelectionChanged;
+                }
+                base.OnDisposing();
+            }
         }
     }
 }

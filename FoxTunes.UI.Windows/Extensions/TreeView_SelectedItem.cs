@@ -158,6 +158,15 @@ namespace FoxTunes
                 }
                 SetSelectedItem(this.TreeView, this.TreeView.SelectedItem);
             }
+
+            protected override void OnDisposing()
+            {
+                if (this.TreeView != null)
+                {
+                    this.TreeView.SelectedItemChanged -= this.OnSelectedItemChanged;
+                }
+                base.OnDisposing();
+            }
         }
     }
 }

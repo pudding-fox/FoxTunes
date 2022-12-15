@@ -29,22 +29,22 @@ namespace FoxTunes
 
         private static void OnColumnHeaderContainerStylePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var GridView = sender as GridView;
-            if (GridView == null)
+            var gridView = sender as GridView;
+            if (gridView == null)
             {
                 return;
             }
-            if (GetColumnHeaderContainerStyle(GridView) != null)
+            if (GetColumnHeaderContainerStyle(gridView) != null)
             {
                 var behaviour = default(ColumnHeaderContainerStyleBehaviour);
-                if (!ColumnHeaderContainerStyleBehaviours.TryGetValue(GridView, out behaviour))
+                if (!ColumnHeaderContainerStyleBehaviours.TryGetValue(gridView, out behaviour))
                 {
-                    ColumnHeaderContainerStyleBehaviours.Add(GridView, new ColumnHeaderContainerStyleBehaviour(GridView));
+                    ColumnHeaderContainerStyleBehaviours.Add(gridView, new ColumnHeaderContainerStyleBehaviour(gridView));
                 }
             }
             else
             {
-                ColumnHeaderContainerStyleBehaviours.Remove(GridView);
+                ColumnHeaderContainerStyleBehaviours.Remove(gridView);
             }
         }
 
@@ -63,9 +63,9 @@ namespace FoxTunes
                 );
             }
 
-            public ColumnHeaderContainerStyleBehaviour(GridView GridView) : this()
+            public ColumnHeaderContainerStyleBehaviour(GridView gridView) : this()
             {
-                this.GridView = GridView;
+                this.GridView = gridView;
                 this.Apply();
             }
 

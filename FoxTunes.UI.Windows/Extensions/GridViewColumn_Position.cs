@@ -48,7 +48,7 @@ namespace FoxTunes
             public PositionBehaviour(GridViewColumn gridViewColumn)
             {
                 this.GridViewColumn = gridViewColumn;
-                InheritanceContextHelper.AddEventHandler(gridViewColumn, this.OnInheritanceContextChanged);
+                InheritanceContextHelper.AddEventHandler(this.GridViewColumn, this.OnInheritanceContextChanged);
             }
 
             public GridViewColumn GridViewColumn { get; private set; }
@@ -118,6 +118,15 @@ namespace FoxTunes
                     return;
                 }
                 SetPosition(this.GridViewColumn, position);
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.GridViewColumn != null)
+                {
+                    InheritanceContextHelper.RemoveEventHandler(this.GridViewColumn, this.OnInheritanceContextChanged);
+                }
+                base.OnDisposing();
             }
         }
     }

@@ -76,7 +76,10 @@ namespace FoxTunes
 
             protected override void OnDisposing()
             {
-                this.ListView.SelectionChanged -= this.OnSelectionChanged;
+                if (this.ListView != null)
+                {
+                    this.ListView.SelectionChanged -= this.OnSelectionChanged;
+                }
                 base.OnDisposing();
             }
         }

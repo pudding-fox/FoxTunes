@@ -276,6 +276,14 @@ namespace FoxTunes
                 {
                     this.Timer.Tick -= this.OnTick;
                 }
+                if (this.ListView != null)
+                {
+                    this.ListView.DragEnter -= this.OnDragEnter;
+                    this.ListView.DragOver -= this.OnDragOver;
+                    this.ListView.Drop -= this.OnDrop;
+                    this.ListView.DragLeave -= this.OnDragLeave;
+                    this.ListView.QueryContinueDrag -= this.OnQueryContinueDrag;
+                }
                 base.OnDisposing();
             }
         }

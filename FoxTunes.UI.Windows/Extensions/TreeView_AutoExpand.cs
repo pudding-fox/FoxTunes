@@ -73,11 +73,19 @@ namespace FoxTunes
 
             public TreeView TreeView { get; private set; }
 
+            public INotifyCollectionChanged ItemsSource { get; private set; }
+
             protected virtual void OnItemsSourceChanged(object sender, EventArgs e)
             {
+                if (this.ItemsSource != null)
+                {
+                    this.ItemsSource.CollectionChanged -= this.OnCollectionChanged;
+                    this.ItemsSource = null;
+                }
                 if (this.TreeView.ItemsSource is INotifyCollectionChanged notifyCollectionChanged)
                 {
-                    notifyCollectionChanged.CollectionChanged += this.OnCollectionChanged;
+                    this.ItemsSource = notifyCollectionChanged;
+                    this.ItemsSource.CollectionChanged += this.OnCollectionChanged;
                 }
                 this.ExpandAllIfRequired();
             }
@@ -120,6 +128,24 @@ namespace FoxTunes
                         stack.Push(child);
                     }
                 }
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.TreeView != null)
+                {
+                    BindingHelper.RemoveHandler(
+                        this.TreeView,
+                        ItemsControl.ItemsSourceProperty,
+                        typeof(ListView),
+                        this.OnItemsSourceChanged
+                    );
+                }
+                if (this.ItemsSource != null)
+                {
+                    this.ItemsSource.CollectionChanged -= this.OnCollectionChanged;
+                }
+                base.OnDisposing();
             }
         }
     }
