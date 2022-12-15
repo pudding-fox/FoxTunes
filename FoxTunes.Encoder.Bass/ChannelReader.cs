@@ -31,16 +31,28 @@ namespace FoxTunes
 
         public void CopyTo(ProcessWriter writer, CancellationToken cancellationToken)
         {
-            this.CopyTo(writer.Write, cancellationToken);
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing process input.", this.Stream.ChannelHandle);
-            writer.Close();
+            try
+            {
+                this.CopyTo(writer.Write, cancellationToken);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing process input.", this.Stream.ChannelHandle);
+            }
+            finally
+            {
+                writer.Close();
+            }
         }
 
         public void CopyTo(IBassEncoderWriter writer, CancellationToken cancellationToken)
         {
-            this.CopyTo(writer.Write, cancellationToken);
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing writer input.", this.Stream.ChannelHandle);
-            writer.Close();
+            try
+            {
+                this.CopyTo(writer.Write, cancellationToken);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing writer input.", this.Stream.ChannelHandle);
+            }
+            finally
+            {
+                writer.Close();
+            }
         }
 
         public void CopyTo(Writer writer, CancellationToken cancellationToken)
@@ -62,7 +74,7 @@ namespace FoxTunes
                 {
                     case BASS_STREAMPROC_END:
                     case BASS_ERROR_UNKNOWN:
-                        break;
+                        return;
                 }
                 writer(buffer, length);
                 this.Update();

@@ -24,16 +24,28 @@ namespace FoxTunes
 
         public void CopyTo(ProcessWriter writer, CancellationToken cancellationToken)
         {
-            this.CopyTo(writer.Write, cancellationToken);
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from process {0}, closing process input.", this.Process.Id);
-            writer.Close();
+            try
+            {
+                this.CopyTo(writer.Write, cancellationToken);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from process {0}, closing process input.", this.Process.Id);
+            }
+            finally
+            {
+                writer.Close();
+            }
         }
 
         public void CopyTo(IBassEncoderWriter writer, CancellationToken cancellationToken)
         {
-            this.CopyTo(writer.Write, cancellationToken);
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from process {0}, closing writer input.", this.Process.Id);
-            writer.Close();
+            try
+            {
+                this.CopyTo(writer.Write, cancellationToken);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from process {0}, closing writer input.", this.Process.Id);
+            }
+            finally
+            {
+                writer.Close();
+            }
         }
 
         public void CopyTo(Writer writer, CancellationToken cancellationToken)
