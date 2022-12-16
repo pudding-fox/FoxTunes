@@ -285,7 +285,7 @@ namespace FoxTunes
                 {
                     await task.Run().ConfigureAwait(false);
                 }
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new PlaylistUpdatedSignalState(this.Playlist))).ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new PlaylistUpdatedSignalState(this.Playlist, DataSignalType.Updated))).ConfigureAwait(false);
             }
 
             protected override async Task AddPlaylistItems(IEnumerable<PlaylistItem> playlistItems)

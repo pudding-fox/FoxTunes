@@ -19,6 +19,8 @@ namespace FoxTunes
             }
         }
 
+        public static readonly object SyncRoot = new object();
+
         private AsyncDebouncer()
         {
             this.Tasks = new ConcurrentDictionary<Func<Task>, TaskCompletionSource<bool>>(FuncComparer<Task>.Instance);
@@ -39,10 +41,13 @@ namespace FoxTunes
         public Task Exec(Func<Task> task)
         {
             var completionSource = this.Tasks.GetOrAdd(task, key => new TaskCompletionSource<bool>());
-            if (this.Timer != null)
+            lock (SyncRoot)
             {
-                this.Timer.Stop();
-                this.Timer.Start();
+                if (this.Timer != null)
+                {
+                    this.Timer.Stop();
+                    this.Timer.Start();
+                }
             }
             return completionSource.Task;
         }
@@ -76,9 +81,12 @@ namespace FoxTunes
         {
             while (true)
             {
-                if (this.Timer == null || !this.Timer.Enabled)
+                lock (SyncRoot)
                 {
-                    return;
+                    if (this.Timer == null || !this.Timer.Enabled)
+                    {
+                        return;
+                    }
                 }
                 if (this.Tasks.Count == 0)
                 {
@@ -152,11 +160,14 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.Timer != null)
+            lock (SyncRoot)
             {
-                this.Timer.Elapsed -= this.OnElapsed;
-                this.Timer.Dispose();
-                this.Timer = null;
+                if (this.Timer != null)
+                {
+                    this.Timer.Elapsed -= this.OnElapsed;
+                    this.Timer.Dispose();
+                    this.Timer = null;
+                }
             }
             //Execute any pending actions.
             this.OnElapsed(this, default(ElapsedEventArgs));

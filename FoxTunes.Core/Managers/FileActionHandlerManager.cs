@@ -48,6 +48,10 @@ namespace FoxTunes
                     if (this.OpenMode == CommandLineParser.OpenMode.Play)
                     {
                         playlist = this.PlaylistManager.SelectedPlaylist;
+                        if (playlist == null)
+                        {
+                            return;
+                        }
                         index = this.PlaylistBrowser.GetInsertIndex(playlist);
                     }
                     await this.RunPaths(e.Sequence, FileActionType.Playlist).ConfigureAwait(false);

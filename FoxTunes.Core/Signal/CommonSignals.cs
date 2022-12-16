@@ -32,23 +32,27 @@ namespace FoxTunes
             this.Playlists = new Playlist[] { };
         }
 
-        public PlaylistUpdatedSignalState(Playlist playlist) : this()
+        public PlaylistUpdatedSignalState(Playlist playlist, DataSignalType type) : this()
         {
             if (playlist != null)
             {
                 this.Playlists = new[] { playlist };
             }
+            this.Type = type;
         }
 
-        public PlaylistUpdatedSignalState(IEnumerable<Playlist> playlists) : this()
+        public PlaylistUpdatedSignalState(IEnumerable<Playlist> playlists, DataSignalType type) : this()
         {
             if (playlists != null)
             {
                 this.Playlists = playlists.ToArray();
             }
+            this.Type = type;
         }
 
         public Playlist[] Playlists { get; private set; }
+
+        public DataSignalType Type { get; private set; }
     }
 
     public class MetaDataUpdatedSignalState : SignalState
@@ -90,11 +94,22 @@ namespace FoxTunes
 
     public class PlaylistColumnsUpdatedSignalState : SignalState
     {
-        public PlaylistColumnsUpdatedSignalState(IEnumerable<PlaylistColumn> columns)
+        public PlaylistColumnsUpdatedSignalState(IEnumerable<PlaylistColumn> columns, DataSignalType type)
         {
             this.Columns = columns;
+            this.Type = type;
         }
 
         public IEnumerable<PlaylistColumn> Columns { get; private set; }
+
+        public DataSignalType Type { get; private set; }
+    }
+
+    public enum DataSignalType : byte
+    {
+        None,
+        Added,
+        Updated,
+        Removed
     }
 }
