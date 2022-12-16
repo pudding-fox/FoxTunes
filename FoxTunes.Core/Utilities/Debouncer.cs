@@ -62,10 +62,6 @@ namespace FoxTunes
             lock (SyncRoot)
             {
                 this.Actions.Remove(action);
-                if (this.Actions.Count == 0)
-                {
-                    this.Timer.Stop();
-                }
             }
         }
 

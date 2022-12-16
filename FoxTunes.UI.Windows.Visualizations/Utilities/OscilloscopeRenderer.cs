@@ -51,7 +51,7 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            var task = this.RefreshBitmap();
+            this.Debouncer.Exec(this.RefreshBitmap);
         }
 
         protected override void CreateViewBox()
