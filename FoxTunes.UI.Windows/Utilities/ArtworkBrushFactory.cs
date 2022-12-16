@@ -121,7 +121,10 @@ namespace FoxTunes
             {
                 Stretch = Stretch.Uniform
             };
-            brush.Freeze();
+            if (brush.CanFreeze)
+            {
+                brush.Freeze();
+            }
             return brush;
         }
 

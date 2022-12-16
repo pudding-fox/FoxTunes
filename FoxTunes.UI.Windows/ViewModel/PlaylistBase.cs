@@ -101,7 +101,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged;
 
-        protected virtual async Task<string> GetStatusMessage()
+        protected virtual string GetStatusMessage()
         {
             if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null)
             {
@@ -116,7 +116,7 @@ namespace FoxTunes.ViewModel
                 case PlaylistBrowserState.Loading:
                     return LOADING;
             }
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
+            var playlist = this.GetPlaylist();
             var isUpdating = global::FoxTunes.BackgroundTask.Active
                     .OfType<PlaylistTaskBase>()
                     .Any(task => task.Playlist == playlist);
@@ -181,7 +181,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual async Task RefreshStatus()
         {
-            var statusMessage = await this.GetStatusMessage().ConfigureAwait(false);
+            var statusMessage = this.GetStatusMessage();
             await Windows.Invoke(() =>
             {
                 this.StatusMessage = statusMessage;
@@ -194,7 +194,7 @@ namespace FoxTunes.ViewModel
             return this.RefreshItems();
         }
 
-        protected abstract Task<Playlist> GetPlaylist();
+        protected abstract Playlist GetPlaylist();
 
         protected override void InitializeComponent(ICore core)
         {
@@ -241,7 +241,7 @@ namespace FoxTunes.ViewModel
         {
             if (state != null && state.Playlists != null && state.Playlists.Any())
             {
-                var playlist = await this.GetPlaylist().ConfigureAwait(false);
+                var playlist = this.GetPlaylist();
                 if (playlist == null || state.Playlists.Contains(playlist))
                 {
                     await this.Refresh().ConfigureAwait(false);
@@ -260,7 +260,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual async Task RefreshItems()
         {
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
+            var playlist = this.GetPlaylist();
             await this.RefreshItems(playlist).ConfigureAwait(false);
         }
 

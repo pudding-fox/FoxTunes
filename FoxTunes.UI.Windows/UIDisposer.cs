@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
 
 namespace FoxTunes
 {
     public static class UIDisposer
     {
-        public static void Dispose(FrameworkElement element)
+        public static void Dispose(FrameworkElement element, UIDisposerFlags flags = UIDisposerFlags.Default)
         {
             var stack = new Stack<FrameworkElement>();
             stack.Push(element);
@@ -27,10 +28,20 @@ namespace FoxTunes
                     }
                 }
                 Dispose(element.Resources);
-                for (int a = 0, b = VisualTreeHelper.GetChildrenCount(element); a < b; a++)
+                if (flags.HasFlag(UIDisposerFlags.VisualTree))
                 {
-                    var child = VisualTreeHelper.GetChild(element, a) as FrameworkElement;
-                    if (child != null)
+                    for (int a = 0, b = VisualTreeHelper.GetChildrenCount(element); a < b; a++)
+                    {
+                        var child = VisualTreeHelper.GetChild(element, a) as FrameworkElement;
+                        if (child != null)
+                        {
+                            stack.Push(child);
+                        }
+                    }
+                }
+                if (flags.HasFlag(UIDisposerFlags.LogicalTree))
+                {
+                    foreach (var child in LogicalTreeHelper.GetChildren(element).OfType<FrameworkElement>())
                     {
                         stack.Push(child);
                     }
@@ -52,5 +63,15 @@ namespace FoxTunes
                 }
             }
         }
+    }
+
+    [Flags]
+    public enum UIDisposerFlags : byte
+    {
+        None,
+        VisualTree,
+        LogicalTree,
+        Default = VisualTree,
+        All = VisualTree | LogicalTree
     }
 }

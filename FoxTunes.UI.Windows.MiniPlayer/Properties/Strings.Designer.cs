@@ -194,5 +194,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("MiniPlayerKeyBindingsBehaviourConfiguration.Toggle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drop files anywhere..
+        /// </summary>
+        internal static string MiniPlaylist_Empty {
+            get {
+                return ResourceManager.GetString("MiniPlaylist.Empty", resourceCulture);
+            }
+        }
     }
 }

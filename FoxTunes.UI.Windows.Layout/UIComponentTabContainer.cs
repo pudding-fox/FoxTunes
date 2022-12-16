@@ -46,7 +46,7 @@ namespace FoxTunes
         protected virtual void UpdateChildren()
         {
             var index = this.TabControl.SelectedIndex;
-            this.TabControl.Items.Clear();
+            this.TabControl.Items.Clear(UIDisposerFlags.All);
             if (this.Component.Children != null && this.Component.Children.Count > 0)
             {
                 foreach (var component in this.Component.Children)

@@ -194,7 +194,10 @@ namespace FoxTunes
             if (region.Width != region.Height)
             {
                 source = this.CropImage(source, region, width, height);
-                source.Freeze();
+                if (source.CanFreeze)
+                {
+                    source.Freeze();
+                }
             }
             context.DrawImage(source, region);
         }
@@ -278,7 +281,10 @@ namespace FoxTunes
                     this.WriteToCache(libraryHierarchyNode, width, height, stream);
                 }
             }
-            target.Freeze();
+            if (target.CanFreeze)
+            {
+                target.Freeze();
+            }
             return target;
         }
 

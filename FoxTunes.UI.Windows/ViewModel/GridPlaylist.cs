@@ -255,24 +255,32 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async Task RemovePlaylistItems()
+        protected virtual Task RemovePlaylistItems()
         {
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            if (playlist == null)
+            var playlist = this.GetPlaylist();
+            if (playlist != null)
             {
-                return;
+                return this.PlaylistManager.Remove(playlist, this.SelectedItems.OfType<PlaylistItem>());
             }
-            await this.PlaylistManager.Remove(playlist, this.SelectedItems.OfType<PlaylistItem>()).ConfigureAwait(false);
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
-        protected virtual async Task CropPlaylistItems()
+        protected virtual Task CropPlaylistItems()
         {
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            if (playlist == null)
+            var playlist = this.GetPlaylist();
+            if (playlist != null)
             {
-                return;
+                return this.PlaylistManager.Crop(playlist, this.SelectedItems.OfType<PlaylistItem>());
             }
-            await this.PlaylistManager.Crop(playlist, this.SelectedItems.OfType<PlaylistItem>()).ConfigureAwait(false);
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected virtual Task LocatePlaylistItems()
@@ -427,53 +435,59 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        private async Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)
+        private Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)
         {
             var sequence = default(int);
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            if (playlist == null)
+            var playlist = this.GetPlaylist();
+            if (playlist != null)
             {
-                return;
+                if (this.TryGetInsertSequence(out sequence))
+                {
+                    return this.PlaylistManager.Insert(playlist, sequence, libraryHierarchyNode, false);
+                }
+                else
+                {
+                    return this.PlaylistManager.Add(playlist, libraryHierarchyNode, false);
+                }
             }
-            if (this.TryGetInsertSequence(out sequence))
-            {
-                await this.PlaylistManager.Insert(playlist, sequence, libraryHierarchyNode, false).ConfigureAwait(false);
-            }
-            else
-            {
-                await this.PlaylistManager.Add(playlist, libraryHierarchyNode, false).ConfigureAwait(false);
-            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
-        private async Task AddToPlaylist(IEnumerable<PlaylistItem> playlistItems)
+        private Task AddToPlaylist(IEnumerable<PlaylistItem> playlistItems)
         {
             var sequence = default(int);
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            if (playlist == null)
+            var playlist = this.GetPlaylist();
+            if (playlist != null)
             {
-                return;
-            }
-            if (this.TryGetInsertSequence(out sequence))
-            {
-                //TODO: This was really confusing, there is some disconnection between what the UI suggests will happen (where the items will be moved to) and what happens.
-                //TODO: I don't really understand it but if the current sequence is less than the target sequence (moving down the list) then we have to decrement the target sequence.
-                //TODO: The unit tests don't have this problem for some reason.
-                var playlistItem = playlistItems.FirstOrDefault();
-                if (playlistItem != null && playlistItem.Sequence < sequence)
+                if (this.TryGetInsertSequence(out sequence))
                 {
-                    sequence--;
+                    //TODO: This was really confusing, there is some disconnection between what the UI suggests will happen (where the items will be moved to) and what happens.
+                    //TODO: I don't really understand it but if the current sequence is less than the target sequence (moving down the list) then we have to decrement the target sequence.
+                    //TODO: The unit tests don't have this problem for some reason.
+                    var playlistItem = playlistItems.FirstOrDefault();
+                    if (playlistItem != null && playlistItem.Sequence < sequence)
+                    {
+                        sequence--;
+                    }
+                    if (this.IsInsertSequenceValid(playlistItems, sequence))
+                    {
+                        return this.PlaylistManager.Move(playlist, sequence, playlistItems);
+                    }
                 }
-                if (!this.IsInsertSequenceValid(playlistItems, sequence))
+                else
                 {
-                    //Operation doesn't make sense.
-                    return;
+                    return this.PlaylistManager.Move(playlist, playlistItems);
                 }
-                await this.PlaylistManager.Move(playlist, sequence, playlistItems).ConfigureAwait(false);
             }
-            else
-            {
-                await this.PlaylistManager.Move(playlist, playlistItems).ConfigureAwait(false);
-            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected virtual bool TryGetInsertSequence(out int sequence)
@@ -584,10 +598,27 @@ namespace FoxTunes.ViewModel
             );
         }
 
-        public async Task Sort(PlaylistColumn playlistColumn)
+        public Task Sort(PlaylistColumn playlistColumn)
         {
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            await this.PlaylistSortingBehaviour.Sort(playlist, playlistColumn).ConfigureAwait(false);
+            var playlist = this.GetPlaylist();
+            if (playlist != null)
+            {
+                return this.PlaylistSortingBehaviour.Sort(playlist, playlistColumn);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.PlaylistManager != null)
+            {
+                this.PlaylistManager.SelectedItemsChanged -= this.OnSelectedItemsChanged;
+            }
+            base.OnDisposing();
         }
     }
 }

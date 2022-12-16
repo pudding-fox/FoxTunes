@@ -260,7 +260,7 @@ namespace FoxTunes
             {
                 items = this.ItemsSource;
             }
-            this._TabControl.Items.Clear();
+            this._TabControl.Items.Clear(UIDisposerFlags.All);
             if (items != null)
             {
                 this.Add(items);
@@ -290,7 +290,13 @@ namespace FoxTunes
 
         protected virtual void Remove(object element)
         {
-            this._TabControl.Items.Remove(this.GetTabItem(element));
+            var tabItem = this.GetTabItem(element);
+            if (tabItem == null)
+            {
+                return;
+            }
+            this._TabControl.Items.Remove(tabItem);
+            UIDisposer.Dispose(tabItem, UIDisposerFlags.All);
         }
 
         protected virtual TabItem CreateTabItem(object content)

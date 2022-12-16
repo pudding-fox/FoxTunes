@@ -14,7 +14,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return "Drop files anywhere.";
+                return Strings.MiniPlaylist_Empty;
             }
         }
 
@@ -76,14 +76,10 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScriptChanged;
 
-        protected override Task<Playlist> GetPlaylist()
+        protected override Playlist GetPlaylist()
         {
             var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
-#if NET40
-            return TaskEx.FromResult(playlist);
-#else
-            return Task.FromResult(playlist);
-#endif
+            return playlist;
         }
 
         protected override void InitializeComponent(ICore core)
