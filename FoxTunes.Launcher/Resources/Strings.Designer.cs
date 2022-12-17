@@ -104,5 +104,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("Program.DatabaseMismatch", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A running instance is not responding, terminate it?.
+        /// </summary>
+        internal static string Program_Unresponsive {
+            get {
+                return ResourceManager.GetString("Program.Unresponsive", resourceCulture);
+            }
+        }
     }
 }
