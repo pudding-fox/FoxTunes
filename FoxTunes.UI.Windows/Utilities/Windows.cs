@@ -35,7 +35,12 @@ namespace FoxTunes
                 {
                     return Application.Current.Dispatcher;
                 }
-                return Dispatcher.CurrentDispatcher;
+                if (!IsShuttingDown)
+                {
+                    //TODO: Questionable.
+                    return Dispatcher.CurrentDispatcher;
+                }
+                return null;
             }
         }
 
@@ -137,6 +142,10 @@ namespace FoxTunes
 #endif
                 }
             }
+            else
+            {
+                Logger.Write(typeof(Windows), LogLevel.Warn, "Cannot Invoke, Dispatcher is not available.");
+            }
 #if NET40
             return TaskEx.FromResult(false);
 #else
@@ -173,6 +182,10 @@ namespace FoxTunes
                     return dispatcher.BeginInvoke(func).Task;
 #endif
                 }
+            }
+            else
+            {
+                Logger.Write(typeof(Windows), LogLevel.Warn, "Cannot Invoke, Dispatcher is not available.");
             }
 #if NET40
             return TaskEx.FromResult(false);
