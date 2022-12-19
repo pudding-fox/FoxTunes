@@ -13,8 +13,8 @@ namespace FoxTunes
 
         public JSScriptingRuntime() : base(ID, string.Format(Strings.JSScriptingRuntime_Name, VERSION))
         {
-            Loader.Load("msvcp100.dll");
             Loader.Load("msvcr100.dll");
+            Loader.Load("msvcp100.dll");
         }
 
         public ICore Core { get; private set; }
