@@ -468,6 +468,7 @@ namespace FoxTunes
                         "encoders/wavpack.exe",
                         "encoders/wavpack_license.txt",
                         "sox/LICENSE.GPL.txt",
+                        "sox/msvcr120d.dll",
                         "sox/sox.exe",
                         "FoxTunes.Encoder.Bass.exe",
                         "FoxTunes.Encoder.Bass.exe.config"
