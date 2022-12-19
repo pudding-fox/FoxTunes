@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class LyricsProvider : StandardComponent
+    public abstract class LyricsProvider : StandardComponent, ILyricsProvider
     {
         protected LyricsProvider(string id, string name = null, string description = null)
         {

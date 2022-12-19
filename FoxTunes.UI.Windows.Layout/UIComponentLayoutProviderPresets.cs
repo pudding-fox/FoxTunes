@@ -5,81 +5,70 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public static class UIComponentLayoutProviderPresets
+    [WindowsUserInterfaceDependency]
+    public class UIComponentLayoutProviderPresets : StandardComponent
     {
-        public static class Main
+        public UIComponentLayoutProviderPresets()
         {
-            public const string A = "AAAA5819-A188-4B16-A0D9-825FC4150E5B";
+            Instance = this;
+            this.Presets = new Dictionary<string, IList<IUIComponentLayoutProviderPreset>>(StringComparer.OrdinalIgnoreCase);
+        }
 
-            public const string B = "BBBB00AD-2D37-41EB-968F-86EE5C566C78";
+        public IDictionary<string, IList<IUIComponentLayoutProviderPreset>> Presets { get; private set; }
 
-            public const string C = "CCCCEA3C-E75C-48CE-B15D-B11873448DE2";
-
-            public const string D = "DDDD8DCA-65F9-4704-8AAC-17631219E70D";
-
-            public const string E = "EEEE2131-1882-43BE-9FCC-AE0EECA67EFD";
-
-            public static readonly IEnumerable<Preset> Presets = new[]
+        public override void InitializeComponent(ICore core)
+        {
+            foreach (var preset in ComponentRegistry.Instance.GetComponents<IUIComponentLayoutProviderPreset>())
             {
-                new Preset(
-                    A,
-                    Strings.UIComponentLayoutProviderPresets_Main_1,
-                    Resources.Main_1
-                ),
-                new Preset(
-                    B,
-                    Strings.UIComponentLayoutProviderPresets_Main_2,
-                    Resources.Main_2
-                ),
-                new Preset(
-                    C,
-                    Strings.UIComponentLayoutProviderPresets_Main_3,
-                    Resources.Main_3
-                ),
-                new Preset(
-                    D,
-                    Strings.UIComponentLayoutProviderPresets_Simple_1,
-                    Resources.Simple_1
-                ),
-                new Preset(
-                    E,
-                    Strings.UIComponentLayoutProviderPresets_Simple_2,
-                    Resources.Simple_2
-                ),
-            };
+                this.Presets.GetOrAdd(
+                    preset.Category,
+                    () => new List<IUIComponentLayoutProviderPreset>()
+                ).Add(preset);
+            }
+            base.InitializeComponent(core);
         }
 
-        public static Preset GetPresetById(IEnumerable<Preset> presets, string id)
+        public IEnumerable<IUIComponentLayoutProviderPreset> GetPresetsByCategory(string category)
         {
-            return presets.FirstOrDefault(preset => string.Equals(preset.Id, id, StringComparison.OrdinalIgnoreCase));
+            var presets = default(IList<IUIComponentLayoutProviderPreset>);
+            if (this.Presets.TryGetValue(category, out presets))
+            {
+                return presets;
+            }
+            return Enumerable.Empty<IUIComponentLayoutProviderPreset>();
         }
 
-        public static Preset GetPresetByName(IEnumerable<Preset> presets, string name)
+        public IUIComponentLayoutProviderPreset GetPresetById(string id, string category)
         {
-            return presets.FirstOrDefault(preset => string.Equals(preset.Name, name, StringComparison.OrdinalIgnoreCase));
+            return this.GetPresetsByCategory(category).FirstOrDefault(preset => string.Equals(preset.Id, id, StringComparison.OrdinalIgnoreCase));
         }
 
-        public static Preset GetActivePreset(string sectionId, string presetId, string layoutId, IEnumerable<Preset> presets)
+        public IUIComponentLayoutProviderPreset GetPresetByName(string name, string category)
+        {
+            return this.GetPresetsByCategory(category).FirstOrDefault(preset => string.Equals(preset.Name, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public IUIComponentLayoutProviderPreset GetActivePreset(string category)
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
             var presetElement = configuration.GetElement<SelectionConfigurationElement>(
-                sectionId,
-                presetId
+                UIComponentLayoutProviderPreset.GetSection(category),
+                UIComponentLayoutProviderPreset.GetPreset(category)
             );
             if (presetElement.Value == null)
             {
                 //No preset selected.
                 return null;
             }
-            var preset = GetPresetById(presets, presetElement.Value.Id);
+            var preset = this.GetPresetById(presetElement.Value.Id, category);
             if (preset == null)
             {
                 //The selected preset was not found.
                 return null;
             }
             var layoutElement = configuration.GetElement<TextConfigurationElement>(
-                sectionId,
-                layoutId
+                UIComponentLayoutProviderPreset.GetSection(category),
+                UIComponentLayoutProviderPreset.GetLayout(category)
             );
             if (!string.Equals(preset.Layout, layoutElement.Value, StringComparison.OrdinalIgnoreCase))
             {
@@ -89,12 +78,12 @@ namespace FoxTunes
             return preset;
         }
 
-        public static bool IsLoaded(string sectionId, string presetId, string layoutId, IEnumerable<Preset> presets, Preset preset)
+        public bool IsLoaded(IUIComponentLayoutProviderPreset preset)
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
             var presetElement = configuration.GetElement<SelectionConfigurationElement>(
-                sectionId,
-                presetId
+                UIComponentLayoutProviderPreset.GetSection(preset.Category),
+                UIComponentLayoutProviderPreset.GetPreset(preset.Category)
             );
             if (presetElement.Value == null || !string.Equals(presetElement.Value.Id, preset.Id, StringComparison.OrdinalIgnoreCase))
             {
@@ -102,8 +91,8 @@ namespace FoxTunes
                 return false;
             }
             var layoutElement = configuration.GetElement<TextConfigurationElement>(
-                sectionId,
-                layoutId
+                UIComponentLayoutProviderPreset.GetSection(preset.Category),
+                UIComponentLayoutProviderPreset.GetLayout(preset.Category)
             );
             if (!string.Equals(preset.Layout, layoutElement.Value, StringComparison.OrdinalIgnoreCase))
             {
@@ -113,53 +102,6 @@ namespace FoxTunes
             return true;
         }
 
-        public static EventHandler Loader(string sectionId, string presetId, string layoutId, IEnumerable<Preset> presets)
-        {
-            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
-            var presetElement = configuration.GetElement<SelectionConfigurationElement>(
-                sectionId,
-                presetId
-            );
-            var layoutElement = configuration.GetElement<TextConfigurationElement>(
-                sectionId,
-                layoutId
-            );
-            return Loader(presetElement, layoutElement, presets);
-        }
-
-        public static EventHandler Loader(SelectionConfigurationElement presetElement, TextConfigurationElement layoutElement, IEnumerable<Preset> presets)
-        {
-            return (sender, e) =>
-            {
-                if (presetElement.Value == null)
-                {
-                    //No preset selected.
-                    return;
-                }
-                var preset = GetPresetById(presets, presetElement.Value.Id);
-                if (preset == null)
-                {
-                    //The selected preset was not found.
-                    return;
-                }
-                layoutElement.Value = preset.Layout;
-            };
-        }
-
-        public class Preset
-        {
-            public Preset(string id, string name, string layout)
-            {
-                this.Id = id;
-                this.Name = name;
-                this.Layout = layout;
-            }
-
-            public string Id { get; private set; }
-
-            public string Name { get; private set; }
-
-            public string Layout { get; private set; }
-        }
+        public static UIComponentLayoutProviderPresets Instance { get; private set; }
     }
 }
