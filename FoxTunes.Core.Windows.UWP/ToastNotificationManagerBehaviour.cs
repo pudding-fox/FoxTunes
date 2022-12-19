@@ -291,6 +291,10 @@ namespace FoxTunes
                     Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, "Local")
                 );
             }
+            else
+            {
+                fileName = Path.GetFullPath(fileName);
+            }
             return new Uri(fileName).AbsoluteUri;
         }
 
