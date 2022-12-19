@@ -7,9 +7,6 @@ using System.Windows.Controls;
 
 namespace FoxTunes
 {
-    //TODO: This control causes freezes on XP when visualizations (specifically WriteableBitmaps) are hosted in it.
-    //TODO: For this reason, it is disabled.
-    [PlatformDependency(Major = 6, Minor = 0)]
     [UIComponent("67A0F63C-DC86-4B4E-91E1-290B71822853", role: UIComponentRole.Container)]
     public class UIComponentTabContainer : UIComponentPanel
     {

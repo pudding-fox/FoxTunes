@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -114,41 +115,18 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            this.Debouncer.Exec(this.RefreshBitmap);
+            this.Debouncer.Exec(this.CreateData);
         }
 
-        protected override void CreateViewBox()
+        protected override bool CreateData(int width, int height)
         {
-            var bitmap = this.Bitmap;
-            if (bitmap == null)
-            {
-                return;
-            }
             this.RendererData = Create(
                 this,
-                bitmap.PixelWidth,
-                bitmap.PixelHeight,
+                width,
+                height,
                 this.Orientation
             );
-            this.Viewbox = new Rect(0, 0, this.RendererData.Width, this.RendererData.Height);
-        }
-
-        protected virtual Task RefreshBitmap()
-        {
-            return Windows.Invoke(() =>
-            {
-                var bitmap = this.Bitmap;
-                if (bitmap == null)
-                {
-                    return;
-                }
-                this.RendererData = Create(
-                    this,
-                    bitmap.PixelWidth,
-                    bitmap.PixelHeight,
-                    this.Orientation
-                );
-            });
+            return true;
         }
 
         protected virtual async Task Render(PeakRendererData data)
@@ -278,11 +256,6 @@ namespace FoxTunes
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data, disabling: {0}", exception.Message);
 #endif
             }
-        }
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new PeakRenderer();
         }
 
         protected override void OnDisposing()

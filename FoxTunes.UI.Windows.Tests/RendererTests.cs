@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -58,12 +57,7 @@ namespace FoxTunes
             Assert.IsTrue(Enumerable.SequenceEqual(expected, actual));
         }
 
-        protected override void CreateViewBox()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override Freezable CreateInstanceCore()
+        protected override bool CreateData(int width, int height)
         {
             throw new NotImplementedException();
         }

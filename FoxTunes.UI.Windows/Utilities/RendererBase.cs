@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace FoxTunes
 {
-    public abstract class RendererBase : Freezable, IBaseComponent, INotifyPropertyChanged, IDisposable
+    public abstract class RendererBase : FrameworkElement, IBaseComponent, INotifyPropertyChanged, IDisposable
     {
         public const double DPIX = 96;
 
@@ -36,139 +36,36 @@ namespace FoxTunes
 
         public static readonly Duration LockTimeout = new Duration(TimeSpan.FromMilliseconds(1));
 
-        public static readonly DependencyProperty BitmapProperty = DependencyProperty.Register(
-            "Bitmap",
-            typeof(WriteableBitmap),
+        public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(
+            "Background",
+            typeof(Brush),
             typeof(RendererBase),
-            new FrameworkPropertyMetadata(new PropertyChangedCallback(OnBitmapChanged))
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.SubPropertiesDoNotAffectRender)
         );
 
-        public static WriteableBitmap GetBitmap(RendererBase source)
+        public Brush GetBackground(RendererBase source)
         {
-            return (WriteableBitmap)source.GetValue(BitmapProperty);
+            return (Brush)source.GetValue(BackgroundProperty);
         }
 
-        public static void SetBitmap(RendererBase source, WriteableBitmap value)
+        public void SetBackground(RendererBase source, Brush value)
         {
-            source.SetValue(BitmapProperty, value);
+            source.SetValue(BackgroundProperty, value);
         }
 
-        public static void OnBitmapChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var renderer = sender as RendererBase;
-            if (renderer == null)
-            {
-                return;
-            }
-            renderer.OnBitmapChanged();
-        }
-
-        public static readonly DependencyProperty WidthProperty = DependencyProperty.Register(
-            "Width",
-            typeof(double),
+        public static readonly DependencyProperty ForegroundProperty = Control.ForegroundProperty.AddOwner(
             typeof(RendererBase),
-            new FrameworkPropertyMetadata(double.NaN, new PropertyChangedCallback(OnWidthChanged))
+            new FrameworkPropertyMetadata(SystemColors.ControlTextBrush, FrameworkPropertyMetadataOptions.Inherits)
         );
 
-        public static double GetWidth(RendererBase source)
+        public Brush GetForeground(RendererBase source)
         {
-            return (double)source.GetValue(WidthProperty);
+            return (Brush)source.GetValue(ForegroundProperty);
         }
 
-        public static void SetWidth(RendererBase source, double value)
+        public void SetForeground(RendererBase source, Brush value)
         {
-            source.SetValue(WidthProperty, value);
-        }
-
-        public static void OnWidthChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var renderer = sender as RendererBase;
-            if (renderer == null)
-            {
-                return;
-            }
-            renderer.OnWidthChanged();
-        }
-
-        public static readonly DependencyProperty HeightProperty = DependencyProperty.Register(
-           "Height",
-           typeof(double),
-           typeof(RendererBase),
-           new FrameworkPropertyMetadata(double.NaN, new PropertyChangedCallback(OnHeightChanged))
-       );
-
-        public static double GetHeight(RendererBase source)
-        {
-            return (double)source.GetValue(HeightProperty);
-        }
-
-        public static void SetHeight(RendererBase source, double value)
-        {
-            source.SetValue(HeightProperty, value);
-        }
-
-        public static void OnHeightChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var renderer = sender as RendererBase;
-            if (renderer == null)
-            {
-                return;
-            }
-            renderer.OnHeightChanged();
-        }
-
-        public static readonly DependencyProperty ViewboxProperty = DependencyProperty.Register(
-           "Viewbox",
-           typeof(Rect),
-           typeof(RendererBase),
-           new FrameworkPropertyMetadata(new Rect(0, 0, 1, 1), new PropertyChangedCallback(OnViewboxChanged))
-       );
-
-        public static Rect GetViewbox(RendererBase source)
-        {
-            return (Rect)source.GetValue(ViewboxProperty);
-        }
-
-        protected static void SetViewbox(RendererBase source, Rect value)
-        {
-            source.SetValue(ViewboxProperty, value);
-        }
-
-        public static void OnViewboxChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var renderer = sender as RendererBase;
-            if (renderer == null)
-            {
-                return;
-            }
-            renderer.OnViewboxChanged();
-        }
-
-        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register(
-            "Color",
-            typeof(Color),
-            typeof(RendererBase),
-            new FrameworkPropertyMetadata(Colors.Transparent, new PropertyChangedCallback(OnColorChanged))
-        );
-
-        public static Color GetColor(RendererBase source)
-        {
-            return (Color)source.GetValue(ColorProperty);
-        }
-
-        public static void SetColor(RendererBase source, Color value)
-        {
-            source.SetValue(ColorProperty, value);
-        }
-
-        public static void OnColorChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var renderer = sender as RendererBase;
-            if (renderer == null)
-            {
-                return;
-            }
-            renderer.OnColorChanged();
+            source.SetValue(ForegroundProperty, value);
         }
 
         const int TIMEOUT = 100;
@@ -184,122 +81,65 @@ namespace FoxTunes
 
         public AsyncDebouncer Debouncer { get; private set; }
 
+        public Brush Background
+        {
+            get
+            {
+                return GetBackground(this);
+            }
+            set
+            {
+                SetBackground(this, value);
+            }
+        }
+
+        public Brush Foreground
+        {
+            get
+            {
+                return GetForeground(this);
+            }
+            set
+            {
+                SetForeground(this, value);
+            }
+        }
+
         public WriteableBitmap Bitmap
         {
             get
             {
-                return (WriteableBitmap)this.GetValue(BitmapProperty);
+                if (this.Background is ImageBrush brush)
+                {
+                    return brush.ImageSource as WriteableBitmap;
+                }
+                return null;
             }
             set
             {
-                this.SetValue(BitmapProperty, value);
+                if (value != null)
+                {
+                    var brush = new ImageBrush(value);
+                    this.Background = brush;
+                }
+                else
+                {
+                    this.Background = null;
+                }
             }
         }
-
-        protected virtual void OnBitmapChanged()
-        {
-            if (this.BitmapChanged != null)
-            {
-                this.BitmapChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Bitmap");
-        }
-
-        public event EventHandler BitmapChanged;
-
-        public double Width
-        {
-            get
-            {
-                return (double)this.GetValue(WidthProperty);
-            }
-            set
-            {
-                this.SetValue(WidthProperty, value);
-            }
-        }
-
-        protected virtual void OnWidthChanged()
-        {
-            this.Debouncer.Exec(this.CreateBitmap);
-            if (this.WidthChanged != null)
-            {
-                this.WidthChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Width");
-        }
-
-        public event EventHandler WidthChanged;
-
-        public double Height
-        {
-            get
-            {
-                return (double)this.GetValue(HeightProperty);
-            }
-            set
-            {
-                this.SetValue(HeightProperty, value);
-            }
-        }
-
-        protected virtual void OnHeightChanged()
-        {
-            this.Debouncer.Exec(this.CreateBitmap);
-            if (this.HeightChanged != null)
-            {
-                this.HeightChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Height");
-        }
-
-        public event EventHandler HeightChanged;
-
-        public Rect Viewbox
-        {
-            get
-            {
-                return (Rect)this.GetValue(ViewboxProperty);
-            }
-            protected set
-            {
-                this.SetValue(ViewboxProperty, value);
-            }
-        }
-
-        protected virtual void OnViewboxChanged()
-        {
-            if (this.ViewboxChanged != null)
-            {
-                this.ViewboxChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Viewbox");
-        }
-
-        public event EventHandler ViewboxChanged;
 
         public Color Color
         {
             get
             {
-                return (Color)this.GetValue(ColorProperty);
-            }
-            set
-            {
-                this.SetValue(ColorProperty, value);
+                if (this.Foreground is SolidColorBrush brush)
+                {
+                    return brush.Color;
+                }
+                return Colors.Transparent;
             }
         }
-
-        protected virtual void OnColorChanged()
-        {
-            if (this.ColorChanged != null)
-            {
-                this.ColorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Color");
-        }
-
-        public event EventHandler ColorChanged;
 
         public IOutput Output { get; private set; }
 
@@ -310,7 +150,6 @@ namespace FoxTunes
         public virtual void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
-            this.Output.IsStartedChanged += this.OnIsStartedChanged;
             this.Configuration = core.Components.Configuration;
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
                WindowsUserInterfaceConfiguration.SECTION,
@@ -319,45 +158,48 @@ namespace FoxTunes
             this.ScalingFactor.ValueChanged += this.OnScalingFactorChanged;
         }
 
-        protected virtual void OnIsStartedChanged(object sender, AsyncEventArgs e)
-        {
-            if (!this.Output.IsStarted)
-            {
-                var task = this.Clear();
-            }
-        }
-
         protected virtual void OnScalingFactorChanged(object sender, EventArgs e)
         {
             this.Debouncer.Exec(this.CreateBitmap);
+        }
+
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            this.Debouncer.Exec(this.CreateBitmap);
+            base.OnRenderSizeChanged(sizeInfo);
+        }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            drawingContext.DrawRectangle(this.Background, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
         protected virtual Task CreateBitmap()
         {
             return Windows.Invoke(() =>
             {
-                var width = this.Width;
-                var height = this.Height;
-                if (width == 0 || double.IsNaN(width) || height == 0 || double.IsNaN(height))
+                var width = default(int);
+                var height = default(int);
+                if (!this.GetPixelSize(out width, out height))
                 {
-                    //We need proper dimentions.
                     return;
                 }
-
-                var size = Windows.ActiveWindow.GetElementPixelSize(
-                    width * this.ScalingFactor.Value,
-                    height * this.ScalingFactor.Value
+                if (!this.CreateData(width, height))
+                {
+                    return;
+                }
+                this.Bitmap = this.CreateBitmap(
+                    width,
+                    height
                 );
-                this.Bitmap = this.CreateBitmap(size);
-                this.CreateViewBox();
             });
         }
 
-        protected virtual WriteableBitmap CreateBitmap(Size size)
+        protected virtual WriteableBitmap CreateBitmap(int width, int height)
         {
             return new WriteableBitmap(
-                Convert.ToInt32(size.Width),
-                Convert.ToInt32(size.Height),
+                width,
+                height,
                 DPIX,
                 DPIY,
                 PixelFormats.Pbgra32,
@@ -365,7 +207,77 @@ namespace FoxTunes
             );
         }
 
-        protected abstract void CreateViewBox();
+        protected virtual Task RefreshBitmap()
+        {
+            return Windows.Invoke(() =>
+            {
+                var width = default(int);
+                var height = default(int);
+                if (!this.GetPixelSize(out width, out height))
+                {
+                    return;
+                }
+                if (!this.CreateData(width, height))
+                {
+                    return;
+                }
+                var bitmap = this.Bitmap;
+                if (bitmap != null && bitmap.PixelWidth == width && bitmap.PixelHeight == height)
+                {
+                    return;
+                }
+                this.Bitmap = this.CreateBitmap(
+                    width,
+                    height
+                );
+            });
+        }
+
+        protected virtual Task CreateData()
+        {
+            return Windows.Invoke(() =>
+            {
+                if (this.Bitmap == null)
+                {
+                    return;
+                }
+                this.CreateData(this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
+            });
+        }
+
+        protected abstract bool CreateData(int width, int height);
+
+        protected virtual bool GetPixelSize(out int width, out int height)
+        {
+            var actualWidth = this.ActualWidth;
+            var actualHeight = this.ActualHeight;
+            if (actualWidth == 0 || double.IsNaN(actualWidth) || actualHeight == 0 || double.IsNaN(actualHeight))
+            {
+                //We need proper dimentions.
+                width = 0;
+                height = 0;
+                return false;
+            }
+
+            var size = Windows.ActiveWindow.GetElementPixelSize(
+                actualWidth * this.ScalingFactor.Value,
+                actualHeight * this.ScalingFactor.Value
+            );
+
+            width = this.GetPixelWidth(size.Width);
+            height = this.GetPixelHeight(size.Height);
+            return true;
+        }
+
+        protected virtual int GetPixelWidth(double width)
+        {
+            return Convert.ToInt32(width);
+        }
+
+        protected virtual int GetPixelHeight(double height)
+        {
+            return Convert.ToInt32(height);
+        }
 
         protected virtual Task Clear()
         {

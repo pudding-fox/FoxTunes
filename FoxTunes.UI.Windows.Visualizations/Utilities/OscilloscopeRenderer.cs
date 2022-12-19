@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -51,43 +50,19 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            this.Debouncer.Exec(this.RefreshBitmap);
+            this.Debouncer.Exec(this.CreateData);
         }
 
-        protected override void CreateViewBox()
+        protected override bool CreateData(int width, int height)
         {
-            var bitmap = this.Bitmap;
-            if (bitmap == null)
-            {
-                return;
-            }
             this.RendererData = Create(
                 this.Output,
-                bitmap.PixelWidth,
-                bitmap.PixelHeight,
+                width,
+                height,
                 OscilloscopeBehaviourConfiguration.GetDuration(this.Duration.Value),
                 OscilloscopeBehaviourConfiguration.GetMode(this.Mode.Value)
             );
-            this.Viewbox = new Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight);
-        }
-
-        protected virtual Task RefreshBitmap()
-        {
-            return Windows.Invoke(() =>
-            {
-                var bitmap = this.Bitmap;
-                if (bitmap == null)
-                {
-                    return;
-                }
-                this.RendererData = Create(
-                    this.Output,
-                    bitmap.PixelWidth,
-                    bitmap.PixelHeight,
-                    OscilloscopeBehaviourConfiguration.GetDuration(this.Duration.Value),
-                    OscilloscopeBehaviourConfiguration.GetMode(this.Mode.Value)
-                );
-            });
+            return true;
         }
 
         protected virtual async Task Render(OscilloscopeRendererData data)
@@ -336,11 +311,6 @@ namespace FoxTunes
                     Animate(ref elements[channel, x].Y, y, center - height, center + height, smoothing);
                 }
             }
-        }
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new OscilloscopeRenderer();
         }
 
         protected override void OnDisposing()

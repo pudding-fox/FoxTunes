@@ -7,27 +7,34 @@
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
              xmlns:LocalWindows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
+             xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" 
              Foreground="{DynamicResource TextBrush}"
              MinWidth="160"
              MinHeight="30">
     <UserControl.Resources>
-        <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-        <Rectangle x:Key="Rectangle">
-            <Rectangle.Resources>
-                <LocalWindows:OscilloscopeRenderer x:Key="Renderer"              
-                    Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
-                    Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
-                    Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}"></LocalWindows:OscilloscopeRenderer>
-            </Rectangle.Resources>
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"/>
-            </Rectangle.Fill>
-        </Rectangle>
+        <LocalViewModel:Oscilloscope x:Key="ViewModel"></LocalViewModel:Oscilloscope>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:OscilloscopeBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <Windows:Visualization Content="{Binding Source={StaticResource Rectangle}}"></Windows:Visualization>
+    <Windows:Visualization>
+        <LocalWindows:OscilloscopeRenderer>
+            <LocalWindows:OscilloscopeRenderer.Style>
+                <Style TargetType="{x:Type LocalWindows:OscilloscopeRenderer}">
+                    <Setter Property="Effect" Value="{x:Null}"></Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DropShadow, Source={StaticResource ViewModel}}" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect></DropShadowEffect>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </LocalWindows:OscilloscopeRenderer.Style>
+        </LocalWindows:OscilloscopeRenderer>
+    </Windows:Visualization>
 </Windows:UIComponentBase>

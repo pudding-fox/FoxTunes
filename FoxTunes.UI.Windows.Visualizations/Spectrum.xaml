@@ -12,23 +12,10 @@
              Foreground="{DynamicResource TextBrush}"
              MinWidth="160"
              MinHeight="30">
-    <UserControl.Resources>
-        <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-    </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.BASIC_CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <Windows:Visualization>
-        <Rectangle>
-            <Rectangle.Resources>
-                <LocalWindows:SpectrumRenderer x:Key="Renderer"
-                    Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}" 
-                    Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}" 
-                    Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrum}}}"></LocalWindows:SpectrumRenderer>
-            </Rectangle.Resources>
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
-            </Rectangle.Fill>
-        </Rectangle>
+        <LocalWindows:SpectrumRenderer></LocalWindows:SpectrumRenderer>
     </Windows:Visualization>
 </Windows:UIComponentBase>

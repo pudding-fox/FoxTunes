@@ -12,23 +12,10 @@
              Foreground="{DynamicResource TextBrush}"
              MinWidth="160"
              MinHeight="30">
-    <UserControl.Resources>
-        <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-    </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrogramBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <Windows:Visualization>
-        <Rectangle>
-            <Rectangle.Resources>
-                <LocalWindows:SpectrogramRenderer x:Key="Renderer"
-                    Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrogram}}}" 
-                    Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrogram}}}" 
-                    Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Spectrogram}}}"></LocalWindows:SpectrogramRenderer>
-            </Rectangle.Resources>
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
-            </Rectangle.Fill>
-        </Rectangle>
+        <LocalWindows:SpectrogramRenderer></LocalWindows:SpectrogramRenderer>
     </Windows:Visualization>
 </Windows:UIComponentBase>
