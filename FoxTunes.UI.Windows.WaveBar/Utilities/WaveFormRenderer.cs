@@ -91,6 +91,11 @@ namespace FoxTunes
                 this.GeneratorData = this.Generator.Generate(stream);
                 this.GeneratorData.Updated += this.OnUpdated;
             }
+            else
+            {
+                this.GeneratorData = WaveFormGenerator.WaveFormGeneratorData.Empty;
+                await this.Clear().ConfigureAwait(false);
+            }
 
             await this.RefreshBitmap().ConfigureAwait(false);
         }

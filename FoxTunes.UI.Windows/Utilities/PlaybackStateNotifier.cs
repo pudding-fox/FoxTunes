@@ -140,7 +140,11 @@ namespace FoxTunes
 
         private static void Update()
         {
-            IsStarted = Output.IsStarted;
+            var isStarted = Output.IsStarted;
+            if (isStarted != IsStarted)
+            {
+                IsStarted = isStarted;
+            }
             var isPlaying = default(bool);
             var isPaused = default(bool);
             var outputStream = PlaybackManager.CurrentStream;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -242,12 +243,15 @@ namespace FoxTunes
             memset(IntPtr.Add(buffer, 3), 0, new UIntPtr(1));
         }
 
+        [SuppressUnmanagedCodeSecurity]
         [DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern IntPtr memset(IntPtr destination, int value, UIntPtr count);
 
+        [SuppressUnmanagedCodeSecurity]
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         private static extern IntPtr memcpy(IntPtr destination, IntPtr source, UIntPtr count);
 
+        [SuppressUnmanagedCodeSecurity]
         [DllImport("msvcrt.dll", EntryPoint = "memmove", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr memmove(IntPtr destination, IntPtr source, UIntPtr count);
 
