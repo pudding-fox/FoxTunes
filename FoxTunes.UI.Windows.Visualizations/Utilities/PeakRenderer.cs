@@ -280,6 +280,7 @@ namespace FoxTunes
             {
                 this.HoldInterval.ValueChanged -= this.OnValueChanged;
             }
+            base.OnDisposing();
         }
 
         private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, PeakRendererData data)

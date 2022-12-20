@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Timers;
+using System.Windows.Media.Animation;
 
 namespace FoxTunes
 {
@@ -49,6 +50,10 @@ namespace FoxTunes
 
         protected virtual void Update()
         {
+            if (!PlaybackStateNotifier.IsStarted && this.Enabled)
+            {
+                var task = this.Clear();
+            }
             if (PlaybackStateNotifier.IsPlaying && !this.Enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");

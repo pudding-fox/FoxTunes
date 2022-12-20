@@ -279,6 +279,7 @@ namespace FoxTunes
             {
                 this.FFTSize.ValueChanged -= this.OnValueChanged;
             }
+            base.OnDisposing();
         }
 
         private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, BitmapHelper.RenderInfo crestRenderInfo, SpectrumRendererData data)
