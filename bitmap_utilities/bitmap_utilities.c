@@ -71,6 +71,21 @@ BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT3
 	return TRUE;
 }
 
+BOOL WINAPI draw_lines(RenderInfo* info, Int32Point* points, size_t dimentions, size_t count) {
+	BOOL result = TRUE;
+	for (size_t dimention = 0; dimention < dimentions; dimention++)
+	{
+		size_t offset = count * dimention;
+		for (size_t position = 0; position < count - 1; position++)
+		{
+			Int32Point point1 = points[offset + position];
+			Int32Point point2 = points[offset + position + 1];
+			result &= draw_line(info, point1.X, point1.Y, point2.X, point2.Y);
+		}
+	}
+	return result;
+}
+
 BOOL WINAPI draw_line(RenderInfo* info, INT32 x1, INT32 y1, INT32 x2, INT32 y2)
 {
 	//Check arguments are valid.
