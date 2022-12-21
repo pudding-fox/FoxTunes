@@ -771,6 +771,8 @@ namespace FoxTunes
                     "wpf",
                     new PackageElement[]
                     {
+                        "x86/bitmap_utilities.dll",
+                        "x64/bitmap_utilities.dll",
                         "FoxTunes.UI.Windows.dll",
                         "FoxTunes.UI.Windows.Themes.dll"
                     },
