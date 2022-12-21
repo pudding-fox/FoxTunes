@@ -1,0 +1,9 @@
+LIBRARY bitmap_utilities
+VERSION 2.4
+EXPORTS
+draw_rectangles
+draw_rectangle
+draw_line
+draw_dot
+shift_left
+clear
