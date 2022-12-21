@@ -79,7 +79,6 @@
 
 	<ItemGroup>
 		<Page Remove="Resources\PlaybackState.xaml" />
-		<Page Remove="Resources\TabContent.xaml" />
 		<Page Remove="Resources\WindowBase.xaml" />
 	</ItemGroup>
 
@@ -87,6 +86,18 @@
 		<EmbeddedResource Include="Images\Fox.ico">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
+	</ItemGroup>
+  
+  <ItemGroup>
+		<None Include="..\lib\x86\bitmap_utilities.dll" Link="x86\bitmap_utilities.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\lib\x64\bitmap_utilities.dll" Link="x64\bitmap_utilities.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>

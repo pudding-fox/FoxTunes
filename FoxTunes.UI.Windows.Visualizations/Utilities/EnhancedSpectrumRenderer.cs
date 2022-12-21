@@ -289,7 +289,7 @@ namespace FoxTunes
             var crestPoints = data.CrestPoints;
             var peakElements = data.PeakElements;
 
-            BitmapHelper.Clear(valueRenderInfo);
+            BitmapHelper.Clear(ref valueRenderInfo);
 
             if (data.SampleCount == 0)
             {
@@ -303,28 +303,14 @@ namespace FoxTunes
                 return;
             }
 
+            BitmapHelper.DrawRectangles(ref valueRenderInfo, valueElements, valueElements.Length);
+            if (rmsElements != null)
+            {
+                BitmapHelper.DrawRectangles(ref rmsRenderInfo, rmsElements, rmsElements.Length);
+            }
+
             for (var a = 0; a < valueElements.Length; a++)
             {
-                BitmapHelper.DrawRectangle(
-                    valueRenderInfo,
-                    valueElements[a].X,
-                    valueElements[a].Y,
-                    valueElements[a].Width,
-                    valueElements[a].Height
-                );
-                if (rmsElements != null)
-                {
-                    if (rmsElements[a].Height > 0)
-                    {
-                        BitmapHelper.DrawRectangle(
-                            rmsRenderInfo,
-                            rmsElements[a].X,
-                            rmsElements[a].Y,
-                            rmsElements[a].Width,
-                            rmsElements[a].Height
-                        );
-                    }
-                }
                 if (peakElements != null)
                 {
                     var max = valueElements[a].Y;
@@ -335,7 +321,7 @@ namespace FoxTunes
                     if (peakElements[a].Y < max)
                     {
                         BitmapHelper.DrawRectangle(
-                            valueRenderInfo,
+                            ref valueRenderInfo,
                             peakElements[a].X,
                             peakElements[a].Y,
                             peakElements[a].Width,
@@ -352,7 +338,7 @@ namespace FoxTunes
                     var point1 = crestPoints[a];
                     var point2 = crestPoints[a + 1];
                     BitmapHelper.DrawLine(
-                        crestRenderInfo,
+                        ref crestRenderInfo,
                         point1.X,
                         point1.Y,
                         point2.X,
