@@ -143,7 +143,7 @@ namespace FoxTunes
                 {
                     default:
                     case OscilloscopeRendererMode.Mono:
-                        if (this.Smooth.Value)
+                        if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                         {
                             UpdateElementsSmoothMono(data.Values, data.Peaks, data.Elements, data.Width, data.Height, this.SmoothingFactor.Value);
                         }
@@ -153,7 +153,7 @@ namespace FoxTunes
                         }
                         break;
                     case OscilloscopeRendererMode.Seperate:
-                        if (this.Smooth.Value)
+                        if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                         {
                             UpdateElementsSmoothSeperate(data.Values, data.Peaks, data.Elements, data.Width, data.Height, data.Channels, this.SmoothingFactor.Value);
                         }
