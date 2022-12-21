@@ -14,27 +14,27 @@ namespace FoxTunes
         }
 
         [SuppressUnmanagedCodeSecurity]
-        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_rectangles", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_rectangles")]
         public static extern bool DrawRectangles([In] ref RenderInfo info, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] Int32Rect[] rectangles, int count);
 
         [SuppressUnmanagedCodeSecurity]
-        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_rectangle", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_rectangle")]
         public static extern bool DrawRectangle([In] ref RenderInfo info, int x, int y, int width, int height);
 
         [SuppressUnmanagedCodeSecurity]
-        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_line", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_line")]
         public static extern bool DrawLine([In] ref RenderInfo info, int x1, int y1, int x2, int y2);
 
         [SuppressUnmanagedCodeSecurity]
-        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_dot", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_dot")]
         public static extern bool DrawDot([In] ref RenderInfo info, int x, int y);
 
         [SuppressUnmanagedCodeSecurity]
-        [DllImport("bitmap_utilities.dll", EntryPoint = "shift_left", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "shift_left")]
         public static extern bool ShiftLeft([In] ref RenderInfo info, int count);
 
         [SuppressUnmanagedCodeSecurity]
-        [DllImport("bitmap_utilities.dll", EntryPoint = "clear", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "clear")]
         public static extern bool Clear([In] ref RenderInfo info);
 
         public static RenderInfo CreateRenderInfo(WriteableBitmap bitmap, Color color)
