@@ -19,6 +19,8 @@ namespace FoxTunes
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
+        public IntegerConfigurationElement History { get; private set; }
+
         public SelectionConfigurationElement FFTSize { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -40,6 +42,10 @@ namespace FoxTunes
                 SpectrogramBehaviourConfiguration.SECTION,
                 SpectrogramBehaviourConfiguration.COLOR_PALETTE_ELEMENT
             );
+            this.History = this.Configuration.GetElement<IntegerConfigurationElement>(
+               VisualizationBehaviourConfiguration.SECTION,
+               SpectrogramBehaviourConfiguration.HISTORY_ELEMENT
+            );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
@@ -52,6 +58,7 @@ namespace FoxTunes
             this.Scale.ValueChanged += this.OnValueChanged;
             this.Smoothing.ValueChanged += this.OnValueChanged;
             this.ColorPalette.ValueChanged += this.OnValueChanged;
+            this.History.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
         }
@@ -75,17 +82,8 @@ namespace FoxTunes
                     data.Mode = SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value);
                     data.Scale = SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value);
                     data.Smoothing = this.Smoothing.Value;
-                    //TODO: Only realloc if required.
-                    switch (data.Mode)
-                    {
-                        default:
-                        case SpectrogramRendererMode.Mono:
-                            data.Values = new float[1, data.Height];
-                            break;
-                        case SpectrogramRendererMode.Seperate:
-                            data.Values = new float[data.Channels, data.Height];
-                            break;
-                    }
+                    data.HistoryCapacity = this.History.Value;
+                    data.Initialized = false;
                 }
             }
             else
@@ -98,7 +96,8 @@ namespace FoxTunes
                     SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
                     SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value),
                     SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value),
-                    this.Smoothing.Value
+                    this.Smoothing.Value,
+                    this.History.Value
                 );
             }
             return true;
@@ -112,8 +111,16 @@ namespace FoxTunes
             {
                 try
                 {
-                    var info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
-                    Restore(info, data);
+                    if (bitmap.TryLock(LockTimeout))
+                    {
+                        var info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+                        lock (data)
+                        {
+                            Restore(info, data);
+                        }
+                        bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                        bitmap.Unlock();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -192,12 +199,15 @@ namespace FoxTunes
             }
             try
             {
-                if (!data.Update())
+                lock (data)
                 {
-                    this.Restart();
-                    return;
+                    if (!data.Update())
+                    {
+                        this.Restart();
+                        return;
+                    }
+                    UpdateValues(data);
                 }
-                UpdateValues(data);
 
                 var task = this.Render(data);
             }
@@ -230,6 +240,10 @@ namespace FoxTunes
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
             }
+            if (this.History != null)
+            {
+                this.History.ValueChanged -= this.OnValueChanged;
+            }
             if (this.FFTSize != null)
             {
                 this.FFTSize.ValueChanged -= this.OnValueChanged;
@@ -239,7 +253,7 @@ namespace FoxTunes
 
         private static void Render(BitmapHelper.RenderInfo info, SpectrogramRendererData data)
         {
-            if (data.SampleCount == 0)
+            if (data.SampleCount == 0 || !data.Initialized)
             {
                 //No data.
                 return;
@@ -408,6 +422,24 @@ namespace FoxTunes
 
         private static void Restore(BitmapHelper.RenderInfo info, SpectrogramRendererData data)
         {
+            if (info.Width != data.Width || info.Height != data.Height)
+            {
+                //Bitmap does not match data.
+                return;
+            }
+
+            //TODO: Only realloc if required.
+            switch (data.Mode)
+            {
+                default:
+                case SpectrogramRendererMode.Mono:
+                    data.Values = new float[1, data.Height];
+                    break;
+                case SpectrogramRendererMode.Seperate:
+                    data.Values = new float[data.Channels, data.Height];
+                    break;
+            }
+
             var samples = data.Samples;
             var history = data.History;
             var position = data.HistoryPosition - 1;
@@ -446,7 +478,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing)
+        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing, int history)
         {
             var data = new SpectrogramRendererData()
             {
@@ -454,8 +486,7 @@ namespace FoxTunes
                 Width = width,
                 Height = height,
                 FFTSize = fftSize,
-                //TODO: Is this a reasonable value?
-                HistoryCapacity = 4096,
+                HistoryCapacity = history,
                 Colors = colors,
                 Mode = mode,
                 Scale = scale,
@@ -502,6 +533,8 @@ namespace FoxTunes
 
             public int Smoothing;
 
+            public bool Initialized;
+
             public bool Update()
             {
                 var rate = default(int);
@@ -528,7 +561,10 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                UpdateHistory(this.Samples, this.History, ref this.HistoryPosition, ref this.HistoryCount, this.HistoryCapacity);
+                if (this.HistoryCapacity > 0)
+                {
+                    UpdateHistory(this.Samples, this.History, ref this.HistoryPosition, ref this.HistoryCount, this.HistoryCapacity);
+                }
                 return true;
             }
 
@@ -555,7 +591,7 @@ namespace FoxTunes
 
             private void Update(int rate, int channels, OutputStreamFormat format)
             {
-                if (this.Rate == rate && this.Channels == channels && this.Format == format)
+                if (this.Rate == rate && this.Channels == channels && this.Format == format && this.Initialized)
                 {
                     return;
                 }
@@ -563,6 +599,7 @@ namespace FoxTunes
                 this.Rate = rate;
                 this.Channels = channels;
                 this.Format = format;
+                this.Initialized = true;
 
                 //TODO: Only realloc if required.
                 switch (this.Mode)
@@ -577,12 +614,23 @@ namespace FoxTunes
                         this.Values = new float[this.Channels, this.Height];
                         break;
                 }
-
-                if (this.History == null || this.History.GetLength(0) != this.Samples.Length)
+                if (this.HistoryCapacity > 0)
                 {
-                    this.HistoryPosition = 0;
-                    this.HistoryCount = 0;
-                    this.History = new float[this.Samples.Length, this.HistoryCapacity];
+                    if (this.History == null || this.History.GetLength(0) != this.Samples.Length || this.History.GetLength(1) != this.HistoryCapacity)
+                    {
+                        this.HistoryPosition = 0;
+                        this.HistoryCount = 0;
+                        this.History = new float[this.Samples.Length, this.HistoryCapacity];
+                    }
+                }
+                else
+                {
+                    if (this.History != null)
+                    {
+                        this.HistoryPosition = 0;
+                        this.HistoryCount = 0;
+                        this.History = null;
+                    }
                 }
             }
         }

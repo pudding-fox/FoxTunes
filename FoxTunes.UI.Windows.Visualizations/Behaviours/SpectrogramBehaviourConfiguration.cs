@@ -35,13 +35,22 @@ namespace FoxTunes
 
         public const string COLOR_PALETTE_ELEMENT = "DDDDBAFC-0C99-4329-9DA2-C041E674597E";
 
+        public const string HISTORY_ELEMENT = "EEEE2EBD-4483-4281-A4AD-E042E0367996";
+
+        public const int HISTORY_MIN = 0;
+
+        public const int HISTORY_MAX = 8192;
+
+        public const int HISTORY_DEFAULT = 2048;
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Mode, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
                 .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Scale, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetScaleOptions()))
                 .WithElement(new IntegerConfigurationElement(SMOOTHING_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Smoothing, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(SMOOTHING_DEFAULT).WithValidationRule(new IntegerValidationRule(SMOOTHING_MIN, SMOOTHING_MAX)))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_ColorPalette, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_ColorPalette, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(HISTORY_ELEMENT, Strings.SpectrogramBehaviourConfiguration_History, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(Publication.ReleaseType == ReleaseType.Default ? HISTORY_DEFAULT : HISTORY_MIN).WithValidationRule(new IntegerValidationRule(HISTORY_MIN, HISTORY_MAX))
             );
         }
 

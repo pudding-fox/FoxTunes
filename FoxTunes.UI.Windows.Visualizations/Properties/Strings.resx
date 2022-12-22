@@ -198,6 +198,9 @@
   <data name="SpectrogramBehaviourConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
+  <data name="SpectrogramBehaviourConfiguration.History" xml:space="preserve">
+    <value>History Buffer Length</value>
+  </data>
   <data name="SpectrogramBehaviourConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
   </data>
