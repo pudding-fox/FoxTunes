@@ -413,6 +413,10 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Debug, "Closing window: {0}", pair.Value.Title);
                     pair.Value.Closed -= this.OnClosed;
+                    if (pair.Value.WindowState != WindowState.Normal)
+                    {
+                        pair.Value.WindowState = WindowState.Normal;
+                    }
                     pair.Value.Close();
                 }
                 this.Windows.Clear();
