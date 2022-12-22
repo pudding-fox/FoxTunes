@@ -31,7 +31,9 @@ namespace FoxTunes
             //TODO: Translations should be better managed.
             "fr",
             //TODO: Coupling to some other random component?
-            "encoders"
+            "encoders",
+            //TODO: Coupling to some other random component?
+            "Sox"
         };
 
         static FileSystemHelper()
