@@ -227,8 +227,8 @@ namespace FoxTunes
                         {
                             UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
                         }
-                        data.LastUpdated = DateTime.UtcNow;
                     }
+                    data.LastUpdated = DateTime.UtcNow;
                 }
 
                 var task = this.Render(data);
