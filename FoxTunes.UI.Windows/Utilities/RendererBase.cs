@@ -810,22 +810,11 @@ namespace FoxTunes
                 G = shade,
                 B = shade
             };
-            if (color.IsLighter())
+            return new[]
             {
-                return new[]
-                {
-                    color.Shade(contrast),
-                    color
-                };
-            }
-            else
-            {
-                return new[]
-                {
-                    color,
-                    color.Shade(contrast)
-                };
-            }
+                color.Shade(contrast),
+                color
+            };
         }
 
         public static Color[] ToGradient(this KeyValuePair<int, Color>[] colors)

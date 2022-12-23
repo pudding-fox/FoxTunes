@@ -36,7 +36,7 @@
                 </Interactivity:Interaction.Triggers>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type Core:PlaylistItem}">
-                        <LocalWindows:GlassLabel Content="{Binding Converter={StaticResource ViewModel}}"></LocalWindows:GlassLabel>
+                        <TextBlock Foreground="{DynamicResource TextBrush}" Text="{Binding Converter={StaticResource ViewModel}}" TextTrimming="CharacterEllipsis"></TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

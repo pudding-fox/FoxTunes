@@ -120,32 +120,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler DropCommitChanged;
 
-        private BooleanConfigurationElement _ExtendGlass { get; set; }
-
-        public BooleanConfigurationElement ExtendGlass
-        {
-            get
-            {
-                return this._ExtendGlass;
-            }
-            set
-            {
-                this._ExtendGlass = value;
-                this.OnExtendGlassChanged();
-            }
-        }
-
-        protected virtual void OnExtendGlassChanged()
-        {
-            if (this.ExtendGlassChanged != null)
-            {
-                this.ExtendGlassChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ExtendGlass");
-        }
-
-        public event EventHandler ExtendGlassChanged;
-
         public ICommand DragEnterCommand
         {
             get
@@ -292,10 +266,6 @@ namespace FoxTunes.ViewModel
             this.DropCommit = this.Configuration.GetElement<SelectionConfigurationElement>(
               MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.DROP_COMMIT_ELEMENT
-            );
-            this.ExtendGlass = this.Configuration.GetElement<BooleanConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.EXTEND_GLASS_ELEMENT
             );
             base.InitializeComponent(core);
         }
