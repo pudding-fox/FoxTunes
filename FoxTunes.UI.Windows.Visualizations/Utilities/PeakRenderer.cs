@@ -46,8 +46,6 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Smooth { get; private set; }
 
-        public IntegerConfigurationElement SmoothingFactor { get; private set; }
-
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public Orientation Orientation
@@ -93,10 +91,6 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
             );
-            this.SmoothingFactor = this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
-            );
             this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
                PeakMeterBehaviourConfiguration.SECTION,
                PeakMeterBehaviourConfiguration.HOLD
@@ -108,7 +102,6 @@ namespace FoxTunes
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
-            this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
         }
@@ -272,10 +265,6 @@ namespace FoxTunes
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;
             }
-            if (this.SmoothingFactor != null)
-            {
-                this.SmoothingFactor.ValueChanged -= this.OnValueChanged;
-            }
             if (this.HoldInterval != null)
             {
                 this.HoldInterval.ValueChanged -= this.OnValueChanged;
@@ -414,10 +403,10 @@ namespace FoxTunes
 
         private static void UpdateElementsSmooth(PeakRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Renderer.SmoothingFactor.Value, data.Orientation);
+            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Orientation);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Renderer.SmoothingFactor.Value, data.Orientation);
+                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Orientation);
             }
         }
 
@@ -484,14 +473,14 @@ namespace FoxTunes
                 switch (this.Format)
                 {
                     case OutputStreamFormat.Short:
-                        this.SampleCount = this.Renderer.Output.GetData(this.Samples16) / sizeof(short);
+                        this.SampleCount = this.Renderer.Output.GetData(this.Samples16);
                         for (var a = 0; a < this.SampleCount; a++)
                         {
                             this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
                         }
                         break;
                     case OutputStreamFormat.Float:
-                        this.SampleCount = this.Renderer.Output.GetData(this.Samples32) / sizeof(float);
+                        this.SampleCount = this.Renderer.Output.GetData(this.Samples32);
                         break;
                     default:
                         throw new NotImplementedException();

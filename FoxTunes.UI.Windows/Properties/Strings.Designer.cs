@@ -1357,15 +1357,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Smooth Factor.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_SmoothFactor {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.SmoothFactor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Volume.
         /// </summary>
         internal static string Volume_Name {

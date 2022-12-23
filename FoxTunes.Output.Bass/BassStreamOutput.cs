@@ -129,7 +129,7 @@ namespace FoxTunes
                 //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
                 lock (ChannelDataSyncRoot)
                 {
-                    return BassMix.ChannelGetData(channelHandle, buffer, buffer.Length);
+                    return BassMix.ChannelGetData(channelHandle, buffer, buffer.Length * sizeof(short)) / sizeof(short);
                 }
             }
             return 0;
@@ -142,7 +142,7 @@ namespace FoxTunes
                 //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
                 lock (ChannelDataSyncRoot)
                 {
-                    return BassMix.ChannelGetData(channelHandle, buffer, buffer.Length);
+                    return BassMix.ChannelGetData(channelHandle, buffer, buffer.Length * sizeof(float)) / sizeof(float);
                 }
             }
             return 0;

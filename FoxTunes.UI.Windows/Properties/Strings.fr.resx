@@ -534,9 +534,6 @@
   <data name="VisualizationBehaviourConfiguration.Smooth" xml:space="preserve">
     <value>Lisse</value>
   </data>
-  <data name="VisualizationBehaviourConfiguration.SmoothFactor" xml:space="preserve">
-    <value>Facteur de lissage</value>
-  </data>
   <data name="Volume.Name" xml:space="preserve">
     <value>Volume</value>
   </data>

@@ -17,8 +17,6 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Smooth { get; private set; }
 
-        public IntegerConfigurationElement SmoothingFactor { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
@@ -34,10 +32,6 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
             );
-            this.SmoothingFactor = this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
-            );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
@@ -45,7 +39,6 @@ namespace FoxTunes
             this.Mode.ValueChanged += this.OnValueChanged;
             this.Duration.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
-            this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
         }
 
@@ -145,7 +138,7 @@ namespace FoxTunes
                     case OscilloscopeRendererMode.Mono:
                         if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                         {
-                            UpdateElementsSmoothMono(data.Values, data.Peaks, data.Elements, data.Width, data.Height, this.SmoothingFactor.Value);
+                            UpdateElementsSmoothMono(data.Values, data.Peaks, data.Elements, data.Width, data.Height);
                         }
                         else
                         {
@@ -155,7 +148,7 @@ namespace FoxTunes
                     case OscilloscopeRendererMode.Seperate:
                         if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                         {
-                            UpdateElementsSmoothSeperate(data.Values, data.Peaks, data.Elements, data.Width, data.Height, data.Channels, this.SmoothingFactor.Value);
+                            UpdateElementsSmoothSeperate(data.Values, data.Peaks, data.Elements, data.Width, data.Height, data.Channels);
                         }
                         else
                         {
@@ -245,7 +238,7 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateElementsSmoothMono(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int smoothing)
+        private static void UpdateElementsSmoothMono(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height)
         {
             if (values.Length == 0 || peaks[0] == 0.0f)
             {
@@ -255,6 +248,8 @@ namespace FoxTunes
             height = height / 2;
             var center = height;
             var peak = peaks[0];
+            var minChange = 1;
+            var maxChange = Convert.ToInt32(height * 0.05f);
             for (var x = 0; x < width; x++)
             {
                 var y = default(int);
@@ -272,11 +267,11 @@ namespace FoxTunes
                     y = center;
                 }
                 elements[0, x].X = x;
-                Animate(ref elements[0, x].Y, y, center - height, center + height, smoothing);
+                Animate(ref elements[0, x].Y, y, center - height, center + height, minChange, maxChange);
             }
         }
 
-        private static void UpdateElementsSmoothSeperate(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int channels, int smoothing)
+        private static void UpdateElementsSmoothSeperate(float[,] values, float[] peaks, Int32Point[,] elements, int width, int height, int channels)
         {
             if (values.Length == 0 || channels == 0)
             {
@@ -284,6 +279,8 @@ namespace FoxTunes
             }
             height = height - 1;
             height = (height / channels) / 2;
+            var minChange = 1;
+            var maxChange = Convert.ToInt32(height * 0.05f);
             for (var channel = 0; channel < channels; channel++)
             {
                 var center = ((height * 2) * channel) + height;
@@ -309,7 +306,7 @@ namespace FoxTunes
                         y = center;
                     }
                     elements[channel, x].X = x;
-                    Animate(ref elements[channel, x].Y, y, center - height, center + height, smoothing);
+                    Animate(ref elements[channel, x].Y, y, center - height, center + height, minChange, maxChange);
                 }
             }
         }
@@ -327,10 +324,6 @@ namespace FoxTunes
             if (this.Smooth != null)
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.SmoothingFactor != null)
-            {
-                this.SmoothingFactor.ValueChanged -= this.OnValueChanged;
             }
             base.OnDisposing();
         }
@@ -606,14 +599,14 @@ namespace FoxTunes
                 switch (this.Format)
                 {
                     case OutputStreamFormat.Short:
-                        this.SampleCount = this.Output.GetData(this.Samples16) / sizeof(short);
+                        this.SampleCount = this.Output.GetData(this.Samples16);
                         for (var a = 0; a < this.SampleCount; a++)
                         {
                             this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
                         }
                         break;
                     case OutputStreamFormat.Float:
-                        this.SampleCount = this.Output.GetData(this.Samples32) / sizeof(float);
+                        this.SampleCount = this.Output.GetData(this.Samples32);
                         break;
                     default:
                         throw new NotImplementedException();
