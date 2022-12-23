@@ -29,6 +29,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnOrientationChanged()
         {
+            var task = this.Refresh();
             if (this.OrientationChanged != null)
             {
                 this.OrientationChanged(this, EventArgs.Empty);
@@ -85,7 +86,6 @@ namespace FoxTunes.ViewModel
                 PeakMeterBehaviourConfiguration.SECTION,
                 PeakMeterBehaviourConfiguration.ORIENTATION
             ).ConnectValue(value => this.Orientation = PeakMeterBehaviourConfiguration.GetOrientation(value));
-            var task = this.Refresh();
             base.InitializeComponent(core);
         }
 
@@ -96,24 +96,27 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task Refresh()
         {
-            return Windows.Invoke(() =>
+            var channels = default(IDictionary<int, OutputChannel>);
+            if (!this.Output.CanGetData || !this.Output.GetDataChannelMap(out channels))
             {
-                var channels = default(IDictionary<int, OutputChannel>);
-                if (this.Output.CanGetData && this.Output.GetDataChannelMap(out channels))
+                channels = new Dictionary<int, OutputChannel>()
                 {
-                    this.Channels = new StringCollection(
-                        channels.Values.Select(ChannelMap.GetChannelName)
-                    );
-                }
-                else
-                {
-                    this.Channels = new StringCollection(new[]
-                    {
-                        Strings.Speakers_Left,
-                        Strings.Speakers_Right
-                    });
-                }
-            });
+                    { 0, OutputChannel.Left },
+                    { 1, OutputChannel.Right }
+                };
+            }
+            var channelNames = channels.Values.Select(ChannelMap.GetChannelName);
+            switch (this.Orientation)
+            {
+                default:
+                case Orientation.Horizontal:
+                    channelNames = channelNames.Reverse();
+                    break;
+                case Orientation.Vertical:
+                    //Nothing to do.
+                    break;
+            }
+            return Windows.Invoke(() => this.Channels = new StringCollection(channelNames));
         }
 
         protected override Freezable CreateInstanceCore()
