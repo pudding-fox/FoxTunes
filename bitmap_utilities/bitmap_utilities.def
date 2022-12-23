@@ -5,6 +5,7 @@ draw_rectangles
 draw_rectangle
 draw_lines
 draw_line
+draw_dots
 draw_dot
 shift_left
 clear

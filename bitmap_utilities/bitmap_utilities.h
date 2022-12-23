@@ -39,6 +39,21 @@ typedef struct Int32Point
 	INT32 Y;
 } Int32Point;
 
+typedef struct  Int32Pixel
+{
+	INT32 X;
+
+	INT32 Y;
+
+	INT32 Blue;
+
+	INT32 Green;
+
+	INT32 Red;
+
+	INT32 Alpha;
+} Int32Pixel;
+
 BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, size_t count);
 
 BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height);
@@ -46,6 +61,8 @@ BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT3
 BOOL WINAPI draw_lines(RenderInfo* info, Int32Point* points, size_t dimentions, size_t count);
 
 BOOL WINAPI draw_line(RenderInfo* info, INT32 x1, INT32 y1, INT32 x2, INT32 y2);
+
+BOOL WINAPI  draw_dots(RenderInfo* info, Int32Pixel* pixels, size_t count);
 
 BOOL WINAPI  draw_dot(RenderInfo* info, INT32 x, INT32 y);
 

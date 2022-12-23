@@ -30,6 +30,10 @@ namespace FoxTunes
         public static extern bool DrawLine([In] ref RenderInfo info, int x1, int y1, int x2, int y2);
 
         [SuppressUnmanagedCodeSecurity]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_dots")]
+        public static extern bool DrawDots([In] ref RenderInfo info, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] Int32Pixel[] pixels, int count);
+
+        [SuppressUnmanagedCodeSecurity]
         [DllImport("bitmap_utilities.dll", EntryPoint = "draw_dot")]
         public static extern bool DrawDot([In] ref RenderInfo info, int x, int y);
 
@@ -97,6 +101,32 @@ namespace FoxTunes
         public int X;
 
         public int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Int32Pixel
+    {
+        public Int32Pixel(int x, int y, int blue, int green, int red, int alpha)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Blue = blue;
+            this.Green = green;
+            this.Red = red;
+            this.Alpha = alpha;
+        }
+
+        public int X;
+
+        public int Y;
+
+        public int Blue;
+
+        public int Green;
+
+        public int Red;
+
+        public int Alpha;
     }
 
     [StructLayout(LayoutKind.Sequential)]
