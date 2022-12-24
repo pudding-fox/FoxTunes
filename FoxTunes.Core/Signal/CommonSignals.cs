@@ -73,6 +73,7 @@ namespace FoxTunes
             {
                 this.Names = names.ToArray();
             }
+            this.UpdateType = updateType;
         }
 
         public IFileData[] FileDatas { get; private set; }

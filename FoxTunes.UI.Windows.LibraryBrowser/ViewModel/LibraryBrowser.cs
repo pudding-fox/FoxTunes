@@ -212,13 +212,19 @@ namespace FoxTunes.ViewModel
             }
             if (fileDatas != null && fileDatas.Any())
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return this.Refresh(fileDatas);
             }
             return this.Refresh();
+        }
+
+        protected virtual Task Refresh(IEnumerable<IFileData> fileDatas)
+        {
+            //Updates for specific items are handled by LibraryHierarchyBrowser.
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public override Task Refresh()

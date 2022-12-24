@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes
@@ -14,20 +15,16 @@ namespace FoxTunes
 
         public Artwork()
         {
-            this.Debouncer = new Debouncer(TIMEOUT);
+            this.Debouncer = new AsyncDebouncer(TIMEOUT);
             this.InitializeComponent();
             this.OnFileNameChanged(this, EventArgs.Empty);
         }
 
-        public Debouncer Debouncer { get; private set; }
+        public AsyncDebouncer Debouncer { get; private set; }
 
         protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var viewModel = this.FindResource<global::FoxTunes.ViewModel.Artwork>("ViewModel");
-            if (viewModel != null)
-            {
-                this.Debouncer.Exec(viewModel.Emit);
-            }
+            this.Debouncer.Exec(this.Refresh);
         }
 
         protected virtual void OnFileNameChanged(object sender, EventArgs e)
@@ -37,6 +34,18 @@ namespace FoxTunes
             {
                 this.IsComponentEnabled = !string.IsNullOrEmpty(viewModel.FileName) && File.Exists(viewModel.FileName);
             }
+        }
+
+        protected virtual Task Refresh()
+        {
+            return Windows.Invoke(() =>
+            {
+                var viewModel = this.FindResource<global::FoxTunes.ViewModel.Artwork>("ViewModel");
+                if (viewModel != null)
+                {
+                    viewModel.Emit();
+                }
+            });
         }
     }
 }

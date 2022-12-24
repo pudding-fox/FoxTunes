@@ -10,7 +10,6 @@ using System.Windows.Threading;
 namespace FoxTunes
 {
     [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
-    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [Component(ID, ComponentSlots.UserInterface)]
     public class WindowsUserInterface : UserInterface, IConfigurableComponent, IDisposable
     {

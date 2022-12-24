@@ -107,7 +107,7 @@ namespace FoxTunes
         protected virtual ImageBrush Create(string fileName, int width, int height, bool cache)
         {
             Logger.Write(this, LogLevel.Debug, "Creating brush: {0}x{1}", width, height);
-            var source = ImageLoader.Load(
+            var source = this.ImageLoader.Load(
                 fileName,
                 width,
                 height,

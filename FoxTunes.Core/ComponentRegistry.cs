@@ -22,9 +22,9 @@ namespace FoxTunes
 
         private IDictionary<Type, IBaseComponent> ComponentsByType { get; set; }
 
-        private IDictionary<Type, ISet<IBaseComponent>> ComponentsByInterface { get; set; }
+        private IDictionary<Type, IList<IBaseComponent>> ComponentsByInterface { get; set; }
 
-        private IDictionary<string, ISet<IBaseComponent>> ComponentsBySlot { get; set; }
+        private IDictionary<string, IList<IBaseComponent>> ComponentsBySlot { get; set; }
 
         public void AddComponents(params IBaseComponent[] components)
         {
@@ -52,20 +52,14 @@ namespace FoxTunes
             }
             foreach (var componentInterface in componentType.GetInterfaces())
             {
-                if (!this.ComponentsByInterface.GetOrAdd(componentInterface, () => new HashSet<IBaseComponent>()).Add(component))
-                {
-                    Logger.Write(typeof(ComponentRegistry), LogLevel.Warn, "Cannot register component type \"{0}\" by interface \"{1}\", it was already registered.", componentType.FullName, componentInterface.FullName);
-                }
+                this.ComponentsByInterface.GetOrAdd(componentInterface, () => new List<IBaseComponent>()).Add(component);
             }
             var attribute = componentType.GetCustomAttribute<ComponentAttribute>();
             if (attribute == null || string.IsNullOrEmpty(attribute.Slot) || string.Equals(attribute.Slot, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
-            if (!this.ComponentsBySlot.GetOrAdd(attribute.Slot, () => new HashSet<IBaseComponent>()).Add(component))
-            {
-                Logger.Write(typeof(ComponentRegistry), LogLevel.Warn, "Cannot register component type \"{0}\" by slot \"{1}\", it was already registered.", componentType.FullName, attribute.Slot);
-            }
+            this.ComponentsBySlot.GetOrAdd(attribute.Slot, () => new List<IBaseComponent>()).Add(component);
         }
 
         public IBaseComponent GetComponent(Type type)
@@ -90,7 +84,7 @@ namespace FoxTunes
             }
             if (type.IsInterface)
             {
-                var components = default(ISet<IBaseComponent>);
+                var components = default(IList<IBaseComponent>);
                 if (this.ComponentsByInterface.TryGetValue(type, out components))
                 {
                     return components;
@@ -101,7 +95,7 @@ namespace FoxTunes
 
         public IEnumerable<IBaseComponent> GetComponents(string slot)
         {
-            var components = default(ISet<IBaseComponent>);
+            var components = default(IList<IBaseComponent>);
             if (this.ComponentsBySlot.TryGetValue(slot, out components))
             {
                 return components;
@@ -121,7 +115,7 @@ namespace FoxTunes
 
         public void RemoveComponent(IBaseComponent component)
         {
-            var components = default(ISet<IBaseComponent>);
+            var components = default(IList<IBaseComponent>);
             var componentType = component.GetType();
             this.ComponentsByType.Remove(componentType);
             foreach (var componentInterface in componentType.GetInterfaces())
@@ -172,8 +166,8 @@ namespace FoxTunes
         public void Clear()
         {
             this.ComponentsByType = new Dictionary<Type, IBaseComponent>();
-            this.ComponentsByInterface = new Dictionary<Type, ISet<IBaseComponent>>();
-            this.ComponentsBySlot = new Dictionary<string, ISet<IBaseComponent>>(StringComparer.OrdinalIgnoreCase);
+            this.ComponentsByInterface = new Dictionary<Type, IList<IBaseComponent>>();
+            this.ComponentsBySlot = new Dictionary<string, IList<IBaseComponent>>(StringComparer.OrdinalIgnoreCase);
         }
 
         public static readonly IComponentRegistry Instance = new ComponentRegistry();

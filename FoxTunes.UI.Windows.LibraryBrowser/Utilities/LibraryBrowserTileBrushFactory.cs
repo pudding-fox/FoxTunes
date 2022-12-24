@@ -11,7 +11,9 @@ namespace FoxTunes
     //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
     [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [WindowsUserInterfaceDependency]
-    public class LibraryBrowserTileBrushFactory : StandardFactory, IDisposable
+    //TODO: This was (and technically still is) a StandardFactory, but it overrides the ComponentPriorityAttribute.HIGH.
+    //TODO: I hate the Factory, Manager, Behaviour and Component sub types and they should go away...
+    public class LibraryBrowserTileBrushFactory : StandardComponent, IDisposable
     {
         public LibraryBrowserTileProvider LibraryBrowserTileProvider { get; private set; }
 
@@ -92,7 +94,7 @@ namespace FoxTunes
             }
         }
 
-        public AsyncResult<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)
+        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)
         {
             var width = this.TileSize.Value;
             var height = this.TileSize.Value;
@@ -109,15 +111,15 @@ namespace FoxTunes
                 var metaDataItems = new Func<MetaDataItem[]>(
                     () => LibraryHierarchyNodeConverter.Instance.Convert(libraryHierarchyNode).Result.MetaDatas.ToArray()
                 );
-                return this.Create(libraryHierarchyNode, metaDataItems, width, height, false);
+                return this.Create(libraryHierarchyNode, metaDataItems, width, height, cache);
             });
             if (cache)
             {
-                return new AsyncResult<ImageBrush>(placeholder, this.Factory.StartNew(
+                return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, () => this.Factory.StartNew(
                     () => this.Store.GetOrAdd(libraryHierarchyNode, width, height, factory)
                 ));
             }
-            return new AsyncResult<ImageBrush>(placeholder, this.Factory.StartNew(factory));
+            return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, () => this.Factory.StartNew(factory));
         }
 
         protected virtual ImageBrush Create(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
