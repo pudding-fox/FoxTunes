@@ -1,8 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Net;
 using System.Threading.Tasks;
-using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -17,6 +15,8 @@ namespace FoxTunes
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         public SelectionConfigurationElement Mode { get; private set; }
 
         public IntegerConfigurationElement Resolution { get; private set; }
@@ -25,10 +25,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            base.InitializeComponent(core);
             this.Generator = ComponentRegistry.Instance.GetComponent<WaveFormGenerator>();
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            this.Configuration = core.Components.Configuration;
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WaveBarBehaviourConfiguration.SECTION,
                 WaveBarBehaviourConfiguration.MODE_ELEMENT
@@ -41,10 +41,10 @@ namespace FoxTunes
                 WaveBarBehaviourConfiguration.SECTION,
                 WaveBarBehaviourConfiguration.RMS_ELEMENT
             );
-            this.ScalingFactor.ValueChanged += this.OnValueChanged;
             this.Mode.ValueChanged += this.OnValueChanged;
             this.Resolution.ValueChanged += this.OnValueChanged;
             this.Rms.ValueChanged += this.OnValueChanged;
+            base.InitializeComponent(core);
 #if NET40
             var task = TaskEx.Run(async () =>
 #else
@@ -235,10 +235,6 @@ namespace FoxTunes
             {
                 this.GeneratorData.Updated -= this.OnUpdated;
             }
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
-            }
             if (this.Mode != null)
             {
                 this.Mode.ValueChanged -= this.OnValueChanged;
@@ -247,6 +243,7 @@ namespace FoxTunes
             {
                 this.Resolution.ValueChanged += this.OnValueChanged;
             }
+            base.OnDisposing();
         }
 
         private static void Update(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, bool rms, WaveFormRendererMode mode)

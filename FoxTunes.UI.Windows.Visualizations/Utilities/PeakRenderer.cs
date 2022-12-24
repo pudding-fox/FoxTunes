@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Drawing;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -37,6 +36,8 @@ namespace FoxTunes
             }
             renderer.OnOrientationChanged();
         }
+
+        public IConfiguration Configuration { get; private set; }
 
         public PeakRendererData RendererData { get; private set; }
 
@@ -78,7 +79,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            base.InitializeComponent(core);
+            this.Configuration = core.Components.Configuration;
             this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                 PeakMeterBehaviourConfiguration.SECTION,
                 PeakMeterBehaviourConfiguration.PEAKS
@@ -103,6 +104,7 @@ namespace FoxTunes
             this.ShowRms.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
+            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 

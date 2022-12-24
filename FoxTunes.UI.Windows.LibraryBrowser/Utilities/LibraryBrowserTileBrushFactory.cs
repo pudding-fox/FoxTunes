@@ -31,7 +31,7 @@ namespace FoxTunes
 
         public TaskFactory Factory { get; private set; }
 
-        public CappedDictionary<LibraryHierarchyNode, Lazy<MonitoringAsyncResult<ImageBrush>>> Store { get; private set; }
+        public ImageBrushCache<LibraryHierarchyNode> Store { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -92,34 +92,32 @@ namespace FoxTunes
             }
         }
 
-        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)
+        public AsyncResult<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)
         {
             var width = this.TileSize.Value;
             var height = this.TileSize.Value;
             this.PixelSizeConverter.Convert(ref width, ref height);
+            var placeholder = this.PlaceholderBrushFactory.Create(width, height);
             if (libraryHierarchyNode == null)
             {
-                return AsyncResult<ImageBrush>.FromValue(this.PlaceholderBrushFactory.Create(width, height));
+                return AsyncResult<ImageBrush>.FromValue(placeholder);
             }
             var cache = string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter);
-            var factory = new Func<Task<ImageBrush>>(() => this.Factory.StartNew(() =>
+            var factory = new Func<ImageBrush>(() =>
             {
                 //TODO: Bad .Result
                 var metaDataItems = new Func<MetaDataItem[]>(
                     () => LibraryHierarchyNodeConverter.Instance.Convert(libraryHierarchyNode).Result.MetaDatas.ToArray()
                 );
                 return this.Create(libraryHierarchyNode, metaDataItems, width, height, false);
-            }));
+            });
             if (cache)
             {
-                return this.Store.GetOrAdd(
-                    libraryHierarchyNode,
-                    new Lazy<MonitoringAsyncResult<ImageBrush>>(
-                        () => new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, this.PlaceholderBrushFactory.Create(width, height), factory, true)
-                    )
-                ).Value;
+                return new AsyncResult<ImageBrush>(placeholder, this.Factory.StartNew(
+                    () => this.Store.GetOrAdd(libraryHierarchyNode, width, height, factory)
+                ));
             }
-            return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, this.PlaceholderBrushFactory.Create(width, height), factory, true);
+            return new AsyncResult<ImageBrush>(placeholder, this.Factory.StartNew(factory));
         }
 
         protected virtual ImageBrush Create(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
@@ -159,7 +157,7 @@ namespace FoxTunes
         protected virtual void CreateCache(int capacity)
         {
             Logger.Write(this, LogLevel.Debug, "Creating cache for {0} items.", capacity);
-            this.Store = new CappedDictionary<LibraryHierarchyNode, Lazy<MonitoringAsyncResult<ImageBrush>>>(capacity);
+            this.Store = new ImageBrushCache<LibraryHierarchyNode>(capacity);
         }
 
         protected virtual void Reset(IEnumerable<string> names)

@@ -24,7 +24,7 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public Cache Store { get; private set; }
+        public ImageBrushCache<string> Store { get; private set; }
 
         public TaskFactory Factory { get; private set; }
 
@@ -140,7 +140,7 @@ namespace FoxTunes
         protected virtual void CreateCache(int capacity)
         {
             Logger.Write(this, LogLevel.Debug, "Creating cache for {0} items.", capacity);
-            this.Store = new Cache(capacity);
+            this.Store = new ImageBrushCache<string>(capacity);
         }
 
         protected virtual void Reset(IEnumerable<string> names)
@@ -197,116 +197,6 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
-            }
-        }
-
-        public class Cache
-        {
-            public Cache(int capacity)
-            {
-                this.Store = new CappedDictionary<Key, ImageBrush>(capacity);
-            }
-
-            public CappedDictionary<Key, ImageBrush> Store { get; private set; }
-
-            public bool TryGetValue(string fileName, int width, int height, out ImageBrush brush)
-            {
-                var key = new Key(fileName, width, height);
-                return this.Store.TryGetValue(key, out brush);
-            }
-
-            public ImageBrush GetOrAdd(string fileName, int width, int height, Func<ImageBrush> factory)
-            {
-                var key = new Key(fileName, width, height);
-                return this.Store.GetOrAdd(key, factory);
-            }
-
-            public void Clear()
-            {
-                this.Store.Clear();
-            }
-
-            public class Key : IEquatable<Key>
-            {
-                public Key(string fileName, int width, int height)
-                {
-                    this.FileName = fileName;
-                    this.Width = width;
-                    this.Height = height;
-                }
-
-                public string FileName { get; private set; }
-
-                public int Width { get; private set; }
-
-                public int Height { get; private set; }
-
-                public virtual bool Equals(Key other)
-                {
-                    if (other == null)
-                    {
-                        return false;
-                    }
-                    if (object.ReferenceEquals(this, other))
-                    {
-                        return true;
-                    }
-                    if (!string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return false;
-                    }
-                    if (this.Width != other.Width)
-                    {
-                        return false;
-                    }
-                    if (this.Height != other.Height)
-                    {
-                        return false;
-                    }
-                    return true;
-                }
-
-                public override bool Equals(object obj)
-                {
-                    return this.Equals(obj as Key);
-                }
-
-                public override int GetHashCode()
-                {
-                    var hashCode = default(int);
-                    unchecked
-                    {
-                        if (!string.IsNullOrEmpty(this.FileName))
-                        {
-                            hashCode += this.FileName.GetHashCode();
-                        }
-                        hashCode += this.Width.GetHashCode();
-                        hashCode += this.Height.GetHashCode();
-                    }
-                    return hashCode;
-                }
-
-                public static bool operator ==(Key a, Key b)
-                {
-                    if ((object)a == null && (object)b == null)
-                    {
-                        return true;
-                    }
-                    if ((object)a == null || (object)b == null)
-                    {
-                        return false;
-                    }
-                    if (object.ReferenceEquals((object)a, (object)b))
-                    {
-                        return true;
-                    }
-                    return a.Equals(b);
-                }
-
-                public static bool operator !=(Key a, Key b)
-                {
-                    return !(a == b);
-                }
             }
         }
     }

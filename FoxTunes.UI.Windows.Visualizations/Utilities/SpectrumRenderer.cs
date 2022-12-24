@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public class SpectrumRenderer : VisualizationBase
     {
+        public IConfiguration Configuration { get; private set; }
+
         public SpectrumRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Bars { get; private set; }
@@ -25,7 +27,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            base.InitializeComponent(core);
+            this.Configuration = core.Components.Configuration;
             this.Bars = this.Configuration.GetElement<SelectionConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.BARS_ELEMENT
@@ -60,6 +62,7 @@ namespace FoxTunes
             this.Smooth.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
+            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 

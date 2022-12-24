@@ -141,26 +141,14 @@ namespace FoxTunes
             }
         }
 
+        public PixelSizeConverter PixelSizeConverter { get; private set; }
+
         public IOutput Output { get; private set; }
-
-        public IConfiguration Configuration { get; private set; }
-
-        public DoubleConfigurationElement ScalingFactor { get; private set; }
 
         public virtual void InitializeComponent(ICore core)
         {
+            this.PixelSizeConverter = ComponentRegistry.Instance.GetComponent<PixelSizeConverter>();
             this.Output = core.Components.Output;
-            this.Configuration = core.Components.Configuration;
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-               WindowsUserInterfaceConfiguration.SECTION,
-               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
-            this.ScalingFactor.ValueChanged += this.OnScalingFactorChanged;
-        }
-
-        protected virtual void OnScalingFactorChanged(object sender, EventArgs e)
-        {
-            this.Debouncer.Exec(this.CreateBitmap);
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -259,10 +247,9 @@ namespace FoxTunes
                 return false;
             }
 
-            var size = Windows.ActiveWindow.GetElementPixelSize(
-                actualWidth * this.ScalingFactor.Value,
-                actualHeight * this.ScalingFactor.Value
-            );
+            var size = new Size(actualWidth, actualHeight);
+            this.PixelSizeConverter.Convert(ref size);
+
             width = this.GetPixelWidth(size.Width);
             height = this.GetPixelHeight(size.Height);
             if (width == 0 || height == 0)
@@ -369,10 +356,6 @@ namespace FoxTunes
             if (this.Debouncer != null)
             {
                 this.Debouncer.Dispose();
-            }
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ValueChanged -= this.OnScalingFactorChanged;
             }
         }
 
