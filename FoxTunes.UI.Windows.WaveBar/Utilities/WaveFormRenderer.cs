@@ -147,12 +147,12 @@ namespace FoxTunes
                 if (this.Rms.Value)
                 {
                     var colors = this.Color.ToPair(SHADE);
-                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, colors[0]));
-                    powerRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, colors[1]));
+                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
+                    powerRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[1]));
                 }
                 else
                 {
-                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, this.Color));
+                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Color));
                 }
             }).ConfigureAwait(false);
 
