@@ -45,8 +45,8 @@
         <UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95" />
         <UIComponentConfiguration Component="D3FBE95D-3B9E-4DAB-B3AD-B66A53AF5F85" />
       </UIComponentConfiguration>
-      <MetaDataEntry Name="SplitterDistance" Value="2*" />
-      <MetaDataEntry Name="SplitterDirection" Value="Top" />
+      <MetaDataEntry Name="SplitterDistance" Value="0.35*" />
+      <MetaDataEntry Name="SplitterDirection" Value="Bottom" />
     </UIComponentConfiguration>
     <UIComponentConfiguration Component="C1BD2AF7-ACF8-4710-99A3-AB5F34C46A90">
       <UIComponentConfiguration Component="26A6EFC8-E2A5-4157-AAF7-6E7A52516FCA" />
