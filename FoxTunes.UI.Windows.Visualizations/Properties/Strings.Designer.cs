@@ -457,20 +457,20 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to High Cut.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_HighCut {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.HighCut", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Hold Duration.
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Hold {
             get {
                 return ResourceManager.GetString("SpectrumBehaviourConfiguration.Hold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max Frequency (KHz).
+        /// </summary>
+        internal static string SpectrumBehaviourConfiguration_MaxFrequency {
+            get {
+                return ResourceManager.GetString("SpectrumBehaviourConfiguration.MaxFrequency", resourceCulture);
             }
         }
         
