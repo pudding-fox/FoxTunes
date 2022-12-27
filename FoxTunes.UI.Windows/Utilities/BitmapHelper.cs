@@ -57,12 +57,7 @@ namespace FoxTunes
         [DllImport("bitmap_utilities.dll", EntryPoint = "clear")]
         public static extern bool Clear([In] ref RenderInfo info);
 
-        public static RenderInfo CreateRenderInfo(WriteableBitmap bitmap, params Color[] colors)
-        {
-            return CreateRenderInfo(bitmap, 0, colors);
-        }
-
-        public static RenderInfo CreateRenderInfo(WriteableBitmap bitmap, int flags, params Color[] colors)
+        public static RenderInfo CreateRenderInfo(WriteableBitmap bitmap, IntPtr palette)
         {
             if (bitmap.Format != PixelFormats.Pbgra32)
             {
@@ -76,10 +71,13 @@ namespace FoxTunes
                 Height = bitmap.PixelHeight,
                 Stride = bitmap.PixelWidth * (bitmap.Format.BitsPerPixel / 8),
                 Buffer = bitmap.BackBuffer,
-                Palette = CreatePalette(flags, colors.Select(
-                    color => new Int32Color(color.B, color.G, color.R, color.A)
-                ).ToArray())
+                Palette = palette
             };
+        }
+
+        public static IntPtr CreatePalette(int flags, params Color[] colors)
+        {
+            return CreatePalette(flags, colors.Select(color => new Int32Color(color)).ToArray());
         }
 
         public static IntPtr CreatePalette(int flags, params Int32Color[] colors)
@@ -107,6 +105,11 @@ namespace FoxTunes
     [StructLayout(LayoutKind.Sequential)]
     public struct Int32Color
     {
+        public Int32Color(Color color) : this(color.B, color.G, color.R, color.A)
+        {
+
+        }
+
         public Int32Color(int blue, int green, int red, int alpha)
         {
             this.Blue = blue;

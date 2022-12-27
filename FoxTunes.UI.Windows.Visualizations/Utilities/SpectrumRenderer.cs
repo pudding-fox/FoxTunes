@@ -52,8 +52,8 @@ namespace FoxTunes
                SpectrumBehaviourConfiguration.HOLD_ELEMENT
             );
             this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                SpectrogramBehaviourConfiguration.SECTION,
-                SpectrogramBehaviourConfiguration.COLOR_PALETTE_ELEMENT
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.COLOR_PALETTE_ELEMENT
             );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
@@ -97,7 +97,7 @@ namespace FoxTunes
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.HighCut.Value,
-                SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value)
+                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color)
             );
             return true;
         }
@@ -121,7 +121,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.COLOR_FROM_Y, data.Colors);
+                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(BitmapHelper.COLOR_FROM_Y, data.Colors));
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)

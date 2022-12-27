@@ -98,58 +98,24 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public static Color[] GetColorPalette()
-        {
-            return GetColorPalette(GetDefaultColorPalette());
-        }
-
         public static Color[] GetColorPalette(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
             {
-                return GetColorPalette();
-            }
-            var lines = value
-                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(line => line.Trim())
-                .ToArray();
-            var colors = new List<KeyValuePair<int, Color>>();
-            foreach (var line in lines)
-            {
-                var parts = line
-                    .Split(new[] { ':' }, 2)
-                    .Select(part => part.Trim())
-                    .ToArray();
-                if (parts.Length != 2)
-                {
-                    continue;
-                }
-                var index = default(int);
-                if (!int.TryParse(parts[0], out index))
-                {
-                    index = colors.Count * 10;
-                }
-                var color = default(Color);
                 try
                 {
-                    color = (Color)ColorConverter.ConvertFromString(parts[1]);
+                    var colors = value.ToPalette();
+                    if (colors != null && colors.Length > 1)
+                    {
+                        return colors;
+                    }
                 }
                 catch
                 {
-                    //Failed to parse the color.
-                    color = Colors.Red;
+                    //Nothing can be done.
                 }
-                colors.Add(new KeyValuePair<int, Color>(index, color));
             }
-            if (colors.Count < 2)
-            {
-                //Need at least two colors.
-                return GetColorPalette();
-            }
-            return colors
-                .OrderBy(color => color.Key)
-                .ToArray()
-                .ToGradient();
+            return GetDefaultColorPalette().ToPalette();
         }
     }
 }
