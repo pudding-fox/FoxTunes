@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -13,8 +12,6 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public SelectionConfigurationElement Orientation { get; private set; }
-
         public BooleanConfigurationElement Peaks { get; private set; }
 
         public BooleanConfigurationElement Rms { get; private set; }
@@ -22,10 +19,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.Orientation = this.Configuration.GetElement<SelectionConfigurationElement>(
-                PeakMeterBehaviourConfiguration.SECTION,
-                PeakMeterBehaviourConfiguration.ORIENTATION
-            );
             this.Peaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                 PeakMeterBehaviourConfiguration.SECTION,
                 PeakMeterBehaviourConfiguration.PEAKS
@@ -49,15 +42,6 @@ namespace FoxTunes
         {
             get
             {
-                foreach (var option in this.Orientation.Options)
-                {
-                    yield return new InvocationComponent(
-                        CATEGORY,
-                        option.Id,
-                        option.Name,
-                        attributes: this.Orientation.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                    );
-                }
                 yield return new InvocationComponent(
                     CATEGORY,
                     this.Peaks.Id,
@@ -82,14 +66,6 @@ namespace FoxTunes
             else if (string.Equals(component.Id, this.Rms.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.Rms.Toggle();
-            }
-            else
-            {
-                var orientation = this.Orientation.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id, StringComparison.OrdinalIgnoreCase));
-                if (orientation != null)
-                {
-                    this.Orientation.Value = orientation;
-                }
             }
             this.Configuration.Save();
 #if NET40

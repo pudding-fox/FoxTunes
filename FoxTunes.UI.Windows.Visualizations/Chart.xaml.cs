@@ -8,6 +8,10 @@ namespace FoxTunes
     /// </summary>
     public partial class Chart : UserControl
     {
+        public Size MinSizeForXAxis = new Size(300, 150);
+
+        public Size MinSizeForYAxis = new Size(150, 300);
+
         public static readonly DependencyProperty XAxisContentProperty = DependencyProperty.Register(
             "XAxisContent",
             typeof(object),
@@ -100,34 +104,38 @@ namespace FoxTunes
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
-            var xAxis = this.Template.FindName("XAxis", this) as UIElement;
-            var yAxis = this.Template.FindName("YAxis", this) as UIElement;
-            var legend = this.Template.FindName("Legend", this) as UIElement;
-            if (xAxis != null && yAxis != null && legend != null)
+            var size = sizeInfo.NewSize;
+            if (!double.IsNaN(size.Width) && !double.IsNaN(size.Height))
             {
-                if (!double.IsNaN(sizeInfo.NewSize.Height) && sizeInfo.NewSize.Height >= 300)
+                var xAxis = this.Template.FindName("XAxis", this) as UIElement;
+                var yAxis = this.Template.FindName("YAxis", this) as UIElement;
+                var legend = this.Template.FindName("Legend", this) as UIElement;
+                if (xAxis != null && yAxis != null && legend != null)
                 {
-                    xAxis.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    xAxis.Visibility = Visibility.Collapsed;
-                }
-                if (!double.IsNaN(sizeInfo.NewSize.Width) && sizeInfo.NewSize.Width >= 300)
-                {
-                    yAxis.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    yAxis.Visibility = Visibility.Collapsed;
-                }
-                if (xAxis.Visibility == Visibility.Visible && yAxis.Visibility == Visibility.Visible)
-                {
-                    legend.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    legend.Visibility = Visibility.Collapsed;
+                    if (size.Width >= MinSizeForXAxis.Width && size.Height >= MinSizeForXAxis.Height)
+                    {
+                        xAxis.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        xAxis.Visibility = Visibility.Collapsed;
+                    }
+                    if (size.Width >= MinSizeForYAxis.Width && size.Height >= MinSizeForYAxis.Height)
+                    {
+                        yAxis.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        yAxis.Visibility = Visibility.Collapsed;
+                    }
+                    if (xAxis.Visibility == Visibility.Visible && yAxis.Visibility == Visibility.Visible)
+                    {
+                        legend.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        legend.Visibility = Visibility.Collapsed;
+                    }
                 }
             }
             base.OnRenderSizeChanged(sizeInfo);

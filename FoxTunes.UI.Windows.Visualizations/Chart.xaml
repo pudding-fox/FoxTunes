@@ -20,10 +20,10 @@
                     <RowDefinition></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <ContentPresenter x:Name="XAxis" Grid.Column="0" Grid.Row="0" Content="{Binding XAxisContent, RelativeSource={RelativeSource AncestorType={x:Type LocalWindows:Chart}}}"></ContentPresenter>
+                <ContentPresenter x:Name="YAxis" Grid.Column="0" Grid.Row="0" Content="{Binding YAxisContent, RelativeSource={RelativeSource AncestorType={x:Type LocalWindows:Chart}}}"></ContentPresenter>
                 <ContentPresenter x:Name="Legend" Grid.Column="0" Grid.Row="1" Content="{Binding LegendContent, RelativeSource={RelativeSource AncestorType={x:Type LocalWindows:Chart}}}"></ContentPresenter>
                 <ContentPresenter Grid.Column="1" Grid.Row="0"></ContentPresenter>
-                <ContentPresenter x:Name="YAxis"  Grid.Column="1" Grid.Row="1" Content="{Binding YAxisContent, RelativeSource={RelativeSource AncestorType={x:Type LocalWindows:Chart}}}"></ContentPresenter>
+                <ContentPresenter x:Name="XAxis"  Grid.Column="1" Grid.Row="1" Content="{Binding XAxisContent, RelativeSource={RelativeSource AncestorType={x:Type LocalWindows:Chart}}}"></ContentPresenter>
             </Grid>
         </ControlTemplate>
     </UserControl.Template>

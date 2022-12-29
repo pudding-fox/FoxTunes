@@ -24,10 +24,10 @@
     <Windows:Visualization>
         <LocalWindows:Chart>
             <LocalWindows:Chart.XAxisContent>
-                <LocalWindows:Axis Width="32" Orientation="Vertical" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Levels}" Padding="1,0,1,0"></LocalWindows:Axis>
+                <LocalWindows:Axis Height="32" Orientation="Horizontal" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Bands}" Padding="4,0,4,0"></LocalWindows:Axis>
             </LocalWindows:Chart.XAxisContent>
             <LocalWindows:Chart.YAxisContent>
-                <LocalWindows:Axis Height="32" Orientation="Horizontal" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Bands}" Padding="4,0,4,0"></LocalWindows:Axis>
+                <LocalWindows:Axis Width="32" Orientation="Vertical" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Levels}" Padding="1,0,1,0"></LocalWindows:Axis>
             </LocalWindows:Chart.YAxisContent>
             <LocalWindows:Chart.LegendContent>
                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Text="dB/Hz" Foreground="{DynamicResource TextBrush}">

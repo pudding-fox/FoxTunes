@@ -8,10 +8,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    /// <summary>
-    /// Interaction logic for Axis.xaml
-    /// </summary>
-    public partial class Axis : UserControl
+    public class Axis : Control
     {
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
             "Orientation",
@@ -44,7 +41,7 @@ namespace FoxTunes
             "LabelProvider",
             typeof(AxisLabelProvider),
             typeof(Axis),
-            new PropertyMetadata(null, new PropertyChangedCallback(OnLabelProviderChanged))
+            new PropertyMetadata(new PropertyChangedCallback(OnLabelProviderChanged))
         );
 
         public static AxisLabelProvider GetLabelProvider(Axis source)
@@ -65,12 +62,6 @@ namespace FoxTunes
                 return;
             }
             axis.OnLabelProviderChanged();
-        }
-
-        public Axis()
-        {
-            this.LabelProvider = new TextAxisLabelProvider();
-            this.InitializeComponent();
         }
 
         public Orientation Orientation
