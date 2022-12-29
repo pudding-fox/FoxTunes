@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -850,6 +851,20 @@ namespace FoxTunes
                         .ToArray()
                         .ToGradient();
             }
+        }
+
+        public static Color[] MirrorGradient(this Color[] colors)
+        {
+            return new[]
+            {
+                colors,
+                colors.Reverse()
+            }.SelectMany(a => a).ToArray();
+        }
+
+        public static Color[] DuplicateGradient(this Color[] colors, int count)
+        {
+            return Enumerable.Range(0, count).SelectMany(position => colors).ToArray();
         }
 
         public static Color ToColor(this string value)

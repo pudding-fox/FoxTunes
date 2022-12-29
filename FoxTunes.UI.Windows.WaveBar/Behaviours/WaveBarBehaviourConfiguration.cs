@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -21,6 +24,8 @@ namespace FoxTunes
 
         public const string CACHE_ELEMENT = "BBBBAD4B-8BB4-47C9-9D18-2121C48115CE";
 
+        public const string COLOR_PALETTE_ELEMENT = "CCCC7E5A-ECA1-4D45-92C1-82B9EF4F8228";
+
         public const string CLEANUP_ELEMENT = "ZZZZ8740-576A-4456-A2CC-0B1E7DEF6913";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -28,8 +33,9 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION, Strings.WaveBarBehaviourConfiguration_Section)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Mode).WithOptions(GetModeOptions()))
                 .WithElement(new IntegerConfigurationElement(RESOLUTION_ELEMENT, Strings.WaveBarBehaviourConfiguration_Resolution, path: Strings.General_Advanced).WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)))
-                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.WaveBarBehaviourConfiguration_RMS, path: Strings.General_Advanced).WithValue(true))
+                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.WaveBarBehaviourConfiguration_RMS).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(CACHE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cache, path: Strings.General_Advanced).WithValue(true))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.WaveBarBehaviourConfiguration_ColorPalette).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(new CommandConfigurationElement(CLEANUP_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cleanup, path: Strings.General_Advanced)
                     .WithHandler(() => WaveFormCache.Cleanup())
                     .DependsOn(SECTION, CACHE_ELEMENT)
@@ -52,6 +58,28 @@ namespace FoxTunes
                 case MODE_SEPERATE_OPTION:
                     return WaveFormRendererMode.Seperate;
             }
+        }
+
+        public static string GetDefaultColorPalette()
+        {
+            var builder = new StringBuilder();
+            return builder.ToString();
+        }
+
+        public static Color[] GetColorPalette(string value, Color color)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                try
+                {
+                    return value.ToPalette().MirrorGradient();
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
+            }
+            return new[] { color };
         }
     }
 }

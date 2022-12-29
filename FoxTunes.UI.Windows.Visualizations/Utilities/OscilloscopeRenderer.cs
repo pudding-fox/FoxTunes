@@ -595,6 +595,7 @@ namespace FoxTunes
                 {
                     switch (this.Mode)
                     {
+                        default:
                         case OscilloscopeRendererMode.Mono:
                             this.SampleCount = DownmixMono(this.Samples, this.Samples32, this.Channels, this.SampleCount);
                             break;
