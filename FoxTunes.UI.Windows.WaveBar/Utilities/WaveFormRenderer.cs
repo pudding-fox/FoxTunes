@@ -331,8 +331,10 @@ namespace FoxTunes
                     y = Convert.ToInt32(center - (topValue * center));
                     height = Math.Max(Convert.ToInt32((center - y) + (bottomValue * center)), 1);
 
-                    waveElements[rendererData.Position, 0].Y = y;
-                    waveElements[rendererData.Position, 0].Height = height;
+                    waveElements[0, rendererData.Position].X = rendererData.Position;
+                    waveElements[0, rendererData.Position].Y = y;
+                    waveElements[0, rendererData.Position].Width = 1;
+                    waveElements[0, rendererData.Position].Height = height;
 
                 }
 
@@ -359,8 +361,10 @@ namespace FoxTunes
                     y = Convert.ToInt32(center - (value * center));
                     height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
-                    powerElements[rendererData.Position, 0].Y = y;
-                    powerElements[rendererData.Position, 0].Height = height;
+                    powerElements[0, rendererData.Position].X = rendererData.Position;
+                    powerElements[0, rendererData.Position].Y = y;
+                    powerElements[0, rendererData.Position].Width = 1;
+                    powerElements[0, rendererData.Position].Height = height;
 
                 }
 
@@ -429,8 +433,10 @@ namespace FoxTunes
                         y = Convert.ToInt32(waveCenter - (topValue * (waveHeight / 2)));
                         height = Math.Max(Convert.ToInt32((waveCenter - y) + (bottomValue * (waveHeight / 2))), 1);
 
-                        waveElements[rendererData.Position, channel].Y = y;
-                        waveElements[rendererData.Position, channel].Height = height;
+                        waveElements[channel, rendererData.Position].X = rendererData.Position;
+                        waveElements[channel, rendererData.Position].Y = y;
+                        waveElements[channel, rendererData.Position].Width = 1;
+                        waveElements[channel, rendererData.Position].Height = height;
 
                     }
 
@@ -454,8 +460,10 @@ namespace FoxTunes
                         y = Convert.ToInt32(waveCenter - (value * (waveHeight / 2)));
                         height = Math.Max(Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2))), 1);
 
-                        powerElements[rendererData.Position, channel].Y = y;
-                        powerElements[rendererData.Position, channel].Height = height;
+                        powerElements[channel, rendererData.Position].X = rendererData.Position;
+                        powerElements[channel, rendererData.Position].Y = y;
+                        powerElements[channel, rendererData.Position].Width = 1;
+                        powerElements[channel, rendererData.Position].Height = height;
 
                     }
                 }
@@ -543,93 +551,19 @@ namespace FoxTunes
 
         public static void RenderMono(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo, bool rms)
         {
+            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, 1, rendererData.Position);
             if (rms)
             {
-                var waveElements = rendererData.WaveElements;
-                var powerElements = rendererData.PowerElements;
-                for (var position = 0; position < rendererData.Position; position++)
-                {
-                    var waveElement = waveElements[position, 0];
-                    var powerElement = powerElements[position, 0];
-                    BitmapHelper.DrawRectangle(
-                        ref waveRenderInfo,
-                        position,
-                        waveElement.Y,
-                        1,
-                        waveElement.Height
-                    );
-                    BitmapHelper.DrawRectangle(
-                        ref powerRenderInfo,
-                        position,
-                        powerElement.Y,
-                        1,
-                        powerElement.Height
-                    );
-                }
-            }
-            else
-            {
-                var elements = rendererData.WaveElements;
-                for (var position = 0; position < rendererData.Position; position++)
-                {
-                    var element = elements[position, 0];
-                    BitmapHelper.DrawRectangle(
-                        ref waveRenderInfo,
-                        position,
-                        element.Y,
-                        1,
-                        element.Height
-                    );
-                }
+                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, 1, rendererData.Position);
             }
         }
 
         public static void RenderSeperate(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo, bool rms)
         {
+            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, rendererData.Channels, rendererData.Position);
             if (rms)
             {
-                var waveElements = rendererData.WaveElements;
-                var powerElements = rendererData.PowerElements;
-                for (var position = 0; position < rendererData.Position; position++)
-                {
-                    for (var channel = 0; channel < rendererData.Channels; channel++)
-                    {
-                        var waveElement = waveElements[position, channel];
-                        var powerElement = powerElements[position, channel];
-                        BitmapHelper.DrawRectangle(
-                            ref waveRenderInfo,
-                            position,
-                            waveElement.Y,
-                            1,
-                            waveElement.Height
-                        );
-                        BitmapHelper.DrawRectangle(
-                            ref powerRenderInfo,
-                            position,
-                            powerElement.Y,
-                            1,
-                            powerElement.Height
-                        );
-                    }
-                }
-            }
-            else
-            {
-                var elements = rendererData.WaveElements;
-                for (var position = 0; position < rendererData.Position; position++)
-                {
-                    for (var channel = 0; channel < rendererData.Channels; channel++)
-                    {
-                        var element = elements[position, channel];
-                        BitmapHelper.DrawRectangle(
-                            ref waveRenderInfo,
-                            position,
-                            element.Y,
-                            1,
-                            element.Height
-                        );
-                    }
-                }
+                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, rendererData.Channels, rendererData.Position);
             }
         }
 
@@ -641,8 +575,8 @@ namespace FoxTunes
                 Width = width,
                 Height = height,
                 ValuesPerElement = valuesPerElement,
-                WaveElements = new Int32Pair[width, generatorData.Channels],
-                PowerElements = new Int32Pair[width, generatorData.Channels],
+                WaveElements = new Int32Rect[generatorData.Channels, width],
+                PowerElements = new Int32Rect[generatorData.Channels, width],
                 Channels = generatorData.Channels,
                 Position = 0,
                 Capacity = width,
@@ -658,9 +592,9 @@ namespace FoxTunes
 
             public int ValuesPerElement;
 
-            public Int32Pair[,] WaveElements;
+            public Int32Rect[,] WaveElements;
 
-            public Int32Pair[,] PowerElements;
+            public Int32Rect[,] PowerElements;
 
             public int Channels;
 
@@ -671,19 +605,6 @@ namespace FoxTunes
             public float Peak;
 
             public float NormalizedPeak;
-        }
-
-        public struct Int32Pair
-        {
-            public Int32Pair(int y, int height)
-            {
-                this.Y = y;
-                this.Height = height;
-            }
-
-            public int Y;
-
-            public int Height;
         }
     }
 

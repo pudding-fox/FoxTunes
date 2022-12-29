@@ -71,6 +71,8 @@ BOOL WINAPI destroy_palette(ColorPalette** palette);
 
 BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, INT32 count);
 
+BOOL WINAPI draw_rectangles2(RenderInfo* info, Int32Rect* rectangles, INT32 dimentions, INT32 count);
+
 BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height);
 
 BOOL WINAPI draw_lines(RenderInfo* info, Int32Point* points, INT32 dimentions, INT32 count);

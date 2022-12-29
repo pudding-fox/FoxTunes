@@ -31,6 +31,10 @@ namespace FoxTunes
         public static extern bool DrawRectangles([In] ref RenderInfo info, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] Int32Rect[] rectangles, int count);
 
         [SuppressUnmanagedCodeSecurity]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "draw_rectangles2")]
+        public static extern bool DrawRectangles([In] ref RenderInfo info, [In, MarshalAs(UnmanagedType.LPArray)] Int32Rect[,] rectangles, int dimentions, int count);
+
+        [SuppressUnmanagedCodeSecurity]
         [DllImport("bitmap_utilities.dll", EntryPoint = "draw_rectangle")]
         public static extern bool DrawRectangle([In] ref RenderInfo info, int x, int y, int width, int height);
 
