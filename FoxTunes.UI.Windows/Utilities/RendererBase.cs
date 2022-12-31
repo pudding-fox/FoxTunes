@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -809,13 +808,13 @@ namespace FoxTunes
             };
         }
 
-        public static Color[] ToPalette(this string value)
+        public static ColorStop[] ToColorStops(this string value)
         {
             var lines = value
                 .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => line.Trim())
                 .ToArray();
-            var colors = new List<KeyValuePair<int, Color>>();
+            var colors = new List<ColorStop>();
             foreach (var line in lines)
             {
                 var parts = line
@@ -828,29 +827,95 @@ namespace FoxTunes
                 {
                     if (!int.TryParse(parts[0], out index))
                     {
-                        index = colors.Count * 10;
+                        index = -1;
                     }
                     color = parts[1].ToColor();
                 }
                 else
                 {
-                    index = colors.Count * 10;
+                    index = -1;
                     color = parts[0].ToColor();
                 }
-                colors.Add(new KeyValuePair<int, Color>(index, color));
+                colors.Add(new ColorStop(index, color));
             }
-            switch (colors.Count)
+            var max = Math.Max(colors.Max(color => color.Index), colors.Count);
+            for (var index = 0; index < colors.Count; index++)
+            {
+                var color = colors[index];
+                if (color.Index >= 0)
+                {
+                    continue;
+                }
+                if (max == colors.Count)
+                {
+                    color.Index = index;
+                }
+                else
+                {
+                    //TODO: Sorry, couldn't work this out.
+                    color.Index = Convert.ToInt32(((float)index / colors.Count) * max);
+                }
+            }
+            return colors.ToArray();
+        }
+
+        public static Color[] ToGradient(this ColorStop[] colors)
+        {
+            switch (colors.Length)
             {
                 case 0:
                     return new Color[] { };
                 case 1:
-                    return new Color[] { colors[0].Value };
-                default:
-                    return colors
-                        .OrderBy(color => color.Key)
-                        .ToArray()
-                        .ToGradient();
+                    return new Color[] { colors[0].Color };
             }
+            var min = Math.Max(colors.Min(color => color.Index), 0);
+            var max = Math.Max(colors.Max(color => color.Index), colors.Length);
+            var result = new Color[max];
+            for (var a = 0; a < colors.Length; a++)
+            {
+                var previousOffset = 0;
+                var previousColor = default(Color);
+                if (a == 0)
+                {
+                    previousOffset = 0;
+                    previousColor = Colors.Black;
+                }
+                else
+                {
+                    previousOffset = colors[a - 1].Index;
+                    previousColor = colors[a - 1].Color;
+                }
+                var nextOffset = 0;
+                var nextColor = default(Color);
+                if (a == colors.Length - 1)
+                {
+                    nextOffset = max;
+                    nextColor = Colors.White;
+                }
+                else
+                {
+                    nextOffset = colors[a + 1].Index;
+                    nextColor = colors[a + 1].Color;
+                }
+                var offset = colors[a].Index;
+                var color = colors[a].Color;
+                for (int b = 0, c = previousOffset; c < offset; b++, c++)
+                {
+                    var d = offset - previousOffset - 1;
+                    if (d > 0)
+                    {
+                        var ratio = (float)b / d;
+                        result[c] = Interpolate(previousColor, color, ratio);
+                    }
+                    else
+                    {
+                        result[c] = previousColor;
+                    }
+                }
+            }
+            //TODO: Hack hack hack.
+            result[result.Length - 1] = colors[colors.Length - 1].Color;
+            return result;
         }
 
         public static Color[] MirrorGradient(this Color[] colors)
@@ -880,55 +945,6 @@ namespace FoxTunes
             }
         }
 
-        public static Color[] ToGradient(this KeyValuePair<int, Color>[] colors)
-        {
-            var min = colors.Min(color => color.Key);
-            var max = colors.Max(color => color.Key);
-            var result = new Color[max];
-            for (var a = 0; a < colors.Length; a++)
-            {
-                var previousOffset = 0;
-                var previousColor = default(Color);
-                if (a == 0)
-                {
-                    previousOffset = 0;
-                    previousColor = Colors.Black;
-                }
-                else
-                {
-                    previousOffset = colors[a - 1].Key;
-                    previousColor = colors[a - 1].Value;
-                }
-                var nextOffset = 0;
-                var nextColor = default(Color);
-                if (a == colors.Length - 1)
-                {
-                    nextOffset = max;
-                    nextColor = Colors.White;
-                }
-                else
-                {
-                    nextOffset = colors[a + 1].Key;
-                    nextColor = colors[a + 1].Value;
-                }
-                var offset = colors[a].Key;
-                var color = colors[a].Value;
-                for (int b = 0, c = previousOffset; c < offset; b++, c++)
-                {
-                    if (offset > 1)
-                    {
-                        var ratio = (float)b / (offset - previousOffset - 1);
-                        result[c] = Interpolate(previousColor, color, ratio);
-                    }
-                    else
-                    {
-                        result[c] = previousColor;
-                    }
-                }
-            }
-            return result;
-        }
-
         public static Color Interpolate(Color color1, Color color2, float ratio)
         {
             var ratio1 = 1 - ratio;
@@ -940,5 +956,18 @@ namespace FoxTunes
                 (byte)Math.Round((color1.B * ratio1) + (color2.B * ratio2))
             );
         }
+    }
+
+    public class ColorStop
+    {
+        public ColorStop(int index, Color color)
+        {
+            this.Index = index;
+            this.Color = color;
+        }
+
+        public int Index;
+
+        public Color Color;
     }
 }

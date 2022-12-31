@@ -104,7 +104,7 @@ namespace FoxTunes
             {
                 try
                 {
-                    var colors = value.ToPalette();
+                    var colors = value.ToColorStops().ToGradient();
                     if (colors != null && colors.Length > 1)
                     {
                         return colors;
@@ -115,7 +115,7 @@ namespace FoxTunes
                     //Nothing can be done.
                 }
             }
-            return GetDefaultColorPalette().ToPalette();
+            return GetDefaultColorPalette().ToColorStops().ToGradient();
         }
     }
 }
