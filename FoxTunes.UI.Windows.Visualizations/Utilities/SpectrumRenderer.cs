@@ -267,9 +267,9 @@ namespace FoxTunes
 
             BitmapHelper.DrawRectangles(ref info, elements, elements.Length);
 
-            for (var a = 0; a < elements.Length; a++)
+            if (peaks != null)
             {
-                if (peaks != null)
+                for (var a = 0; a < elements.Length; a++)
                 {
                     if (peaks[a].Y >= elements[a].Y)
                     {
