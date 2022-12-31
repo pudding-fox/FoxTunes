@@ -252,4 +252,7 @@
   <data name="SpectrumBehaviourConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>
+  <data name="SpectrumBehaviourConfiguration.PreAmp" xml:space="preserve">
+    <value>Pre Amp (dB)</value>
+  </data>
 </root>

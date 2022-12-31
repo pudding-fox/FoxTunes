@@ -10,6 +10,10 @@ namespace FoxTunes
 
         public static bool WindowBoundsVisible(Rect bounds)
         {
+            if (double.IsNaN(bounds.X) || double.IsNaN(bounds.Y))
+            {
+                return false;
+            }
             var rect = new Rectangle(
                 Convert.ToInt32(bounds.X) - MARGIN,
                 Convert.ToInt32(bounds.Y) - MARGIN,
