@@ -18,7 +18,7 @@ namespace FoxTunes
             {
                 return this._UpdateInterval;
             }
-            set
+            protected set
             {
                 this._UpdateInterval = value;
                 this.OnUpdateIntervalChanged();
@@ -38,14 +38,20 @@ namespace FoxTunes
 
         protected global::System.Timers.Timer Timer { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Timer = new global::System.Timers.Timer();
             this.Timer.AutoReset = false;
-            this.Timer.Interval = this.UpdateInterval;
             this.Timer.Elapsed += this.OnElapsed;
             PlaybackStateNotifier.IsStartedChanged += this.OnIsStartedChanged;
             PlaybackStateNotifier.IsPlayingChanged += this.OnIsPlayingChanged;
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
+            ).ConnectValue(value => this.UpdateInterval = value);
             base.InitializeComponent(core);
             this.Update();
         }

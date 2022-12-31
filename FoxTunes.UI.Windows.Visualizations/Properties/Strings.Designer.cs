@@ -88,11 +88,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hold Duration.
+        /// </summary>
+        internal static string EnhancedSpectrumBehaviourConfiguration_Hold {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Hold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string EnhancedSpectrumBehaviourConfiguration_Path {
             get {
                 return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Peaks.
+        /// </summary>
+        internal static string EnhancedSpectrumBehaviourConfiguration_Peaks {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Peaks", resourceCulture);
             }
         }
         
@@ -111,24 +129,6 @@ namespace FoxTunes {
         internal static string General_Advanced {
             get {
                 return ResourceManager.GetString("General.Advanced", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bands.
-        /// </summary>
-        internal static string General_Bands {
-            get {
-                return ResourceManager.GetString("General.Bands", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bars.
-        /// </summary>
-        internal static string General_Bars {
-            get {
-                return ResourceManager.GetString("General.Bars", resourceCulture);
             }
         }
         

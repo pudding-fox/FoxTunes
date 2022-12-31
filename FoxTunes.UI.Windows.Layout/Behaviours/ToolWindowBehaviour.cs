@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -269,6 +271,7 @@ namespace FoxTunes
                 ToolWindowBehaviourConfiguration.SECTION,
                 ToolWindowBehaviourConfiguration.ELEMENT
             );
+            this.Element.ValueChanged += this.OnValueChanged;
             if (this.Enabled)
             {
                 var task = this.Load();
@@ -328,6 +331,16 @@ namespace FoxTunes
                 return;
             }
             this.Save();
+        }
+
+        protected void OnValueChanged(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(this.Element.Value))
+            {
+                return;
+            }
+            //Looks like the config was reset.
+            var task = this.Reset();
         }
 
         public IEnumerable<string> InvocationCategories
@@ -425,6 +438,19 @@ namespace FoxTunes
             {
                 await this.UpdateVisiblity(pair.Key, pair.Value).ConfigureAwait(false);
             }
+        }
+
+        public Task Reset()
+        {
+            Logger.Write(this, LogLevel.Debug, "Resetting configuration.");
+            return global::FoxTunes.Windows.Invoke(() =>
+            {
+                foreach (var pair in this.Windows)
+                {
+                    pair.Value.Close();
+                }
+                this.Windows.Clear();
+            });
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

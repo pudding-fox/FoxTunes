@@ -10,8 +10,6 @@ namespace FoxTunes
 {
     public class EnhancedSpectrumRenderer : VisualizationBase
     {
-        public IConfiguration Configuration { get; private set; }
-
         public SpectrumRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Bands { get; private set; }
@@ -22,23 +20,25 @@ namespace FoxTunes
 
         public BooleanConfigurationElement ShowCrestFactor { get; private set; }
 
-        public BooleanConfigurationElement Smooth { get; private set; }
-
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Configuration = core.Components.Configuration;
+            base.InitializeComponent(core);
             this.Bands = this.Configuration.GetElement<SelectionConfigurationElement>(
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
                 EnhancedSpectrumBehaviourConfiguration.BANDS_ELEMENT
             );
             this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.PEAKS_ELEMENT
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.PEAKS_ELEMENT
              );
+            this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
+               EnhancedSpectrumBehaviourConfiguration.SECTION,
+               EnhancedSpectrumBehaviourConfiguration.HOLD_ELEMENT
+            );
             this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
                 EnhancedSpectrumBehaviourConfiguration.RMS_ELEMENT
@@ -47,18 +47,6 @@ namespace FoxTunes
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
                 EnhancedSpectrumBehaviourConfiguration.CREST_ELEMENT
             );
-            this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
-            );
-            this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.HOLD_ELEMENT
-            );
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
-            ).ConnectValue(value => this.UpdateInterval = value);
             this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
@@ -67,10 +55,7 @@ namespace FoxTunes
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
             this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
-            this.Smooth.ValueChanged += this.OnValueChanged;
-            this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
-            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 
@@ -193,7 +178,7 @@ namespace FoxTunes
                 else
                 {
                     UpdateValues(data);
-                    if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
+                    if (!data.LastUpdated.Equals(default(DateTime)))
                     {
                         UpdateElementsSmooth(data);
                     }
@@ -258,14 +243,6 @@ namespace FoxTunes
             if (this.ShowCrestFactor != null)
             {
                 this.ShowCrestFactor.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.Smooth != null)
-            {
-                this.Smooth.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.HoldInterval != null)
-            {
-                this.HoldInterval.ValueChanged -= this.OnValueChanged;
             }
             if (this.FFTSize != null)
             {

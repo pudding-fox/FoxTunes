@@ -48,7 +48,8 @@ namespace FoxTunes
                     yield return new InvocationComponent(
                         CATEGORY,
                         option.Id,
-                        string.Format("{0} {1}", option.Name, Strings.General_Bars),
+                        string.Format("{0} {1}", option.Name, this.Bars.Name),
+                        path: this.Bars.Name,
                         attributes: this.Bars.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
@@ -56,7 +57,7 @@ namespace FoxTunes
                     CATEGORY,
                     this.Peaks.Id,
                     this.Peaks.Name,
-                    attributes: (byte)((this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                    attributes: this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
             }
         }

@@ -10,15 +10,11 @@ namespace FoxTunes
 {
     public class SpectrumRenderer : VisualizationBase
     {
-        public IConfiguration Configuration { get; private set; }
-
         public SpectrumRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Bars { get; private set; }
 
         public BooleanConfigurationElement ShowPeaks { get; private set; }
-
-        public BooleanConfigurationElement Smooth { get; private set; }
 
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
@@ -30,7 +26,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Configuration = core.Components.Configuration;
+            base.InitializeComponent(core);
             this.Bars = this.Configuration.GetElement<SelectionConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.BARS_ELEMENT
@@ -39,10 +35,6 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.PEAKS_ELEMENT
              );
-            this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
-            );
             this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.HOLD_ELEMENT
@@ -55,22 +47,15 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.CUT_OFF_ELEMENT
             );
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
-            ).ConnectValue(value => this.UpdateInterval = value);
             this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
             this.Bars.ValueChanged += this.OnValueChanged;
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
-            this.Smooth.ValueChanged += this.OnValueChanged;
-            this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.ColorPalette.ValueChanged += this.OnValueChanged;
             this.CutOff.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
-            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 
@@ -174,7 +159,7 @@ namespace FoxTunes
                     return;
                 }
                 UpdateValues(data);
-                if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
+                if (!data.LastUpdated.Equals(default(DateTime)))
                 {
                     UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, Orientation.Vertical);
                 }
@@ -222,14 +207,6 @@ namespace FoxTunes
             if (this.ShowPeaks != null)
             {
                 this.ShowPeaks.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.Smooth != null)
-            {
-                this.Smooth.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.HoldInterval != null)
-            {
-                this.HoldInterval.ValueChanged -= this.OnValueChanged;
             }
             if (this.ColorPalette != null)
             {
