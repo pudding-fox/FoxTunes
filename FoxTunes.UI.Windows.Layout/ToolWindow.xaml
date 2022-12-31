@@ -15,18 +15,6 @@
     <Window.Topmost>
         <Binding Path="AlwaysOnTop" Source="{StaticResource ViewModel}"/>
     </Window.Topmost>
-    <Window.Top>
-        <Binding Path="Top" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
-    </Window.Top>
-    <Window.Height>
-        <Binding Path="Height" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
-    </Window.Height>
-    <Window.Width>
-        <Binding Path="Width" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
-    </Window.Width>
-    <Window.Left>
-        <Binding Path="Left" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
-    </Window.Left>
     <Window.Title>
         <!-- This seems to produce a binding warning but I don't know why. The FallbackValue doesn't seem to help. -->
         <Binding Path="Title" Source="{StaticResource ViewModel}" Mode="OneWay" FallbackValue="Tool Window"/>

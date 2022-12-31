@@ -1,8 +1,5 @@
-﻿using FoxTunes.Interfaces;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
-using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -39,129 +36,36 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler TitleChanged;
 
-        public double Left
+        public Rect Bounds
         {
             get
             {
-                if (this.Configuration == null || this.Configuration.Left == 0)
+                if (this.Configuration == null)
                 {
-                    return double.NaN;
+                    return Rect.Empty;
                 }
-                return this.Configuration.Left;
+                return new Rect(this.Configuration.Left, this.Configuration.Top, this.Configuration.Width, this.Configuration.Height);
             }
             set
             {
-                if (this.Configuration == null || this.Configuration.Left == Convert.ToInt32(value))
-                {
-                    return;
-                }
-                this.Configuration.Left = Convert.ToInt32(value);
+                this.Configuration.Left = !double.IsNaN(value.Left) ? Convert.ToInt32(value.Left) : 0;
+                this.Configuration.Top = !double.IsNaN(value.Top) ? Convert.ToInt32(value.Top) : 0;
+                this.Configuration.Width = !double.IsNaN(value.Width) ? Convert.ToInt32(value.Width) : 0;
+                this.Configuration.Height = !double.IsNaN(value.Height) ? Convert.ToInt32(value.Height) : 0;
+                this.OnBoundsChanged(this, EventArgs.Empty);
             }
         }
 
-        protected virtual void OnLeftChanged(object sender, EventArgs e)
+        protected virtual void OnBoundsChanged(object sender, EventArgs e)
         {
-            if (this.LeftChanged != null)
+            if (this.BoundsChanged != null)
             {
-                this.LeftChanged(this, EventArgs.Empty);
+                this.BoundsChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Left");
+            this.OnPropertyChanged("Bounds");
         }
 
-        public event EventHandler LeftChanged;
-
-        public double Top
-        {
-            get
-            {
-                if (this.Configuration == null || this.Configuration.Top == 0)
-                {
-                    return double.NaN;
-                }
-                return this.Configuration.Top;
-            }
-            set
-            {
-                if (this.Configuration == null || this.Configuration.Top == Convert.ToInt32(value))
-                {
-                    return;
-                }
-                this.Configuration.Top = Convert.ToInt32(value);
-            }
-        }
-
-        protected virtual void OnTopChanged(object sender, EventArgs e)
-        {
-            if (this.TopChanged != null)
-            {
-                this.TopChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Top");
-        }
-
-        public event EventHandler TopChanged;
-
-        public double Width
-        {
-            get
-            {
-                if (this.Configuration == null || this.Configuration.Width <= 0)
-                {
-                    return double.NaN;
-                }
-                return this.Configuration.Width;
-            }
-            set
-            {
-                if (this.Configuration == null || this.Configuration.Width == Convert.ToInt32(value))
-                {
-                    return;
-                }
-                this.Configuration.Width = Convert.ToInt32(value);
-            }
-        }
-
-        protected virtual void OnWidthChanged(object sender, EventArgs e)
-        {
-            if (this.WidthChanged != null)
-            {
-                this.WidthChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Width");
-        }
-
-        public event EventHandler WidthChanged;
-
-        public double Height
-        {
-            get
-            {
-                if (this.Configuration == null || this.Configuration.Height <= 0)
-                {
-                    return double.NaN;
-                }
-                return this.Configuration.Height;
-            }
-            set
-            {
-                if (this.Configuration == null || this.Configuration.Height == Convert.ToInt32(value))
-                {
-                    return;
-                }
-                this.Configuration.Height = Convert.ToInt32(value);
-            }
-        }
-
-        protected virtual void OnHeightChanged(object sender, EventArgs e)
-        {
-            if (this.HeightChanged != null)
-            {
-                this.HeightChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Height");
-        }
-
-        public event EventHandler HeightChanged;
+        public event EventHandler BoundsChanged;
 
         public UIComponentConfiguration Component
         {
@@ -312,20 +216,13 @@ namespace FoxTunes.ViewModel
             if (this.Configuration != null)
             {
                 this.Configuration.TitleChanged += this.OnTitleChanged;
-                this.Configuration.TopChanged += this.OnTopChanged;
-                this.Configuration.LeftChanged += this.OnLeftChanged;
-                this.Configuration.WidthChanged += this.OnWidthChanged;
-                this.Configuration.HeightChanged += this.OnHeightChanged;
                 this.Configuration.ComponentChanged += this.OnComponentChanged;
                 this.Configuration.ShowWithMainWindowChanged += this.OnShowWithMainWindowChanged;
                 this.Configuration.ShowWithMiniWindowChanged += this.OnShowWithMiniWindowChanged;
                 this.Configuration.AlwaysOnTopChanged += this.OnAlwaysOnTopChanged;
 
                 this.OnTitleChanged(this, EventArgs.Empty);
-                this.OnTopChanged(this, EventArgs.Empty);
-                this.OnLeftChanged(this, EventArgs.Empty);
-                this.OnWidthChanged(this, EventArgs.Empty);
-                this.OnHeightChanged(this, EventArgs.Empty);
+                this.OnBoundsChanged(this, EventArgs.Empty);
                 this.OnComponentChanged(this, EventArgs.Empty);
                 this.OnShowWithMainWindowChanged(this, EventArgs.Empty);
                 this.OnShowWithMiniWindowChanged(this, EventArgs.Empty);
@@ -350,10 +247,6 @@ namespace FoxTunes.ViewModel
             if (this.Configuration != null)
             {
                 this.Configuration.TitleChanged -= this.OnTitleChanged;
-                this.Configuration.TopChanged -= this.OnTopChanged;
-                this.Configuration.LeftChanged -= this.OnLeftChanged;
-                this.Configuration.WidthChanged -= this.OnWidthChanged;
-                this.Configuration.HeightChanged -= this.OnHeightChanged;
                 this.Configuration.ComponentChanged -= this.OnComponentChanged;
                 this.Configuration.ShowWithMainWindowChanged -= this.OnShowWithMainWindowChanged;
                 this.Configuration.ShowWithMiniWindowChanged -= this.OnShowWithMiniWindowChanged;
