@@ -454,8 +454,21 @@ namespace FoxTunes
 
         public static int GetWidth(SelectionConfigurationOption option)
         {
-            var bands = GetBands(option);
-            return (bands.Length * 2) - 1;
+            switch (option.Id)
+            {
+                default:
+                case BANDS_10_OPTION:
+                case BANDS_14_OPTION:
+                case BANDS_21_OPTION:
+                case BANDS_31_OPTION:
+                    return 160;
+                case BANDS_40_OPTION:
+                    return 192;
+                case BANDS_80_OPTION:
+                    return 192;
+                case BANDS_160_OPTION:
+                    return 320;
+            }
         }
 
         public static int GetFFTSize(SelectionConfigurationOption fftSize, SelectionConfigurationOption bands)
@@ -467,10 +480,10 @@ namespace FoxTunes
             {
                 case 40:
                 case 80:
-                    size = Math.Min(size, 8192);
+                    size = Math.Max(size, 8192);
                     break;
                 case 160:
-                    size = Math.Min(size, 16384);
+                    size = Math.Max(size, 16384);
                     break;
             }
             return size;

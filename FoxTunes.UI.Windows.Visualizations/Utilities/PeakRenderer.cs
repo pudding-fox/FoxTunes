@@ -1,15 +1,19 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
     public class PeakRenderer : VisualizationBase
     {
+        const int MARGIN = 1;
+
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
             "Orientation",
             typeof(Orientation),
@@ -203,25 +207,7 @@ namespace FoxTunes
                 }
                 if (data.PeakElements != null)
                 {
-                    var duration = Convert.ToInt32(
-                        Math.Min(
-                            (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
-                            this.UpdateInterval * 100
-                        )
-                    );
-                    if (data.RmsElements != null)
-                    {
-                        var elements = new[]
-                        {
-                            data.ValueElements,
-                            data.RmsElements
-                        };
-                        UpdateElementsSmooth(elements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, data.Orientation);
-                    }
-                    else
-                    {
-                        UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, data.Orientation);
-                    }
+                    UpdatePeaks(data, this.UpdateInterval, this.HoldInterval.Value);
                 }
                 data.LastUpdated = DateTime.UtcNow;
 
@@ -373,20 +359,59 @@ namespace FoxTunes
 
         private static void UpdateElementsFast(PeakRendererData data)
         {
-            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, data.Orientation);
+            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, data.Orientation);
+                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, MARGIN, data.Orientation);
             }
         }
 
         private static void UpdateElementsSmooth(PeakRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Orientation);
+            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Orientation);
+                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, MARGIN, data.Orientation);
             }
+        }
+
+        private static void UpdatePeaks(PeakRendererData data, int updateInterval, int holdInterval)
+        {
+            if (data.RmsElements != null)
+            {
+                for (var a = 0; a < data.Peaks.Length; a++)
+                {
+                    if (data.Orientation == Orientation.Horizontal)
+                    {
+                        data.Peaks[a] = Math.Max(data.ValueElements[a].Width, data.RmsElements[a].Width);
+                    }
+                    else if (data.Orientation == Orientation.Vertical)
+                    {
+                        data.Peaks[a] = Math.Max(data.ValueElements[a].Y, data.RmsElements[a].Y);
+                    }
+                }
+            }
+            else
+            {
+                for (var a = 0; a < data.Peaks.Length; a++)
+                {
+                    if (data.Orientation == Orientation.Horizontal)
+                    {
+                        data.Peaks[a] = data.ValueElements[a].Width;
+                    }
+                    else if (data.Orientation == Orientation.Vertical)
+                    {
+                        data.Peaks[a] = data.ValueElements[a].Y;
+                    }
+                }
+            }
+            var duration = Convert.ToInt32(
+                Math.Min(
+                    (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
+                    updateInterval * 100
+                )
+            );
+            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, data.Orientation);
         }
 
         public static PeakRendererData Create(PeakRenderer renderer, int width, int height, Orientation orientation)
@@ -400,7 +425,6 @@ namespace FoxTunes
             };
             return data;
         }
-
         public class PeakRendererData
         {
             public PeakRenderer Renderer;
@@ -434,6 +458,8 @@ namespace FoxTunes
             public Int32Rect[] RmsElements;
 
             public Int32Rect[] PeakElements;
+
+            public int[] Peaks;
 
             public int[] Holds;
 
@@ -508,8 +534,9 @@ namespace FoxTunes
                 }
                 if (this.Renderer.ShowPeaks.Value)
                 {
-                    this.PeakElements = CreatePeaks(channels);
+                    this.Peaks = new int[channels];
                     this.Holds = new int[channels];
+                    this.PeakElements = CreatePeaks(channels);
                 }
             }
 

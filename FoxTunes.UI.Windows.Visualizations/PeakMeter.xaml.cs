@@ -24,10 +24,14 @@ namespace FoxTunes
                 if (ratio > 1)
                 {
                     orientation = Orientation.Horizontal;
+                    this.MinWidth = 160;
+                    this.MinHeight = 30;
                 }
                 else
                 {
                     orientation = Orientation.Vertical;
+                    this.MinWidth = 30;
+                    this.MinHeight = 160;
                 }
                 var viewModel = this.FindResource<global::FoxTunes.ViewModel.PeakMeter>("ViewModel");
                 if (viewModel != null && viewModel.Orientation != orientation)

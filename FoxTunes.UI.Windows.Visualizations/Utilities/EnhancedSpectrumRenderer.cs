@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -10,6 +11,8 @@ namespace FoxTunes
 {
     public class EnhancedSpectrumRenderer : VisualizationBase
     {
+        const int MARGIN = 1;
+
         public SpectrumRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Bands { get; private set; }
@@ -188,25 +191,7 @@ namespace FoxTunes
                     }
                     if (data.PeakElements != null)
                     {
-                        var duration = Convert.ToInt32(
-                            Math.Min(
-                                (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
-                                this.UpdateInterval * 100
-                            )
-                        );
-                        if (data.RmsElements != null)
-                        {
-                            var elements = new[]
-                            {
-                                data.ValueElements,
-                                data.RmsElements
-                            };
-                            UpdateElementsSmooth(elements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
-                        }
-                        else
-                        {
-                            UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
-                        }
+                        UpdatePeaks(data, this.UpdateInterval, this.HoldInterval.Value);
                     }
                     data.LastUpdated = DateTime.UtcNow;
                 }
@@ -226,8 +211,9 @@ namespace FoxTunes
 
         protected override int GetPixelWidth(double width)
         {
+            var min = EnhancedSpectrumBehaviourConfiguration.GetWidth(this.Bands.Value);
             var bands = EnhancedSpectrumBehaviourConfiguration.GetBands(this.Bands.Value);
-            return base.GetPixelWidth(bands.Length * (Convert.ToInt32(width) / bands.Length));
+            return base.GetPixelWidth(Math.Max(bands.Length * (Convert.ToInt32(width) / bands.Length), min));
         }
 
         protected override void OnDisposing()
@@ -287,16 +273,17 @@ namespace FoxTunes
                     {
                         max = Math.Max(max, rmsElements[a].Y);
                     }
-                    if (peakElements[a].Y < max)
+                    if (peakElements[a].Y >= max)
                     {
-                        BitmapHelper.DrawRectangle(
-                            ref valueRenderInfo,
-                            peakElements[a].X,
-                            peakElements[a].Y,
-                            peakElements[a].Width,
-                            peakElements[a].Height
-                        );
+                        continue;
                     }
+                    BitmapHelper.DrawRectangle(
+                        ref valueRenderInfo,
+                        peakElements[a].X,
+                        peakElements[a].Y,
+                        peakElements[a].Width,
+                        peakElements[a].Height
+                    );
                 }
             }
 
@@ -411,15 +398,40 @@ namespace FoxTunes
 
         private static void UpdateElementsFast(SpectrumRendererData data)
         {
-            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, Orientation.Vertical);
+            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, Orientation.Vertical);
+                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
                 UpdateCrestPointsFast(data.Values, data.Rms, data.CrestPoints, data.Width, data.Height);
             }
+        }
+
+        private static void UpdatePeaks(SpectrumRendererData data, int updateInterval, int holdInterval)
+        {
+            if (data.RmsElements != null)
+            {
+                for (var a = 0; a < data.Peaks.Length; a++)
+                {
+                    data.Peaks[a] = Math.Max(data.ValueElements[a].Y, data.RmsElements[a].Y);
+                }
+            }
+            else
+            {
+                for (var a = 0; a < data.Peaks.Length; a++)
+                {
+                    data.Peaks[a] = data.ValueElements[a].Y;
+                }
+            }
+            var duration = Convert.ToInt32(
+                Math.Min(
+                    (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
+                    updateInterval * 100
+                )
+            );
+            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, Orientation.Vertical);
         }
 
         private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, int width, int height)
@@ -454,10 +466,10 @@ namespace FoxTunes
 
         private static void UpdateElementsSmooth(SpectrumRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, Orientation.Vertical);
+            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, Orientation.Vertical);
+                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
@@ -523,8 +535,9 @@ namespace FoxTunes
             }
             if (showPeaks)
             {
-                data.PeakElements = CreatePeaks(bands.Length);
+                data.Peaks = new int[bands.Length];
                 data.Holds = new int[bands.Length];
+                data.PeakElements = CreatePeaks(bands.Length);
             }
             return data;
         }
@@ -580,6 +593,8 @@ namespace FoxTunes
             public Int32Point[] CrestPoints;
 
             public Int32Rect[] PeakElements;
+
+            public int[] Peaks;
 
             public int[] Holds;
 

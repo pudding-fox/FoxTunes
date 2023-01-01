@@ -1,9 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -11,6 +11,8 @@ namespace FoxTunes
 {
     public class SpectrumRenderer : VisualizationBase
     {
+        const int MARGIN = 0;
+
         public SpectrumRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Bars { get; private set; }
@@ -87,7 +89,7 @@ namespace FoxTunes
                 width,
                 height,
                 SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
-                VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
+                SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value, this.Bars.Value),
                 this.ShowPeaks.Value,
                 SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color),
                 this.CutOff.Value,
@@ -170,21 +172,15 @@ namespace FoxTunes
                 UpdateValues(data);
                 if (!data.LastUpdated.Equals(default(DateTime)))
                 {
-                    UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, Orientation.Vertical);
+                    UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
                 }
                 else
                 {
-                    UpdateElementsFast(data.Values, data.Elements, data.Width, data.Height, Orientation.Vertical);
+                    UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
                 }
                 if (data.Peaks != null)
                 {
-                    var duration = Convert.ToInt32(
-                        Math.Min(
-                            (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
-                            this.UpdateInterval * 100
-                        )
-                    );
-                    UpdateElementsSmooth(data.Elements, data.Peaks, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
+                    UpdatePeaks(data, this.UpdateInterval, this.HoldInterval.Value);
                 }
                 data.LastUpdated = DateTime.UtcNow;
 
@@ -203,8 +199,9 @@ namespace FoxTunes
 
         protected override int GetPixelWidth(double width)
         {
+            var min = SpectrumBehaviourConfiguration.GetWidth(this.Bars.Value);
             var bars = SpectrumBehaviourConfiguration.GetBars(this.Bars.Value);
-            return base.GetPixelWidth(bars * (Convert.ToInt32(width) / bars));
+            return base.GetPixelWidth(Math.Max(bars * (Convert.ToInt32(width) / bars), min));
         }
 
         protected override void OnDisposing()
@@ -238,8 +235,8 @@ namespace FoxTunes
 
         private static void Render(BitmapHelper.RenderInfo info, SpectrumRendererData data)
         {
-            var elements = data.Elements;
-            var peaks = data.Peaks;
+            var valueElements = data.ValueElements;
+            var peakElements = data.PeakElements;
 
             BitmapHelper.Clear(ref info);
 
@@ -255,22 +252,22 @@ namespace FoxTunes
                 return;
             }
 
-            BitmapHelper.DrawRectangles(ref info, elements, elements.Length);
+            BitmapHelper.DrawRectangles(ref info, valueElements, valueElements.Length);
 
-            if (peaks != null)
+            if (peakElements != null)
             {
-                for (var a = 0; a < elements.Length; a++)
+                for (var a = 0; a < valueElements.Length; a++)
                 {
-                    if (peaks[a].Y >= elements[a].Y)
+                    if (peakElements[a].Y >= valueElements[a].Y)
                     {
                         continue;
                     }
                     BitmapHelper.DrawRectangle(
                         ref info,
-                        peaks[a].X,
-                        peaks[a].Y,
-                        peaks[a].Width,
-                        peaks[a].Height
+                        peakElements[a].X,
+                        peakElements[a].Y,
+                        peakElements[a].Width,
+                        peakElements[a].Height
                     );
                 }
             }
@@ -322,6 +319,21 @@ namespace FoxTunes
             }
         }
 
+        private static void UpdatePeaks(SpectrumRendererData data, int updateInterval, int holdInterval)
+        {
+            for (var a = 0; a < data.Peaks.Length; a++)
+            {
+                data.Peaks[a] = data.ValueElements[a].Y;
+            }
+            var duration = Convert.ToInt32(
+                Math.Min(
+                    (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
+                    updateInterval * 100
+                )
+            );
+            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, Orientation.Vertical);
+        }
+
         public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff, float preAmp)
         {
             if (count > width)
@@ -342,12 +354,13 @@ namespace FoxTunes
                 Colors = colors,
                 CutOff = cutOff,
                 PreAmp = preAmp,
-                Elements = new Int32Rect[count]
+                ValueElements = new Int32Rect[count]
             };
             if (showPeaks)
             {
-                data.Peaks = CreatePeaks(count);
+                data.Peaks = new int[count];
                 data.Holds = new int[count];
+                data.PeakElements = CreatePeaks(count);
             }
             return data;
         }
@@ -388,9 +401,11 @@ namespace FoxTunes
 
             public float PreAmp;
 
-            public Int32Rect[] Elements;
+            public Int32Rect[] ValueElements;
 
-            public Int32Rect[] Peaks;
+            public Int32Rect[] PeakElements;
+
+            public int[] Peaks;
 
             public int[] Holds;
 
