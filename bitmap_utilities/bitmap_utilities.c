@@ -134,6 +134,25 @@ BOOL WINAPI draw_horizontal_line(RenderInfo* info, INT32 color, INT32 x, INT32 y
 	return TRUE;
 }
 
+BOOL WINAPI draw_vertical_line(RenderInfo* info, INT32 color, INT32 x, INT32 y, INT32 height) {
+	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
+
+	//Set initial pixel.
+	if (!write_color(info->Palette, color, topLeft)) {
+		return FALSE;
+	}
+
+	INT32 position = 1;
+	BYTE* linePosition = topLeft + info->Stride;
+	for (position = 1; position <= height;)
+	{
+		memcpy(linePosition, topLeft, info->BytesPerPixel);
+		linePosition += info->Stride;
+	}
+
+	return TRUE;
+}
+
 BOOL WINAPI draw_vertical_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BOOL result = TRUE;
 	for (INT32 position = 0; position < height; position++) {
@@ -144,7 +163,12 @@ BOOL WINAPI draw_vertical_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y,
 }
 
 BOOL WINAPI draw_horizontal_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
-	return FALSE;
+	BOOL result = TRUE;
+	for (INT32 position = 0; position < width; position++) {
+		INT32 color = (INT32)(((float)(x + position) / info->Width) * info->Palette->Count);
+		result &= draw_vertical_line(info, color, x + position, y, height);
+	}
+	return result;
 }
 
 BOOL WINAPI draw_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
