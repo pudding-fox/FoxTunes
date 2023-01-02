@@ -35,7 +35,7 @@ namespace FoxTunes
                 .WithElement(new IntegerConfigurationElement(RESOLUTION_ELEMENT, Strings.WaveBarBehaviourConfiguration_Resolution, path: Strings.General_Advanced).WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.WaveBarBehaviourConfiguration_RMS).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(CACHE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cache, path: Strings.General_Advanced).WithValue(true))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.WaveBarBehaviourConfiguration_ColorPalette).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.WaveBarBehaviourConfiguration_ColorPalette).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(SECTION, RMS_ELEMENT, true))
                 .WithElement(new CommandConfigurationElement(CLEANUP_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cleanup, path: Strings.General_Advanced)
                     .WithHandler(() => WaveFormCache.Cleanup())
                     .DependsOn(SECTION, CACHE_ELEMENT)

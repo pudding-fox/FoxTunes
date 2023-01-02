@@ -1,11 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Markup;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -48,6 +47,8 @@ namespace FoxTunes
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public BooleanConfigurationElement ShowRms { get; private set; }
+
+        public TextConfigurationElement ColorPalette { get; private set; }
 
         public Orientation Orientation
         {
@@ -92,8 +93,13 @@ namespace FoxTunes
                 PeakMeterBehaviourConfiguration.SECTION,
                 PeakMeterBehaviourConfiguration.RMS
             );
+            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                PeakMeterBehaviourConfiguration.SECTION,
+                PeakMeterBehaviourConfiguration.COLOR_PALETTE
+            );
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
+            this.ColorPalette.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
         }
 
@@ -108,6 +114,7 @@ namespace FoxTunes
                 this,
                 width,
                 height,
+                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color),
                 this.Orientation
             );
             return true;
@@ -143,7 +150,18 @@ namespace FoxTunes
                 }
                 else
                 {
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Color));
+                    var flags = default(int);
+                    switch (this.Orientation)
+                    {
+                        default:
+                        case Orientation.Horizontal:
+                            flags = BitmapHelper.COLOR_FROM_X;
+                            break;
+                        case Orientation.Vertical:
+                            flags = BitmapHelper.COLOR_FROM_Y;
+                            break;
+                    }
+                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, data.Colors));
                 }
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
@@ -233,6 +251,10 @@ namespace FoxTunes
             if (this.ShowRms != null)
             {
                 this.ShowRms.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.ColorPalette != null)
+            {
+                this.ColorPalette.ValueChanged -= this.OnValueChanged;
             }
             base.OnDisposing();
         }
@@ -414,13 +436,14 @@ namespace FoxTunes
             UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, data.Orientation);
         }
 
-        public static PeakRendererData Create(PeakRenderer renderer, int width, int height, Orientation orientation)
+        public static PeakRendererData Create(PeakRenderer renderer, int width, int height, Color[] colors, Orientation orientation)
         {
             var data = new PeakRendererData()
             {
                 Renderer = renderer,
                 Width = width,
                 Height = height,
+                Colors = colors,
                 Orientation = orientation
             };
             return data;
@@ -432,6 +455,8 @@ namespace FoxTunes
             public int Width;
 
             public int Height;
+
+            public Color[] Colors;
 
             public Orientation Orientation;
 

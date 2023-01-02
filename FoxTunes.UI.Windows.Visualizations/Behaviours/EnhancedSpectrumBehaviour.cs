@@ -77,12 +77,15 @@ namespace FoxTunes
                     this.Rms.Name,
                     attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
-                yield return new InvocationComponent(
-                    CATEGORY,
-                    this.Crest.Id,
-                    this.Crest.Name,
-                    attributes: this.Crest.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                );
+                if (this.Rms.Value)
+                {
+                    yield return new InvocationComponent(
+                        CATEGORY,
+                        this.Crest.Id,
+                        this.Crest.Name,
+                        attributes: this.Crest.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    );
+                }
             }
         }
 

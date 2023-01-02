@@ -79,6 +79,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color Palette.
+        /// </summary>
+        internal static string EnhancedSpectrumBehaviourConfiguration_ColorPalette {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.ColorPalette", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Crest Factor.
         /// </summary>
         internal static string EnhancedSpectrumBehaviourConfiguration_Crest {
@@ -205,11 +214,47 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color Palette.
+        /// </summary>
+        internal static string PeakMeterBehaviourConfiguration_ColorPalette {
+            get {
+                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.ColorPalette", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hold Duration.
+        /// </summary>
+        internal static string PeakMeterBehaviourConfiguration_Hold {
+            get {
+                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Hold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Peak Meter.
         /// </summary>
         internal static string PeakMeterBehaviourConfiguration_Path {
             get {
                 return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Peaks.
+        /// </summary>
+        internal static string PeakMeterBehaviourConfiguration_Peaks {
+            get {
+                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Peaks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show RMS.
+        /// </summary>
+        internal static string PeakMeterBehaviourConfiguration_Rms {
+            get {
+                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Rms", resourceCulture);
             }
         }
         

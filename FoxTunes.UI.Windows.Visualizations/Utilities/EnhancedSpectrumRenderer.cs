@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
+        public TextConfigurationElement ColorPalette { get; private set; }
+
         public SelectionConfigurationElement FFTSize { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -50,6 +52,10 @@ namespace FoxTunes
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
                 EnhancedSpectrumBehaviourConfiguration.CREST_ELEMENT
             );
+            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.COLOR_PALETTE_ELEMENT
+            );
             this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
@@ -58,6 +64,7 @@ namespace FoxTunes
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
             this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
+            this.ColorPalette.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
         }
@@ -85,7 +92,8 @@ namespace FoxTunes
                 EnhancedSpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value),
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
-                this.ShowCrestFactor.Value
+                this.ShowCrestFactor.Value,
+                EnhancedSpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color)
             );
             return true;
         }
@@ -125,7 +133,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Color));
+                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(BitmapHelper.COLOR_FROM_Y, data.Colors));
                 }
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
@@ -229,6 +237,10 @@ namespace FoxTunes
             if (this.ShowCrestFactor != null)
             {
                 this.ShowCrestFactor.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.ColorPalette != null)
+            {
+                this.ColorPalette.ValueChanged -= this.OnValueChanged;
             }
             if (this.FFTSize != null)
             {
@@ -509,7 +521,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(EnhancedSpectrumRenderer renderer, int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest)
+        public static SpectrumRendererData Create(EnhancedSpectrumRenderer renderer, int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest, Color[] colors)
         {
             var data = new SpectrumRendererData()
             {
@@ -522,6 +534,7 @@ namespace FoxTunes
                 FFTSize = fftSize,
                 Samples = renderer.Output.GetBuffer(fftSize),
                 Values = new float[bands.Length],
+                Colors = colors,
                 ValueElements = new Int32Rect[bands.Length]
             };
             if (showRms)
@@ -585,6 +598,8 @@ namespace FoxTunes
             public int Width;
 
             public int Height;
+
+            public Color[] Colors;
 
             public Int32Rect[] ValueElements;
 
