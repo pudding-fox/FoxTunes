@@ -3,7 +3,6 @@ using System;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -89,7 +88,7 @@ namespace FoxTunes
                 width,
                 height,
                 SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
-                SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value, this.Bars.Value),
+                VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color),
                 this.CutOff.Value,
@@ -302,7 +301,7 @@ namespace FoxTunes
             }
             else
             {
-                var valuesPerSample = (float)data.Count / data.FFTRange;
+                var valuesPerSample = (float)data.Count / (data.FFTRange - 1);
                 for (var a = 0; a < data.Count; a++)
                 {
                     var value = samples[Convert.ToInt32(a / valuesPerSample)];

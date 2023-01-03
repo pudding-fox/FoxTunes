@@ -11,14 +11,21 @@ namespace FoxTunes
     {
         public const string CATEGORY = "3DF40656-FDD5-4B98-A25C-66DDFFD66CA0";
 
+        public IUserInterface UserInterface { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public SelectionConfigurationElement Bars { get; private set; }
 
         public BooleanConfigurationElement Peaks { get; private set; }
 
+        public IntegerConfigurationElement CutOff { get; private set; }
+
+        public SelectionConfigurationElement FFTSize { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.UserInterface = core.Components.UserInterface;
             this.Configuration = core.Components.Configuration;
             this.Bars = this.Configuration.GetElement<SelectionConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
@@ -27,6 +34,14 @@ namespace FoxTunes
             this.Peaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.PEAKS_ELEMENT
+            );
+            this.CutOff = this.Configuration.GetElement<IntegerConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.CUT_OFF_ELEMENT
+            );
+            this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
+               VisualizationBehaviourConfiguration.SECTION,
+               VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -74,6 +89,7 @@ namespace FoxTunes
                 if (bars != null)
                 {
                     this.Bars.Value = bars;
+                    this.CheckSettings();
                 }
             }
 
@@ -83,6 +99,28 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void CheckSettings()
+        {
+            var bars = SpectrumBehaviourConfiguration.GetBars(this.Bars.Value);
+            if (bars <= 128)
+            {
+                return;
+            }
+            if (this.CutOff.IsModified || this.FFTSize.IsModified)
+            {
+                return;
+            }
+            //Looks like we're using the default settings but a high count was selected, warn the user and present the settings.
+            this.UserInterface.Warn(Strings.SpectrumBehaviour_Warning);
+            var task = this.UserInterface.ShowSettings(
+                Strings.SpectrumBehaviourConfiguration_Path,
+                new[]
+                {
+                    SpectrumBehaviourConfiguration.SECTION
+                }
+            );
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

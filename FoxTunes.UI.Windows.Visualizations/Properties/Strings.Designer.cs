@@ -457,6 +457,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to High sample points (&gt;128) require either a higher FFT, lower cut off, or both. Check the settings..
+        /// </summary>
+        internal static string SpectrumBehaviour_Warning {
+            get {
+                return ResourceManager.GetString("SpectrumBehaviour.Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bars.
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Bars {

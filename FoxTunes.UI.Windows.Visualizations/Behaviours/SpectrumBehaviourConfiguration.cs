@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Windows.Media;
 
@@ -142,20 +141,6 @@ namespace FoxTunes
                 }
             }
             return new[] { color };
-        }
-
-        public static int GetFFTSize(SelectionConfigurationOption fftSize, SelectionConfigurationOption bars)
-        {
-            var size = VisualizationBehaviourConfiguration.GetFFTSize(fftSize);
-            var count = GetBars(bars);
-            //More bars requires more FFT bins, increase if required.
-            switch (count)
-            {
-                case 1024:
-                    size = Math.Max(size, 4096);
-                    break;
-            }
-            return size;
         }
     }
 }

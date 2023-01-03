@@ -249,6 +249,9 @@
   <data name="Spectrum.Name" xml:space="preserve">
     <value>Spectrum (Basic)</value>
   </data>
+  <data name="SpectrumBehaviour.Warning" xml:space="preserve">
+    <value>High sample points (&gt;128) require either a higher FFT, lower cut off, or both. Check the settings.</value>
+  </data>
   <data name="SpectrumBehaviourConfiguration.Bars" xml:space="preserve">
     <value>Bars</value>
   </data>
