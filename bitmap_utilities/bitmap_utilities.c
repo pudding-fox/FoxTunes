@@ -144,7 +144,7 @@ BOOL WINAPI draw_vertical_line(RenderInfo* info, INT32 color, INT32 x, INT32 y, 
 
 	INT32 position = 1;
 	BYTE* linePosition = topLeft + info->Stride;
-	for (position = 1; position <= height;)
+	for (position = 1; position < height; position++)
 	{
 		memcpy(linePosition, topLeft, info->BytesPerPixel);
 		linePosition += info->Stride;
