@@ -72,10 +72,10 @@ BOOL WINAPI draw_flat_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width,
 	//Fill first line by copying initial pixel.
 	INT32 position = 1;
 	BYTE* linePosition = topLeft + info->BytesPerPixel;
-	for (position = 1; position <= width;)
+	while (position < width)
 	{
 		//Double the number of pixels we copy until there isn't enough room.
-		if (position * 2 <= width)
+		if (position * 2 < width)
 		{
 			memcpy(linePosition, topLeft, position * info->BytesPerPixel);
 			linePosition += position * info->BytesPerPixel;
@@ -114,10 +114,10 @@ BOOL WINAPI draw_horizontal_line(RenderInfo* info, INT32 color, INT32 x, INT32 y
 
 	INT32 position = 1;
 	BYTE* linePosition = topLeft + info->BytesPerPixel;
-	for (position = 1; position <= width;)
+	while (position < width)
 	{
 		//Double the number of pixels we copy until there isn't enough room.
-		if (position * 2 <= width)
+		if (position * 2 < width)
 		{
 			memcpy(linePosition, topLeft, position * info->BytesPerPixel);
 			linePosition += position * info->BytesPerPixel;
@@ -144,10 +144,11 @@ BOOL WINAPI draw_vertical_line(RenderInfo* info, INT32 color, INT32 x, INT32 y, 
 
 	INT32 position = 1;
 	BYTE* linePosition = topLeft + info->Stride;
-	for (position = 1; position < height; position++)
+	while (position < height)
 	{
 		memcpy(linePosition, topLeft, info->BytesPerPixel);
 		linePosition += info->Stride;
+		position++;
 	}
 
 	return TRUE;
