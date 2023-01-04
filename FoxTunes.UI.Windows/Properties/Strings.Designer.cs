@@ -1186,6 +1186,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto.
+        /// </summary>
+        internal static string ThemeLoader_ColorPaletteAuto {
+            get {
+                return ResourceManager.GetString("ThemeLoader.ColorPaletteAuto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Container.
         /// </summary>
         internal static string UIComponentRole_Container {

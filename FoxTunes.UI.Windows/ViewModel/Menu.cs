@@ -253,7 +253,7 @@ namespace FoxTunes.ViewModel
                         continue;
                     }
                     var path = invocation.Path.Split(global::System.IO.Path.DirectorySeparatorChar, global::System.IO.Path.AltDirectorySeparatorChar);
-                    var children = this.GetItem(items, invocation, path).Children;
+                    var children = this.GetItem(items, component, invocation, path).Children;
                     if (item.Separator && children.LastOrDefault() != null)
                     {
                         children.Add(null);
@@ -262,6 +262,17 @@ namespace FoxTunes.ViewModel
                 }
             }
             return items;
+        }
+
+        public virtual IEnumerable<MenuItem> SortItems(IEnumerable<MenuItem> items)
+        {
+            //If there's only one component then return menu items in the order they were created.
+            var components = items.Select(item => item.Component).Distinct();
+            if (components.Count() <= 1)
+            {
+                return items;
+            }
+            return items.OrderBy(item => item.Invocation.Category).ThenBy(item => item.Invocation.Id);
         }
 
         protected virtual bool IncludeComponent(IInvocableComponent component)
@@ -291,18 +302,18 @@ namespace FoxTunes.ViewModel
             return true;
         }
 
-        protected virtual MenuItem GetItem(IList<MenuItem> items, IInvocationComponent invocation, string[] path)
+        protected virtual MenuItem GetItem(IList<MenuItem> items, IInvocableComponent component, IInvocationComponent invocation, string[] path)
         {
             var item = default(MenuItem);
             foreach (var segment in path)
             {
-                item = this.GetItem(items, invocation, segment);
+                item = this.GetItem(items, component, invocation, segment);
                 items = item.Children;
             }
             return item;
         }
 
-        protected virtual MenuItem GetItem(IList<MenuItem> items, IInvocationComponent invocation, string path)
+        protected virtual MenuItem GetItem(IList<MenuItem> items, IInvocableComponent component, IInvocationComponent invocation, string path)
         {
             foreach (var item in items)
             {
@@ -313,7 +324,7 @@ namespace FoxTunes.ViewModel
             }
             {
                 var item = new MenuItem(
-                    null,
+                    component,
                     new InvocationComponent(
                         invocation.Category,
                         invocation.Id,
@@ -337,7 +348,7 @@ namespace FoxTunes.ViewModel
                 item.Dispose();
             }
             this.Items.Clear();
-            foreach (var item in this.GetItems().OrderBy(item => item.Invocation.Category).ThenBy(item => item.Invocation.Id))
+            foreach (var item in this.SortItems(this.GetItems()))
             {
                 if (item.Separator && this.Items.Count > 0)
                 {

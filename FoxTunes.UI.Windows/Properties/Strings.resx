@@ -492,6 +492,9 @@
   <data name="TempoDialog.Name" xml:space="preserve">
     <value>Tempo</value>
   </data>
+  <data name="ThemeLoader.ColorPaletteAuto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
   <data name="UIComponentRole.Container" xml:space="preserve">
     <value>Container</value>
   </data>

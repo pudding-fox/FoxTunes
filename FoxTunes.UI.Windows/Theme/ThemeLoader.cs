@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -7,6 +8,8 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     public class ThemeLoader : StandardComponent
     {
+        public const string SELECT_COLOR_PALETTE_AUTO = "ZZZZ";
+
         private Lazy<ITheme> _Theme { get; set; }
 
         public ITheme Theme
@@ -83,6 +86,49 @@ namespace FoxTunes
             handler(this, EventArgs.Empty);
             this.ThemeChanged += handler;
             return this;
+        }
+
+        public IEnumerable<IInvocationComponent> SelectColorPalette(string category, TextConfigurationElement element)
+        {
+            foreach (var colorPalette in this.Theme.ColorPalettes)
+            {
+                yield return new InvocationComponent(
+                    category,
+                    colorPalette.Id,
+                    colorPalette.Name,
+                    path: element.Name,
+                    attributes: string.Equals(colorPalette.Value, element.Value, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+            }
+            yield return new InvocationComponent(
+                category,
+                SELECT_COLOR_PALETTE_AUTO,
+                Strings.ThemeLoader_ColorPaletteAuto,
+                path: element.Name,
+                attributes: (byte)((string.IsNullOrEmpty(element.Value) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+            );
+        }
+
+        public bool SelectColorPalette(TextConfigurationElement element, IInvocationComponent component)
+        {
+            if (string.Equals(element.Name, component.Path, StringComparison.OrdinalIgnoreCase))
+            {
+                foreach (var colorPalette in this.Theme.ColorPalettes)
+                {
+                    if (!string.Equals(colorPalette.Id, component.Id, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+                    element.Value = colorPalette.Value;
+                    return true;
+                }
+                if (string.Equals(component.Id, SELECT_COLOR_PALETTE_AUTO, StringComparison.OrdinalIgnoreCase))
+                {
+                    element.Value = string.Empty;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

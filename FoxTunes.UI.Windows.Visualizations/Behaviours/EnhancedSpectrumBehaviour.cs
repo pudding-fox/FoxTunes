@@ -11,6 +11,8 @@ namespace FoxTunes
     {
         public const string CATEGORY = "13FD94CF-9FBF-460F-9501-571BA7144DCF";
 
+        public ThemeLoader ThemeLoader { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public SelectionConfigurationElement Bands { get; private set; }
@@ -21,8 +23,11 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Crest { get; private set; }
 
+        public TextConfigurationElement ColorPalette { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.Configuration = core.Components.Configuration;
             this.Bands = this.Configuration.GetElement<SelectionConfigurationElement>(
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
@@ -39,6 +44,10 @@ namespace FoxTunes
             this.Crest = this.Configuration.GetElement<BooleanConfigurationElement>(
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
                 EnhancedSpectrumBehaviourConfiguration.CREST_ELEMENT
+            );
+            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.COLOR_PALETTE_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -64,6 +73,13 @@ namespace FoxTunes
                         path: this.Bands.Name,
                         attributes: this.Bands.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
+                }
+                if (!this.Rms.Value)
+                {
+                    foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
+                    {
+                        yield return component;
+                    }
                 }
                 yield return new InvocationComponent(
                     CATEGORY,
@@ -102,6 +118,10 @@ namespace FoxTunes
             else if (string.Equals(component.Id, this.Crest.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.Crest.Toggle();
+            }
+            else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
+            {
+                //Nothing to do.
             }
             else
             {
