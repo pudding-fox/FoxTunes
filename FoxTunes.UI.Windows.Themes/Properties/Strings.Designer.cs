@@ -63,6 +63,61 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string AdamantineTheme_ColorPalette_Default_Description {
+            get {
+                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Default.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string AdamantineTheme_ColorPalette_Default_Name {
+            get {
+                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Default.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #FFFFFFFF.
+        /// </summary>
+        internal static string AdamantineTheme_ColorPalette_Default_Value {
+            get {
+                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Default.Value", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AdamantineTheme_ColorPalette_Gradient1_Description {
+            get {
+                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Gradient1.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default (Gradient).
+        /// </summary>
+        internal static string AdamantineTheme_ColorPalette_Gradient1_Name {
+            get {
+                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Gradient1.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #00000000
+        ///100:#FFFFFFFF.
+        /// </summary>
+        internal static string AdamantineTheme_ColorPalette_Gradient1_Value {
+            get {
+                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Gradient1.Value", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string AdamantineTheme_Description {
             get {
                 return ResourceManager.GetString("AdamantineTheme.Description", resourceCulture);
@@ -84,6 +139,61 @@ namespace FoxTunes {
         internal static string AdamantineThemeConfiguration_ListRowShading {
             get {
                 return ResourceManager.GetString("AdamantineThemeConfiguration.ListRowShading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string ExpressionDarkTheme_ColorPalette_Default_Description {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Default.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string ExpressionDarkTheme_ColorPalette_Default_Name {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Default.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #FFFFFFFF.
+        /// </summary>
+        internal static string ExpressionDarkTheme_ColorPalette_Default_Value {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Default.Value", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string ExpressionDarkTheme_ColorPalette_Gradient1_Description {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Gradient1.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default (Gradient).
+        /// </summary>
+        internal static string ExpressionDarkTheme_ColorPalette_Gradient1_Name {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Gradient1.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #00000000
+        ///100:#FFFFFFFF.
+        /// </summary>
+        internal static string ExpressionDarkTheme_ColorPalette_Gradient1_Value {
+            get {
+                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Gradient1.Value", resourceCulture);
             }
         }
         
@@ -120,6 +230,61 @@ namespace FoxTunes {
         internal static string General_Advanced {
             get {
                 return ResourceManager.GetString("General.Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string SystemTheme_ColorPalette_Default_Description {
+            get {
+                return ResourceManager.GetString("SystemTheme.ColorPalette.Default.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string SystemTheme_ColorPalette_Default_Name {
+            get {
+                return ResourceManager.GetString("SystemTheme.ColorPalette.Default.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #FF9BDDFB.
+        /// </summary>
+        internal static string SystemTheme_ColorPalette_Default_Value {
+            get {
+                return ResourceManager.GetString("SystemTheme.ColorPalette.Default.Value", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string SystemTheme_ColorPalette_Gradient1_Description {
+            get {
+                return ResourceManager.GetString("SystemTheme.ColorPalette.Gradient1.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default (Gradient).
+        /// </summary>
+        internal static string SystemTheme_ColorPalette_Gradient1_Name {
+            get {
+                return ResourceManager.GetString("SystemTheme.ColorPalette.Gradient1.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #00000000
+        ///100:#FF9BDDFB.
+        /// </summary>
+        internal static string SystemTheme_ColorPalette_Gradient1_Value {
+            get {
+                return ResourceManager.GetString("SystemTheme.ColorPalette.Gradient1.Value", resourceCulture);
             }
         }
         

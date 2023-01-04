@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -54,22 +53,6 @@ namespace FoxTunes
             source.SetValue(BackgroundProperty, value);
         }
 
-        public static readonly DependencyProperty ForegroundProperty = Control.ForegroundProperty.AddOwner(
-            typeof(RendererBase),
-            new FrameworkPropertyMetadata(SystemColors.ControlTextBrush, FrameworkPropertyMetadataOptions.Inherits)
-        );
-
-
-        public Brush GetForeground(RendererBase source)
-        {
-            return (Brush)source.GetValue(ForegroundProperty);
-        }
-
-        public void SetForeground(RendererBase source, Brush value)
-        {
-            source.SetValue(ForegroundProperty, value);
-        }
-
         protected RendererBase(bool initialize = true)
         {
             if (initialize && Core.Instance != null)
@@ -87,18 +70,6 @@ namespace FoxTunes
             set
             {
                 SetBackground(this, value);
-            }
-        }
-
-        public Brush Foreground
-        {
-            get
-            {
-                return GetForeground(this);
-            }
-            set
-            {
-                SetForeground(this, value);
             }
         }
 
@@ -126,25 +97,32 @@ namespace FoxTunes
             }
         }
 
-        public Color Color
+        public Color[] Colors { get; private set; }
+
+        protected virtual void OnColorsChanged()
         {
-            get
-            {
-                if (this.Foreground is SolidColorBrush brush)
-                {
-                    return brush.Color;
-                }
-                return Colors.Transparent;
-            }
+            var task = this.CreateData();
         }
 
         public PixelSizeConverter PixelSizeConverter { get; private set; }
+
+        public ThemeLoader ThemeLoader { get; private set; }
 
         public IOutput Output { get; private set; }
 
         public virtual void InitializeComponent(ICore core)
         {
             this.PixelSizeConverter = ComponentRegistry.Instance.GetComponent<PixelSizeConverter>();
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            this.ThemeLoader.ConnectTheme(theme =>
+            {
+                var raise = this.Colors != null;
+                this.Colors = theme.ColorPalettes.First().Value.ToColorStops().ToGradient();
+                if (raise)
+                {
+                    this.OnColorsChanged();
+                }
+            });
             this.Output = core.Components.Output;
         }
 

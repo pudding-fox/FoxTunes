@@ -93,7 +93,7 @@ namespace FoxTunes
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
-                EnhancedSpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color)
+                EnhancedSpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors)
             );
             return true;
         }
@@ -123,12 +123,12 @@ namespace FoxTunes
                 }
                 if (data.RmsElements != null)
                 {
-                    var colors = this.Color.ToPair(SHADE);
+                    var colors = data.Colors[0].ToPair(SHADE);
                     valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
                     rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[1]));
                     if (data.CrestPoints != null)
                     {
-                        crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, Colors.Red));
+                        crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, global::System.Windows.Media.Colors.Red));
                     }
                 }
                 else

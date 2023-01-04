@@ -122,7 +122,7 @@ namespace FoxTunes
                 return false;
             }
             var mode = WaveBarBehaviourConfiguration.GetMode(this.Mode.Value);
-            var colors = WaveBarBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color);
+            var colors = WaveBarBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
             switch (mode)
             {
                 default:
@@ -172,7 +172,7 @@ namespace FoxTunes
                 }
                 if (data.PowerElements != null)
                 {
-                    var colors = this.Color.ToPair(SHADE);
+                    var colors = data.Colors[0].ToPair(SHADE);
                     waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
                     powerRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[1]));
                 }

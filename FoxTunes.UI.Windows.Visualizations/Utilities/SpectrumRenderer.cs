@@ -90,7 +90,7 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
-                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color),
+                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors),
                 this.CutOff.Value,
                 1.0f + FromDecibel(this.PreAmp.Value)
             );
