@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -44,19 +45,32 @@ namespace FoxTunes
                     return;
                 }
                 viewModel.Configuration = value;
-                if (viewModel.Configuration != null)
+                if (viewModel.Configuration == null)
                 {
-                    if (!viewModel.Bounds.IsEmpty)
-                    {
-                        if (ScreenHelper.WindowBoundsVisible(viewModel.Bounds))
-                        {
-                            this.Left = viewModel.Bounds.Left;
-                            this.Top = viewModel.Bounds.Top;
-                        }
-                        this.Width = viewModel.Bounds.Width;
-                        this.Height = viewModel.Bounds.Height;
-                    }
+                    return;
                 }
+                this.UpdateBounds(viewModel.Bounds);
+            }
+        }
+
+        protected virtual void UpdateBounds(Rect bounds)
+        {
+            if (bounds.IsEmpty)
+            {
+                return;
+            }
+            if (bounds.Left != 0 && bounds.Right != 0 && ScreenHelper.WindowBoundsVisible(bounds))
+            {
+                this.Left = bounds.Left;
+                this.Top = bounds.Top;
+            }
+            if (bounds.Width > 0)
+            {
+                this.Width = bounds.Width;
+            }
+            if (bounds.Height > 0)
+            {
+                this.Height = bounds.Height;
             }
         }
 
