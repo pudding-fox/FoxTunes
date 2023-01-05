@@ -117,67 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AdamantineTheme.ColorPalette.Default.Description" xml:space="preserve">
-    <value />
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Blue" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\blue.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="AdamantineTheme.ColorPalette.Default.Name" xml:space="preserve">
-    <value>Default</value>
+  <data name="Transparent_Blue" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\transparent_blue.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="AdamantineTheme.ColorPalette.Gradient1.Description" xml:space="preserve">
-    <value />
+  <data name="Transparent_White" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\transparent_white.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="AdamantineTheme.ColorPalette.Gradient1.Name" xml:space="preserve">
-    <value>Default (Gradient)</value>
-  </data>
-  <data name="AdamantineTheme.Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="AdamantineTheme.Name" xml:space="preserve">
-    <value>Adamantine</value>
-  </data>
-  <data name="AdamantineThemeConfiguration.ListRowShading" xml:space="preserve">
-    <value>List Row Shading</value>
-  </data>
-  <data name="ExpressionDarkTheme.ColorPalette.Default.Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ExpressionDarkTheme.ColorPalette.Default.Name" xml:space="preserve">
-    <value>Default</value>
-  </data>
-  <data name="ExpressionDarkTheme.ColorPalette.Gradient1.Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ExpressionDarkTheme.ColorPalette.Gradient1.Name" xml:space="preserve">
-    <value>Default (Gradient)</value>
-  </data>
-  <data name="ExpressionDarkTheme.Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ExpressionDarkTheme.Name" xml:space="preserve">
-    <value>Expression Dark</value>
-  </data>
-  <data name="ExpressionDarkThemeConfiguration.ListRowShading" xml:space="preserve">
-    <value>List Row Shading</value>
-  </data>
-  <data name="General.Advanced" xml:space="preserve">
-    <value>Advanced</value>
-  </data>
-  <data name="SystemTheme.ColorPalette.Default.Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="SystemTheme.ColorPalette.Default.Name" xml:space="preserve">
-    <value>Default</value>
-  </data>
-  <data name="SystemTheme.ColorPalette.Gradient1.Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="SystemTheme.ColorPalette.Gradient1.Name" xml:space="preserve">
-    <value>Default (Gradient)</value>
-  </data>
-  <data name="SystemTheme.Description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="SystemTheme.Name" xml:space="preserve">
-    <value>System</value>
+  <data name="White" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\white.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

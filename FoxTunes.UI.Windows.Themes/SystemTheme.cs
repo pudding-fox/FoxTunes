@@ -47,14 +47,14 @@ namespace FoxTunes
                     ColorPaletteRole.Visualization,
                     Strings.SystemTheme_ColorPalette_Default_Name,
                     Strings.SystemTheme_ColorPalette_Default_Description,
-                    Strings.SystemTheme_ColorPalette_Default_Value
+                    Resources.Blue
                 ),
                 new ColorPalette(
                     ID + "_BBBB",
                     ColorPaletteRole.Visualization,
                     Strings.SystemTheme_ColorPalette_Gradient1_Name,
                     Strings.SystemTheme_ColorPalette_Gradient1_Description,
-                    Strings.SystemTheme_ColorPalette_Gradient1_Value
+                    Resources.Transparent_Blue
                 ),
             };
         }
