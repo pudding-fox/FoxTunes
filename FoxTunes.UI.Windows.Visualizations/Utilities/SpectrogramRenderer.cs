@@ -9,6 +9,14 @@ namespace FoxTunes
 {
     public class SpectrogramRenderer : VisualizationBase
     {
+        protected override bool LoadColorPalette
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public SpectrogramRendererData RendererData { get; private set; }
 
         public SpectrogramRendererHistory RendererHistory { get; private set; }

@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -110,11 +111,16 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
+            var colors = this.ShowRms.Value ? this.Colors : PeakMeterBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
+            if (this.Orientation == Orientation.Horizontal && colors.Length > 1)
+            {
+                Array.Reverse(colors);
+            }
             this.RendererData = Create(
                 this,
                 width,
                 height,
-                PeakMeterBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors),
+                colors,
                 this.Orientation
             );
             return true;
