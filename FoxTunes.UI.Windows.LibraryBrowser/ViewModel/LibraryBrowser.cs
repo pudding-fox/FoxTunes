@@ -31,6 +31,10 @@ namespace FoxTunes.ViewModel
             }
             set
             {
+                if (object.ReferenceEquals(this._Frames, value))
+                {
+                    return;
+                }
                 this.OnFramesChanging();
                 this._Frames = value;
                 this.OnFramesChanged();
@@ -76,7 +80,7 @@ namespace FoxTunes.ViewModel
         {
             if (this.IsInitialized)
             {
-                this.Dispatch(this.Reload);
+                this.Debouncer.Exec(this.Reload);
             }
             if (this.TileSizeChanged != null)
             {
@@ -104,6 +108,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnViewModeChanged()
         {
+            if (this.IsInitialized)
+            {
+                this.Debouncer.Exec(this.Reload);
+            }
             if (this.ViewModeChanged != null)
             {
                 this.ViewModeChanged(this, EventArgs.Empty);
@@ -130,6 +138,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnImageModeChanged()
         {
+            if (this.IsInitialized)
+            {
+                this.Debouncer.Exec(this.Reload);
+            }
             if (this.ImageModeChanged != null)
             {
                 this.ImageModeChanged(this, EventArgs.Empty);
@@ -235,10 +247,13 @@ namespace FoxTunes.ViewModel
                 try
                 {
                     await base.Refresh().ConfigureAwait(false);
-                    await this.Synchronize(new List<LibraryBrowserFrame>()
+                    if (!this.IsReloading)
                     {
-                        new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                    }).ConfigureAwait(false);
+                        await this.Synchronize(new List<LibraryBrowserFrame>()
+                        {
+                            new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+                        }).ConfigureAwait(false);
+                    }
                 }
                 finally
                 {
@@ -263,10 +278,13 @@ namespace FoxTunes.ViewModel
             try
             {
                 await base.Reload().ConfigureAwait(false);
-                await this.Synchronize(new List<LibraryBrowserFrame>()
+                if (!this.IsRefreshing)
                 {
-                    new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                }).ConfigureAwait(false);
+                    await this.Synchronize(new List<LibraryBrowserFrame>()
+                    {
+                        new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+                    }).ConfigureAwait(false);
+                }
             }
             finally
             {

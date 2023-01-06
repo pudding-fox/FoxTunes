@@ -85,6 +85,11 @@ namespace FoxTunes
 
         public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
         {
+            //We only support caching for compound images.
+            if (this.ImageMode != LibraryBrowserImageMode.Compound)
+            {
+                cache = false;
+            }
             try
             {
                 if (cache)
