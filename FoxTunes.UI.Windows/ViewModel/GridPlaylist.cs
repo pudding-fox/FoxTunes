@@ -20,6 +20,11 @@ namespace FoxTunes.ViewModel
 
         public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
 
+#if NET40
+#else
+        public IConfiguration Configuration { get; private set; }
+#endif
+
         private bool _GroupingEnabled { get; set; }
 
         public bool GroupingEnabled
@@ -191,6 +196,7 @@ namespace FoxTunes.ViewModel
 #if NET40
             //ListView grouping is too slow under net40 due to lack of virtualization.
 #else
+            this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 PlaylistBehaviourConfiguration.SECTION,
                 PlaylistGroupingBehaviourConfiguration.GROUP_ENABLED_ELEMENT
