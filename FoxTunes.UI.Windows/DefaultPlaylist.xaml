@@ -38,7 +38,6 @@
                   Windows:ListViewExtensions.GroupStyle="{Binding GroupingEnabled, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.GroupScript="{Binding GroupingScript, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.AutoSizeColumns="True"
-                  Windows:FrameworkElementExtensions.IsVirtualizing="{Binding IsVirtualizing, Source={StaticResource ViewModel}}"
                   GridViewColumnHeader.Click="OnHeaderClick"
                   SelectionChanged="OnSelectionChanged">
             <ListView.Resources>
