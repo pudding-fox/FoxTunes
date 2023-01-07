@@ -1,8 +1,10 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace FoxTunes
 {
@@ -49,6 +51,7 @@ namespace FoxTunes
             {
                 this.TreeView = treeView;
                 this.TreeView.SelectedItemChanged += this.OnSelectedItemChanged;
+                this.TreeView.ItemContainerGenerator.StatusChanged += this.OnStatusChanged;
             }
 
             public TreeView TreeView { get; private set; }
@@ -69,6 +72,24 @@ namespace FoxTunes
                     {
                         this.Select(hierarchical);
                     }
+                }
+            }
+
+            protected virtual void Select()
+            {
+                var selectedItem = GetSelectedItem(this.TreeView);
+                //TODO: This shouldn't be here...
+                if (LibraryHierarchyNode.Empty.Equals(selectedItem))
+                {
+                    return;
+                }
+                if (object.ReferenceEquals(this.SelectedItem, selectedItem))
+                {
+                    return;
+                }
+                if (selectedItem is IHierarchical hierarchical)
+                {
+                    this.Select(hierarchical);
                 }
             }
 
@@ -142,9 +163,11 @@ namespace FoxTunes
                     var scrollViewer = items.FindChild<ScrollViewer>();
                     if (scrollViewer != null)
                     {
-                        scrollViewer.ScrollToItemOffset<TreeViewItem>(index);
-                        items.UpdateLayout();
-                        item = items.ItemContainerGenerator.ContainerFromItem(value) as TreeViewItem;
+                        if (scrollViewer.ScrollToItemOffset<TreeViewItem>(index, this.OnItemLoaded))
+                        {
+                            items.UpdateLayout();
+                            item = items.ItemContainerGenerator.ContainerFromItem(value) as TreeViewItem;
+                        }
                     }
                 }
                 return item;
@@ -159,11 +182,29 @@ namespace FoxTunes
                 SetSelectedItem(this.TreeView, this.TreeView.SelectedItem);
             }
 
+            protected virtual void OnStatusChanged(object sender, EventArgs e)
+            {
+                if (this.TreeView.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
+                {
+                    return;
+                }
+                this.Select();
+            }
+
+            protected virtual void OnItemLoaded(object sender, RoutedEventArgs e)
+            {
+                this.Select();
+            }
+
             protected override void OnDisposing()
             {
                 if (this.TreeView != null)
                 {
                     this.TreeView.SelectedItemChanged -= this.OnSelectedItemChanged;
+                    if (this.TreeView.ItemContainerGenerator != null)
+                    {
+                        this.TreeView.ItemContainerGenerator.StatusChanged -= this.OnStatusChanged;
+                    }
                 }
                 base.OnDisposing();
             }
