@@ -16,6 +16,14 @@ namespace FoxTunes.ViewModel
             this.InitializeComponent(Core.Instance);
         }
 
+        public bool Supported
+        {
+            get
+            {
+                return ComponentResolver.Instance.Enabled;
+            }
+        }
+
         public ObservableCollection<Plugin> Items { get; private set; }
 
         public IUserInterface UserInterface { get; private set; }
@@ -29,7 +37,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            if (!ComponentResolver.Instance.Enabled)
+            if (!this.Supported)
             {
                 return;
             }
@@ -41,16 +49,12 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(this.Save);
+                return CommandFactory.Instance.CreateCommand(this.Save, () => this.Supported);
             }
         }
 
         public void Save()
         {
-            if (!ComponentResolver.Instance.Enabled)
-            {
-                return;
-            }
             foreach (var plugin in this.Items)
             {
                 if (plugin.Components.Count <= 1 || plugin.SelectedComponent == null)
@@ -69,7 +73,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(this.Cancel);
+                return CommandFactory.Instance.CreateCommand(this.Cancel, () => this.Supported);
             }
         }
 
