@@ -6,11 +6,11 @@ namespace FoxTunes
     /// Interaction logic for LibraryBrowser.xaml
     /// </summary>
     [UIComponent(ID, role: UIComponentRole.Library)]
-    public partial class LibraryBrowser : LibraryBrowserBase
+    public partial class LibraryList : LibraryBrowserBase
     {
-        public const string ID = "FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3";
+        public const string ID = "435999ED-83D7-45AF-9CBF-A99DBE842EB3";
 
-        public LibraryBrowser()
+        public LibraryList()
         {
             this.InitializeComponent();
         }

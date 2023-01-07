@@ -44,6 +44,10 @@
     <SolidColorBrush x:Key="PressedBorderBrush" Color="{StaticResource PressBorderColor}" />
     <SolidColorBrush x:Key="SelectedBrush" Color="{StaticResource SelectColor}" />
 
+    <!-- TODO: Looks like some styles reference these brushes by name, they are duplicated as ControlBorderBrush and ControlBrush. -->
+    <SolidColorBrush x:Key="SolidBorderBrush" Color="{StaticResource ControlBorderColor}" />
+    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{StaticResource ControlColor}" />
+
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
     <BorderGapMaskConverter x:Key="BorderGapMaskConverter" />
 
