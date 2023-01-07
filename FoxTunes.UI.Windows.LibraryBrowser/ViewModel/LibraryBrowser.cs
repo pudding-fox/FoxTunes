@@ -12,13 +12,6 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowser : LibraryBase
     {
-        public LibraryBrowser()
-        {
-            this.Semaphore = new SemaphoreSlim(1, 1);
-        }
-
-        public SemaphoreSlim Semaphore { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         private ObservableCollection<LibraryBrowserFrame> _Frames { get; set; }
@@ -191,8 +184,6 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public bool IsRefreshing { get; private set; }
-
         protected virtual Task Refresh(IEnumerable<IFileData> fileDatas, IEnumerable<string> names, MetaDataUpdateType updateType)
         {
             if (updateType == MetaDataUpdateType.System)
@@ -231,57 +222,22 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        public override Task Refresh()
+        protected override async Task OnRefresh()
         {
-            var task = new Func<Task>(async () =>
+            await base.OnRefresh().ConfigureAwait(false);
+            await this.Synchronize(new List<LibraryBrowserFrame>()
             {
-                this.IsRefreshing = true;
-                try
-                {
-                    await base.Refresh().ConfigureAwait(false);
-                    if (!this.IsReloading)
-                    {
-                        await this.Synchronize(new List<LibraryBrowserFrame>()
-                        {
-                            new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                        }).ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    this.IsRefreshing = false;
-                }
-            });
-            if (this.IsInitialized && this.Items != null)
-            {
-                return this.Debouncer.Exec(task);
-            }
-            else
-            {
-                return task();
-            }
+                new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+            }).ConfigureAwait(false);
         }
-
-        public bool IsReloading { get; private set; }
 
         public override async Task Reload()
         {
-            this.IsReloading = true;
-            try
+            await base.Reload().ConfigureAwait(false);
+            await this.Synchronize(new List<LibraryBrowserFrame>()
             {
-                await base.Reload().ConfigureAwait(false);
-                if (!this.IsRefreshing)
-                {
-                    await this.Synchronize(new List<LibraryBrowserFrame>()
-                    {
-                        new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                    }).ConfigureAwait(false);
-                }
-            }
-            finally
-            {
-                this.IsReloading = false;
-            }
+                new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+            }).ConfigureAwait(false);
         }
 
         protected override void OnSelectedItemChanged(object sender, EventArgs e)
@@ -395,21 +351,9 @@ namespace FoxTunes.ViewModel
             return true;
         }
 
-        private async Task Synchronize()
+        private Task Synchronize()
         {
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
-            {
-                await this.Synchronize(this.Frames).ConfigureAwait(false);
-            }
-            finally
-            {
-                this.Semaphore.Release();
-            }
+            return this.Synchronize(this.Frames);
         }
 
         private async Task Synchronize(IList<LibraryBrowserFrame> frames)
@@ -457,15 +401,6 @@ namespace FoxTunes.ViewModel
             {
                 await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames)).ConfigureAwait(false);
             }
-        }
-
-        protected override void OnDisposing()
-        {
-            if (this.Semaphore != null)
-            {
-                this.Semaphore.Dispose();
-            }
-            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()
