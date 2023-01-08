@@ -20,7 +20,7 @@ namespace FoxTunes.ViewModel
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is LibraryHierarchyNode libraryHierarchyNode && !LibraryHierarchyNode.Empty.Equals(libraryHierarchyNode))
+            if (value is LibraryHierarchyNode libraryHierarchyNode)
             {
                 return new AsyncResult<IFileData>(this.Convert(libraryHierarchyNode));
             }

@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -54,25 +53,6 @@ namespace FoxTunes
 
         private class EnsureSelectedItemVisibleBehaviour : UIBehaviour
         {
-            private static readonly PropertyInfo ItemsHost = typeof(ItemsControl).GetProperty(
-                "ItemsHost",
-                BindingFlags.Instance | BindingFlags.NonPublic
-             );
-
-            private static readonly MethodInfo EnsureGenerator = typeof(Panel).GetMethod(
-                "EnsureGenerator",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-
-#if NET40
-
-            private static readonly MethodInfo BringIndexIntoView = typeof(VirtualizingPanel).GetMethod(
-                "BringIndexIntoView",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-
-#endif
-
             public EnsureSelectedItemVisibleBehaviour(ListBox listBox)
             {
                 this.ListBox = listBox;
@@ -83,63 +63,37 @@ namespace FoxTunes
 
             protected virtual void EnsureVisible(object value)
             {
-                //Try the easy method.
-                var item = this.ListBox.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
-                if (item == null)
+                if (value == null)
                 {
-                    //Looks like the item hasn't been generated.
-                    //Apply any templates we might need.
-                    if (this.ListBox.Template != null)
-                    {
-                        this.ListBox.ApplyTemplate();
-                        var presenter = this.ListBox.Template.FindName("ItemsHost", this.ListBox) as ItemsPresenter;
-                        if (presenter != null)
-                        {
-                            presenter.ApplyTemplate();
-                        }
-                    }
-                    //Update the layout and get the panel.
-                    this.ListBox.UpdateLayout();
-                    var panel = ItemsHost.GetValue(this.ListBox, null) as VirtualizingPanel;
-                    if (panel != null)
-                    {
-                        //Enssure the ItemContainerGenerator is constructed.
-                        EnsureGenerator.Invoke(panel, null);
-                        //Get the index of the value.
-                        var index = this.ListBox.Items.IndexOf(value);
-                        if (index < 0)
-                        {
-                            //There is no item corresponding to the current value.
-                            //Nothing can be done.
-                            return;
-                        }
-                        //Tell the panel to being the index into view.
-                        //This will create the item we're looking for.
-#if NET40
-                        BringIndexIntoView.Invoke(panel, new object[] { index });
-#else
-                        panel.BringIndexIntoViewPublic(index);
-#endif
-                    }
-                    //Try the easy method (again).
-                    item = this.ListBox.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
-                    if (item == null)
-                    {
-                        //Looks like the item hasn't been generated.
-                        //Nothing can be done.
-                        return;
-                    }
+                    return;
                 }
-
+                var index = this.ListBox.Items.IndexOf(value);
+                if (index < 0)
+                {
+                    return;
+                }
+                var item = this.ListBox.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
                 if (item != null)
                 {
-                    //Found the item, ensure it's visible.
                     item.BringIntoView();
                 }
                 else
                 {
-
+                    var scrollViewer = this.ListBox.FindChild<ScrollViewer>();
+                    if (scrollViewer != null)
+                    {
+                        if (scrollViewer.ScrollToItemOffset<ListBoxItem>(index, this.OnItemLoaded))
+                        {
+                            this.ListBox.UpdateLayout();
+                            item = this.ListBox.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
+                        }
+                    }
                 }
+            }
+
+            protected virtual void OnItemLoaded(object sender, RoutedEventArgs e)
+            {
+                this.EnsureVisible(this.ListBox.SelectedItem);
             }
 
             protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)

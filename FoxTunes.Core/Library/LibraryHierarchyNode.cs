@@ -7,7 +7,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [Table(Name = "LibraryHierarchyItems")]
-    public class LibraryHierarchyNode : PersistableComponent, ISelectable, IExpandable, IHierarchical
+    public class LibraryHierarchyNode : PersistableComponent, IExpandable, IHierarchical
     {
         public LibraryHierarchyNode()
         {
@@ -88,32 +88,6 @@ namespace FoxTunes
         }
 
         public event EventHandler IsExpandedChanged;
-
-        private bool _IsSelected { get; set; }
-
-        public bool IsSelected
-        {
-            get
-            {
-                return this._IsSelected;
-            }
-            set
-            {
-                this._IsSelected = value;
-                this.OnIsSelectedChanged();
-            }
-        }
-
-        protected virtual void OnIsSelectedChanged()
-        {
-            if (this.IsSelectedChanged != null)
-            {
-                this.IsSelectedChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsSelected");
-        }
-
-        public event EventHandler IsSelectedChanged;
 
         #region IHierarchical
 

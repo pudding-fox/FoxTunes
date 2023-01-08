@@ -201,6 +201,7 @@ namespace FoxTunes
             foreach (var libraryHierarchy in libraryHierarchies)
             {
                 this.RefreshSelectedItem(libraryHierarchy);
+                this.OnSelectedItemChanged();
             }
         }
 

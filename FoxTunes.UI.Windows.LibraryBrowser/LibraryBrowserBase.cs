@@ -91,11 +91,7 @@ namespace FoxTunes
                 return;
             }
             var viewModel = this.FindResource<global::FoxTunes.ViewModel.LibraryBrowser>("ViewModel");
-            if (viewModel == null)
-            {
-                return;
-            }
-            if (LibraryHierarchyNode.Empty.Equals(viewModel.SelectedItem))
+            if (viewModel == null || viewModel.SelectedItem == null)
             {
                 return;
             }

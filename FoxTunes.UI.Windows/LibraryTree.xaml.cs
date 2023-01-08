@@ -18,17 +18,14 @@ namespace FoxTunes
         protected virtual void DragSourceInitialized(object sender, TreeViewExtensions.DragSourceInitializedEventArgs e)
         {
             var viewModel = this.FindResource<global::FoxTunes.ViewModel.LibraryTree>("ViewModel");
-            if (viewModel != null)
+            if (viewModel == null || viewModel.SelectedItem == null)
             {
-                if (LibraryHierarchyNode.Empty.Equals(viewModel.SelectedItem))
-                {
-                    return;
-                }
-                //Only show adorners when hosted in main window.
-                if (this.IsHostedIn<MainWindow>() && viewModel.ShowCursorAdorners)
-                {
-                    this.MouseCursorAdorner.Show();
-                }
+                return;
+            }
+            //Only show adorners when hosted in main window.
+            if (this.IsHostedIn<MainWindow>() && viewModel.ShowCursorAdorners)
+            {
+                this.MouseCursorAdorner.Show();
             }
             try
             {
