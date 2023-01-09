@@ -21,7 +21,7 @@
             <ColumnDefinition x:Name="RightColumn" ></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <LocalWindows:UIComponentContainer x:Name="LeftContainer" Grid.Column="0" Component="{Binding LeftComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentVerticalSplitContainer}}}"></LocalWindows:UIComponentContainer>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
+        <GridSplitter x:Name="Splitter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
         <LocalWindows:UIComponentContainer x:Name="RightContainer" Grid.Column="2" Component="{Binding RightComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentVerticalSplitContainer}}}"></LocalWindows:UIComponentContainer>
     </Grid>
 </LocalWindows:UIComponentPanel>

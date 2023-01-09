@@ -21,7 +21,7 @@
             <RowDefinition x:Name="BottomRow" ></RowDefinition>
         </Grid.RowDefinitions>
         <LocalWindows:UIComponentContainer x:Name="TopContainer" Grid.Row="0" Component="{Binding TopComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></LocalWindows:UIComponentContainer>
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+        <GridSplitter x:Name="Splitter" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
         <LocalWindows:UIComponentContainer x:Name="BottomContainer" Grid.Row="2" Component="{Binding BottomComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentHorizontalSplitContainer}}}"></LocalWindows:UIComponentContainer>
     </Grid>
 </LocalWindows:UIComponentPanel>
