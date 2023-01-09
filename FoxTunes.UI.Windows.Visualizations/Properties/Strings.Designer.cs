@@ -72,63 +72,63 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Bands.
         /// </summary>
-        internal static string EnhancedSpectrumBehaviourConfiguration_Bands {
+        internal static string EnhancedSpectrumConfiguration_Bands {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Bands", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Bands", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Color Palette.
         /// </summary>
-        internal static string EnhancedSpectrumBehaviourConfiguration_ColorPalette {
+        internal static string EnhancedSpectrumConfiguration_ColorPalette {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.ColorPalette", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.ColorPalette", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Show Crest Factor.
         /// </summary>
-        internal static string EnhancedSpectrumBehaviourConfiguration_Crest {
+        internal static string EnhancedSpectrumConfiguration_Crest {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Crest", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Crest", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Hold Duration.
         /// </summary>
-        internal static string EnhancedSpectrumBehaviourConfiguration_Hold {
+        internal static string EnhancedSpectrumConfiguration_Hold {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Hold", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Hold", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
-        internal static string EnhancedSpectrumBehaviourConfiguration_Path {
+        internal static string EnhancedSpectrumConfiguration_Path {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Path", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
-        internal static string EnhancedSpectrumBehaviourConfiguration_Peaks {
+        internal static string EnhancedSpectrumConfiguration_Peaks {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Peaks", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Peaks", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Show RMS.
         /// </summary>
-        internal static string EnhancedSpectrumBehaviourConfiguration_Rms {
+        internal static string EnhancedSpectrumConfiguration_Rms {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Rms", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Rms", resourceCulture);
             }
         }
         
@@ -153,54 +153,54 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Drop Shadow.
         /// </summary>
-        internal static string OscilloscopeBehaviourConfiguration_DropShadow {
+        internal static string OscilloscopeConfiguration_DropShadow {
             get {
-                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.DropShadow", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeConfiguration.DropShadow", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Duration.
         /// </summary>
-        internal static string OscilloscopeBehaviourConfiguration_Duration {
+        internal static string OscilloscopeConfiguration_Duration {
             get {
-                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Duration", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeConfiguration.Duration", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mode.
         /// </summary>
-        internal static string OscilloscopeBehaviourConfiguration_Mode {
+        internal static string OscilloscopeConfiguration_Mode {
             get {
-                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Mode", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeConfiguration.Mode", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mono.
         /// </summary>
-        internal static string OscilloscopeBehaviourConfiguration_Mode_Mono {
+        internal static string OscilloscopeConfiguration_Mode_Mono {
             get {
-                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Mode.Mono", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeConfiguration.Mode.Mono", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Seperate.
         /// </summary>
-        internal static string OscilloscopeBehaviourConfiguration_Mode_Seperate {
+        internal static string OscilloscopeConfiguration_Mode_Seperate {
             get {
-                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Mode.Seperate", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeConfiguration.Mode.Seperate", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Oscilloscope.
         /// </summary>
-        internal static string OscilloscopeBehaviourConfiguration_Path {
+        internal static string OscilloscopeConfiguration_Path {
             get {
-                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeConfiguration.Path", resourceCulture);
             }
         }
         
@@ -216,45 +216,45 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Color Palette.
         /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_ColorPalette {
+        internal static string PeakMeterConfiguration_ColorPalette {
             get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.ColorPalette", resourceCulture);
+                return ResourceManager.GetString("PeakMeterConfiguration.ColorPalette", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Hold Duration.
         /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Hold {
+        internal static string PeakMeterConfiguration_Hold {
             get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Hold", resourceCulture);
+                return ResourceManager.GetString("PeakMeterConfiguration.Hold", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Peak Meter.
         /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Path {
+        internal static string PeakMeterConfiguration_Path {
             get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("PeakMeterConfiguration.Path", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Peaks {
+        internal static string PeakMeterConfiguration_Peaks {
             get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Peaks", resourceCulture);
+                return ResourceManager.GetString("PeakMeterConfiguration.Peaks", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Show RMS.
         /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Rms {
+        internal static string PeakMeterConfiguration_Rms {
             get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Rms", resourceCulture);
+                return ResourceManager.GetString("PeakMeterConfiguration.Rms", resourceCulture);
             }
         }
         
@@ -351,99 +351,99 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Color Palette.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_ColorPalette {
+        internal static string SpectrogramConfiguration_ColorPalette {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.ColorPalette", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.ColorPalette", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to History Buffer Length.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_History {
+        internal static string SpectrogramConfiguration_History {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.History", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.History", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mode.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Mode {
+        internal static string SpectrogramConfiguration_Mode {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Mode", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Mode", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mono.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Mode_Mono {
+        internal static string SpectrogramConfiguration_Mode_Mono {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Mode.Mono", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Mode.Mono", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Seperate.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Mode_Seperate {
+        internal static string SpectrogramConfiguration_Mode_Seperate {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Mode.Seperate", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Mode.Seperate", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Spectrogram.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Path {
+        internal static string SpectrogramConfiguration_Path {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Path", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Scale.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Scale {
+        internal static string SpectrogramConfiguration_Scale {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Scale", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Scale", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Linear.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Scale_Linear {
+        internal static string SpectrogramConfiguration_Scale_Linear {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Scale.Linear", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Scale.Linear", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Logarithmic.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Scale_Logarithmic {
+        internal static string SpectrogramConfiguration_Scale_Logarithmic {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Scale.Logarithmic", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Scale.Logarithmic", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Smoothing.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Smoothing {
+        internal static string SpectrogramConfiguration_Smoothing {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Smoothing", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Smoothing", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Off.
         /// </summary>
-        internal static string SpectrogramBehaviourConfiguration_Smoothing_Off {
+        internal static string SpectrogramConfiguration_Smoothing_Off {
             get {
-                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Smoothing.Off", resourceCulture);
+                return ResourceManager.GetString("SpectrogramConfiguration.Smoothing.Off", resourceCulture);
             }
         }
         
@@ -468,63 +468,63 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Bars.
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Bars {
+        internal static string SpectrumConfiguration_Bars {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Bars", resourceCulture);
+                return ResourceManager.GetString("SpectrumConfiguration.Bars", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Color Palette.
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_ColorPalette {
+        internal static string SpectrumConfiguration_ColorPalette {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.ColorPalette", resourceCulture);
+                return ResourceManager.GetString("SpectrumConfiguration.ColorPalette", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Hold Duration.
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Hold {
+        internal static string SpectrumConfiguration_Hold {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Hold", resourceCulture);
+                return ResourceManager.GetString("SpectrumConfiguration.Hold", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Max Frequency (KHz).
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_MaxFrequency {
+        internal static string SpectrumConfiguration_MaxFrequency {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.MaxFrequency", resourceCulture);
+                return ResourceManager.GetString("SpectrumConfiguration.MaxFrequency", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Spectrum (Basic).
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Path {
+        internal static string SpectrumConfiguration_Path {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("SpectrumConfiguration.Path", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Peaks {
+        internal static string SpectrumConfiguration_Peaks {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Peaks", resourceCulture);
+                return ResourceManager.GetString("SpectrumConfiguration.Peaks", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Pre Amp (dB).
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_PreAmp {
+        internal static string SpectrumConfiguration_PreAmp {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.PreAmp", resourceCulture);
+                return ResourceManager.GetString("SpectrumConfiguration.PreAmp", resourceCulture);
             }
         }
     }

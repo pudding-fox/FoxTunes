@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public static class PeakMeterBehaviourConfiguration
+    public static class PeakMeterConfiguration
     {
         public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
@@ -25,10 +25,10 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new BooleanConfigurationElement(PEAKS, Strings.PeakMeterBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new BooleanConfigurationElement(RMS, Strings.PeakMeterBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new IntegerConfigurationElement(HOLD, Strings.PeakMeterBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.PeakMeterBehaviourConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(SECTION, RMS, true)
+                .WithElement(new BooleanConfigurationElement(PEAKS, Strings.PeakMeterConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.PeakMeterConfiguration_Path, Strings.General_Advanced)).WithValue(true))
+                .WithElement(new BooleanConfigurationElement(RMS, Strings.PeakMeterConfiguration_Rms, path: string.Format("{0}/{1}", Strings.PeakMeterConfiguration_Path, Strings.General_Advanced)).WithValue(true))
+                .WithElement(new IntegerConfigurationElement(HOLD, Strings.PeakMeterConfiguration_Hold, path: string.Format("{0}/{1}", Strings.PeakMeterConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.PeakMeterConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.PeakMeterConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(SECTION, RMS, true)
             );
         }
 

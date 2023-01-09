@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -79,29 +78,32 @@ namespace FoxTunes
 
         public event EventHandler OrientationChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void OnConfigurationChanged()
         {
-            base.InitializeComponent(core);
-            this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
-                PeakMeterBehaviourConfiguration.SECTION,
-                PeakMeterBehaviourConfiguration.PEAKS
-             );
-            this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
-               PeakMeterBehaviourConfiguration.SECTION,
-               PeakMeterBehaviourConfiguration.HOLD
-            );
-            this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                PeakMeterBehaviourConfiguration.SECTION,
-                PeakMeterBehaviourConfiguration.RMS
-            );
-            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                PeakMeterBehaviourConfiguration.SECTION,
-                PeakMeterBehaviourConfiguration.COLOR_PALETTE
-            );
-            this.ShowPeaks.ValueChanged += this.OnValueChanged;
-            this.ShowRms.ValueChanged += this.OnValueChanged;
-            this.ColorPalette.ValueChanged += this.OnValueChanged;
-            var task = this.CreateBitmap();
+            if (this.Configuration != null)
+            {
+                this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                   PeakMeterConfiguration.SECTION,
+                   PeakMeterConfiguration.PEAKS
+                );
+                this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                   PeakMeterConfiguration.SECTION,
+                   PeakMeterConfiguration.HOLD
+                );
+                this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    PeakMeterConfiguration.SECTION,
+                    PeakMeterConfiguration.RMS
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    PeakMeterConfiguration.SECTION,
+                    PeakMeterConfiguration.COLOR_PALETTE
+                );
+                this.ShowPeaks.ValueChanged += this.OnValueChanged;
+                this.ShowRms.ValueChanged += this.OnValueChanged;
+                this.ColorPalette.ValueChanged += this.OnValueChanged;
+                var task = this.CreateBitmap();
+            }
+            base.OnConfigurationChanged();
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -111,7 +113,11 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
-            var colors = this.ShowRms.Value ? this.Colors : PeakMeterBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
+            if (this.Configuration == null)
+            {
+                return false;
+            }
+            var colors = this.ShowRms.Value ? this.Colors : PeakMeterConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
             if (this.Orientation == Orientation.Horizontal && colors.Length > 1)
             {
                 Array.Reverse(colors);

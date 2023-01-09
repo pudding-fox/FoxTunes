@@ -1,10 +1,9 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class Oscilloscope : ViewModelBase
+    public class Oscilloscope : ConfigurableViewModelBase
     {
         private bool _DropShadow { get; set; }
 
@@ -32,13 +31,16 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler DropShadowChanged;
 
-        protected override void InitializeComponent(ICore core)
+        protected override void OnConfigurationChanged()
         {
-            core.Components.Configuration.GetElement<BooleanConfigurationElement>(
-                OscilloscopeBehaviourConfiguration.SECTION,
-                OscilloscopeBehaviourConfiguration.DROP_SHADOW_ELEMENT
-            ).ConnectValue(value => this.DropShadow = value);
-            base.InitializeComponent(core);
+            if (this.Configuration != null)
+            {
+                this.Configuration.GetElement<BooleanConfigurationElement>(
+                    OscilloscopeConfiguration.SECTION,
+                    OscilloscopeConfiguration.DROP_SHADOW_ELEMENT
+                ).ConnectValue(value => this.DropShadow = value);
+            }
+            base.OnConfigurationChanged();
         }
 
         protected override Freezable CreateInstanceCore()

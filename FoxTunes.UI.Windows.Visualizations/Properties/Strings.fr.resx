@@ -126,25 +126,25 @@
   <data name="Oscilloscope.Name" xml:space="preserve">
     <value>Oscilloscope</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Duration" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Duration" xml:space="preserve">
     <value>Durée</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Mode" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Mode.Mono" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Mode.Mono" xml:space="preserve">
     <value>Mono</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Mode.Seperate" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Mode.Seperate" xml:space="preserve">
     <value>Séparé</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Path" xml:space="preserve">
     <value>Oscilloscope</value>
   </data>
   <data name="PeakMeter.Name" xml:space="preserve">
     <value>Compteur de crête</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="PeakMeterConfiguration.Path" xml:space="preserve">
     <value>Compteur de crête</value>
   </data>
   <data name="Speakers.Center" xml:space="preserve">
@@ -177,25 +177,25 @@
   <data name="Spectrum.Name" xml:space="preserve">
     <value>Spectre</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Bands" xml:space="preserve">
+  <data name="SpectrumConfiguration.Bands" xml:space="preserve">
     <value>Bandes (Améliorées)</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Bars" xml:space="preserve">
+  <data name="SpectrumConfiguration.Bars" xml:space="preserve">
     <value>Barres (Basique)</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Crest" xml:space="preserve">
+  <data name="SpectrumConfiguration.Crest" xml:space="preserve">
     <value>Afficher le facteur de crête</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Hold" xml:space="preserve">
+  <data name="SpectrumConfiguration.Hold" xml:space="preserve">
     <value>Durée de maintien</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="SpectrumConfiguration.Path" xml:space="preserve">
     <value>Spectre</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Peaks" xml:space="preserve">
+  <data name="SpectrumConfiguration.Peaks" xml:space="preserve">
     <value>Afficher les pics</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Rms" xml:space="preserve">
+  <data name="SpectrumConfiguration.Rms" xml:space="preserve">
     <value>Afficher RMS</value>
   </data>
 </root>

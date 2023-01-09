@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public static class SpectrogramBehaviourConfiguration
+    public static class SpectrogramConfiguration
     {
         public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
@@ -44,18 +44,18 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Mode, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
-                .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Scale, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetScaleOptions()))
-                .WithElement(new IntegerConfigurationElement(SMOOTHING_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Smoothing, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(SMOOTHING_DEFAULT).WithValidationRule(new IntegerValidationRule(SMOOTHING_MIN, SMOOTHING_MAX)))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_ColorPalette, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(HISTORY_ELEMENT, Strings.SpectrogramBehaviourConfiguration_History, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(Publication.ReleaseType == ReleaseType.Default ? HISTORY_DEFAULT : HISTORY_MIN).WithValidationRule(new IntegerValidationRule(HISTORY_MIN, HISTORY_MAX))
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramConfiguration_Mode, path: Strings.SpectrogramConfiguration_Path).WithOptions(GetModeOptions()))
+                .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramConfiguration_Scale, path: Strings.SpectrogramConfiguration_Path).WithOptions(GetScaleOptions()))
+                .WithElement(new IntegerConfigurationElement(SMOOTHING_ELEMENT, Strings.SpectrogramConfiguration_Smoothing, path: Strings.SpectrogramConfiguration_Path).WithValue(SMOOTHING_DEFAULT).WithValidationRule(new IntegerValidationRule(SMOOTHING_MIN, SMOOTHING_MAX)))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramConfiguration_ColorPalette, path: Strings.SpectrogramConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(HISTORY_ELEMENT, Strings.SpectrogramConfiguration_History, path: Strings.SpectrogramConfiguration_Path).WithValue(Publication.ReleaseType == ReleaseType.Default ? HISTORY_DEFAULT : HISTORY_MIN).WithValidationRule(new IntegerValidationRule(HISTORY_MIN, HISTORY_MAX))
             );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetModeOptions()
         {
-            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, Strings.SpectrogramBehaviourConfiguration_Mode_Mono).Default();
-            yield return new SelectionConfigurationOption(MODE_SEPERATE_OPTION, Strings.SpectrogramBehaviourConfiguration_Mode_Seperate);
+            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, Strings.SpectrogramConfiguration_Mode_Mono).Default();
+            yield return new SelectionConfigurationOption(MODE_SEPERATE_OPTION, Strings.SpectrogramConfiguration_Mode_Seperate);
         }
 
         public static SpectrogramRendererMode GetMode(SelectionConfigurationOption option)
@@ -72,8 +72,8 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetScaleOptions()
         {
-            yield return new SelectionConfigurationOption(SCALE_LINEAR_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Linear).Default();
-            yield return new SelectionConfigurationOption(SCALE_LOGARITHMIC_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Logarithmic);
+            yield return new SelectionConfigurationOption(SCALE_LINEAR_OPTION, Strings.SpectrogramConfiguration_Scale_Linear).Default();
+            yield return new SelectionConfigurationOption(SCALE_LOGARITHMIC_OPTION, Strings.SpectrogramConfiguration_Scale_Logarithmic);
         }
 
         public static SpectrogramRendererScale GetScale(SelectionConfigurationOption option)

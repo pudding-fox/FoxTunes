@@ -120,28 +120,28 @@
   <data name="General.Advanced" xml:space="preserve">
     <value>Avancé</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.Cache" xml:space="preserve">
+  <data name="WaveFormCacheConfiguration.Cache" xml:space="preserve">
     <value>Cache</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.Cleanup" xml:space="preserve">
+  <data name="WaveFormCacheConfiguration.Cleanup" xml:space="preserve">
     <value>Nettoyer les fichiers temporaires</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.Mode" xml:space="preserve">
+  <data name="WaveFormStreamPositionConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.Mode.Mono" xml:space="preserve">
+  <data name="WaveFormStreamPositionConfiguration.Mode.Mono" xml:space="preserve">
     <value>Mono</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.Mode.Seperate" xml:space="preserve">
+  <data name="WaveFormStreamPositionConfiguration.Mode.Seperate" xml:space="preserve">
     <value>Séparé</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.Resolution" xml:space="preserve">
+  <data name="WaveFormGeneratorConfiguration.Resolution" xml:space="preserve">
     <value>Résolution</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.RMS" xml:space="preserve">
+  <data name="WaveFormStreamPositionConfiguration.RMS" xml:space="preserve">
     <value>RMS</value>
   </data>
-  <data name="WaveBarBehaviourConfiguration.Section" xml:space="preserve">
+  <data name="WaveFormStreamPositionConfiguration.Section" xml:space="preserve">
     <value>Forme d'onde</value>
   </data>
   <data name="WaveFormStreamPosition.Name" xml:space="preserve">

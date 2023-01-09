@@ -120,25 +120,25 @@
   <data name="EnhancedSpectrum.Name" xml:space="preserve">
     <value>Spectrum</value>
   </data>
-  <data name="EnhancedSpectrumBehaviourConfiguration.Bands" xml:space="preserve">
+  <data name="EnhancedSpectrumConfiguration.Bands" xml:space="preserve">
     <value>Bands</value>
   </data>
-  <data name="EnhancedSpectrumBehaviourConfiguration.ColorPalette" xml:space="preserve">
+  <data name="EnhancedSpectrumConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
-  <data name="EnhancedSpectrumBehaviourConfiguration.Crest" xml:space="preserve">
+  <data name="EnhancedSpectrumConfiguration.Crest" xml:space="preserve">
     <value>Show Crest Factor</value>
   </data>
-  <data name="EnhancedSpectrumBehaviourConfiguration.Hold" xml:space="preserve">
+  <data name="EnhancedSpectrumConfiguration.Hold" xml:space="preserve">
     <value>Hold Duration</value>
   </data>
-  <data name="EnhancedSpectrumBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="EnhancedSpectrumConfiguration.Path" xml:space="preserve">
     <value>Spectrum</value>
   </data>
-  <data name="EnhancedSpectrumBehaviourConfiguration.Peaks" xml:space="preserve">
+  <data name="EnhancedSpectrumConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>
-  <data name="EnhancedSpectrumBehaviourConfiguration.Rms" xml:space="preserve">
+  <data name="EnhancedSpectrumConfiguration.Rms" xml:space="preserve">
     <value>Show RMS</value>
   </data>
   <data name="General.Advanced" xml:space="preserve">
@@ -147,40 +147,40 @@
   <data name="Oscilloscope.Name" xml:space="preserve">
     <value>Oscilloscope</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.DropShadow" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.DropShadow" xml:space="preserve">
     <value>Drop Shadow</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Duration" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Duration" xml:space="preserve">
     <value>Duration</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Mode" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Mode.Mono" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Mode.Mono" xml:space="preserve">
     <value>Mono</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Mode.Seperate" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Mode.Seperate" xml:space="preserve">
     <value>Seperate</value>
   </data>
-  <data name="OscilloscopeBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Path" xml:space="preserve">
     <value>Oscilloscope</value>
   </data>
   <data name="PeakMeter.Name" xml:space="preserve">
     <value>Peak Meter</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.ColorPalette" xml:space="preserve">
+  <data name="PeakMeterConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.Hold" xml:space="preserve">
+  <data name="PeakMeterConfiguration.Hold" xml:space="preserve">
     <value>Hold Duration</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="PeakMeterConfiguration.Path" xml:space="preserve">
     <value>Peak Meter</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.Peaks" xml:space="preserve">
+  <data name="PeakMeterConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.Rms" xml:space="preserve">
+  <data name="PeakMeterConfiguration.Rms" xml:space="preserve">
     <value>Show RMS</value>
   </data>
   <data name="Speakers.Center" xml:space="preserve">
@@ -213,37 +213,37 @@
   <data name="Spectrogram.Name" xml:space="preserve">
     <value>Spectrogram</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.ColorPalette" xml:space="preserve">
+  <data name="SpectrogramConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.History" xml:space="preserve">
+  <data name="SpectrogramConfiguration.History" xml:space="preserve">
     <value>History Buffer Length</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Mode" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Mode.Mono" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Mode.Mono" xml:space="preserve">
     <value>Mono</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Mode.Seperate" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Mode.Seperate" xml:space="preserve">
     <value>Seperate</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Path" xml:space="preserve">
     <value>Spectrogram</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Scale" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Scale" xml:space="preserve">
     <value>Scale</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Scale.Linear" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Scale.Linear" xml:space="preserve">
     <value>Linear</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Scale.Logarithmic" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Scale.Logarithmic" xml:space="preserve">
     <value>Logarithmic</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Smoothing" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Smoothing" xml:space="preserve">
     <value>Smoothing</value>
   </data>
-  <data name="SpectrogramBehaviourConfiguration.Smoothing.Off" xml:space="preserve">
+  <data name="SpectrogramConfiguration.Smoothing.Off" xml:space="preserve">
     <value>Off</value>
   </data>
   <data name="Spectrum.Name" xml:space="preserve">
@@ -252,25 +252,25 @@
   <data name="SpectrumBehaviour.Warning" xml:space="preserve">
     <value>High sample points (&gt;128) require either a higher FFT, lower cut off, or both. Check the settings.</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Bars" xml:space="preserve">
+  <data name="SpectrumConfiguration.Bars" xml:space="preserve">
     <value>Bars</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.ColorPalette" xml:space="preserve">
+  <data name="SpectrumConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Hold" xml:space="preserve">
+  <data name="SpectrumConfiguration.Hold" xml:space="preserve">
     <value>Hold Duration</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.MaxFrequency" xml:space="preserve">
+  <data name="SpectrumConfiguration.MaxFrequency" xml:space="preserve">
     <value>Max Frequency (KHz)</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="SpectrumConfiguration.Path" xml:space="preserve">
     <value>Spectrum (Basic)</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.Peaks" xml:space="preserve">
+  <data name="SpectrumConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.PreAmp" xml:space="preserve">
+  <data name="SpectrumConfiguration.PreAmp" xml:space="preserve">
     <value>Pre Amp (dB)</value>
   </data>
 </root>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public static class OscilloscopeBehaviourConfiguration
+    public static class OscilloscopeConfiguration
     {
         public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
@@ -29,16 +29,16 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Mode, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
-                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_Duration, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10)))
-                .WithElement(new BooleanConfigurationElement(DROP_SHADOW_ELEMENT, Strings.OscilloscopeBehaviourConfiguration_DropShadow, path: Strings.OscilloscopeBehaviourConfiguration_Path).WithValue(false)
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeConfiguration_Mode, path: Strings.OscilloscopeConfiguration_Path).WithOptions(GetModeOptions()))
+                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeConfiguration_Duration, path: Strings.OscilloscopeConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10)))
+                .WithElement(new BooleanConfigurationElement(DROP_SHADOW_ELEMENT, Strings.OscilloscopeConfiguration_DropShadow, path: Strings.OscilloscopeConfiguration_Path).WithValue(false)
             );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetModeOptions()
         {
-            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, Strings.OscilloscopeBehaviourConfiguration_Mode_Mono).Default();
-            yield return new SelectionConfigurationOption(MODE_SEPERATE_OPTION, Strings.OscilloscopeBehaviourConfiguration_Mode_Seperate);
+            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, Strings.OscilloscopeConfiguration_Mode_Mono).Default();
+            yield return new SelectionConfigurationOption(MODE_SEPERATE_OPTION, Strings.OscilloscopeConfiguration_Mode_Seperate);
         }
 
         public static OscilloscopeRendererMode GetMode(SelectionConfigurationOption option)

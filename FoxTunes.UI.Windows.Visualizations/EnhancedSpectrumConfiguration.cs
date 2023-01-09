@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public static class EnhancedSpectrumBehaviourConfiguration
+    public static class EnhancedSpectrumConfiguration
     {
         public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
@@ -44,12 +44,12 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Bands, path: Strings.EnhancedSpectrumBehaviourConfiguration_Path).WithOptions(GetBandsOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, RMS_ELEMENT))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(SECTION, RMS_ELEMENT, true)
+                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands, path: Strings.EnhancedSpectrumConfiguration_Path).WithOptions(GetBandsOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.EnhancedSpectrumConfiguration_Hold, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
+                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, RMS_ELEMENT))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(SECTION, RMS_ELEMENT, true)
             );
         }
 

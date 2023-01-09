@@ -1,9 +1,9 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace FoxTunes
 {
@@ -11,17 +11,14 @@ namespace FoxTunes
     {
         public const string PREFIX = "Configuration_";
 
-        public const string DELIMITER = "_";
-
         public UIComponentConfigurationProvider(UIComponentConfiguration component)
         {
             this.Component = component;
             this.Sections = new ObservableCollection<ConfigurationSection>();
+            this.Elements = new Dictionary<string, ConfigurationElement>(StringComparer.OrdinalIgnoreCase);
         }
 
         public UIComponentConfiguration Component { get; private set; }
-
-        public bool IsLoaded { get; private set; }
 
         public IEnumerable<string> AvailableProfiles
         {
@@ -49,11 +46,17 @@ namespace FoxTunes
 
         public ObservableCollection<ConfigurationSection> Sections { get; private set; }
 
+        public IDictionary<string, ConfigurationElement> Elements { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
+            foreach (var section in this.Configuration.Sections)
+            {
+                this.WithSection(section);
+            }
             base.InitializeComponent(core);
         }
 
@@ -78,44 +81,21 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var parts = pair.Key.Substring(
-                    PREFIX.Length
-                ).Split(new[] { DELIMITER }, 2, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length != 2)
-                {
-                    continue;
-                }
-                var sectionId = parts[0];
-                var elementId = parts[1];
-                if (!this.Contains(sectionId))
-                {
-                    Logger.Write(this, LogLevel.Warn, "Configuration section \"{0}\" no longer exists.", sectionId);
-                    continue;
-                }
-                var existing = this.GetSection(sectionId);
-                try
-                {
-                    Logger.Write(this, LogLevel.Debug, "Loading configuration section \"{0}\".", sectionId);
-                    this.Load(existing, elementId, pair.Value);
-                }
-                catch (Exception e)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to load configuration section \"{0}\": {1}", existing.Id, e.Message);
-                }
+                var id = pair.Key.Substring(PREFIX.Length);
+                var value = pair.Value;
             }
-            this.IsLoaded = true;
         }
 
-        protected virtual void Load(ConfigurationSection section, string id, string value)
+        protected virtual void Load(string id, string value)
         {
-            if (!section.Contains(id))
+            var element = default(ConfigurationElement);
+            if (!this.Elements.TryGetValue(id, out element))
             {
                 Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", id);
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Loading configuration element: \"{0}\".", id);
-            var existing = section.GetElement(id);
-            existing.SetPersistentValue(value);
+            element.SetPersistentValue(value);
         }
 
         protected virtual void OnSaved()
@@ -146,14 +126,7 @@ namespace FoxTunes
 
         public ConfigurationSection GetSection(string sectionId)
         {
-            var result = this.Sections.FirstOrDefault(
-                section => string.Equals(section.Id, sectionId, StringComparison.OrdinalIgnoreCase)
-            );
-            if (result == null && this.IsLoaded)
-            {
-                result = this.Configuration.GetSection(sectionId);
-            }
-            return result;
+            return this.Sections.FirstOrDefault(section => string.Equals(section.Id, sectionId, StringComparison.OrdinalIgnoreCase));
         }
 
         public T GetElement<T>(string sectionId, string elementId) where T : ConfigurationElement
@@ -168,12 +141,7 @@ namespace FoxTunes
             {
                 return default(ConfigurationElement);
             }
-            var result = section.GetElement(elementId);
-            if (result == null && this.IsLoaded)
-            {
-                result = this.Configuration.GetElement(sectionId, elementId);
-            }
-            return result;
+            return section.GetElement(elementId);
         }
 
         public void Reset()
@@ -198,22 +166,11 @@ namespace FoxTunes
                     this.Component.MetaData.TryRemove(pair.Key);
                 }
             }
-            foreach (var section in this.Sections)
+            foreach (var element in this.Elements.Values)
             {
-                var elements = section.Elements.Where(
-                    element => element.IsModified
-                ).ToArray();
-                if (!elements.Any())
-                {
-                    continue;
-                }
-                foreach (var element in elements)
-                {
-                    this.Component.MetaData.TryAdd(
-                        string.Concat(PREFIX, section.Id, DELIMITER, element.Id),
-                        element.GetPersistentValue()
-                    );
-                }
+                var key = string.Concat(PREFIX, element.Id);
+                var value = element.GetPersistentValue();
+                this.Component.MetaData.TryAdd(key, value);
             }
             this.OnSaved();
         }
@@ -239,6 +196,7 @@ namespace FoxTunes
         private void Add(ConfigurationSection section)
         {
             Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
+            section = new ConfigurationSectionWrapper(this, section);
             this.Sections.Add(section);
         }
 
@@ -247,6 +205,34 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
             var existing = this.GetSection(section.Id);
             existing.Update(section);
+        }
+
+        public class ConfigurationSectionWrapper : ConfigurationSection
+        {
+            public ConfigurationSectionWrapper(UIComponentConfigurationProvider provider, ConfigurationSection section) : base(section.Id, section.Name, section.Description)
+            {
+                this.Provider = provider;
+                this.Elements.AddRange(section.Elements);
+                if (this.Provider.IsInitialized)
+                {
+                    foreach (var element in section.Elements)
+                    {
+                        this.Provider.Elements.Add(element.Id, element);
+                    }
+                }
+                this.Flags = section.Flags;
+            }
+
+            public UIComponentConfigurationProvider Provider { get; private set; }
+
+            protected override void Add(ConfigurationElement element)
+            {
+                if (this.Provider.IsInitialized)
+                {
+                    this.Provider.Elements.Add(element.Id, element);
+                }
+                base.Add(element);
+            }
         }
     }
 }
