@@ -121,7 +121,10 @@ namespace FoxTunes
 
         public void ConnectDependencies()
         {
-            throw new NotImplementedException();
+            foreach (var element in this.Elements.Values)
+            {
+                element.ConnectDependencies(this);
+            }
         }
 
         public ConfigurationSection GetSection(string sectionId)

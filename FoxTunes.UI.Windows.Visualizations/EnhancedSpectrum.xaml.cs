@@ -98,7 +98,7 @@ namespace FoxTunes
                         attributes: this.Bands.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
-                if (!this.Rms.Value)
+                if (this.ColorPalette.IsVisible)
                 {
                     foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
                     {

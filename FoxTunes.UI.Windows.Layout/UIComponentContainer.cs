@@ -302,6 +302,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Failed to register configuration for component {0}: {1}", component.GetType().Name, e.Message);
             }
             configuration.Load();
+            configuration.ConnectDependencies();
             return configuration;
         }
 
