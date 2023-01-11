@@ -186,19 +186,21 @@ namespace FoxTunes
 
         protected virtual void UpdateChildren()
         {
-            if (this.Component.Children != null && this.Component.Children.Count == 2)
-            {
-                this.ContentComponent = this.Component.Children[0];
-                this.DockComponent = this.Component.Children[1];
-            }
-            else
+            if (this.Component.Children == null)
             {
                 this.Component.Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     new UIComponentConfiguration(),
                     new UIComponentConfiguration()
                 };
+                return;
             }
+            for (var a = this.Component.Children.Count; a < 2; a++)
+            {
+                this.Component.Children.Add(new UIComponentConfiguration());
+            }
+            this.ContentComponent = this.Component.Children[0];
+            this.DockComponent = this.Component.Children[1];
         }
 
         protected virtual void UpdateMetaData()
@@ -237,7 +239,7 @@ namespace FoxTunes
 
         protected virtual void OnContentComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count > 0 && this.ContentComponent != null)
+            if (this.Component != null && this.Component.Children.Count >= 1 && this.ContentComponent != null)
             {
                 this.Component.Children[0] = this.ContentComponent;
             }
@@ -264,7 +266,7 @@ namespace FoxTunes
 
         protected virtual void OnDockComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count == 2 && this.DockComponent != null)
+            if (this.Component != null && this.Component.Children.Count >= 2 && this.DockComponent != null)
             {
                 this.Component.Children[1] = this.DockComponent;
             }

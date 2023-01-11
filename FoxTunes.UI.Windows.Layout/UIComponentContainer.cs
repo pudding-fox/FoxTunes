@@ -58,7 +58,10 @@ namespace FoxTunes
             }
             if (e.OldValue is UIComponentConfiguration oldComponent && e.NewValue is UIComponentConfiguration newComponent)
             {
-                //Preserve alignment and such.
+                foreach (var child in oldComponent.Children)
+                {
+                    newComponent.Children.Add(child);
+                }
                 foreach (var pair in oldComponent.MetaData)
                 {
                     newComponent.MetaData.TryAdd(pair.Key, pair.Value);
@@ -252,6 +255,7 @@ namespace FoxTunes
         {
             get
             {
+                var attributes = InvocationComponent.ATTRIBUTE_SEPARATOR;
                 if (this.Component != null)
                 {
                     var component = Factory.CreateComponent(this.Component);
@@ -259,14 +263,19 @@ namespace FoxTunes
                     {
                         foreach (var alternative in LayoutManager.Instance.GetComponents(component.Role))
                         {
-                            yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REPLACE, alternative.Name, path: Strings.UIComponentContainer_Replace, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                            if (string.Equals(component.Id, alternative.Id, StringComparison.OrdinalIgnoreCase))
+                            {
+                                continue;
+                            }
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REPLACE, alternative.Name, path: Strings.UIComponentContainer_Replace, attributes: attributes);
+                            attributes = InvocationComponent.ATTRIBUTE_NONE;
                         }
                     }
                 }
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, Strings.UIComponentContainer_Clear, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, Strings.UIComponentContainer_Clear, attributes: attributes);
                 if (!Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, Strings.UIComponentContainer_Exit);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, Strings.UIComponentContainer_Exit, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                 }
             }
         }
@@ -291,33 +300,24 @@ namespace FoxTunes
 
         public Task Replace(string name)
         {
-            if (this.Component == null)
+            return Windows.Invoke(() =>
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var component = Factory.CreateComponent(this.Component);
-            if (component == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            component = LayoutManager.Instance.GetComponent(name, component.Role);
-            if (component == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return Windows.Invoke(() => this.Component = Factory.CreateConfiguration(component));
+                if (this.Component == null)
+                {
+                    return;
+                }
+                var component = Factory.CreateComponent(this.Component);
+                if (component == null)
+                {
+                    return;
+                }
+                component = LayoutManager.Instance.GetComponent(name, component.Role);
+                if (component == null)
+                {
+                    return;
+                }
+                this.Component = Factory.CreateConfiguration(component);
+            });
         }
 
         public Task Clear()

@@ -13,7 +13,7 @@ namespace FoxTunes
     /// Interaction logic for UIComponentHorizontalSplitContainer.xaml
     /// </summary>
     [UIComponent("A6820FDA-E415-40C6-AEFB-A73B6FBE4C93", role: UIComponentRole.Container)]
-    public partial class UIComponentHorizontalSplitContainer : UIComponentPanel
+    public partial class UIComponentHorizontalSplitContainer : UIComponentSplitPanel
     {
         const string FREEZE_TOP = "AAAA";
 
@@ -353,19 +353,21 @@ namespace FoxTunes
 
         protected virtual void UpdateChildren()
         {
-            if (this.Component.Children != null && this.Component.Children.Count == 2)
-            {
-                this.TopComponent = this.Component.Children[0];
-                this.BottomComponent = this.Component.Children[1];
-            }
-            else
+            if (this.Component.Children == null)
             {
                 this.Component.Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     new UIComponentConfiguration(),
                     new UIComponentConfiguration()
                 };
+                return;
             }
+            for (var a = this.Component.Children.Count; a < 2; a++)
+            {
+                this.Component.Children.Add(new UIComponentConfiguration());
+            }
+            this.TopComponent = this.Component.Children[0];
+            this.BottomComponent = this.Component.Children[1];
         }
 
         protected virtual void UpdateMetaData()
@@ -422,7 +424,7 @@ namespace FoxTunes
 
         protected virtual void OnTopComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count == 2 && this.TopComponent != null)
+            if (this.Component != null && this.Component.Children.Count >= 1 && this.TopComponent != null)
             {
                 this.Component.Children[0] = this.TopComponent;
             }
@@ -449,7 +451,7 @@ namespace FoxTunes
 
         protected virtual void OnBottomComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count == 2 && this.BottomComponent != null)
+            if (this.Component != null && this.Component.Children.Count >= 2 && this.BottomComponent != null)
             {
                 this.Component.Children[1] = this.BottomComponent;
             }
