@@ -14,6 +14,8 @@ namespace FoxTunes
 {
     public class UIComponentContainer : DockPanel, IInvocableComponent, IUIComponent, IValueConverter, IConfigurationProvider
     {
+        public const string REPLACE = "XXXX";
+
         public const string CLEAR = "YYYY";
 
         public const string EXIT = "ZZZZ";
@@ -250,6 +252,17 @@ namespace FoxTunes
         {
             get
             {
+                if (this.Component != null)
+                {
+                    var component = Factory.CreateComponent(this.Component);
+                    if (component != null)
+                    {
+                        foreach (var alternative in LayoutManager.Instance.GetComponents(component.Role))
+                        {
+                            yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REPLACE, alternative.Name, path: Strings.UIComponentContainer_Replace, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                        }
+                    }
+                }
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, Strings.UIComponentContainer_Clear, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                 if (!Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
                 {
@@ -262,6 +275,8 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
+                case REPLACE:
+                    return this.Replace(component.Name);
                 case CLEAR:
                     return this.Clear();
                 case EXIT:
@@ -272,6 +287,37 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public Task Replace(string name)
+        {
+            if (this.Component == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            var component = Factory.CreateComponent(this.Component);
+            if (component == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            component = LayoutManager.Instance.GetComponent(name, component.Role);
+            if (component == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            return Windows.Invoke(() => this.Component = Factory.CreateConfiguration(component));
         }
 
         public Task Clear()

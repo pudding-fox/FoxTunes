@@ -123,6 +123,16 @@ namespace FoxTunes
             return this.Components.FirstOrDefault(component => string.Equals(component.Id, id, StringComparison.OrdinalIgnoreCase));
         }
 
+        public UIComponent GetComponent(string name, UIComponentRole role)
+        {
+            return this.Components.FirstOrDefault(component => string.Equals(component.Name, name, StringComparison.OrdinalIgnoreCase) && component.Role == role);
+        }
+
+        public IEnumerable<UIComponent> GetComponents(UIComponentRole role)
+        {
+            return this.Components.Where(component => component.Role == role);
+        }
+
         public UIComponentBase Load(UILayoutTemplate template)
         {
             var provider = this.Provider;
