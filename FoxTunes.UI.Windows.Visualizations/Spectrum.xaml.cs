@@ -138,7 +138,7 @@ namespace FoxTunes
                     this.CheckSettings();
                 }
             }
-            this.GetConfiguration().Save();
+            this.SaveSettings();
 #if NET40
             return TaskEx.FromResult(false);
 #else
@@ -164,13 +164,9 @@ namespace FoxTunes
 
         protected override Task ShowSettings()
         {
-            return this.UserInterface.ShowSettings(
+            return this.ShowSettings(
                 Strings.SpectrumConfiguration_Path,
-                this.GetConfiguration(),
-                new[]
-                {
-                    SpectrumConfiguration.SECTION
-                }
+                SpectrumConfiguration.SECTION
             );
         }
 

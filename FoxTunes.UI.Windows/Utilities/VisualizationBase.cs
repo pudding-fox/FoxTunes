@@ -1,38 +1,13 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Timers;
-using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
     public abstract class VisualizationBase : RendererBase
     {
         public readonly object SyncRoot = new object();
-
-        public static readonly DependencyProperty ConfigurationProperty = ConfigurableUIComponentBase.ConfigurationProperty.AddOwner(
-            typeof(VisualizationBase),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits, OnConfigurationChanged)
-        );
-
-        private static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var visualizationBase = sender as VisualizationBase;
-            if (visualizationBase == null)
-            {
-                return;
-            }
-            visualizationBase.OnConfigurationChanged();
-        }
-
-        public static IConfiguration GetConfiguration(VisualizationBase source)
-        {
-            return (IConfiguration)source.GetValue(ConfigurationProperty);
-        }
-
-        public static void SetConfiguration(VisualizationBase source, IConfiguration value)
-        {
-            source.SetValue(ConfigurationProperty, value);
-        }
 
         public bool Enabled { get; private set; }
 
@@ -64,43 +39,6 @@ namespace FoxTunes
 
         protected global::System.Timers.Timer Timer { get; private set; }
 
-        private IConfiguration _Configuration { get; set; }
-
-        protected IConfiguration GetConfiguration()
-        {
-            return this._Configuration;
-        }
-
-        public IConfiguration Configuration
-        {
-            get
-            {
-                return GetConfiguration(this);
-            }
-            set
-            {
-                SetConfiguration(this, value);
-            }
-        }
-
-        protected virtual void OnConfigurationChanged()
-        {
-            this._Configuration = this.Configuration;
-            if (this.Configuration != null)
-            {
-                this.Configuration.GetElement<IntegerConfigurationElement>(
-                   VisualizationBehaviourConfiguration.SECTION,
-                   VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
-                ).ConnectValue(value => this.UpdateInterval = value);
-            }
-            if (this.ConfigurationChanged != null)
-            {
-                this.ConfigurationChanged(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler ConfigurationChanged;
-
         public override void InitializeComponent(ICore core)
         {
             this.Timer = new global::System.Timers.Timer();
@@ -120,6 +58,18 @@ namespace FoxTunes
         protected virtual void OnIsPlayingChanged(object sender, EventArgs e)
         {
             this.Update();
+        }
+
+        protected override void OnConfigurationChanged()
+        {
+            if (this.Configuration != null)
+            {
+                this.Configuration.GetElement<IntegerConfigurationElement>(
+                   VisualizationBehaviourConfiguration.SECTION,
+                   VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
+                ).ConnectValue(value => this.UpdateInterval = value);
+            }
+            base.OnConfigurationChanged();
         }
 
         protected virtual void Update()

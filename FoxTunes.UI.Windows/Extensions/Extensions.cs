@@ -34,12 +34,12 @@ namespace FoxTunes
             return default(DependencyObject);
         }
 
-        public static T FindChild<T>(this DependencyObject visual) where T : DependencyObject
+        public static T FindChild<T>(this DependencyObject visual)
         {
-            return visual.FindChildren<T>().FirstOrDefault();
+            return visual.FindChildren<T>(false).FirstOrDefault();
         }
 
-        public static IEnumerable<T> FindChildren<T>(this DependencyObject visual) where T : DependencyObject
+        public static IEnumerable<T> FindChildren<T>(this DependencyObject visual, bool recursive = true)
         {
             var stack = new Stack<DependencyObject>();
             stack.Push(visual);
@@ -49,6 +49,10 @@ namespace FoxTunes
                 if (visual is T element)
                 {
                     yield return element;
+                    if (!recursive)
+                    {
+                        break;
+                    }
                 }
                 for (int a = 0, b = VisualTreeHelper.GetChildrenCount(visual); a < b; a++)
                 {

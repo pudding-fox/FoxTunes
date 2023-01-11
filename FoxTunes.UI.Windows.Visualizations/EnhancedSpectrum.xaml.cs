@@ -174,13 +174,9 @@ namespace FoxTunes
 
         protected override Task ShowSettings()
         {
-            return this.UserInterface.ShowSettings(
-                Strings.EnhancedSpectrumConfiguration_Path,
-                this.GetConfiguration(),
-                new[]
-                {
-                    EnhancedSpectrumConfiguration.SECTION
-                }
+            return this.ShowSettings(
+                Strings.EnhancedSpectrumConfiguration_Path, 
+                EnhancedSpectrumConfiguration.SECTION
             );
         }
 

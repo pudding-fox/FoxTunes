@@ -9,36 +9,9 @@ using System.Windows;
 
 namespace FoxTunes
 {
-    public abstract class ConfigurableUIComponentBase : UIComponentBase, IConfigurableComponent, IInvocableComponent
+    public abstract class ConfigurableUIComponentBase : UIComponentBase, IConfigurableComponent, IInvocableComponent, IConfigurationTarget
     {
         public const string SETTINGS = "ZZZZ";
-
-        public static readonly DependencyProperty ConfigurationProperty = DependencyProperty.RegisterAttached(
-           "Configuration",
-           typeof(IConfiguration),
-           typeof(ConfigurableUIComponentBase),
-           new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits, OnConfigurationChanged)
-       );
-
-        public static IConfiguration GetConfiguration(ConfigurableUIComponentBase source)
-        {
-            return (IConfiguration)source.GetValue(ConfigurationProperty);
-        }
-
-        public static void SetConfiguration(ConfigurableUIComponentBase source, IConfiguration value)
-        {
-            source.SetValue(ConfigurationProperty, value);
-        }
-
-        private static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var componentBase = sender as ConfigurableUIComponentBase;
-            if (componentBase == null)
-            {
-                return;
-            }
-            componentBase.OnConfigurationChanged();
-        }
 
         public ConfigurableUIComponentBase()
         {
@@ -48,6 +21,46 @@ namespace FoxTunes
                 this
             };
             this.ContextMenu = menu;
+            this.Loaded += this.OnLoaded;
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (this.Configuration != null)
+            {
+                this.ApplyConfiguration();
+            }
+        }
+
+        protected virtual void ApplyConfiguration()
+        {
+            this.ApplyConfiguration(this);
+            var children = this.FindChildren<IConfigurationTarget>();
+            foreach (var child in children)
+            {
+                if (object.ReferenceEquals(this, child))
+                {
+                    //Not sure if this is a bug or intended behaviour but FindChildren returns the parent (this).
+                    continue;
+                }
+                child.Configuration = this.Configuration;
+                if (child is FrameworkElement element)
+                {
+                    this.ApplyConfiguration(element);
+                }
+            }
+        }
+
+        protected virtual void ApplyConfiguration(FrameworkElement element)
+        {
+            if (element.Resources == null)
+            {
+                return;
+            }
+            foreach (var configurationTarget in element.Resources.Values.OfType<IConfigurationTarget>())
+            {
+                configurationTarget.Configuration = this.Configuration;
+            }
         }
 
         public IUserInterface UserInterface { get; private set; }
@@ -60,37 +73,26 @@ namespace FoxTunes
 
         private IConfiguration _Configuration { get; set; }
 
-        protected IConfiguration GetConfiguration()
-        {
-            return this._Configuration;
-        }
-
         public IConfiguration Configuration
         {
             get
             {
-                return GetConfiguration(this);
+                return this._Configuration;
             }
             set
             {
-                SetConfiguration(this, value);
+                this._Configuration = value;
+                this.OnConfigurationChanged();
             }
         }
 
         protected virtual void OnConfigurationChanged()
         {
-            this._Configuration = this.Configuration;
-            if (this.Resources != null)
-            {
-                foreach (var configurationTarget in this.Resources.Values.OfType<IConfigurationTarget>())
-                {
-                    configurationTarget.Configuration = this._Configuration;
-                }
-            }
             if (this.ConfigurationChanged != null)
             {
                 this.ConfigurationChanged(this, EventArgs.Empty);
             }
+            this.OnPropertyChanged("Configuration");
         }
 
         public event EventHandler ConfigurationChanged;
@@ -129,9 +131,23 @@ namespace FoxTunes
 
         protected abstract Task ShowSettings();
 
+        protected virtual Task ShowSettings(string title, string section)
+        {
+            return this.ShowSettings(title, new[] { section });
+        }
+
+        protected virtual Task ShowSettings(string title, IEnumerable<string> sections)
+        {
+            return this.UserInterface.ShowSettings(
+                title,
+                this.Configuration,
+                sections
+            );
+        }
+
         protected virtual void SaveSettings()
         {
-            this.GetConfiguration().Save();
+            this.Configuration.Save();
         }
 
         public abstract IEnumerable<ConfigurationSection> GetConfigurationSections();

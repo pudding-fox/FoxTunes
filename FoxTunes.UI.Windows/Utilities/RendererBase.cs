@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace FoxTunes
 {
-    public abstract class RendererBase : FrameworkElement, IBaseComponent, INotifyPropertyChanged, IDisposable
+    public abstract class RendererBase : FrameworkElement, IBaseComponent, IConfigurationTarget, INotifyPropertyChanged, IDisposable
     {
         public const double DPIX = 96;
 
@@ -75,6 +75,32 @@ namespace FoxTunes
                 this.InitializeComponent(Core.Instance);
             }
         }
+
+        private IConfiguration _Configuration { get; set; }
+
+        public IConfiguration Configuration
+        {
+            get
+            {
+                return this._Configuration;
+            }
+            set
+            {
+                this._Configuration = value;
+                this.OnConfigurationChanged();
+            }
+        }
+
+        protected virtual void OnConfigurationChanged()
+        {
+            if (this.ConfigurationChanged != null)
+            {
+                this.ConfigurationChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Configuration");
+        }
+
+        public event EventHandler ConfigurationChanged;
 
         public Brush Background
         {

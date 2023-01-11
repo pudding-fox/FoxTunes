@@ -9,36 +9,6 @@ namespace FoxTunes
 {
     public class WaveFormRenderer : RendererBase
     {
-        public static readonly DependencyProperty ConfigurationProperty = ConfigurableUIComponentBase.ConfigurationProperty.AddOwner(
-            typeof(WaveFormRenderer),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits, OnConfigurationChanged)
-        );
-
-        private static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var waveFormRenderer = sender as WaveFormRenderer;
-            if (waveFormRenderer == null)
-            {
-                return;
-            }
-            waveFormRenderer.OnConfigurationChanged();
-        }
-
-        public static IConfiguration GetConfiguration(WaveFormRenderer source)
-        {
-            return (IConfiguration)source.GetValue(ConfigurationProperty);
-        }
-
-        public static void SetConfiguration(WaveFormRenderer source, IConfiguration value)
-        {
-            source.SetValue(ConfigurationProperty, value);
-        }
-
-        public WaveFormRenderer()
-        {
-
-        }
-
         public WaveFormGenerator.WaveFormGeneratorData GeneratorData { get; private set; }
 
         public WaveFormRendererData RendererData { get; private set; }
@@ -55,28 +25,16 @@ namespace FoxTunes
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
-        private IConfiguration _Configuration { get; set; }
-
-        protected IConfiguration GetConfiguration()
+        public override void InitializeComponent(ICore core)
         {
-            return this._Configuration;
+            this.Generator = ComponentRegistry.Instance.GetComponent<WaveFormGenerator>();
+            this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            base.InitializeComponent(core);
         }
 
-        public IConfiguration Configuration
+        protected override void OnConfigurationChanged()
         {
-            get
-            {
-                return GetConfiguration(this);
-            }
-            set
-            {
-                SetConfiguration(this, value);
-            }
-        }
-
-        protected virtual void OnConfigurationChanged()
-        {
-            this._Configuration = this.Configuration;
             if (this.Configuration != null)
             {
                 this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
@@ -111,21 +69,7 @@ namespace FoxTunes
                     }
                 });
             }
-            if (this.ConfigurationChanged != null)
-            {
-                this.ConfigurationChanged(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler ConfigurationChanged;
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.Generator = ComponentRegistry.Instance.GetComponent<WaveFormGenerator>();
-            this.PlaybackManager = core.Managers.Playback;
-            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-            base.InitializeComponent(core);
-
+            base.OnConfigurationChanged();
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
