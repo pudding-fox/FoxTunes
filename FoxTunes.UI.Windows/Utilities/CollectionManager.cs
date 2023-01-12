@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Windows;
 using System.Windows.Input;
 
@@ -14,6 +15,7 @@ namespace FoxTunes
         public CollectionManager()
         {
             this.Removed = new HashSet<T>();
+            this.Updated = new HashSet<T>();
             this.Flags = CollectionManagerFlags.None;
         }
 
@@ -21,6 +23,8 @@ namespace FoxTunes
         {
             this.Flags = flags;
         }
+
+        public HashSet<T> Updated { get; private set; }
 
         public HashSet<T> Removed { get; private set; }
 
@@ -168,6 +172,10 @@ namespace FoxTunes
             }
             set
             {
+                if (object.ReferenceEquals(this._SelectedValue, value))
+                {
+                    return;
+                }
                 this._SelectedValue = value;
                 this.OnSelectedValueChanged();
             }
@@ -314,7 +322,11 @@ namespace FoxTunes
 
         public void Exchange(object[] items)
         {
-            this.ExchangeHandler((T)items[0], (T)items[1]);
+            var item1 = (T)items[0];
+            var item2 = (T)items[1];
+            this.ExchangeHandler(item1, item2);
+            this.Updated.Add(item1);
+            this.Updated.Add(item2);
             this.RefreshOrderedItemsSource();
         }
 
@@ -391,27 +403,25 @@ namespace FoxTunes
 
         protected virtual void RefreshSelectedItem()
         {
-            //TODO: This is sketchy because T is not properly equatable.
-            //TODO: We need to always set SelectedValue to null and then try to "restore" it from the new ItemsSource.
-            //TODO: If it isn't IPersistableComponent then there's not much we can do.
-            if (this.SelectedValue is IPersistableComponent persistable)
+            var selectedValue = this.SelectedValue;
+            if (selectedValue is IPersistableComponent persistable)
             {
                 if (this._ItemsSource != null && typeof(IPersistableComponent).IsAssignableFrom(typeof(T)))
                 {
-                    this.SelectedValue = default(T);
-                    this.SelectedValue = this._ItemsSource
+                    selectedValue = this._ItemsSource
                         .OfType<IPersistableComponent>()
                         .FirstOrDefault(element => element.Id == persistable.Id) as T;
                 }
             }
-            else
+            if (selectedValue == default(T))
             {
-                this.SelectedValue = default(T);
+                selectedValue = (this.OrderedItemsSource ?? this.ItemsSource ?? Enumerable.Empty<T>()).FirstOrDefault();
             }
-            if (this.SelectedValue == default(T))
+            if (object.ReferenceEquals(this.SelectedValue, selectedValue))
             {
-                this.SelectedValue = (this.OrderedItemsSource ?? this.ItemsSource ?? Enumerable.Empty<T>()).FirstOrDefault();
+                return;
             }
+            this.SelectedValue = selectedValue;
         }
 
         protected virtual void RefreshCommands()
@@ -424,6 +434,7 @@ namespace FoxTunes
 
         public void Reset()
         {
+            this.Updated.Clear();
             this.Removed.Clear();
         }
 

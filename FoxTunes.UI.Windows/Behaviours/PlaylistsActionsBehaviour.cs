@@ -22,30 +22,6 @@ namespace FoxTunes
             Instance = this;
         }
 
-        public bool Enabled
-        {
-            get
-            {
-                return LayoutManager.Instance.IsComponentActive(Playlists.ID);
-            }
-        }
-
-        protected virtual void OnEnabledChanged()
-        {
-            if (!this.Enabled)
-            {
-                var playlists = this.PlaylistBrowser.GetPlaylists();
-                this.PlaylistManager.SelectedPlaylist = playlists.FirstOrDefault();
-            }
-            if (this.EnabledChanged != null)
-            {
-                this.EnabledChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Enabled");
-        }
-
-        public event EventHandler EnabledChanged;
-
         public ICore Core { get; private set; }
 
         public ILibraryManager LibraryManager { get; private set; }
@@ -79,15 +55,12 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled)
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, ADD_PLAYLIST, Strings.PlaylistsActionsBehaviour_Add);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, REMOVE_PLAYLIST, Strings.PlaylistsActionsBehaviour_Remove);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, MANAGE_PLAYLISTS, Strings.PlaylistsActionsBehaviour_Manage, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                if (this.LibraryManager.SelectedItem != null)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, ADD_PLAYLIST, Strings.PlaylistsActionsBehaviour_Add);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, REMOVE_PLAYLIST, Strings.PlaylistsActionsBehaviour_Remove);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, MANAGE_PLAYLISTS, Strings.PlaylistsActionsBehaviour_Manage, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                    if (this.LibraryManager.SelectedItem != null)
-                    {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, CREATE_PLAYLIST, Strings.PlaylistsActionsBehaviour_Create);
-                    }
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, CREATE_PLAYLIST, Strings.PlaylistsActionsBehaviour_Create);
                 }
             }
         }

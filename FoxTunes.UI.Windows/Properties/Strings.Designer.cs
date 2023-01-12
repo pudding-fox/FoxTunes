@@ -961,11 +961,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Playlist Selector.
+        /// </summary>
+        internal static string PlaylistSelector_Name {
+            get {
+                return ResourceManager.GetString("PlaylistSelector.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sorting.
         /// </summary>
         internal static string PlaylistSortingBehaviourConfiguration_Enabled {
             get {
                 return ResourceManager.GetString("PlaylistSortingBehaviourConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlist Tabs.
+        /// </summary>
+        internal static string PlaylistTabs_Name {
+            get {
+                return ResourceManager.GetString("PlaylistTabs.Name", resourceCulture);
             }
         }
         

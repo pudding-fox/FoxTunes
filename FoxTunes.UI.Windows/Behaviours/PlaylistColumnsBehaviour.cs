@@ -18,12 +18,12 @@ namespace FoxTunes
         public PlaylistColumnsBehaviour()
         {
             this.Columns = new ConcurrentDictionary<PlaylistColumn, bool>();
-            this.Debouncer = new Debouncer(TIMEOUT);
+            this.Debouncer = new AsyncDebouncer(TIMEOUT);
         }
 
         public ConcurrentDictionary<PlaylistColumn, bool> Columns { get; private set; }
 
-        public Debouncer Debouncer { get; private set; }
+        public AsyncDebouncer Debouncer { get; private set; }
 
         public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
 
@@ -121,7 +121,7 @@ namespace FoxTunes
         protected virtual void Update(PlaylistColumn column, bool notify)
         {
             this.Columns.AddOrUpdate(column, notify);
-            this.Debouncer.Exec(() => this.Dispatch(this.Update));
+            this.Debouncer.Exec(this.Update);
             Logger.Write(this, LogLevel.Debug, "Queued update for column {0} => {1}.", column.Id, column.Name);
         }
 

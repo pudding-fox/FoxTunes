@@ -417,8 +417,14 @@
   <data name="PlaylistsActionsBehaviour.Remove" xml:space="preserve">
     <value>Remove Playlist</value>
   </data>
+  <data name="PlaylistSelector.Name" xml:space="preserve">
+    <value>Playlist Selector</value>
+  </data>
   <data name="PlaylistSortingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Sorting</value>
+  </data>
+  <data name="PlaylistTabs.Name" xml:space="preserve">
+    <value>Playlist Tabs</value>
   </data>
   <data name="Plugins.NoDescription" xml:space="preserve">
     <value>The plugin does not have a description.</value>
