@@ -13,6 +13,8 @@ namespace FoxTunes
 {
     public class UIComponentDesignerOverlay : BaseComponent, IDisposable
     {
+        public static readonly LayoutDesignerBehaviour Behaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
+
         public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
         public static UIComponentContainer Container { get; private set; }
@@ -146,8 +148,10 @@ namespace FoxTunes
             }
         }
 
-        public class UIComponentDesignerAdorner : Adorner, IDisposable
+        public class UIComponentDesignerAdorner : Adorner, IInvocableComponent, IDisposable
         {
+            public const string EXIT = "ZZZZ";
+
             public UIComponentDesignerAdorner(UIComponentContainer container) : base(container)
             {
                 this.Container = container;
@@ -166,14 +170,19 @@ namespace FoxTunes
                     var component = Factory.CreateComponent(panel.Component);
                     if (component != null)
                     {
-                        components.Add(new InvocableComponentWrapper(panel, component.Name));
+                        components.Add(new InvocableComponentWrapper(panel, string.Format(Strings.UIComponentDesignerOverlay_Path_Parent, component.Name)));
                     }
                     else
                     {
                         components.Add(panel);
                     }
                 }
-                components.Add(this.Container);
+                if (this.Container != null)
+                {
+                    var component = Factory.CreateComponent(this.Container.Component);
+                    components.Add(new InvocableComponentWrapper(this.Container, component.Name));
+                }
+                components.Add(this);
                 this.ContextMenu = new Menu()
                 {
                     Category = InvocationComponent.CATEGORY_GLOBAL,
@@ -218,6 +227,45 @@ namespace FoxTunes
                 var rectangle = new Rect(this.RenderSize);
                 drawingContext.DrawRectangle(brush, pen, rectangle);
             }
+
+            public virtual IEnumerable<string> InvocationCategories
+            {
+                get
+                {
+                    yield return InvocationComponent.CATEGORY_GLOBAL;
+                }
+            }
+
+            public virtual IEnumerable<IInvocationComponent> Invocations
+            {
+                get
+                {
+                    if (!Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, Strings.UIComponentContainer_Exit, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    }
+                }
+            }
+
+            public virtual Task InvokeAsync(IInvocationComponent component)
+            {
+                switch (component.Id)
+                {
+                    case EXIT:
+                        return this.Exit();
+                }
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+
+            public Task Exit()
+            {
+                return Windows.Invoke(() => Behaviour.IsDesigning = false);
+            }
+
 
             public bool IsDisposed { get; private set; }
 
