@@ -9,14 +9,6 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     public class UIComponentFactory : StandardFactory
     {
-        public UIComponentConfiguration CreateConfiguration(UIComponent component)
-        {
-            return new UIComponentConfiguration()
-            {
-                Component = component
-            };
-        }
-
         public FrameworkElement CreateControl(UIComponentConfiguration configuration, out UIComponentBase component)
         {
             if (configuration.Component == null)

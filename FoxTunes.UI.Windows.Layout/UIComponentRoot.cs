@@ -61,9 +61,32 @@ namespace FoxTunes
             OnActiveChanged(this);
         }
 
+        public UIComponentContainer Container
+        {
+            get
+            {
+                return this.Content as UIComponentContainer;
+            }
+        }
+
         protected override void CreateBindings()
         {
             //Nothing to do.
+        }
+
+        public bool Contains(UIComponentConfiguration configuration, out UIComponentContainer container)
+        {
+            foreach (var child in this.FindChildren<UIComponentContainer>())
+            {
+                if (!object.ReferenceEquals(child.Configuration, configuration))
+                {
+                    continue;
+                }
+                container = child;
+                return true;
+            }
+            container = null;
+            return false;
         }
 
         public bool IsDisposed { get; private set; }

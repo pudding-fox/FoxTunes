@@ -134,7 +134,27 @@ namespace FoxTunes
 
         public void ShowDesignerOverlay(UIComponentConfiguration configuration)
         {
+            var container = default(UIComponentContainer);
+            var designerOverlay = this.GetDesignerOverlay(configuration, out container);
+            if (designerOverlay == null)
+            {
+                return;
+            }
+            designerOverlay.ShowDesignerOverlay(container);
+        }
 
+        protected virtual UIComponentDesignerOverlay GetDesignerOverlay(UIComponentConfiguration configuration, out UIComponentContainer container)
+        {
+            foreach (var designerOverlay in this.Overlays)
+            {
+                if (!designerOverlay.Root.Contains(configuration, out container))
+                {
+                    continue;
+                }
+                return designerOverlay;
+            }
+            container = null;
+            return null;
         }
 
         protected virtual void HideDesignerOverlay()
@@ -150,6 +170,8 @@ namespace FoxTunes
                 designerOverlay.Dispose();
             }
             this.Overlays.Clear();
+
+            Windows.Registrations.Hide(LayoutTreeWindow.ID);
         }
 
         public IEnumerable<string> InvocationCategories

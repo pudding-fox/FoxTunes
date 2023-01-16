@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -91,10 +89,7 @@ namespace FoxTunes.ViewModel
                 var configurations = new List<UIComponentConfiguration>();
                 foreach (var root in UIComponentRoot.Active)
                 {
-                    root.AddHandler(
-                        UIComponentContainer.ConfigurationChangedEvent,
-                        new RoutedPropertyChangedEventHandler<UIComponentConfiguration>(this.OnConfigurationChanged)
-                    );
+                    root.Container.ConfigurationChanged += this.OnConfigurationChanged;
                     configurations.Add(root.Configuration);
                 }
                 this.Configurations = new ObservableCollection<UIComponentConfiguration>(configurations);

@@ -50,7 +50,7 @@ namespace FoxTunes
             return result.VisualHit.FindAncestor<UIComponentContainer>();
         }
 
-        protected virtual void ShowDesignerOverlay(UIComponentContainer container)
+        public void ShowDesignerOverlay(UIComponentContainer container)
         {
             Container = container;
             var layer = AdornerLayer.GetAdornerLayer(container);
