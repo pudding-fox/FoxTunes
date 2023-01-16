@@ -51,22 +51,22 @@ namespace FoxTunes
 
         public Grid Grid { get; private set; }
 
-        protected override void OnComponentChanged()
+        protected override void OnConfigurationChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
                 this.UpdateChildren();
             }
-            base.OnComponentChanged();
+            base.OnConfigurationChanged();
         }
 
         protected virtual void UpdateChildren()
         {
             this.Grid.Children.Clear();
             this.Grid.ColumnDefinitions.Clear();
-            if (this.Component.Children != null && this.Component.Children.Count > 0)
+            if (this.Configuration.Children != null && this.Configuration.Children.Count > 0)
             {
-                foreach (var component in this.Component.Children)
+                foreach (var component in this.Configuration.Children)
                 {
                     var horizontalAlignment = default(string);
                     var verticalAlignment = default(string);
@@ -85,7 +85,7 @@ namespace FoxTunes
             {
                 var component = new UIComponentConfiguration();
                 this.AddComponent(component, Fill, Fill);
-                this.Component.Children = new ObservableCollection<UIComponentConfiguration>()
+                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     component
                 };
@@ -96,27 +96,27 @@ namespace FoxTunes
         {
             var container = new UIComponentContainer()
             {
-                Component = component,
+                Configuration = component,
                 HorizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), horizontalAlignment),
                 VerticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), verticalAlignment),
             };
             //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
-            container.ComponentChanged += (sender, e) =>
+            container.ConfigurationChanged += (sender, e) =>
             {
-                this.UpdateComponent(component, container.Component);
+                this.UpdateComponent(component, container.Configuration);
             };
             this.Grid.Children.Add(container);
         }
 
         protected virtual void UpdateComponent(UIComponentConfiguration originalComponent, UIComponentConfiguration newComponent)
         {
-            for (var a = 0; a < this.Component.Children.Count; a++)
+            for (var a = 0; a < this.Configuration.Children.Count; a++)
             {
-                if (!object.ReferenceEquals(this.Component.Children[a], originalComponent))
+                if (!object.ReferenceEquals(this.Configuration.Children[a], originalComponent))
                 {
                     continue;
                 }
-                this.Component.Children[a] = newComponent;
+                this.Configuration.Children[a] = newComponent;
                 this.UpdateChildren();
                 return;
             }
@@ -149,13 +149,13 @@ namespace FoxTunes
                 var verticalAlignment = default(string);
                 var container = UIComponentDesignerOverlay.Container;
 
-                if (container != null && container.Component != null)
+                if (container != null && container.Configuration != null)
                 {
-                    if (!container.Component.MetaData.TryGetValue(HorizontalAlignment, out horizontalAlignment))
+                    if (!container.Configuration.MetaData.TryGetValue(HorizontalAlignment, out horizontalAlignment))
                     {
                         horizontalAlignment = Fill;
                     }
-                    if (!container.Component.MetaData.TryGetValue(VerticalAlignment, out verticalAlignment))
+                    if (!container.Configuration.MetaData.TryGetValue(VerticalAlignment, out verticalAlignment))
                     {
                         verticalAlignment = Fill;
                     }
@@ -257,7 +257,7 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                this.Component.Children.Add(new UIComponentConfiguration());
+                this.Configuration.Children.Add(new UIComponentConfiguration());
                 this.UpdateChildren();
             });
         }
@@ -266,13 +266,13 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                for (var a = 0; a < this.Component.Children.Count; a++)
+                for (var a = 0; a < this.Configuration.Children.Count; a++)
                 {
-                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
+                    if (!object.ReferenceEquals(this.Configuration.Children[a], container.Configuration))
                     {
                         continue;
                     }
-                    this.Component.Children.RemoveAt(a);
+                    this.Configuration.Children.RemoveAt(a);
                     this.UpdateChildren();
                     return;
                 }
@@ -285,16 +285,16 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                for (var a = 0; a < this.Component.Children.Count; a++)
+                for (var a = 0; a < this.Configuration.Children.Count; a++)
                 {
-                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
+                    if (!object.ReferenceEquals(this.Configuration.Children[a], container.Configuration))
                     {
                         continue;
                     }
-                    if (this.Component.Children.Count - 1 > a)
+                    if (this.Configuration.Children.Count - 1 > a)
                     {
-                        this.Component.Children[a] = this.Component.Children[a + 1];
-                        this.Component.Children[a + 1] = container.Component;
+                        this.Configuration.Children[a] = this.Configuration.Children[a + 1];
+                        this.Configuration.Children[a + 1] = container.Configuration;
                         this.UpdateChildren();
                     }
                     return;
@@ -308,16 +308,16 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                for (var a = 0; a < this.Component.Children.Count; a++)
+                for (var a = 0; a < this.Configuration.Children.Count; a++)
                 {
-                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
+                    if (!object.ReferenceEquals(this.Configuration.Children[a], container.Configuration))
                     {
                         continue;
                     }
                     if (a > 0)
                     {
-                        this.Component.Children[a] = this.Component.Children[a - 1];
-                        this.Component.Children[a - 1] = container.Component;
+                        this.Configuration.Children[a] = this.Configuration.Children[a - 1];
+                        this.Configuration.Children[a - 1] = container.Configuration;
                         this.UpdateChildren();
                     }
                     return;
@@ -331,12 +331,12 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (container.Component == null)
+                if (container.Configuration == null)
                 {
-                    container.Component = new UIComponentConfiguration();
+                    container.Configuration = new UIComponentConfiguration();
                 }
-                container.Component.MetaData.AddOrUpdate(HorizontalAlignment, Fill);
-                container.Component.MetaData.AddOrUpdate(VerticalAlignment, Fill);
+                container.Configuration.MetaData.AddOrUpdate(HorizontalAlignment, Fill);
+                container.Configuration.MetaData.AddOrUpdate(VerticalAlignment, Fill);
                 this.UpdateChildren();
             });
         }
@@ -345,11 +345,11 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (container.Component == null)
+                if (container.Configuration == null)
                 {
-                    container.Component = new UIComponentConfiguration();
+                    container.Configuration = new UIComponentConfiguration();
                 }
-                container.Component.MetaData.AddOrUpdate(HorizontalAlignment, alignment);
+                container.Configuration.MetaData.AddOrUpdate(HorizontalAlignment, alignment);
                 this.UpdateChildren();
             });
         }
@@ -358,11 +358,11 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (container.Component == null)
+                if (container.Configuration == null)
                 {
-                    container.Component = new UIComponentConfiguration();
+                    container.Configuration = new UIComponentConfiguration();
                 }
-                container.Component.MetaData.AddOrUpdate(VerticalAlignment, alignment);
+                container.Configuration.MetaData.AddOrUpdate(VerticalAlignment, alignment);
                 this.UpdateChildren();
             });
         }

@@ -45,18 +45,18 @@ namespace FoxTunes
 
         public Grid Grid { get; private set; }
 
-        protected override void OnComponentChanged()
+        protected override void OnConfigurationChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
                 this.UpdateChildren();
             }
-            base.OnComponentChanged();
+            base.OnConfigurationChanged();
         }
 
         protected virtual IEnumerable<UIComponentConfiguration> GetComponents(string alignment)
         {
-            return this.Component.Children.Where(component =>
+            return this.Configuration.Children.Where(component =>
             {
                 var value = default(string);
                 if (component.MetaData.TryGetValue(Alignment, out value))
@@ -72,7 +72,7 @@ namespace FoxTunes
         {
             this.Grid.Children.Clear();
             this.Grid.ColumnDefinitions.Clear();
-            if (this.Component.Children != null && this.Component.Children.Count > 0)
+            if (this.Configuration.Children != null && this.Configuration.Children.Count > 0)
             {
                 this.AddLeft(this.GetComponents(AlignLeft));
                 this.AddStretch(this.GetComponents(AlignStretch));
@@ -82,7 +82,7 @@ namespace FoxTunes
             {
                 var component = new UIComponentConfiguration();
                 this.AddLeft(new[] { component });
-                this.Component.Children = new ObservableCollection<UIComponentConfiguration>()
+                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     component
                 };
@@ -134,14 +134,14 @@ namespace FoxTunes
             });
             var container = new UIComponentContainer()
             {
-                Component = component,
+                Configuration = component,
                 Margin = margin,
                 HorizontalAlignment = alignment,
             };
             //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
-            container.ComponentChanged += (sender, e) =>
+            container.ConfigurationChanged += (sender, e) =>
             {
-                this.UpdateComponent(component, container.Component);
+                this.UpdateComponent(component, container.Configuration);
             };
             Grid.SetColumn(container, this.Grid.ColumnDefinitions.Count - 1);
             this.Grid.Children.Add(container);
@@ -149,13 +149,13 @@ namespace FoxTunes
 
         protected virtual void UpdateComponent(UIComponentConfiguration originalComponent, UIComponentConfiguration newComponent)
         {
-            for (var a = 0; a < this.Component.Children.Count; a++)
+            for (var a = 0; a < this.Configuration.Children.Count; a++)
             {
-                if (!object.ReferenceEquals(this.Component.Children[a], originalComponent))
+                if (!object.ReferenceEquals(this.Configuration.Children[a], originalComponent))
                 {
                     continue;
                 }
-                this.Component.Children[a] = newComponent;
+                this.Configuration.Children[a] = newComponent;
                 this.UpdateChildren();
                 return;
             }
@@ -186,9 +186,9 @@ namespace FoxTunes
             {
                 var alignment = default(string);
                 var container = UIComponentDesignerOverlay.Container;
-                if (container != null && container.Component != null)
+                if (container != null && container.Configuration != null)
                 {
-                    if (!container.Component.MetaData.TryGetValue(Alignment, out alignment))
+                    if (!container.Configuration.MetaData.TryGetValue(Alignment, out alignment))
                     {
                         //Align left by default.
                         alignment = AlignLeft;
@@ -273,7 +273,7 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                this.Component.Children.Add(new UIComponentConfiguration());
+                this.Configuration.Children.Add(new UIComponentConfiguration());
                 this.UpdateChildren();
             });
         }
@@ -283,13 +283,13 @@ namespace FoxTunes
             return Windows.Invoke(() =>
             {
                 var component = new UIComponentConfiguration();
-                var index = this.Component.Children.IndexOf(container.Component);
+                var index = this.Configuration.Children.IndexOf(container.Configuration);
                 var alignment = default(string);
-                if (container.Component.MetaData.TryGetValue(Alignment, out alignment))
+                if (container.Configuration.MetaData.TryGetValue(Alignment, out alignment))
                 {
                     component.MetaData.TryAdd(Alignment, alignment);
                 }
-                this.Component.Children.Insert(index + 1, component);
+                this.Configuration.Children.Insert(index + 1, component);
                 this.UpdateChildren();
             });
         }
@@ -298,13 +298,13 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                for (var a = 0; a < this.Component.Children.Count; a++)
+                for (var a = 0; a < this.Configuration.Children.Count; a++)
                 {
-                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
+                    if (!object.ReferenceEquals(this.Configuration.Children[a], container.Configuration))
                     {
                         continue;
                     }
-                    this.Component.Children.RemoveAt(a);
+                    this.Configuration.Children.RemoveAt(a);
                     this.UpdateChildren();
                     return;
                 }
@@ -328,21 +328,21 @@ namespace FoxTunes
             return Windows.Invoke(() =>
             {
                 var containerAlignment = default(string);
-                if (!container.Component.MetaData.TryGetValue(Alignment, out containerAlignment))
+                if (!container.Configuration.MetaData.TryGetValue(Alignment, out containerAlignment))
                 {
                     //Align left by default.
                     containerAlignment = AlignLeft;
                 }
-                for (var a = 0; a < this.Component.Children.Count; a++)
+                for (var a = 0; a < this.Configuration.Children.Count; a++)
                 {
-                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
+                    if (!object.ReferenceEquals(this.Configuration.Children[a], container.Configuration))
                     {
                         continue;
                     }
-                    for (var b = step(a); b >= 0 && b < this.Component.Children.Count; b = step(b))
+                    for (var b = step(a); b >= 0 && b < this.Configuration.Children.Count; b = step(b))
                     {
                         var childAlignment = default(string);
-                        if (!this.Component.Children[b].MetaData.TryGetValue(Alignment, out childAlignment))
+                        if (!this.Configuration.Children[b].MetaData.TryGetValue(Alignment, out childAlignment))
                         {
                             //Align left by default.
                             childAlignment = AlignLeft;
@@ -352,8 +352,8 @@ namespace FoxTunes
                             //Alignment differs.
                             continue;
                         }
-                        this.Component.Children[a] = this.Component.Children[b];
-                        this.Component.Children[b] = container.Component;
+                        this.Configuration.Children[a] = this.Configuration.Children[b];
+                        this.Configuration.Children[b] = container.Configuration;
                         this.UpdateChildren();
                         return;
                     }
@@ -367,11 +367,11 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (container.Component == null)
+                if (container.Configuration == null)
                 {
-                    container.Component = new UIComponentConfiguration();
+                    container.Configuration = new UIComponentConfiguration();
                 }
-                container.Component.MetaData.AddOrUpdate(Alignment, alignment);
+                container.Configuration.MetaData.AddOrUpdate(Alignment, alignment);
                 this.UpdateChildren();
             });
         }

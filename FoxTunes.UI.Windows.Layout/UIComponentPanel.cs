@@ -60,55 +60,55 @@ namespace FoxTunes
 
         public event EventHandler IsInDesignModeChanged;
 
-        public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
-            "Component",
+        public static readonly DependencyProperty ConfigurationProperty = DependencyProperty.Register(
+            "Configuration",
             typeof(UIComponentConfiguration),
             typeof(UIComponentPanel),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnComponentChanged))
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnConfigurationChanged))
         );
 
-        public static UIComponentConfiguration GetComponent(UIComponentPanel source)
+        public static UIComponentConfiguration GetConfiguration(UIComponentPanel source)
         {
-            return (UIComponentConfiguration)source.GetValue(ComponentProperty);
+            return (UIComponentConfiguration)source.GetValue(ConfigurationProperty);
         }
 
-        public static void SetComponent(UIComponentPanel source, UIComponentConfiguration value)
+        public static void SetConfiguration(UIComponentPanel source, UIComponentConfiguration value)
         {
-            source.SetValue(ComponentProperty, value);
+            source.SetValue(ConfigurationProperty, value);
         }
 
-        public static void OnComponentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        public static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var container = sender as UIComponentPanel;
             if (container == null)
             {
                 return;
             }
-            container.OnComponentChanged();
+            container.OnConfigurationChanged();
         }
 
-        public UIComponentConfiguration Component
+        public UIComponentConfiguration Configuration
         {
             get
             {
-                return this.GetValue(ComponentProperty) as UIComponentConfiguration;
+                return this.GetValue(ConfigurationProperty) as UIComponentConfiguration;
             }
             set
             {
-                this.SetValue(ComponentProperty, value);
+                this.SetValue(ConfigurationProperty, value);
             }
         }
 
-        protected virtual void OnComponentChanged()
+        protected virtual void OnConfigurationChanged()
         {
-            if (this.ComponentChanged != null)
+            if (this.ConfigurationChanged != null)
             {
-                this.ComponentChanged(this, EventArgs.Empty);
+                this.ConfigurationChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Component");
+            this.OnPropertyChanged("Configuration");
         }
 
-        public event EventHandler ComponentChanged;
+        public event EventHandler ConfigurationChanged;
 
         protected UIComponentPanel()
         {

@@ -342,33 +342,33 @@ namespace FoxTunes
             base.OnIsInDesignModeChanged();
         }
 
-        protected override void OnComponentChanged()
+        protected override void OnConfigurationChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
                 this.UpdateMetaData();
                 this.UpdateChildren();
             }
-            base.OnComponentChanged();
+            base.OnConfigurationChanged();
         }
 
         protected virtual void UpdateChildren()
         {
-            if (this.Component.Children == null)
+            if (this.Configuration.Children == null)
             {
-                this.Component.Children = new ObservableCollection<UIComponentConfiguration>()
+                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     new UIComponentConfiguration(),
                     new UIComponentConfiguration()
                 };
                 return;
             }
-            for (var a = this.Component.Children.Count; a < 2; a++)
+            for (var a = this.Configuration.Children.Count; a < 2; a++)
             {
-                this.Component.Children.Add(new UIComponentConfiguration());
+                this.Configuration.Children.Add(new UIComponentConfiguration());
             }
-            this.LeftComponent = this.Component.Children[0];
-            this.RightComponent = this.Component.Children[1];
+            this.LeftComponent = this.Configuration.Children[0];
+            this.RightComponent = this.Configuration.Children[1];
         }
 
         protected virtual void UpdateMetaData()
@@ -377,7 +377,7 @@ namespace FoxTunes
             var splitterDirection = default(string);
             var collapseLeft = default(string);
             var collapseRight = default(string);
-            if (this.Component.MetaData.TryGetValue(nameof(this.SplitterDistance), out splitterDistance))
+            if (this.Configuration.MetaData.TryGetValue(nameof(this.SplitterDistance), out splitterDistance))
             {
                 this.SplitterDistance = splitterDistance;
             }
@@ -385,7 +385,7 @@ namespace FoxTunes
             {
                 this.SplitterDistance = "1*";
             }
-            if (this.Component.MetaData.TryGetValue(nameof(this.SplitterDirection), out splitterDirection) && IsSplitterDirectionValid(splitterDirection))
+            if (this.Configuration.MetaData.TryGetValue(nameof(this.SplitterDirection), out splitterDirection) && IsSplitterDirectionValid(splitterDirection))
             {
                 this.SplitterDirection = splitterDirection;
             }
@@ -393,7 +393,7 @@ namespace FoxTunes
             {
                 this.SplitterDirection = Enum.GetName(typeof(Dock), Dock.Left);
             }
-            if (this.Component.MetaData.TryGetValue(nameof(this.CollapseLeft), out collapseLeft))
+            if (this.Configuration.MetaData.TryGetValue(nameof(this.CollapseLeft), out collapseLeft))
             {
                 this.CollapseLeft = Convert.ToBoolean(collapseLeft);
             }
@@ -401,7 +401,7 @@ namespace FoxTunes
             {
                 this.CollapseLeft = false;
             }
-            if (this.Component.MetaData.TryGetValue(nameof(this.CollapseRight), out collapseRight))
+            if (this.Configuration.MetaData.TryGetValue(nameof(this.CollapseRight), out collapseRight))
             {
                 this.CollapseRight = Convert.ToBoolean(collapseRight);
             }
@@ -425,9 +425,9 @@ namespace FoxTunes
 
         protected virtual void OnLeftComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count >= 1 && this.LeftComponent != null)
+            if (this.Configuration != null && this.Configuration.Children.Count >= 1 && this.LeftComponent != null)
             {
-                this.Component.Children[0] = this.LeftComponent;
+                this.Configuration.Children[0] = this.LeftComponent;
             }
             if (this.LeftComponentChanged != null)
             {
@@ -452,9 +452,9 @@ namespace FoxTunes
 
         protected virtual void OnRightComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count >= 2 && this.RightComponent != null)
+            if (this.Configuration != null && this.Configuration.Children.Count >= 2 && this.RightComponent != null)
             {
-                this.Component.Children[1] = this.RightComponent;
+                this.Configuration.Children[1] = this.RightComponent;
             }
             if (this.RightComponentChanged != null)
             {
@@ -527,9 +527,9 @@ namespace FoxTunes
 
         protected virtual void OnSplitterDistanceChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
-                this.Component.MetaData.AddOrUpdate(
+                this.Configuration.MetaData.AddOrUpdate(
                     nameof(this.SplitterDistance),
                     this.SplitterDistance
                 );
@@ -557,9 +557,9 @@ namespace FoxTunes
 
         protected virtual void OnSplitterDirectionChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
-                this.Component.MetaData.AddOrUpdate(
+                this.Configuration.MetaData.AddOrUpdate(
                     nameof(this.SplitterDirection),
                     this.SplitterDirection
                 );
@@ -588,9 +588,9 @@ namespace FoxTunes
 
         protected virtual void OnCollapseLeftChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
-                this.Component.MetaData.AddOrUpdate(
+                this.Configuration.MetaData.AddOrUpdate(
                     nameof(this.CollapseLeft),
                     Convert.ToString(this.CollapseLeft)
                 );
@@ -619,9 +619,9 @@ namespace FoxTunes
 
         protected virtual void OnCollapseRightChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
-                this.Component.MetaData.AddOrUpdate(
+                this.Configuration.MetaData.AddOrUpdate(
                     nameof(this.CollapseRight),
                     Convert.ToString(this.CollapseRight)
                 );

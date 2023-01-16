@@ -167,9 +167,9 @@ namespace FoxTunes
                 var components = new List<IInvocableComponent>();
                 if (panel != null)
                 {
-                    if (panel.Component != null && panel.Component.Component != null)
+                    if (panel.Configuration != null && panel.Configuration.Component != null)
                     {
-                        components.Add(new InvocableComponentWrapper(panel, string.Format(Strings.UIComponentDesignerOverlay_Path_Parent, panel.Component.Component.Name)));
+                        components.Add(new InvocableComponentWrapper(panel, string.Format(Strings.UIComponentDesignerOverlay_Path_Parent, panel.Configuration.Component.Name)));
                     }
                     else
                     {
@@ -178,9 +178,9 @@ namespace FoxTunes
                 }
                 if (this.Container != null)
                 {
-                    if (this.Container.Component != null && this.Container.Component.Component != null)
+                    if (this.Container.Configuration != null && this.Container.Configuration.Component != null)
                     {
-                        components.Add(new InvocableComponentWrapper(this.Container, this.Container.Component.Component.Name));
+                        components.Add(new InvocableComponentWrapper(this.Container, this.Container.Configuration.Component.Name));
                     }
                     else
                     {

@@ -33,7 +33,7 @@ namespace FoxTunes
             component = ComponentActivator.Instance.Activate<UIComponentBase>(configuration.Component.Type);
             if (component is IUIComponentPanel panel)
             {
-                panel.Component = configuration;
+                panel.Configuration = configuration;
             }
             //Some components expect to be hosted in a Grid (Artwork..)
             //We might as well add a Rectangle to make the entire thing hit testable.
