@@ -11,7 +11,7 @@ namespace FoxTunes
     {
         public FrameworkElement CreateControl(UIComponentConfiguration configuration, out UIComponentBase component)
         {
-            if (configuration.Component == null)
+            if (configuration.Component.IsEmpty)
             {
                 component = null;
                 return null;

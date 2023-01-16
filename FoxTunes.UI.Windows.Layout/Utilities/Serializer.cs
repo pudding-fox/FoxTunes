@@ -82,7 +82,7 @@ namespace FoxTunes
         private static void SaveComponent(XmlTextWriter writer, UIComponentConfiguration config)
         {
             writer.WriteStartElement(nameof(UIComponentConfiguration));
-            if (config != null && config.Component != null)
+            if (config != null && !config.Component.IsEmpty)
             {
                 writer.WriteAttributeString(nameof(UIComponentConfiguration.Component), config.Component.Id);
                 foreach (var child in config.Children)
@@ -186,7 +186,7 @@ namespace FoxTunes
         {
             if (!reader.IsStartElement(nameof(UIComponentConfiguration)))
             {
-                return null;
+                return new UIComponentConfiguration();
             }
             var component = reader.GetAttribute(nameof(UIComponentConfiguration.Component));
             var children = new List<UIComponentConfiguration>();
@@ -228,7 +228,7 @@ namespace FoxTunes
             }
             return new UIComponentConfiguration()
             {
-                Component = LayoutManager.Instance.GetComponent(component),
+                Component = LayoutManager.Instance.GetComponent(component) ?? UIComponent.None,
                 Children = new ObservableCollection<UIComponentConfiguration>(children),
                 MetaData = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(metaDatas)
             };

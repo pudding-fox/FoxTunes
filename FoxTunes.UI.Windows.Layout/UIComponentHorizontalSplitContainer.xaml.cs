@@ -343,26 +343,14 @@ namespace FoxTunes
 
         protected override void OnConfigurationChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.UpdateMetaData();
-                this.UpdateChildren();
-            }
+            this.UpdateMetaData();
+            this.UpdateChildren();
             base.OnConfigurationChanged();
         }
 
         protected virtual void UpdateChildren()
         {
-            if (this.Configuration.Children == null)
-            {
-                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
-                {
-                    new UIComponentConfiguration(),
-                    new UIComponentConfiguration()
-                };
-                return;
-            }
-            for (var a = this.Configuration.Children.Count; a < 2; a++)
+            while (this.Configuration.Children.Count < 2)
             {
                 this.Configuration.Children.Add(new UIComponentConfiguration());
             }
@@ -424,10 +412,7 @@ namespace FoxTunes
 
         protected virtual void OnTopComponentChanged()
         {
-            if (this.Configuration != null && this.Configuration.Children.Count >= 1 && this.TopComponent != null)
-            {
-                this.Configuration.Children[0] = this.TopComponent;
-            }
+            this.Configuration.Children[0] = this.TopComponent;
             if (this.TopComponentChanged != null)
             {
                 this.TopComponentChanged(this, EventArgs.Empty);
@@ -451,10 +436,7 @@ namespace FoxTunes
 
         protected virtual void OnBottomComponentChanged()
         {
-            if (this.Configuration != null && this.Configuration.Children.Count >= 2 && this.BottomComponent != null)
-            {
-                this.Configuration.Children[1] = this.BottomComponent;
-            }
+            this.Configuration.Children[1] = this.BottomComponent;
             if (this.BottomComponentChanged != null)
             {
                 this.BottomComponentChanged(this, EventArgs.Empty);
@@ -526,13 +508,10 @@ namespace FoxTunes
 
         protected virtual void OnSplitterDistanceChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.SplitterDistance),
-                    this.SplitterDistance
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.SplitterDistance),
+                this.SplitterDistance
+            );
             if (this.SplitterDistanceChanged != null)
             {
                 this.SplitterDistanceChanged(this, EventArgs.Empty);
@@ -556,13 +535,10 @@ namespace FoxTunes
 
         protected virtual void OnSplitterDirectionChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.SplitterDirection),
-                    this.SplitterDirection
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.SplitterDirection),
+                this.SplitterDirection
+            );
             this.UpdateBindings();
             if (this.SplitterDirectionChanged != null)
             {
@@ -587,13 +563,10 @@ namespace FoxTunes
 
         protected virtual void OnCollapseTopChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.CollapseTop),
-                    Convert.ToString(this.CollapseTop)
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.CollapseTop),
+                Convert.ToString(this.CollapseTop)
+            );
             this.UpdateBindings();
             if (this.CollapseTopChanged != null)
             {
@@ -618,13 +591,10 @@ namespace FoxTunes
 
         protected virtual void OnCollapseBottomChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.CollapseBottom),
-                    Convert.ToString(this.CollapseBottom)
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.CollapseBottom),
+                Convert.ToString(this.CollapseBottom)
+            );
             this.UpdateBindings();
             if (this.CollapseBottomChanged != null)
             {

@@ -29,5 +29,21 @@ namespace FoxTunes
         public UIComponentRole Role { get; private set; }
 
         public Type Type { get; private set; }
+
+        public bool IsEmpty
+        {
+            get
+            {
+                return this.Type == null || this.Type == LayoutManager.PLACEHOLDER;
+            }
+        }
+
+        public static UIComponent None
+        {
+            get
+            {
+                return new UIComponent(PLACEHOLDER);
+            }
+        }
     }
 }

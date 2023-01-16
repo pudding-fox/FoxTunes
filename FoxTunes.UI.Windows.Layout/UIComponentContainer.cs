@@ -272,7 +272,7 @@ namespace FoxTunes
             get
             {
                 var attributes = InvocationComponent.ATTRIBUTE_SEPARATOR;
-                if (this.Configuration != null && this.Configuration.Component != null)
+                if (!this.Configuration.Component.IsEmpty)
                 {
                     foreach (var alternative in LayoutManager.Instance.GetComponents(this.Configuration.Component.Role))
                     {
@@ -318,10 +318,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                this.Configuration = new UIComponentConfiguration()
-                {
-                    Component = component
-                };
+                this.Configuration = new UIComponentConfiguration(component);
             });
         }
 

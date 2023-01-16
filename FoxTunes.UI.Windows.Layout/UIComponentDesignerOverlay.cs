@@ -163,7 +163,7 @@ namespace FoxTunes
                 var components = new List<IInvocableComponent>();
                 if (panel != null)
                 {
-                    if (panel.Configuration != null && panel.Configuration.Component != null)
+                    if (!panel.Configuration.Component.IsEmpty)
                     {
                         components.Add(new InvocableComponentWrapper(panel, string.Format(Strings.UIComponentDesignerOverlay_Path_Parent, panel.Configuration.Component.Name)));
                     }
@@ -174,7 +174,7 @@ namespace FoxTunes
                 }
                 if (this.Container != null)
                 {
-                    if (this.Container.Configuration != null && this.Container.Configuration.Component != null)
+                    if (!this.Container.Configuration.Component.IsEmpty)
                     {
                         components.Add(new InvocableComponentWrapper(this.Container, this.Container.Configuration.Component.Name));
                     }

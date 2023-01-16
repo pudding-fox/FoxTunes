@@ -36,10 +36,7 @@ namespace FoxTunes
 
         protected override void OnConfigurationChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.UpdateChildren();
-            }
+            this.UpdateChildren();
             base.OnConfigurationChanged();
         }
 
@@ -47,7 +44,7 @@ namespace FoxTunes
         {
             var index = this.TabControl.SelectedIndex;
             this.TabControl.Items.Clear(UIDisposerFlags.All);
-            if (this.Configuration.Children != null && this.Configuration.Children.Count > 0)
+            if (this.Configuration.Children.Count > 0)
             {
                 foreach (var component in this.Configuration.Children)
                 {
@@ -62,10 +59,7 @@ namespace FoxTunes
             {
                 var component = new UIComponentConfiguration();
                 this.AddComponent(component);
-                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
-                {
-                    component
-                };
+                this.Configuration.Children.Add(component);
             }
         }
 
@@ -276,15 +270,12 @@ namespace FoxTunes
 
         public string GetHeader(UIComponentContainer container)
         {
-            if (container.Configuration != null)
+            var header = default(string);
+            if (container.Configuration.MetaData.TryGetValue(Header, out header) && !string.IsNullOrEmpty(header))
             {
-                var header = default(string);
-                if (container.Configuration.MetaData.TryGetValue(Header, out header) && !string.IsNullOrEmpty(header))
-                {
-                    return header;
-                }
+                return header;
             }
-            if (container.Configuration.Component != null)
+            if (!container.Configuration.Component.IsEmpty)
             {
                 return container.Configuration.Component.Name;
             }

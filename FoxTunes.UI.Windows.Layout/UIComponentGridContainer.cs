@@ -47,10 +47,7 @@ namespace FoxTunes
 
         protected override void OnConfigurationChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.UpdateChildren();
-            }
+            this.UpdateChildren();
             base.OnConfigurationChanged();
         }
 
@@ -72,7 +69,7 @@ namespace FoxTunes
         {
             this.Grid.Children.Clear();
             this.Grid.ColumnDefinitions.Clear();
-            if (this.Configuration.Children != null && this.Configuration.Children.Count > 0)
+            if (this.Configuration.Children.Count > 0)
             {
                 this.AddLeft(this.GetComponents(AlignLeft));
                 this.AddStretch(this.GetComponents(AlignStretch));
@@ -82,10 +79,7 @@ namespace FoxTunes
             {
                 var component = new UIComponentConfiguration();
                 this.AddLeft(new[] { component });
-                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
-                {
-                    component
-                };
+                this.Configuration.Children.Add(component);
             }
         }
 
@@ -186,7 +180,7 @@ namespace FoxTunes
             {
                 var alignment = default(string);
                 var container = UIComponentDesignerOverlay.Container;
-                if (container != null && container.Configuration != null)
+                if (container != null)
                 {
                     if (!container.Configuration.MetaData.TryGetValue(Alignment, out alignment))
                     {
