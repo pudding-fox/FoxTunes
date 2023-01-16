@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -86,8 +88,34 @@ namespace FoxTunes.ViewModel
         {
             return Windows.Invoke(() =>
             {
-                this.Configurations = new ObservableCollection<UIComponentConfiguration>(UIComponentRoot.Active.Select(root => root.Configuration));
+                var configurations = new List<UIComponentConfiguration>();
+                foreach (var root in UIComponentRoot.Active)
+                {
+                    root.AddHandler(
+                        UIComponentContainer.ConfigurationChangedEvent,
+                        new RoutedPropertyChangedEventHandler<UIComponentConfiguration>(this.OnConfigurationChanged)
+                    );
+                    configurations.Add(root.Configuration);
+                }
+                this.Configurations = new ObservableCollection<UIComponentConfiguration>(configurations);
             });
+        }
+
+        protected virtual void OnConfigurationChanged(object sender, RoutedPropertyChangedEventArgs<UIComponentConfiguration> e)
+        {
+            if (this.Configurations == null)
+            {
+                return;
+            }
+            for (var a = 0; a < this.Configurations.Count; a++)
+            {
+                if (!object.ReferenceEquals(this.Configurations[a], e.OldValue))
+                {
+                    continue;
+                }
+                this.Configurations[a] = e.NewValue;
+                break;
+            }
         }
 
         public ICommand ShowDesignerOverlayCommand

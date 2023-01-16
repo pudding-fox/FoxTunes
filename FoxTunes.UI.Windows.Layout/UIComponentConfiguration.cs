@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace FoxTunes
 {
-    public class UIComponentConfiguration 
+    public class UIComponentConfiguration
     {
         public UIComponentConfiguration()
         {
