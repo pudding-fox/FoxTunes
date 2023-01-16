@@ -12,9 +12,15 @@ namespace FoxTunes
     {
         public const string DESIGN = "ZZZZ";
 
+        static LayoutDesignerBehaviour()
+        {
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(LayoutTreeWindow.ID, UserInterfaceWindowRole.None, () => new LayoutTreeWindow()));
+        }
+
         public LayoutDesignerBehaviour()
         {
             this.Overlays = new List<UIComponentDesignerOverlay>();
+            Instance = this;
         }
 
         public IList<UIComponentDesignerOverlay> Overlays { get; private set; }
@@ -75,7 +81,7 @@ namespace FoxTunes
         {
             Windows.ShuttingDown += this.OnShuttingDown;
             UIComponentRoot.ActiveChanged += this.OnActiveChanged;
-            Windows.Registrations.AddIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
+            Windows.Registrations.AddIsVisibleChanged(LayoutTreeWindow.ID, this.OnWindowIsVisibleChanged);
             this.Core = core;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             base.InitializeComponent(core);
@@ -102,12 +108,12 @@ namespace FoxTunes
 
         protected virtual void OnWindowIsVisibleChanged(object sender, EventArgs e)
         {
-            this.IsDesigning = Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID);
+            this.IsDesigning = Windows.Registrations.IsVisible(LayoutTreeWindow.ID);
         }
 
         protected virtual void ShowDesignerOverlay()
         {
-            this.DesignerTask = new LayoutDesignerBehaviourTask(this);
+            this.DesignerTask = new LayoutDesignerBehaviourTask();
             this.DesignerTask.InitializeComponent(this.Core);
             var task = this.BackgroundTaskEmitter.Send(this.DesignerTask);
             this.Dispatch(this.DesignerTask.Run);
@@ -115,6 +121,8 @@ namespace FoxTunes
             {
                 this.ShowDesignerOverlay(root);
             }
+
+            Windows.Registrations.Show(LayoutTreeWindow.ID);
         }
 
         protected virtual void ShowDesignerOverlay(UIComponentRoot root)
@@ -122,6 +130,11 @@ namespace FoxTunes
             var designerOverlay = new UIComponentDesignerOverlay(root);
             designerOverlay.InitializeComponent(this.Core);
             this.Overlays.Add(designerOverlay);
+        }
+
+        public void ShowDesignerOverlay(UIComponentConfiguration configuration)
+        {
+
         }
 
         protected virtual void HideDesignerOverlay()
@@ -206,7 +219,7 @@ namespace FoxTunes
             this.HideDesignerOverlay();
             Windows.ShuttingDown -= this.OnShuttingDown;
             UIComponentRoot.ActiveChanged -= this.OnActiveChanged;
-            Windows.Registrations.RemoveIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
+            Windows.Registrations.RemoveIsVisibleChanged(LayoutTreeWindow.ID, this.OnWindowIsVisibleChanged);
         }
 
         ~LayoutDesignerBehaviour()
@@ -222,24 +235,19 @@ namespace FoxTunes
             }
         }
 
+        public static LayoutDesignerBehaviour Instance { get; private set; }
+
         public class LayoutDesignerBehaviourTask : BackgroundTask
         {
             public const string ID = "A8C4F704-F688-4CD2-8CF8-BAF8C7815759";
 
-            private LayoutDesignerBehaviourTask() : base(ID)
+            public LayoutDesignerBehaviourTask() : base(ID)
             {
-                this.Name = "Editing Layout";
+                this.Name = Strings.LayoutDesignerBehaviourTask_Name;
                 this.Handle = new AutoResetEvent(false);
             }
 
-            public LayoutDesignerBehaviourTask(LayoutDesignerBehaviour behaviour) : this()
-            {
-                this.Behaviour = behaviour;
-            }
-
             public AutoResetEvent Handle { get; private set; }
-
-            public LayoutDesignerBehaviour Behaviour { get; private set; }
 
             public override bool Visible
             {
@@ -269,7 +277,7 @@ namespace FoxTunes
 
             protected override void OnCancellationRequested()
             {
-                var task = Windows.Invoke(() => this.Behaviour.IsDesigning = false);
+                var task = Windows.Invoke(() => LayoutDesignerBehaviour.Instance.IsDesigning = false);
                 base.OnCancellationRequested();
             }
 

@@ -44,8 +44,6 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public LayoutDesignerBehaviour LayoutDesignerBehaviour { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         public SelectionConfigurationElement Layout { get; private set; }
@@ -259,9 +257,9 @@ namespace FoxTunes
             global::FoxTunes.LayoutManager.Instance.ProviderChanged += this.OnProviderChanged;
             global::FoxTunes.Windows.ActiveWindowChanged += this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
+            global::FoxTunes.Windows.Registrations.AddIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
+            LayoutDesignerBehaviour.Instance.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Core = core;
-            this.LayoutDesignerBehaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
-            this.LayoutDesignerBehaviour.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Configuration = core.Components.Configuration;
             this.Layout = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -324,9 +322,14 @@ namespace FoxTunes
             var task = this.Shutdown();
         }
 
+        protected virtual void OnWindowIsVisibleChanged(object sender, EventArgs e)
+        {
+            LayoutDesignerBehaviour.Instance.IsDesigning = global::FoxTunes.Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID);
+        }
+
         protected virtual void OnIsDesigningChanged(object sender, EventArgs e)
         {
-            if (this.LayoutDesignerBehaviour.IsDesigning)
+            if (LayoutDesignerBehaviour.Instance.IsDesigning)
             {
                 return;
             }
@@ -481,10 +484,8 @@ namespace FoxTunes
             global::FoxTunes.LayoutManager.Instance.ProviderChanged -= this.OnProviderChanged;
             global::FoxTunes.Windows.ActiveWindowChanged -= this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
-            if (this.LayoutDesignerBehaviour != null)
-            {
-                this.LayoutDesignerBehaviour.IsDesigningChanged -= this.OnIsDesigningChanged;
-            }
+            global::FoxTunes.Windows.Registrations.RemoveIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
+            LayoutDesignerBehaviour.Instance.IsDesigningChanged -= this.OnIsDesigningChanged;
         }
 
         ~ToolWindowBehaviour()
