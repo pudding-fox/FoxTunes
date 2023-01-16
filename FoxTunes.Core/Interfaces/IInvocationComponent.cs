@@ -12,7 +12,7 @@ namespace FoxTunes.Interfaces
 
         string Description { get; }
 
-        string Path { get; }
+        string Path { get; set; }
 
         object Source { get; set; }
 

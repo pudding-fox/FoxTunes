@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -11,6 +13,8 @@ namespace FoxTunes
 {
     public class UIComponentDesignerOverlay : BaseComponent, IDisposable
     {
+        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
+
         public static UIComponentContainer Container { get; private set; }
 
         public UIComponentDesignerOverlay(UIComponentRoot root)
@@ -159,7 +163,15 @@ namespace FoxTunes
                 var components = new List<IInvocableComponent>();
                 if (panel != null)
                 {
-                    components.Add(panel);
+                    var component = Factory.CreateComponent(panel.Component);
+                    if (component != null)
+                    {
+                        components.Add(new InvocableComponentWrapper(panel, component.Name));
+                    }
+                    else
+                    {
+                        components.Add(panel);
+                    }
                 }
                 components.Add(this.Container);
                 this.ContextMenu = new Menu()
@@ -244,6 +256,51 @@ namespace FoxTunes
                 catch
                 {
                     //Nothing can be done, never throw on GC thread.
+                }
+            }
+
+            public class InvocableComponentWrapper : BaseComponent, IInvocableComponent
+            {
+                public InvocableComponentWrapper(IInvocableComponent component, string prefix)
+                {
+                    this.Component = component;
+                    this.Prefix = prefix;
+                }
+
+                public IInvocableComponent Component { get; private set; }
+
+                public string Prefix { get; private set; }
+
+                public IEnumerable<string> InvocationCategories
+                {
+                    get
+                    {
+                        return this.Component.InvocationCategories;
+                    }
+                }
+
+                public IEnumerable<IInvocationComponent> Invocations
+                {
+                    get
+                    {
+                        foreach (var invocation in this.Component.Invocations)
+                        {
+                            if (!string.IsNullOrEmpty(invocation.Path))
+                            {
+                                invocation.Path = string.Concat(this.Prefix, Path.AltDirectorySeparatorChar, invocation.Path);
+                            }
+                            else
+                            {
+                                invocation.Path = this.Prefix;
+                            }
+                            yield return invocation;
+                        }
+                    }
+                }
+
+                public Task InvokeAsync(IInvocationComponent component)
+                {
+                    return this.Component.InvokeAsync(component);
                 }
             }
         }

@@ -11,6 +11,8 @@ namespace FoxTunes
     {
         public static void Dispose(FrameworkElement element, UIDisposerFlags flags = UIDisposerFlags.Default)
         {
+            var history = new HashSet<FrameworkElement>();
+            history.Add(element);
             var stack = new Stack<FrameworkElement>();
             stack.Push(element);
             while (stack.Count > 0)
@@ -35,6 +37,10 @@ namespace FoxTunes
                         var child = VisualTreeHelper.GetChild(element, a) as FrameworkElement;
                         if (child != null)
                         {
+                            if (!history.Add(child))
+                            {
+                                continue;
+                            }
                             stack.Push(child);
                         }
                     }
@@ -43,6 +49,10 @@ namespace FoxTunes
                 {
                     foreach (var child in LogicalTreeHelper.GetChildren(element).OfType<FrameworkElement>())
                     {
+                        if (!history.Add(child))
+                        {
+                            continue;
+                        }
                         stack.Push(child);
                     }
                 }

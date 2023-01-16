@@ -57,7 +57,7 @@ namespace FoxTunes
 
         public string Description { get; }
 
-        public string Path { get; }
+        public string Path { get; set; }
 
         public object Source { get; set; }
 
