@@ -90,7 +90,15 @@ namespace FoxTunes.ViewModel
                 foreach (var root in UIComponentRoot.Active)
                 {
                     root.Container.ConfigurationChanged += this.OnConfigurationChanged;
-                    configurations.Add(root.Configuration);
+                    if (root.Configuration != null)
+                    {
+                        configurations.Add(root.Configuration);
+                    }
+                    else
+                    {
+                        //TODO: This is garbage. The UIComponentConfiguration hasn't been created yet but will be in a moment. 
+                        root.ConfigurationChanged += this.OnConfigurationChanged;
+                    }
                 }
                 this.Configurations = new ObservableCollection<UIComponentConfiguration>(configurations);
             });
@@ -111,6 +119,17 @@ namespace FoxTunes.ViewModel
                 this.Configurations[a] = e.NewValue;
                 break;
             }
+        }
+
+        protected virtual void OnConfigurationChanged(object sender, EventArgs e)
+        {
+            var root = sender as UIComponentRoot;
+            if (root == null || root.Configuration == null)
+            {
+                return;
+            }
+            this.Configurations.Add(root.Configuration);
+            root.ConfigurationChanged -= this.OnConfigurationChanged;
         }
 
         public ICommand ShowDesignerOverlayCommand

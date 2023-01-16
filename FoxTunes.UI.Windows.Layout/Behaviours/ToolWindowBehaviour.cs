@@ -401,7 +401,8 @@ namespace FoxTunes
                 Width = 400,
                 Height = 250,
                 ShowWithMainWindow = true,
-                ShowWithMiniWindow = false
+                ShowWithMiniWindow = false,
+                Component = new UIComponentConfiguration()
             };
             var window = await this.Load(config).ConfigureAwait(false);
             if (window == null)
