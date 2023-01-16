@@ -529,11 +529,92 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        internal static string UIComponentStackContainer_Add {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Align Bottom.
+        /// </summary>
+        internal static string UIComponentStackContainer_AlignBottom {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.AlignBottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Align Left.
+        /// </summary>
+        internal static string UIComponentStackContainer_AlignLeft {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.AlignLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Align Right.
+        /// </summary>
+        internal static string UIComponentStackContainer_AlignRight {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.AlignRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Align Top.
+        /// </summary>
+        internal static string UIComponentStackContainer_AlignTop {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.AlignTop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fill.
+        /// </summary>
+        internal static string UIComponentStackContainer_Fill {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.Fill", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Down.
+        /// </summary>
+        internal static string UIComponentStackContainer_MoveDown {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.MoveDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Up.
+        /// </summary>
+        internal static string UIComponentStackContainer_MoveUp {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.MoveUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stack Grid.
         /// </summary>
         internal static string UIComponentStackContainer_Name {
             get {
                 return ResourceManager.GetString("UIComponentStackContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string UIComponentStackContainer_Remove {
+            get {
+                return ResourceManager.GetString("UIComponentStackContainer.Remove", resourceCulture);
             }
         }
         

@@ -273,8 +273,35 @@
   <data name="UIComponentLayoutProviderPresets.Simple.2" xml:space="preserve">
     <value>Simple (With Library)</value>
   </data>
+  <data name="UIComponentStackContainer.Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="UIComponentStackContainer.AlignBottom" xml:space="preserve">
+    <value>Align Bottom</value>
+  </data>
+  <data name="UIComponentStackContainer.AlignLeft" xml:space="preserve">
+    <value>Align Left</value>
+  </data>
+  <data name="UIComponentStackContainer.AlignRight" xml:space="preserve">
+    <value>Align Right</value>
+  </data>
+  <data name="UIComponentStackContainer.AlignTop" xml:space="preserve">
+    <value>Align Top</value>
+  </data>
+  <data name="UIComponentStackContainer.Fill" xml:space="preserve">
+    <value>Fill</value>
+  </data>
+  <data name="UIComponentStackContainer.MoveDown" xml:space="preserve">
+    <value>Move Down</value>
+  </data>
+  <data name="UIComponentStackContainer.MoveUp" xml:space="preserve">
+    <value>Move Up</value>
+  </data>
   <data name="UIComponentStackContainer.Name" xml:space="preserve">
     <value>Stack Grid</value>
+  </data>
+  <data name="UIComponentStackContainer.Remove" xml:space="preserve">
+    <value>Remove</value>
   </data>
   <data name="UIComponentTabContainer.Add" xml:space="preserve">
     <value>Add Tab</value>
