@@ -167,10 +167,9 @@ namespace FoxTunes
                 var components = new List<IInvocableComponent>();
                 if (panel != null)
                 {
-                    var component = Factory.CreateComponent(panel.Component);
-                    if (component != null)
+                    if (panel.Component != null && panel.Component.Component != null)
                     {
-                        components.Add(new InvocableComponentWrapper(panel, string.Format(Strings.UIComponentDesignerOverlay_Path_Parent, component.Name)));
+                        components.Add(new InvocableComponentWrapper(panel, string.Format(Strings.UIComponentDesignerOverlay_Path_Parent, panel.Component.Component.Name)));
                     }
                     else
                     {
@@ -179,8 +178,14 @@ namespace FoxTunes
                 }
                 if (this.Container != null)
                 {
-                    var component = Factory.CreateComponent(this.Container.Component);
-                    components.Add(new InvocableComponentWrapper(this.Container, component.Name));
+                    if (this.Container.Component != null && this.Container.Component.Component != null)
+                    {
+                        components.Add(new InvocableComponentWrapper(this.Container, this.Container.Component.Component.Name));
+                    }
+                    else
+                    {
+                        components.Add(this.Container);
+                    }
                 }
                 components.Add(this);
                 this.ContextMenu = new Menu()

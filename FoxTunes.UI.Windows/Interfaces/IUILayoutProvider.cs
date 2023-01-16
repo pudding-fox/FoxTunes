@@ -10,8 +10,6 @@ namespace FoxTunes.Interfaces
 
         string Description { get; }
 
-        bool IsComponentActive(string id);
-
         UIComponentBase Load(UILayoutTemplate template);
 
         event EventHandler Updated;

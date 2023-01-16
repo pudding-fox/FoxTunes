@@ -756,14 +756,9 @@ namespace FoxTunes
             {
                 return instance.Title;
             }
-            if (instance.Component != null)
+            if (instance.Component != null && instance.Component.Component != null)
             {
-                //TODO: This is really bad, creating a component (FrameworkElement) just to read a property?
-                var component = Factory.CreateComponent(instance.Component);
-                if (component != null)
-                {
-                    return component.Name;
-                }
+                return instance.Component.Component.Name;
             }
             return Strings.ToolWindowBehaviour_NewWindow;
         }

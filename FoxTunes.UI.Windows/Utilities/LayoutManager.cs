@@ -77,15 +77,6 @@ namespace FoxTunes
             }
         }
 
-        public bool IsComponentActive(string id)
-        {
-            if (this.Provider == null)
-            {
-                return false;
-            }
-            return this.Provider.IsComponentActive(id);
-        }
-
         public IConfiguration Configuration { get; private set; }
 
         public SelectionConfigurationElement Layout { get; private set; }

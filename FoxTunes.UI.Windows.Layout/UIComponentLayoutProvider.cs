@@ -118,44 +118,6 @@ namespace FoxTunes
             return null;
         }
 
-        public override bool IsComponentActive(string id)
-        {
-            foreach (var root in UIComponentRoot.Active)
-            {
-                if (this.IsComponentActive(root, id))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        protected virtual bool IsComponentActive(UIComponentRoot root, string id)
-        {
-            var stack = new Stack<UIComponentConfiguration>();
-            stack.Push(root.Component);
-            while (stack.Count > 0)
-            {
-                var component = stack.Pop();
-                if (component == null)
-                {
-                    continue;
-                }
-                if (string.Equals(component.Component, id, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                if (component.Children != null)
-                {
-                    foreach (var child in component.Children)
-                    {
-                        stack.Push(child);
-                    }
-                }
-            }
-            return false;
-        }
-
         public override UIComponentBase Load(UILayoutTemplate template)
         {
             switch (template)
