@@ -64,12 +64,12 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
-        public Task ShowSettings(string title, IEnumerable<string> sections)
+        public Task<bool> ShowSettings(string title, IEnumerable<string> sections)
         {
             throw new NotImplementedException();
         }
 
-        public Task ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections)
+        public Task<bool> ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections)
         {
             throw new NotImplementedException();
         }

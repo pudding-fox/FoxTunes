@@ -162,7 +162,7 @@ namespace FoxTunes
             var task = this.ShowSettings();
         }
 
-        protected override Task ShowSettings()
+        protected override Task<bool> ShowSettings()
         {
             return this.ShowSettings(
                 Strings.SpectrumConfiguration_Path,

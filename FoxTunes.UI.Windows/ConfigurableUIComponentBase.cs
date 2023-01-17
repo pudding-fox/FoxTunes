@@ -123,27 +123,25 @@ namespace FoxTunes
             }
         }
 
-        public virtual Task InvokeAsync(IInvocationComponent component)
+        public virtual async Task InvokeAsync(IInvocationComponent component)
         {
             if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
             {
-                return this.ShowSettings();
+                if (await this.ShowSettings().ConfigureAwait(false))
+                {
+                    this.SaveSettings();
+                }
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
-        protected abstract Task ShowSettings();
+        protected abstract Task<bool> ShowSettings();
 
-        protected virtual Task ShowSettings(string title, string section)
+        protected virtual Task<bool> ShowSettings(string title, string section)
         {
             return this.ShowSettings(title, new[] { section });
         }
 
-        protected virtual Task ShowSettings(string title, IEnumerable<string> sections)
+        protected virtual Task<bool> ShowSettings(string title, IEnumerable<string> sections)
         {
             return this.UserInterface.ShowSettings(
                 title,

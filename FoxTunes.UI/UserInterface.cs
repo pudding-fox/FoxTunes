@@ -27,9 +27,9 @@ namespace FoxTunes
 
         public abstract void OpenInShell(string fileName);
 
-        public abstract Task ShowSettings(string title, IEnumerable<string> sections);
+        public abstract Task<bool> ShowSettings(string title, IEnumerable<string> sections);
 
-        public abstract Task ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections);
+        public abstract Task<bool> ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections);
 
         public abstract void Restart();
 

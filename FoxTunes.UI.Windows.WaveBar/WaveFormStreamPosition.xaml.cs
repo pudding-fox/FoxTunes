@@ -121,7 +121,7 @@ namespace FoxTunes
 #endif
         }
 
-        protected override Task ShowSettings()
+        protected override Task<bool> ShowSettings()
         {
             return this.ShowSettings(
                 Strings.WaveFormStreamPositionConfiguration_Section,

@@ -188,12 +188,12 @@ namespace FoxTunes
             Explorer.Open(fileName);
         }
 
-        public override Task ShowSettings(string title, IEnumerable<string> sections)
+        public override Task<bool> ShowSettings(string title, IEnumerable<string> sections)
         {
             return this.ShowSettings(title, this.Configuration, sections);
         }
 
-        public override async Task ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections)
+        public override async Task<bool> ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections)
         {
             var settings = default(ComponentSettingsDialog);
             await global::FoxTunes.Windows.Invoke(() =>
@@ -202,7 +202,8 @@ namespace FoxTunes
                 settings.Configuration = configuration;
                 settings.Sections = new StringCollection(sections);
             }).ConfigureAwait(false);
-            await global::FoxTunes.Windows.ShowDialog(this.Core, title, settings).ConfigureAwait(false);
+            var result = await global::FoxTunes.Windows.ShowDialog(this.Core, title, settings).ConfigureAwait(false);
+            return result;
         }
 
         public override void Restart()
