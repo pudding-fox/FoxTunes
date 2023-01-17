@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -43,8 +44,37 @@ namespace FoxTunes
                     LibraryBrowserBaseConfiguration.SECTION,
                     LibraryBrowserBaseConfiguration.TILE_IMAGE
                 );
+                this.TileSize.ValueChanged += this.OnValueChanged;
+                this.ImageMode.ValueChanged += this.OnValueChanged;
             }
             base.OnConfigurationChanged();
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+            //It's important that we perform the refresh with low priority, we need to wait for bindings to settle.
+            var task = Windows.Invoke(this.RefreshVisibleItems, DispatcherPriority.ApplicationIdle);
+        }
+
+        protected virtual void RefreshVisibleItems()
+        {
+            var listBox = this.GetActiveListBox();
+            if (listBox == null)
+            {
+                return;
+            }
+            var names = new[]
+            {
+                CommonImageTypes.FrontCover
+            };
+            var listBoxItems = listBox.FindChildren<ListBoxItem>();
+            foreach (var listBoxItem in listBoxItems)
+            {
+                if (listBoxItem.Content is LibraryHierarchyNode libraryHierarchyNode)
+                {
+                    libraryHierarchyNode.Refresh(names);
+                }
+            }
         }
 
         protected abstract ItemsControl GetItemsControl();
@@ -122,6 +152,10 @@ namespace FoxTunes
                 index = 1;
             }
             var container = listBox.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
+            if (container == null)
+            {
+                return;
+            }
             Keyboard.Focus(container);
         }
 
