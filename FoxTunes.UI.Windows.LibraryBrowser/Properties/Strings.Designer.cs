@@ -70,56 +70,83 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Library\Browser.
+        /// </summary>
+        internal static string LibraryBrowserBase_Path {
+            get {
+                return ResourceManager.GetString("LibraryBrowserBase.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Large.
+        /// </summary>
+        internal static string LibraryBrowserBase_Size_Large {
+            get {
+                return ResourceManager.GetString("LibraryBrowserBase.Size.Large", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        internal static string LibraryBrowserBase_Size_Medium {
+            get {
+                return ResourceManager.GetString("LibraryBrowserBase.Size.Medium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Small.
+        /// </summary>
+        internal static string LibraryBrowserBase_Size_Small {
+            get {
+                return ResourceManager.GetString("LibraryBrowserBase.Size.Small", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image Type.
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Image {
+        internal static string LibraryBrowserBaseConfiguration_Image {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Image", resourceCulture);
+                return ResourceManager.GetString("LibraryBrowserBaseConfiguration.Image", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Compound.
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Image_Compound {
+        internal static string LibraryBrowserBaseConfiguration_Image_Compound {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Image.Compound", resourceCulture);
+                return ResourceManager.GetString("LibraryBrowserBaseConfiguration.Image.Compound", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to First.
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Image_First {
+        internal static string LibraryBrowserBaseConfiguration_Image_First {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Image.First", resourceCulture);
+                return ResourceManager.GetString("LibraryBrowserBaseConfiguration.Image.First", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Library Browser.
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Path {
+        internal static string LibraryBrowserBaseConfiguration_Section {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("LibraryBrowserBaseConfiguration.Section", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tile Size (Grid).
+        ///   Looks up a localized string similar to Tile Size.
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Size_Grid {
+        internal static string LibraryBrowserBaseConfiguration_Size {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Size.Grid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tile Size (List).
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Size_List {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Size.List", resourceCulture);
+                return ResourceManager.GetString("LibraryBrowserBaseConfiguration.Size", resourceCulture);
             }
         }
         

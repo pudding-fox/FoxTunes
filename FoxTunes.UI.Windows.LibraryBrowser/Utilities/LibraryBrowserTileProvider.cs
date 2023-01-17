@@ -24,20 +24,11 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
-        public LibraryBrowserImageMode ImageMode { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<SelectionConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
-            ).ConnectValue(option => this.ImageMode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(option));
             base.InitializeComponent(core);
         }
 
@@ -83,10 +74,10 @@ namespace FoxTunes
             this.ClearCache();
         }
 
-        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
+        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, LibraryBrowserImageMode mode, bool cache)
         {
             //We only support caching for compound images.
-            if (this.ImageMode != LibraryBrowserImageMode.Compound)
+            if (mode != LibraryBrowserImageMode.Compound)
             {
                 cache = false;
             }
@@ -100,7 +91,7 @@ namespace FoxTunes
                         return this.ImageLoader.Load(fileName, 0, 0, true);
                     }
                 }
-                return this.CreateImageSourceCore(libraryHierarchyNode, metaDataItems, width, height, cache);
+                return this.CreateImageSourceCore(libraryHierarchyNode, metaDataItems, width, height, mode, cache);
             }
             catch (Exception e)
             {
@@ -109,14 +100,14 @@ namespace FoxTunes
             }
         }
 
-        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
+        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, LibraryBrowserImageMode mode, bool cache)
         {
             var fileNames = metaDataItems().Where(
                 metaDataItem => string.Equals(metaDataItem.Name, CommonImageTypes.FrontCover, StringComparison.OrdinalIgnoreCase) && metaDataItem.Type == MetaDataItemType.Image && File.Exists(metaDataItem.Value)
             ).Select(
                 metaDataItem => metaDataItem.Value
             ).ToArray();
-            switch (this.ImageMode)
+            switch (mode)
             {
                 case LibraryBrowserImageMode.First:
                     switch (fileNames.Length)

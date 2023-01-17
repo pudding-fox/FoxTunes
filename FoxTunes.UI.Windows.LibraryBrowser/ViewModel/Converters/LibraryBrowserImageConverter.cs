@@ -109,6 +109,56 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HeightChanged;
 
+        public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(
+            "Mode",
+            typeof(LibraryBrowserImageMode),
+            typeof(LibraryBrowserImageConverter),
+            new PropertyMetadata(new PropertyChangedCallback(OnModeChanged))
+        );
+
+        public static LibraryBrowserImageMode GetMode(ViewModelBase source)
+        {
+            return (LibraryBrowserImageMode)source.GetValue(ModeProperty);
+        }
+
+        public static void SetMode(ViewModelBase source, LibraryBrowserImageMode value)
+        {
+            source.SetValue(ModeProperty, value);
+        }
+
+        public static void OnModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var libraryBrowserImageConverter = sender as LibraryBrowserImageConverter;
+            if (libraryBrowserImageConverter == null)
+            {
+                return;
+            }
+            libraryBrowserImageConverter.OnModeChanged();
+        }
+
+        public LibraryBrowserImageMode Mode
+        {
+            get
+            {
+                return (LibraryBrowserImageMode)this.GetValue(ModeProperty);
+            }
+            set
+            {
+                this.SetValue(ModeProperty, value);
+            }
+        }
+
+        protected virtual void OnModeChanged()
+        {
+            if (this.ModeChanged != null)
+            {
+                this.ModeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Mode");
+        }
+
+        public event EventHandler ModeChanged;
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (Factory == null)
@@ -125,7 +175,8 @@ namespace FoxTunes.ViewModel
                 return Factory.Create(
                     libraryHierarchyNode,
                     size,
-                    size
+                    size,
+                    this.Mode
                 );
             }
             return value;

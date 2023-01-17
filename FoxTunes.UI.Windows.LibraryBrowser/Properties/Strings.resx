@@ -120,23 +120,32 @@
   <data name="LibraryBrowser.Name" xml:space="preserve">
     <value>Library Browser (Grid)</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Image" xml:space="preserve">
+  <data name="LibraryBrowserBase.Path" xml:space="preserve">
+    <value>Library\Browser</value>
+  </data>
+  <data name="LibraryBrowserBase.Size.Large" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="LibraryBrowserBase.Size.Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="LibraryBrowserBase.Size.Small" xml:space="preserve">
+    <value>Small</value>
+  </data>
+  <data name="LibraryBrowserBaseConfiguration.Image" xml:space="preserve">
     <value>Image Type</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Image.Compound" xml:space="preserve">
+  <data name="LibraryBrowserBaseConfiguration.Image.Compound" xml:space="preserve">
     <value>Compound</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Image.First" xml:space="preserve">
+  <data name="LibraryBrowserBaseConfiguration.Image.First" xml:space="preserve">
     <value>First</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="LibraryBrowserBaseConfiguration.Section" xml:space="preserve">
     <value>Library Browser</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Size.Grid" xml:space="preserve">
-    <value>Tile Size (Grid)</value>
-  </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Size.List" xml:space="preserve">
-    <value>Tile Size (List)</value>
+  <data name="LibraryBrowserBaseConfiguration.Size" xml:space="preserve">
+    <value>Tile Size</value>
   </data>
   <data name="LibraryList.Name" xml:space="preserve">
     <value>Library Browser (List)</value>

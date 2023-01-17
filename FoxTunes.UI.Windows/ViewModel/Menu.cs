@@ -320,7 +320,7 @@ namespace FoxTunes.ViewModel
         {
             foreach (var item in items)
             {
-                if (string.Equals(item.Invocation.Name, path, StringComparison.OrdinalIgnoreCase))
+                if (item != null && string.Equals(item.Invocation.Name, path, StringComparison.OrdinalIgnoreCase))
                 {
                     return item;
                 }

@@ -5,14 +5,48 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class LibraryBrowser : LibraryBase
+    public class LibraryBrowser : LibraryBase, IConfigurationTarget
     {
-        public IConfiguration Configuration { get; private set; }
+        private IConfiguration _Configuration { get; set; }
+
+        public IConfiguration Configuration
+        {
+            get
+            {
+                return this._Configuration;
+            }
+            set
+            {
+                this._Configuration = value;
+                this.OnConfigurationChanged();
+            }
+        }
+
+        protected virtual void OnConfigurationChanged()
+        {
+            if (this.Configuration != null)
+            {
+                this.Configuration.GetElement<IntegerConfigurationElement>(
+                    LibraryBrowserBaseConfiguration.SECTION,
+                    LibraryBrowserBaseConfiguration.TILE_SIZE
+                ).ConnectValue(value => this.TileSize = value);
+                this.Configuration.GetElement<SelectionConfigurationElement>(
+                    LibraryBrowserBaseConfiguration.SECTION,
+                    LibraryBrowserBaseConfiguration.TILE_IMAGE
+                ).ConnectValue(value => this.ImageMode = LibraryBrowserBaseConfiguration.GetLibraryImage(value));
+            }
+            if (this.ConfigurationChanged != null)
+            {
+                this.ConfigurationChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Configuration");
+        }
+
+        public event EventHandler ConfigurationChanged;
 
         private ObservableCollection<LibraryBrowserFrame> _Frames { get; set; }
 
@@ -93,57 +127,31 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedFrameChanged;
 
-        private int _GridTileSize { get; set; }
+        private int _TileSize { get; set; }
 
-        public int GridTileSize
+        public int TileSize
         {
             get
             {
-                return this._GridTileSize;
+                return this._TileSize;
             }
             set
             {
-                this._GridTileSize = value;
-                this.OnGridTileSizeChanged();
+                this._TileSize = value;
+                this.OnTileSizeChanged();
             }
         }
 
-        protected virtual void OnGridTileSizeChanged()
+        protected virtual void OnTileSizeChanged()
         {
-            if (this.GridTileSizeChanged != null)
+            if (this.TileSizeChanged != null)
             {
-                this.GridTileSizeChanged(this, EventArgs.Empty);
+                this.TileSizeChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("GridTileSize");
+            this.OnPropertyChanged("TileSize");
         }
 
-        public event EventHandler GridTileSizeChanged;
-
-        private int _ListTileSize { get; set; }
-
-        public int ListTileSize
-        {
-            get
-            {
-                return this._ListTileSize;
-            }
-            set
-            {
-                this._ListTileSize = value;
-                this.OnListTileSizeChanged();
-            }
-        }
-
-        protected virtual void OnListTileSizeChanged()
-        {
-            if (this.ListTileSizeChanged != null)
-            {
-                this.ListTileSizeChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ListTileSize");
-        }
-
-        public event EventHandler ListTileSizeChanged;
+        public event EventHandler TileSizeChanged;
 
         private LibraryBrowserImageMode _ImageMode { get; set; }
 
@@ -162,10 +170,6 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnImageModeChanged()
         {
-            if (this.IsInitialized)
-            {
-                this.Debouncer.Exec(this.Refresh);
-            }
             if (this.ImageModeChanged != null)
             {
                 this.ImageModeChanged(this, EventArgs.Empty);
@@ -174,24 +178,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ImageModeChanged;
-
-        protected override void InitializeComponent(ICore core)
-        {
-            this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_GRID_TILE_SIZE
-            ).ConnectValue(value => this.GridTileSize = value);
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_LIST_TILE_SIZE
-            ).ConnectValue(value => this.ListTileSize = value);
-            this.Configuration.GetElement<SelectionConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
-            ).ConnectValue(option => this.ImageMode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(option));
-            base.InitializeComponent(core);
-        }
 
         protected override async Task OnSignal(object sender, ISignal signal)
         {

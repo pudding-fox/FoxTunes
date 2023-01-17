@@ -120,17 +120,14 @@
   <data name="LibraryBrowser.Name" xml:space="preserve">
     <value>Bibliothèque (Grille)</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Image" xml:space="preserve">
+  <data name="LibraryBrowserBaseConfiguration.Image" xml:space="preserve">
     <value>Type d'image</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Path" xml:space="preserve">
+  <data name="LibraryBrowserBaseConfiguration.Section" xml:space="preserve">
     <value>Bibliothèque</value>
   </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Size.Grid" xml:space="preserve">
-    <value>Taille de la tuile (Grille)</value>
-  </data>
-  <data name="LibraryBrowserBehaviourConfiguration.Size.List" xml:space="preserve">
-    <value>Taille de la tuile (Liste)</value>
+  <data name="LibraryBrowserBaseConfiguration.Size" xml:space="preserve">
+    <value>Taille de la tuile</value>
   </data>
   <data name="LibraryList.Name" xml:space="preserve">
     <value>Bibliothèque (Liste)</value>
