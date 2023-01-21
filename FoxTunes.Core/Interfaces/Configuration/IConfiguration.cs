@@ -23,6 +23,8 @@ namespace FoxTunes.Interfaces
 
         void Save(string profile);
 
+        event EventHandler Saving;
+
         event EventHandler Saved;
 
         void Delete();
