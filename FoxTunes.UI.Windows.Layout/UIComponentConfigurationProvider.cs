@@ -88,6 +88,7 @@ namespace FoxTunes
                 }
                 pair.Value.InitializeComponent();
             }
+            this.OnLoading();
             foreach (var pair in this.Component.MetaData)
             {
                 if (!pair.Key.StartsWith(PREFIX, StringComparison.OrdinalIgnoreCase))
@@ -98,6 +99,7 @@ namespace FoxTunes
                 var value = pair.Value;
                 this.Load(id, value);
             }
+            this.OnLoaded();
         }
 
         protected virtual void Load(string id, string value)
@@ -111,6 +113,28 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Loading configuration element: \"{0}\".", id);
             element.SetPersistentValue(value);
         }
+
+        protected virtual void OnLoading()
+        {
+            if (this.Loading == null)
+            {
+                return;
+            }
+            this.Loading(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Loading;
+
+        protected virtual void OnLoaded()
+        {
+            if (this.Loaded == null)
+            {
+                return;
+            }
+            this.Loaded(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Loaded;
 
         protected virtual void OnSaving()
         {

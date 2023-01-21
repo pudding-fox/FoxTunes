@@ -290,7 +290,6 @@ namespace FoxTunes
                     }
                     element.Value = bands[band.Key];
                 }
-                StandardComponents.Instance.Configuration.Save();
             }
         }
     }

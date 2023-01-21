@@ -116,7 +116,7 @@ namespace FoxTunes.Launcher
 
         private static void UnloadCore(ICore core)
         {
-            Core.IsShuttingDown = true;
+            core.Unload();
             if (core.Components.Output != null)
             {
                 if (core.Components.Output.IsStarted)

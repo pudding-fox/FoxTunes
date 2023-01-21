@@ -19,6 +19,10 @@ namespace FoxTunes.Interfaces
 
         void Load(string profile);
 
+        event EventHandler Loading;
+
+        event EventHandler Loaded;
+
         void Save();
 
         void Save(string profile);

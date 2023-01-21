@@ -113,7 +113,6 @@ namespace FoxTunes
             {
                 return this.ShowSettings();
             }
-            this.Configuration.Save();
 #if NET40
             return TaskEx.FromResult(false);
 #else

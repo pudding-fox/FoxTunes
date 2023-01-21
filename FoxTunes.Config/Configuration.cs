@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Design;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -9,17 +8,12 @@ namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [Component("BA77B392-1900-4931-B720-16206B23DDA1", ComponentSlots.Configuration)]
-    public class Configuration : StandardComponent, IConfiguration, IDisposable
+    public class Configuration : StandardComponent, IConfiguration
     {
-        const int TIMEOUT = 5000;
-
         public Configuration()
         {
-            this.Debouncer = new Debouncer(TIMEOUT);
             this.Sections = new Dictionary<string, ConfigurationSection>(StringComparer.OrdinalIgnoreCase);
         }
-
-        public Debouncer Debouncer { get; private set; }
 
         public IEnumerable<string> AvailableProfiles
         {
@@ -105,7 +99,7 @@ namespace FoxTunes
             if (!string.Equals(Profiles.Profile, profile, StringComparison.OrdinalIgnoreCase))
             {
                 //Switching profile, ensure the current one is saved.
-                this.Save(Profiles.Profile, true);
+                this.Save(Profiles.Profile);
             }
             if (!File.Exists(fileName))
             {
@@ -113,6 +107,7 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Loading configuration from file \"{0}\".", fileName);
+            this.OnLoading();
             try
             {
                 var modifiedElements = this.GetModifiedElements();
@@ -156,6 +151,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to load configuration: {0}", e.Message);
             }
+            this.OnLoaded();
         }
 
         protected virtual IEnumerable<ConfigurationElement> Load(ConfigurationSection section, IEnumerable<KeyValuePair<string, string>> elements)
@@ -178,51 +174,56 @@ namespace FoxTunes
             return restoredElements;
         }
 
+        protected virtual void OnLoading()
+        {
+            if (this.Loading == null)
+            {
+                return;
+            }
+            this.Loading(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Loading;
+
+        protected virtual void OnLoaded()
+        {
+            if (this.Loaded == null)
+            {
+                return;
+            }
+            this.Loaded(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Loaded;
+
         public void Save()
         {
-            this.Save(this.Profile, false);
+            this.Save(this.Profile);
         }
 
         public void Save(string profile)
         {
-            this.Save(profile, true);
-        }
-
-        protected virtual void Save(string profile, bool immidiate)
-        {
             var fileName = Profiles.GetFileName(profile);
-            var action = new Action(() =>
-            {
-                Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", fileName);
-                try
-                {
-                    //Use a temp file so the settings aren't lost if something goes wrong.
-                    var temp = Path.GetTempFileName();
-                    using (var stream = File.Create(temp))
-                    {
-                        Serializer.Save(stream, this.Sections.Values);
-                    }
-                    if (!MoveFileEx(temp, fileName, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
-                    {
-                        throw new Exception("MoveFileEx: Failed.");
-                    }
-                    Profiles.Profile = profile;
-                }
-                catch (Exception e)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
-                }
-            });
             this.OnSaving();
-            if (immidiate)
+            Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", fileName);
+            try
             {
-                this.Debouncer.ExecNow(action);
+                //Use a temp file so the settings aren't lost if something goes wrong.
+                var temp = Path.GetTempFileName();
+                using (var stream = File.Create(temp))
+                {
+                    Serializer.Save(stream, this.Sections.Values);
+                }
+                if (!MoveFileEx(temp, fileName, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+                {
+                    throw new Exception("MoveFileEx: Failed.");
+                }
+                Profiles.Profile = profile;
             }
-            else
+            catch (Exception e)
             {
-                this.Debouncer.Exec(action);
+                Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
             }
-            //Configuration not technically saved *yet* but it doesn't matter.
             this.OnSaved();
         }
 
@@ -331,45 +332,6 @@ namespace FoxTunes
                 return default(ConfigurationElement);
             }
             return section.GetElement(elementId);
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            if (this.Debouncer != null)
-            {
-                this.Debouncer.Dispose();
-            }
-        }
-
-        ~Configuration()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
         }
 
         const int MOVEFILE_REPLACE_EXISTING = 0x1;

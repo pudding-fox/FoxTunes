@@ -19,6 +19,10 @@ namespace FoxTunes.ViewModel
         {
             if (value is string config && targetType.IsAssignableFrom(typeof(UIComponentConfiguration)))
             {
+                if (string.IsNullOrEmpty(config))
+                {
+                    return new UIComponentConfiguration();
+                }
                 return Serializer.LoadComponent(config);
             }
             return value;

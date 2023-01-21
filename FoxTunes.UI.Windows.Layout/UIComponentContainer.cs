@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -193,9 +192,9 @@ namespace FoxTunes
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (this.ContentControl.Content is FrameworkElement element)
+            if (this.Content != null)
             {
-                UIDisposer.Dispose(element);
+                UIDisposer.Dispose(this.Content);
             }
             var configuration = value as UIComponentConfiguration;
             if (configuration == null || configuration.Component == null)

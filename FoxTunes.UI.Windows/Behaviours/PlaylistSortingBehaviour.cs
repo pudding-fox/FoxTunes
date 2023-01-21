@@ -75,7 +75,6 @@ namespace FoxTunes
             {
                 case TOGGLE_SORTING:
                     this.Sorting.Toggle();
-                    this.Configuration.Save();
                     break;
             }
 #if NET40

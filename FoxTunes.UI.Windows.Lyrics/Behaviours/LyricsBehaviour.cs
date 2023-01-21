@@ -133,12 +133,10 @@ namespace FoxTunes
             if (string.Equals(component.Id, this.AutoScroll.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.AutoScroll.Toggle();
-                this.Configuration.Save();
             }
             else if (string.Equals(component.Id, this.AutoLookup.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.AutoLookup.Toggle();
-                this.Configuration.Save();
             }
 #if NET40
             return TaskEx.FromResult(false);

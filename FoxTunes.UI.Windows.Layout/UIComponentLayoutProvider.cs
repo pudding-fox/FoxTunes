@@ -73,7 +73,7 @@ namespace FoxTunes
             this.Configuration = core.Components.Configuration;
             this.Configuration.Saving += this.OnSaving;
             this.Main = this.Configuration.GetElement<TextConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
+                UIComponentLayoutProviderConfiguration.SECTION,
                 UIComponentLayoutProviderConfiguration.MAIN_LAYOUT
             );
             this.Main.ConnectValue(value => this.MainComponent = this.LoadComponent(value));
@@ -147,12 +147,6 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to save config: {0}", e.Message);
             }
-        }
-
-        public void Reset()
-        {
-            this.MainComponent = this.LoadComponent(this.Main.Value);
-            this.OnUpdated();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

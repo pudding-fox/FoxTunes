@@ -16,10 +16,6 @@ namespace FoxTunes
             set
             {
                 this.EnabledElement.Value = value;
-                if (this.IsInitialized)
-                {
-                    this.Configuration.Save();
-                }
             }
         }
 
@@ -48,10 +44,6 @@ namespace FoxTunes
             set
             {
                 this.TempoElement.Value = value;
-                if (this.IsInitialized)
-                {
-                    this.Configuration.Save();
-                }
             }
         }
 
@@ -91,10 +83,6 @@ namespace FoxTunes
             set
             {
                 this.PitchElement.Value = value;
-                if (this.IsInitialized)
-                {
-                    this.Configuration.Save();
-                }
             }
         }
 
@@ -134,10 +122,6 @@ namespace FoxTunes
             set
             {
                 this.RateElement.Value = value;
-                if (this.IsInitialized)
-                {
-                    this.Configuration.Save();
-                }
             }
         }
 
