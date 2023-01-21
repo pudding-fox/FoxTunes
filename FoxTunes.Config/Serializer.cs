@@ -26,7 +26,7 @@ namespace FoxTunes
                 writer.WriteStartElement(Publication.Product);
                 foreach (var section in sections)
                 {
-                    var elements = section.Elements.Where(
+                    var elements = section.Elements.Values.Where(
                         element => element.IsModified
                     ).ToArray();
                     if (!elements.Any())

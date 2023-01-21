@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
 {
@@ -12,7 +11,7 @@ namespace FoxTunes.Interfaces
 
         bool IsDefaultProfile { get; }
 
-        ObservableCollection<ConfigurationSection> Sections { get; }
+        IEnumerable<ConfigurationSection> Sections { get; }
 
         IConfiguration WithSection(ConfigurationSection section);
 

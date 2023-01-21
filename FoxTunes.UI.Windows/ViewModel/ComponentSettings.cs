@@ -236,9 +236,9 @@ namespace FoxTunes.ViewModel
                 var elements = default(IEnumerable<ConfigurationElement>);
                 if (sectionMatches)
                 {
-                    elements = section.Elements;
+                    elements = section.Elements.Values;
                 }
-                else if (!this.MatchesFilter(section.Elements, out elements))
+                else if (!this.MatchesFilter(section.Elements.Values, out elements))
                 {
                     continue;
                 }

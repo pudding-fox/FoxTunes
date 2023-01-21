@@ -1,9 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace FoxTunes
@@ -17,7 +15,7 @@ namespace FoxTunes
         public Configuration()
         {
             this.Debouncer = new Debouncer(TIMEOUT);
-            this.Sections = new ObservableCollection<ConfigurationSection>();
+            this.Sections = new Dictionary<string, ConfigurationSection>(StringComparer.OrdinalIgnoreCase);
         }
 
         public Debouncer Debouncer { get; private set; }
@@ -46,7 +44,15 @@ namespace FoxTunes
             }
         }
 
-        public ObservableCollection<ConfigurationSection> Sections { get; private set; }
+        IEnumerable<ConfigurationSection> IConfiguration.Sections
+        {
+            get
+            {
+                return this.Sections.Values;
+            }
+        }
+
+        public IDictionary<string, ConfigurationSection> Sections { get; private set; }
 
         public IConfiguration WithSection(ConfigurationSection section)
         {
@@ -69,7 +75,7 @@ namespace FoxTunes
         private void Add(ConfigurationSection section)
         {
             Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
-            this.Sections.Add(section);
+            this.Sections.Add(section.Id, section);
         }
 
         private void Update(ConfigurationSection section)
@@ -86,13 +92,13 @@ namespace FoxTunes
 
         public void Load(string profile)
         {
-            foreach (var section in this.Sections)
+            foreach (var pair in this.Sections)
             {
-                if (section.IsInitialized)
+                if (pair.Value.IsInitialized)
                 {
                     continue;
                 }
-                section.InitializeComponent();
+                pair.Value.InitializeComponent();
             }
             var fileName = Profiles.GetFileName(profile);
             if (!string.Equals(Profiles.Profile, profile, StringComparison.OrdinalIgnoreCase))
@@ -193,7 +199,7 @@ namespace FoxTunes
                     var temp = Path.GetTempFileName();
                     using (var stream = File.Create(temp))
                     {
-                        Serializer.Save(stream, this.Sections);
+                        Serializer.Save(stream, this.Sections.Values);
                     }
                     if (!MoveFileEx(temp, fileName, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
                     {
@@ -252,19 +258,19 @@ namespace FoxTunes
 
         public void Reset()
         {
-            foreach (var section in this.Sections)
+            foreach (var pair in this.Sections)
             {
-                section.Reset();
+                pair.Value.Reset();
             }
         }
 
         public void ConnectDependencies()
         {
-            foreach (var section in this.Sections)
+            foreach (var pair1 in this.Sections)
             {
-                foreach (var element in section.Elements)
+                foreach (var pair2 in pair1.Value.Elements)
                 {
-                    element.ConnectDependencies(this);
+                    pair2.Value.ConnectDependencies(this);
                 }
             }
         }
@@ -274,15 +280,15 @@ namespace FoxTunes
             var elements = new List<ConfigurationElement>();
             if (!string.IsNullOrEmpty(this.Profile))
             {
-                foreach (var section in this.Sections)
+                foreach (var pair1 in this.Sections)
                 {
-                    foreach (var element in section.Elements)
+                    foreach (var pair2 in pair1.Value.Elements)
                     {
-                        if (!element.IsModified)
+                        if (!pair2.Value.IsModified)
                         {
                             continue;
                         }
-                        elements.Add(element);
+                        elements.Add(pair2.Value);
                     }
                 }
             }
@@ -291,7 +297,12 @@ namespace FoxTunes
 
         public ConfigurationSection GetSection(string sectionId)
         {
-            return this.Sections.FirstOrDefault(section => string.Equals(section.Id, sectionId, StringComparison.OrdinalIgnoreCase));
+            var section = default(ConfigurationSection);
+            if (this.Sections.TryGetValue(sectionId, out section))
+            {
+                return section;
+            }
+            return default(ConfigurationSection);
         }
 
         public T GetElement<T>(string sectionId, string elementId) where T : ConfigurationElement
