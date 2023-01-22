@@ -5,7 +5,8 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for NowPlaying.xaml
     /// </summary>
-    public partial class NowPlaying : UserControl
+    [UIComponent("CFF16494-CB86-4483-99C7-07E496FE894A", role: UIComponentRole.Info)]
+    public partial class NowPlaying : UIComponentBase
     {
         public NowPlaying()
         {

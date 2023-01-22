@@ -203,5 +203,23 @@ namespace FoxTunes {
                 return ResourceManager.GetString("MiniPlaylist.Empty", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simple Playlist.
+        /// </summary>
+        internal static string MiniPlaylist_Name {
+            get {
+                return ResourceManager.GetString("MiniPlaylist.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marquee.
+        /// </summary>
+        internal static string NowPlaying_Name {
+            get {
+                return ResourceManager.GetString("NowPlaying.Name", resourceCulture);
+            }
+        }
     }
 }
