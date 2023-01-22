@@ -261,6 +261,15 @@ namespace FoxTunes
             return sequence;
         }
 
+        public static IEnumerable<KeyValuePair<TKey, TValue>> TryAddRange<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<KeyValuePair<TKey, TValue>> sequence)
+        {
+            foreach (var pair in sequence)
+            {
+                dictionary.TryAdd(pair.Key, pair.Value);
+            }
+            return sequence;
+        }
+
         public static IEnumerable<T> EnqueueRange<T>(this Queue<T> queue, IEnumerable<T> sequence)
         {
             foreach (var element in sequence)

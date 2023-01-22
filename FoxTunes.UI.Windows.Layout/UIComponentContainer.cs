@@ -1,8 +1,10 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -54,13 +56,13 @@ namespace FoxTunes
             }
             if (e.OldValue is UIComponentConfiguration oldComponent && e.NewValue is UIComponentConfiguration newComponent)
             {
-                foreach (var child in oldComponent.Children)
+                if (!newComponent.Children.Any())
                 {
-                    newComponent.Children.Add(child);
+                    newComponent.Children.AddRange(oldComponent.Children);
                 }
-                foreach (var pair in oldComponent.MetaData)
+                if (!newComponent.MetaData.Any())
                 {
-                    newComponent.MetaData.TryAdd(pair.Key, pair.Value);
+                    newComponent.MetaData.TryAddRange(oldComponent.MetaData);
                 }
                 componentContainer.RaiseEvent(new RoutedPropertyChangedEventArgs<UIComponentConfiguration>(
                     oldComponent,

@@ -76,37 +76,15 @@ namespace FoxTunes
 
         public event EventHandler IsHiddenChanged;
 
-        private ObservableCollection<ValidationRule> _ValidationRules;
+        public IList<ValidationRule> ValidationRules { get; private set; }
 
-        public ObservableCollection<ValidationRule> ValidationRules
-        {
-            get
-            {
-                return this._ValidationRules;
-            }
-            set
-            {
-                this._ValidationRules = value;
-                this.OnValidationRulesChanged();
-            }
-        }
-
-        protected virtual void OnValidationRulesChanged()
-        {
-            if (this.ValidationRulesChanged != null)
-            {
-                this.ValidationRulesChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ValidationRules");
-        }
-
-        public event EventHandler ValidationRulesChanged;
+        public bool IsInitialized { get; protected set; }
 
         public ConfigurationElement WithValidationRule(ValidationRule validationRule)
         {
             if (this.ValidationRules == null)
             {
-                this.ValidationRules = new ObservableCollection<ValidationRule>();
+                this.ValidationRules = new List<ValidationRule>();
             }
             this.ValidationRules.Add(validationRule);
             return this;
@@ -170,7 +148,10 @@ namespace FoxTunes
 
         public event EventHandler DependenciesChanged;
 
-        public abstract void InitializeComponent();
+        public virtual void InitializeComponent()
+        {
+            this.IsInitialized = true;
+        }
 
         public virtual void Update(ConfigurationElement element)
         {
@@ -371,6 +352,7 @@ namespace FoxTunes
             //TODO: This log message is noisy.
             //Logger.Write(typeof(ConfigurationSection), LogLevel.Trace, "Setting default value for configuration element \"{0}\": {1}", this.Name, Convert.ToString(this.Value));
             this.DefaultValue = this.Value;
+            base.InitializeComponent();
         }
 
         public override void Update(ConfigurationElement element)
