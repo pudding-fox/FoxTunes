@@ -10,7 +10,9 @@ namespace FoxTunes
 {
     public class EnhancedSpectrumRenderer : VisualizationBase
     {
-        const int MARGIN = 1;
+        const int MARGIN_ZERO = 0;
+
+        const int MARGIN_ONE = 1;
 
         public SpectrumRendererData RendererData { get; private set; }
 
@@ -66,7 +68,7 @@ namespace FoxTunes
                 this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.FFTSize.ValueChanged += this.OnValueChanged;
-                var task = this.CreateBitmap();
+                var task = this.CreateBitmap(true);
             }
             base.OnConfigurationChanged();
         }
@@ -76,7 +78,7 @@ namespace FoxTunes
             if (object.ReferenceEquals(sender, this.Bands))
             {
                 //Changing bands requires full refresh.
-                var task = this.CreateBitmap();
+                var task = this.CreateBitmap(true);
             }
             else
             {
@@ -229,9 +231,8 @@ namespace FoxTunes
             {
                 return 0;
             }
-            var min = EnhancedSpectrumConfiguration.GetWidth(this.Bands.Value);
             var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value);
-            return base.GetPixelWidth(Math.Max(bands.Length * (Convert.ToInt32(width) / bands.Length), min));
+            return base.GetPixelWidth(Math.Max(bands.Length * (Convert.ToInt32(width) / bands.Length), bands.Length));
         }
 
         protected override void OnDisposing()
@@ -420,10 +421,10 @@ namespace FoxTunes
 
         private static void UpdateElementsFast(SpectrumRendererData data)
         {
-            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
+            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
+                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
@@ -453,7 +454,7 @@ namespace FoxTunes
                     updateInterval * 100
                 )
             );
-            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, Orientation.Vertical);
+            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, data.Margin, holdInterval, duration, Orientation.Vertical);
         }
 
         private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, int width, int height)
@@ -488,10 +489,10 @@ namespace FoxTunes
 
         private static void UpdateElementsSmooth(SpectrumRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
+            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
+                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
@@ -533,11 +534,13 @@ namespace FoxTunes
 
         public static SpectrumRendererData Create(EnhancedSpectrumRenderer renderer, int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest, Color[] colors)
         {
+            var margin = width > (bands.Length * 4) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
             {
                 Renderer = renderer,
-                Width = width,
+                Width = width, 
                 Height = height,
+                Margin = margin,
                 Bands = bands,
                 MinBand = bands[0],
                 MaxBand = bands[bands.Length - 1],
@@ -608,6 +611,8 @@ namespace FoxTunes
             public int Width;
 
             public int Height;
+
+            public int Margin;
 
             public Color[] Colors;
 

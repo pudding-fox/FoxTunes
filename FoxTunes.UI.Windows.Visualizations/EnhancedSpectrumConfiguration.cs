@@ -13,11 +13,7 @@ namespace FoxTunes
 
         public const string BANDS_10_OPTION = "AAAA058C-2C96-4540-9ABE-10A584A17CE4";
 
-        public const string BANDS_14_OPTION = "BBBB2B6D-E6FE-43F1-8358-AEE0299F0F8E";
-
-        public const string BANDS_21_OPTION = "CCCCC739-B777-474B-B4A8-F96375254FAC";
-
-        public const string BANDS_31_OPTION = "DDDD0A9D-0512-4F9F-903D-9AC33A9C6CFD";
+        public const string BANDS_20_OPTION = "BBBB2B6D-E6FE-43F1-8358-AEE0299F0F8E";
 
         public const string BANDS_40_OPTION = "EEEE9CF3-A711-45D7-BFAC-A72E769106B9";
 
@@ -56,9 +52,7 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetBandsOptions()
         {
             yield return new SelectionConfigurationOption(BANDS_10_OPTION, "10");
-            yield return new SelectionConfigurationOption(BANDS_14_OPTION, "14").Default();
-            yield return new SelectionConfigurationOption(BANDS_21_OPTION, "21");
-            yield return new SelectionConfigurationOption(BANDS_31_OPTION, "31");
+            yield return new SelectionConfigurationOption(BANDS_20_OPTION, "20").Default();
             yield return new SelectionConfigurationOption(BANDS_40_OPTION, "40");
             yield return new SelectionConfigurationOption(BANDS_80_OPTION, "80");
             yield return new SelectionConfigurationOption(BANDS_160_OPTION, "160");
@@ -67,89 +61,38 @@ namespace FoxTunes
         private static IDictionary<string, int[]> Bands = new Dictionary<string, int[]>(StringComparer.OrdinalIgnoreCase)
         {
             { BANDS_10_OPTION, new[] {
-                    20,
                     50,
-                    100,
-                    200,
-                    500,
-                    1000,
-                    2000,
-                    5000,
-                    10000,
-                    20000
-                }
-            },
-            { BANDS_14_OPTION, new[] {
-                    20,
-                    50,
-                    100,
-                    200,
-                    500,
-                    1000,
-                    1400,
-                    2000,
-                    3000,
-                    5000,
-                    7500,
-                    10000,
-                    17000,
-                    20000
-                }
-            },
-            { BANDS_21_OPTION, new[] {
-                    20,
-                    35,
-                    50,
-                    70,
-                    100,
-                    160,
-                    200,
-                    360,
-                    500,
-                    760,
-                    1000,
-                    1400,
-                    2000,
-                    2600,
-                    3000,
-                    5000,
-                    7500,
-                    10000,
-                    13000,
-                    17000,
-                    20000
-                }
-            },
-            { BANDS_31_OPTION, new[] {
-                    20,
-                    35,
-                    50,
-                    70,
-                    100,
-                    120,
-                    160,
-                    200,
-                    300,
-                    360,
-                    440,
-                    500,
-                    600,
-                    760,
-                    1000,
+                    94,
+                    176,
+                    331,
+                    630,
                     1200,
-                    1400,
+                    2200,
+                    4100,
+                    7700,
+                    14000
+                }
+            },
+            { BANDS_20_OPTION, new[] {
+                    50,
+                    69,
+                    94,
+                    129,
+                    176,
+                    241,
+                    331,
+                    453,
+                    620,
+                    850,
+                    1200,
                     1600,
-                    2000,
-                    2600,
+                    2200,
                     3000,
-                    3600,
-                    4000,
-                    5000,
-                    7500,
-                    10000,
-                    12000,
+                    4100,
+                    5600,
+                    7700,
+                    11000,
                     14000,
-                    17000,
                     20000
                 }
             },
@@ -449,28 +392,9 @@ namespace FoxTunes
             var bands = default(int[]);
             if (!Bands.TryGetValue(option.Id, out bands))
             {
-                bands = Bands[BANDS_14_OPTION];
+                bands = Bands[BANDS_20_OPTION];
             }
             return bands;
-        }
-
-        public static int GetWidth(SelectionConfigurationOption option)
-        {
-            switch (option.Id)
-            {
-                default:
-                case BANDS_10_OPTION:
-                case BANDS_14_OPTION:
-                case BANDS_21_OPTION:
-                case BANDS_31_OPTION:
-                    return 160;
-                case BANDS_40_OPTION:
-                    return 192;
-                case BANDS_80_OPTION:
-                    return 192;
-                case BANDS_160_OPTION:
-                    return 320;
-            }
         }
 
         public static string GetDefaultColorPalette()

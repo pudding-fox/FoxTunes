@@ -90,6 +90,15 @@ namespace FoxTunes
             {
                 foreach (var option in this.Bars.Options)
                 {
+                    var count = default(int);
+                    if (int.TryParse(option.Name, out count))
+                    {
+                        if (count > 128)
+                        {
+                            //Don't show really high counts on this menu, they need additional configuration.
+                            break;
+                        }
+                    }
                     yield return new InvocationComponent(
                         CATEGORY,
                         option.Id,
@@ -135,7 +144,6 @@ namespace FoxTunes
                 if (bars != null)
                 {
                     this.Bars.Value = bars;
-                    this.CheckSettings();
                 }
             }
 #if NET40
@@ -143,22 +151,6 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
-        }
-
-        protected virtual void CheckSettings()
-        {
-            var bars = SpectrumConfiguration.GetBars(this.Bars.Value);
-            if (bars <= 128)
-            {
-                return;
-            }
-            if (this.CutOff.IsModified || this.FFTSize.IsModified)
-            {
-                return;
-            }
-            //Looks like we're using the default settings but a high count was selected, warn the user and present the settings.
-            this.UserInterface.Warn(Strings.SpectrumBehaviour_Warning);
-            var task = this.ShowSettings();
         }
 
         protected override Task<bool> ShowSettings()

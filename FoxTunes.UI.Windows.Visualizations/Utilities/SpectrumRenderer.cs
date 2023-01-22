@@ -10,7 +10,9 @@ namespace FoxTunes
 {
     public class SpectrumRenderer : VisualizationBase
     {
-        const int MARGIN = 0;
+        const int MARGIN_ZERO = 0;
+
+        const int MARGIN_ONE = 1;
 
         public SpectrumRendererData RendererData { get; private set; }
 
@@ -66,7 +68,7 @@ namespace FoxTunes
                 this.CutOff.ValueChanged += this.OnValueChanged;
                 this.PreAmp.ValueChanged += this.OnValueChanged;
                 this.FFTSize.ValueChanged += this.OnValueChanged;
-                var task = this.CreateBitmap();
+                var task = this.CreateBitmap(true);
             }
             base.OnConfigurationChanged();
         }
@@ -76,7 +78,7 @@ namespace FoxTunes
             if (object.ReferenceEquals(sender, this.Bars))
             {
                 //Changing bars requires full refresh.
-                var task = this.CreateBitmap();
+                var task = this.CreateBitmap(true);
             }
             else
             {
@@ -178,11 +180,11 @@ namespace FoxTunes
                 UpdateValues(data);
                 if (!data.LastUpdated.Equals(default(DateTime)))
                 {
-                    UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
+                    UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
                 }
                 else
                 {
-                    UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, Orientation.Vertical);
+                    UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
                 }
                 if (data.Peaks != null)
                 {
@@ -341,7 +343,7 @@ namespace FoxTunes
                     updateInterval * 100
                 )
             );
-            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, Orientation.Vertical);
+            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, data.Margin, holdInterval, duration, Orientation.Vertical);
         }
 
         public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff, float preAmp)
@@ -352,11 +354,13 @@ namespace FoxTunes
                 return null;
             }
 
+            var margin = width > (count * 10) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
             {
                 Output = output,
                 Width = width,
                 Height = height,
+                Margin = margin,
                 Count = count,
                 FFTSize = fftSize,
                 Samples = output.GetBuffer(fftSize),
@@ -402,6 +406,8 @@ namespace FoxTunes
             public int Width;
 
             public int Height;
+
+            public int Margin;
 
             public int Count;
 

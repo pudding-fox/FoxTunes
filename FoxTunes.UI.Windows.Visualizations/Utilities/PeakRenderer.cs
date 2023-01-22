@@ -101,7 +101,7 @@ namespace FoxTunes
                 this.ShowPeaks.ValueChanged += this.OnValueChanged;
                 this.ShowRms.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
-                var task = this.CreateBitmap();
+                var task = this.CreateBitmap(true);
             }
             base.OnConfigurationChanged();
         }
