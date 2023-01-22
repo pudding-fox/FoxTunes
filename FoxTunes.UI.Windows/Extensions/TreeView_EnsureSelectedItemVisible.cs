@@ -147,7 +147,7 @@ namespace FoxTunes
                     item.BringIntoView();
                     offset += index;
                 }
-                else
+                else if (scrollViewer != null)
                 {
                     if (scrollViewer.ScrollToItemOffset<TreeViewItem>(offset + index, this.OnItemLoaded))
                     {
