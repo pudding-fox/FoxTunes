@@ -382,14 +382,6 @@ namespace FoxTunes
             if (this._TabControl != null)
             {
                 this._TabControl.SelectionChanged -= this.OnSelectionChanged;
-                foreach (var tabItem in this._TabControl.Items.Cast<TabItem>())
-                {
-                    if (object.ReferenceEquals(this._TabControl.SelectedItem, tabItem))
-                    {
-                        continue;
-                    }
-                    UIDisposer.Dispose(tabItem);
-                }
             }
             if (this.ItemsSource is INotifyCollectionChanged collectionChanged)
             {
