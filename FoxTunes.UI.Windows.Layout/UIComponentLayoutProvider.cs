@@ -69,6 +69,8 @@ namespace FoxTunes
 
         public event EventHandler MainComponentChanged;
 
+        public bool IsSaving { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -78,6 +80,7 @@ namespace FoxTunes
                 UIComponentLayoutProviderConfiguration.SECTION,
                 UIComponentLayoutProviderConfiguration.MAIN_LAYOUT
             );
+            this.Main.ValueChanged += this.OnValueChanged;
             var task = this.Load();
             base.InitializeComponent(core);
         }
@@ -87,9 +90,19 @@ namespace FoxTunes
             var task = this.Load();
         }
 
-        protected virtual void OnSaving(object sender, EventArgs e)
+        protected virtual void OnSaving(object sender, OrderedEventArgs e)
         {
-            this.Save();
+            e.Add(this.Save, OrderedEventArgs.PRIORITY_LOW);
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+            if (this.IsSaving)
+            {
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Layout was modified, reloading.");
+            var task = this.Load();
         }
 
         protected virtual Task Load()
@@ -152,7 +165,15 @@ namespace FoxTunes
                 {
                     return;
                 }
-                this.Main.Value = value;
+                this.IsSaving = true;
+                try
+                {
+                    this.Main.Value = value;
+                }
+                finally
+                {
+                    this.IsSaving = false;
+                }
             }
             catch (Exception e)
             {
@@ -187,7 +208,12 @@ namespace FoxTunes
         {
             if (this.Configuration != null)
             {
+                this.Configuration.Loaded -= this.OnLoaded;
                 this.Configuration.Saving -= this.OnSaving;
+            }
+            if (this.Main != null)
+            {
+                this.Main.ValueChanged -= this.OnValueChanged;
             }
         }
 
