@@ -151,7 +151,7 @@
     <value>Drop Shadow</value>
   </data>
   <data name="OscilloscopeConfiguration.Duration" xml:space="preserve">
-    <value>Duration</value>
+    <value>Duration (ms)</value>
   </data>
   <data name="OscilloscopeConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
@@ -164,6 +164,9 @@
   </data>
   <data name="OscilloscopeConfiguration.Path" xml:space="preserve">
     <value>Oscilloscope</value>
+  </data>
+  <data name="OscilloscopeConfiguration.Window" xml:space="preserve">
+    <value>Window (ms)</value>
   </data>
   <data name="PeakMeter.Name" xml:space="preserve">
     <value>Peak Meter</value>
