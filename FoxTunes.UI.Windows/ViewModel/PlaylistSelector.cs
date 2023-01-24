@@ -210,6 +210,10 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             if (this.PlaylistManager != null)
             {
                 this.PlaylistManager.SelectedPlaylistChanged -= this.OnSelectedPlaylistChanged;

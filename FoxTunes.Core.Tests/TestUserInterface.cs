@@ -100,5 +100,16 @@ namespace FoxTunes
         }
 
         public event UserInterfaceWindowEventHandler WindowDestroyed;
+
+        protected virtual void OnShuttingDown()
+        {
+            if (this.ShuttingDown == null)
+            {
+                return;
+            }
+            this.ShuttingDown(this, EventArgs.Empty);
+        }
+
+        public event EventHandler ShuttingDown;
     }
 }

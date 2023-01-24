@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,7 +10,7 @@ namespace FoxTunes
     /// Interaction logic for Artwork.xaml
     /// </summary>
     [UIComponent("66C8A9E7-0891-48DD-8086-E40F72D4D030", role: UIComponentRole.Info)]
-    public partial class Artwork : SquareUIComponentBase
+    public partial class Artwork : SquareUIComponentBase, IDisposable
     {
         const int TIMEOUT = 100;
 
@@ -46,6 +47,45 @@ namespace FoxTunes
                     viewModel.Emit();
                 }
             });
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
+        }
+
+        ~Artwork()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }
