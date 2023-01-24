@@ -52,38 +52,42 @@ namespace FoxTunes
 
         public bool IsLoaded { get; private set; }
 
+        public bool IsSaving { get; private set; }
+
         protected virtual async Task Load()
         {
             if (this.IsLoaded)
             {
+                if (!this.HasChanges())
+                {
+                    return;
+                }
                 await this.Reset().ConfigureAwait(false);
             }
             else
             {
                 this.IsLoaded = true;
             }
-            if (!string.IsNullOrEmpty(this.Element.Value))
-            {
-                Logger.Write(this, LogLevel.Debug, "Loading config..");
-                try
-                {
-                    using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Element.Value)))
-                    {
-                        var configs = Serializer.LoadWindows(stream);
-                        foreach (var config in configs)
-                        {
-                            await this.Load(config).ConfigureAwait(false);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
-                }
-            }
-            else
+            if (string.IsNullOrEmpty(this.Element.Value))
             {
                 Logger.Write(this, LogLevel.Debug, "No config to load.");
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Loading config..");
+            try
+            {
+                using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Element.Value)))
+                {
+                    var configs = Serializer.LoadWindows(stream);
+                    foreach (var config in configs)
+                    {
+                        await this.Load(config).ConfigureAwait(false);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
             }
         }
 
@@ -210,6 +214,28 @@ namespace FoxTunes
 
         public event ToolWindowConfigurationEventHandler Unloaded;
 
+        protected virtual bool HasChanges()
+        {
+            var value = default(string);
+            return this.HasChanges(out value);
+        }
+
+        protected virtual bool HasChanges(out string value)
+        {
+            var configs = this.Windows.Keys.ToArray();
+            if (configs.Length == 0)
+            {
+                value = null;
+                return !string.IsNullOrEmpty(this.Element.Value);
+            }
+            using (var stream = new MemoryStream())
+            {
+                Serializer.Save(stream, configs);
+                value = Encoding.Default.GetString(stream.ToArray());
+            }
+            return !string.Equals(this.Element.Value, value, StringComparison.OrdinalIgnoreCase);
+        }
+
         protected virtual void Save()
         {
             if (this.Configuration == null || this.Element == null)
@@ -217,30 +243,24 @@ namespace FoxTunes
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Saving config..");
-            var configs = this.Windows.Keys.ToArray();
-            if (!configs.Any())
-            {
-                Logger.Write(this, LogLevel.Debug, "No config to save.");
-                if (!string.IsNullOrEmpty(this.Element.Value))
-                {
-                    this.Element.Value = null;
-                }
-                return;
-            }
             try
             {
                 var value = default(string);
-                using (var stream = new MemoryStream())
+                if (!this.HasChanges(out value))
                 {
-                    Serializer.Save(stream, configs);
-                    value = Encoding.Default.GetString(stream.ToArray());
-                }
-                if (string.Equals(this.Element.Value, value, StringComparison.OrdinalIgnoreCase))
-                {
+                    //Nothing to do.
                     return;
                 }
-                this.Element.Value = value;
-                Logger.Write(this, LogLevel.Debug, "Saved config for {0} windows.", configs.Length);
+                this.IsSaving = true;
+                try
+                {
+                    this.Element.Value = value;
+                }
+                finally
+                {
+                    this.IsSaving = false;
+                }
+                Logger.Write(this, LogLevel.Debug, "Saved config for {0} windows.", this.Windows.Count);
             }
             catch (Exception e)
             {

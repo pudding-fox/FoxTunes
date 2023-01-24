@@ -69,6 +69,8 @@ namespace FoxTunes
 
         public event EventHandler MainComponentChanged;
 
+        public bool IsLoaded { get; private set; }
+
         public bool IsSaving { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -81,39 +83,63 @@ namespace FoxTunes
                 UIComponentLayoutProviderConfiguration.MAIN_LAYOUT
             );
             this.Main.ValueChanged += this.OnValueChanged;
-            var task = this.Load();
+            if (this.Active)
+            {
+                var task = this.Load();
+            }
             base.InitializeComponent(core);
         }
 
         protected virtual void OnLoaded(object sender, EventArgs e)
         {
-            var task = this.Load();
+            if (this.Active)
+            {
+                var task = this.Load();
+            }
         }
 
         protected virtual void OnSaving(object sender, OrderedEventArgs e)
         {
+            if (!this.IsLoaded)
+            {
+                return;
+            }
             e.Add(this.Save, OrderedEventArgs.PRIORITY_LOW);
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            if (this.IsSaving)
+            if (this.Active)
             {
-                return;
+                if (this.IsSaving)
+                {
+                    return;
+                }
+                Logger.Write(this, LogLevel.Debug, "Layout was modified, reloading.");
+                var task = this.Load();
             }
-            Logger.Write(this, LogLevel.Debug, "Layout was modified, reloading.");
-            var task = this.Load();
         }
 
         protected virtual Task Load()
         {
+            if (!this.HasChanges())
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            this.IsLoaded = true;
             return Windows.Invoke(() =>
             {
                 if (string.IsNullOrEmpty(this.Main.Value))
                 {
+                    Logger.Write(this, LogLevel.Debug, "No component to load.");
                     this.MainComponent = null;
                     return;
                 }
+                Logger.Write(this, LogLevel.Debug, "Loading component..");
                 try
                 {
                     using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Main.Value)))
@@ -133,6 +159,11 @@ namespace FoxTunes
             switch (template)
             {
                 case UILayoutTemplate.Main:
+                    if (!this.IsLoaded)
+                    {
+                        //TODO: Bad .Wait()
+                        this.Load().Wait();
+                    }
                     var root = new UIComponentRoot();
                     root.SetBinding(
                         UIComponentPanel.ConfigurationProperty,
@@ -147,6 +178,27 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
+        protected virtual bool HasChanges()
+        {
+            var value = default(string);
+            return this.HasChanges(out value);
+        }
+
+        protected virtual bool HasChanges(out string value)
+        {
+            if (this.MainComponent == null)
+            {
+                value = null;
+                return !string.IsNullOrEmpty(this.Main.Value);
+            }
+            using (var stream = new MemoryStream())
+            {
+                Serializer.Save(stream, this.MainComponent);
+                value = Encoding.Default.GetString(stream.ToArray());
+            }
+            return !string.Equals(this.Main.Value, value, StringComparison.OrdinalIgnoreCase);
+        }
+
         protected virtual void Save()
         {
             if (this.Configuration == null || this.Main == null)
@@ -156,13 +208,9 @@ namespace FoxTunes
             try
             {
                 var value = default(string);
-                using (var stream = new MemoryStream())
+                if (!this.HasChanges(out value))
                 {
-                    Serializer.Save(stream, this.MainComponent);
-                    value = Encoding.Default.GetString(stream.ToArray());
-                }
-                if (string.Equals(this.Main.Value, value, StringComparison.OrdinalIgnoreCase))
-                {
+                    //Nothing to do.
                     return;
                 }
                 this.IsSaving = true;
