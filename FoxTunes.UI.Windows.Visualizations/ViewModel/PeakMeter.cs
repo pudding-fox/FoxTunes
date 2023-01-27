@@ -10,7 +10,7 @@ namespace FoxTunes.ViewModel
 {
     public class PeakMeter : ViewModelBase
     {
-        public IOutput Output { get; private set; }
+        public IOutputDataSource OutputDataSource { get; private set; }
 
         private Orientation _Orientation { get; set; }
 
@@ -80,8 +80,8 @@ namespace FoxTunes.ViewModel
 
         protected override void InitializeComponent(ICore core)
         {
-            this.Output = core.Components.Output;
-            this.Output.CanGetDataChanged += this.OnCanGetDataChanged;
+            this.OutputDataSource = core.Components.OutputDataSource;
+            this.OutputDataSource.CanGetDataChanged += this.OnCanGetDataChanged;
             var task = this.Refresh();
             base.InitializeComponent(core);
         }
@@ -94,7 +94,7 @@ namespace FoxTunes.ViewModel
         protected virtual Task Refresh()
         {
             var channels = default(IDictionary<int, OutputChannel>);
-            if (!this.Output.CanGetData || !this.Output.GetDataChannelMap(out channels))
+            if (!this.OutputDataSource.CanGetData || !this.OutputDataSource.GetDataChannelMap(out channels))
             {
                 channels = new Dictionary<int, OutputChannel>()
                 {
@@ -123,9 +123,9 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.Output != null)
+            if (this.OutputDataSource != null)
             {
-                this.Output.CanGetDataChanged -= this.OnCanGetDataChanged;
+                this.OutputDataSource.CanGetDataChanged -= this.OnCanGetDataChanged;
             }
             base.OnDisposing();
         }

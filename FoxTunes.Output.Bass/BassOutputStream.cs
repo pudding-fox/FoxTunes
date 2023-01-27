@@ -359,46 +359,6 @@ namespace FoxTunes
             return Bass.ChannelGetData(this.ChannelHandle, buffer, buffer.Length * sizeof(float));
         }
 
-        public override float[] GetBuffer(int fftSize)
-        {
-            return this.Output.GetBuffer(fftSize);
-        }
-
-        public override int GetData(float[] buffer, int fftSize)
-        {
-            var length = (uint)buffer.Length;
-            switch (fftSize)
-            {
-                case BassFFT.FFT256:
-                    length |= BassFFT.FFT256_MASK;
-                    break;
-                case BassFFT.FFT512:
-                    length |= BassFFT.FFT512_MASK;
-                    break;
-                case BassFFT.FFT1024:
-                    length |= BassFFT.FFT1024_MASK;
-                    break;
-                case BassFFT.FFT2048:
-                    length |= BassFFT.FFT2048_MASK;
-                    break;
-                case BassFFT.FFT4096:
-                    length |= BassFFT.FFT4096_MASK;
-                    break;
-                case BassFFT.FFT8192:
-                    length |= BassFFT.FFT8192_MASK;
-                    break;
-                case BassFFT.FFT16384:
-                    length |= BassFFT.FFT16384_MASK;
-                    break;
-                case BassFFT.FFT32768:
-                    length |= BassFFT.FFT32768_MASK;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-            return Bass.ChannelGetData(this.ChannelHandle, buffer, unchecked((int)length));
-        }
-
         public override event EventHandler Ending
         {
             add

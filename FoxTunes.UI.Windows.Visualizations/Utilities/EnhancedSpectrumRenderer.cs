@@ -547,7 +547,7 @@ namespace FoxTunes
                 MinBand = bands[0],
                 MaxBand = bands[bands.Length - 1],
                 FFTSize = fftSize,
-                Samples = renderer.Output.GetBuffer(fftSize),
+                Samples = renderer.OutputDataSource.GetBuffer(fftSize),
                 Values = new float[bands.Length],
                 Colors = colors,
                 ValueElements = new Int32Rect[bands.Length]
@@ -634,11 +634,11 @@ namespace FoxTunes
 
             public bool Update()
             {
-                if (!this.Renderer.Output.GetDataFormat(out this.Rate, out this.Channels, out this.Format))
+                if (!this.Renderer.OutputDataSource.GetDataFormat(out this.Rate, out this.Channels, out this.Format))
                 {
                     return false;
                 }
-                this.SampleCount = this.Renderer.Output.GetData(this.Samples, this.FFTSize);
+                this.SampleCount = this.Renderer.OutputDataSource.GetData(this.Samples, this.FFTSize);
                 return this.SampleCount > 0;
             }
         }

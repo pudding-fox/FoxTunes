@@ -84,7 +84,7 @@ namespace FoxTunes
                 return false;
             }
             this.RendererData = Create(
-                this.Output,
+                this.OutputDataSource,
                 width,
                 height,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
@@ -481,11 +481,11 @@ namespace FoxTunes
             BitmapHelper.DrawDots(ref info, elements, elements.Length);
         }
 
-        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing)
+        public static SpectrogramRendererData Create(IOutputDataSource outputDataSource, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing)
         {
             var data = new SpectrogramRendererData()
             {
-                Output = output,
+                OutputDataSource = outputDataSource,
                 Width = width,
                 Height = height,
                 FFTSize = fftSize,
@@ -499,7 +499,7 @@ namespace FoxTunes
 
         public class SpectrogramRendererData
         {
-            public IOutput Output;
+            public IOutputDataSource OutputDataSource;
 
             public int Width;
 
@@ -536,7 +536,7 @@ namespace FoxTunes
                 var rate = default(int);
                 var channels = default(int);
                 var format = default(OutputStreamFormat);
-                if (!this.Output.GetDataFormat(out rate, out channels, out format))
+                if (!this.OutputDataSource.GetDataFormat(out rate, out channels, out format))
                 {
                     return false;
                 }
@@ -552,7 +552,7 @@ namespace FoxTunes
                         individual = true;
                         break;
                 }
-                this.SampleCount = this.Output.GetData(this.Samples, this.FFTSize, individual);
+                this.SampleCount = this.OutputDataSource.GetData(this.Samples, this.FFTSize, individual);
                 return this.SampleCount > 0;
             }
 
@@ -573,11 +573,11 @@ namespace FoxTunes
                 {
                     default:
                     case SpectrogramRendererMode.Mono:
-                        this.Samples = this.Output.GetBuffer(this.FFTSize, false);
+                        this.Samples = this.OutputDataSource.GetBuffer(this.FFTSize, false);
                         this.Values = new float[1, this.Height];
                         break;
                     case SpectrogramRendererMode.Seperate:
-                        this.Samples = this.Output.GetBuffer(this.FFTSize, true);
+                        this.Samples = this.OutputDataSource.GetBuffer(this.FFTSize, true);
                         this.Values = new float[this.Channels, this.Height];
                         break;
                 }

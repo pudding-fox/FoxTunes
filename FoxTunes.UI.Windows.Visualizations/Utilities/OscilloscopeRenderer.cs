@@ -59,7 +59,7 @@ namespace FoxTunes
                 return false;
             }
             this.RendererData = Create(
-                this.Output,
+                this.OutputDataSource,
                 width,
                 height,
                 OscilloscopeConfiguration.GetWindow(this.Window.Value),
@@ -515,11 +515,11 @@ namespace FoxTunes
             }
         }
 
-        public static OscilloscopeRendererData Create(IOutput output, int width, int height, TimeSpan window, TimeSpan duration, OscilloscopeRendererMode mode)
+        public static OscilloscopeRendererData Create(IOutputDataSource outputDataSource, int width, int height, TimeSpan window, TimeSpan duration, OscilloscopeRendererMode mode)
         {
             var data = new OscilloscopeRendererData()
             {
-                Output = output,
+                OutputDataSource = outputDataSource,
                 Width = width,
                 Height = height,
                 Window = window,
@@ -531,7 +531,7 @@ namespace FoxTunes
 
         public class OscilloscopeRendererData
         {
-            public IOutput Output;
+            public IOutputDataSource OutputDataSource;
 
             public int Width;
 
@@ -578,7 +578,7 @@ namespace FoxTunes
                 var rate = default(int);
                 var channels = default(int);
                 var format = default(OutputStreamFormat);
-                if (!this.Output.GetDataFormat(out rate, out channels, out format))
+                if (!this.OutputDataSource.GetDataFormat(out rate, out channels, out format))
                 {
                     return false;
                 }
@@ -586,14 +586,14 @@ namespace FoxTunes
                 switch (this.Format)
                 {
                     case OutputStreamFormat.Short:
-                        this.SampleCount = this.Output.GetData(this.Samples16);
+                        this.SampleCount = this.OutputDataSource.GetData(this.Samples16);
                         for (var a = 0; a < this.SampleCount; a++)
                         {
                             this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
                         }
                         break;
                     case OutputStreamFormat.Float:
-                        this.SampleCount = this.Output.GetData(this.Samples32);
+                        this.SampleCount = this.OutputDataSource.GetData(this.Samples32);
                         break;
                     default:
                         throw new NotImplementedException();
@@ -629,11 +629,11 @@ namespace FoxTunes
                 switch (format)
                 {
                     case OutputStreamFormat.Short:
-                        this.Samples16 = this.Output.GetBuffer<short>(this.Window);
+                        this.Samples16 = this.OutputDataSource.GetBuffer<short>(this.Window);
                         this.Samples32 = new float[this.Samples16.Length];
                         break;
                     case OutputStreamFormat.Float:
-                        this.Samples32 = this.Output.GetBuffer<float>(this.Window);
+                        this.Samples32 = this.OutputDataSource.GetBuffer<float>(this.Window);
                         break;
                     default:
                         throw new NotImplementedException();

@@ -236,6 +236,17 @@ namespace FoxTunes
 
         public event EventHandler Created;
 
+        protected virtual void OnDestroyed()
+        {
+            if (this.Destroyed == null)
+            {
+                return;
+            }
+            this.Destroyed(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Destroyed;
+
 #if NET40
         public Task FreePipeline()
 #else
@@ -280,6 +291,7 @@ namespace FoxTunes
                 this.Pipeline.Dispose();
                 this.Pipeline.IsStopping = false;
                 this.Pipeline = null;
+                this.OnDestroyed();
             }
         }
 
