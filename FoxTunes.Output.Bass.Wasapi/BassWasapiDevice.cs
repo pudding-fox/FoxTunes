@@ -74,6 +74,10 @@ namespace FoxTunes
                 Update(device, flags);
                 Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initialized WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", BassWasapi.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
                 Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initialized WASAPI device: {0} => Rates => {1}", BassWasapi.CurrentDevice, string.Join(", ", Info.SupportedRates));
+                foreach (var pair in Info.SupportedFormats)
+                {
+                    Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initialized WASAPI device: {0} => Format => {1} => {2}", BassWasapi.CurrentDevice, pair.Key, Enum.GetName(typeof(WasapiFormat), pair.Value));
+                }
             }
             catch
             {
@@ -108,6 +112,10 @@ namespace FoxTunes
                 Update(device, flags);
                 Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", BassWasapi.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
                 Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Rates => {1}", BassWasapi.CurrentDevice, string.Join(", ", Info.SupportedRates));
+                foreach (var pair in Info.SupportedFormats)
+                {
+                    Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Format => {1} => {2}", BassWasapi.CurrentDevice, pair.Key, Enum.GetName(typeof(WasapiFormat), pair.Value));
+                }
             }
             finally
             {

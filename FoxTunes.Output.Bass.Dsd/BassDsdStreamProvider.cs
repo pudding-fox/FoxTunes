@@ -62,7 +62,7 @@ namespace FoxTunes
             if (this.Behaviour != null && this.Behaviour.Memory)
             {
                 Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
-                channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, BassFlags.Decode);
+                channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, flags);
                 if (channelHandle != 0)
                 {
                     Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
@@ -74,7 +74,7 @@ namespace FoxTunes
             }
             if (channelHandle == 0)
             {
-                channelHandle = BassDsd.CreateStream(fileName, 0, 0, BassFlags.Decode);
+                channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
             }
             return channelHandle;
         }
@@ -86,7 +86,7 @@ namespace FoxTunes
             if (this.Behaviour != null && this.Behaviour.Memory)
             {
                 Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
-                channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
+                channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, flags | BassFlags.DSDRaw);
                 if (channelHandle != 0)
                 {
                     Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
@@ -98,7 +98,7 @@ namespace FoxTunes
             }
             if (channelHandle == 0)
             {
-                channelHandle = BassDsd.CreateStream(fileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
+                channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags | BassFlags.DSDRaw);
             }
             if (channelHandle == 0)
             {

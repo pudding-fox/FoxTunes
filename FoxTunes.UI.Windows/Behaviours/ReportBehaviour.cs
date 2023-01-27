@@ -23,8 +23,7 @@ namespace FoxTunes
                 var window = new ReportWindow()
                 {
                     Source = report,
-                    ShowActivated = true,
-                    Owner = Windows.ActiveWindow,
+                    ShowActivated = true
                 };
                 if (report.IsDialog)
                 {
