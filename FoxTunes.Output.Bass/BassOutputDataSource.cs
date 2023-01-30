@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassOutputDataSource : StandardComponent, IOutputDataSource, IDisposable
     {
         public IBassStreamOutput Output { get; private set; }

@@ -95,7 +95,6 @@ namespace FoxTunes
                 return false;
             }
             this.RendererData = Create(
-                this,
                 width,
                 height,
                 EnhancedSpectrumConfiguration.GetBands(this.Bands.Value),
@@ -191,7 +190,7 @@ namespace FoxTunes
             }
             try
             {
-                if (!data.Update())
+                if (!this.VisualizationDataSource.Update(data))
                 {
                     this.Restart();
                     return;
@@ -334,9 +333,6 @@ namespace FoxTunes
             var bands = data.Bands;
             var position = default(int);
 
-            data.ValuePeak = 0;
-            data.RmsPeak = 0;
-
             for (int a = FrequencyToIndex(data.MinBand, data.FFTSize, data.Rate), b = a; a < data.FFTSize; a++)
             {
                 var frequency = IndexToFrequency(a, data.FFTSize, data.Rate);
@@ -359,7 +355,7 @@ namespace FoxTunes
 
         private static void UpdateValue(SpectrumRendererData data, int band, int start, int end)
         {
-            var samples = data.Samples;
+            var samples = data.Data;
             var value = default(float);
             var rms = default(float);
             var doRms = data.Rms != null;
@@ -369,10 +365,10 @@ namespace FoxTunes
             {
                 for (var a = start; a < end; a++)
                 {
-                    value = Math.Max(samples[a], value);
+                    value = Math.Max(samples[0, a], value);
                     if (doRms)
                     {
-                        rms += samples[a] * samples[a];
+                        rms += samples[0, a] * samples[0, a];
                     }
                 }
             }
@@ -390,34 +386,20 @@ namespace FoxTunes
                 count = end - start;
                 for (var a = start; a < end; a++)
                 {
-                    value += samples[a];
+                    value += samples[0, a];
                     if (doRms)
                     {
-                        rms += samples[a] * samples[a];
+                        rms += samples[0, a] * samples[0, a];
                     }
                 }
                 value /= count;
             }
 
-            if (value > 0)
-            {
-                data.ValuePeak = Math.Max(data.Values[band] = ToDecibelFixed(value), data.ValuePeak);
-            }
-            else
-            {
-                data.Values[band] = 0;
-            }
+            data.Values[band] = ToDecibelFixed(value);
 
             if (doRms)
             {
-                if (count > 0)
-                {
-                    data.RmsPeak = Math.Max(data.Rms[band] = ToDecibelFixed(Convert.ToSingle(Math.Sqrt(rms / count))), data.RmsPeak);
-                }
-                else
-                {
-                    data.Rms[band] = 0;
-                }
+                data.Rms[band] = ToDecibelFixed(Convert.ToSingle(Math.Sqrt(rms / count)));
             }
         }
 
@@ -440,7 +422,7 @@ namespace FoxTunes
             {
                 for (var a = 0; a < data.Peaks.Length; a++)
                 {
-                    data.Peaks[a] = Math.Max(data.ValueElements[a].Y, data.RmsElements[a].Y);
+                    data.Peaks[a] = Math.Min(data.ValueElements[a].Y, data.RmsElements[a].Y);
                 }
             }
             else
@@ -534,20 +516,18 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(EnhancedSpectrumRenderer renderer, int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest, Color[] colors)
+        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest, Color[] colors)
         {
             var margin = width > (bands.Length * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
             {
-                Renderer = renderer,
-                Width = width, 
+                Width = width,
                 Height = height,
                 Margin = margin,
                 Bands = bands,
                 MinBand = bands[0],
                 MaxBand = bands[bands.Length - 1],
                 FFTSize = fftSize,
-                Samples = renderer.OutputDataSource.GetBuffer(fftSize),
                 Values = new float[bands.Length],
                 Colors = colors,
                 ValueElements = new Int32Rect[bands.Length]
@@ -580,35 +560,17 @@ namespace FoxTunes
             return peaks;
         }
 
-        public class SpectrumRendererData
+        public class SpectrumRendererData : FFTVisualizationData
         {
-            public EnhancedSpectrumRenderer Renderer;
-
             public int[] Bands;
 
             public int MinBand;
 
             public int MaxBand;
 
-            public int Rate;
-
-            public int Channels;
-
-            public OutputStreamFormat Format;
-
-            public int FFTSize;
-
-            public float[] Samples;
-
-            public int SampleCount;
-
             public float[] Values;
 
-            public float ValuePeak;
-
             public float[] Rms;
-
-            public float RmsPeak;
 
             public int Width;
 
@@ -631,16 +593,6 @@ namespace FoxTunes
             public int[] Holds;
 
             public DateTime LastUpdated;
-
-            public bool Update()
-            {
-                if (!this.Renderer.OutputDataSource.GetDataFormat(out this.Rate, out this.Channels, out this.Format))
-                {
-                    return false;
-                }
-                this.SampleCount = this.Renderer.OutputDataSource.GetData(this.Samples, this.FFTSize);
-                return this.SampleCount > 0;
-            }
         }
     }
 }

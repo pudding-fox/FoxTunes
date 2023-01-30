@@ -61,15 +61,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to One or more required components were not loaded..
-        /// </summary>
-        internal static string Program_CoreValidationFailed {
-            get {
-                return ResourceManager.GetString("Program.CoreValidationFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The database was not found, initialize it?.
         /// </summary>
         internal static string Program_CreateDatabase {

@@ -108,10 +108,6 @@ namespace FoxTunes.Launcher
         private static void LoadCore(ICore core)
         {
             core.Load();
-            if (!CoreValidator.Instance.Validate(core))
-            {
-                throw new InvalidOperationException(Strings.Program_CoreValidationFailed);
-            }
         }
 
         private static void UnloadCore(ICore core)

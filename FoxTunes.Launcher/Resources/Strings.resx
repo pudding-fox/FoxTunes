@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Program.CoreValidationFailed" xml:space="preserve">
-    <value>One or more required components were not loaded.</value>
-  </data>
   <data name="Program.CreateDatabase" xml:space="preserve">
     <value>The database was not found, initialize it?</value>
   </data>

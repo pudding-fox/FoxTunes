@@ -10,6 +10,8 @@
 
         IOutputDataSource OutputDataSource { get; }
 
+        IVisualizationDataSource VisualizationDataSource { get; }
+
         IOutputEffects OutputEffects { get; }
 
         IOutputStreamQueue OutputStreamQueue { get; }

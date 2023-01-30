@@ -57,7 +57,6 @@ namespace FoxTunes
             this.Setup = CoreSetup.Default;
             this.Core = new Core(this.Setup);
             this.Core.Load();
-            Assert.IsTrue(CoreValidator.Instance.Validate(this.Core));
             if (this.Core.Factories.Database.Test() != DatabaseTestResult.OK)
             {
                 this.Core.Factories.Database.Initialize();

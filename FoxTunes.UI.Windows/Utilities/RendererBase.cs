@@ -183,6 +183,8 @@ namespace FoxTunes
 
         public IOutputDataSource OutputDataSource { get; private set; }
 
+        public IVisualizationDataSource VisualizationDataSource { get; private set; }
+
         public virtual void InitializeComponent(ICore core)
         {
             this.PixelSizeConverter = ComponentRegistry.Instance.GetComponent<PixelSizeConverter>();
@@ -200,6 +202,7 @@ namespace FoxTunes
                 });
             }
             this.OutputDataSource = core.Components.OutputDataSource;
+            this.VisualizationDataSource = core.Components.VisualizationDataSource;
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
