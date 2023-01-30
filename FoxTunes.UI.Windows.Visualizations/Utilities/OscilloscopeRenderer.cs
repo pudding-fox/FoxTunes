@@ -135,7 +135,7 @@ namespace FoxTunes
             }
             try
             {
-                if (!data.Update())
+                if (!this.VisualizationDataSource.Update(data))
                 {
                     this.Restart();
                     return;
@@ -363,11 +363,11 @@ namespace FoxTunes
             {
                 default:
                 case OscilloscopeRendererMode.Mono:
-                    UpdateValuesMono(data.Samples, data.Values, data.Width, data.SampleCount);
+                    UpdateValuesMono(data.Data, data.Values, data.Width, data.SampleCount);
                     UpdateHistoryMono(data.Values, data.Peaks, data.Width, data.History, ref data.HistoryPosition, ref data.HistoryCount, data.HistoryCapacity);
                     break;
                 case OscilloscopeRendererMode.Seperate:
-                    UpdateValuesSeperate(data.Samples, data.Values, data.Channels, data.Width, data.SampleCount);
+                    UpdateValuesSeperate(data.Data, data.Values, data.Channels, data.Width, data.SampleCount);
                     UpdateHistorySeperate(data.Values, data.Peaks, data.Channels, data.Width, data.History, ref data.HistoryPosition, ref data.HistoryCount, data.HistoryCapacity);
                     break;
             }
@@ -522,34 +522,21 @@ namespace FoxTunes
                 OutputDataSource = outputDataSource,
                 Width = width,
                 Height = height,
-                Window = window,
+                Interval = window,
                 Duration = duration,
-                Mode = mode
+                Mode = mode,
+                Flags = mode.HasFlag(OscilloscopeRendererMode.Seperate) ? VisualizationDataFlags.Individual : VisualizationDataFlags.None
             };
             return data;
         }
 
-        public class OscilloscopeRendererData
+        public class OscilloscopeRendererData : PCMVisualizationData
         {
             public IOutputDataSource OutputDataSource;
 
             public int Width;
 
             public int Height;
-
-            public int Rate;
-
-            public int Channels;
-
-            public OutputStreamFormat Format;
-
-            public short[] Samples16;
-
-            public float[] Samples32;
-
-            public float[,] Samples;
-
-            public int SampleCount;
 
             public float[,,] History;
 
@@ -567,79 +554,13 @@ namespace FoxTunes
 
             public DateTime LastUpdated;
 
-            public TimeSpan Window;
-
             public TimeSpan Duration;
 
             public OscilloscopeRendererMode Mode;
 
-            public bool Update()
+            public override void OnAllocated()
             {
-                var rate = default(int);
-                var channels = default(int);
-                var format = default(OutputStreamFormat);
-                if (!this.OutputDataSource.GetDataFormat(out rate, out channels, out format))
-                {
-                    return false;
-                }
-                this.Update(rate, channels, format);
-                switch (this.Format)
-                {
-                    case OutputStreamFormat.Short:
-                        this.SampleCount = this.OutputDataSource.GetData(this.Samples16);
-                        for (var a = 0; a < this.SampleCount; a++)
-                        {
-                            this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
-                        }
-                        break;
-                    case OutputStreamFormat.Float:
-                        this.SampleCount = this.OutputDataSource.GetData(this.Samples32);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-                if (this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0)
-                {
-                    switch (this.Mode)
-                    {
-                        default:
-                        case OscilloscopeRendererMode.Mono:
-                            this.SampleCount = DownmixMono(this.Samples, this.Samples32, this.Channels, this.SampleCount);
-                            break;
-                        case OscilloscopeRendererMode.Seperate:
-                            this.SampleCount = Deinterlace(this.Samples, this.Samples32, this.Channels, this.SampleCount);
-                            break;
-                    }
-                    return true;
-                }
-                return false;
-            }
-
-            private void Update(int rate, int channels, OutputStreamFormat format)
-            {
-                if (this.Rate == rate && this.Channels == channels && this.Format == format)
-                {
-                    return;
-                }
-
-                this.Rate = rate;
-                this.Channels = channels;
-                this.Format = format;
-
-                switch (format)
-                {
-                    case OutputStreamFormat.Short:
-                        this.Samples16 = this.OutputDataSource.GetBuffer<short>(this.Window);
-                        this.Samples32 = new float[this.Samples16.Length];
-                        break;
-                    case OutputStreamFormat.Float:
-                        this.Samples32 = this.OutputDataSource.GetBuffer<float>(this.Window);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                this.HistoryCapacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Window.TotalMilliseconds), 1);
+                this.HistoryCapacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Interval.TotalMilliseconds), 1);
 
                 //TODO: Only realloc if required.
                 switch (this.Mode)
@@ -647,19 +568,18 @@ namespace FoxTunes
                     default:
                     case OscilloscopeRendererMode.Mono:
                         this.History = new float[1, this.Width, this.HistoryCapacity];
-                        this.Samples = new float[1, this.Samples32.Length];
                         this.Values = new float[1, this.Width];
                         this.Elements = CreateElements(1, this.Width, this.Height);
                         this.Peaks = new float[1];
                         break;
                     case OscilloscopeRendererMode.Seperate:
                         this.History = new float[this.Channels, this.Width, this.HistoryCapacity];
-                        this.Samples = new float[this.Channels, this.Samples32.Length];
                         this.Values = new float[this.Channels, this.Width];
                         this.Elements = CreateElements(this.Channels, this.Width, this.Height);
                         this.Peaks = new float[this.Channels];
                         break;
                 }
+                base.OnAllocated();
             }
 
             private Int32Point[,] CreateElements(int channels, int width, int height)

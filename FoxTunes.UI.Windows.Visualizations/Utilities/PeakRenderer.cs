@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -221,7 +222,7 @@ namespace FoxTunes
             }
             try
             {
-                if (!data.Update())
+                if (!this.VisualizationDataSource.Update(data))
                 {
                     this.Restart();
                     return;
@@ -344,7 +345,7 @@ namespace FoxTunes
 
         private static void UpdateValues(PeakRendererData data)
         {
-            UpdateValues(data.Samples, data.Values, data.Rms, data.Channels, data.SampleCount);
+            UpdateValues(data.Data, data.Values, data.Rms, data.Channels, data.SampleCount);
         }
 
         private static void UpdateValues(float[,] samples, float[] values, float[] rms, int channels, int count)
@@ -456,11 +457,14 @@ namespace FoxTunes
                 Width = width,
                 Height = height,
                 Colors = colors,
-                Orientation = orientation
+                Orientation = orientation,
+                //TODO: This should be PeakRenderer.UpdateInterval I think.
+                Interval = TimeSpan.FromMilliseconds(100),
+                Flags = VisualizationDataFlags.Individual
             };
             return data;
         }
-        public class PeakRendererData
+        public class PeakRendererData : PCMVisualizationData
         {
             public PeakRenderer Renderer;
 
@@ -471,20 +475,6 @@ namespace FoxTunes
             public Color[] Colors;
 
             public Orientation Orientation;
-
-            public int Rate;
-
-            public int Channels;
-
-            public OutputStreamFormat Format;
-
-            public short[] Samples16;
-
-            public float[] Samples32;
-
-            public float[,] Samples;
-
-            public int SampleCount;
 
             public float[] Values;
 
@@ -502,79 +492,23 @@ namespace FoxTunes
 
             public DateTime LastUpdated;
 
-            public bool Update()
+            public override void OnAllocated()
             {
-                var rate = default(int);
-                var channels = default(int);
-                var format = default(OutputStreamFormat);
-                if (!this.Renderer.OutputDataSource.GetDataFormat(out rate, out channels, out format))
-                {
-                    return false;
-                }
-                this.Update(rate, channels, format);
-                switch (this.Format)
-                {
-                    case OutputStreamFormat.Short:
-                        this.SampleCount = this.Renderer.OutputDataSource.GetData(this.Samples16);
-                        for (var a = 0; a < this.SampleCount; a++)
-                        {
-                            this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
-                        }
-                        break;
-                    case OutputStreamFormat.Float:
-                        this.SampleCount = this.Renderer.OutputDataSource.GetData(this.Samples32);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-                if (this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0)
-                {
-                    this.SampleCount = Deinterlace(this.Samples, this.Samples32, this.Channels, this.SampleCount);
-                    return true;
-                }
-                return false;
-            }
-
-            private void Update(int rate, int channels, OutputStreamFormat format)
-            {
-                if (this.Rate == rate && this.Channels == channels && this.Format == format)
-                {
-                    return;
-                }
-
-                this.Rate = rate;
-                this.Channels = channels;
-                this.Format = format;
-
-                switch (format)
-                {
-                    case OutputStreamFormat.Short:
-                        this.Samples16 = this.Renderer.OutputDataSource.GetBuffer<short>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
-                        this.Samples32 = new float[this.Samples16.Length];
-                        break;
-                    case OutputStreamFormat.Float:
-                        this.Samples32 = this.Renderer.OutputDataSource.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                this.Samples = new float[this.Channels, this.Samples32.Length];
-
-                this.Values = new float[channels];
-                this.ValueElements = new Int32Rect[channels];
+                this.Values = new float[this.Channels];
+                this.ValueElements = new Int32Rect[this.Channels];
 
                 if (this.Renderer.ShowRms.Value)
                 {
-                    this.Rms = new float[channels];
-                    this.RmsElements = new Int32Rect[channels];
+                    this.Rms = new float[this.Channels];
+                    this.RmsElements = new Int32Rect[this.Channels];
                 }
                 if (this.Renderer.ShowPeaks.Value)
                 {
-                    this.Peaks = new int[channels];
-                    this.Holds = new int[channels];
-                    this.PeakElements = CreatePeaks(channels);
+                    this.Peaks = new int[this.Channels];
+                    this.Holds = new int[this.Channels];
+                    this.PeakElements = CreatePeaks(this.Channels);
                 }
+                base.OnAllocated();
             }
 
             private static Int32Rect[] CreatePeaks(int count)
