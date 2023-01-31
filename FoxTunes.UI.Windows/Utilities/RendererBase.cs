@@ -714,32 +714,6 @@ namespace FoxTunes
                 }
             }
         }
-
-        protected static int Deinterlace(float[,] destination, float[] source, int channels, int count)
-        {
-            for (int a = 0, b = 0; a < count; a += channels, b++)
-            {
-                for (var channel = 0; channel < channels; channel++)
-                {
-                    destination[channel, b] = source[a + channel];
-                }
-            }
-            return count / channels;
-        }
-
-        protected static int DownmixMono(float[,] destination, float[] source, int channels, int count)
-        {
-            for (int a = 0, b = 0; a < count; a += channels, b++)
-            {
-                destination[0, b] = 0f;
-                for (var channel = 0; channel < channels; channel++)
-                {
-                    destination[0, b] += source[a + channel];
-                }
-                destination[0, b] /= channels;
-            }
-            return count / channels;
-        }
     }
 
     public static partial class Extensions

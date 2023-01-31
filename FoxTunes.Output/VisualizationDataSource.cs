@@ -6,10 +6,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class VisualizationDataSource : StandardComponent, IVisualizationDataSource
     {
-        public const int DB_MIN = -90;
-
-        public const int DB_MAX = 0;
-
         public IOutputDataSource OutputDataSource { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -102,6 +98,7 @@ namespace FoxTunes
                     data.Samples = this.OutputDataSource.GetBuffer(data.FFTSize, false);
                     data.Data = new float[1, data.Samples.Length];
                 }
+                data.OnAllocated();
             }
             if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
             {
@@ -138,18 +135,6 @@ namespace FoxTunes
             data.Format = format;
             data.Initialized = true;
             return true;
-        }
-
-
-        public static float ToDecibel(float value)
-        {
-            return Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
-        }
-
-        public static float ToDecibelFixed(float value)
-        {
-            var dB = ToDecibel(value);
-            return 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
         }
 
         public static int Deinterlace(float[,] destination, float[] source, int channels, int count)

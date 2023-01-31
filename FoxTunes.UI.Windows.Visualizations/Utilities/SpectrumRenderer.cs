@@ -174,7 +174,7 @@ namespace FoxTunes
             }
             try
             {
-                if (!data.Update())
+                if (!this.VisualizationDataSource.Update(data))
                 {
                     this.Restart();
                     return;
@@ -393,17 +393,11 @@ namespace FoxTunes
             return peaks;
         }
 
-        public class SpectrumRendererData
+        public class SpectrumRendererData : FFTVisualizationData
         {
             public IOutputDataSource OutputDataSource;
 
-            public int FFTSize;
-
             public int FFTRange;
-
-            public float[] Samples;
-
-            public int SampleCount;
 
             public float[] Values;
 
@@ -431,25 +425,17 @@ namespace FoxTunes
 
             public DateTime LastUpdated;
 
-            public bool Update()
+            public override void OnAllocated()
             {
                 if (this.CutOff > 0)
                 {
-                    var rate = default(int);
-                    var channels = default(int);
-                    var format = default(OutputStreamFormat);
-                    if (!this.OutputDataSource.GetDataFormat(out rate, out channels, out format))
-                    {
-                        return false;
-                    }
-                    this.FFTRange = FrequencyToIndex(this.CutOff * 1000, this.FFTSize, rate);
+                    this.FFTRange = FrequencyToIndex(this.CutOff * 1000, this.FFTSize, this.Rate);
                 }
                 else
                 {
                     this.FFTRange = this.Samples.Length;
                 }
-                this.SampleCount = this.OutputDataSource.GetData(this.Samples, this.FFTSize);
-                return this.SampleCount > 0;
+                base.OnAllocated();
             }
         }
     }
