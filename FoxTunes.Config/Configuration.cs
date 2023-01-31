@@ -203,6 +203,12 @@ namespace FoxTunes
 
         public void Save(string profile)
         {
+            if (!string.Equals(Profiles.Profile, profile, StringComparison.OrdinalIgnoreCase))
+            {
+                //Switching profile, copy the current one.
+                this.Copy(profile);
+                return;
+            }
             var fileName = Profiles.GetFileName(profile);
             this.OnSaving();
             Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", fileName);
@@ -225,6 +231,30 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
             }
             this.OnSaved();
+        }
+
+        public void Copy(string profile)
+        {
+            if (string.Equals(Profiles.Profile, profile, StringComparison.OrdinalIgnoreCase))
+            {
+                //Nothing to do.
+                return;
+            }
+            this.Save();
+            try
+            {
+                var sourceFileName = Profiles.GetFileName(Profiles.Profile);
+                var targetFileName = Profiles.GetFileName(profile);
+                if (File.Exists(sourceFileName))
+                {
+                    File.Copy(sourceFileName, targetFileName);
+                }
+                Profiles.Profile = profile;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to copy configuration: {0}", e.Message);
+            }
         }
 
         protected virtual void OnSaving()
@@ -263,7 +293,10 @@ namespace FoxTunes
             try
             {
                 Profiles.Delete(profile);
-                File.Delete(fileName);
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
                 this.Load();
             }
             catch (Exception e)

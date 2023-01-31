@@ -31,6 +31,60 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public bool IsDefaultProfile
+        {
+            get
+            {
+                return this.Configuration.IsDefaultProfile;
+            }
+        }
+
+        public IEnumerable<string> AvailableProfiles
+        {
+            get
+            {
+                return this.Configuration.AvailableProfiles;
+            }
+        }
+
+        protected virtual void OnAvailableProfilesChanged()
+        {
+            if (this.AvailableProfilesChanged != null)
+            {
+                this.AvailableProfilesChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("AvailableProfiles");
+        }
+
+        public event EventHandler AvailableProfilesChanged;
+
+        public string ActiveProfile
+        {
+            get
+            {
+                return this.Configuration.Profile;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    return;
+                }
+                this.Load(value);
+            }
+        }
+
+        protected virtual void OnActiveProfileChanged()
+        {
+            if (this.ActiveProfileChanged != null)
+            {
+                this.ActiveProfileChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ActiveProfile");
+        }
+
+        public event EventHandler ActiveProfileChanged;
+
         public IEnumerable<string> InvocationCategories
         {
             get
@@ -98,6 +152,7 @@ namespace FoxTunes
             if (!string.Equals(this.Configuration.Profile, profile, StringComparison.OrdinalIgnoreCase))
             {
                 this.Configuration.Load(profile);
+                this.OnActiveProfileChanged();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -112,6 +167,8 @@ namespace FoxTunes
             if (!string.IsNullOrEmpty(profile))
             {
                 this.Configuration.Save(profile);
+                this.OnAvailableProfilesChanged();
+                this.OnActiveProfileChanged();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -122,7 +179,12 @@ namespace FoxTunes
 
         public Task Delete()
         {
-            this.Configuration.Delete();
+            if (!this.Configuration.IsDefaultProfile)
+            {
+                this.Configuration.Delete();
+                this.OnAvailableProfilesChanged();
+                this.OnActiveProfileChanged();
+            }
 #if NET40
             return TaskEx.FromResult(false);
 #else
