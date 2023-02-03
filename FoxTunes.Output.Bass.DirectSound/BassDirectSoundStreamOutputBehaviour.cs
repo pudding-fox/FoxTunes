@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
+        public IOutputDeviceManager OutputDeviceManager { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
@@ -31,7 +33,7 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -47,7 +49,7 @@ namespace FoxTunes
             {
                 this._DirectSoundDevice = value;
                 Logger.Write(this, LogLevel.Debug, "Direct Sound Device = {0}", this.DirectSoundDevice);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -57,6 +59,7 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
+            this.OutputDeviceManager = core.Managers.OutputDevice;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,

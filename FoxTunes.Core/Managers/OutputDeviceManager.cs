@@ -3,16 +3,22 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class OutputDeviceManager : StandardManager, IOutputDeviceManager, IDisposable
     {
+        public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(100);
+
         public OutputDeviceManager()
         {
+            this.Debouncer = new AsyncDebouncer(TIMEOUT);
             this.Selectors = new List<IOutputDeviceSelector>();
         }
+
+        public AsyncDebouncer Debouncer { get; private set; }
 
         public IList<IOutputDeviceSelector> Selectors { get; private set; }
 
@@ -76,8 +82,20 @@ namespace FoxTunes
 
         public event EventHandler DeviceChanged;
 
+        public IOutput Output { get; private set; }
+
+        public IPlaylistManager PlaylistManager { get; private set; }
+
+        public IPlaybackManager PlaybackManager { get; private set; }
+
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.Output = core.Components.Output;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.PlaybackManager = core.Managers.Playback;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Selectors.AddRange(
                 ComponentRegistry.Instance.GetComponents<IOutputDeviceSelector>()
             );
@@ -125,6 +143,61 @@ namespace FoxTunes
             {
                 this.IsRefreshing = false;
                 this.OnDevicesChanged();
+            }
+        }
+
+        public void Restart()
+        {
+            if (!this.Output.IsStarted)
+            {
+                return;
+            }
+            this.Debouncer.Exec(this.OnRestart);
+        }
+
+        protected virtual async Task OnRestart()
+        {
+            var position = default(long);
+            var paused = default(bool);
+            var playlistItem = default(PlaylistItem);
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream != null)
+            {
+                position = outputStream.Position;
+                paused = outputStream.IsPaused;
+                playlistItem = outputStream.PlaylistItem;
+            }
+            try
+            {
+                await this.Output.Shutdown().ConfigureAwait(false);
+                await this.Output.Start().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
+                return;
+            }
+            if (playlistItem != null)
+            {
+                try
+                {
+                    await this.PlaylistManager.Play(playlistItem).ConfigureAwait(false);
+                    if (this.PlaybackManager.CurrentStream != null)
+                    {
+                        if (position > 0)
+                        {
+                            await this.PlaybackManager.CurrentStream.Seek(position).ConfigureAwait(false);
+                        }
+                        if (paused)
+                        {
+                            await this.PlaybackManager.CurrentStream.Pause().ConfigureAwait(false);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
+                }
             }
         }
 

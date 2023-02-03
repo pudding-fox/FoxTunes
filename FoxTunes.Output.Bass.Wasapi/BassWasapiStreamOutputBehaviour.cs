@@ -28,6 +28,8 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
+        public IOutputDeviceManager OutputDeviceManager { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
@@ -46,7 +48,7 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -62,7 +64,7 @@ namespace FoxTunes
             {
                 this._WasapiDevice = value;
                 Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -78,7 +80,7 @@ namespace FoxTunes
             {
                 this._Exclusive = value;
                 Logger.Write(this, LogLevel.Debug, "Exclusive = {0}", this.Exclusive);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -102,7 +104,7 @@ namespace FoxTunes
             {
                 this._DoubleBuffer = value;
                 Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -118,7 +120,7 @@ namespace FoxTunes
             {
                 this._EventDriven = value;
                 Logger.Write(this, LogLevel.Debug, "EventDriven = {0}", this.EventDriven);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -134,7 +136,7 @@ namespace FoxTunes
             {
                 this._Async = value;
                 Logger.Write(this, LogLevel.Debug, "Async = {0}", this.Async);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -150,7 +152,7 @@ namespace FoxTunes
             {
                 this._Dither = value;
                 Logger.Write(this, LogLevel.Debug, "Dither = {0}", this.Dither);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -166,7 +168,7 @@ namespace FoxTunes
             {
                 this._Mixer = value;
                 Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -182,7 +184,7 @@ namespace FoxTunes
             {
                 this._BufferLength = value;
                 Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -198,7 +200,7 @@ namespace FoxTunes
             {
                 this._Raw = value;
                 Logger.Write(this, LogLevel.Debug, "Raw = {0}", this.Raw);
-                var task = this.Output.Shutdown();
+                this.OutputDeviceManager.Restart();
             }
         }
 
@@ -208,6 +210,7 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
+            this.OutputDeviceManager = core.Managers.OutputDevice;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
