@@ -6,7 +6,8 @@ namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassAsioOutputDeviceSelector : OutputDeviceSelector
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    public class BassAsioOutputDeviceSelector : BassOutputDeviceSelector
     {
         public override string Name
         {

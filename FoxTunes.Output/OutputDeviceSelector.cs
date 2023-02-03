@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -48,6 +49,8 @@ namespace FoxTunes
         public event EventHandler DeviceChanged;
 
         public abstract void Refresh();
+
+        public abstract Task ShowSettings();
 
         public bool IsDisposed { get; private set; }
 
