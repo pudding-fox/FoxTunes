@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
@@ -8,7 +7,7 @@ namespace FoxTunes
 {
     [Component(ID)]
     [WindowsUserInterfaceDependency]
-    public class ExpressionDarkTheme : ThemeBase, IConfigurableComponent
+    public class ExpressionDarkTheme : ThemeBase
     {
         public const string ID = "3E9EFE8C-5245-4F8B-97D1-EB47CC70E373";
 
@@ -16,19 +15,6 @@ namespace FoxTunes
             : base(ID, Strings.ExpressionDarkTheme_Name, Strings.ExpressionDarkTheme_Description, GetColorPalettes())
         {
 
-        }
-
-        public override void InitializeComponent(ICore core)
-        {
-            base.InitializeComponent(core);
-            this.ConnectSetting(
-                ExpressionDarkThemeConfiguration.SECTION,
-                ExpressionDarkThemeConfiguration.LIST_ROW_SHADING,
-                () => new ResourceDictionary()
-                {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark_ListRowShading.xaml", UriKind.Relative)
-                }
-            );
         }
 
         public override int CornerRadius
@@ -71,11 +57,6 @@ namespace FoxTunes
                     Resources.Transparent_White
                 ),
             };
-        }
-
-        public IEnumerable<ConfigurationSection> GetConfigurationSections()
-        {
-            return ExpressionDarkThemeConfiguration.GetConfigurationSections();
         }
     }
 }
