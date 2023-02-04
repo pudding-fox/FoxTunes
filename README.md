@@ -1,14 +1,14 @@
 # FoxTunes
 A **portable, modular music player and converter** using the BASS framework for Windows XP/.../10/11.
 
-The main release is [FoxTunes-2.8.1-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.8.1/FoxTunes-2.8.1-net462.zip).  
-For additional plugins, download [FoxTunes-2.8.1-Plugins-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.8.1/FoxTunes-2.8.1-Plugins-net462.zip) (extract and copy required folders to the FoxTunes\lib directory).
+The main release is [FoxTunes-2.8.3-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.8.3/FoxTunes-2.8.3-net462.zip).  
+For additional plugins, download [FoxTunes-2.8.3-Plugins-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.8.3/FoxTunes-2.8.3-Plugins-net462.zip) (extract and copy required folders to the FoxTunes\lib directory).
 
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
 Consult the [Wiki](https://github.com/aidan-g/FoxTunes/wiki) for more informations.
 
-![Main](Media/Screenshots/Main.PNG)
+![Main](https://user-images.githubusercontent.com/13859177/216791551-186168bd-78fd-4a2d-96d1-195855a80330.png)
 
 ## Input/Output
 
@@ -16,47 +16,57 @@ Consult the [Wiki](https://github.com/aidan-g/FoxTunes/wiki) for more informatio
 * The following **output formats** are supported: flac, m4a, mp3, ogg, opus, wv.
 * Gapless and fading (with crossfading) **input modes** are supported.
 * DirectSound, WASAPI and ASIO **output modes** are supported.
-* Replay Gain and Tempo.
+* 10 band equalizer with build in and custom presets.
+* Tempo control.
+* A high quality resampler based on the soxr library.
 * Cue sheets can be played and split using the converter.
+* Various archive files can be played directly.
 
 ## Interface/Layout
 
-The UI components can be relocated and removed via the layout editor.  
+The user interface can be customized. A flexible layout system is included with split panels, tabs and other containers.
+Several layout presets are included.
 You can save and switch between different layouts by activating in the settings '**Profiles**'.  
 Additional windows can be added and customized.
 
-![Main](Media/Screenshots/Browser.PNG)
+![Main](https://user-images.githubusercontent.com/13859177/216791727-5e778da7-5d69-43ee-819b-7d2ead898a67.png)
 
 ## Scriptable
 
 Library, playlist and other elements can be customized using Javascript.
 
-![Hierarchy](Media/Screenshots/HierarchyBuilder.PNG)
-![Playlist](Media/Screenshots/PlaylistBuilder.PNG)
+![Hierarchy](https://user-images.githubusercontent.com/13859177/216791910-b752b699-6762-4985-be8c-bc8a7a6f91ff.png)
 
 ## Themable
 
-You can create a theme library with xaml.  
-See the FoxTunes.UI.Windows.Themes project for an example.
- 
-Two are included. We are no artists;
-* Expression Dark - A style developed by Microsoft. 
-* System - Use the default appearance. Minimal resource usage.
+Our default style is a dark flat appearence called Adamantine
+
+Several other styles by Microsoft are available:
+* Expression Dark
+* Aero
+* Aero 2
+* Classic
+* Royale
 
 ## Mini player
 
 Includes a mini player with optional artwork and playlist.
 
-![Mini A](Media/Screenshots/MiniPlayerA.PNG)
-![Mini B](Media/Screenshots/MiniPlayerB.PNG)
-
-Can be used with file associations and the "Send to" explorer action. 
+![Mini A](https://user-images.githubusercontent.com/13859177/216791988-f615e790-7255-4e5d-8fda-2534046a6360.png)
+![Mini B](https://user-images.githubusercontent.com/13859177/216791973-4f7bd572-2e53-4db4-9a75-3ba88d9c160e.png)
 
 ## Settings
 
-A lot of settings are available depending on plugins installed.
+We try to make functionality as flexible and configurable as possible.
+Unfortunately this is often at the expense of ease of use.
+Many areas have context (right click) menus exposing additional features and settings.
 
-![Settings](Media/Screenshots/Settings.PNG)
+![Settings](https://user-images.githubusercontent.com/13859177/216792034-43cbdae8-9392-46a0-b56b-69d5362a2ac4.png)
+
+## Mini Disc
+
+A mini disc plugin is included and can be activated in the settings screen.
+If you have a supported NET MD device, physical disks can be created and modified.
 
 ## Windows XP support
 
@@ -64,6 +74,9 @@ A Windows XP compatibile .NET 4.0 build can be created (raise an issue if you th
 It needs at least;
 * [KB2468871](https://www.microsoft.com/en-us/download/details.aspx?id=3556) - Portable class libraries patch.
   * Microsoft keep breaking the link. Google: NDP40-KB2468871
+* [Windows Imaging Component (x86)](http://www.microsoft.com/downloads/details.aspx?FamilyID=8E011506-6307-445B-B950-215DEF45DDD8)
+* [Windows Imaging Component (x64)](http://www.microsoft.com/downloads/details.aspx?familyid=F64654AC-6E26-41D9-A90A-0E7783B864EE)
+  * Microsoft keep breaking the links. Google: Windows Imaging Component
 
 ![Minimal](Media/Screenshots/Minimal.PNG)
 
@@ -85,9 +98,8 @@ It needs at least;
   * Can rip CDs with the CD plugin.
   * Can up/down sample rate/depth with the Resampler plugin.
 * **GAPLESS** - A "true" gapless input transport: https://github.com/aidan-g/BASS_GAPLESS
-* **noesis** - Use Noesis.Javascript for scriptable elements.
-* **v8net** - Use V8.Net for scriptable elements.
-* **clearscript** - Use Microsoft.ClearScript for scriptable elements.  
+* **Noesis** - Use Noesis.Javascript for scriptable elements.
+* **ClearScript** - Use Microsoft.ClearScript for scriptable elements.  
 * **Layout** - A flexible layout system with various panel types. 
 * **LibraryBrowser** - An album art grid interface for the library.
 * **Logging** - Use Log4Net logging back-end. Only used for debugging.
@@ -103,11 +115,9 @@ It needs at least;
 * **ReplayGain** - Calculate and utilize replay gain meta data for tracks and albums: https://github.com/aidan-g/BASS_REPLAY_GAIN
   * Can calculate on demand (per track) if you don't mind waiting a moment for playback.
 * **Resampler** - SOXR based high quality configurable resampler. Can perform up/down sampling: https://github.com/aidan-g/BASS_SOX
-* **SimpleMetaData** - A meta data provider using the file path and regular expressions. Recommended for older systems.
 * **Snapping** - Enable winamp like window snapping.
-* **Spectrum** - Various visualizations.
+* **Visualizations** - Visualizations: Spectrum, Peak Meter, Oscilloscope and Spectrogram.
 * **SQLite** - Use SQLite for database functions.
-* **SqlServer** - Use Microsoft SQL Server for database functions.
 * **Statistics** - Playback statistics like play count and last played date/time.
 * **TagLib** - Use TagLib for meta data functions.
 * **Tempo** - Adjust the tempo and pitch of media.
@@ -115,7 +125,7 @@ It needs at least;
   * Open media with MusicBrainz Picard.
 * **WASAPI** - Windows Audio Session API output.
 * **WaveBar** - A wave form seek bar with mono and multi channel modes.
-* **Windows** - Global key bindings (Multi media keys), system tray icon, system media transport controls, taskbar controls.
+* **Windows** - Global key bindings (Multi media keys), system tray icon, system media transport controls, taskbar controls, toast notifications.
 * **WPF** - Used for UI themes.
 
 ## Translations
