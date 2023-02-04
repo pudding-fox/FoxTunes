@@ -43,7 +43,7 @@
                             <TextBlock Text="{Binding Name, Mode=OneWay}" ToolTip="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
                         </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding Description, Mode=OneWay}" ToolTip="{Binding Description, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
-                        <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}" IsIndeterminate="{Binding IsIndeterminate, Mode=OneWay}"></ProgressBar>
+                        <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}" IsIndeterminate="{Binding IsIndeterminate, Mode=OneWay}" MinHeight="10"></ProgressBar>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

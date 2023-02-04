@@ -11,13 +11,18 @@
     <UserControl.Resources>
         <ViewModel:LibrarySearch x:Key="ViewModel"></ViewModel:LibrarySearch>
     </UserControl.Resources>
-    <Windows:SearchBox 
-           SearchText="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}"
-           Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}">
-        <Interactivity:Interaction.Triggers>
-            <Interactivity:EventTrigger EventName="Commit">
-                <ViewModel:InvokeParameterizedCommandAction Command="{Binding SearchCommitCommand, Source={StaticResource ViewModel}}" />
-            </Interactivity:EventTrigger>
-        </Interactivity:Interaction.Triggers>
-    </Windows:SearchBox>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Windows:SearchBox 
+               SearchText="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}"
+               Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="Commit">
+                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding SearchCommitCommand, Source={StaticResource ViewModel}}" />
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
+        </Windows:SearchBox>
+    </Grid>
 </Windows:UIComponentBase>

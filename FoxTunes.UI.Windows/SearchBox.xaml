@@ -30,19 +30,6 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Button Grid.Column="1" Content="r" Margin="2,0,0,0" Command="{Binding ClearCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}}">
-            <Button.Style>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                    <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"></Setter>
-                    <Setter Property="FontSize" Value="10"></Setter>
-                    <Setter Property="FontFamily" Value="Webdings"></Setter>
-                    <!-- System -->
-                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
-                </Style>
-            </Button.Style>
-        </Button>
+        <Button Grid.Column="1" Content="r" Margin="2,0,0,0" Command="{Binding ClearCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}}" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" FontSize="10" FontFamily="Webdings"></Button>
     </Grid>
 </UserControl>

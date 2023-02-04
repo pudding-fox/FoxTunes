@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mini Player Launcher.
+        /// </summary>
+        internal static string MiniPlayer_Name {
+            get {
+                return ResourceManager.GetString("MiniPlayer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quit.
         /// </summary>
         internal static string MiniPlayerBehaviour_Quit {

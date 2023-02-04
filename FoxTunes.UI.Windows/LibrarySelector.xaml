@@ -14,9 +14,14 @@
     <Windows:UIComponentBase.IsComponentEnabled>
         <Binding Path="Hierarchies.Count" Source="{StaticResource ViewModel}" Converter="{StaticResource IntegerToBooleanConverter}" ConverterParameter="2" FallbackValue="False" />
     </Windows:UIComponentBase.IsComponentEnabled>
-    <ComboBox 
-           ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}, IsAsync=True}" 
-           SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
-           DisplayMemberPath="Name">
-    </ComboBox>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ComboBox 
+               ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}, IsAsync=True}" 
+               SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
+               DisplayMemberPath="Name">
+        </ComboBox>
+    </Grid>
 </Windows:UIComponentBase>

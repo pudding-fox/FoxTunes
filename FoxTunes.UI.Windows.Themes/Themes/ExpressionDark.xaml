@@ -814,8 +814,9 @@
     </Style>
 
     <Style TargetType="{x:Type ProgressBar}">
-        <Setter Property="Background" Value="{DynamicResource NormalBorderBrush}"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource NormalBrush}"></Setter>
+        <Setter Property="Background" Value="{DynamicResource NormalBrush}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource NormalBorderBrush}"></Setter>
+        <Setter Property="BorderThickness" Value="0"></Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ProgressBar}">
