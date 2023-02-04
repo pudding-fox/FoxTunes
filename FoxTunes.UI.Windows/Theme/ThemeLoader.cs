@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -26,16 +27,24 @@ namespace FoxTunes
 
         protected virtual void SetTheme(Func<ITheme> factory)
         {
-            if (this._Theme != null && this._Theme.IsValueCreated)
+            this.OnBeginSetTheme();
+            try
             {
-                this._Theme.Value.Disable();
+                if (this._Theme != null && this._Theme.IsValueCreated)
+                {
+                    this._Theme.Value.Disable();
+                }
+                this._Theme = new Lazy<ITheme>(() =>
+                {
+                    var theme = factory();
+                    theme.Enable();
+                    return theme;
+                });
             }
-            this._Theme = new Lazy<ITheme>(() =>
+            finally
             {
-                var theme = factory();
-                theme.Enable();
-                return theme;
-            });
+                this.OnEndSetTheme();
+            }
             this.OnThemeChanged();
         }
 
@@ -49,6 +58,16 @@ namespace FoxTunes
         }
 
         public event EventHandler ThemeChanged;
+
+        protected virtual void OnBeginSetTheme()
+        {
+            Application.Current.Resources.BeginInit();
+        }
+
+        protected virtual void OnEndSetTheme()
+        {
+            Application.Current.Resources.EndInit();
+        }
 
         public IConfiguration Configuration { get; private set; }
 
