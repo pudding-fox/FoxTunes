@@ -260,10 +260,19 @@ namespace FoxTunes
             {
                 items = this.ItemsSource;
             }
-            this._TabControl.Items.Clear(UIDisposerFlags.All);
-            if (items != null)
+            this.IsRefreshing = true;
+            try
             {
-                this.Add(items);
+                this._TabControl.Items.Clear(UIDisposerFlags.All);
+                if (items != null)
+                {
+                    this.Add(items);
+                }
+            }
+            finally
+            {
+                this.IsRefreshing = false;
+                this.UpdateSelectionTarget();
             }
         }
 
@@ -338,8 +347,14 @@ namespace FoxTunes
             return null;
         }
 
+        public bool IsRefreshing { get; private set; }
+
         protected virtual void UpdateSelectionSource()
         {
+            if (this.IsRefreshing)
+            {
+                return;
+            }
             if (this._TabControl.SelectedItem is TabItem tabItem)
             {
                 var content = this.GetContent(tabItem);
@@ -352,6 +367,10 @@ namespace FoxTunes
 
         protected virtual void UpdateSelectionTarget()
         {
+            if (this.IsRefreshing)
+            {
+                return;
+            }
             var tabItem = this.GetTabItem(this.SelectedItem);
             if (tabItem != null && this._TabControl.SelectedItem != tabItem)
             {
