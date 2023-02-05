@@ -7,8 +7,6 @@ namespace FoxTunes
     {
         public const string SECTION = "F3E58830-97C0-4BA2-9E07-3EC27E3D4418";
 
-        public const string ENABLED_ELEMENT = "AAAAF9DF-2F0C-4F6B-BC9F-0BFC142EBD57";
-
         public const string NOW_PLAYING_SCRIPT_ELEMENT = "BBBB78F3-B32F-4A8C-B566-9A8B39A896C7";
 
         public const string TOPMOST_ELEMENT = "CCCC7F71-A506-48DF-9420-E6926465FFDC";
@@ -21,13 +19,9 @@ namespace FoxTunes
 
         public const string DROP_COMMIT_ELEMENT = "IIIIF490-CE3D-481A-8924-B698BD443D88";
 
-
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.MiniPlayerBehaviourConfiguration_Section)
-                .WithElement(
-                    new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_Enabled).WithValue(false).Hide())
                 .WithElement(
                     new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_NowPlayingScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced).WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(

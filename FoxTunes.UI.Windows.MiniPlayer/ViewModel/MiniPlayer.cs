@@ -7,20 +7,17 @@ namespace FoxTunes.ViewModel
 {
     public class MiniPlayer : ViewModelBase
     {
-        public IConfiguration Configuration { get; private set; }
+        public static readonly MiniPlayerBehaviour Behaviour = ComponentRegistry.Instance.GetComponent<MiniPlayerBehaviour>();
 
-        private BooleanConfigurationElement _Enabled { get; set; }
-
-        public BooleanConfigurationElement Enabled
+        public bool Enabled
         {
             get
             {
-                return this._Enabled;
+                return Behaviour.Enabled;
             }
             set
             {
-                this._Enabled = value;
-                this.OnEnabledChanged();
+                Behaviour.Enabled = value;
             }
         }
 
@@ -34,12 +31,12 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler EnabledChanged;
-        
+
         public ICommand ShowCommand
         {
             get
             {
-                return new Command(() => this.Enabled.Value = true);
+                return new Command(() => this.Enabled = true);
             }
         }
 
@@ -47,7 +44,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() => this.Enabled.Value = false);
+                return new Command(() => this.Enabled = false);
             }
         }
 
@@ -55,23 +52,33 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() => this.Enabled.Value = !this.Enabled.Value);
+                return new Command(() => this.Enabled = !this.Enabled);
             }
         }
 
         protected override void InitializeComponent(ICore core)
         {
-            this.Configuration = core.Components.Configuration;
-            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.SECTION,
-                MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
-            );
+            Behaviour.EnabledChanged += this.OnEnabledChanged;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnEnabledChanged(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(this.OnEnabledChanged);
         }
 
         protected override Freezable CreateInstanceCore()
         {
             return new MiniPlayer();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (Behaviour != null)
+            {
+                Behaviour.EnabledChanged -= this.OnEnabledChanged;
+            }
+            base.OnDisposing();
         }
     }
 }

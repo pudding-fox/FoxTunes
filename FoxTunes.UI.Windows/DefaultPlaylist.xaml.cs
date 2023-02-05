@@ -14,7 +14,6 @@ namespace FoxTunes
         public DefaultPlaylist()
         {
             this.InitializeComponent();
-            this.IsVisibleChanged += this.OnIsVisibleChanged;
         }
 
         protected virtual void DragSourceInitialized(object sender, ListViewExtensions.DragSourceInitializedEventArgs e)
@@ -31,14 +30,6 @@ namespace FoxTunes
                 items,
                 DragDropEffects.Copy
             );
-        }
-
-        protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (this.IsVisible && this.ListView.SelectedItem != null)
-            {
-                this.ListView.ScrollIntoView(this.ListView.SelectedItem);
-            }
         }
 
         protected virtual void OnHeaderClick(object sender, RoutedEventArgs e)
