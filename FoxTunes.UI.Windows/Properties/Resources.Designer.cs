@@ -62,33 +62,6 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///    var parts = [];
-        ///    if (tag.iscompilation || tag.__ft_variousartists) {
-        ///        parts.push(strings.general_variousartists);
-        ///    }
-        ///    else if (tag.artist) {
-        ///        parts.push(tag.artist);
-        ///    }
-        ///    if (tag.year) {
-        ///        parts.push(tag.year);
-        ///    }
-        ///    if (tag.album) {
-        ///        parts.push(tag.album);
-        ///    }
-        ///    else {
-        ///        parts.push(directoryname(file));
-        ///    }
-        ///    return parts.join(&quot; - &quot;);
-        ///})().
-        /// </summary>
-        internal static string Grouping {
-            get {
-                return ResourceManager.GetString("Grouping", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
         ///    if (!file) {
         ///        return version();
         ///    }
@@ -164,12 +137,14 @@ namespace FoxTunes {
         ///   Looks up a localized string similar to &lt;ControlTemplate
         ///    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
         ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
-        ///    xmlns:Core=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.Core&quot; 
         ///    xmlns:Windows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows&quot;
-        ///    xmlns:ViewModel=&quot;clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows&quot;
         ///    TargetType=&quot;{x:Type Window}&quot;&gt;
-        ///    &lt;ControlTemplate.Resources&gt;
-        ///        &lt;ViewModel:WindowBase x:Key=&quot;ViewModel&quot;&gt;&lt;/ViewModel:WindowBase&gt;        /// [rest of string was truncated]&quot;;.
+        ///    &lt;Grid Background=&quot;{DynamicResource NormalBrush}&quot;&gt;
+        ///        &lt;Grid.RowDefinitions&gt;
+        ///            &lt;RowDefinition Height=&quot;Auto&quot;&gt;&lt;/RowDefinition&gt;
+        ///            &lt;RowDefinition&gt;&lt;/RowDefinition&gt;
+        ///        &lt;/Grid.RowDefinitions&gt;
+        ///        &lt;Windows:Titlebar&gt;&lt;/Windo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WindowBase {
             get {
