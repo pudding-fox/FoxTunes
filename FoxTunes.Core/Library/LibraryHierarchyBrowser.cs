@@ -12,7 +12,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class LibraryHierarchyBrowser : StandardComponent, ILibraryHierarchyBrowser, IDisposable
     {
-        const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Image;
+        const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Property | MetaDataItemType.Statistic | MetaDataItemType.Image;
 
         public LibraryHierarchyBrowser()
         {

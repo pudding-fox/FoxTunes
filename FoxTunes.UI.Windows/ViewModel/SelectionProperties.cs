@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace FoxTunes.ViewModel
 {
@@ -34,6 +33,7 @@ namespace FoxTunes.ViewModel
 
         private static readonly string[] PROPERTIES = new[]
         {
+            CountValueProvider.NAME,
             CommonProperties.AudioBitrate,
             CommonProperties.AudioChannels,
             CommonProperties.AudioSampleRate,
@@ -57,6 +57,8 @@ namespace FoxTunes.ViewModel
 
         private static readonly IDictionary<string, ValueProvider> PROVIDERS = new Dictionary<string, ValueProvider>(StringComparer.OrdinalIgnoreCase)
         {
+            { CountValueProvider.NAME, CountValueProvider.Instance },
+            { CommonProperties.Duration, NumericMetaDataValueProvider.Instance },
             { FileSystemProperties.FileName, FileSystemValueProvider.Instance },
             { FileSystemProperties.DirectoryName, FileSystemValueProvider.Instance },
             { FileSystemProperties.FileSize, FileSystemValueProvider.Instance },
@@ -66,6 +68,7 @@ namespace FoxTunes.ViewModel
 
         private static readonly IDictionary<string, ValueAggregator> AGGREGATORS = new Dictionary<string, ValueAggregator>(StringComparer.OrdinalIgnoreCase)
         {
+            { CountValueAggregator.NAME, CountValueAggregator.Instance },
             { CommonProperties.Duration, TimeSpanValueAggregator.Instance },
             { FileSystemProperties.FileSize, FileSystemUsageValueAggregator.Instance },
         };
@@ -480,14 +483,33 @@ namespace FoxTunes.ViewModel
             public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
             {
                 var value = default(string);
-                if (metaData != null && metaData.TryGetValue(name, out value))
+                if (metaData != null && metaData.TryGetValue(name, out value) && !string.IsNullOrEmpty(value))
                 {
                     return value;
                 }
-                return null;
+                return Strings.SelectionProperties_NoValue;
             }
 
             public static readonly ValueProvider Instance = new MetaDataValueProvider();
+        }
+
+        public class NumericMetaDataValueProvider : MetaDataValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                var value = default(string);
+                if (metaData != null && metaData.TryGetValue(name, out value) && !string.IsNullOrEmpty(value))
+                {
+                    var numeric = default(int);
+                    if (int.TryParse(value, out numeric))
+                    {
+                        return numeric;
+                    }
+                }
+                return 0;
+            }
+
+            new public static readonly ValueProvider Instance = new NumericMetaDataValueProvider();
         }
 
         public class FileSystemValueProvider : ValueProvider
@@ -530,6 +552,18 @@ namespace FoxTunes.ViewModel
             }
 
             public static readonly ValueProvider Instance = new FileSystemValueProvider();
+        }
+
+        public class CountValueProvider : ValueProvider
+        {
+            public const string NAME = "SelectionCount";
+
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                return name;
+            }
+
+            public static readonly ValueProvider Instance = new CountValueProvider();
         }
 
         public abstract class ValueAggregator
@@ -575,6 +609,10 @@ namespace FoxTunes.ViewModel
 
             public override string GetValue(IEnumerable<object> values)
             {
+                if (!values.Any())
+                {
+                    return Strings.SelectionProperties_NoValue;
+                }
                 return string.Join(
                     DELIMITER,
                     values
@@ -588,20 +626,19 @@ namespace FoxTunes.ViewModel
         {
             public override void Add(IList<object> values, object value)
             {
-                var numeric = default(int);
-                if (!int.TryParse(Convert.ToString(value), out numeric))
-                {
-                    return;
-                }
                 values.Add(value);
             }
 
             public override string GetValue(IEnumerable<object> values)
             {
+                if (!values.Any())
+                {
+                    return Strings.SelectionProperties_NoValue;
+                }
                 var total = values.Select(value => Convert.ToInt64(value) / 1000).Sum();
                 if (total == 0)
                 {
-                    return null;
+                    return Strings.SelectionProperties_NoValue;
                 }
                 return TimeSpan.FromSeconds(total).ToString();
             }
@@ -620,10 +657,14 @@ namespace FoxTunes.ViewModel
 
             public override string GetValue(IEnumerable<object> values)
             {
+                if (!values.Any())
+                {
+                    return Strings.SelectionProperties_NoValue;
+                }
                 var total = values.Cast<long>().Sum();
                 if (total == 0)
                 {
-                    return null;
+                    return Strings.SelectionProperties_NoValue;
                 }
                 var length = total;
                 var order = 0;
@@ -636,6 +677,24 @@ namespace FoxTunes.ViewModel
             }
 
             public static readonly ValueAggregator Instance = new FileSystemUsageValueAggregator();
+        }
+
+        public class CountValueAggregator : ValueAggregator
+        {
+            public const string NAME = "SelectionCount";
+
+            public override void Add(IList<object> values, object value)
+            {
+                values.Add(value);
+            }
+
+            public override string GetValue(IEnumerable<object> values)
+            {
+                var count = values.Count();
+                return Convert.ToString(count);
+            }
+
+            public static readonly ValueAggregator Instance = new CountValueAggregator();
         }
 
         public class Row

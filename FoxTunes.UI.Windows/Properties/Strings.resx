@@ -336,6 +336,9 @@
   <data name="MetaDataName.IsCompilation" xml:space="preserve">
     <value>Compilation</value>
   </data>
+  <data name="MetaDataName.SelectionCount" xml:space="preserve">
+    <value>Items Selected</value>
+  </data>
   <data name="MetaDataProvidersSettingsDialog.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
