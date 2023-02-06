@@ -414,6 +414,14 @@
             }
         }
 
+        public static string SelectionProperties_Location
+        {
+            get
+            {
+                return Strings.SelectionProperties_Location;
+            }
+        }
+
         public static string SelectionProperties_Images
         {
             get
