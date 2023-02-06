@@ -459,6 +459,33 @@
   <data name="Report.Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="SelectionProperties.Images" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="SelectionProperties.Name" xml:space="preserve">
+    <value>Selection Properties</value>
+  </data>
+  <data name="SelectionProperties.NoValue" xml:space="preserve">
+    <value>&lt;No Value&gt;</value>
+  </data>
+  <data name="SelectionProperties.Properties" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="SelectionProperties.Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="SelectionPropertiesConfiguration.Section" xml:space="preserve">
+    <value>Selection Properties</value>
+  </data>
+  <data name="SelectionPropertiesConfiguration.ShowImages" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="SelectionPropertiesConfiguration.ShowProperties" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="SelectionPropertiesConfiguration.ShowTags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
   <data name="Settings.Name" xml:space="preserve">
     <value>Settings Launcher</value>
   </data>
