@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FoxTunes
 {
@@ -117,6 +120,16 @@ namespace FoxTunes
         protected override Task<bool> ShowSettings()
         {
             throw new NotImplementedException();
+        }
+
+        protected virtual void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+            e = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
+            e.RoutedEvent = UIElement.MouseWheelEvent;
+            e.Source = sender;
+            var parent = ((Control)sender).Parent as UIElement;
+            parent.RaiseEvent(e);
         }
 
         public override IEnumerable<ConfigurationSection> GetConfigurationSections()
