@@ -664,6 +664,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Codec.
+        /// </summary>
+        internal static string MetaDataName_Description {
+            get {
+                return ResourceManager.GetString("MetaDataName.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Folder.
         /// </summary>
         internal static string MetaDataName_DirectoryName {

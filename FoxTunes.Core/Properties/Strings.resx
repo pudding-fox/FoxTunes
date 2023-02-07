@@ -183,6 +183,9 @@
   <data name="MetaDataBehaviourConfiguration.Extended" xml:space="preserve">
     <value>Extended Attributes</value>
   </data>
+  <data name="MetaDataBehaviourConfiguration.FileSystem" xml:space="preserve">
+    <value>Filesystem</value>
+  </data>
   <data name="MetaDataBehaviourConfiguration.FrontCover" xml:space="preserve">
     <value>Front Cover</value>
   </data>
@@ -215,6 +218,9 @@
   </data>
   <data name="MetaDataBehaviourConfiguration.Threads" xml:space="preserve">
     <value>Background Threads</value>
+  </data>
+  <data name="MetaDataBehaviourConfiguration.WindowsMedia" xml:space="preserve">
+    <value>Windows Media</value>
   </data>
   <data name="MetaDataBehaviourConfiguration.Write" xml:space="preserve">
     <value>Write Behaviour</value>

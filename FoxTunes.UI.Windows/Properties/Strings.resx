@@ -318,6 +318,9 @@
   <data name="MetaDataItemType.Tag" xml:space="preserve">
     <value>Tag</value>
   </data>
+  <data name="MetaDataName.Description" xml:space="preserve">
+    <value>Codec</value>
+  </data>
   <data name="MetaDataName.DirectoryName" xml:space="preserve">
     <value>Folder</value>
   </data>
