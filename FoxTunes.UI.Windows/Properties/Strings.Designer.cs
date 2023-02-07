@@ -727,6 +727,42 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Album Gain.
+        /// </summary>
+        internal static string MetaDataName_ReplayGainAlbumGain {
+            get {
+                return ResourceManager.GetString("MetaDataName.ReplayGainAlbumGain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Album Peak.
+        /// </summary>
+        internal static string MetaDataName_ReplayGainAlbumPeak {
+            get {
+                return ResourceManager.GetString("MetaDataName.ReplayGainAlbumPeak", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Track Gain.
+        /// </summary>
+        internal static string MetaDataName_ReplayGainTrackGain {
+            get {
+                return ResourceManager.GetString("MetaDataName.ReplayGainTrackGain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Track Peak.
+        /// </summary>
+        internal static string MetaDataName_ReplayGainTrackPeak {
+            get {
+                return ResourceManager.GetString("MetaDataName.ReplayGainTrackPeak", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Items Selected.
         /// </summary>
         internal static string MetaDataName_SelectionCount {
@@ -1195,6 +1231,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replay Gain.
+        /// </summary>
+        internal static string SelectionProperties_ReplayGain {
+            get {
+                return ResourceManager.GetString("SelectionProperties.ReplayGain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tags.
         /// </summary>
         internal static string SelectionProperties_Tags {
@@ -1236,6 +1281,15 @@ namespace FoxTunes {
         internal static string SelectionPropertiesConfiguration_ShowProperties {
             get {
                 return ResourceManager.GetString("SelectionPropertiesConfiguration.ShowProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replay Gain.
+        /// </summary>
+        internal static string SelectionPropertiesConfiguration_ShowReplayGain {
+            get {
+                return ResourceManager.GetString("SelectionPropertiesConfiguration.ShowReplayGain", resourceCulture);
             }
         }
         

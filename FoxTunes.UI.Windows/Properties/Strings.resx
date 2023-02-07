@@ -339,6 +339,18 @@
   <data name="MetaDataName.IsCompilation" xml:space="preserve">
     <value>Compilation</value>
   </data>
+  <data name="MetaDataName.ReplayGainAlbumGain" xml:space="preserve">
+    <value>Album Gain</value>
+  </data>
+  <data name="MetaDataName.ReplayGainAlbumPeak" xml:space="preserve">
+    <value>Album Peak</value>
+  </data>
+  <data name="MetaDataName.ReplayGainTrackGain" xml:space="preserve">
+    <value>Track Gain</value>
+  </data>
+  <data name="MetaDataName.ReplayGainTrackPeak" xml:space="preserve">
+    <value>Track Peak</value>
+  </data>
   <data name="MetaDataName.SelectionCount" xml:space="preserve">
     <value>Items Selected</value>
   </data>
@@ -495,6 +507,9 @@
   <data name="SelectionProperties.Properties" xml:space="preserve">
     <value>Properties</value>
   </data>
+  <data name="SelectionProperties.ReplayGain" xml:space="preserve">
+    <value>Replay Gain</value>
+  </data>
   <data name="SelectionProperties.Tags" xml:space="preserve">
     <value>Tags</value>
   </data>
@@ -509,6 +524,9 @@
   </data>
   <data name="SelectionPropertiesConfiguration.ShowProperties" xml:space="preserve">
     <value>Properties</value>
+  </data>
+  <data name="SelectionPropertiesConfiguration.ShowReplayGain" xml:space="preserve">
+    <value>Replay Gain</value>
   </data>
   <data name="SelectionPropertiesConfiguration.ShowTags" xml:space="preserve">
     <value>Tags</value>

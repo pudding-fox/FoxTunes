@@ -41,6 +41,14 @@ namespace FoxTunes.ViewModel
             CommonProperties.Description,
         };
 
+        private static readonly string[] REPLAYGAIN = new[]
+        {
+            CommonMetaData.ReplayGainTrackGain,
+            CommonMetaData.ReplayGainTrackPeak,
+            CommonMetaData.ReplayGainAlbumGain,
+            CommonMetaData.ReplayGainAlbumPeak
+        };
+
         private static readonly string[] FILESYSTEM = new[]
         {
             FileSystemProperties.FileName,
@@ -61,6 +69,8 @@ namespace FoxTunes.ViewModel
             { CommonProperties.AudioBitrate, BitrateValueProvider.Instance },
             { CommonProperties.AudioSampleRate, SamplerateValueProvider.Instance },
             { CommonProperties.Duration, NumericMetaDataValueProvider.Instance },
+            { CommonMetaData.ReplayGainAlbumGain, DecibelValueProvider.Instance },
+            { CommonMetaData.ReplayGainTrackGain, DecibelValueProvider.Instance },
             { CommonImageTypes.FrontCover, MetaDataValueProvider.Instance },
         };
 
@@ -77,6 +87,7 @@ namespace FoxTunes.ViewModel
             this.FileDatas = new ObservableCollection<IFileData>();
             this.Tags = new ObservableCollection<Row>();
             this.Properties = new ObservableCollection<Row>();
+            this.ReplayGain = new ObservableCollection<Row>();
             this.FileSystem = new ObservableCollection<Row>();
             this.Images = new ObservableCollection<Row>();
             if (Core.Instance != null)
@@ -92,6 +103,8 @@ namespace FoxTunes.ViewModel
         public ObservableCollection<Row> Tags { get; private set; }
 
         public ObservableCollection<Row> Properties { get; private set; }
+
+        public ObservableCollection<Row> ReplayGain { get; private set; }
 
         public ObservableCollection<Row> FileSystem { get; private set; }
 
@@ -156,6 +169,33 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ShowPropertiesChanged;
+
+        private bool _ShowReplayGain { get; set; }
+
+        public bool ShowReplayGain
+        {
+            get
+            {
+                return this._ShowReplayGain;
+            }
+            set
+            {
+                this._ShowReplayGain = value;
+                this.OnShowReplayGainChanged();
+            }
+        }
+
+        protected virtual void OnShowReplayGainChanged()
+        {
+            this.Debouncer.Exec(this.Refresh);
+            if (this.ShowReplayGainChanged != null)
+            {
+                this.ShowReplayGainChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowReplayGain");
+        }
+
+        public event EventHandler ShowReplayGainChanged;
 
         private bool _ShowImages { get; set; }
 
@@ -236,6 +276,10 @@ namespace FoxTunes.ViewModel
                 ).ConnectValue(value => this.ShowProperties = value);
                 this.Configuration.GetElement<BooleanConfigurationElement>(
                     SelectionPropertiesConfiguration.SECTION,
+                    SelectionPropertiesConfiguration.SHOW_REPLAYGAIN
+                ).ConnectValue(value => this.ShowReplayGain = value);
+                this.Configuration.GetElement<BooleanConfigurationElement>(
+                    SelectionPropertiesConfiguration.SECTION,
                     SelectionPropertiesConfiguration.SHOW_LOCATION
                 ).ConnectValue(value => this.ShowLocation = value);
                 this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -288,6 +332,7 @@ namespace FoxTunes.ViewModel
             var metaDatas = this.GetMetaDatas(fileDatas);
             var tags = this.GetTags(fileDatas, metaDatas);
             var properties = this.GetProperties(fileDatas, metaDatas);
+            var replaygain = this.GetReplayGain(fileDatas, metaDatas);
             var filesystem = this.GetFileSystem(fileDatas, metaDatas);
             var images = this.GetImages(fileDatas, metaDatas);
             return Windows.Invoke(() =>
@@ -298,6 +343,8 @@ namespace FoxTunes.ViewModel
                 this.Tags.AddRange(tags);
                 this.Properties.Clear();
                 this.Properties.AddRange(properties);
+                this.ReplayGain.Clear();
+                this.ReplayGain.AddRange(replaygain);
                 this.FileSystem.Clear();
                 this.FileSystem.AddRange(filesystem);
                 this.Images.Clear();
@@ -347,6 +394,17 @@ namespace FoxTunes.ViewModel
                 foreach (var property in PROPERTIES)
                 {
                     yield return this.GetRow(property, fileDatas, metaDatas);
+                }
+            }
+        }
+
+        protected virtual IEnumerable<Row> GetReplayGain(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        {
+            if (this.ShowReplayGain)
+            {
+                foreach (var replaygain in REPLAYGAIN)
+                {
+                    yield return this.GetRow(replaygain, fileDatas, metaDatas);
                 }
             }
         }
@@ -576,6 +634,30 @@ namespace FoxTunes.ViewModel
             }
 
             public static readonly ValueProvider Instance = new SamplerateValueProvider();
+        }
+
+        public class DecibelValueProvider : ValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                var value = Convert.ToString(MetaDataValueProvider.Instance.GetValue(fileData, metaData, name));
+                if (string.IsNullOrEmpty(value))
+                {
+                    return Strings.SelectionProperties_NoValue;
+                }
+                var numeric = default(float);
+                if (!float.TryParse(value, out numeric))
+                {
+                    return Strings.SelectionProperties_NoValue;
+                }
+                if (float.IsNaN(numeric))
+                {
+                    return Strings.SelectionProperties_NoValue;
+                }
+                return string.Format("{0}{1:0.00}dB", numeric > 0 ? "+" : string.Empty, numeric);
+            }
+
+            public static readonly ValueProvider Instance = new DecibelValueProvider();
         }
 
         public abstract class ValueAggregator

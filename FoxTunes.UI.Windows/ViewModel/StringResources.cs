@@ -429,5 +429,13 @@
                 return Strings.SelectionProperties_Images;
             }
         }
+
+        public static string SelectionProperties_ReplayGain
+        {
+            get
+            {
+                return Strings.SelectionProperties_ReplayGain;
+            }
+        }
     }
 }
