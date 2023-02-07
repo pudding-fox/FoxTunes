@@ -520,6 +520,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default (With Visualizations + Properties).
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Main_4 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Simple.
         /// </summary>
         internal static string UIComponentLayoutProviderPresets_Simple_1 {
@@ -534,6 +543,15 @@ namespace FoxTunes {
         internal static string UIComponentLayoutProviderPresets_Simple_2 {
             get {
                 return ResourceManager.GetString("UIComponentLayoutProviderPresets.Simple.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simple (With Library + Properties).
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Simple_3 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Simple.3", resourceCulture);
             }
         }
         
