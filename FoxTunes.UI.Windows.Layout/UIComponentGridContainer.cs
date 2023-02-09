@@ -67,7 +67,7 @@ namespace FoxTunes
 
         protected virtual void UpdateChildren()
         {
-            this.Grid.Children.Clear();
+            this.Grid.Children.Clear(UIDisposerFlags.Default);
             this.Grid.ColumnDefinitions.Clear();
             if (this.Configuration.Children.Count > 0)
             {

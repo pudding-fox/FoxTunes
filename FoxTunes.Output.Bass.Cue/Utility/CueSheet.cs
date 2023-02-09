@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,6 +19,14 @@ namespace FoxTunes
 
         public CueSheetTag[] Tags { get; private set; }
 
+        public TimeSpan Duration
+        {
+            get
+            {
+                return TimeSpan.FromMilliseconds(this.Files.Sum(file => file.Duration.TotalMilliseconds));
+            }
+        }
+
         public static string GetTrackLength(CueSheetTrack currentTrack, CueSheetTrack nextTrack)
         {
             var currentTrackPosition = CueSheetIndex.ToTimeSpan(currentTrack.Index.Time);
@@ -31,18 +38,58 @@ namespace FoxTunes
 
     public class CueSheetFile
     {
-        public CueSheetFile(string path, string format, IEnumerable<CueSheetTrack> tracks)
+        private CueSheetFile()
+        {
+            this.TrackPositions = new Lazy<KeyValuePair<CueSheetTrack, int>[]>(() => GetTrackPositions(this.Tracks));
+        }
+
+        public CueSheetFile(string path, string format, IEnumerable<CueSheetTrack> tracks) : this()
         {
             this.Path = path;
             this.Format = format;
             this.Tracks = tracks.ToArray();
         }
 
+        public Lazy<KeyValuePair<CueSheetTrack, int>[]> TrackPositions { get; private set; }
+
         public string Path { get; private set; }
 
         public string Format { get; private set; }
 
+        public TimeSpan Duration { get; set; }
+
         public CueSheetTrack[] Tracks { get; private set; }
+
+        public CueSheetTrack GetNextTrack(CueSheetTrack track)
+        {
+            var tracks = this.TrackPositions.Value;
+            for (var a = 0; a < tracks.Length; a++)
+            {
+                if (object.ReferenceEquals(tracks[a].Key, track))
+                {
+                    if (a < tracks.Length - 1)
+                    {
+                        return tracks[a + 1].Key;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private static KeyValuePair<CueSheetTrack, int>[] GetTrackPositions(CueSheetTrack[] tracks)
+        {
+            return tracks.Select(
+                track =>
+                {
+                    var position = default(int);
+                    if (!int.TryParse(track.Number, out position))
+                    {
+                        position = tracks.IndexOf(track) + 1;
+                    }
+                    return new KeyValuePair<CueSheetTrack, int>(track, position);
+                }
+            ).OrderBy(pair => pair.Value).ToArray();
+        }
     }
 
     public class CueSheetTrack

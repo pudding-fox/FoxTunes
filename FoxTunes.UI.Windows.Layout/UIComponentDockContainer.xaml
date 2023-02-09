@@ -44,6 +44,6 @@
                 </Style>
             </LocalWindows:UIComponentContainer.Style>
         </LocalWindows:UIComponentContainer>
-        <LocalWindows:UIComponentContainer Configuration="{Binding ContentComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}"></LocalWindows:UIComponentContainer>
+        <LocalWindows:UIComponentContainer x:Name="ContentContainer" Configuration="{Binding ContentComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}"></LocalWindows:UIComponentContainer>
     </DockPanel>
 </LocalWindows:UIComponentPanel>
