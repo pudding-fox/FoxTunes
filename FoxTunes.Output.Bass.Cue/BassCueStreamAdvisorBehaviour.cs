@@ -1,7 +1,7 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using ManagedBass.Substream;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -124,7 +124,7 @@ namespace FoxTunes
             {
                 return false;
             }
-            if (type != FileActionType.Playlist)
+            if (type != FileActionType.Playlist && type != FileActionType.Library)
             {
                 return false;
             }
@@ -144,6 +144,12 @@ namespace FoxTunes
                     foreach (var path in paths)
                     {
                         await this.AddCueToPlaylist(playlist, path).ConfigureAwait(false);
+                    }
+                    break;
+                case FileActionType.Library:
+                    foreach (var path in paths)
+                    {
+                        await this.AddCueToLibrary(path).ConfigureAwait(false);
                     }
                     break;
             }
@@ -198,6 +204,16 @@ namespace FoxTunes
         public async Task AddCueToPlaylist(Playlist playlist, int index, string fileName)
         {
             using (var task = new AddCueToPlaylistTask(playlist, index, fileName))
+            {
+                task.InitializeComponent(this.Core);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task AddCueToLibrary(string fileName)
+        {
+            using (var task = new AddCueToLibraryTask(fileName))
             {
                 task.InitializeComponent(this.Core);
                 await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
@@ -309,6 +325,118 @@ namespace FoxTunes
                         transaction.Commit();
                     }
                 }
+            }
+        }
+
+        public class AddCueToLibraryTask : LibraryTaskBase
+        {
+            public AddCueToLibraryTask(string fileName)
+            {
+                this.FileName = fileName;
+            }
+
+            public override bool Visible
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            public string FileName { get; private set; }
+
+            public CueSheetParser Parser { get; private set; }
+
+            public CueSheetLibraryItemFactory Factory { get; private set; }
+
+            public override void InitializeComponent(ICore core)
+            {
+                this.Parser = new CueSheetParser();
+                this.Parser.InitializeComponent(core);
+                this.Factory = new CueSheetLibraryItemFactory(this.Visible);
+                this.Factory.InitializeComponent(core);
+                base.InitializeComponent(core);
+            }
+
+            protected override async Task OnRun()
+            {
+                await this.AddRoot(this.FileName).ConfigureAwait(false);
+                await this.AddPath().ConfigureAwait(false);
+            }
+
+            protected virtual async Task AddPath()
+            {
+                var cueSheet = this.Parser.Parse(this.FileName);
+                var libraryItems = default(LibraryItem[]);
+                await this.WithSubTask(this.Factory, async () => libraryItems = await this.Factory.Create(cueSheet).ConfigureAwait(false)).ConfigureAwait(false);
+                using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+                {
+                    await this.RemoveLibraryItems().ConfigureAwait(false);
+                    await this.AddLibraryItems(libraryItems).ConfigureAwait(false);
+                }))
+                {
+                    await task.Run().ConfigureAwait(false);
+                }
+                await this.BuildHierarchies(LibraryItemStatus.Import).ConfigureAwait(false);
+                await RemoveCancelledLibraryItems(this.Database).ConfigureAwait(false);
+                await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None).ConfigureAwait(false);
+            }
+
+            private async Task RemoveLibraryItems()
+            {
+                var cleanup = default(bool);
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    //Using source without relations.
+                    //TODO: Add this kind of thing to FoxDb, we're actually performing some schema queries to create this structure.
+                    var source = this.Database.Source(
+                        this.Database.Config.Transient.Table<LibraryItem>(TableFlags.AutoColumns),
+                        transaction
+                    );
+                    var set = this.Database.Set<LibraryItem>(source);
+                    var libraryItems = set.Where(libraryItem => libraryItem.DirectoryName == this.FileName);
+                    foreach (var libraryItem in libraryItems)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Removing file from library: {0}", libraryItem.FileName);
+                        libraryItem.Status = LibraryItemStatus.Remove;
+                        await set.AddOrUpdateAsync(libraryItem).ConfigureAwait(false);
+                        cleanup = true;
+                    }
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
+                }
+                if (cleanup)
+                {
+                    await this.RemoveItems(LibraryItemStatus.Remove).ConfigureAwait(false);
+                }
+            }
+
+            private async Task AddLibraryItems(LibraryItem[] libraryItems)
+            {
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    var set = this.Database.Set<LibraryItem>(transaction);
+                    foreach (var libraryItem in libraryItems)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", libraryItem.FileName);
+                        libraryItem.Status = LibraryItemStatus.Import;
+                        libraryItem.SetImportDate(DateTime.UtcNow);
+                        await set.AddAsync(libraryItem).ConfigureAwait(false);
+                    }
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
+                }
+            }
+
+            protected override async Task OnCompleted()
+            {
+                await base.OnCompleted().ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated)).ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
             }
         }
     }
