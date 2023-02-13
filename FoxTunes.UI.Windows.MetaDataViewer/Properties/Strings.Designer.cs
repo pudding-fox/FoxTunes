@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string SelectionProperties_False {
+            get {
+                return ResourceManager.GetString("SelectionProperties.False", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Images.
         /// </summary>
         internal static string SelectionProperties_Images {
@@ -120,6 +129,15 @@ namespace FoxTunes {
         internal static string SelectionProperties_Tags {
             get {
                 return ResourceManager.GetString("SelectionProperties.Tags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        internal static string SelectionProperties_True {
+            get {
+                return ResourceManager.GetString("SelectionProperties.True", resourceCulture);
             }
         }
         
