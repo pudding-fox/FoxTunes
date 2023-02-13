@@ -116,6 +116,8 @@ namespace FoxTunes.ViewModel
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
         private bool _ShowTags { get; set; }
 
         public bool ShowTags
@@ -256,8 +258,10 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = core.Managers.Library;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
             this.PlaylistManager = core.Managers.Playlist;
+            this.PlaylistManager.SelectedPlaylistChanged += this.OnSelectedPlaylistChanged;
             this.PlaylistManager.SelectedItemsChanged += this.OnSelectedItemsChanged;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.Debouncer.Exec(this.Refresh);
             base.InitializeComponent(core);
         }
@@ -296,7 +300,16 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            var task = this.Refresh(this.LibraryManager.SelectedItem);
+            this.Dispatch(() => this.Refresh(this.LibraryManager.SelectedItem));
+        }
+
+        protected virtual void OnSelectedPlaylistChanged(object sender, EventArgs e)
+        {
+            if (this.PlaylistManager.SelectedPlaylist == null)
+            {
+                return;
+            }
+            this.Dispatch(() => this.Refresh(this.PlaylistManager.SelectedPlaylist));
         }
 
         protected virtual void OnSelectedItemsChanged(object sender, EventArgs e)
@@ -305,12 +318,12 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            var task = this.Refresh(this.PlaylistManager.SelectedItems);
+            this.Dispatch(() => this.Refresh(this.PlaylistManager.SelectedItems));
         }
 
         protected virtual void Refresh()
         {
-            var task = this.Refresh(this.FileDatas.ToArray());
+            this.Dispatch(() => this.Refresh(this.FileDatas.ToArray()));
         }
 
         protected virtual Task Refresh(LibraryHierarchyNode libraryHierarchyNode)
@@ -325,6 +338,20 @@ namespace FoxTunes.ViewModel
 #endif
             }
             return this.Refresh(libraryItems);
+        }
+
+        protected virtual Task Refresh(Playlist playlist)
+        {
+            var playlistItems = this.PlaylistBrowser.GetItems(playlist);
+            if (playlistItems == null || !playlistItems.Any())
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            return this.Refresh(playlistItems);
         }
 
         protected virtual Task Refresh(IEnumerable<IFileData> fileDatas)
@@ -525,6 +552,7 @@ namespace FoxTunes.ViewModel
             }
             if (this.PlaylistManager != null)
             {
+                this.PlaylistManager.SelectedPlaylistChanged -= this.OnSelectedPlaylistChanged;
                 this.PlaylistManager.SelectedItemsChanged -= this.OnSelectedItemsChanged;
             }
             base.OnDisposing();
