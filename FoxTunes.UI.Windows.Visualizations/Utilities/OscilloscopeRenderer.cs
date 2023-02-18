@@ -363,25 +363,25 @@ namespace FoxTunes
             {
                 default:
                 case OscilloscopeRendererMode.Mono:
-                    UpdateValuesMono(data.Data, data.Values, data.Width, data.SampleCount);
-                    UpdateHistoryMono(data.Values, data.Peaks, data.Width, data.History, ref data.HistoryPosition, ref data.HistoryCount, data.HistoryCapacity);
+                    UpdateValuesMono(data.History.Peak, data.Values, data.Peaks, data.Width, data.SampleCount);
                     break;
                 case OscilloscopeRendererMode.Seperate:
-                    UpdateValuesSeperate(data.Data, data.Values, data.Channels, data.Width, data.SampleCount);
-                    UpdateHistorySeperate(data.Values, data.Peaks, data.Channels, data.Width, data.History, ref data.HistoryPosition, ref data.HistoryCount, data.HistoryCapacity);
+                    UpdateValuesSeperate(data.History.Peak, data.Values, data.Peaks, data.Channels, data.Width, data.SampleCount);
                     break;
             }
             data.LastUpdated = DateTime.UtcNow;
         }
 
-        private static void UpdateValuesMono(float[,] samples, float[,] values, int width, int count)
+        private static void UpdateValuesMono(float[,] samples, float[,] values, float[] peaks, int width, int count)
         {
             var samplesPerValue = count / width;
+            peaks[0] = 0.0f;
             if (samplesPerValue == 1)
             {
                 for (int x = 0; x < width; x++)
                 {
                     values[0, x] = samples[0, x];
+                    peaks[0] = Math.Max(peaks[0], Math.Abs(values[0, x]));
                 }
             }
             else if (samplesPerValue > 1)
@@ -394,6 +394,7 @@ namespace FoxTunes
                         values[0, x] += samples[0, a + b];
                     }
                     values[0, x] /= samplesPerValue;
+                    peaks[0] = Math.Max(peaks[0], Math.Abs(values[0, x]));
                 }
             }
             else
@@ -402,59 +403,32 @@ namespace FoxTunes
                 for (var x = 0; x < width; x++)
                 {
                     values[0, x] = samples[0, Convert.ToInt32(x / valuesPerSample)];
+                    peaks[0] = Math.Max(peaks[0], Math.Abs(values[0, x]));
                 }
             }
         }
 
-        private static void UpdateHistoryMono(float[,] values, float[] peaks, int width, float[,,] history, ref int position, ref int count, int capacity)
-        {
-            peaks[0] = 0.1f;
-            for (var x = 0; x < width; x++)
-            {
-                history[0, x, position] = values[0, x];
-                if (count > 1)
-                {
-                    values[0, x] = 0;
-                    for (var a = 0; a < count; a++)
-                    {
-                        values[0, x] += history[0, x, (a + position) % count];
-                    }
-                    values[0, x] /= count;
-                }
-                peaks[0] = Math.Max(Math.Abs(values[0, x]), peaks[0]);
-            }
-            if (position < capacity - 1)
-            {
-                position++;
-            }
-            else
-            {
-                position = 0;
-            }
-            if (count < capacity)
-            {
-                count++;
-            }
-        }
-
-        private static void UpdateValuesSeperate(float[,] samples, float[,] values, int channels, int width, int count)
+        private static void UpdateValuesSeperate(float[,] samples, float[,] values, float[] peaks, int channels, int width, int count)
         {
             var samplesPerValue = (count / channels) / width;
             if (samplesPerValue == 1)
             {
-                for (var x = 0; x < width; x++)
+                for (var channel = 0; channel < channels; channel++)
                 {
-                    for (var channel = 0; channel < channels; channel++)
+                    peaks[channel] = 0.0f;
+                    for (var x = 0; x < width; x++)
                     {
                         values[channel, x] = samples[channel, x];
+                        peaks[channel] = Math.Max(peaks[channel], Math.Abs(values[channel, x]));
                     }
                 }
             }
             else if (samplesPerValue > 1)
             {
-                for (int a = 0, x = 0; a < count && x < width; a += samplesPerValue, x++)
+                for (var channel = 0; channel < channels; channel++)
                 {
-                    for (var channel = 0; channel < channels; channel++)
+                    peaks[channel] = 0.0f;
+                    for (int a = 0, x = 0; a < count && x < width; a += samplesPerValue, x++)
                     {
                         values[channel, x] = 0.0f;
                         for (var b = 0; b < samplesPerValue; b++)
@@ -462,6 +436,7 @@ namespace FoxTunes
                             values[channel, x] += samples[channel, a + b];
                         }
                         values[channel, x] /= samplesPerValue;
+                        peaks[channel] = Math.Max(peaks[channel], Math.Abs(values[channel, x]));
                     }
                 }
             }
@@ -473,45 +448,9 @@ namespace FoxTunes
                     for (var channel = 0; channel < channels; channel++)
                     {
                         values[channel, x] = samples[channel, Convert.ToInt32(x / valuesPerSample)];
+                        peaks[channel] = Math.Max(peaks[channel], Math.Abs(values[channel, x]));
                     }
                 }
-            }
-        }
-
-        private static void UpdateHistorySeperate(float[,] values, float[] peaks, int channels, int width, float[,,] history, ref int position, ref int count, int capacity)
-        {
-            for (var channel = 0; channel < channels; channel++)
-            {
-                peaks[channel] = 0.1f;
-            }
-            for (var x = 0; x < width; x++)
-            {
-                for (var channel = 0; channel < channels; channel++)
-                {
-                    history[channel, x, position] = values[channel, x];
-                    if (count > 1)
-                    {
-                        values[channel, x] = 0;
-                        for (var a = 0; a < count; a++)
-                        {
-                            values[channel, x] += history[channel, x, (a + position) % count];
-                        }
-                        values[channel, x] /= count;
-                    }
-                    peaks[channel] = Math.Max(Math.Abs(values[channel, x]), peaks[channel]);
-                }
-            }
-            if (position < capacity - 1)
-            {
-                position++;
-            }
-            else
-            {
-                position = 0;
-            }
-            if (count < capacity)
-            {
-                count++;
             }
         }
 
@@ -532,19 +471,16 @@ namespace FoxTunes
 
         public class OscilloscopeRendererData : PCMVisualizationData
         {
+            public OscilloscopeRendererData()
+            {
+                this.History = new VisualizationDataHistory();
+            }
+
             public IOutputDataSource OutputDataSource;
 
             public int Width;
 
             public int Height;
-
-            public float[,,] History;
-
-            public int HistoryPosition;
-
-            public int HistoryCount;
-
-            public int HistoryCapacity;
 
             public float[,] Values;
 
@@ -560,20 +496,18 @@ namespace FoxTunes
 
             public override void OnAllocated()
             {
-                this.HistoryCapacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Interval.TotalMilliseconds), 1);
+                this.History.Capacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Interval.TotalMilliseconds), 1);
 
                 //TODO: Only realloc if required.
                 switch (this.Mode)
                 {
                     default:
                     case OscilloscopeRendererMode.Mono:
-                        this.History = new float[1, this.Width, this.HistoryCapacity];
                         this.Values = new float[1, this.Width];
                         this.Elements = CreateElements(1, this.Width, this.Height);
                         this.Peaks = new float[1];
                         break;
                     case OscilloscopeRendererMode.Seperate:
-                        this.History = new float[this.Channels, this.Width, this.HistoryCapacity];
                         this.Values = new float[this.Channels, this.Width];
                         this.Elements = CreateElements(this.Channels, this.Width, this.Height);
                         this.Peaks = new float[this.Channels];

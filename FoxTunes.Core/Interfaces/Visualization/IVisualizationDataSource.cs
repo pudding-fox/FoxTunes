@@ -11,6 +11,10 @@ namespace FoxTunes.Interfaces
 
     public abstract class VisualizationData : BaseComponent
     {
+        public float[,] Data;
+
+        public float[] Peak;
+
         public int Rate;
 
         public int Channels;
@@ -20,6 +24,8 @@ namespace FoxTunes.Interfaces
         public bool Initialized;
 
         public VisualizationDataFlags Flags;
+
+        public VisualizationDataHistory History;
 
         public virtual void OnAllocated()
         {
@@ -43,8 +49,6 @@ namespace FoxTunes.Interfaces
         public float[] Samples32;
 
         public int SampleCount;
-
-        public float[,] Data;
     }
 
     public class FFTVisualizationData : VisualizationData
@@ -54,7 +58,27 @@ namespace FoxTunes.Interfaces
         public float[] Samples;
 
         public int SampleCount;
+    }
 
-        public float[,] Data;
+    public class VisualizationDataHistory
+    {
+        public float[,,] Values;
+
+        public float[,] Avg;
+
+        public float[,] Peak;
+
+        public float[,] Rms;
+
+        public int Position;
+
+        public int Count;
+
+        public int Capacity;
+
+        public virtual void OnAllocated()
+        {
+            //Nothing to do.
+        }
     }
 }
