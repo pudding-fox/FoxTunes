@@ -76,9 +76,20 @@ namespace FoxTunes.Interfaces
 
         public int Capacity;
 
+        public VisualizationDataHistoryFlags Flags;
+
         public virtual void OnAllocated()
         {
             //Nothing to do.
         }
+    }
+
+    [Flags]
+    public enum VisualizationDataHistoryFlags : byte
+    {
+        None = 0,
+        Average = 1,
+        Peak = 2,
+        Rms = 4
     }
 }

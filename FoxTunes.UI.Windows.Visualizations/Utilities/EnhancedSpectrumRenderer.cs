@@ -355,7 +355,8 @@ namespace FoxTunes
 
         private static void UpdateValue(SpectrumRendererData data, int band, int start, int end)
         {
-            var samples = data.Data;
+            var peakValues = data.History.Peak;
+            var rmsValues = data.History.Rms;
             var value = default(float);
             var rms = default(float);
             var doRms = data.Rms != null;
@@ -365,10 +366,10 @@ namespace FoxTunes
             {
                 for (var a = start; a < end; a++)
                 {
-                    value = Math.Max(samples[0, a], value);
+                    value = Math.Max(peakValues[0, a], value);
                     if (doRms)
                     {
-                        rms += samples[0, a] * samples[0, a];
+                        rms = Math.Max(rmsValues[0, a], rms);
                     }
                 }
             }
@@ -384,22 +385,31 @@ namespace FoxTunes
                     end++;
                 }
                 count = end - start;
+                if (count == 0)
+                {
+                    //Sorry.
+                    return;
+                }
                 for (var a = start; a < end; a++)
                 {
-                    value += samples[0, a];
+                    value += peakValues[0, a];
                     if (doRms)
                     {
-                        rms += samples[0, a] * samples[0, a];
+                        rms += rmsValues[0, a];
                     }
                 }
                 value /= count;
+                if (doRms)
+                {
+                    rms /= count;
+                }
             }
 
             data.Values[band] = ToDecibelFixed(value);
 
             if (doRms)
             {
-                data.Rms[band] = ToDecibelFixed(Convert.ToSingle(Math.Sqrt(rms / count)));
+                data.Rms[band] = ToDecibelFixed(rms);
             }
         }
 
@@ -562,6 +572,11 @@ namespace FoxTunes
 
         public class SpectrumRendererData : FFTVisualizationData
         {
+            public SpectrumRendererData()
+            {
+                this.History = new VisualizationDataHistory();
+            }
+
             public int[] Bands;
 
             public int MinBand;
@@ -593,6 +608,17 @@ namespace FoxTunes
             public int[] Holds;
 
             public DateTime LastUpdated;
+
+            public override void OnAllocated()
+            {
+                this.History.Capacity = 4;
+                this.History.Flags = VisualizationDataHistoryFlags.Peak;
+                if (this.Rms != null)
+                {
+                    this.History.Flags |= VisualizationDataHistoryFlags.Rms;
+                }
+                base.OnAllocated();
+            }
         }
     }
 }
