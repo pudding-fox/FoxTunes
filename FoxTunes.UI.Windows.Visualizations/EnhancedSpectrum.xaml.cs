@@ -23,7 +23,7 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Bands { get; private set; }
 
-        public BooleanConfigurationElement Peaks { get; private set; }
+        public BooleanConfigurationElement Peak { get; private set; }
 
         public BooleanConfigurationElement Rms { get; private set; }
 
@@ -45,9 +45,9 @@ namespace FoxTunes
                    EnhancedSpectrumConfiguration.SECTION,
                    EnhancedSpectrumConfiguration.BANDS_ELEMENT
                );
-                this.Peaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                this.Peak = this.Configuration.GetElement<BooleanConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
-                    EnhancedSpectrumConfiguration.PEAKS_ELEMENT
+                    EnhancedSpectrumConfiguration.PEAK_ELEMENT
                 );
                 this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
@@ -96,9 +96,9 @@ namespace FoxTunes
                 }
                 yield return new InvocationComponent(
                     CATEGORY,
-                    this.Peaks.Id,
-                    this.Peaks.Name,
-                    attributes: this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    this.Peak.Id,
+                    this.Peak.Name,
+                    attributes: this.Peak.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     CATEGORY,
@@ -124,9 +124,9 @@ namespace FoxTunes
 
         public override Task InvokeAsync(IInvocationComponent component)
         {
-            if (string.Equals(component.Id, this.Peaks.Id, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(component.Id, this.Peak.Id, StringComparison.OrdinalIgnoreCase))
             {
-                this.Peaks.Toggle();
+                this.Peak.Toggle();
             }
             else if (string.Equals(component.Id, this.Rms.Id, StringComparison.OrdinalIgnoreCase))
             {
@@ -162,7 +162,7 @@ namespace FoxTunes
         protected override Task<bool> ShowSettings()
         {
             return this.ShowSettings(
-                Strings.EnhancedSpectrumConfiguration_Path, 
+                Strings.EnhancedSpectrumConfiguration_Path,
                 EnhancedSpectrumConfiguration.SECTION
             );
         }

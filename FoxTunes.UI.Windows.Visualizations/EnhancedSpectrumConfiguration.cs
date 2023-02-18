@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Media;
 
@@ -21,15 +22,7 @@ namespace FoxTunes
 
         public const string BANDS_160_OPTION = "GGGG5E28-CC67-43F2-8778-61570785C766";
 
-        public const string PEAKS_ELEMENT = "BBBBDCF0-8B24-4321-B7BE-74DADE59D4FA";
-
-        public const string HOLD_ELEMENT = "CCCCA25C-F8FA-4C37-82E8-2C5F297D2ED3";
-
-        public const int MIN_HOLD = 500;
-
-        public const int MAX_HOLD = 5000;
-
-        public const int DEFAULT_HOLD = 1000;
+        public const string PEAK_ELEMENT = "BBBBDCF0-8B24-4321-B7BE-74DADE59D4FA";
 
         public const string RMS_ELEMENT = "DDDEE2B6A-188E-4FF4-A277-37D140D49C45";
 
@@ -37,15 +30,26 @@ namespace FoxTunes
 
         public const string COLOR_PALETTE_ELEMENT = "EEEE907A-5812-42CD-9844-89362C96C6AF";
 
+        public const string COLOR_PALETTE_THEME = "THEME";
+
+        public const string COLOR_PALETTE_PEAK = "PEAK";
+
+        public const string COLOR_PALETTE_RMS = "RMS";
+
+        public const string COLOR_PALETTE_VALUE = "VALUE";
+
+        public const string COLOR_PALETTE_CREST = "CREST";
+
+        public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands, path: Strings.EnhancedSpectrumConfiguration_Path).WithOptions(GetBandsOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.EnhancedSpectrumConfiguration_Hold, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(PEAK_ELEMENT, Strings.EnhancedSpectrumConfiguration_Peak, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, RMS_ELEMENT))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(SECTION, RMS_ELEMENT, true)
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }
 
@@ -403,20 +407,29 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public static Color[] GetColorPalette(string value, Color[] colors)
+        public static IDictionary<string, Color[]> GetColorPalette(string value, Color[] colors)
         {
             if (!string.IsNullOrEmpty(value))
             {
                 try
                 {
-                    return value.ToColorStops().ToGradient();
+                    var palettes = value.ToNamedColorStops().ToDictionary(
+                        pair => pair.Key,
+                        pair => pair.Value.ToGradient(),
+                        StringComparer.OrdinalIgnoreCase
+                    );
+                    palettes[COLOR_PALETTE_THEME] = colors;
+                    return palettes;
                 }
                 catch
                 {
                     //Nothing can be done.
                 }
             }
-            return colors;
+            return new Dictionary<string, Color[]>(StringComparer.OrdinalIgnoreCase)
+            {
+                { COLOR_PALETTE_THEME, colors }
+            };
         }
 
         public static int GetFFTSize(SelectionConfigurationOption fftSize, SelectionConfigurationOption bands)

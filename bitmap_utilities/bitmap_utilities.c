@@ -52,6 +52,37 @@ BOOL write_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
 	return TRUE;
 }
 
+BOOL blend_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
+	Int32Color color1;
+	Int32Color color2;
+	Int32Color color3;
+	color1.Blue = *(buffer + 0);
+	color1.Green = *(buffer + 1);
+	color1.Red = *(buffer + 2);
+	color1.Alpha = *(buffer + 3);
+	if (!get_color(palette, position, &color2)) {
+		return FALSE;
+	}
+	if (color2.Alpha < 0xff) {
+		color3.Blue = ((color2.Blue * color2.Alpha) + (color1.Blue * (255 - color2.Alpha))) / 255;
+		color3.Green = ((color2.Green * color2.Alpha) + (color1.Green * (255 - color2.Alpha))) / 255;
+		color3.Red = ((color2.Red * color2.Alpha) + (color1.Red * (255 - color2.Alpha))) / 255;
+		//color3.Alpha = color1.Alpha; //TODO: Not sure what the alpha should be.
+		color3.Alpha = 0xff;
+		memset(buffer + 0, color3.Blue, 1);
+		memset(buffer + 1, color3.Green, 1);
+		memset(buffer + 2, color3.Red, 1);
+		memset(buffer + 3, color3.Alpha, 1);
+	}
+	else {
+		memset(buffer + 0, color2.Blue, 1);
+		memset(buffer + 1, color2.Green, 1);
+		memset(buffer + 2, color2.Red, 1);
+		memset(buffer + 3, color2.Alpha, 1);
+	}
+	return TRUE;
+}
+
 BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, INT32 count) {
 	BOOL result = TRUE;
 	for (INT32 position = 0; position < count; position++) {
@@ -59,6 +90,37 @@ BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, INT32 count
 		result &= draw_rectangle(info, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 	}
 	return result;
+}
+
+BOOL WINAPI draw_blended_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
+	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
+
+	for (INT32 xposition = 0; xposition < width; xposition++)
+	{
+		for (INT32 yposition = 0; yposition < height; yposition++)
+		{
+			INT32 color;
+			if ((info->Palette->Flags & COLOR_FROM_X) == COLOR_FROM_X)
+			{
+				color = (INT32)(((float)(x + xposition) / info->Width) * info->Palette->Count);
+			}
+			else if ((info->Palette->Flags & COLOR_FROM_Y) == COLOR_FROM_Y)
+			{
+				color = (INT32)(((float)(y + yposition) / info->Height) * info->Palette->Count);
+			}
+			else
+			{
+				color = 0;
+			}
+			BYTE* pixel = topLeft + ((xposition * info->BytesPerPixel) + (yposition * info->Stride));
+			if (!blend_color(info->Palette, 0, pixel))
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
 }
 
 BOOL WINAPI draw_flat_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
@@ -196,13 +258,17 @@ BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT3
 		return FALSE;
 	}
 
-	switch (info->Palette->Count) {
-	case 0:
-		//No colors?
-		return FALSE;
-	case 1:
+	if ((info->Palette->Flags & ALPHA_BLENDING) == ALPHA_BLENDING)
+	{
+		return draw_blended_rectangle(info, x, y, width, height);
+	}
+
+	if (info->Palette->Count == 1)
+	{
 		return draw_flat_rectangle(info, x, y, width, height);
-	default:
+	}
+	else
+	{
 		return draw_gradient_rectangle(info, x, y, width, height);
 	}
 }
@@ -346,7 +412,21 @@ BOOL WINAPI shift_left(RenderInfo* info, INT32 count)
 	return TRUE;
 }
 
-BOOL WINAPI clear(RenderInfo* info) {
-	memset(info->Buffer, 0, info->Height * info->Stride);
+BOOL WINAPI clear(RenderInfo* info, Int32Color* color) {
+	if (color)
+	{
+		memset(info->Buffer + 0, color->Blue, 1);
+		memset(info->Buffer + 1, color->Green, 1);
+		memset(info->Buffer + 2, color->Red, 1);
+		memset(info->Buffer + 3, color->Alpha, 1);
+		for (INT32 a = info->BytesPerPixel, b = info->Height * info->Stride; a < b; a += info->BytesPerPixel)
+		{
+			memcpy(info->Buffer + a, info->Buffer, info->BytesPerPixel);
+		}
+	}
+	else
+	{
+		memset(info->Buffer, 0, info->Height * info->Stride);
+	}
 	return TRUE;
 }
