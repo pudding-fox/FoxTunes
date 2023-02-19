@@ -414,7 +414,7 @@ namespace FoxTunes
                 try
                 {
                     var palettes = value.ToNamedColorStops().ToDictionary(
-                        pair => pair.Key,
+                        pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
                         pair => pair.Value.ToGradient(),
                         StringComparer.OrdinalIgnoreCase
                     );
