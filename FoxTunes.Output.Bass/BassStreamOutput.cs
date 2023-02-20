@@ -195,6 +195,15 @@ namespace FoxTunes
             return 0;
         }
 
+        public virtual TimeSpan GetDuration(int length)
+        {
+            foreach (var channelHandle in this.GetMixerChannelHandles())
+            {
+                return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(channelHandle, length));
+            }
+            return TimeSpan.Zero;
+        }
+
         protected abstract float GetVolume();
 
         protected abstract void SetVolume(float volume);

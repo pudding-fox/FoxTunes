@@ -146,12 +146,14 @@ namespace FoxTunes
                 if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                 {
                     data.Samples = this.OutputDataSource.GetBuffer(data.FFTSize, true);
+                    data.Interval = this.OutputDataSource.GetDuration(data.Samples.Length);
                     data.Data = new float[data.Channels, data.Samples.Length];
                     data.Peak = new float[data.Channels];
                 }
                 else
                 {
                     data.Samples = this.OutputDataSource.GetBuffer(data.FFTSize, false);
+                    data.Interval = this.OutputDataSource.GetDuration(data.Samples.Length);
                     data.Data = new float[1, data.Samples.Length];
                     data.Peak = new float[1];
                 }

@@ -97,6 +97,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duration (ms).
+        /// </summary>
+        internal static string EnhancedSpectrumConfiguration_Duration {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Duration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string EnhancedSpectrumConfiguration_Path {

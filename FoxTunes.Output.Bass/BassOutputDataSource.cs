@@ -247,6 +247,11 @@ namespace FoxTunes
             return this.Output.GetData(buffer, fftSize, individual);
         }
 
+        public TimeSpan GetDuration(int count)
+        {
+            return this.Output.GetDuration(count);
+        }
+
         #endregion
 
         public bool IsDisposed { get; private set; }

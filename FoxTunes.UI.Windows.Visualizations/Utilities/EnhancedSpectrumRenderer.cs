@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -29,6 +30,8 @@ namespace FoxTunes
         public BooleanConfigurationElement ShowCrestFactor { get; private set; }
 
         public TextConfigurationElement ColorPalette { get; private set; }
+
+        public IntegerConfigurationElement Duration { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
@@ -56,6 +59,10 @@ namespace FoxTunes
                     EnhancedSpectrumConfiguration.SECTION,
                     EnhancedSpectrumConfiguration.COLOR_PALETTE_ELEMENT
                 );
+                this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    EnhancedSpectrumConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.DURATION_ELEMENT
+                );
                 this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
                    VisualizationBehaviourConfiguration.SECTION,
                    VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
@@ -65,6 +72,7 @@ namespace FoxTunes
                 this.ShowRms.ValueChanged += this.OnValueChanged;
                 this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
+                this.Duration.ValueChanged += this.OnValueChanged;
                 this.FFTSize.ValueChanged += this.OnValueChanged;
                 var task = this.CreateBitmap(true);
             }
@@ -98,6 +106,7 @@ namespace FoxTunes
                 this.ShowPeak.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
+                EnhancedSpectrumConfiguration.GetDuration(this.Duration.Value),
                 this.GetColorPalettes(this.ColorPalette.Value, this.ShowPeak.Value, this.ShowRms.Value, this.ShowCrestFactor.Value, this.Colors)
             );
             return true;
@@ -305,6 +314,10 @@ namespace FoxTunes
             if (this.ColorPalette != null)
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.Duration != null)
+            {
+                this.Duration.ValueChanged -= this.OnValueChanged;
             }
             if (this.FFTSize != null)
             {
@@ -577,10 +590,6 @@ namespace FoxTunes
             height = height - 1;
             var step = width / values.Length;
             var offset = default(float);
-            //for (var a = 0; a < values.Length; a++)
-            //{
-            //    offset = Math.Max(offset, values[a] - rms[a]);
-            //}
             for (var a = 0; a < values.Length; a++)
             {
                 var x = (a * step) + (step / 2);
@@ -626,10 +635,6 @@ namespace FoxTunes
             var offset = default(float);
             var minChange = 1;
             var maxChange = Convert.ToInt32(height * 0.05f);
-            //for (var a = 0; a < values.Length; a++)
-            //{
-            //    offset = Math.Max(offset, values[a] - rms[a]);
-            //}
             for (var a = 0; a < values.Length; a++)
             {
                 var x = (a * step) + (step / 2);
@@ -647,7 +652,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, IDictionary<string, Color[]> colors)
+        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, TimeSpan duration, IDictionary<string, Color[]> colors)
         {
             var margin = width > (bands.Length * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
@@ -661,7 +666,8 @@ namespace FoxTunes
                 FFTSize = fftSize,
                 Values = new float[bands.Length],
                 Colors = colors,
-                ValueElements = new Int32Rect[bands.Length]
+                ValueElements = new Int32Rect[bands.Length],
+                Duration = duration
             };
             if (showPeak)
             {
@@ -717,17 +723,22 @@ namespace FoxTunes
 
             public DateTime LastUpdated;
 
+            public TimeSpan Duration;
+
             public override void OnAllocated()
             {
-                this.History.Capacity = 32;
-                this.History.Flags = VisualizationDataHistoryFlags.None;
-                if (this.PeakValues != null)
+                if (this.Duration != TimeSpan.Zero && this.Interval != TimeSpan.Zero)
                 {
-                    this.History.Flags |= VisualizationDataHistoryFlags.Peak;
-                }
-                if (this.RmsValues != null)
-                {
-                    this.History.Flags |= VisualizationDataHistoryFlags.Rms;
+                    this.History.Capacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Interval.TotalMilliseconds), 1);
+                    this.History.Flags = VisualizationDataHistoryFlags.None;
+                    if (this.PeakValues != null)
+                    {
+                        this.History.Flags |= VisualizationDataHistoryFlags.Peak;
+                    }
+                    if (this.RmsValues != null)
+                    {
+                        this.History.Flags |= VisualizationDataHistoryFlags.Rms;
+                    }
                 }
                 base.OnAllocated();
             }

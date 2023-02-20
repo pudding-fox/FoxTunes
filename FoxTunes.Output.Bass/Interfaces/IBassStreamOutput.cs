@@ -1,4 +1,5 @@
 ﻿using ManagedBass;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
@@ -22,5 +23,7 @@ namespace FoxTunes.Interfaces
         int GetData(float[] buffer);
 
         int GetData(float[] buffer, int fftSize, bool individual = false);
+
+        TimeSpan GetDuration(int length);
     }
 }
