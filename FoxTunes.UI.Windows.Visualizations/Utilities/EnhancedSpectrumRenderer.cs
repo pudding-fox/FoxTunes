@@ -152,26 +152,32 @@ namespace FoxTunes
             {
                 return;
             }
-            var info = default(BitmapHelper.RenderInfo);
-            var data = this.RendererData;
-            if (data != null)
+            try
             {
-                info = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND);
-            }
-            else
-            {
-                var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, false, false, this.Colors);
-                var flags = 0;
-                var colors = palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND];
-                if (colors.Length > 1)
+                var info = default(BitmapHelper.RenderInfo);
+                var data = this.RendererData;
+                if (data != null)
                 {
-                    flags |= BitmapHelper.COLOR_FROM_Y;
+                    info = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND);
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, colors));
+                else
+                {
+                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, false, false, this.Colors);
+                    var flags = 0;
+                    var colors = palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND];
+                    if (colors.Length > 1)
+                    {
+                        flags |= BitmapHelper.COLOR_FROM_Y;
+                    }
+                    info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, colors));
+                }
+                BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
             }
-            BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
-            bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-            bitmap.Unlock();
+            finally
+            {
+                bitmap.Unlock();
+            }
         }
 
         protected virtual async Task Render(SpectrumRendererData data)
