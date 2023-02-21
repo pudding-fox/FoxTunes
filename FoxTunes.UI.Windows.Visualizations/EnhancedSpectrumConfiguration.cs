@@ -44,11 +44,11 @@ namespace FoxTunes
 
         public const string DURATION_ELEMENT = "FFFF965B-101C-4A09-9A9A-91BAB17575E6";
 
-        public const int DURATION_MIN = 100;
+        public const int DURATION_MIN = 0;
 
-        public const int DURATION_MAX = 2000;
+        public const int DURATION_MAX = 64;
 
-        public const int DURATION_DEFAULT = 100;
+        public const int DURATION_DEFAULT = 32;
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -56,9 +56,9 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands, path: Strings.EnhancedSpectrumConfiguration_Path).WithOptions(GetBandsOptions()))
                 .WithElement(new BooleanConfigurationElement(PEAK_ELEMENT, Strings.EnhancedSpectrumConfiguration_Peak, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, RMS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, PEAK_ELEMENT).DependsOn(SECTION, RMS_ELEMENT))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.EnhancedSpectrumConfiguration_Duration, path: Strings.EnhancedSpectrumConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
+                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.EnhancedSpectrumConfiguration_Duration, path: Strings.EnhancedSpectrumConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX))
             );
         }
 
@@ -457,11 +457,6 @@ namespace FoxTunes
                     break;
             }
             return size;
-        }
-
-        public static TimeSpan GetDuration(int value)
-        {
-            return TimeSpan.FromMilliseconds(value);
         }
     }
 }

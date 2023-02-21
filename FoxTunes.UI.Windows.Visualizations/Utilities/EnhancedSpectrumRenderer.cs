@@ -106,7 +106,7 @@ namespace FoxTunes
                 this.ShowPeak.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
-                EnhancedSpectrumConfiguration.GetDuration(this.Duration.Value),
+                this.Duration.Value,
                 this.GetColorPalettes(this.ColorPalette.Value, this.ShowPeak.Value, this.ShowRms.Value, this.ShowCrestFactor.Value, this.Colors)
             );
             return true;
@@ -489,8 +489,8 @@ namespace FoxTunes
             var value = default(float);
             var peak = default(float);
             var rms = default(float);
-            var doPeaks = data.PeakValues != null;
-            var doRms = data.RmsValues != null;
+            var doPeaks = peakValues != null;
+            var doRms = rmsValues != null;
             var count = end - start;
 
             if (count > 0)
@@ -647,10 +647,10 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, TimeSpan duration, IDictionary<string, IntPtr> colors)
+        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, int history, IDictionary<string, IntPtr> colors)
         {
             var margin = width > (bands.Length * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
-            var data = new SpectrumRendererData()
+            var data = new SpectrumRendererData(history, showPeak, showRms)
             {
                 Width = width,
                 Height = height,
@@ -662,7 +662,6 @@ namespace FoxTunes
                 Values = new float[bands.Length],
                 Colors = colors,
                 ValueElements = new Int32Rect[bands.Length],
-                Duration = duration
             };
             if (showPeak)
             {
@@ -683,9 +682,21 @@ namespace FoxTunes
 
         public class SpectrumRendererData : FFTVisualizationData
         {
-            public SpectrumRendererData()
+            public SpectrumRendererData(int history, bool showPeak, bool showRms)
             {
-                this.History = new VisualizationDataHistory();
+                this.History = new VisualizationDataHistory()
+                {
+                    Capacity = history,
+                    Flags = VisualizationDataHistoryFlags.None
+                };
+                if (showPeak)
+                {
+                    this.History.Flags |= VisualizationDataHistoryFlags.Peak;
+                }
+                if (showRms)
+                {
+                    this.History.Flags |= VisualizationDataHistoryFlags.Rms;
+                }
             }
 
             public int[] Bands;
@@ -717,26 +728,6 @@ namespace FoxTunes
             public Int32Point[] CrestPoints;
 
             public DateTime LastUpdated;
-
-            public TimeSpan Duration;
-
-            public override void OnAllocated()
-            {
-                if (this.Duration != TimeSpan.Zero && this.Interval != TimeSpan.Zero)
-                {
-                    this.History.Capacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Interval.TotalMilliseconds), 1);
-                    this.History.Flags = VisualizationDataHistoryFlags.None;
-                    if (this.PeakValues != null)
-                    {
-                        this.History.Flags |= VisualizationDataHistoryFlags.Peak;
-                    }
-                    if (this.RmsValues != null)
-                    {
-                        this.History.Flags |= VisualizationDataHistoryFlags.Rms;
-                    }
-                }
-                base.OnAllocated();
-            }
         }
 
         [StructLayout(LayoutKind.Sequential)]

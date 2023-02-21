@@ -150,6 +150,38 @@ namespace FoxTunes
 
         public virtual int GetData(float[] buffer, int fftSize, bool individual = false)
         {
+            var length = this.GetFFTLength(fftSize, individual);
+            foreach (var channelHandle in this.GetMixerChannelHandles())
+            {
+                //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
+                lock (ChannelDataSyncRoot)
+                {
+                    return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
+                }
+            }
+            return 0;
+        }
+
+        public virtual int GetData(float[] buffer, int fftSize, out TimeSpan duration, bool individual = false)
+        {
+            var length = this.GetFFTLength(fftSize, individual);
+            foreach (var channelHandle in this.GetMixerChannelHandles())
+            {
+                var bytes = default(int);
+                //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
+                lock (ChannelDataSyncRoot)
+                {
+                    bytes = BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
+                }
+                duration = TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(channelHandle, bytes));
+                return bytes;
+            }
+            duration = default(TimeSpan);
+            return 0;
+        }
+
+        protected virtual uint GetFFTLength(int fftSize, bool individual = false)
+        {
             var length = default(uint);
             switch (fftSize)
             {
@@ -184,24 +216,7 @@ namespace FoxTunes
             {
                 length |= BassFFT.INDIVIDUAL;
             }
-            foreach (var channelHandle in this.GetMixerChannelHandles())
-            {
-                //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
-                lock (ChannelDataSyncRoot)
-                {
-                    return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
-                }
-            }
-            return 0;
-        }
-
-        public virtual TimeSpan GetDuration(int length)
-        {
-            foreach (var channelHandle in this.GetMixerChannelHandles())
-            {
-                return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(channelHandle, length));
-            }
-            return TimeSpan.Zero;
+            return length;
         }
 
         protected abstract float GetVolume();

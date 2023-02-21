@@ -146,18 +146,24 @@ namespace FoxTunes
                 if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                 {
                     data.Samples = this.OutputDataSource.GetBuffer(data.FFTSize, true);
-                    data.Interval = this.OutputDataSource.GetDuration(data.Samples.Length);
                     data.Data = new float[data.Channels, data.Samples.Length];
                     data.Peak = new float[data.Channels];
                 }
                 else
                 {
                     data.Samples = this.OutputDataSource.GetBuffer(data.FFTSize, false);
-                    data.Interval = this.OutputDataSource.GetDuration(data.Samples.Length);
                     data.Data = new float[1, data.Samples.Length];
                     data.Peak = new float[1];
                 }
                 data.OnAllocated();
+                if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
+                {
+                    data.SampleCount = this.OutputDataSource.GetData(data.Samples, data.FFTSize, out data.Interval, true);
+                }
+                else
+                {
+                    data.SampleCount = this.OutputDataSource.GetData(data.Samples, data.FFTSize, out data.Interval, false);
+                }
                 if (data.History != null && data.History.Capacity > 0)
                 {
                     var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
@@ -200,13 +206,16 @@ namespace FoxTunes
                     data.History.OnAllocated();
                 }
             }
-            if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
-            {
-                data.SampleCount = this.OutputDataSource.GetData(data.Samples, data.FFTSize, true);
-            }
             else
             {
-                data.SampleCount = this.OutputDataSource.GetData(data.Samples, data.FFTSize);
+                if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
+                {
+                    data.SampleCount = this.OutputDataSource.GetData(data.Samples, data.FFTSize, true);
+                }
+                else
+                {
+                    data.SampleCount = this.OutputDataSource.GetData(data.Samples, data.FFTSize, false);
+                }
             }
             if (data.Rate > 0 && data.Channels > 0 && data.SampleCount > 0)
             {
