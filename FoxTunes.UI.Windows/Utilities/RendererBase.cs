@@ -973,13 +973,71 @@ namespace FoxTunes
         {
             try
             {
-                return (Color)ColorConverter.ConvertFromString(value);
+                var color = default(string);
+                var alpha = default(byte);
+                if (!value.TryParse(out color, out alpha))
+                {
+                    //Failed to parse the color.
+                    return Colors.Red;
+                }
+                var result = (Color)ColorConverter.ConvertFromString(color);
+                if (alpha != byte.MaxValue)
+                {
+                    result.A = alpha;
+                }
+                return result;
             }
             catch
             {
                 //Failed to parse the color.
                 return Colors.Red;
             }
+        }
+
+        public static bool TryParse(this string value, out string color, out byte alpha)
+        {
+            const char DELIMITER = ',';
+            var parts = value
+                .Split(new[] { DELIMITER }, 2)
+                .Select(element => element.Trim())
+                .ToArray();
+            if (parts.Length == 0)
+            {
+                color = default(string);
+                alpha = default(byte);
+                return false;
+            }
+            else
+            {
+                color = parts[0];
+                if (parts.Length == 2)
+                {
+                    const string PERCENT = "%";
+                    if (parts[1].EndsWith(PERCENT))
+                    {
+                        if (byte.TryParse(parts[1].Substring(0, parts[1].Length - 1), out alpha) && alpha <= 100)
+                        {
+                            alpha = Convert.ToByte(((float)alpha / 100) * byte.MaxValue);
+                        }
+                        else
+                        {
+                            alpha = byte.MaxValue;
+                        }
+                    }
+                    else
+                    {
+                        if (!byte.TryParse(parts[1], out alpha))
+                        {
+                            alpha = byte.MaxValue;
+                        }
+                    }
+                }
+                else
+                {
+                    alpha = byte.MaxValue;
+                }
+            }
+            return true;
         }
 
         public static Color Interpolate(Color color1, Color color2, float ratio)
