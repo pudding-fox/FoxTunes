@@ -1,10 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -112,7 +112,7 @@ namespace FoxTunes
             return true;
         }
 
-        protected virtual IDictionary<string, Color[]> GetColorPalettes(string value, bool showPeak, bool showRms, bool showCrest, Color[] colors)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, bool showCrest, Color[] colors)
         {
             var palettes = EnhancedSpectrumConfiguration.GetColorPalette(value, colors);
             //Switch the default colors to the VALUE palette if one was provided.
@@ -145,7 +145,71 @@ namespace FoxTunes
                     () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST, showPeak, showRms, colors)
                 );
             }
-            return palettes;
+            return palettes.ToDictionary(
+                pair => pair.Key,
+                pair =>
+                {
+                    var flags = 0;
+                    if (pair.Value.Length > 1)
+                    {
+                        flags |= BitmapHelper.COLOR_FROM_Y;
+                    }
+                    if (showPeak || showRms)
+                    {
+                        if (!string.Equals(pair.Key, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
+                        {
+                            flags |= BitmapHelper.ALPHA_BLENDING;
+                        }
+                    }
+                    return BitmapHelper.GetOrCreatePalette(flags, pair.Value);
+                },
+                StringComparer.OrdinalIgnoreCase
+            );
+        }
+
+        private static Color[] GetDefaultColors(string name, bool showPeak, bool showRms, Color[] colors)
+        {
+            switch (name)
+            {
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK:
+                    if (showRms)
+                    {
+                        return colors.WithAlpha(-200);
+                    }
+                    else
+                    {
+                        return colors.WithAlpha(-100);
+                    }
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS:
+                    if (showPeak)
+                    {
+                        return colors.WithAlpha(-100);
+                    }
+                    else
+                    {
+                        return colors.WithAlpha(-50);
+                    }
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE:
+                    if (showPeak || showRms)
+                    {
+                        return colors.WithAlpha(-25);
+                    }
+                    else
+                    {
+                        return colors;
+                    }
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.Red
+                    };
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.Black
+                    };
+            }
+            throw new NotImplementedException();
         }
 
         protected override WriteableBitmap CreateBitmap(int width, int height)
@@ -167,18 +231,12 @@ namespace FoxTunes
                 var data = this.RendererData;
                 if (data != null)
                 {
-                    info = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND);
+                    info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 else
                 {
                     var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, false, false, this.Colors);
-                    var flags = 0;
-                    var colors = palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND];
-                    if (colors.Length > 1)
-                    {
-                        flags |= BitmapHelper.COLOR_FROM_Y;
-                    }
-                    info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, colors));
+                    info = BitmapHelper.CreateRenderInfo(bitmap, palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
@@ -330,88 +388,25 @@ namespace FoxTunes
         {
             var info = new SpectrumRenderInfo()
             {
-                Background = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND)
+                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND])
             };
             if (data.PeakElements != null)
             {
-                info.Peak = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK);
+                info.Peak = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK]);
             }
             if (data.RmsElements != null)
             {
-                info.Rms = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS);
+                info.Rms = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS]);
             }
             if (data.ValueElements != null)
             {
-                info.Value = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE);
+                info.Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE]);
             }
             if (data.CrestPoints != null)
             {
-                info.Crest = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST);
+                info.Crest = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST]);
             }
             return info;
-        }
-
-        private static BitmapHelper.RenderInfo GetRenderInfo(WriteableBitmap bitmap, SpectrumRendererData data, string name)
-        {
-            var flags = 0;
-            var colors = data.Colors[name];
-            if (colors.Length > 1)
-            {
-                flags |= BitmapHelper.COLOR_FROM_Y;
-            }
-            if (data.PeakElements != null || data.RmsElements != null)
-            {
-                if (!string.Equals(name, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
-                {
-                    flags |= BitmapHelper.ALPHA_BLENDING;
-                }
-            }
-            return BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, colors));
-        }
-
-        private static Color[] GetDefaultColors(string name, bool showPeak, bool showRms, Color[] colors)
-        {
-            switch (name)
-            {
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK:
-                    if (showRms)
-                    {
-                        return colors.WithAlpha(-200);
-                    }
-                    else
-                    {
-                        return colors.WithAlpha(-100);
-                    }
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS:
-                    if (showPeak)
-                    {
-                        return colors.WithAlpha(-100);
-                    }
-                    else
-                    {
-                        return colors.WithAlpha(-50);
-                    }
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE:
-                    if (showPeak || showRms)
-                    {
-                        return colors.WithAlpha(-25);
-                    }
-                    else
-                    {
-                        return colors;
-                    }
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Red
-                    };
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Black
-                    };
-            }
-            throw new NotImplementedException();
         }
 
         private static void Render(ref SpectrumRenderInfo info, SpectrumRendererData data)
@@ -652,7 +647,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, TimeSpan duration, IDictionary<string, Color[]> colors)
+        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, TimeSpan duration, IDictionary<string, IntPtr> colors)
         {
             var margin = width > (bands.Length * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
@@ -711,7 +706,7 @@ namespace FoxTunes
 
             public int Margin;
 
-            public IDictionary<string, Color[]> Colors;
+            public IDictionary<string, IntPtr> Colors;
 
             public Int32Rect[] ValueElements;
 
