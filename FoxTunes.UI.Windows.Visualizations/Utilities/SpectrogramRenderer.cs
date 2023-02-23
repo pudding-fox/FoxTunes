@@ -84,12 +84,13 @@ namespace FoxTunes
             {
                 return false;
             }
+            var colors = SpectrogramConfiguration.GetColorPalette(this.ColorPalette.Value);
             this.RendererData = Create(
-                this.OutputDataSource,
                 width,
                 height,
+                colors.Length,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                SpectrogramConfiguration.GetColorPalette(this.ColorPalette.Value),
+                BitmapHelper.GetOrCreatePalette(0, colors),
                 SpectrogramConfiguration.GetMode(this.Mode.Value),
                 SpectrogramConfiguration.GetScale(this.Scale.Value),
                 this.Smoothing.Value
@@ -123,9 +124,8 @@ namespace FoxTunes
                     {
                         try
                         {
-                            var color = data.Colors.FirstOrDefault();
-                            var info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, data.Colors));
-                            BitmapHelper.Clear(ref info, color);
+                            var info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors);
+                            BitmapHelper.DrawRectangle(ref info, 0, 0, info.Width, info.Height);
                             lock (history)
                             {
                                 Restore(info, data, history);
@@ -152,24 +152,19 @@ namespace FoxTunes
 
         protected override void ClearBitmap(WriteableBitmap bitmap)
         {
+            var data = this.RendererData;
+            if (data == null)
+            {
+                return;
+            }
             if (!bitmap.TryLock(LockTimeout))
             {
                 return;
             }
             try
             {
-                var color = default(Color);
-                var data = this.RendererData;
-                if (data != null)
-                {
-                    color = data.Colors.FirstOrDefault();
-                }
-                else
-                {
-                    color = SpectrogramConfiguration.GetColorPalette(this.ColorPalette.Value).FirstOrDefault();
-                }
-                var info = BitmapHelper.CreateRenderInfo(bitmap, IntPtr.Zero);
-                BitmapHelper.Clear(ref info, color);
+                var info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors);
+                BitmapHelper.DrawRectangle(ref info, 0, 0, info.Width, info.Height);
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
             }
             finally
@@ -197,7 +192,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, data.Colors));
+                info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors);
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)
@@ -432,28 +427,28 @@ namespace FoxTunes
             {
                 default:
                 case SpectrogramRendererMode.Mono:
-                    UpdateElementsMono(data.Values, data.Elements, data.Colors, data.Width - 1, data.Height);
+                    UpdateElementsMono(data.Values, data.Elements, data.Count, data.Width - 1, data.Height);
                     break;
                 case SpectrogramRendererMode.Seperate:
-                    UpdateElementsSeperate(data.Values, data.Elements, data.Colors, data.Width - 1, data.Height, data.Channels);
+                    UpdateElementsSeperate(data.Values, data.Elements, data.Count, data.Width - 1, data.Height, data.Channels);
                     break;
             }
         }
 
-        private static void UpdateElementsMono(float[,] values, Int32Pixel[] elements, Color[] colors, int x, int height)
+        private static void UpdateElementsMono(float[,] values, Int32Pixel[] elements, int count, int x, int height)
         {
             var h = height - 1;
             for (var y = 0; y < height; y++)
             {
                 var value1 = values[0, h - y];
-                var value2 = Convert.ToInt32(value1 * (colors.Length - 1));
+                var value2 = Convert.ToInt32(value1 * (count - 1));
                 elements[y].X = x;
                 elements[y].Y = y;
                 elements[y].Color = value2;
             }
         }
 
-        private static void UpdateElementsSeperate(float[,] values, Int32Pixel[] elements, Color[] colors, int x, int height, int channels)
+        private static void UpdateElementsSeperate(float[,] values, Int32Pixel[] elements, int count, int x, int height, int channels)
         {
             var h = (height - 1) / channels;
             for (var channel = 0; channel < channels; channel++)
@@ -462,7 +457,7 @@ namespace FoxTunes
                 for (var y = 0; y < h; y++)
                 {
                     var value1 = values[channel, h - y];
-                    var value2 = Convert.ToInt32(value1 * (colors.Length - 1));
+                    var value2 = Convert.ToInt32(value1 * (count - 1));
                     elements[offset + y].X = x;
                     elements[offset + y].Y = offset + y;
                     elements[offset + y].Color = value2;
@@ -500,10 +495,10 @@ namespace FoxTunes
                 {
                     default:
                     case SpectrogramRendererMode.Mono:
-                        UpdateElementsMono(data.Values, data.Elements, data.Colors, x, data.Height);
+                        UpdateElementsMono(data.Values, data.Elements, data.Count, x, data.Height);
                         break;
                     case SpectrogramRendererMode.Seperate:
-                        UpdateElementsSeperate(data.Values, data.Elements, data.Colors, x, data.Height, data.Channels);
+                        UpdateElementsSeperate(data.Values, data.Elements, data.Count, x, data.Height, data.Channels);
                         break;
                 }
 
@@ -522,12 +517,13 @@ namespace FoxTunes
             BitmapHelper.DrawDots(ref info, elements, elements.Length);
         }
 
-        public static SpectrogramRendererData Create(IOutputDataSource outputDataSource, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing)
+        public static SpectrogramRendererData Create(int width, int height, int count, int fftSize, IntPtr colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing)
         {
             var data = new SpectrogramRendererData()
             {
                 Width = width,
                 Height = height,
+                Count = count,
                 FFTSize = fftSize,
                 Colors = colors,
                 Elements = new Int32Pixel[height],
@@ -544,9 +540,11 @@ namespace FoxTunes
 
             public int Height;
 
+            public int Count;
+
             public float[,] Values;
 
-            public Color[] Colors;
+            public IntPtr Colors;
 
             public Int32Pixel[] Elements;
 
