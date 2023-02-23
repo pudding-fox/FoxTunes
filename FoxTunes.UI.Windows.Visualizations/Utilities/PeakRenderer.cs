@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Channels;
@@ -196,17 +197,35 @@ namespace FoxTunes
 
         private static Color[] GetDefaultColors(string name, bool showRms, Color[] colors)
         {
+            var color = colors.FirstOrDefault();
             switch (name)
             {
                 case PeakMeterConfiguration.COLOR_PALETTE_PEAK:
                     return new[]
                     {
-                        colors.FirstOrDefault()
+                        color
                     };
                 case PeakMeterConfiguration.COLOR_PALETTE_RMS:
-                    return colors.WithAlpha(-50);
+                    if (colors.Length > 1)
+                    {
+                        return colors.WithAlpha(-50);
+                    }
+                    else
+                    {
+                        const byte SHADE = 30;
+                        var contrast = new Color()
+                        {
+                            R = SHADE,
+                            G = SHADE,
+                            B = SHADE
+                        };
+                        return new[]
+                        {
+                            color.Shade(contrast)
+                        };
+                    }
                 case PeakMeterConfiguration.COLOR_PALETTE_VALUE:
-                    if (showRms)
+                    if (colors.Length > 1 && showRms)
                     {
                         return colors.WithAlpha(-25);
                     }
