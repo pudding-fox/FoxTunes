@@ -477,11 +477,6 @@ namespace FoxTunes
             return index;
         }
 
-        protected static float ToCrestFactor(float value, float rms, float offset)
-        {
-            return Math.Min(Math.Max((value - rms) + offset, 0), 1);
-        }
-
         protected static void UpdateElementsFast(float[] values, Int32Rect[] elements, int width, int height, int margin, Orientation orientation)
         {
             if (values.Length == 0)
@@ -704,6 +699,22 @@ namespace FoxTunes
                 throw new InvalidOperationException();
             }
 #endif
+        }
+
+        protected static void NoiseReduction(float[] values, int count, int smoothing)
+        {
+            for (var a = 0; a < count; a++)
+            {
+                var start = Math.Max(a - smoothing, 0);
+                var end = Math.Min(a + smoothing, count);
+                var value = default(float);
+                for (var b = start; b < end; b++)
+                {
+                    value += values[b];
+                }
+                value /= end - start;
+                values[a] = value;
+            }
         }
 
         protected static void NoiseReduction(float[,] values, int countx, int county, int smoothing)
