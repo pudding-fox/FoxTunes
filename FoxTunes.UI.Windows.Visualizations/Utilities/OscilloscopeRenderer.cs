@@ -620,7 +620,27 @@ namespace FoxTunes
                 base.OnAllocated();
             }
 
-            private Int32Point[,] CreateElements(int channels, int width, int height)
+            ~OscilloscopeRendererData()
+            {
+                try
+                {
+                    if (this.Colors != null)
+                    {
+                        foreach (var pair in this.Colors)
+                        {
+                            var value = pair.Value;
+                            BitmapHelper.DestroyPalette(ref value);
+                        }
+                        this.Colors.Clear();
+                    }
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on GC thread.
+                }
+            }
+
+            private static Int32Point[,] CreateElements(int channels, int width, int height)
             {
                 if (channels == 0)
                 {
