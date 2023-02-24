@@ -198,18 +198,18 @@ BOOL WINAPI draw_horizontal_blended_gradient_rectangle(RenderInfo* info, INT32 x
 	BOOL result = TRUE;
 	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
 
-	for (INT32 xposition = 0; xposition < height; xposition++)
+	for (INT32 xposition = 0; xposition < width; xposition++)
 	{
-		INT32 color = (INT32)(((float)(y + xposition) / info->Height) * info->Palette->Count);
+		INT32 color = (INT32)(((float)(x + xposition) / info->Width) * info->Palette->Count);
 		if (has_alpha(info->Palette, color)) {
-			for (INT32 yposition = 0; yposition < width; yposition++)
+			for (INT32 yposition = 0; yposition < height; yposition++)
 			{
 				BYTE* pixel = topLeft + ((xposition * info->BytesPerPixel) + (yposition * info->Stride));
 				result &= blend_color(info->Palette, color, pixel);
 			}
 		}
 		else {
-			result &= draw_vertical_line(info, color, x + xposition, y, width);
+			result &= draw_vertical_line(info, color, x + xposition, y, height);
 		}
 	}
 

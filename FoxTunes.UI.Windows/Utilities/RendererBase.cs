@@ -734,66 +734,42 @@ namespace FoxTunes
             return color.R > byte.MaxValue / 2 && color.G > byte.MaxValue / 2 && color.B > byte.MaxValue / 2;
         }
 
+        public static Color[] Shade(this Color[] colors, Color color)
+        {
+            return colors.Select(_color => _color.Shade(color)).ToArray();
+        }
+
         public static Color Shade(this Color color1, Color color2)
         {
             if (color1.IsLighter())
             {
                 //Create darner shade.
-                return new Color()
-                {
-                    A = Convert.ToByte(Math.Min(color1.A - color2.A, byte.MaxValue)),
-                    R = Convert.ToByte(Math.Min(color1.R - color2.R, byte.MaxValue)),
-                    G = Convert.ToByte(Math.Min(color1.G - color2.G, byte.MaxValue)),
-                    B = Convert.ToByte(Math.Min(color1.B - color2.B, byte.MaxValue))
-                };
+                return Color.FromArgb(
+                    color1.A,
+                    Convert.ToByte(Math.Min(color1.R - color2.R, byte.MaxValue)),
+                    Convert.ToByte(Math.Min(color1.G - color2.G, byte.MaxValue)),
+                    Convert.ToByte(Math.Min(color1.B - color2.B, byte.MaxValue))
+                );
             }
             else
             {
                 //Create lighter shade.
-                return new Color()
-                {
-                    A = Convert.ToByte(Math.Min(color1.A + color2.A, byte.MaxValue)),
-                    R = Convert.ToByte(Math.Min(color1.R + color2.R, byte.MaxValue)),
-                    G = Convert.ToByte(Math.Min(color1.G + color2.G, byte.MaxValue)),
-                    B = Convert.ToByte(Math.Min(color1.B + color2.B, byte.MaxValue))
-                };
+                return Color.FromArgb(
+                    color1.A,
+                    Convert.ToByte(Math.Min(color1.R + color2.R, byte.MaxValue)),
+                    Convert.ToByte(Math.Min(color1.G + color2.G, byte.MaxValue)),
+                    Convert.ToByte(Math.Min(color1.B + color2.B, byte.MaxValue))
+                );
             }
         }
 
         public static Color[] ToPair(this Color color, byte shade)
         {
-            var contrast = new Color()
-            {
-                R = shade,
-                G = shade,
-                B = shade
-            };
+            var contrast = Color.FromRgb(shade, shade, shade);
             return new[]
             {
                 color.Shade(contrast),
                 color
-            };
-        }
-
-        public static Color[] ToTriplet(this Color color, byte shade)
-        {
-            var contrast1 = new Color()
-            {
-                R = shade,
-                G = shade,
-                B = shade
-            };
-            var contrast2 = new Color()
-            {
-                R = Convert.ToByte(shade * 2),
-                G = Convert.ToByte(shade * 2),
-                B = Convert.ToByte(shade * 2)
-            };
-            return new[]
-            {
-                color.Shade(contrast1),
-                color,
-                color.Shade(contrast2)
             };
         }
 
@@ -1045,10 +1021,10 @@ namespace FoxTunes
             var ratio1 = 1 - ratio;
             var ratio2 = ratio;
             return Color.FromArgb(
-                (byte)Math.Round((color1.A * ratio1) + (color2.A * ratio2)),
-                (byte)Math.Round((color1.R * ratio1) + (color2.R * ratio2)),
-                (byte)Math.Round((color1.G * ratio1) + (color2.G * ratio2)),
-                (byte)Math.Round((color1.B * ratio1) + (color2.B * ratio2))
+                Convert.ToByte((color1.A * ratio1) + (color2.A * ratio2)),
+                Convert.ToByte((color1.R * ratio1) + (color2.R * ratio2)),
+                Convert.ToByte((color1.G * ratio1) + (color2.G * ratio2)),
+                Convert.ToByte((color1.B * ratio1) + (color2.B * ratio2))
             );
         }
     }

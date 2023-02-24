@@ -133,6 +133,7 @@ namespace FoxTunes
 
         protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, Color[] colors, Orientation orientation)
         {
+            var flags = default(int);
             var palettes = PeakMeterConfiguration.GetColorPalette(value, colors);
             //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
@@ -161,8 +162,9 @@ namespace FoxTunes
                 pair => pair.Key,
                 pair =>
                 {
-                    var flags = 0;
-                    if (pair.Value.Length > 1)
+                    flags = 0;
+                    colors = pair.Value;
+                    if (colors.Length > 1)
                     {
                         if (string.Equals(pair.Key, PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
                         {
@@ -173,6 +175,7 @@ namespace FoxTunes
                             if (orientation == Orientation.Horizontal)
                             {
                                 flags |= BitmapHelper.COLOR_FROM_X;
+                                colors = colors.Reverse().ToArray();
                             }
                             else if (orientation == Orientation.Vertical)
                             {
@@ -180,7 +183,7 @@ namespace FoxTunes
                             }
                         }
                     }
-                    return BitmapHelper.CreatePalette(flags, pair.Value);
+                    return BitmapHelper.CreatePalette(flags, colors);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -197,33 +200,11 @@ namespace FoxTunes
                         color
                     };
                 case PeakMeterConfiguration.COLOR_PALETTE_RMS:
-                    if (colors.Length > 1)
-                    {
-                        return colors.WithAlpha(-50);
-                    }
-                    else
-                    {
-                        const byte SHADE = 30;
-                        var contrast = new Color()
-                        {
-                            R = SHADE,
-                            G = SHADE,
-                            B = SHADE
-                        };
-                        return new[]
-                        {
-                            color.Shade(contrast)
-                        };
-                    }
+                    const byte SHADE = 30;
+                    var contrast = Color.FromRgb(SHADE, SHADE, SHADE);
+                    return colors.Shade(contrast);
                 case PeakMeterConfiguration.COLOR_PALETTE_VALUE:
-                    if (colors.Length > 1 && showRms)
-                    {
-                        return colors.WithAlpha(-25);
-                    }
-                    else
-                    {
-                        return colors;
-                    }
+                    return colors;
                 case PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND:
                     return new[]
                     {
