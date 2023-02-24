@@ -279,20 +279,17 @@ namespace FoxTunes
             {
                 data.History.Count++;
             }
-            for (var a = 0; a < count; a++)
+            if (avg)
             {
-                if (avg)
-                {
-                    data.History.Avg[0, a] = 0.0f;
-                }
-                if (peak)
-                {
-                    data.History.Peak[0, a] = 0.0f;
-                }
-                if (rms)
-                {
-                    data.History.Rms[0, a] = 0.0f;
-                }
+                Array.Clear(data.History.Avg, 0, data.History.Avg.Length);
+            }
+            if (peak)
+            {
+                Array.Clear(data.History.Peak, 0, data.History.Peak.Length);
+            }
+            if (rms)
+            {
+                Array.Clear(data.History.Rms, 0, data.History.Rms.Length);
             }
             for (var a = 0; a < count; a++)
             {
@@ -371,23 +368,17 @@ namespace FoxTunes
             {
                 data.History.Count++;
             }
-            for (var channel = 0; channel < data.Channels; channel++)
+            if (avg)
             {
-                for (var a = 0; a < count; a++)
-                {
-                    if (avg)
-                    {
-                        data.History.Avg[channel, a] = 0.0f;
-                    }
-                    if (peak)
-                    {
-                        data.History.Peak[channel, a] = 0.0f;
-                    }
-                    if (rms)
-                    {
-                        data.History.Rms[channel, a] = 0.0f;
-                    }
-                }
+                Array.Clear(data.History.Avg, 0, data.History.Avg.Length);
+            }
+            if (peak)
+            {
+                Array.Clear(data.History.Peak, 0, data.History.Peak.Length);
+            }
+            if (rms)
+            {
+                Array.Clear(data.History.Rms, 0, data.History.Rms.Length);
             }
             for (var channel = 0; channel < data.Channels; channel++)
             {
