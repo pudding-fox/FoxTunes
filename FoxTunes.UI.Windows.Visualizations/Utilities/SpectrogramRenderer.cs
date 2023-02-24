@@ -1,9 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -90,7 +88,7 @@ namespace FoxTunes
                 height,
                 colors.Length,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                BitmapHelper.GetOrCreatePalette(0, colors),
+                BitmapHelper.CreatePalette(0, colors),
                 SpectrogramConfiguration.GetMode(this.Mode.Value),
                 SpectrogramConfiguration.GetScale(this.Scale.Value),
                 this.Smoothing.Value

@@ -1,7 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -63,16 +67,100 @@ namespace FoxTunes
                 height,
                 OscilloscopeConfiguration.GetWindow(this.Window.Value),
                 OscilloscopeConfiguration.GetDuration(this.Duration.Value),
+                this.GetColorPalettes(this.Colors),
                 OscilloscopeConfiguration.GetMode(this.Mode.Value)
             );
             return true;
+        }
+
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(Color[] colors)
+        {
+            var palettes = OscilloscopeConfiguration.GetColorPalette(colors);
+            colors = palettes.GetOrAdd(
+                OscilloscopeConfiguration.COLOR_PALETTE_VALUE,
+                () => GetDefaultColors(OscilloscopeConfiguration.COLOR_PALETTE_VALUE, colors)
+            );
+            palettes.GetOrAdd(
+                OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => GetDefaultColors(OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND, colors)
+            );
+            return palettes.ToDictionary(
+                pair => pair.Key,
+                pair =>
+                {
+                    if (pair.Value == null)
+                    {
+                        return IntPtr.Zero;
+                    }
+                    var flags = 0;
+                    if (pair.Value.Length > 1)
+                    {
+                        flags |= BitmapHelper.COLOR_FROM_Y;
+                    }
+                    return BitmapHelper.CreatePalette(flags, pair.Value);
+                },
+                StringComparer.OrdinalIgnoreCase
+            );
+        }
+
+        private static Color[] GetDefaultColors(string name, Color[] colors)
+        {
+            switch (name)
+            {
+                case OscilloscopeConfiguration.COLOR_PALETTE_VALUE:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.White
+                    };
+                case OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.Black
+                    };
+            }
+            throw new NotImplementedException();
+        }
+
+        protected override WriteableBitmap CreateBitmap(int width, int height)
+        {
+            var bitmap = base.CreateBitmap(width, height);
+            this.ClearBitmap(bitmap);
+            return bitmap;
+        }
+
+        protected override void ClearBitmap(WriteableBitmap bitmap)
+        {
+            if (!bitmap.TryLock(LockTimeout))
+            {
+                return;
+            }
+            try
+            {
+                var info = default(BitmapHelper.RenderInfo);
+                var data = this.RendererData;
+                if (data != null)
+                {
+                    info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND]);
+                }
+                else
+                {
+                    var palettes = this.GetColorPalettes(this.Colors);
+                    info = BitmapHelper.CreateRenderInfo(bitmap, palettes[OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND]);
+                }
+                BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            }
+            finally
+            {
+                bitmap.Unlock();
+            }
         }
 
         protected virtual async Task Render(OscilloscopeRendererData data)
         {
             var bitmap = default(WriteableBitmap);
             var success = default(bool);
-            var info = default(BitmapHelper.RenderInfo);
+            var info = default(OscilloscopeRenderInfo);
 
             await Windows.Invoke(() =>
             {
@@ -87,7 +175,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Color));
+                info = GetRenderInfo(bitmap, data);
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)
@@ -326,6 +414,10 @@ namespace FoxTunes
             {
                 this.Mode.ValueChanged -= this.OnValueChanged;
             }
+            if (this.Window != null)
+            {
+                this.Window.ValueChanged -= this.OnValueChanged;
+            }
             if (this.Duration != null)
             {
                 this.Duration.ValueChanged -= this.OnValueChanged;
@@ -333,9 +425,25 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static void Render(BitmapHelper.RenderInfo info, OscilloscopeRendererData data)
+        private static OscilloscopeRenderInfo GetRenderInfo(WriteableBitmap bitmap, OscilloscopeRendererData data)
         {
-            BitmapHelper.Clear(ref info);
+            var info = new OscilloscopeRenderInfo()
+            {
+                Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[OscilloscopeConfiguration.COLOR_PALETTE_VALUE]),
+                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND])
+            };
+            return info;
+        }
+
+        private static void Render(OscilloscopeRenderInfo info, OscilloscopeRendererData data)
+        {
+            if (info.Background.Width != data.Width || info.Background.Height != data.Height)
+            {
+                //Bitmap does not match data.
+                return;
+            }
+
+            BitmapHelper.DrawRectangle(ref info.Background, 0, 0, data.Width, data.Height);
 
             if (data.SampleCount == 0)
             {
@@ -343,13 +451,7 @@ namespace FoxTunes
                 return;
             }
 
-            if (info.Width != data.Width || info.Height != data.Height)
-            {
-                //Bitmap does not match data.
-                return;
-            }
-
-            BitmapHelper.DrawLines(ref info, data.Elements, data.Elements.GetLength(0), data.Elements.GetLength(1));
+            BitmapHelper.DrawLines(ref info.Value, data.Elements, data.Elements.GetLength(0), data.Elements.GetLength(1));
         }
 
         private static void UpdateValues(OscilloscopeRendererData data)
@@ -453,7 +555,7 @@ namespace FoxTunes
             }
         }
 
-        public static OscilloscopeRendererData Create(int width, int height, TimeSpan window, TimeSpan duration, OscilloscopeRendererMode mode)
+        public static OscilloscopeRendererData Create(int width, int height, TimeSpan window, TimeSpan duration, IDictionary<string, IntPtr> colors, OscilloscopeRendererMode mode)
         {
             var data = new OscilloscopeRendererData()
             {
@@ -461,6 +563,7 @@ namespace FoxTunes
                 Height = height,
                 Interval = window,
                 Duration = duration,
+                Colors = colors,
                 Mode = mode,
                 Flags = mode.HasFlag(OscilloscopeRendererMode.Seperate) ? VisualizationDataFlags.Individual : VisualizationDataFlags.None
             };
@@ -484,6 +587,8 @@ namespace FoxTunes
             public float[,] Values;
 
             public float[] Peaks;
+
+            public IDictionary<string, IntPtr> Colors;
 
             public Int32Point[,] Elements;
 
@@ -534,6 +639,14 @@ namespace FoxTunes
                 }
                 return elements;
             }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct OscilloscopeRenderInfo
+        {
+            public BitmapHelper.RenderInfo Value;
+
+            public BitmapHelper.RenderInfo Background;
         }
     }
 

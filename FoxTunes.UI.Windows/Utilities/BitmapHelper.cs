@@ -17,7 +17,6 @@ namespace FoxTunes
 
         public const int COLOR_FROM_X = 1;
         public const int COLOR_FROM_Y = 2;
-        public const int ALPHA_BLENDING = 4;
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport("bitmap_utilities.dll", EntryPoint = "create_palette")]
@@ -104,36 +103,6 @@ namespace FoxTunes
         public static IntPtr CreatePalette(int flags, params Int32Color[] colors)
         {
             return CreatePalette(colors, colors.Length, flags);
-        }
-
-        private static readonly ConcurrentDictionary<int, IntPtr> Palettes = new ConcurrentDictionary<int, IntPtr>();
-
-        public static IntPtr GetOrCreatePalette(int flags, params Color[] colors)
-        {
-            var key = flags * 17;
-            unchecked
-            {
-                foreach (var color in colors)
-                {
-                    key += color.B + color.G + color.R + color.A;
-                    key *= 23;
-                }
-            }
-            return Palettes.GetOrAdd(key, () => CreatePalette(flags, colors));
-        }
-
-        public static IntPtr GetOrCreatePalette(int flags, params Int32Color[] colors)
-        {
-            var key = flags * 17;
-            unchecked
-            {
-                foreach (var color in colors)
-                {
-                    key += color.Blue + color.Green + color.Red + color.Alpha;
-                    key *= 23;
-                }
-            }
-            return Palettes.GetOrAdd(key, () => CreatePalette(flags, colors));
         }
 
         [StructLayout(LayoutKind.Sequential)]

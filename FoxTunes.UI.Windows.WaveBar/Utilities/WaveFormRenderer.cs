@@ -1,6 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -131,27 +136,13 @@ namespace FoxTunes
                 return false;
             }
             var mode = WaveFormStreamPositionConfiguration.GetMode(this.Mode.Value);
-            var colors = WaveFormStreamPositionConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
-            switch (mode)
-            {
-                default:
-                case WaveFormRendererMode.Mono:
-                    //Nothing to do.
-                    break;
-                case WaveFormRendererMode.Seperate:
-                    if (colors.Length > 1)
-                    {
-                        colors = colors.DuplicateGradient(generatorData.Channels);
-                    }
-                    break;
-            }
             this.RendererData = Create(
                 generatorData,
                 width,
                 height,
                 this.Rms.Value,
                 mode,
-                colors
+                this.GetColorPalettes(this.ColorPalette.Value, this.Rms.Value, generatorData.Channels, this.Colors, mode)
             );
             if (this.RendererData == null)
             {
@@ -161,14 +152,127 @@ namespace FoxTunes
             return true;
         }
 
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showRms, int channels, Color[] colors, WaveFormRendererMode mode)
+        {
+            var flags = default(int);
+            var palettes = WaveFormStreamPositionConfiguration.GetColorPalette(value, colors);
+            //Switch the default colors to the VALUE palette if one was provided.
+            colors = palettes.GetOrAdd(
+                WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE,
+                () => GetDefaultColors(WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE, showRms, colors)
+            );
+            palettes.GetOrAdd(
+                WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => GetDefaultColors(WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND, showRms, colors)
+            );
+            if (showRms)
+            {
+                palettes.GetOrAdd(
+                    WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS,
+                    () => GetDefaultColors(WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS, showRms, colors)
+                );
+            }
+            return palettes.ToDictionary(
+                pair => pair.Key,
+                pair =>
+                {
+                    flags = 0;
+                    colors = pair.Value;
+                    if (colors.Length > 1)
+                    {
+                        flags |= BitmapHelper.COLOR_FROM_Y;
+                        if (new[] { WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE, WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS }.Contains(pair.Key, StringComparer.OrdinalIgnoreCase))
+                        {
+                            colors = colors.MirrorGradient(true);
+                            switch (mode)
+                            {
+                                case WaveFormRendererMode.Seperate:
+                                    colors = colors.DuplicateGradient(channels);
+                                    break;
+                            }
+                        }
+                    }
+                    return BitmapHelper.CreatePalette(flags, colors);
+                },
+                StringComparer.OrdinalIgnoreCase
+            );
+        }
+
+        private static Color[] GetDefaultColors(string name, bool showRms, Color[] colors)
+        {
+            var color = colors.FirstOrDefault();
+            switch (name)
+            {
+                case WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS:
+                    if (colors.Length > 1)
+                    {
+                        return colors.WithAlpha(-50);
+                    }
+                    else
+                    {
+                        const byte SHADE = 30;
+                        var contrast = new Color()
+                        {
+                            R = SHADE,
+                            G = SHADE,
+                            B = SHADE
+                        };
+                        return new[]
+                        {
+                            color.Shade(contrast)
+                        };
+                    }
+                case WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE:
+                    return colors;
+                case WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.Black
+                    };
+            }
+            throw new NotImplementedException();
+        }
+
+        protected override WriteableBitmap CreateBitmap(int width, int height)
+        {
+            var bitmap = base.CreateBitmap(width, height);
+            this.ClearBitmap(bitmap);
+            return bitmap;
+        }
+
+        protected override void ClearBitmap(WriteableBitmap bitmap)
+        {
+            if (!bitmap.TryLock(LockTimeout))
+            {
+                return;
+            }
+            try
+            {
+                var info = default(BitmapHelper.RenderInfo);
+                var data = this.RendererData;
+                if (data != null)
+                {
+                    info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND]);
+                }
+                else
+                {
+                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, 0, this.Colors, WaveFormRendererMode.None);
+                    info = BitmapHelper.CreateRenderInfo(bitmap, palettes[WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND]);
+                }
+                BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            }
+            finally
+            {
+                bitmap.Unlock();
+            }
+        }
+
         public async Task Render(WaveFormRendererData data)
         {
-            const byte SHADE = 30;
-
             var bitmap = default(WriteableBitmap);
             var success = default(bool);
-            var waveRenderInfo = default(BitmapHelper.RenderInfo);
-            var powerRenderInfo = default(BitmapHelper.RenderInfo);
+            var info = default(WaveFormRenderInfo);
 
             await Windows.Invoke(() =>
             {
@@ -183,16 +287,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (data.PowerElements != null)
-                {
-                    var colors = data.Colors[0].ToPair(SHADE);
-                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
-                    powerRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[1]));
-                }
-                else
-                {
-                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(BitmapHelper.COLOR_FROM_Y, data.Colors));
-                }
+                info = GetRenderInfo(bitmap, data);
             }).ConfigureAwait(false);
 
             if (!success)
@@ -202,11 +297,7 @@ namespace FoxTunes
             }
             try
             {
-                Render(
-                    data,
-                    waveRenderInfo,
-                    powerRenderInfo
-                );
+                Render(ref info, data);
             }
             catch (Exception e)
             {
@@ -565,31 +656,49 @@ namespace FoxTunes
             return peak;
         }
 
-        public static void Render(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo)
+        private static WaveFormRenderInfo GetRenderInfo(WriteableBitmap bitmap, WaveFormRendererData data)
         {
-            //TODO: We should only clear and re-render when the peak changes.
-            BitmapHelper.Clear(ref waveRenderInfo);
+            var info = new WaveFormRenderInfo()
+            {
+                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND])
+            };
+            if (data.PowerElements != null)
+            {
+                info.Rms = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS]);
+            }
+            if (data.WaveElements != null)
+            {
+                info.Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE]);
+            }
+            return info;
+        }
 
-            if (rendererData.Capacity == 0)
+        public static void Render(ref WaveFormRenderInfo info, WaveFormRendererData data)
+        {
+            if (info.Background.Width != data.Width || info.Background.Height != data.Height)
+            {
+                //Bitmap does not match data.
+                return;
+            }
+            BitmapHelper.DrawRectangle(ref info.Background, 0, 0, data.Width, data.Height);
+
+            if (data.Position == 0)
             {
                 //No data.
                 return;
             }
 
-            if (rendererData.Width != waveRenderInfo.Width || rendererData.Height != waveRenderInfo.Height)
+            if (data.WaveElements != null)
             {
-                //Bitmap does not match data.
-                return;
+                BitmapHelper.DrawRectangles(ref info.Value, data.WaveElements, data.WaveElements.Length);
             }
-
-            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, rendererData.WaveElements.Length);
-            if (rendererData.PowerElements != null)
+            if (data.PowerElements != null)
             {
-                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, rendererData.PowerElements.Length);
+                BitmapHelper.DrawRectangles(ref info.Rms, data.PowerElements, data.PowerElements.Length);
             }
         }
 
-        public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool rms, WaveFormRendererMode mode, Color[] colors)
+        public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool rms, WaveFormRendererMode mode, IDictionary<string, IntPtr> colors)
         {
             var valuesPerElement = generatorData.Capacity / width;
             if (valuesPerElement == 0)
@@ -637,7 +746,7 @@ namespace FoxTunes
 
             public int ValuesPerElement;
 
-            public Color[] Colors;
+            public IDictionary<string, IntPtr> Colors;
 
             public Int32Rect[,] WaveElements;
 
@@ -660,5 +769,15 @@ namespace FoxTunes
         None,
         Mono,
         Seperate
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WaveFormRenderInfo
+    {
+        public BitmapHelper.RenderInfo Rms;
+
+        public BitmapHelper.RenderInfo Value;
+
+        public BitmapHelper.RenderInfo Background;
     }
 }

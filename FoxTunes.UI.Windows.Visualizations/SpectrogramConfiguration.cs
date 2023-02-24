@@ -12,9 +12,6 @@ namespace FoxTunes
 
         public const string MODE_MONO_OPTION = "AAAABCAA-3545-4861-A4D0-F84475C09C6D";
 
-        //TODO: This was never implemented.
-        public const string MODE_STEREO_OPTION = "BBBB989E-0726-4E87-BFB3-A63D19D96D79";
-
         public const string MODE_SEPERATE_OPTION = "CCCC8D37-067D-4A43-8AE8-7AD000E3E176";
 
         public const string SCALE_ELEMENT = "BBBB3A79-02DD-4D56-A4F9-4641CF2BA1C8";

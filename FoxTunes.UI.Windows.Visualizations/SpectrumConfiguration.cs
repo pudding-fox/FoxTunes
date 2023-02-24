@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Media;
 
@@ -37,6 +39,14 @@ namespace FoxTunes
         public const int DEFAULT_HOLD = 1000;
 
         public const string COLOR_PALETTE_ELEMENT = "FFFF957D-5AEA-4706-B6D0-9C9065E76132";
+
+        public const string COLOR_PALETTE_THEME = "THEME";
+
+        public const string COLOR_PALETTE_PEAK = "PEAK";
+
+        public const string COLOR_PALETTE_VALUE = "VALUE";
+
+        public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";
 
         public const string CUT_OFF_ELEMENT = "GGGGA5E8-4D2D-4039-A03B-305679402052";
 
@@ -127,20 +137,29 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public static Color[] GetColorPalette(string value, Color[] colors)
+        public static IDictionary<string, Color[]> GetColorPalette(string value, Color[] colors)
         {
             if (!string.IsNullOrEmpty(value))
             {
                 try
                 {
-                    return value.ToColorStops().ToGradient();
+                    var palettes = value.ToNamedColorStops().ToDictionary(
+                        pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
+                        pair => pair.Value.ToGradient(),
+                        StringComparer.OrdinalIgnoreCase
+                    );
+                    palettes[COLOR_PALETTE_THEME] = colors;
+                    return palettes;
                 }
                 catch
                 {
                     //Nothing can be done.
                 }
             }
-            return colors;
+            return new Dictionary<string, Color[]>(StringComparer.OrdinalIgnoreCase)
+            {
+                { COLOR_PALETTE_THEME, colors }
+            };
         }
     }
 }
