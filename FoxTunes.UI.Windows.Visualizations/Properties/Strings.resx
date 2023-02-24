@@ -132,6 +132,15 @@
   <data name="EnhancedSpectrumConfiguration.Duration" xml:space="preserve">
     <value>Duration</value>
   </data>
+  <data name="EnhancedSpectrumConfiguration.Duration.High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="EnhancedSpectrumConfiguration.Duration.Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="EnhancedSpectrumConfiguration.Duration.Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
   <data name="EnhancedSpectrumConfiguration.Path" xml:space="preserve">
     <value>Spectrum</value>
   </data>

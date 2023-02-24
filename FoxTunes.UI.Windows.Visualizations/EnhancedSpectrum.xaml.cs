@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace FoxTunes
 {
@@ -119,16 +118,27 @@ namespace FoxTunes
                         attributes: this.Crest.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
-                for (var value = EnhancedSpectrumConfiguration.DURATION_MIN; value <= EnhancedSpectrumConfiguration.DURATION_MAX; value += 100)
-                {
-                    yield return new InvocationComponent(
-                        CATEGORY,
-                        this.Duration.Id,
-                        string.Format("{0}ms", value),
-                        path: this.Duration.Name,
-                        attributes: this.Duration.Value == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                    );
-                }
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Duration.Id,
+                    Strings.EnhancedSpectrumConfiguration_Duration_Low,
+                    path: this.Duration.Name,
+                    attributes: this.Duration.Value == EnhancedSpectrumConfiguration.DURATION_MIN ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Duration.Id,
+                    Strings.EnhancedSpectrumConfiguration_Duration_Medium,
+                    path: this.Duration.Name,
+                    attributes: this.Duration.Value == EnhancedSpectrumConfiguration.DURATION_DEFAULT ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Duration.Id,
+                    Strings.EnhancedSpectrumConfiguration_Duration_High,
+                    path: this.Duration.Name,
+                    attributes: this.Duration.Value == EnhancedSpectrumConfiguration.DURATION_MAX ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
                 foreach (var invocationComponent in base.Invocations)
                 {
                     yield return invocationComponent;
@@ -156,10 +166,13 @@ namespace FoxTunes
             }
             else if (string.Equals(this.Duration.Name, component.Path))
             {
-                var value = default(int);
-                if (!string.IsNullOrEmpty(component.Name) && component.Name.Length > 2 && int.TryParse(component.Name.Substring(0, component.Name.Length - 2), out value))
+                if (string.Equals(component.Name, Strings.EnhancedSpectrumConfiguration_Duration_Low, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.Duration.Value = value;
+                    this.Duration.Value = EnhancedSpectrumConfiguration.DURATION_MIN;
+                }
+                else if (string.Equals(component.Name, Strings.EnhancedSpectrumConfiguration_Duration_High, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Duration.Value = EnhancedSpectrumConfiguration.DURATION_MAX;
                 }
                 else
                 {

@@ -106,6 +106,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        internal static string EnhancedSpectrumConfiguration_Duration_High {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Duration.High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        internal static string EnhancedSpectrumConfiguration_Duration_Low {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Duration.Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        internal static string EnhancedSpectrumConfiguration_Duration_Medium {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Duration.Medium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string EnhancedSpectrumConfiguration_Path {
