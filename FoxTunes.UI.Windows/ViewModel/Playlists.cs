@@ -379,6 +379,19 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
+        public ICommand PlaylistSelectedCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(this.PlaylistSelected);
+            }
+        }
+
+        public void PlaylistSelected()
+        {
+            this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistSelected, SignalState.None));
+        }
+
         protected override Freezable CreateInstanceCore()
         {
             return new Playlists();
