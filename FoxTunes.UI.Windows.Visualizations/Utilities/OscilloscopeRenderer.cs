@@ -45,6 +45,7 @@ namespace FoxTunes
                     OscilloscopeConfiguration.DURATION_ELEMENT
                 );
                 this.Mode.ValueChanged += this.OnValueChanged;
+                this.Window.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
                 var task = this.CreateBitmap(true);
             }
@@ -600,7 +601,10 @@ namespace FoxTunes
 
             public override void OnAllocated()
             {
-                this.History.Capacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Interval.TotalMilliseconds), 1);
+                this.History.Capacity = GetHistoryCapacity(
+                    Convert.ToInt32(this.Interval.TotalMilliseconds),
+                    Convert.ToInt32(this.Duration.TotalMilliseconds)
+                );
 
                 //TODO: Only realloc if required.
                 switch (this.Mode)
@@ -658,6 +662,12 @@ namespace FoxTunes
                     }
                 }
                 return elements;
+            }
+
+            private static int GetHistoryCapacity(int duration, int interval)
+            {
+                var capacity = Convert.ToInt32(Math.Ceiling((float)interval / duration));
+                return capacity;
             }
         }
 
