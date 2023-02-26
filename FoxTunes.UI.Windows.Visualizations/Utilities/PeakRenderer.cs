@@ -146,7 +146,7 @@ namespace FoxTunes
             //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
                 PeakMeterConfiguration.COLOR_PALETTE_VALUE,
-                () => DefaultColors.GetValue(showPeak, showRms, colors)
+                () => DefaultColors.GetValue(colors)
             );
             if (showPeak)
             {
@@ -161,6 +161,14 @@ namespace FoxTunes
                     PeakMeterConfiguration.COLOR_PALETTE_RMS,
                     () => DefaultColors.GetRms(background, showPeak, colors)
                 );
+            }
+            if (showPeak || showRms)
+            {
+                colors = palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE];
+                if (!colors.Any(color => color.A != byte.MaxValue))
+                {
+                    palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE] = colors.WithAlpha(-50);
+                }
             }
             return palettes.ToDictionary(
                 pair => pair.Key,
@@ -618,20 +626,9 @@ namespace FoxTunes
                 }
             }
 
-            public static Color[] GetValue(bool showPeak, bool showRms, Color[] colors)
+            public static Color[] GetValue(Color[] colors)
             {
-                if (showRms)
-                {
-                    return colors.WithAlpha(-50);
-                }
-                else if (showPeak)
-                {
-                    return colors.WithAlpha(-25);
-                }
-                else
-                {
-                    return colors;
-                }
+                return colors;
             }
         }
     }

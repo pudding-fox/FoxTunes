@@ -77,13 +77,13 @@ namespace FoxTunes
         protected virtual IDictionary<string, IntPtr> GetColorPalettes(Color[] colors)
         {
             var palettes = OscilloscopeConfiguration.GetColorPalette(colors);
+            var background = palettes.GetOrAdd(
+                OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => DefaultColors.GetBackground()
+            );
             colors = palettes.GetOrAdd(
                 OscilloscopeConfiguration.COLOR_PALETTE_VALUE,
-                () => GetDefaultColors(OscilloscopeConfiguration.COLOR_PALETTE_VALUE, colors)
-            );
-            palettes.GetOrAdd(
-                OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND,
-                () => GetDefaultColors(OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND, colors)
+                () => DefaultColors.GetValue(colors)
             );
             return palettes.ToDictionary(
                 pair => pair.Key,
@@ -102,24 +102,6 @@ namespace FoxTunes
                 },
                 StringComparer.OrdinalIgnoreCase
             );
-        }
-
-        private static Color[] GetDefaultColors(string name, Color[] colors)
-        {
-            switch (name)
-            {
-                case OscilloscopeConfiguration.COLOR_PALETTE_VALUE:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.White
-                    };
-                case OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Black
-                    };
-            }
-            throw new NotImplementedException();
         }
 
         protected override WriteableBitmap CreateBitmap(int width, int height)
@@ -677,6 +659,25 @@ namespace FoxTunes
             public BitmapHelper.RenderInfo Value;
 
             public BitmapHelper.RenderInfo Background;
+        }
+
+        public static class DefaultColors
+        {
+            public static Color[] GetBackground()
+            {
+                return new[]
+                {
+                    global::System.Windows.Media.Colors.Black
+                };
+            }
+
+            public static Color[] GetValue(Color[] colors)
+            {
+                return new[]
+                {
+                    global::System.Windows.Media.Colors.White
+                };
+            }
         }
     }
 

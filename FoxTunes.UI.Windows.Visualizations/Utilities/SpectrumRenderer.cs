@@ -113,20 +113,20 @@ namespace FoxTunes
         protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, Color[] colors)
         {
             var palettes = SpectrumConfiguration.GetColorPalette(value, colors);
+            var background = palettes.GetOrAdd(
+                SpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => DefaultColors.GetBackground()
+            );
             //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
                 SpectrumConfiguration.COLOR_PALETTE_VALUE,
-                () => GetDefaultColors(SpectrumConfiguration.COLOR_PALETTE_VALUE, colors)
-            );
-            palettes.GetOrAdd(
-                SpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
-                () => GetDefaultColors(SpectrumConfiguration.COLOR_PALETTE_BACKGROUND, colors)
+                () => DefaultColors.GetValue(colors)
             );
             if (showPeak)
             {
                 palettes.GetOrAdd(
                     SpectrumConfiguration.COLOR_PALETTE_PEAK,
-                    () => GetDefaultColors(SpectrumConfiguration.COLOR_PALETTE_PEAK, colors)
+                    () => DefaultColors.GetPeak(colors)
                 );
             }
             return palettes.ToDictionary(
@@ -142,27 +142,6 @@ namespace FoxTunes
                 },
                 StringComparer.OrdinalIgnoreCase
             );
-        }
-
-        private static Color[] GetDefaultColors(string name, Color[] colors)
-        {
-            var color = colors.FirstOrDefault();
-            switch (name)
-            {
-                case SpectrumConfiguration.COLOR_PALETTE_PEAK:
-                    return new[]
-                    {
-                        color
-                    };
-                case SpectrumConfiguration.COLOR_PALETTE_VALUE:
-                    return colors;
-                case SpectrumConfiguration.COLOR_PALETTE_BACKGROUND:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Black
-                    };
-            }
-            throw new NotImplementedException();
         }
 
         protected override WriteableBitmap CreateBitmap(int width, int height)
@@ -558,6 +537,31 @@ namespace FoxTunes
             public BitmapHelper.RenderInfo Value;
 
             public BitmapHelper.RenderInfo Background;
+        }
+
+        public static class DefaultColors
+        {
+            public static Color[] GetBackground()
+            {
+                return new[]
+                {
+                    global::System.Windows.Media.Colors.Black
+                };
+            }
+
+            public static Color[] GetPeak(Color[] colors)
+            {
+                var color = colors.FirstOrDefault();
+                return new[]
+                {
+                    color
+                };
+            }
+
+            public static Color[] GetValue(Color[] colors)
+            {
+                return colors;
+            }
         }
     }
 }
