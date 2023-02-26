@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 
@@ -11,7 +10,7 @@ namespace FoxTunes
     {
         public const string ID = "FB90B62E-839D-43B3-B9C2-DBFF498BFE82";
 
-        public Aero2Theme() : base(ID, Strings.Aero2Theme_Name, Strings.Aero2Theme_Description, GetColorPalettes())
+        public Aero2Theme() : base(ID, Strings.Aero2Theme_Name, Strings.Aero2Theme_Description, global::FoxTunes.ColorPalettes.Light)
         {
 
         }
@@ -41,27 +40,6 @@ namespace FoxTunes
         public override Stream GetArtworkPlaceholder()
         {
             return typeof(Aero2Theme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.System_Artwork.png");
-        }
-
-        public static IEnumerable<IColorPalette> GetColorPalettes()
-        {
-            return new[]
-            {
-                new ColorPalette(
-                    ID + "_AAAA",
-                    ColorPaletteRole.Visualization,
-                    Strings.Aero2Theme_ColorPalette_Default_Name,
-                    Strings.Aero2Theme_ColorPalette_Default_Description,
-                    Resources.Blue
-                ),
-                new ColorPalette(
-                    ID + "_BBBB",
-                    ColorPaletteRole.Visualization,
-                    Strings.Aero2Theme_ColorPalette_Gradient1_Name,
-                    Strings.Aero2Theme_ColorPalette_Gradient1_Description,
-                    Resources.Transparent_Blue
-                ),
-            };
         }
     }
 }
