@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
+        public IntegerConfigurationElement Duration { get; private set; }
+
         protected override void InitializeComponent(ICore core)
         {
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
@@ -50,6 +52,10 @@ namespace FoxTunes
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.COLOR_PALETTE
+                );
+                this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    PeakMeterConfiguration.SECTION,
+                    PeakMeterConfiguration.DURATION
                 );
             }
             base.OnConfigurationChanged();
@@ -111,6 +117,27 @@ namespace FoxTunes
                     this.Rms.Name,
                     attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Duration.Id,
+                    Strings.PeakMeterConfiguration_Duration_Low,
+                    path: this.Duration.Name,
+                    attributes: this.Duration.Value == PeakMeterConfiguration.DURATION_MIN ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Duration.Id,
+                    Strings.PeakMeterConfiguration_Duration_Medium,
+                    path: this.Duration.Name,
+                    attributes: this.Duration.Value == PeakMeterConfiguration.DURATION_DEFAULT ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Duration.Id,
+                    Strings.PeakMeterConfiguration_Duration_High,
+                    path: this.Duration.Name,
+                    attributes: this.Duration.Value == PeakMeterConfiguration.DURATION_MAX ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
                 foreach (var invocationComponent in base.Invocations)
                 {
                     yield return invocationComponent;
@@ -131,6 +158,21 @@ namespace FoxTunes
             else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
             {
                 //Nothing to do.
+            }
+            else if (string.Equals(this.Duration.Name, component.Path))
+            {
+                if (string.Equals(component.Name, Strings.PeakMeterConfiguration_Duration_Low, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Duration.Value = PeakMeterConfiguration.DURATION_MIN;
+                }
+                else if (string.Equals(component.Name, Strings.PeakMeterConfiguration_Duration_High, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Duration.Value = PeakMeterConfiguration.DURATION_MAX;
+                }
+                else
+                {
+                    this.Duration.Value = PeakMeterConfiguration.DURATION_DEFAULT;
+                }
             }
             else if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
             {
