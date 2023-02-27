@@ -13,6 +13,8 @@ namespace FoxTunes.Interfaces
 
         long Position { get; }
 
+        long ActualPosition { get; }
+
         long Length { get; }
 
         int Rate { get; }

@@ -7,6 +7,10 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     public class WaveFormGenerator : StandardComponent, IConfigurableComponent
     {
+        const int BASS_ERROR_UNKNOWN = -1;
+
+        const int BASS_STREAMPROC_END = -2147483648;
+
         public WaveFormCache Cache { get; private set; }
 
         public IOutput Output { get; private set; }
@@ -75,6 +79,12 @@ namespace FoxTunes
                     default:
                         throw new NotImplementedException();
                 }
+                if (duplicated.ActualPosition < duplicated.Length)
+                {
+                    Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generation for file \"{0}\" failed to complete.", stream.FileName);
+                    this.Cache.Remove(stream, data.Resolution);
+                    return;
+                }
             }
 
             if (data.CancellationToken.IsCancellationRequested)
@@ -113,16 +123,25 @@ namespace FoxTunes
 
             do
             {
-                var length = stream.GetData(buffer) / sizeof(short);
-                if (length <= 0)
+                var length = stream.GetData(buffer);
+                if (length == 0)
                 {
-                    break;
+                    continue;
+                }
+
+                switch (length)
+                {
+                    case BASS_STREAMPROC_END:
+                    case BASS_ERROR_UNKNOWN:
+                        return;
                 }
 
                 if (data.Position >= data.Capacity)
                 {
                     break;
                 }
+
+                length /= sizeof(short);
 
                 for (var a = 0; a < length; a += data.Channels)
                 {
@@ -170,16 +189,25 @@ namespace FoxTunes
 
             do
             {
-                var length = stream.GetData(buffer) / sizeof(float);
-                if (length <= 0)
+                var length = stream.GetData(buffer);
+                if (length == 0)
                 {
-                    break;
+                    continue;
+                }
+
+                switch (length)
+                {
+                    case BASS_STREAMPROC_END:
+                    case BASS_ERROR_UNKNOWN:
+                        return;
                 }
 
                 if (data.Position >= data.Capacity)
                 {
                     break;
                 }
+
+                length /= sizeof(float);
 
                 for (var a = 0; a < length; a += data.Channels)
                 {

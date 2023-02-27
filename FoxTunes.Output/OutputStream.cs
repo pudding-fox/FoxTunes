@@ -31,6 +31,8 @@ namespace FoxTunes
 
         public abstract long Position { get; }
 
+        public abstract long ActualPosition { get; }
+
         public abstract long Length { get; }
 
         public abstract int Rate { get; }
