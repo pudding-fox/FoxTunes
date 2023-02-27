@@ -27,8 +27,6 @@ namespace FoxTunes
 
         public IntegerConfigurationElement CutOff { get; private set; }
 
-        public SelectionConfigurationElement FFTSize { get; private set; }
-
         public TextConfigurationElement ColorPalette { get; private set; }
 
         protected override void InitializeComponent(ICore core)
@@ -52,10 +50,6 @@ namespace FoxTunes
                 this.CutOff = this.Configuration.GetElement<IntegerConfigurationElement>(
                     SpectrumConfiguration.SECTION,
                     SpectrumConfiguration.CUT_OFF_ELEMENT
-                );
-                this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-                   VisualizationBehaviourConfiguration.SECTION,
-                   VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
                 );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     SpectrumConfiguration.SECTION,

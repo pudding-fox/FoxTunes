@@ -88,8 +88,8 @@ namespace FoxTunes
         public static string GetDefaultColorPalette()
         {
             var builder = new StringBuilder();
-            builder.AppendLine("0:Black");
-            builder.AppendLine("100:White");
+            builder.AppendLine("BLACK");
+            builder.AppendLine("1000:WHITE");
             return builder.ToString();
         }
 

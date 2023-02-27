@@ -19,11 +19,21 @@ namespace FoxTunes
             this.InitializeComponent();
         }
 
+        public ThemeLoader ThemeLoader { get; private set; }
+
         public SelectionConfigurationElement Mode { get; private set; }
 
         public SelectionConfigurationElement Scale { get; private set; }
 
         public IntegerConfigurationElement Smoothing { get; private set; }
+
+        public TextConfigurationElement ColorPalette { get; private set; }
+
+        protected override void InitializeComponent(ICore core)
+        {
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            base.InitializeComponent(core);
+        }
 
         protected override void OnConfigurationChanged()
         {
@@ -40,6 +50,10 @@ namespace FoxTunes
                 this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
                     SpectrogramConfiguration.SECTION,
                     SpectrogramConfiguration.SMOOTHING_ELEMENT
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    SpectrogramConfiguration.SECTION,
+                    SpectrogramConfiguration.COLOR_PALETTE_ELEMENT
                 );
             }
             base.OnConfigurationChanged();
@@ -76,6 +90,10 @@ namespace FoxTunes
                         path: this.Scale.Name,
                         attributes: this.Scale.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
+                }
+                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette, colorPalette => colorPalette.Role.HasFlag(ColorPaletteRole.WaveForm) && colorPalette.GetGradient().Length > 1))
+                {
+                    yield return component;
                 }
                 for (var value = SpectrogramConfiguration.SMOOTHING_MIN; value <= SpectrogramConfiguration.SMOOTHING_MAX; value++)
                 {
@@ -122,6 +140,10 @@ namespace FoxTunes
                         this.Smoothing.Value = SpectrogramConfiguration.SMOOTHING_DEFAULT;
                     }
                 }
+            }
+            else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
+            {
+                //Nothing to do.
             }
             else if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
             {
