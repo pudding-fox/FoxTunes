@@ -15,17 +15,31 @@ namespace FoxTunes
                     new ThemeBase.ColorPalette(
                         "Custom_AAAA",
                         ColorPaletteRole.Visualization | ColorPaletteRole.WaveForm,
+                        Strings.ColorPalette_MonoChrome,
+                        string.Empty,
+                        Resources.MonoChrome
+                    ),
+                    new ThemeBase.ColorPalette(
+                        "Custom_BBBB",
+                        ColorPaletteRole.Visualization | ColorPaletteRole.WaveForm,
                         Strings.ColorPalette_TrafficLight,
                         string.Empty,
                         Resources.TrafficLight
                     ),
                     new ThemeBase.ColorPalette(
-                        "Custom_BBBB",
+                        "Custom_CCCC",
                         ColorPaletteRole.Visualization,
                         Strings.ColorPalette_RetroVibes,
                         string.Empty,
                         Resources.RetroVibes
                     ),
+                    new ThemeBase.ColorPalette(
+                        "Custom_DDDD",
+                        ColorPaletteRole.Visualization | ColorPaletteRole.WaveForm,
+                        Strings.ColorPalette_Audacity,
+                        string.Empty,
+                        Resources.Audacity
+                    )
                 };
             }
         }
