@@ -107,10 +107,14 @@ namespace FoxTunes
             return this;
         }
 
-        public IEnumerable<IInvocationComponent> SelectColorPalette(string category, TextConfigurationElement element)
+        public IEnumerable<IInvocationComponent> SelectColorPalette(string category, TextConfigurationElement element, ColorPaletteRole role)
         {
             foreach (var colorPalette in this.Theme.ColorPalettes)
             {
+                if (!colorPalette.Role.HasFlag(role))
+                {
+                    continue;
+                }
                 yield return new InvocationComponent(
                     category,
                     colorPalette.Id,

@@ -93,7 +93,7 @@ namespace FoxTunes
                         attributes: this.Bands.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
-                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
+                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette, ColorPaletteRole.Visualization))
                 {
                     yield return component;
                 }

@@ -75,7 +75,7 @@ namespace FoxTunes
                         attributes: this.Mode.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
-                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
+                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette, ColorPaletteRole.WaveForm))
                 {
                     yield return component;
                 }

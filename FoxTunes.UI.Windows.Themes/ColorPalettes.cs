@@ -14,7 +14,7 @@ namespace FoxTunes
                 {
                     new ThemeBase.ColorPalette(
                         "Custom_AAAA",
-                        ColorPaletteRole.Visualization,
+                        ColorPaletteRole.Visualization | ColorPaletteRole.WaveForm,
                         Strings.ColorPalette_TrafficLight,
                         string.Empty,
                         Resources.TrafficLight
@@ -38,7 +38,7 @@ namespace FoxTunes
                 {
                     new ThemeBase.ColorPalette(
                         "Light_AAAA",
-                        ColorPaletteRole.Visualization,
+                        ColorPaletteRole.Visualization | ColorPaletteRole.WaveForm,
                         Strings.ColorPalette_Default,
                         string.Empty,
                         Resources.Blue
@@ -62,7 +62,7 @@ namespace FoxTunes
                 {
                     new ThemeBase.ColorPalette(
                         "Dark_AAAA",
-                        ColorPaletteRole.Visualization,
+                        ColorPaletteRole.Visualization | ColorPaletteRole.WaveForm,
                         Strings.ColorPalette_Default,
                         string.Empty,
                         Resources.White

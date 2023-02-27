@@ -101,7 +101,7 @@ namespace FoxTunes
         {
             get
             {
-                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
+                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette, ColorPaletteRole.Visualization))
                 {
                     yield return component;
                 }
