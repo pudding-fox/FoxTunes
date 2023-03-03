@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassOutputStream : OutputStream
+    public class BassOutputStream : OutputStream, IBassOutputStream
     {
         static BassOutputStream()
         {

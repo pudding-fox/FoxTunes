@@ -150,7 +150,7 @@ namespace FoxTunes
 
         public virtual int GetData(float[] buffer, int fftSize, bool individual = false)
         {
-            var length = this.GetFFTLength(fftSize, individual);
+            var length = GetFFTLength(fftSize, individual);
             foreach (var channelHandle in this.GetMixerChannelHandles())
             {
                 //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
@@ -164,7 +164,7 @@ namespace FoxTunes
 
         public virtual int GetData(float[] buffer, int fftSize, out TimeSpan duration, bool individual = false)
         {
-            var length = this.GetFFTLength(fftSize, individual);
+            var length = GetFFTLength(fftSize, individual);
             foreach (var channelHandle in this.GetMixerChannelHandles())
             {
                 var bytes = default(int);
@@ -180,7 +180,7 @@ namespace FoxTunes
             return 0;
         }
 
-        protected virtual uint GetFFTLength(int fftSize, bool individual = false)
+        public static uint GetFFTLength(int fftSize, bool individual = false)
         {
             var length = default(uint);
             switch (fftSize)

@@ -28,6 +28,22 @@ namespace FoxTunes
             }
         }
 
+        public IOutputStreamDataSourceFactory OutputStreamDataSource
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IOutputStreamDataSourceFactory>();
+            }
+        }
+
+        public IFFTDataTransformerFactory FFTDataTransformer
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IFFTDataTransformerFactory>();
+            }
+        }
+
         public static readonly IStandardFactories Instance = new StandardFactories();
     }
 }

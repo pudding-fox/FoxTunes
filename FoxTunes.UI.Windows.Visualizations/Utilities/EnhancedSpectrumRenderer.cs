@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -19,6 +20,8 @@ namespace FoxTunes
         const int MARGIN_ZERO = 0;
 
         const int MARGIN_ONE = 1;
+
+        public IFFTDataTransformerFactory TransformerFactory { get; private set; }
 
         public SpectrumRendererData RendererData { get; private set; }
 
@@ -35,6 +38,12 @@ namespace FoxTunes
         public IntegerConfigurationElement Duration { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.TransformerFactory = core.Factories.FFTDataTransformer;
+            base.InitializeComponent(core);
+        }
 
         protected override void OnConfigurationChanged()
         {
@@ -99,10 +108,12 @@ namespace FoxTunes
             {
                 return false;
             }
+            var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value);
             this.RendererData = Create(
+                this.TransformerFactory.Create(bands),
                 width,
                 height,
-                EnhancedSpectrumConfiguration.GetBands(this.Bands.Value),
+                bands,
                 EnhancedSpectrumConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value),
                 this.ShowPeak.Value,
                 this.ShowRms.Value,
@@ -419,104 +430,23 @@ namespace FoxTunes
 
         private static void UpdateValues(SpectrumRendererData data)
         {
-            var bands = data.Bands;
-            var position = default(int);
-
-            for (int a = FrequencyToIndex(data.MinBand, data.FFTSize, data.Rate), b = a; a < data.FFTSize; a++)
-            {
-                var frequency = IndexToFrequency(a, data.FFTSize, data.Rate);
-                while (frequency > bands[position])
-                {
-                    if (position < (bands.Length - 1))
-                    {
-                        UpdateValue(data, position, b, a);
-                        b = a;
-                        position++;
-                    }
-                    else
-                    {
-                        UpdateValue(data, position, b, a);
-                        return;
-                    }
-                }
-            }
-        }
-
-        private static void UpdateValue(SpectrumRendererData data, int band, int start, int end)
-        {
-            var values = data.Data;
-            var peakValues = data.History.Peak;
-            var rmsValues = data.History.Rms;
-            var value = default(float);
-            var peak = default(float);
-            var rms = default(float);
+            var values = data.Values;
+            var peakValues = data.PeakValues;
+            var rmsValues = data.RmsValues;
             var doPeaks = peakValues != null;
             var doRms = rmsValues != null;
-            var count = end - start;
-
-            if (count > 0)
+            data.Transformer.Transform(data, data.Values, data.PeakValues, data.RmsValues);
+            for (var a = 0; a < values.Length; a++)
             {
-                for (var a = start; a < end; a++)
-                {
-                    value = Math.Max(values[0, a], value);
-                    if (doPeaks)
-                    {
-                        peak = Math.Max(peakValues[0, a], peak);
-                    }
-                    if (doRms)
-                    {
-                        rms = Math.Max(rmsValues[0, a], rms);
-                    }
-                }
-            }
-            else
-            {
-                //If we don't have data then average the closest available bins.
-                if (start > 0)
-                {
-                    start--;
-                }
-                if (end < data.FFTSize)
-                {
-                    end++;
-                }
-                count = end - start;
-                if (count == 0)
-                {
-                    //Sorry.
-                    return;
-                }
-                for (var a = start; a < end; a++)
-                {
-                    value += values[0, a];
-                    if (doPeaks)
-                    {
-                        peak += peakValues[0, a];
-                    }
-                    if (doRms)
-                    {
-                        rms += rmsValues[0, a];
-                    }
-                }
-                value /= count;
+                values[a] = ToDecibelFixed(values[a]);
                 if (doPeaks)
                 {
-                    peak /= count;
+                    peakValues[a] = ToDecibelFixed(peakValues[a]);
                 }
                 if (doRms)
                 {
-                    rms /= count;
+                    rmsValues[a] = ToDecibelFixed(rmsValues[a]);
                 }
-            }
-
-            data.Values[band] = ToDecibelFixed(value);
-            if (doPeaks)
-            {
-                data.PeakValues[band] = ToDecibelFixed(peak);
-            }
-            if (doRms)
-            {
-                data.RmsValues[band] = ToDecibelFixed(rms);
             }
         }
 
@@ -634,17 +564,15 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, int history, IDictionary<string, IntPtr> colors)
+        public static SpectrumRendererData Create(IFFTDataTransformer transformer, int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, int history, IDictionary<string, IntPtr> colors)
         {
             var margin = width > (bands.Length * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData(history, showPeak, showRms, showCrest)
             {
+                Transformer = transformer,
                 Width = width,
                 Height = height,
                 Margin = margin,
-                Bands = bands,
-                MinBand = bands[0],
-                MaxBand = bands[bands.Length - 1],
                 FFTSize = fftSize,
                 Values = new float[bands.Length],
                 Colors = colors,
@@ -691,11 +619,7 @@ namespace FoxTunes
                 }
             }
 
-            public int[] Bands;
-
-            public int MinBand;
-
-            public int MaxBand;
+            public IFFTDataTransformer Transformer;
 
             public float[] Values;
 

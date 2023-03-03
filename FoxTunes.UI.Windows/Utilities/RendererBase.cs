@@ -457,16 +457,6 @@ namespace FoxTunes
             return Math.Min(Math.Max((float)value / Math.Abs(DB_MIN), 0.0f), 1.0f);
         }
 
-        public static int IndexToFrequency(int index, int fftSize, int rate)
-        {
-            var frequency = (int)Math.Floor((double)index * (double)rate / (double)fftSize);
-            if (frequency > rate / 2)
-            {
-                frequency = rate / 2;
-            }
-            return frequency;
-        }
-
         public static int FrequencyToIndex(int frequency, int fftSize, int rate)
         {
             var index = (int)Math.Floor((double)fftSize * (double)frequency / (double)rate);
