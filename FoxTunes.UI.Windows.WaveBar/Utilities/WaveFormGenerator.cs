@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -15,6 +16,8 @@ namespace FoxTunes
 
         public IOutput Output { get; private set; }
 
+        public IOutputStreamDataSourceFactory Factory { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public IntegerConfigurationElement Resolution { get; private set; }
@@ -23,6 +26,7 @@ namespace FoxTunes
         {
             this.Cache = ComponentRegistry.Instance.GetComponent<WaveFormCache>();
             this.Output = core.Components.Output;
+            this.Factory = core.Factories.OutputStreamDataSource;
             this.Configuration = core.Components.Configuration;
             this.Resolution = this.Configuration.GetElement<IntegerConfigurationElement>(
                 WaveFormGeneratorConfiguration.SECTION,
@@ -68,13 +72,16 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\", cannot generate.", stream.FileName);
                     return;
                 }
+                var dataSource = this.Factory.Create(duplicated);
                 switch (duplicated.Format)
                 {
                     case OutputStreamFormat.Short:
-                        PopulateShort(this.Output, duplicated, data);
+                        Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 16 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, data.Resolution);
+                        PopulateShort(this.Output, dataSource, data);
                         break;
                     case OutputStreamFormat.Float:
-                        PopulateFloat(this.Output, duplicated, data);
+                        Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 32 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, data.Resolution);
+                        PopulateFloat(this.Output, dataSource, data);
                         break;
                     default:
                         throw new NotImplementedException();
@@ -113,17 +120,15 @@ namespace FoxTunes
             return WaveFormGeneratorConfiguration.GetConfigurationSections();
         }
 
-        private static void PopulateShort(IOutput output, IOutputStream stream, WaveFormGeneratorData data)
+        private static void PopulateShort(IOutput output, IOutputStreamDataSource dataSource, WaveFormGeneratorData data)
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
-            var buffer = stream.GetBuffer<short>(duration);
+            var buffer = dataSource.GetBuffer<short>(duration);
             var interval = data.Capacity / 10;
-
-            Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 16 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, duration.TotalMilliseconds);
 
             do
             {
-                var length = stream.GetData(buffer);
+                var length = dataSource.GetData(buffer);
                 if (length == 0)
                 {
                     continue;
@@ -179,17 +184,15 @@ namespace FoxTunes
             } while (!data.CancellationToken.IsCancellationRequested);
         }
 
-        private static void PopulateFloat(IOutput output, IOutputStream stream, WaveFormGeneratorData data)
+        private static void PopulateFloat(IOutput output, IOutputStreamDataSource dataSource, WaveFormGeneratorData data)
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
-            var buffer = stream.GetBuffer<float>(duration);
+            var buffer = dataSource.GetBuffer<float>(duration);
             var interval = data.Capacity / 10;
-
-            Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 32 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, duration.TotalMilliseconds);
 
             do
             {
-                var length = stream.GetData(buffer);
+                var length = dataSource.GetData(buffer);
                 if (length == 0)
                 {
                     continue;
