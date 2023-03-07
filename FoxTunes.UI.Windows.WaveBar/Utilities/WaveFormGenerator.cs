@@ -1,7 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Windows;
+using System.IO;
+using System.Windows.Markup;
 
 namespace FoxTunes
 {
@@ -42,25 +43,28 @@ namespace FoxTunes
                 this.Resolution.Value,
                 () =>
                 {
-                    var length = Convert.ToInt32(
-                        Math.Ceiling(
-                            stream.GetDuration(stream.Length).TotalMilliseconds / this.Resolution.Value
-                        )
-                    );
                     var data = new WaveFormGeneratorData()
                     {
                         Resolution = this.Resolution.Value,
-                        Data = new WaveFormDataElement[length, stream.Channels],
-                        Position = 0,
-                        Capacity = length,
-                        Peak = 0,
                         Channels = stream.Channels,
                         CancellationToken = new CancellationToken(),
                     };
+                    this.Allocate(stream, data);
                     this.Dispatch(() => this.Populate(stream, data));
                     return data;
                 }
             );
+        }
+
+        protected virtual void Allocate(IOutputStream stream, WaveFormGeneratorData data)
+        {
+            var length = Convert.ToInt32(
+                Math.Ceiling(
+                    stream.GetDuration(stream.Length).TotalMilliseconds / this.Resolution.Value
+                )
+            );
+            data.Data = new WaveFormDataElement[length, stream.Channels];
+            data.Capacity = length;
         }
 
         protected virtual void Populate(IOutputStream stream, WaveFormGeneratorData data)
