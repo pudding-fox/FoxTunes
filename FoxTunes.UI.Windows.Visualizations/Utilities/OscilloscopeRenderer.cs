@@ -80,7 +80,8 @@ namespace FoxTunes
             var background = palettes.GetOrAdd(
                 OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
-            );
+            );            
+            //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
                 OscilloscopeConfiguration.COLOR_PALETTE_VALUE,
                 () => DefaultColors.GetValue(colors)

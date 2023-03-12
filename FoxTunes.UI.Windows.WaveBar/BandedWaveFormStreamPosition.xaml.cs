@@ -1,6 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -18,66 +16,12 @@ namespace FoxTunes
             this.InitializeComponent();
         }
 
-        public ThemeLoader ThemeLoader { get; private set; }
-
-        public TextConfigurationElement ColorPalette { get; private set; }
-
-        protected override void InitializeComponent(ICore core)
-        {
-            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
-            base.InitializeComponent(core);
-        }
-
-        protected override void OnConfigurationChanged()
-        {
-            if (this.Configuration != null)
-            {
-                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                    BandedWaveFormStreamPositionConfiguration.SECTION,
-                    BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
-                );
-            }
-            base.OnConfigurationChanged();
-        }
-
         public override IEnumerable<string> InvocationCategories
         {
             get
             {
                 yield return CATEGORY;
             }
-        }
-
-        public override IEnumerable<IInvocationComponent> Invocations
-        {
-            get
-            {
-                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette, ColorPaletteRole.WaveForm))
-                {
-                    yield return component;
-                }
-                foreach (var invocationComponent in base.Invocations)
-                {
-                    yield return invocationComponent;
-                }
-            }
-        }
-
-        public override Task InvokeAsync(IInvocationComponent component)
-        {
-            if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
-            {
-                //Nothing to do.
-            }
-            else if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
-            {
-                return this.ShowSettings();
-            }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
         protected override Task<bool> ShowSettings()

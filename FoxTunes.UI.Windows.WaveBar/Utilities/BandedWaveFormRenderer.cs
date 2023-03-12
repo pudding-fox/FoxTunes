@@ -11,6 +11,14 @@ namespace FoxTunes
 {
     public class BandedWaveFormRenderer : RendererBase
     {
+        protected override bool LoadColorPalette
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public BandedWaveFormGenerator.WaveFormGeneratorData GeneratorData { get; private set; }
 
         public WaveFormRendererData RendererData { get; private set; }
@@ -141,11 +149,6 @@ namespace FoxTunes
                 BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
             );
-            //Switch the default colors to the VALUE palette if one was provided.
-            colors = palettes.GetOrAdd(
-                BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE,
-                () => DefaultColors.GetValue(colors)
-            );
             palettes.GetOrAdd(
                 BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_LOW,
                 () => DefaultColors.GetLow(colors)
@@ -162,12 +165,16 @@ namespace FoxTunes
                 pair => pair.Key,
                 pair =>
                 {
+                    if (pair.Value == null)
+                    {
+                        return IntPtr.Zero;
+                    }
                     flags = 0;
                     colors = pair.Value;
                     if (colors.Length > 1)
                     {
                         flags |= BitmapHelper.COLOR_FROM_Y;
-                        if (new[] { BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE, BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_LOW, BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_MID, BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_HIGH }.Contains(pair.Key, StringComparer.OrdinalIgnoreCase))
+                        if (new[] { BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_LOW, BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_MID, BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_HIGH }.Contains(pair.Key, StringComparer.OrdinalIgnoreCase))
                         {
                             colors = colors.MirrorGradient(false);
                         }
@@ -646,11 +653,6 @@ namespace FoxTunes
                 {
                     global::System.Windows.Media.Colors.White.WithAlpha(-100)
                 };
-            }
-
-            public static Color[] GetValue(Color[] colors)
-            {
-                return colors;
             }
         }
     }
