@@ -203,5 +203,50 @@ namespace FoxTunes {
                 return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Section", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Smoothing.
+        /// </summary>
+        internal static string WaveFormStreamPositionConfiguration_Smoothing {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Smoothing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        internal static string WaveFormStreamPositionConfiguration_Smoothing_High {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Smoothing.High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        internal static string WaveFormStreamPositionConfiguration_Smoothing_Low {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Smoothing.Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        internal static string WaveFormStreamPositionConfiguration_Smoothing_Medium {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Smoothing.Medium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        internal static string WaveFormStreamPositionConfiguration_Smoothing_Off {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Smoothing.Off", resourceCulture);
+            }
+        }
     }
 }

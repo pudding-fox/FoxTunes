@@ -27,6 +27,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Logarithmic { get; private set; }
 
+        public IntegerConfigurationElement Smoothing { get; private set; }
+
         public TextConfigurationElement ColorPalette { get; private set; }
 
         protected override void InitializeComponent(ICore core)
@@ -50,6 +52,10 @@ namespace FoxTunes
                 this.Logarithmic = this.Configuration.GetElement<BooleanConfigurationElement>(
                     WaveFormStreamPositionConfiguration.SECTION,
                     WaveFormStreamPositionConfiguration.DB_ELEMENT
+                );
+                this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    WaveFormStreamPositionConfiguration.SECTION,
+                    WaveFormStreamPositionConfiguration.SMOOTHING_ELEMENT
                 );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     WaveFormStreamPositionConfiguration.SECTION,
@@ -97,6 +103,34 @@ namespace FoxTunes
                     this.Logarithmic.Name,
                     attributes: this.Logarithmic.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.WaveFormStreamPositionConfiguration_Smoothing_Off,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == WaveFormStreamPositionConfiguration.SMOOTHING_MIN ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.WaveFormStreamPositionConfiguration_Smoothing_Low,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == WaveFormStreamPositionConfiguration.SMOOTHING_LOW ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.WaveFormStreamPositionConfiguration_Smoothing_Medium,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == WaveFormStreamPositionConfiguration.SMOOTHING_MEDIUM ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.WaveFormStreamPositionConfiguration_Smoothing_High,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == WaveFormStreamPositionConfiguration.SMOOTHING_MAX ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
                 foreach (var invocationComponent in base.Invocations)
                 {
                     yield return invocationComponent;
@@ -117,6 +151,25 @@ namespace FoxTunes
             else if (string.Equals(this.Logarithmic.Name, component.Name))
             {
                 this.Logarithmic.Toggle();
+            }
+            else if (string.Equals(this.Smoothing.Name, component.Path))
+            {
+                if (string.Equals(component.Name, Strings.WaveFormStreamPositionConfiguration_Smoothing_Off, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = WaveFormStreamPositionConfiguration.SMOOTHING_MIN;
+                }
+                else if (string.Equals(component.Name, Strings.WaveFormStreamPositionConfiguration_Smoothing_Low, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = WaveFormStreamPositionConfiguration.SMOOTHING_LOW;
+                }
+                else if (string.Equals(component.Name, Strings.WaveFormStreamPositionConfiguration_Smoothing_Medium, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = WaveFormStreamPositionConfiguration.SMOOTHING_MEDIUM;
+                }
+                else if (string.Equals(component.Name, Strings.WaveFormStreamPositionConfiguration_Smoothing_High, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = WaveFormStreamPositionConfiguration.SMOOTHING_MAX;
+                }
             }
             else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
             {

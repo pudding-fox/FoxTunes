@@ -165,4 +165,19 @@
   <data name="WaveFormStreamPositionConfiguration.DB" xml:space="preserve">
     <value>Logarithmic (dB)</value>
   </data>
+  <data name="WaveFormStreamPositionConfiguration.Smoothing" xml:space="preserve">
+    <value>Smoothing</value>
+  </data>
+  <data name="WaveFormStreamPositionConfiguration.Smoothing.Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="WaveFormStreamPositionConfiguration.Smoothing.High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="WaveFormStreamPositionConfiguration.Smoothing.Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="WaveFormStreamPositionConfiguration.Smoothing.Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
 </root>
