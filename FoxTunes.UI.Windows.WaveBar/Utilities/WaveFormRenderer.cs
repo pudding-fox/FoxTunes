@@ -3,15 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D.Converters;
 
 namespace FoxTunes
 {
     public class WaveFormRenderer : RendererBase
     {
+        public object SyncRoot = new object();
+
         public WaveFormGenerator.WaveFormGeneratorData GeneratorData { get; private set; }
 
         public WaveFormRendererData RendererData { get; private set; }
@@ -275,6 +279,8 @@ namespace FoxTunes
                 //No bitmap or failed to establish lock.
                 return;
             }
+
+            Monitor.Enter(this.SyncRoot);
             try
             {
                 Render(ref info, data);
@@ -282,6 +288,10 @@ namespace FoxTunes
             catch (Exception e)
             {
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
+            }
+            finally
+            {
+                Monitor.Exit(this.SyncRoot);
             }
 
             await Windows.Invoke(() =>
@@ -293,23 +303,31 @@ namespace FoxTunes
 
         public void Update()
         {
-            var generatorData = this.GeneratorData;
-            var rendererData = this.RendererData;
-            if (generatorData != null && rendererData != null)
+            Monitor.Enter(this.SyncRoot);
+            try
             {
-                try
+                var generatorData = this.GeneratorData;
+                var rendererData = this.RendererData;
+                if (generatorData != null && rendererData != null)
                 {
-                    Update(
-                        generatorData,
-                        rendererData
-                    );
+                    try
+                    {
+                        Update(
+                            generatorData,
+                            rendererData
+                        );
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
+                        return;
+                    }
+                    var task = this.Render(rendererData);
                 }
-                catch (Exception e)
-                {
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
-                    return;
-                }
-                var task = this.Render(rendererData);
+            }
+            finally
+            {
+                Monitor.Exit(this.SyncRoot);
             }
         }
 
@@ -370,15 +388,6 @@ namespace FoxTunes
 
         private static void Update(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
-            if (generatorData.Peak == 0)
-            {
-                return;
-            }
-            else
-            {
-                UpdatePeak(generatorData, rendererData);
-            }
-
             if (rendererData.Channels == 1)
             {
                 UpdateViewMono(generatorData, rendererData);
@@ -391,31 +400,11 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdatePeak(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
-        {
-            var peak = GetPeak(generatorData, rendererData);
-            if (generatorData.Peak > rendererData.Peak || peak > rendererData.NormalizedPeak)
-            {
-                rendererData.Position = 0;
-                rendererData.View.Position = 0;
-                rendererData.Peak = generatorData.Peak;
-                rendererData.NormalizedPeak = peak;
-            }
-        }
-
         private static void UpdateViewMono(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
-            var factor = rendererData.NormalizedPeak;
             var logarithmic = rendererData.Logarithmic;
             var rms = rendererData.View.Rms != null;
             var valuesPerElement = rendererData.ValuesPerElement;
-
-            if (factor == 0)
-            {
-                //Peak has not been calculated.
-                //I don't know how this happens, but it does.
-                return;
-            }
 
             for (; rendererData.View.Position < rendererData.Width; rendererData.View.Position++)
             {
@@ -428,7 +417,7 @@ namespace FoxTunes
                 var value = default(float);
                 for (var a = 0; a < valuesPerElement; a++)
                 {
-                    for (var b = 0; b < rendererData.View.Channels; b++)
+                    for (var b = 0; b < rendererData.Channels; b++)
                     {
                         value += Math.Max(
                             Math.Abs(
@@ -438,39 +427,32 @@ namespace FoxTunes
                         );
                     }
                 }
-                value /= (valuesPerElement * rendererData.View.Channels);
+                value /= (valuesPerElement * rendererData.Channels);
 
                 if (logarithmic)
                 {
                     value = ToDecibelFixed(value);
                 }
-                else
-                {
-                    value /= factor;
-                }
 
                 value = Math.Min(value, 1);
 
+                rendererData.View.Peak = Math.Max(value, rendererData.View.Peak);
                 rendererData.View.Data[0, rendererData.View.Position] = value;
 
                 if (rms)
                 {
                     for (var a = 0; a < valuesPerElement; a++)
                     {
-                        for (var b = 0; b < rendererData.View.Channels; b++)
+                        for (var b = 0; b < rendererData.Channels; b++)
                         {
                             value += generatorData.Data[valuePosition + a, b].Rms;
                         }
                     }
-                    value /= (valuesPerElement * rendererData.View.Channels);
+                    value /= (valuesPerElement * rendererData.Channels);
 
                     if (logarithmic)
                     {
                         value = ToDecibelFixed(value);
-                    }
-                    else
-                    {
-                        value /= factor;
                     }
 
                     value = Math.Min(value, 1);
@@ -482,7 +464,7 @@ namespace FoxTunes
             {
                 if (generatorData.Position == generatorData.Capacity)
                 {
-                    NoiseReduction(rendererData.View.Data, 1, rendererData.Width, rendererData.Smoothing);
+                    rendererData.View.Peak = NoiseReduction(rendererData.View.Data, 1, rendererData.Width, rendererData.Smoothing);
                     if (rms)
                     {
                         NoiseReduction(rendererData.View.Rms, 1, rendererData.Width, rendererData.Smoothing);
@@ -494,17 +476,9 @@ namespace FoxTunes
 
         private static void UpdateViewSeperate(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
-            var factor = rendererData.NormalizedPeak / generatorData.Channels;
             var logarithmic = rendererData.Logarithmic;
             var rms = rendererData.View.Rms != null;
             var valuesPerElement = rendererData.ValuesPerElement;
-
-            if (factor == 0)
-            {
-                //Peak has not been calculated.
-                //I don't know how this happens, but it does.
-                return;
-            }
 
             for (; rendererData.View.Position < rendererData.Width; rendererData.View.Position++)
             {
@@ -515,7 +489,7 @@ namespace FoxTunes
                 }
 
                 var value = default(float);
-                for (var channel = 0; channel < rendererData.View.Channels; channel++)
+                for (var channel = 0; channel < rendererData.Channels; channel++)
                 {
                     for (var a = 0; a < valuesPerElement; a++)
                     {
@@ -532,13 +506,10 @@ namespace FoxTunes
                     {
                         value = ToDecibelFixed(value);
                     }
-                    else
-                    {
-                        value /= factor;
-                    }
 
                     value = Math.Min(value, 1);
 
+                    rendererData.View.Peak = Math.Max(value, rendererData.View.Peak);
                     rendererData.View.Data[channel, rendererData.View.Position] = value;
 
                     if (rms)
@@ -553,10 +524,6 @@ namespace FoxTunes
                         {
                             value = ToDecibelFixed(value);
                         }
-                        else
-                        {
-                            value /= factor;
-                        }
 
                         value = Math.Min(value, 1);
 
@@ -568,10 +535,10 @@ namespace FoxTunes
             {
                 if (generatorData.Position == generatorData.Capacity)
                 {
-                    NoiseReduction(rendererData.View.Data, rendererData.View.Channels, rendererData.Width, rendererData.Smoothing);
+                    rendererData.View.Peak = NoiseReduction(rendererData.View.Data, rendererData.Channels, rendererData.Width, rendererData.Smoothing);
                     if (rms)
                     {
-                        NoiseReduction(rendererData.View.Rms, rendererData.View.Channels, rendererData.Width, rendererData.Smoothing);
+                        NoiseReduction(rendererData.View.Rms, rendererData.Channels, rendererData.Width, rendererData.Smoothing);
                     }
                     rendererData.Position = 0;
                 }
@@ -581,15 +548,6 @@ namespace FoxTunes
         private static void UpdateMono(WaveFormRendererData rendererData)
         {
             var center = rendererData.Height / 2.0f;
-            var factor = rendererData.NormalizedPeak;
-
-            if (factor == 0)
-            {
-                //Peak has not been calculated.
-                //I don't know how this happens, but it does.
-                return;
-            }
-
             var data = rendererData.View.Data;
             var rms = rendererData.View.Rms;
             var waveElements = rendererData.WaveElements;
@@ -598,7 +556,7 @@ namespace FoxTunes
             while (rendererData.Position < rendererData.View.Position)
             {
                 {
-                    var value = data[0, rendererData.Position];
+                    var value = data[0, rendererData.Position] / rendererData.View.Peak;
                     var y = Convert.ToInt32(center - (value * center));
                     var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
@@ -611,7 +569,7 @@ namespace FoxTunes
 
                 if (powerElements != null)
                 {
-                    var value = rms[0, rendererData.Position];
+                    var value = rms[0, rendererData.Position] / rendererData.View.Peak;
                     var y = Convert.ToInt32(center - (value * center));
                     var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
@@ -628,15 +586,6 @@ namespace FoxTunes
 
         private static void UpdateSeperate(WaveFormRendererData rendererData)
         {
-            var factor = rendererData.NormalizedPeak / rendererData.Channels;
-
-            if (factor == 0)
-            {
-                //Peak has not been calculated.
-                //I don't know how this happens, but it does.
-                return;
-            }
-
             var data = rendererData.View.Data;
             var rms = rendererData.View.Rms;
             var waveElements = rendererData.WaveElements;
@@ -651,7 +600,7 @@ namespace FoxTunes
                     var waveCenter = (waveHeight * channel) + (waveHeight / 2);
 
                     {
-                        var value = data[channel, rendererData.Position];
+                        var value = data[channel, rendererData.Position] / rendererData.View.Peak;
                         var y = Convert.ToInt32(waveCenter - (value * (waveHeight / 2)));
                         var height = Math.Max(Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2))), 1);
 
@@ -664,7 +613,7 @@ namespace FoxTunes
 
                     if (powerElements != null)
                     {
-                        var value = rms[channel, rendererData.Position];
+                        var value = rms[channel, rendererData.Position] / rendererData.View.Peak;
                         var y = Convert.ToInt32(waveCenter - (value * (waveHeight / 2)));
                         var height = Math.Max(Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2))), 1);
 
@@ -678,60 +627,6 @@ namespace FoxTunes
 
                 rendererData.Position++;
             }
-        }
-
-        public static float GetPeak(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
-        {
-            var data = generatorData.Data;
-            var valuesPerElement = rendererData.ValuesPerElement;
-            var peak = rendererData.NormalizedPeak;
-            var logarithmic = rendererData.Logarithmic;
-
-            var position = rendererData.Position;
-            while (position < rendererData.Capacity)
-            {
-                var valuePosition = position * rendererData.ValuesPerElement;
-                if ((valuePosition + rendererData.ValuesPerElement) > generatorData.Position)
-                {
-                    if (generatorData.Position <= generatorData.Capacity)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        valuesPerElement = generatorData.Capacity - valuePosition;
-                    }
-                }
-
-                var value = default(float);
-                for (var a = 0; a < valuesPerElement; a++)
-                {
-                    for (var b = 0; b < generatorData.Channels; b++)
-                    {
-                        value += Math.Max(
-                            Math.Abs(data[valuePosition + a, b].Min),
-                            Math.Abs(data[valuePosition + a, b].Max)
-                        );
-                    }
-                }
-                value /= (valuesPerElement * generatorData.Channels);
-
-                if (logarithmic)
-                {
-                    value = ToDecibelFixed(value);
-                }
-
-                peak = Math.Max(peak, value);
-
-                if (peak >= 1)
-                {
-                    return 1;
-                }
-
-                position++;
-            }
-
-            return peak;
         }
 
         private static WaveFormRenderInfo GetRenderInfo(WriteableBitmap bitmap, WaveFormRendererData data)
@@ -793,9 +688,6 @@ namespace FoxTunes
                 Colors = colors,
                 Capacity = width,
                 View = new WaveFormGeneratorDataView()
-                {
-                    Channels = generatorData.Channels
-                }
             };
             switch (mode)
             {
@@ -830,7 +722,7 @@ namespace FoxTunes
 
             public float[,] Rms;
 
-            public int Channels;
+            public float Peak;
 
             public int Position;
         }
@@ -858,10 +750,6 @@ namespace FoxTunes
             public int Position;
 
             public int Capacity;
-
-            public float Peak;
-
-            public float NormalizedPeak;
 
             public WaveFormGeneratorDataView View;
 

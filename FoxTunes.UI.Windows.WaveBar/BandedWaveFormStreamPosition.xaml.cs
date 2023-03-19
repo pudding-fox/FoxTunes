@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Logarithmic { get; private set; }
 
+        public IntegerConfigurationElement Smoothing { get; private set; }
+
         protected override void OnConfigurationChanged()
         {
             if (this.Configuration != null)
@@ -27,6 +29,10 @@ namespace FoxTunes
                 this.Logarithmic = this.Configuration.GetElement<BooleanConfigurationElement>(
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.DB_ELEMENT
+                );
+                this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    BandedWaveFormStreamPositionConfiguration.SECTION,
+                    BandedWaveFormStreamPositionConfiguration.SMOOTHING_ELEMENT
                 );
             }
             base.OnConfigurationChanged();
@@ -50,6 +56,34 @@ namespace FoxTunes
                     this.Logarithmic.Name,
                     attributes: this.Logarithmic.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_Off,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == BandedWaveFormStreamPositionConfiguration.SMOOTHING_MIN ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_Low,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == BandedWaveFormStreamPositionConfiguration.SMOOTHING_LOW ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_Medium,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == BandedWaveFormStreamPositionConfiguration.SMOOTHING_MEDIUM ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Smoothing.Id,
+                    Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_High,
+                    path: this.Smoothing.Name,
+                    attributes: this.Smoothing.Value == BandedWaveFormStreamPositionConfiguration.SMOOTHING_MAX ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
                 foreach (var invocationComponent in base.Invocations)
                 {
                     yield return invocationComponent;
@@ -62,6 +96,25 @@ namespace FoxTunes
             if (string.Equals(this.Logarithmic.Name, component.Name))
             {
                 this.Logarithmic.Toggle();
+            }
+            else if (string.Equals(this.Smoothing.Name, component.Path))
+            {
+                if (string.Equals(component.Name, Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_Off, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = BandedWaveFormStreamPositionConfiguration.SMOOTHING_MIN;
+                }
+                else if (string.Equals(component.Name, Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_Low, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = BandedWaveFormStreamPositionConfiguration.SMOOTHING_LOW;
+                }
+                else if (string.Equals(component.Name, Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_Medium, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = BandedWaveFormStreamPositionConfiguration.SMOOTHING_MEDIUM;
+                }
+                else if (string.Equals(component.Name, Strings.BandedWaveFormStreamPositionConfiguration_Smoothing_High, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Smoothing.Value = BandedWaveFormStreamPositionConfiguration.SMOOTHING_MAX;
+                }
             }
             else if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
             {

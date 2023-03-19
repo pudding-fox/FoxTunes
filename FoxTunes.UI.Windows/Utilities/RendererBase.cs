@@ -691,8 +691,9 @@ namespace FoxTunes
 #endif
         }
 
-        protected static void NoiseReduction(float[] values, int count, int smoothing)
+        protected static float NoiseReduction(float[] values, int count, int smoothing)
         {
+            var peak = default(float);
             for (var a = 0; a < count; a++)
             {
                 var start = Math.Max(a - smoothing, 0);
@@ -704,27 +705,31 @@ namespace FoxTunes
                 }
                 value /= end - start;
                 values[a] = value;
+                peak = Math.Max(value, peak);
             }
+            return peak;
         }
 
-        protected static void NoiseReduction(float[,] values, int countx, int county, int smoothing)
+        protected static float NoiseReduction(float[,] values, int countx, int county, int smoothing)
         {
-            var value = default(float);
+            var peak = default(float);
             for (var y = 0; y < county; y++)
             {
                 var start = Math.Max(y - smoothing, 0);
                 var end = Math.Min(y + smoothing, county);
                 for (var x = 0; x < countx; x++)
                 {
-                    value = 0;
+                    var value = default(float);
                     for (var a = start; a < end; a++)
                     {
                         value += values[x, a];
                     }
                     value /= end - start;
                     values[x, y] = value;
+                    peak = Math.Max(value, peak);
                 }
             }
+            return peak;
         }
     }
 

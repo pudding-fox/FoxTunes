@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -11,6 +12,8 @@ namespace FoxTunes
 {
     public class BandedWaveFormRenderer : RendererBase
     {
+        public object SyncRoot = new object();
+
         protected override bool LoadColorPalette
         {
             get
@@ -30,6 +33,8 @@ namespace FoxTunes
         public IntegerConfigurationElement Resolution { get; private set; }
 
         public BooleanConfigurationElement Logarithmic { get; private set; }
+
+        public IntegerConfigurationElement Smoothing { get; private set; }
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
@@ -53,12 +58,17 @@ namespace FoxTunes
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.DB_ELEMENT
                 );
+                this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    BandedWaveFormStreamPositionConfiguration.SECTION,
+                    BandedWaveFormStreamPositionConfiguration.SMOOTHING_ELEMENT
+                );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
                 );
                 this.Resolution.ValueChanged += this.OnValueChanged;
                 this.Logarithmic.ValueChanged += this.OnValueChanged;
+                this.Smoothing.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
 #if NET40
                 var task = TaskEx.Run(async () =>
@@ -139,6 +149,7 @@ namespace FoxTunes
                 width,
                 height,
                 this.Logarithmic.Value,
+                this.Smoothing.Value,
                 this.GetColorPalettes(this.ColorPalette.Value, this.Colors)
             );
             if (this.RendererData == null)
@@ -255,6 +266,8 @@ namespace FoxTunes
                 //No bitmap or failed to establish lock.
                 return;
             }
+
+            Monitor.Enter(this.SyncRoot);
             try
             {
                 Render(ref info, data);
@@ -262,6 +275,10 @@ namespace FoxTunes
             catch (Exception e)
             {
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
+            }
+            finally
+            {
+                Monitor.Exit(this.SyncRoot);
             }
 
             await Windows.Invoke(() =>
@@ -273,23 +290,31 @@ namespace FoxTunes
 
         public void Update()
         {
-            var generatorData = this.GeneratorData;
-            var rendererData = this.RendererData;
-            if (generatorData != null && rendererData != null)
+            Monitor.Enter(this.SyncRoot);
+            try
             {
-                try
+                var generatorData = this.GeneratorData;
+                var rendererData = this.RendererData;
+                if (generatorData != null && rendererData != null)
                 {
-                    Update(
-                        generatorData,
-                        rendererData
-                    );
+                    try
+                    {
+                        Update(
+                            generatorData,
+                            rendererData
+                        );
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
+                        return;
+                    }
+                    var task = this.Render(rendererData);
                 }
-                catch (Exception e)
-                {
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
-                    return;
-                }
-                var task = this.Render(rendererData);
+            }
+            finally
+            {
+                Monitor.Exit(this.SyncRoot);
             }
         }
 
@@ -329,6 +354,10 @@ namespace FoxTunes
             {
                 this.Logarithmic.ValueChanged -= this.OnValueChanged;
             }
+            if (this.Smoothing != null)
+            {
+                this.Smoothing.ValueChanged -= this.OnValueChanged;
+            }
             if (this.ColorPalette != null)
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
@@ -338,185 +367,125 @@ namespace FoxTunes
 
         private static void Update(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
-            if (generatorData.Peak == 0)
-            {
-                return;
-            }
-            else
-            {
-                UpdatePeak(generatorData, rendererData);
-            }
-
-            UpdateElements(generatorData, rendererData);
+            UpdateView(generatorData, rendererData);
+            UpdateElements(rendererData);
         }
 
-        private static void UpdatePeak(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
+        private static void UpdateView(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
-            var peak = GetPeak(generatorData, rendererData);
-            if (generatorData.Peak > rendererData.Peak || peak > rendererData.NormalizedPeak)
+            var logarithmic = rendererData.Logarithmic;
+            var valuesPerElement = rendererData.ValuesPerElement;
+
+            for (; rendererData.View.Position < rendererData.Width; rendererData.View.Position++)
             {
-                rendererData.Position = 0;
-                rendererData.Peak = generatorData.Peak;
-                rendererData.NormalizedPeak = peak;
+                var valuePosition = rendererData.View.Position * rendererData.ValuesPerElement;
+                if ((valuePosition + rendererData.ValuesPerElement) > generatorData.Position)
+                {
+                    break;
+                }
+
+                var low = default(float);
+                var mid = default(float);
+                var high = default(float);
+                for (var a = 0; a < valuesPerElement; a++)
+                {
+                    low += generatorData.Data[valuePosition + a].Low;
+                    mid += generatorData.Data[valuePosition + a].Mid;
+                    high += generatorData.Data[valuePosition + a].High;
+                }
+
+                low /= valuesPerElement;
+                mid /= valuesPerElement;
+                high /= valuesPerElement;
+
+                if (logarithmic)
+                {
+                    low = ToDecibelFixed(low);
+                    mid = ToDecibelFixed(mid);
+                    high = ToDecibelFixed(high);
+                }
+
+                low = Math.Min(low, 1);
+                mid = Math.Min(mid, 1);
+                high = Math.Min(high, 1);
+
+                rendererData.View.Peak = Math.Max(
+                    Math.Max(
+                        Math.Max(
+                            low,
+                            mid
+                        ),
+                        high
+                    ),
+                    rendererData.View.Peak
+                );
+                rendererData.View.Low[rendererData.View.Position] = low;
+                rendererData.View.Mid[rendererData.View.Position] = mid;
+                rendererData.View.High[rendererData.View.Position] = high;
+            }
+            if (rendererData.Smoothing > 0)
+            {
+                if (generatorData.Position == generatorData.Capacity)
+                {
+                    rendererData.View.Peak = Math.Max(
+                        Math.Max(
+                            NoiseReduction(rendererData.View.Low, rendererData.Width, rendererData.Smoothing),
+                            NoiseReduction(rendererData.View.Mid, rendererData.Width, rendererData.Smoothing)
+                        ),
+                        NoiseReduction(rendererData.View.High, rendererData.Width, rendererData.Smoothing)
+                    );
+                    rendererData.Position = 0;
+                }
             }
         }
 
-        private static void UpdateElements(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
+        private static void UpdateElements(WaveFormRendererData rendererData)
         {
             var center = rendererData.Height / 2.0f;
-            var factor = rendererData.NormalizedPeak;
-            var logarithmic = rendererData.Logarithmic;
-
-            if (factor == 0)
-            {
-                //Peak has not been calculated.
-                //I don't know how this happens, but it does.
-                return;
-            }
-
-            var data = generatorData.Data;
+            var low = rendererData.View.Low;
+            var mid = rendererData.View.Mid;
+            var high = rendererData.View.High;
             var lowElements = rendererData.LowElements;
             var midElements = rendererData.MidElements;
             var highElements = rendererData.HighElements;
-            var valuesPerElement = rendererData.ValuesPerElement;
 
-            while (rendererData.Position < rendererData.Capacity)
+            while (rendererData.Position < rendererData.View.Position)
             {
-                var valuePosition = rendererData.Position * rendererData.ValuesPerElement;
-                if ((valuePosition + rendererData.ValuesPerElement) > generatorData.Position)
                 {
-                    if (generatorData.Position <= generatorData.Capacity)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        valuesPerElement = generatorData.Capacity - valuePosition;
-                    }
+                    var value = low[rendererData.Position] / rendererData.View.Peak;
+                    var y = Convert.ToInt32(center - (value * center));
+                    var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
+
+                    lowElements[rendererData.Position].X = rendererData.Position;
+                    lowElements[rendererData.Position].Y = y;
+                    lowElements[rendererData.Position].Width = 1;
+                    lowElements[rendererData.Position].Height = height;
                 }
 
                 {
+                    var value = mid[rendererData.Position] / rendererData.View.Peak;
+                    var y = Convert.ToInt32(center - (value * center));
+                    var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
-                    var y = default(int);
-                    var height = default(int);
+                    midElements[rendererData.Position].X = rendererData.Position;
+                    midElements[rendererData.Position].Y = y;
+                    midElements[rendererData.Position].Width = 1;
+                    midElements[rendererData.Position].Height = height;
+                }
 
-                    var lowValue = default(float);
-                    var midValue = default(float);
-                    var highValue = default(float);
-                    for (var a = 0; a < valuesPerElement; a++)
-                    {
-                        lowValue += data[valuePosition + a].Low;
-                        midValue += data[valuePosition + a].Mid;
-                        highValue += data[valuePosition + a].High;
-                    }
-                    lowValue /= valuesPerElement;
-                    midValue /= valuesPerElement;
-                    highValue /= valuesPerElement;
+                {
+                    var value = high[rendererData.Position] / rendererData.View.Peak;
+                    var y = Convert.ToInt32(center - (value * center));
+                    var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
-                    if (logarithmic)
-                    {
-                        lowValue = ToDecibelFixed(lowValue);
-                        midValue = ToDecibelFixed(midValue);
-                        highValue = ToDecibelFixed(highValue);
-                    }
-                    else
-                    {
-                        lowValue /= factor;
-                        midValue /= factor;
-                        highValue /= factor;
-                    }
-
-                    lowValue = Math.Min(lowValue, 1);
-                    midValue = Math.Min(midValue, 1);
-                    highValue = Math.Min(highValue, 1);
-
-                    {
-                        y = Convert.ToInt32(center - (lowValue * center));
-                        height = Math.Max(Convert.ToInt32((center - y) + (lowValue * center)), 1);
-
-                        lowElements[rendererData.Position].X = rendererData.Position;
-                        lowElements[rendererData.Position].Y = y;
-                        lowElements[rendererData.Position].Width = 1;
-                        lowElements[rendererData.Position].Height = height;
-                    }
-
-                    {
-                        y = Convert.ToInt32(center - (midValue * center));
-                        height = Math.Max(Convert.ToInt32((center - y) + (midValue * center)), 1);
-
-                        midElements[rendererData.Position].X = rendererData.Position;
-                        midElements[rendererData.Position].Y = y;
-                        midElements[rendererData.Position].Width = 1;
-                        midElements[rendererData.Position].Height = height;
-                    }
-
-                    {
-                        y = Convert.ToInt32(center - (highValue * center));
-                        height = Math.Max(Convert.ToInt32((center - y) + (highValue * center)), 1);
-
-                        highElements[rendererData.Position].X = rendererData.Position;
-                        highElements[rendererData.Position].Y = y;
-                        highElements[rendererData.Position].Width = 1;
-                        highElements[rendererData.Position].Height = height;
-                    }
+                    highElements[rendererData.Position].X = rendererData.Position;
+                    highElements[rendererData.Position].Y = y;
+                    highElements[rendererData.Position].Width = 1;
+                    highElements[rendererData.Position].Height = height;
                 }
 
                 rendererData.Position++;
             }
-        }
-
-        public static float GetPeak(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
-        {
-            var data = generatorData.Data;
-            var valuesPerElement = rendererData.ValuesPerElement;
-            var peak = rendererData.NormalizedPeak;
-            var logarithmic = rendererData.Logarithmic;
-
-            var position = rendererData.Position;
-            while (position < rendererData.Capacity)
-            {
-                var valuePosition = position * rendererData.ValuesPerElement;
-                if ((valuePosition + rendererData.ValuesPerElement) > generatorData.Position)
-                {
-                    if (generatorData.Position <= generatorData.Capacity)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        valuesPerElement = generatorData.Capacity - valuePosition;
-                    }
-                }
-
-                var value = default(float);
-                for (var a = 0; a < valuesPerElement; a++)
-                {
-                    value += Math.Max(
-                        Math.Max(
-                            data[valuePosition + a].Low,
-                            data[valuePosition + a].Mid
-                        ),
-                        data[valuePosition + a].High
-                    );
-                }
-                value /= valuesPerElement;
-
-                if (logarithmic)
-                {
-                    value = ToDecibelFixed(value);
-                }
-
-                peak = Math.Max(peak, value);
-
-                if (peak >= 1)
-                {
-                    return 1;
-                }
-
-                position++;
-            }
-
-            return peak;
         }
 
         private static WaveFormRenderInfo GetRenderInfo(WriteableBitmap bitmap, WaveFormRendererData data)
@@ -569,7 +538,7 @@ namespace FoxTunes
             }
         }
 
-        public static WaveFormRendererData Create(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool logarithmic, IDictionary<string, IntPtr> colors)
+        public static WaveFormRendererData Create(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool logarithmic, int smoothing, IDictionary<string, IntPtr> colors)
         {
             var valuesPerElement = generatorData.Capacity / width;
             if (valuesPerElement == 0)
@@ -581,16 +550,34 @@ namespace FoxTunes
                 Width = width,
                 Height = height,
                 Logarithmic = logarithmic,
+                Smoothing = smoothing,
                 ValuesPerElement = valuesPerElement,
                 Colors = colors,
                 LowElements = new Int32Rect[width],
                 MidElements = new Int32Rect[width],
                 HighElements = new Int32Rect[width],
-                Position = 0,
                 Capacity = width,
-                Peak = 0
+                View = new WaveFormGeneratorDataView()
+                {
+                    Low = new float[width],
+                    Mid = new float[width],
+                    High = new float[width]
+                }
             };
             return data;
+        }
+
+        public class WaveFormGeneratorDataView
+        {
+            public float[] Low;
+
+            public float[] Mid;
+
+            public float[] High;
+
+            public float Peak;
+
+            public int Position;
         }
 
         public class WaveFormRendererData
@@ -600,6 +587,8 @@ namespace FoxTunes
             public int Height;
 
             public bool Logarithmic;
+
+            public int Smoothing;
 
             public int ValuesPerElement;
 
@@ -615,9 +604,7 @@ namespace FoxTunes
 
             public int Capacity;
 
-            public float Peak;
-
-            public float NormalizedPeak;
+            public WaveFormGeneratorDataView View;
 
             ~WaveFormRendererData()
             {
