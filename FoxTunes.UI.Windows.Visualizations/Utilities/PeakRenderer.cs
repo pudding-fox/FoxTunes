@@ -412,14 +412,17 @@ namespace FoxTunes
             {
                 for (var position = 0; position < data.SampleCount; position++)
                 {
-                    data.Values[channel] = Math.Max(data.Values[channel], data.Data[channel, position]);
+                    var value = Math.Min(Math.Max(Math.Abs(data.Data[channel, position]), 0.0f), 1.0f);
+                    data.Values[channel] = Math.Max(data.Values[channel], value);
                     if (data.PeakValues != null)
                     {
-                        data.PeakValues[channel] = Math.Max(data.PeakValues[channel], data.History.Peak[channel, position]);
+                        value = Math.Min(Math.Max(Math.Abs(data.History.Peak[channel, position]), 0.0f), 1.0f);
+                        data.PeakValues[channel] = Math.Max(data.PeakValues[channel], value);
                     }
                     if (data.RmsValues != null)
                     {
-                        data.RmsValues[channel] = Math.Max(data.RmsValues[channel], data.History.Rms[channel, position]);
+                        value = Math.Min(Math.Max(Math.Abs(data.History.Rms[channel, position]), 0.0f), 1.0f);
+                        data.RmsValues[channel] = Math.Max(data.RmsValues[channel], value);
                     }
                 }
             }
