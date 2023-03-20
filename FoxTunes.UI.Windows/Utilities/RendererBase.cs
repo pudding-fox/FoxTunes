@@ -759,26 +759,12 @@ namespace FoxTunes
 
         public static Color Shade(this Color color1, Color color2)
         {
-            if (color1.IsLighter())
-            {
-                //Create darner shade.
-                return Color.FromArgb(
-                    color1.A,
-                    Convert.ToByte(Math.Min(color1.R - color2.R, byte.MaxValue)),
-                    Convert.ToByte(Math.Min(color1.G - color2.G, byte.MaxValue)),
-                    Convert.ToByte(Math.Min(color1.B - color2.B, byte.MaxValue))
-                );
-            }
-            else
-            {
-                //Create lighter shade.
-                return Color.FromArgb(
-                    color1.A,
-                    Convert.ToByte(Math.Min(color1.R + color2.R, byte.MaxValue)),
-                    Convert.ToByte(Math.Min(color1.G + color2.G, byte.MaxValue)),
-                    Convert.ToByte(Math.Min(color1.B + color2.B, byte.MaxValue))
-                );
-            }
+            return Color.FromArgb(
+                color1.A,
+                Convert.ToByte(Math.Max(color1.R - color2.R, byte.MinValue)),
+                Convert.ToByte(Math.Max(color1.G - color2.G, byte.MinValue)),
+                Convert.ToByte(Math.Max(color1.B - color2.B, byte.MinValue))
+            );
         }
 
         public static Color[] ToPair(this Color color, byte shade)
