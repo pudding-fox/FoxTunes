@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace FoxTunes
 {
@@ -14,10 +15,10 @@ namespace FoxTunes
 
         public WaveFormCache()
         {
-            this.Store = new CappedDictionary<Key, WaveFormGenerator.WaveFormGeneratorData>(CACHE_SIZE);
+            this.Store = new CappedDictionary<Key, Lazy<WaveFormGenerator.WaveFormGeneratorData>>(CACHE_SIZE);
         }
 
-        public CappedDictionary<Key, WaveFormGenerator.WaveFormGeneratorData> Store { get; private set; }
+        public CappedDictionary<Key, Lazy<WaveFormGenerator.WaveFormGeneratorData>> Store { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -36,23 +37,28 @@ namespace FoxTunes
         public WaveFormGenerator.WaveFormGeneratorData GetOrCreate(IOutputStream stream, int resolution, Func<WaveFormGenerator.WaveFormGeneratorData> factory)
         {
             var key = new Key(stream.FileName, stream.Length, resolution);
-            return this.Store.GetOrAdd(key, () =>
-            {
-                if (this.Enabled.Value)
-                {
-                    var id = this.GetDataId(stream, resolution);
-                    var fileName = default(string);
-                    if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+            return this.Store.GetOrAdd(
+                key,
+                () => new Lazy<WaveFormGenerator.WaveFormGeneratorData>(
+                    () =>
                     {
-                        var data = default(WaveFormGenerator.WaveFormGeneratorData);
-                        if (this.TryLoad(fileName, out data))
+                        if (this.Enabled.Value)
                         {
-                            return data;
+                            var id = this.GetDataId(stream, resolution);
+                            var fileName = default(string);
+                            if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                            {
+                                var data = default(WaveFormGenerator.WaveFormGeneratorData);
+                                if (this.TryLoad(fileName, out data))
+                                {
+                                    return data;
+                                }
+                            }
                         }
+                        return factory();
                     }
-                }
-                return factory();
-            });
+                )
+            ).Value;
         }
 
         public bool Remove(IOutputStream stream, int resolution)
