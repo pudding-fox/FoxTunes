@@ -139,13 +139,13 @@ namespace FoxTunes
             }
             else
             {
-                if (outputStream.IsPlaying)
-                {
-                    this.TransportControls.PlaybackStatus = MediaPlaybackStatus.Playing;
-                }
-                else if (outputStream.IsPaused)
+                if (outputStream.IsPaused)
                 {
                     this.TransportControls.PlaybackStatus = MediaPlaybackStatus.Paused;
+                }
+                else if (outputStream.IsPlaying)
+                {
+                    this.TransportControls.PlaybackStatus = MediaPlaybackStatus.Playing;
                 }
                 else if (outputStream.IsStopped)
                 {

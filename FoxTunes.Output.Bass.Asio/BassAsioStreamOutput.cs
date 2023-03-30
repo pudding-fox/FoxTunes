@@ -218,7 +218,7 @@ namespace FoxTunes
         {
             get
             {
-                return BassAsio.IsStarted;
+                return BassAsio.IsStarted && BassAsio.ChannelIsActive(false, BassAsioDevice.PRIMARY_CHANNEL) == AsioChannelActive.Enabled;
             }
         }
 
