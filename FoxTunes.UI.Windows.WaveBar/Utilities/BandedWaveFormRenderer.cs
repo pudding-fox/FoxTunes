@@ -130,7 +130,7 @@ namespace FoxTunes
 
         protected virtual void OnUpdated(object sender, EventArgs e)
         {
-            this.Update();
+            this.Dispatch(this.Update);
         }
 
         protected override bool CreateData(int width, int height)
@@ -445,14 +445,20 @@ namespace FoxTunes
             var low = rendererData.View.Low;
             var mid = rendererData.View.Mid;
             var high = rendererData.View.High;
+            var peak = rendererData.View.Peak;
             var lowElements = rendererData.LowElements;
             var midElements = rendererData.MidElements;
             var highElements = rendererData.HighElements;
 
+            if (peak == 0)
+            {
+                peak = 1;
+            }
+
             while (rendererData.Position < rendererData.View.Position)
             {
                 {
-                    var value = low[rendererData.Position] / rendererData.View.Peak;
+                    var value = low[rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
                     var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
@@ -463,7 +469,7 @@ namespace FoxTunes
                 }
 
                 {
-                    var value = mid[rendererData.Position] / rendererData.View.Peak;
+                    var value = mid[rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
                     var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
@@ -474,7 +480,7 @@ namespace FoxTunes
                 }
 
                 {
-                    var value = high[rendererData.Position] / rendererData.View.Peak;
+                    var value = high[rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
                     var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 

@@ -136,7 +136,7 @@ namespace FoxTunes
 
         protected virtual void OnUpdated(object sender, EventArgs e)
         {
-            this.Update();
+            this.Dispatch(this.Update);
         }
 
         protected override bool CreateData(int width, int height)
@@ -548,13 +548,19 @@ namespace FoxTunes
             var center = rendererData.Height / 2.0f;
             var data = rendererData.View.Data;
             var rms = rendererData.View.Rms;
+            var peak = rendererData.View.Peak;
             var waveElements = rendererData.WaveElements;
             var powerElements = rendererData.PowerElements;
+
+            if (peak == 0)
+            {
+                peak = 1;
+            }
 
             while (rendererData.Position < rendererData.View.Position)
             {
                 {
-                    var value = data[0, rendererData.Position] / rendererData.View.Peak;
+                    var value = data[0, rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
                     var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
@@ -567,7 +573,7 @@ namespace FoxTunes
 
                 if (powerElements != null)
                 {
-                    var value = rms[0, rendererData.Position] / rendererData.View.Peak;
+                    var value = rms[0, rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
                     var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
@@ -586,10 +592,15 @@ namespace FoxTunes
         {
             var data = rendererData.View.Data;
             var rms = rendererData.View.Rms;
+            var peak = rendererData.View.Peak;
             var waveElements = rendererData.WaveElements;
             var powerElements = rendererData.PowerElements;
-
             var waveHeight = rendererData.Height / rendererData.Channels;
+
+            if (peak == 0)
+            {
+                peak = 1;
+            }
 
             while (rendererData.Position < rendererData.View.Position)
             {
@@ -598,7 +609,7 @@ namespace FoxTunes
                     var waveCenter = (waveHeight * channel) + (waveHeight / 2);
 
                     {
-                        var value = data[channel, rendererData.Position] / rendererData.View.Peak;
+                        var value = data[channel, rendererData.Position] / peak;
                         var y = Convert.ToInt32(waveCenter - (value * (waveHeight / 2)));
                         var height = Math.Max(Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2))), 1);
 
@@ -611,7 +622,7 @@ namespace FoxTunes
 
                     if (powerElements != null)
                     {
-                        var value = rms[channel, rendererData.Position] / rendererData.View.Peak;
+                        var value = rms[channel, rendererData.Position] / peak;
                         var y = Convert.ToInt32(waveCenter - (value * (waveHeight / 2)));
                         var height = Math.Max(Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2))), 1);
 
