@@ -1,6 +1,7 @@
 ﻿//Content from https://github.com/sbaeumlisberger/VirtualizingWrapPanel
 #if NET40
 #else
+#nullable enable
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
