@@ -3,9 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Security.Cryptography;
 using System.Threading;
-using System.Xml.Linq;
 
 namespace FoxTunes.Launcher
 {
@@ -14,6 +12,14 @@ namespace FoxTunes.Launcher
         public static readonly TimeSpan SHUTDOWN_INTERVAL = TimeSpan.FromSeconds(1);
 
         public static readonly TimeSpan SHUTDOWN_TIMEOUT = TimeSpan.FromSeconds(10);
+
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(Program).Assembly.Location);
+            }
+        }
 
         static Program()
         {
@@ -43,6 +49,12 @@ namespace FoxTunes.Launcher
         [STAThread]
         public static void Main(string[] args)
         {
+            if (!string.Equals(Environment.CurrentDirectory, Location, StringComparison.OrdinalIgnoreCase))
+            {
+                //Since using relative paths for our data, we should always cwd to here.
+                //This only matters when using shortcuts to portable release.
+                Environment.CurrentDirectory = Location;
+            }
 #if DEBUG
             //SetCulture("fr");
 #endif
