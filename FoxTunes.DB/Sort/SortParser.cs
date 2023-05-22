@@ -28,7 +28,7 @@ namespace FoxTunes
             {
                 if (string.IsNullOrEmpty(sort))
                 {
-                    return null;
+                    return SortParserResult.Default;
                 }
                 var lines = sort.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(line => line.Trim())
@@ -58,7 +58,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    return null;
+                    return SortParserResult.Default;
                 }
             });
             return result != null;
@@ -276,6 +276,17 @@ namespace FoxTunes
         {
             return !(a == b);
         }
+
+        public static ISortParserResult Default
+        {
+            get
+            {
+                return new SortParserResult(new[]
+                {
+                    SortParserResultExpression.Default
+                });
+            }
+        }
     }
 
     public class SortParserResultExpression : ISortParserResultExpression
@@ -374,6 +385,16 @@ namespace FoxTunes
         public static bool operator !=(SortParserResultExpression a, SortParserResultExpression b)
         {
             return !(a == b);
+        }
+
+        public static ISortParserResultExpression Default
+        {
+            get
+            {
+                return new SortParserResultExpression(
+                    string.Format("{0}.{1}", nameof(FileSystemProperties), nameof(FileSystemProperties.FileName))
+                );
+            }
         }
     }
 }
