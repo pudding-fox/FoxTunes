@@ -47,7 +47,7 @@ namespace FoxTunes
                 this.Mode.ValueChanged += this.OnValueChanged;
                 this.Window.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
-                var task = this.CreateBitmap(true);
+                var task = this.CreateBitmap();
             }
             base.OnConfigurationChanged();
         }
@@ -80,7 +80,7 @@ namespace FoxTunes
             var background = palettes.GetOrAdd(
                 OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
-            );            
+            );
             //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
                 OscilloscopeConfiguration.COLOR_PALETTE_VALUE,
@@ -140,60 +140,46 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task Render(OscilloscopeRendererData data)
+        protected virtual Task Render(OscilloscopeRendererData data)
         {
-            var bitmap = default(WriteableBitmap);
-            var success = default(bool);
-            var info = default(OscilloscopeRenderInfo);
-
-            await Windows.Invoke(() =>
+            return Windows.Invoke(() =>
             {
-                bitmap = this.Bitmap;
+                var bitmap = this.Bitmap;
                 if (bitmap == null)
                 {
+                    this.Restart();
                     return;
                 }
 
-                success = bitmap.TryLock(LockTimeout);
+                if (!bitmap.TryLock(LockTimeout))
+                {
+                    this.Restart();
+                    return;
+                }
+                var success = default(bool);
+                var info = GetRenderInfo(bitmap, data);
+                try
+                {
+                    Render(info, data);
+                    success = true;
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render oscilloscope: {0}", e.Message);
+#else
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render oscilloscope, disabling: {0}", e.Message);
+                    success = false;
+#endif
+                }
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.Unlock();
                 if (!success)
                 {
                     return;
                 }
-                info = GetRenderInfo(bitmap, data);
-            }, DISPATCHER_PRIORITY).ConfigureAwait(false);
-
-            if (!success)
-            {
-                //Failed to establish lock.
                 this.Restart();
-                return;
-            }
-
-            try
-            {
-                Render(info, data);
-            }
-            catch (Exception e)
-            {
-#if DEBUG
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render oscilloscope: {0}", e.Message);
-#else
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render oscilloscope, disabling: {0}", e.Message);
-                success = false;
-#endif
-            }
-
-            await Windows.Invoke(() =>
-            {
-                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                bitmap.Unlock();
-            }, DISPATCHER_PRIORITY).ConfigureAwait(false);
-
-            if (!success)
-            {
-                return;
-            }
-            this.Restart();
+            }, DISPATCHER_PRIORITY);
         }
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
