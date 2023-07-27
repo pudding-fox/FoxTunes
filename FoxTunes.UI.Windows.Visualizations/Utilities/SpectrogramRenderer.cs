@@ -194,6 +194,7 @@ namespace FoxTunes
                     lock (data)
                     {
                         Render(info, data);
+                        success = true;
                     }
                 }
                 catch (Exception e)
