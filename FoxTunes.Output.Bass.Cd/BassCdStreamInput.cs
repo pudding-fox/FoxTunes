@@ -114,6 +114,11 @@ namespace FoxTunes
 
         public override bool Add(BassOutputStream stream, Action<BassOutputStream> callBack)
         {
+            if (!this.Contains(stream))
+            {
+                //I think this happens when the CD has ended.
+                BassUtils.OK(BassGapless.ChannelEnqueue(stream.ChannelHandle));
+            }
             return false;
         }
 
