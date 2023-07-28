@@ -50,7 +50,15 @@ namespace FoxTunes.Interfaces
             {
                 return true;
             }
-            return string.Equals(this.Id, other.Id, StringComparison.OrdinalIgnoreCase);
+            if (!string.Equals(this.Selector.Name, other.Selector.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            if (!string.Equals(this.Id, other.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
         }
 
         public override bool Equals(object obj)
