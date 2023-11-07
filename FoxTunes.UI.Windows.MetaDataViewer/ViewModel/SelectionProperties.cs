@@ -435,21 +435,30 @@ namespace FoxTunes.ViewModel
             var replaygain = this.GetReplayGain(fileDatas, metaDatas);
             var filesystem = this.GetFileSystem(fileDatas, metaDatas);
             var images = this.GetImages(fileDatas, metaDatas);
-            return Windows.Invoke(() =>
+            //Forking so we don't block the UI.
+            this.Debouncer.Exec(() =>
             {
-                this.FileDatas.Clear();
-                this.FileDatas.AddRange(fileDatas);
-                this.Tags.Clear();
-                this.Tags.AddRange(tags);
-                this.Properties.Clear();
-                this.Properties.AddRange(properties);
-                this.ReplayGain.Clear();
-                this.ReplayGain.AddRange(replaygain);
-                this.FileSystem.Clear();
-                this.FileSystem.AddRange(filesystem);
-                this.Images.Clear();
-                this.Images.AddRange(images);
+                var task = Windows.Invoke(() =>
+                {
+                    this.FileDatas.Clear();
+                    this.FileDatas.AddRange(fileDatas);
+                    this.Tags.Clear();
+                    this.Tags.AddRange(tags);
+                    this.Properties.Clear();
+                    this.Properties.AddRange(properties);
+                    this.ReplayGain.Clear();
+                    this.ReplayGain.AddRange(replaygain);
+                    this.FileSystem.Clear();
+                    this.FileSystem.AddRange(filesystem);
+                    this.Images.Clear();
+                    this.Images.AddRange(images);
+                });
             });
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected virtual IDictionary<IFileData, IDictionary<string, string>> GetMetaDatas(IEnumerable<IFileData> fileDatas)
