@@ -29,6 +29,9 @@ namespace FoxTunes
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
+        public IntegerConfigurationElement Interval { get; private set; }
+
+
         protected override void InitializeComponent(ICore core)
         {
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
@@ -54,6 +57,10 @@ namespace FoxTunes
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     SpectrogramConfiguration.SECTION,
                     SpectrogramConfiguration.COLOR_PALETTE_ELEMENT
+                );
+                this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    VisualizationBehaviourConfiguration.SECTION,
+                    VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }
             base.OnConfigurationChanged();
@@ -105,6 +112,27 @@ namespace FoxTunes
                         attributes: this.Smoothing.Value == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Interval.Id,
+                    Strings.Visualization_Speed_Slow,
+                    path: this.Interval.Name,
+                    attributes: this.Interval.Value == VisualizationBehaviourConfiguration.MAX_INTERVAL ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Interval.Id,
+                    Strings.Visualization_Speed_Default,
+                    path: this.Interval.Name,
+                    attributes: this.Interval.Value == VisualizationBehaviourConfiguration.DEFAULT_INTERVAL ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Interval.Id,
+                    Strings.Visualization_Speed_Fast,
+                    path: this.Interval.Name,
+                    attributes: this.Interval.Value == VisualizationBehaviourConfiguration.MIN_INTERVAL ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
                 foreach (var invocationComponent in base.Invocations)
                 {
                     yield return invocationComponent;
@@ -144,6 +172,21 @@ namespace FoxTunes
             else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
             {
                 //Nothing to do.
+            }
+            else if (string.Equals(this.Interval.Name, component.Path))
+            {
+                if (string.Equals(component.Name, Strings.Visualization_Speed_Slow, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Interval.Value = VisualizationBehaviourConfiguration.MAX_INTERVAL;
+                }
+                else if (string.Equals(component.Name, Strings.Visualization_Speed_Fast, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Interval.Value = VisualizationBehaviourConfiguration.MIN_INTERVAL;
+                }
+                else
+                {
+                    this.Interval.Value = VisualizationBehaviourConfiguration.DEFAULT_INTERVAL;
+                }
             }
             else if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
             {

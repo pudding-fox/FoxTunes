@@ -31,6 +31,9 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Duration { get; private set; }
 
+        public IntegerConfigurationElement Interval { get; private set; }
+
+
         protected override void InitializeComponent(ICore core)
         {
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
@@ -56,6 +59,10 @@ namespace FoxTunes
                 this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.DURATION
+                );
+                this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    VisualizationBehaviourConfiguration.SECTION,
+                    VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }
             base.OnConfigurationChanged();
@@ -133,6 +140,27 @@ namespace FoxTunes
                 );
                 yield return new InvocationComponent(
                     CATEGORY,
+                    this.Interval.Id,
+                    Strings.Visualization_Speed_Slow,
+                    path: this.Interval.Name,
+                    attributes: this.Interval.Value == VisualizationBehaviourConfiguration.MAX_INTERVAL ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Interval.Id,
+                    Strings.Visualization_Speed_Default,
+                    path: this.Interval.Name,
+                    attributes: this.Interval.Value == VisualizationBehaviourConfiguration.DEFAULT_INTERVAL ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Interval.Id,
+                    Strings.Visualization_Speed_Fast,
+                    path: this.Interval.Name,
+                    attributes: this.Interval.Value == VisualizationBehaviourConfiguration.MIN_INTERVAL ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
                     this.Duration.Id,
                     Strings.PeakMeterConfiguration_Duration_High,
                     path: this.Duration.Name,
@@ -172,6 +200,21 @@ namespace FoxTunes
                 else
                 {
                     this.Duration.Value = PeakMeterConfiguration.DURATION_DEFAULT;
+                }
+            }
+            else if (string.Equals(this.Interval.Name, component.Path))
+            {
+                if (string.Equals(component.Name, Strings.Visualization_Speed_Slow, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Interval.Value = VisualizationBehaviourConfiguration.MAX_INTERVAL;
+                }
+                else if (string.Equals(component.Name, Strings.Visualization_Speed_Fast, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Interval.Value = VisualizationBehaviourConfiguration.MIN_INTERVAL;
+                }
+                else
+                {
+                    this.Interval.Value = VisualizationBehaviourConfiguration.DEFAULT_INTERVAL;
                 }
             }
             else if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))

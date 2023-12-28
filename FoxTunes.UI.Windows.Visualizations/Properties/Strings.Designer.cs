@@ -572,5 +572,32 @@ namespace FoxTunes {
                 return ResourceManager.GetString("SpectrumConfiguration.PreAmp", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string Visualization_Speed_Default {
+            get {
+                return ResourceManager.GetString("Visualization.Speed.Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fast.
+        /// </summary>
+        internal static string Visualization_Speed_Fast {
+            get {
+                return ResourceManager.GetString("Visualization.Speed.Fast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slow.
+        /// </summary>
+        internal static string Visualization_Speed_Slow {
+            get {
+                return ResourceManager.GetString("Visualization.Speed.Slow", resourceCulture);
+            }
+        }
     }
 }
