@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -126,6 +128,30 @@ namespace FoxTunes
         }
 
         protected abstract void OnElapsed(object sender, ElapsedEventArgs e);
+
+#if DEBUG
+
+        protected global::FoxTunes.ViewModel.Visualization ViewModel;
+
+        protected override async Task<bool> CreateBitmap()
+        {
+            var success = await base.CreateBitmap().ConfigureAwait(false);
+            if (success)
+            {
+                var visualization = this.FindAncestor<Visualization>();
+                if (visualization != null)
+                {
+                    var grid = visualization.FindChild<Grid>();
+                    if (grid != null)
+                    {
+                        grid.TryFindResource("ViewModel", out this.ViewModel);
+                    }
+                }
+            }
+            return success;
+        }
+
+#endif
 
         protected override void OnDisposing()
         {

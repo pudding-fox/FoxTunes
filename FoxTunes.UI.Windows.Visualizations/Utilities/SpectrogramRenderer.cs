@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Media.Imaging;
@@ -212,6 +213,12 @@ namespace FoxTunes
                 {
                     return;
                 }
+#if DEBUG
+                if (this.ViewModel != null)
+                {
+                    Interlocked.Increment(ref this.ViewModel.Frames);
+                }
+#endif
                 this.Restart();
             }, DISPATCHER_PRIORITY);
         }

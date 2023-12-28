@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -253,6 +254,12 @@ namespace FoxTunes
                 {
                     return;
                 }
+#if DEBUG
+                if (this.ViewModel != null)
+                {
+                    Interlocked.Increment(ref this.ViewModel.Frames);
+                }
+#endif
                 this.Restart();
             }, DISPATCHER_PRIORITY);
         }

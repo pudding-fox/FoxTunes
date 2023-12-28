@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -199,7 +200,7 @@ namespace FoxTunes
                 var info = GetRenderInfo(bitmap, data);
                 try
                 {
-                    Render(ref info, data); 
+                    Render(ref info, data);
                     success = true;
                 }
                 catch (Exception e)
@@ -217,6 +218,12 @@ namespace FoxTunes
                 {
                     return;
                 }
+#if DEBUG
+                if (this.ViewModel != null)
+                {
+                    Interlocked.Increment(ref this.ViewModel.Frames);
+                }
+#endif
                 this.Restart();
             }, DISPATCHER_PRIORITY);
         }
