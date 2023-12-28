@@ -581,7 +581,7 @@ namespace FoxTunes
                 data.RmsValues = new float[bands.Length];
                 data.RmsElements = new Int32Rect[bands.Length];
             }
-            if (showCrest)
+            if (showPeak && showRms && showCrest)
             {
                 data.CrestValues = new float[width];
                 data.CrestPoints = new Int32Point[width];
@@ -606,7 +606,7 @@ namespace FoxTunes
                 {
                     this.History.Flags |= VisualizationDataHistoryFlags.Rms;
                 }
-                if (showCrest)
+                if (showPeak && showRms && showCrest)
                 {
                     this.History.Flags |= VisualizationDataHistoryFlags.Crest;
                 }
