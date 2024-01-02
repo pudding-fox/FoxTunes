@@ -210,6 +210,9 @@
   <data name="UIComponentGridContainer.Add" xml:space="preserve">
     <value>Add</value>
   </data>
+  <data name="UIComponentGridContainer.AlignBottom" xml:space="preserve">
+    <value>Align Bottom</value>
+  </data>
   <data name="UIComponentGridContainer.AlignLeft" xml:space="preserve">
     <value>Align Left</value>
   </data>
@@ -219,17 +222,26 @@
   <data name="UIComponentGridContainer.AlignStretch" xml:space="preserve">
     <value>Align Center</value>
   </data>
+  <data name="UIComponentGridContainer.AlignTop" xml:space="preserve">
+    <value>Align Top</value>
+  </data>
+  <data name="UIComponentGridContainer.MoveDown" xml:space="preserve">
+    <value>Move Down</value>
+  </data>
   <data name="UIComponentGridContainer.MoveLeft" xml:space="preserve">
     <value>Move Left</value>
   </data>
   <data name="UIComponentGridContainer.MoveRight" xml:space="preserve">
     <value>Move Right</value>
   </data>
-  <data name="UIComponentGridContainer.Name" xml:space="preserve">
-    <value>Horizontal Grid</value>
+  <data name="UIComponentGridContainer.MoveUp" xml:space="preserve">
+    <value>Move Up</value>
   </data>
   <data name="UIComponentGridContainer.Remove" xml:space="preserve">
     <value>Remove</value>
+  </data>
+  <data name="UIComponentHorizontalGridContainer.Name" xml:space="preserve">
+    <value>Horizontal Grid</value>
   </data>
   <data name="UIComponentHorizontalSplitContainer.CollapseBottom" xml:space="preserve">
     <value>Collapse Bottom</value>
@@ -335,6 +347,9 @@
   </data>
   <data name="UIComponentTabContainer.TabName" xml:space="preserve">
     <value>Tab Name</value>
+  </data>
+  <data name="UIComponentVerticalGridContainer.Name" xml:space="preserve">
+    <value>Vertical Grid</value>
   </data>
   <data name="UIComponentVerticalSplitContainer.CollapseLeft" xml:space="preserve">
     <value>Collapse Left</value>
