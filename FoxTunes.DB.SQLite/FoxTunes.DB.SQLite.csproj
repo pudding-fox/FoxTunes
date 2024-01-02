@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115.5" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
   </ItemGroup>
 
   <ItemGroup>
@@ -129,7 +129,7 @@
   <ItemGroup>
     <PackageReference Include="FoxDb.SQLite" Version="0.5.1"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
+    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 
   <ItemGroup>
