@@ -7,11 +7,12 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             SizeChanged="OnSizeChanged">
+             SizeChanged="OnSizeChanged"
+             MouseUp="OnMouseUp">
     <Windows:SquareUIComponentBase.Resources>
         <ViewModel:Artwork x:Key="ViewModel" FileNameChanged="OnFileNameChanged"></ViewModel:Artwork>
         <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}" Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}"></ViewModel:ArtworkImageConverter>
         <SolidColorBrush x:Key="Transparent" Color="Transparent"></SolidColorBrush>
     </Windows:SquareUIComponentBase.Resources>
-    <Rectangle x:Name="Rectangle" DataContext="{Binding FileName, Converter={StaticResource ArtworkImageConverter}, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}"></Rectangle>
+    <Rectangle DataContext="{Binding FileName, Converter={StaticResource ArtworkImageConverter}, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}"></Rectangle>
 </Windows:SquareUIComponentBase>
