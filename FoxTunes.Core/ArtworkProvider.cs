@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,6 +35,8 @@ namespace FoxTunes
 
         public string[] Back { get; private set; }
 
+        public string[] Folders { get; private set; }
+
         public int MaxSize { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -49,15 +52,35 @@ namespace FoxTunes
             this.Configuration.GetElement<TextConfigurationElement>(
                MetaDataBehaviourConfiguration.SECTION,
                MetaDataBehaviourConfiguration.LOOSE_IMAGES_FRONT
-           ).ConnectValue(value => this.Front = this.Parse(value));
+           ).ConnectValue(value =>
+           {
+               this.Front = this.Parse(value);
+               this.Store.Clear();
+           });
             this.Configuration.GetElement<TextConfigurationElement>(
                MetaDataBehaviourConfiguration.SECTION,
                MetaDataBehaviourConfiguration.LOOSE_IMAGES_BACK
-           ).ConnectValue(value => this.Back = this.Parse(value));
+           ).ConnectValue(value =>
+           {
+               this.Back = this.Parse(value);
+               this.Store.Clear();
+           });
+            this.Configuration.GetElement<TextConfigurationElement>(
+               MetaDataBehaviourConfiguration.SECTION,
+               MetaDataBehaviourConfiguration.LOOSE_IMAGES_FOLDER
+            ).ConnectValue(value =>
+            {
+                this.Folders = this.Parse(value);
+                this.Store.Clear();
+            });
             this.Configuration.GetElement<IntegerConfigurationElement>(
                MetaDataBehaviourConfiguration.SECTION,
                MetaDataBehaviourConfiguration.MAX_IMAGE_SIZE
-            ).ConnectValue(value => this.MaxSize = value * 1024000);
+            ).ConnectValue(value =>
+            {
+                this.MaxSize = value * 1024000;
+                this.Store.Clear();
+            });
             base.InitializeComponent(core);
         }
 
@@ -115,14 +138,23 @@ namespace FoxTunes
             return Path.Combine(directoryName, string.Concat(name, ".", extension.TrimStart('.')));
         }
 
+        public IEnumerable<string> GetDirectoryNames(string root)
+        {
+            yield return root;
+            foreach (var folder in this.Folders)
+            {
+                yield return Path.Combine(root, folder);
+            }
+        }
+
         public string Find(string path, ArtworkType type)
         {
             if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
             {
                 return null;
             }
-            var directoryName = Path.GetDirectoryName(path);
-            return this.Store.GetOrAdd(directoryName, type, () =>
+            var root = Path.GetDirectoryName(path);
+            return this.Store.GetOrAdd(root, type, () =>
             {
                 var names = default(string[]);
                 switch (type)
@@ -140,16 +172,19 @@ namespace FoxTunes
                 {
                     foreach (var name in names)
                     {
-                        foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name), FileSystemHelper.SearchOption.None))
+                        foreach (var directoryName in this.GetDirectoryNames(root))
                         {
-                            var info = new FileInfo(fileName);
-                            if (!EXTENSIONS.Contains(info.Extension, StringComparer.OrdinalIgnoreCase))
+                            foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name), FileSystemHelper.SearchOption.None))
                             {
-                                continue;
-                            }
-                            if (info.Length <= this.MaxSize)
-                            {
-                                return fileName;
+                                var info = new FileInfo(fileName);
+                                if (!EXTENSIONS.Contains(info.Extension, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    continue;
+                                }
+                                if (info.Length <= this.MaxSize)
+                                {
+                                    return fileName;
+                                }
                             }
                         }
                     }
