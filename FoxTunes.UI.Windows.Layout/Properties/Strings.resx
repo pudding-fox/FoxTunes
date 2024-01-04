@@ -159,11 +159,17 @@
   <data name="ToolWindowBehaviour.Path" xml:space="preserve">
     <value>Dialogs</value>
   </data>
+  <data name="ToolWindowKeyBindingsBehaviourConfiguration.Manage" xml:space="preserve">
+    <value>Dialogs</value>
+  </data>
   <data name="ToolWindowManager.AlwaysOnTop" xml:space="preserve">
     <value>Always On Top</value>
   </data>
   <data name="ToolWindowManager.Component" xml:space="preserve">
     <value>Component</value>
+  </data>
+  <data name="ToolWindowManager.CopyToMain" xml:space="preserve">
+    <value>Copy To Main</value>
   </data>
   <data name="ToolWindowManager.EditLayoutXML" xml:space="preserve">
     <value>Edit Layout XML</value>

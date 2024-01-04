@@ -30,6 +30,7 @@ namespace FoxTunes
         public ToolWindowBehaviour()
         {
             this.Windows = new ConcurrentDictionary<ToolWindowConfiguration, ToolWindow>();
+            Instance = this;
         }
 
         public bool Enabled
@@ -536,6 +537,8 @@ namespace FoxTunes
                 //Nothing can be done, never throw on GC thread.
             }
         }
+
+        public static ToolWindowBehaviour Instance { get; private set; }
     }
 
     public class ToolWindowConfiguration
