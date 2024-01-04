@@ -106,6 +106,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit Layout.
+        /// </summary>
+        internal static string LayoutDesignerKeyBindingsBehaviourConfiguration_Edit {
+            get {
+                return ResourceManager.GetString("LayoutDesignerKeyBindingsBehaviourConfiguration.Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string LayoutEditor_Cancel {
