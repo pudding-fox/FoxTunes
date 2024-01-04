@@ -195,6 +195,9 @@
   <data name="UIComponentContainer.Replace" xml:space="preserve">
     <value>Replace</value>
   </data>
+  <data name="UIComponentContainer.Wrap" xml:space="preserve">
+    <value>Wrap</value>
+  </data>
   <data name="UIComponentDesignerOverlay.Path.Parent" xml:space="preserve">
     <value>Parent: {0}</value>
   </data>

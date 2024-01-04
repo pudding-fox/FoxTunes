@@ -15,9 +15,13 @@ namespace FoxTunes
             this.MetaData = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public UIComponentConfiguration(UIComponent component) : this()
+        public UIComponentConfiguration(UIComponent component, params UIComponentConfiguration[] children) : this()
         {
             this.Component = component;
+            if (children.Length > 0)
+            {
+                this.Children.AddRange(children);
+            }
         }
 
         public Guid Id { get; private set; }
