@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public BackgroundTasks()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

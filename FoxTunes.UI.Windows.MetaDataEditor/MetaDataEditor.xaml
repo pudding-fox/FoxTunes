@@ -25,7 +25,6 @@
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0" Header="Tags">
                 <ItemsControl ItemsSource="{Binding Tags, Source={StaticResource ViewModel}}" Margin="0,2,0,0">
@@ -71,23 +70,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </GroupBox>
-            <GroupBox Grid.Row="2" Header="Properties">
-                <ItemsControl ItemsSource="{Binding Properties, Source={StaticResource ViewModel}}" Margin="0,2,0,0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,0,0,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
-                                <TextBox Grid.Column="1" Text="{Binding Value}" IsReadOnly="True"></TextBox>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </GroupBox>
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="7">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="7">
                 <Button Width="60" Height="30" Margin="7,0,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
                 <Button Width="60" Height="30" Margin="7,0,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
             </StackPanel>

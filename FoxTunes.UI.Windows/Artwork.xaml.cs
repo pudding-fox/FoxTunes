@@ -1,9 +1,6 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Data;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -11,8 +8,8 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for Artwork.xaml
     /// </summary>
-    [UIComponent("66C8A9E7-0891-48DD-8086-E40F72D4D030", UIComponentSlots.BOTTOM_LEFT, "Artwork")]
-    public partial class Artwork : UIComponentBase
+    [UIComponent("66C8A9E7-0891-48DD-8086-E40F72D4D030", UIComponentSlots.NONE, "Artwork")]
+    public partial class Artwork : Square
     {
         public static readonly IArtworkProvider ArtworkProvider = ComponentRegistry.Instance.GetComponent<IArtworkProvider>();
 
@@ -20,44 +17,9 @@ namespace FoxTunes
 
         public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
 
-        private static Lazy<Size> PixelSize { get; set; }
-
-        public static readonly DependencyProperty ShowPlaceholderProperty = DependencyProperty.Register(
-            "ShowPlaceholder",
-            typeof(bool),
-            typeof(Artwork),
-            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnShowPlaceholderChanged))
-        );
-
-        public static bool GetShowPlaceholder(Artwork source)
-        {
-            return (bool)source.GetValue(ShowPlaceholderProperty);
-        }
-
-        public static void SetShowPlaceholder(Artwork source, bool value)
-        {
-            source.SetValue(ShowPlaceholderProperty, value);
-        }
-
-        private static void OnShowPlaceholderChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var artwork = sender as Artwork;
-            if (artwork == null)
-            {
-                return;
-            }
-            artwork.OnShowPlaceholderChanged();
-        }
-
         public Artwork()
         {
             this.InitializeComponent();
-            this.SizeChanged += this.OnSizeChanged;
-            this.Unloaded += this.OnUnloaded;
-            if (PixelSize == null)
-            {
-                PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
-            }
             if (PlaybackManager != null)
             {
                 PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
@@ -67,25 +29,6 @@ namespace FoxTunes
                 ThemeLoader.ThemeChanged += this.OnThemeChanged;
             }
             var task = this.Refresh();
-        }
-
-        protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            var task = this.Refresh();
-        }
-
-        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
-        {
-            this.SizeChanged -= this.OnSizeChanged;
-            this.Unloaded -= this.OnUnloaded;
-            if (PlaybackManager != null)
-            {
-                PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
-            }
-            if (ThemeLoader != null)
-            {
-                ThemeLoader.ThemeChanged -= this.OnThemeChanged;
-            }
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
@@ -98,59 +41,8 @@ namespace FoxTunes
             var task = this.Refresh();
         }
 
-        public bool ShowPlaceholder
-        {
-            get
-            {
-                return GetShowPlaceholder(this);
-            }
-            set
-            {
-                SetShowPlaceholder(this, value);
-            }
-        }
-
-        protected virtual void OnShowPlaceholderChanged()
-        {
-            var task = this.Refresh();
-        }
-
-        public int DecodePixelWidth
-        {
-            get
-            {
-                if (!PixelSize.IsValueCreated)
-                {
-                    if (this.ActualWidth == 0 || this.ActualHeight == 0)
-                    {
-                        return 0;
-                    }
-                }
-                return (int)PixelSize.Value.Width;
-            }
-        }
-
-        public int DecodePixelHeight
-        {
-            get
-            {
-                if (!PixelSize.IsValueCreated)
-                {
-                    if (this.ActualWidth == 0 || this.ActualHeight == 0)
-                    {
-                        return 0;
-                    }
-                }
-                return (int)PixelSize.Value.Height;
-            }
-        }
-
         public async Task Refresh()
         {
-            if (this.DecodePixelWidth == 0 || this.DecodePixelHeight == 0)
-            {
-                return;
-            }
             var metaDataItem = default(MetaDataItem);
             var outputStream = PlaybackManager.CurrentStream;
             if (outputStream != null)
@@ -165,34 +57,25 @@ namespace FoxTunes
             {
                 await Windows.Invoke(() =>
                 {
-                    if (this.ShowPlaceholder && ThemeLoader.Theme != null)
+                    using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
                     {
-                        using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
+                        this.Background = new ImageBrush(ImageLoader.Load(stream, 0, 0))
                         {
-                            if (this.Visibility != Visibility.Visible)
-                            {
-                                this.Visibility = Visibility.Visible;
-                            }
-                            this.Background = new ImageBrush(ImageLoader.Load(stream, this.DecodePixelWidth, this.DecodePixelHeight));
-
-                        }
+                            Stretch = Stretch.Uniform
+                        };
                     }
-                    else
-                    {
-                        this.Visibility = Visibility.Collapsed;
-                        this.Background = null;
-                    }
+                    this.IsComponentEnabled = false;
                 });
             }
             else
             {
                 await Windows.Invoke(() =>
                 {
-                    if (this.Visibility != Visibility.Visible)
+                    this.Background = new ImageBrush(ImageLoader.Load(metaDataItem.Value, 0, 0))
                     {
-                        this.Visibility = Visibility.Visible;
-                    }
-                    this.Background = new ImageBrush(ImageLoader.Load(metaDataItem.Value, this.DecodePixelWidth, this.DecodePixelHeight));
+                        Stretch = Stretch.Uniform
+                    };
+                    this.IsComponentEnabled = true;
                 });
             }
         }
