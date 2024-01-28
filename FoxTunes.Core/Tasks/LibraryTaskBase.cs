@@ -295,10 +295,7 @@ namespace FoxTunes
                 {
                     case DatabaseParameterPhase.Fetch:
                         parameters["id"] = libraryItem.Id;
-                        parameters["importDate"] = importDate.ToString(
-                            Constants.DATE_FORMAT,
-                            CultureInfo.InvariantCulture
-                        );
+                        parameters["importDate"] = DateTimeHelper.ToString(importDate);
                         break;
                 }
             }, transaction).ConfigureAwait(false);
