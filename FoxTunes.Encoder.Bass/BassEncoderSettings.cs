@@ -71,12 +71,26 @@ namespace FoxTunes
                 default:
                 case BassEncoderOutputDestination.Source:
                     directory = Path.GetDirectoryName(fileName);
+                    if (!this.CanWrite(directory))
+                    {
+                        throw new InvalidOperationException(string.Format("Cannot output to path \"{0}\" please check encoder settings.", directory));
+                    }
                     break;
                 case BassEncoderOutputDestination.Specific:
                     directory = this.Location;
                     break;
             }
             return Path.Combine(directory, string.Format("{0}.{1}", name, this.Extension));
+        }
+
+        protected virtual bool CanWrite(string directoryName)
+        {
+            var uri = default(Uri);
+            if (!Uri.TryCreate(directoryName, UriKind.Absolute, out uri))
+            {
+                return false;
+            }
+            return string.Equals(uri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase);
         }
 
         public virtual int GetDepth(EncoderItem encoderItem, IBassStream stream)

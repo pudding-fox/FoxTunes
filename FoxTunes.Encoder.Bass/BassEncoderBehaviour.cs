@@ -219,27 +219,6 @@ namespace FoxTunes
                 return this.PlaylistItems.FirstOrDefault(playlistItem => string.Equals(playlistItem.FileName, encoderItem.InputFileName, StringComparison.OrdinalIgnoreCase));
             }
 
-            protected virtual void Unload(AppDomain domain)
-            {
-                const int ATTEMPTS = 5;
-                var name = domain.FriendlyName;
-                for (int a = 1; a <= ATTEMPTS; a++)
-                {
-                    try
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Attempting to unload app domain \"{0}\" attempt {1} of {2}. ", name, a, ATTEMPTS);
-                        AppDomain.Unload(domain);
-                        Logger.Write(this, LogLevel.Debug, "Successfully unloaded app domain \"{0}\".", name);
-                        return;
-                    }
-                    catch (CannotUnloadAppDomainException e)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Failed to unloaded app domain \"{0}\": {1}", name, e.Message);
-                    }
-                }
-                Logger.Write(this, LogLevel.Error, "Failed to unloaded app domain \"{0}\".", name);
-            }
-
             protected override void OnCancellationRequested()
             {
                 this.CancellationToken.Cancel();
