@@ -391,7 +391,14 @@ namespace FoxTunes
                 {
                     playlistItems[a].Sequence = a;
                 }
-                await set.AddOrUpdateAsync(playlistItems).ConfigureAwait(false);
+                await EntityHelper<PlaylistItem>.Create(
+                    this.Database,
+                    this.Database.Tables.PlaylistItem,
+                    transaction
+                ).UpdateAsync(
+                    playlistItems,
+                    new[] { nameof(PlaylistItem.Sequence) }
+                ).ConfigureAwait(false);
                 if (transaction.HasTransaction)
                 {
                     transaction.Commit();
