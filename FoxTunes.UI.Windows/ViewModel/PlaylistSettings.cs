@@ -9,7 +9,7 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistSettings : ViewModelBase
     {
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -77,7 +77,7 @@ namespace FoxTunes.ViewModel
         {
             using (var transaction = this.Database.BeginTransaction())
             {
-                var playlistColumns = this.Database.GetSet<PlaylistColumn>(transaction);
+                var playlistColumns = this.Database.Set<PlaylistColumn>(transaction);
                 playlistColumns.Delete(playlistColumns.Except(this.PlaylistColumns));
                 playlistColumns.AddOrUpdate(this.PlaylistColumns);
                 transaction.Commit();

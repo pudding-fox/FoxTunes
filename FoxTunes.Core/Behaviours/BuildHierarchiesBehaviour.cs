@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Behaviours
 {
@@ -17,19 +18,19 @@ namespace FoxTunes.Behaviours
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnSignal(object sender, ISignal signal)
+        protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.LibraryUpdated:
-                    this.OnRun();
-                    break;
+                    return this.OnRun();
             }
+            return Task.CompletedTask;
         }
 
-        protected virtual void OnRun()
+        protected virtual Task OnRun()
         {
-            this.HierarchyManager.BuildHierarchies();
+            return this.HierarchyManager.BuildHierarchies();
         }
     }
 }

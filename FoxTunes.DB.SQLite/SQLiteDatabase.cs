@@ -1,68 +1,94 @@
-﻿using FoxTunes.Interfaces;
-using System.Data;
+﻿using FoxDb;
+using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
+using System;
+using System.ComponentModel;
 using System.Data.SQLite;
 using System.IO;
 
 namespace FoxTunes
 {
-    public class SQLiteDatabase : Database
+    [Component("13A75018-8A24-413D-A731-C558C8FAF08F", ComponentSlots.Database)]
+    public class SQLiteDatabase : Database, IDatabaseComponent
     {
-        private static readonly string DatabaseFileName = Path.Combine(
-            Path.GetDirectoryName(typeof(SQLiteDatabase).Assembly.Location),
-            "Database.dat"
-        );
-
-        public SQLiteDatabase()
-        {
-            this.Queries = new SQLiteDatabaseQueries(this);
-            this.Connection = CreateConnection();
-        }
-
-        private string ConnectionString
+        protected static ILogger Logger
         {
             get
             {
-                var builder = new SQLiteConnectionStringBuilder();
-                builder.DataSource = DatabaseFileName;
-                return builder.ToString();
+                return LogManager.Logger;
             }
         }
 
-        private IDbConnection CreateConnection()
+        private static readonly string DatabaseFileName = Path.Combine(
+            Path.GetDirectoryName(typeof(SQLiteDatabase).Assembly.Location),
+            "Database.db"
+        );
+
+        public SQLiteDatabase() : base(GetProvider())
         {
-            var create = false;
             if (!File.Exists(DatabaseFileName))
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to locate the database: {0}", DatabaseFileName);
-                create = true;
+                this.CreateDatabase();
             }
-            Logger.Write(this, LogLevel.Debug, "Connecting to database: {0}", this.ConnectionString);
-            var connection = new SQLiteConnection(this.ConnectionString);
-            switch (connection.State)
-            {
-                case ConnectionState.Closed:
-                    connection.Open();
-                    break;
-            }
-            if (create)
-            {
-                this.CreateDatabase(connection);
-            }
-            return connection;
         }
 
-        private void CreateDatabase(IDbConnection connection)
+        public IDatabaseSets Sets { get; private set; }
+
+        public IDatabaseQueries Queries { get; private set; }
+
+        public virtual void InitializeComponent(ICore core)
         {
-            Logger.Write(this, LogLevel.Debug, "Creating database: {0}", this.ConnectionString);
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = Resources.Database;
-                command.ExecuteNonQuery();
-            }
+            this.Sets = new DatabaseSets();
+            this.Sets.InitializeComponent(core);
+            this.Queries = new SQLiteDatabaseQueries(this);
         }
 
-        public override IDatabaseQueries Queries { get; protected set; }
+        protected virtual void CreateDatabase()
+        {
+            this.Execute(new DatabaseQuery(Resources.Database));
+        }
 
-        public override IDbConnection Connection { get; protected set; }
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged == null)
+            {
+                return;
+            }
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        [field: NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        protected virtual void OnError(string message)
+        {
+            this.OnError(new Exception(message));
+        }
+
+        protected virtual void OnError(Exception exception)
+        {
+            this.OnError(exception.Message, exception);
+        }
+
+        protected virtual void OnError(string message, Exception exception)
+        {
+            Logger.Write(this, LogLevel.Error, message, exception);
+            if (this.Error == null)
+            {
+                return;
+            }
+            this.Error(this, new ComponentOutputErrorEventArgs(message, exception));
+        }
+
+        [field: NonSerialized]
+        public event ComponentOutputErrorEventHandler Error = delegate { };
+
+        private static IProvider GetProvider()
+        {
+            var builder = new SQLiteConnectionStringBuilder();
+            builder.DataSource = DatabaseFileName;
+            builder.JournalMode = SQLiteJournalModeEnum.Wal;
+            return new SQLiteProvider(DatabaseFileName);
+        }
     }
 }

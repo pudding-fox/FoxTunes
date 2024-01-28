@@ -162,6 +162,19 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DELETE FROM &quot;LibraryHierarchy_LibraryHierarchyItem&quot;;
+        ///DELETE FROM &quot;LibraryHierarchyItems&quot;;
+        ///DELETE FROM &quot;LibraryHierarchyItem_LibraryItem&quot;;
+        ///DELETE FROM &quot;LibraryItems&quot;;
+        ///DELETE FROM &quot;LibraryItem_MetaDataItem&quot;;.
+        /// </summary>
+        internal static string CLearLibrary {
+            get {
+                return ResourceManager.GetString("CLearLibrary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistItems&quot;;
         ///DELETE FROM &quot;PlaylistItem_MetaDataItem&quot;;.
         /// </summary>
@@ -203,30 +216,6 @@ namespace FoxTunes {
         internal static string Database {
             get {
                 return ResourceManager.GetString("Database", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT *
-        ///FROM &quot;PlaylistItems&quot;
-        ///ORDER BY &quot;Sequence&quot;
-        ///LIMIT 1.
-        /// </summary>
-        internal static string GetFirstPlaylistItem {
-            get {
-                return ResourceManager.GetString("GetFirstPlaylistItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT *
-        ///FROM &quot;PlaylistItems&quot;
-        ///ORDER BY &quot;Sequence&quot; DESC
-        ///LIMIT 1.
-        /// </summary>
-        internal static string GetLastPlaylistItem {
-            get {
-                return ResourceManager.GetString("GetLastPlaylistItem", resourceCulture);
             }
         }
         
@@ -300,19 +289,6 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to SELECT *
         ///FROM &quot;PlaylistItems&quot;
-        ///WHERE &quot;Sequence&quot; &gt; @sequence
-        ///ORDER BY  &quot;Sequence&quot;
-        ///LIMIT 1.
-        /// </summary>
-        internal static string GetNextPlaylistItem {
-            get {
-                return ResourceManager.GetString("GetNextPlaylistItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT *
-        ///FROM &quot;PlaylistItems&quot;
         ///WHERE &quot;Status&quot; = @status
         ///    AND NOT EXISTS
         ///    (
@@ -337,19 +313,6 @@ namespace FoxTunes {
         internal static string GetPlaylistMetaDataItems {
             get {
                 return ResourceManager.GetString("GetPlaylistMetaDataItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT *
-        ///FROM &quot;PlaylistItems&quot;
-        ///WHERE &quot;Sequence&quot; &lt; @sequence
-        ///ORDER BY  &quot;Sequence&quot; DESC
-        ///LIMIT 1.
-        /// </summary>
-        internal static string GetPreviousPlaylistItem {
-            get {
-                return ResourceManager.GetString("GetPreviousPlaylistItem", resourceCulture);
             }
         }
         

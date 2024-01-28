@@ -1,9 +1,9 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -12,7 +12,7 @@ namespace FoxTunes
     {
         public const string ID = "972222C8-8F6E-44CF-8EBE-DA4FCFD7CD80";
 
-        public const int SAVE_INTERVAL = 1000;
+        //public const int SAVE_INTERVAL = 1000;
 
         public AddPathsToLibraryTask(IEnumerable<string> paths)
             : base(ID)
@@ -57,14 +57,15 @@ namespace FoxTunes
             return Task.CompletedTask;
         }
 
-        private void AddLibraryItems(IDbTransaction transaction)
+        private void AddLibraryItems(ITransactionSource transaction)
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.AddLibraryItem, out parameters))
+            //var batch = 0;
+            var parameters = default(IDatabaseParameters);
+            using (var command = this.Database.Connection.CreateCommand(this.Database.Queries.AddLibraryItem, out parameters))
             {
-                command.Transaction = transaction;
+                transaction.Bind(command);
                 var addLibraryItem = new Action<string>(fileName =>
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
@@ -75,6 +76,12 @@ namespace FoxTunes
                     parameters["fileName"] = fileName;
                     parameters["status"] = LibraryItemStatus.Import;
                     command.ExecuteNonQuery();
+                    //if (batch++ >= SAVE_INTERVAL)
+                    //{
+                    //    transaction.Commit();
+                    //    transaction.Bind(command);
+                    //    batch = 0;
+                    //}
                 });
                 foreach (var path in this.Paths)
                 {
@@ -95,30 +102,24 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(IDbTransaction transaction)
+        private void AddOrUpdateMetaData(ITransactionSource transaction)
         {
             using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddLibraryMetaDataItems, true))
             {
-                var query = this.Database.Sets.LibraryItem.Query(this.Database.Queries.GetLibraryItems, parameters => parameters["status"] = LibraryItemStatus.Import);
+                var enumerable = this.Database.ExecuteEnumerator<LibraryItem>(this.Database.Queries.GetLibraryItems, parameters => parameters["status"] = LibraryItemStatus.Import, transaction);
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
                 metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
                 metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                metaDataPopulator.Populate(query);
+                metaDataPopulator.Populate(enumerable);
             }
         }
 
-        private void SetLibraryItemsStatus(IDbTransaction transaction)
+        private void SetLibraryItemsStatus(ITransactionSource transaction)
         {
             this.IsIndeterminate = true;
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.SetLibraryItemStatus, out parameters))
-            {
-                command.Transaction = transaction;
-                parameters["status"] = LibraryItemStatus.None;
-                command.ExecuteNonQuery();
-            }
+            this.Database.Execute(this.Database.Queries.SetLibraryItemStatus, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
         }
     }
 }

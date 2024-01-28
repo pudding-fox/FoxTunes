@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 
@@ -11,10 +12,6 @@ namespace FoxTunes
 
         }
 
-        public ICore Core { get; private set; }
-
-        public IDatabase Database { get; private set; }
-
         public int Sequence { get; set; }
 
         public string DirectoryName { get; set; }
@@ -23,24 +20,8 @@ namespace FoxTunes
 
         public PlaylistItemStatus Status { get; set; }
 
-        private ObservableCollection<MetaDataItem> _MetaDatas { get; set; }
-
-        public ObservableCollection<MetaDataItem> MetaDatas
-        {
-            get
-            {
-                if (this._MetaDatas == null)
-                {
-                    this.LoadMetaDatas();
-                }
-                return this._MetaDatas;
-            }
-            set
-            {
-                this._MetaDatas = value;
-                this.OnMetaDatasChanged();
-            }
-        }
+        [Relation(RelationFlags.ManyToMany)]
+        public ObservableCollection<MetaDataItem> MetaDatas { get; set; }
 
         protected virtual void OnMetaDatasChanged()
         {
@@ -53,18 +34,6 @@ namespace FoxTunes
 
         public event EventHandler MetaDatasChanged = delegate { };
 
-        public override void InitializeComponent(ICore core)
-        {
-            this.Core = core;
-            this.Database = core.Components.Database;
-            base.InitializeComponent(core);
-        }
-
-        public void LoadMetaDatas()
-        {
-            this.MetaDatas = new ObservableCollection<MetaDataItem>(MetaDataInfo.GetMetaData(this.Core, this.Database, this, MetaDataItemType.All));
-        }
-
         public override bool Equals(IPersistableComponent other)
         {
             if (other is PlaylistItem)
@@ -73,7 +42,6 @@ namespace FoxTunes
             }
             return base.Equals(other);
         }
-
     }
 
     public enum PlaylistItemStatus : byte

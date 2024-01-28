@@ -1,7 +1,7 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -11,7 +11,7 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         private string _Filter { get; set; }
 
@@ -67,15 +67,20 @@ namespace FoxTunes
             {
                 query = this.Database.Queries.GetLibraryHierarchyNodesWithFilter;
             }
-            return new RecordEnumerator<LibraryHierarchyNode>(this.Core, this.Database, query, parameters =>
+            var nodes = this.Database.ExecuteEnumerator<LibraryHierarchyNode>(query, parameters =>
             {
                 parameters["libraryHierarchyId"] = libraryHierarchyId;
-                parameters["libraryHierarchyItemId"] = libraryHierarchyItemId.HasValue ? (object)libraryHierarchyItemId.Value : DBNull.Value;
+                parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
                 if (parameters.Contains("filter"))
                 {
                     parameters["filter"] = this.GetFilter();
                 }
-            });
+            }).ToArray();
+            foreach (var node in nodes)
+            {
+                node.InitializeComponent(this.Core);
+            }
+            return nodes;
         }
 
         private string GetFilter()

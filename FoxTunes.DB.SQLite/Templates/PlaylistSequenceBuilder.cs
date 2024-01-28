@@ -28,52 +28,27 @@ namespace FoxTunes.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"
-DROP TABLE IF EXISTS ""PlaylistSort"";
-CREATE TEMPORARY TABLE ""PlaylistSort""
-(
-	""PlaylistItem_Id"" INTEGER NOT NULL, 
-	""Value1"" text NULL,
-	""Value2"" text NULL,
-	""Value3"" text NULL,
-	""Value4"" text NULL,
-	""Value5"" text NULL,
-	""Value6"" text NULL,
-	""Value7"" text NULL,
-	""Value8"" text NULL,
-	""Value9"" text NULL,
-	""Value10"" text NULL
-);
-
-WITH ""VerticalMetaData""
-AS
-(
-	SELECT ""PlaylistItems"".""Id"", ""PlaylistItems"".""FileName"", ""MetaDataItems"".""Name"", 
-		CASE 
-			WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN 'Numeric' 
-			WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN 'Text' 
-			WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN 'File' 
-		END AS ""ValueType"",
-			CASE 
-			WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN ""MetaDataItems"".""NumericValue""
-			WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN ""MetaDataItems"".""TextValue"" 
-			WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN ""MetaDataItems"".""FileValue""
-		END AS ""Value""
-	FROM ""PlaylistItems""
-		LEFT OUTER JOIN ""PlaylistItem_MetaDataItem"" 
-			ON ""PlaylistItems"".""Id"" = ""PlaylistItem_MetaDataItem"".""PlaylistItem_Id""
-		LEFT OUTER JOIN ""MetaDataItems"" 
-			ON ""MetaDataItems"".""Id"" = ""PlaylistItem_MetaDataItem"".""MetaDataItem_Id""
-	WHERE ""PlaylistItems"".""Status"" = @status
-	ORDER BY ""PlaylistItems"".""Id""
-)
-,
-""HorizontalMetaData""
-AS
-(
-");
+            this.Write("\r\nCREATE TEMPORARY TABLE IF NOT EXISTS \"PlaylistSort\"\r\n(\r\n\t\"PlaylistItem_Id\" INTE" +
+                    "GER NOT NULL, \r\n\t\"Value1\" text NULL,\r\n\t\"Value2\" text NULL,\r\n\t\"Value3\" text NULL," +
+                    "\r\n\t\"Value4\" text NULL,\r\n\t\"Value5\" text NULL,\r\n\t\"Value6\" text NULL,\r\n\t\"Value7\" te" +
+                    "xt NULL,\r\n\t\"Value8\" text NULL,\r\n\t\"Value9\" text NULL,\r\n\t\"Value10\" text NULL\r\n);\r\n" +
+                    "\r\nCREATE TEMPORARY TABLE IF NOT EXISTS \"PlaylistSequence\"\r\n(\r\n\t\"Id\" INTEGER PRIM" +
+                    "ARY KEY NOT NULL,\r\n\t\"PlaylistItem_Id\" INTEGER NOT NULL\r\n);\r\n\r\nDELETE FROM \"Playl" +
+                    "istSort\";\r\nDELETE FROM \"PlaylistSequence\";\r\n\r\nWITH \"VerticalMetaData\"\r\nAS\r\n(\r\n\tS" +
+                    "ELECT \"PlaylistItems\".\"Id\", \"PlaylistItems\".\"FileName\", \"MetaDataItems\".\"Name\", " +
+                    "\r\n\t\tCASE \r\n\t\t\tWHEN \"MetaDataItems\".\"NumericValue\" IS NOT NULL THEN \'Numeric\' \r\n\t" +
+                    "\t\tWHEN \"MetaDataItems\".\"TextValue\" IS NOT NULL THEN \'Text\' \r\n\t\t\tWHEN \"MetaDataIt" +
+                    "ems\".\"FileValue\" IS NOT NULL THEN \'File\' \r\n\t\tEND AS \"ValueType\",\r\n\t\t\tCASE \r\n\t\t\tW" +
+                    "HEN \"MetaDataItems\".\"NumericValue\" IS NOT NULL THEN \"MetaDataItems\".\"NumericValu" +
+                    "e\"\r\n\t\t\tWHEN \"MetaDataItems\".\"TextValue\" IS NOT NULL THEN \"MetaDataItems\".\"TextVa" +
+                    "lue\" \r\n\t\t\tWHEN \"MetaDataItems\".\"FileValue\" IS NOT NULL THEN \"MetaDataItems\".\"Fil" +
+                    "eValue\"\r\n\t\tEND AS \"Value\"\r\n\tFROM \"PlaylistItems\"\r\n\t\tLEFT OUTER JOIN \"PlaylistIte" +
+                    "m_MetaDataItem\" \r\n\t\t\tON \"PlaylistItems\".\"Id\" = \"PlaylistItem_MetaDataItem\".\"Play" +
+                    "listItem_Id\"\r\n\t\tLEFT OUTER JOIN \"MetaDataItems\" \r\n\t\t\tON \"MetaDataItems\".\"Id\" = \"" +
+                    "PlaylistItem_MetaDataItem\".\"MetaDataItem_Id\"\r\n\tWHERE \"PlaylistItems\".\"Status\" = " +
+                    "@status\r\n\tORDER BY \"PlaylistItems\".\"Id\"\r\n)\r\n,\r\n\"HorizontalMetaData\"\r\nAS\r\n(\r\n");
             
-            #line 49 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
+            #line 57 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 		"VerticalMetaData", 
 		new[] { "Id", "FileName" }, 
@@ -87,7 +62,7 @@ AS
             this.Write("\r\n)\r\n\r\nSELECT \"HorizontalMetaData\".\"Id\" AS \"PlaylistItem_Id\", \"HorizontalMetaData" +
                     "\".\"FileName\" AS \"FileName\"\r\n");
             
-            #line 61 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
+            #line 69 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
 
 	for(var index = 0; index < this.MetaDataNames.Length; index++)
 	{
@@ -97,21 +72,21 @@ AS
             #line hidden
             this.Write(",\"Key_");
             
-            #line 64 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
+            #line 72 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 64 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
+            #line 72 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 64 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
+            #line 72 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\PlaylistSequenceBuilder.tt"
 
 	}
 
@@ -119,13 +94,6 @@ AS
             #line default
             #line hidden
             this.Write(@"FROM ""HorizontalMetaData"";
-
-DROP TABLE IF EXISTS ""PlaylistSequence"";
-CREATE TEMPORARY TABLE ""PlaylistSequence""
-(
-	""Id"" INTEGER PRIMARY KEY NOT NULL,
-	""PlaylistItem_Id"" INTEGER NOT NULL
-);
 
 INSERT INTO ""PlaylistSequence"" (""PlaylistItem_Id"")
 SELECT ""PlaylistItem_Id""
@@ -139,10 +107,7 @@ SET ""Sequence"" = ""Sequence"" +
 	FROM ""PlaylistSequence""
 	WHERE ""PlaylistSequence"".""PlaylistItem_Id"" = ""PlaylistItems"".""Id""
 )
-WHERE ""Status"" = @status;
-
-DROP TABLE ""PlaylistSort"";
-DROP TABLE ""PlaylistSequence"";");
+WHERE ""Status"" = @status;");
             return this.GenerationEnvironment.ToString();
         }
     }

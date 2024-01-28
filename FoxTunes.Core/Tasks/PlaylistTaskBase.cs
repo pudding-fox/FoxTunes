@@ -1,6 +1,6 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System;
-using System.Data;
 
 namespace FoxTunes
 {
@@ -18,7 +18,7 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -33,36 +33,31 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void ShiftItems(IDbTransaction transaction)
+        protected virtual void ShiftItems(ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Shifting playlist items at position {0} by offset {1}.", this.Sequence, this.Offset);
             this.IsIndeterminate = true;
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.ShiftPlaylistItems, out parameters))
+            this.Database.Execute(this.Database.Queries.ShiftPlaylistItems, parameters =>
             {
-                command.Transaction = transaction;
                 parameters["status"] = PlaylistItemStatus.None;
                 parameters["sequence"] = this.Sequence;
                 parameters["offset"] = this.Offset;
-                command.ExecuteNonQuery();
-            }
+            }, transaction);
         }
 
-        protected virtual void SequenceItems(IDbTransaction transaction)
+        protected virtual void SequenceItems(ITransactionSource transaction)
         {
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.PlaylistSequenceBuilder(MetaDataInfo.GetMetaDataNames(this.Database, transaction)), out parameters))
+            var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
+            using (var reader = this.Database.ExecuteReader(this.Database.Queries.PlaylistSequenceBuilder(metaDataNames), parameters =>
             {
-                command.Transaction = transaction;
                 parameters["status"] = PlaylistItemStatus.Import;
-                using (var reader = EnumerableDataReader.Create(command.ExecuteReader()))
-                {
-                    this.SequenceItems(transaction, reader);
-                }
+            }, transaction))
+            {
+                this.SequenceItems(transaction, reader);
             }
         }
 
-        protected virtual void SequenceItems(IDbTransaction transaction, EnumerableDataReader reader)
+        protected virtual void SequenceItems(ITransactionSource transaction, IDatabaseReader reader)
         {
             using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, transaction, false))
             {
@@ -71,29 +66,17 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void SetPlaylistItemsStatus(IDbTransaction transaction)
+        protected virtual void SetPlaylistItemsStatus(ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             this.IsIndeterminate = true;
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.SetPlaylistItemStatus, out parameters))
-            {
-                command.Transaction = transaction;
-                parameters["status"] = LibraryItemStatus.None;
-                command.ExecuteNonQuery();
-            }
+            this.Database.Execute(this.Database.Queries.SetPlaylistItemStatus, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
         }
 
-        protected virtual void AddOrUpdateMetaDataFromLibrary(IDbTransaction transaction)
+        protected virtual void AddOrUpdateMetaDataFromLibrary(ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Updating playlist items with meta data from library.");
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.CopyMetaDataItems, out parameters))
-            {
-                command.Transaction = transaction;
-                parameters["status"] = PlaylistItemStatus.Import;
-                command.ExecuteNonQuery();
-            }
+            this.Database.Execute(this.Database.Queries.CopyMetaDataItems, parameters => parameters["status"] = LibraryItemStatus.Import, transaction);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,10 +10,24 @@ namespace FoxTunes
     {
         static BackgroundTask()
         {
-            Semaphores = new ConcurrentDictionary<Type, SemaphoreSlim>();
+            Semaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
         }
 
-        private static ConcurrentDictionary<Type, SemaphoreSlim> Semaphores { get; set; }
+        private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
+
+        public static async Task Idle()
+        {
+            foreach (var key in Semaphores.Keys)
+            {
+                var value = default(SemaphoreSlim);
+                if (!Semaphores.TryGetValue(key, out value))
+                {
+                    continue;
+                }
+                await value.WaitAsync();
+                value.Release();
+            }
+        }
 
         protected BackgroundTask(string id)
         {
@@ -39,19 +52,11 @@ namespace FoxTunes
             }
         }
 
-        public virtual BackgroundTaskPriority Priority
-        {
-            get
-            {
-                return BackgroundTaskPriority.None;
-            }
-        }
-
         public SemaphoreSlim Semaphore
         {
             get
             {
-                return Semaphores.GetOrAdd(this.GetType(), type => new SemaphoreSlim(this.Concurrency, this.Concurrency));
+                return Semaphores.GetOrAdd(this.Id, type => new SemaphoreSlim(this.Concurrency, this.Concurrency));
             }
         }
 
@@ -74,9 +79,9 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnNameChanged()
+        protected virtual Task OnNameChanged()
         {
-            this.ForegroundTaskRunner.Run(() =>
+            return this.ForegroundTaskRunner.RunAsync(() =>
             {
                 if (this.NameChanged != null)
                 {
@@ -103,9 +108,9 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnDescriptionChanged()
+        protected virtual Task OnDescriptionChanged()
         {
-            this.ForegroundTaskRunner.Run(() =>
+            return this.ForegroundTaskRunner.RunAsync(() =>
             {
                 if (this.DescriptionChanged != null)
                 {
@@ -132,16 +137,16 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnPositionChanged()
+        protected virtual Task OnPositionChanged()
         {
-            this.ForegroundTaskRunner.Run(() =>
+            return this.ForegroundTaskRunner.RunAsync(() =>
             {
                 if (this.PositionChanged != null)
                 {
                     this.PositionChanged(this, EventArgs.Empty);
                 }
                 this.OnPropertyChanged("Position");
-                this.OnIsIndeterminateChanged();
+                return this.OnIsIndeterminateChanged();
             });
         }
 
@@ -162,16 +167,16 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnCountChanged()
+        protected virtual Task OnCountChanged()
         {
-            this.ForegroundTaskRunner.Run(() =>
+            return this.ForegroundTaskRunner.RunAsync(() =>
             {
                 if (this.CountChanged != null)
                 {
                     this.CountChanged(this, EventArgs.Empty);
                 }
                 this.OnPropertyChanged("Count");
-                this.OnIsIndeterminateChanged();
+                return this.OnIsIndeterminateChanged();
             });
         }
 
@@ -198,9 +203,9 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnIsIndeterminateChanged()
+        protected virtual Task OnIsIndeterminateChanged()
         {
-            this.ForegroundTaskRunner.Run(() =>
+            return this.ForegroundTaskRunner.RunAsync(() =>
             {
                 if (this.IsIndeterminateChanged != null)
                 {
@@ -212,27 +217,27 @@ namespace FoxTunes
 
         public event EventHandler IsIndeterminateChanged = delegate { };
 
-        public Task Run()
+        public virtual Task Run()
         {
             Logger.Write(this, LogLevel.Debug, "Running background task.");
             return this.BackgroundTaskRunner.Run(async () =>
             {
                 await Semaphore.WaitAsync();
-                this.OnStarted();
+                await this.OnStarted();
                 try
                 {
-                    await this.OnRun().ContinueWith(task =>
+                    await this.OnRun().ContinueWith(async task =>
                     {
                         switch (task.Status)
                         {
                             case TaskStatus.Faulted:
                                 Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
                                 this.Exception = task.Exception.InnerException;
-                                this.OnFaulted();
+                                await this.OnFaulted();
                                 break;
                             default:
                                 Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
-                                this.OnCompleted();
+                                await this.OnCompleted();
                                 break;
                         }
                         Semaphore.Release();
@@ -242,37 +247,32 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
                     this.Exception = e;
-                    this.OnFaulted();
+                    await this.OnFaulted();
                     Semaphore.Release();
                 }
-            }, this.Priority);
-        }
-
-        public void RunSynchronously()
-        {
-            throw new NotImplementedException();
+            });
         }
 
         protected abstract Task OnRun();
 
-        protected virtual void OnStarted()
+        protected virtual Task OnStarted()
         {
             if (this.Started == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.ForegroundTaskRunner.Run(() => this.Started(this, EventArgs.Empty));
+            return this.ForegroundTaskRunner.RunAsync(() => this.Started(this, EventArgs.Empty));
         }
 
         public event EventHandler Started = delegate { };
 
-        protected virtual void OnCompleted()
+        protected virtual Task OnCompleted()
         {
             if (this.Completed == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.ForegroundTaskRunner.Run(() => this.Completed(this, EventArgs.Empty));
+            return this.ForegroundTaskRunner.RunAsync(() => this.Completed(this, EventArgs.Empty));
         }
 
         public event EventHandler Completed = delegate { };
@@ -292,9 +292,9 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnExceptionChanged()
+        protected virtual Task OnExceptionChanged()
         {
-            this.ForegroundTaskRunner.Run(() =>
+            return this.ForegroundTaskRunner.RunAsync(() =>
             {
                 if (this.ExceptionChanged != null)
                 {
@@ -306,13 +306,13 @@ namespace FoxTunes
 
         public event EventHandler ExceptionChanged = delegate { };
 
-        protected virtual void OnFaulted()
+        protected virtual Task OnFaulted()
         {
             if (this.Faulted == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.ForegroundTaskRunner.Run(() => this.Faulted(this, EventArgs.Empty));
+            return this.ForegroundTaskRunner.RunAsync(() => this.Faulted(this, EventArgs.Empty));
         }
 
         public event EventHandler Faulted = delegate { };

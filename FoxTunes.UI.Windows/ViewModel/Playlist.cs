@@ -26,7 +26,7 @@ namespace FoxTunes.ViewModel
 
         public IScriptingContext ScriptingContext { get; private set; }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -179,14 +179,14 @@ namespace FoxTunes.ViewModel
             base.OnCoreChanged();
         }
 
-        protected virtual void OnSignal(object sender, ISignal signal)
+        protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistColumnsUpdated:
-                    this.ForegroundTaskRunner.Run(this.Reload);
-                    break;
+                    return this.ForegroundTaskRunner.RunAsync(() => this.Reload());
             }
+            return Task.CompletedTask;
         }
 
         public ICommand PlaySelectedItemCommand

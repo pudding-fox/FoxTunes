@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System.Windows;
 using System.Windows.Input;
 

@@ -1,6 +1,5 @@
-﻿using FoxTunes.Interfaces;
-using System;
-using System.Data;
+﻿using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -38,14 +37,11 @@ namespace FoxTunes
             using (var transaction = this.Database.BeginTransaction())
             {
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
-                using (var command = this.Database.CreateCommand(this.Database.Queries.LibraryHierarchyBuilder(metaDataNames), transaction))
+                using (var reader = this.Database.ExecuteReader(this.Database.Queries.LibraryHierarchyBuilder(metaDataNames), null, transaction))
                 {
-                    using (var reader = EnumerableDataReader.Create(command.ExecuteReader()))
-                    {
-                        this.AddHiearchies(transaction, reader);
-                        this.Description = "Finalizing";
-                        this.IsIndeterminate = true;
-                    }
+                    this.AddHiearchies(transaction, reader);
+                    this.Description = "Finalizing";
+                    this.IsIndeterminate = true;
                 }
                 transaction.Commit();
             }
@@ -53,7 +49,7 @@ namespace FoxTunes
             return Task.CompletedTask;
         }
 
-        private void AddHiearchies(IDbTransaction transaction, EnumerableDataReader reader)
+        private void AddHiearchies(ITransactionSource transaction, IDatabaseReader reader)
         {
             using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, transaction, true))
             {

@@ -45,7 +45,7 @@ namespace FoxTunes.Behaviours
                 return;
             }
             Logger.Write(this, LogLevel.Debug, "Current stream is about to end, pre-empting the next stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-            this.Output.Preempt(outputStream);
+            this.Output.Preempt(outputStream).Wait();
         }
     }
 }

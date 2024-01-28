@@ -44,7 +44,7 @@ namespace FoxTunes.Managers
                 Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
                 this.Unload().Wait();
             }
-            this.ForegroundTaskRunner.Run(() => this.CurrentStream = e.OutputStream).Wait();
+            this.ForegroundTaskRunner.RunAsync(() => this.CurrentStream = e.OutputStream).Wait();
             Logger.Write(this, LogLevel.Debug, "Output stream loaded: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
         }
 

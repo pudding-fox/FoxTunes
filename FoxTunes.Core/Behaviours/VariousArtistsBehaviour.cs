@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Behaviours
 {
     [Component("D3B587B2-C1AE-4E06-A6C9-592DD7FF157D", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class VariousArtistsBehaviour : StandardBehaviour
     {
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -17,26 +18,25 @@ namespace FoxTunes.Behaviours
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnSignal(object sender, ISignal signal)
+        protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.LibraryUpdated:
-                    this.OnRun();
-                    break;
+                    return this.OnRun();
             }
+            return Task.CompletedTask;
         }
 
-        protected virtual void OnRun()
+        protected virtual Task OnRun()
         {
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.VariousArtists, out parameters))
+            this.Database.Execute(this.Database.Queries.VariousArtists, parameters =>
             {
                 parameters["name"] = CustomMetaData.VariousArtists;
                 parameters["type"] = MetaDataItemType.Tag;
                 parameters["numericValue"] = 1;
-                command.ExecuteNonQuery();
-            }
+            });
+            return Task.CompletedTask;
         }
     }
 }

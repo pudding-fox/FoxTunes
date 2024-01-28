@@ -20,7 +20,5 @@ namespace FoxTunes.Interfaces
         event EventHandler Faulted;
 
         Task Run();
-
-        void RunSynchronously();
     }
 }

@@ -17,11 +17,11 @@ namespace FoxTunes
             }
         }
 
-        public IDatabase Database
+        public IDatabaseComponent Database
         {
             get
             {
-                return ComponentRegistry.Instance.GetComponent<IDatabase>();
+                return ComponentRegistry.Instance.GetComponent<IDatabaseComponent>();
             }
         }
 

@@ -5,6 +5,9 @@ CREATE TABLE [PlaylistItems](
     [DirectoryName] text NOT NULL, 
     [FileName] text NOT NULL, 
     [Status] bigint NOT NULL);
+CREATE INDEX [IDX_PlaylistItems]
+ON [PlaylistItems](
+    [Status]);
 CREATE TABLE [PlaylistItem_MetaDataItem](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
     [PlaylistItem_Id] INTEGER NOT NULL REFERENCES PlaylistItems([Id]) ON DELETE CASCADE, 
@@ -44,6 +47,9 @@ CREATE TABLE "LibraryHierarchyLevels" (
 	`SortScript`	TEXT,
 	PRIMARY KEY(`Id`)
 );
+CREATE INDEX [IDX_LibraryHierarchyLevels]
+ON [LibraryHierarchyLevels](
+	[LibraryHierarchy_Id]);
 INSERT INTO `LibraryHierarchyLevels` VALUES (1,1,'(function(){if(tag.__ft_variousartists) { return "Various Artists"; } return  tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist||"No Artist";})()',NULL);
 INSERT INTO `LibraryHierarchyLevels` VALUES (2,1,'(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
 INSERT INTO `LibraryHierarchyLevels` VALUES (3,1,'(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
