@@ -30,10 +30,6 @@ namespace FoxTunes
             {
                 return;
             }
-            if (!WindowExtensions.SupportsAcrylicBlur)
-            {
-                return;
-            }
             var windowHelper = new WindowInteropHelper(window);
             WindowExtensions.EnableAcrylicBlur(windowHelper.Handle, GetAccentColor(window));
         }

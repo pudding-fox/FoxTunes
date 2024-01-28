@@ -105,22 +105,6 @@ namespace FoxTunes
             }
         }
 
-        public static bool SupportsAcrylicBlur
-        {
-            get
-            {
-                OsVersion version = new OsVersion();
-                if (RtlGetVersion(ref version) == 0)
-                {
-                    return version.BuildNumber >= 22621;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
         public static Color DefaultAccentColor
         {
             get
@@ -186,21 +170,6 @@ namespace FoxTunes
             }
             CurrentAccentColor = color;
         }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct OsVersion
-        {
-            public uint OSVersionInfoSize;
-            public uint MajorVersion;
-            public uint MinorVersion;
-            public uint BuildNumber;
-            public uint PlatformId;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-            public string CSDVersion;
-        }
-
-        [DllImport("ntdll.dll", SetLastError = true)]
-        public static extern int RtlGetVersion(ref OsVersion version);
 
         public struct DwmColors
         {
