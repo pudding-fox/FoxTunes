@@ -45,7 +45,12 @@ namespace FoxTunes
 
         public int ChannelHandle { get; private set; }
 
-        public BassFlags InputFlags { get; private set; }
+        /// <remarks>
+        /// If we define this property as <see cref="BassFlags"/> we will
+        /// get a type load exception when starting up. I have no idea
+        /// why. Good stuff.
+        /// </remarks>
+        public virtual Enum InputFlags { get; private set; }
 
         public virtual BassFlags OutputFlags
         {
@@ -222,7 +227,7 @@ namespace FoxTunes
             }
             else if (this.Position(outputStream) == 0)
             {
-                //Nothing to do, already playing.
+                this.Play();
                 return;
             }
             else
