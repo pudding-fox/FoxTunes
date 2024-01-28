@@ -13,5 +13,13 @@
         {
             this.IsCancellationRequested = false;
         }
+
+        public static CancellationToken None
+        {
+            get
+            {
+                return new CancellationToken();
+            }
+        }
     }
 }

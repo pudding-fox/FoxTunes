@@ -39,7 +39,7 @@ namespace FoxTunes
                 await this.Database.ExecuteAsync(this.Database.Queries.BeginBuildLibraryHierarchies, transaction);
                 using (var reader = this.Database.ExecuteReader(this.Database.Queries.BuildLibraryHierarchies(metaDataNames), null, transaction))
                 {
-                    await this.AddHiearchies(reader, new CancellationToken(), transaction);
+                    await this.AddHiearchies(reader, CancellationToken.None, transaction);
                     this.Description = "Finalizing";
                     this.IsIndeterminate = true;
                 }

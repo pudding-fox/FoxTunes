@@ -3,8 +3,10 @@ using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -24,6 +26,10 @@ namespace FoxTunes
 
         public IDatabaseComponent Database { get; private set; }
 
+        public IPlaybackManager PlaybackManager { get; private set; }
+
+        public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
@@ -32,9 +38,57 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Database = core.Factories.Database.Create();
+            this.PlaybackManager = core.Managers.Playback;
+            this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             base.InitializeComponent(core);
+        }
+
+        protected virtual async Task AddPaths(IEnumerable<string> paths, ITransactionSource transaction)
+        {
+            await this.AddPlaylistItems(paths, transaction);
+            await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
+            using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            {
+                await this.AddOrUpdateMetaData(cancellationToken, transaction);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    this.Name = "Waiting..";
+                    this.Description = string.Empty;
+                }
+            }))
+            {
+                await task.Run();
+            }
+            await this.UpdateVariousArtists(transaction);
+            await this.SequenceItems(CancellationToken.None, transaction);
+            await this.SetPlaylistItemsStatus(transaction);
+        }
+
+        protected virtual async Task AddPlaylistItems(IEnumerable<string> paths, ITransactionSource transaction)
+        {
+            using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, false, transaction))
+            {
+                await playlistPopulator.Populate(paths);
+                this.Offset = playlistPopulator.Offset;
+            }
+        }
+
+        protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken, ITransactionSource transaction)
+        {
+            var query = this.Database
+               .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
+               .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, true, transaction))
+            {
+                metaDataPopulator.InitializeComponent(this.Core);
+                metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
+                metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
+                metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
+                metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
+                await metaDataPopulator.Populate(query, cancellationToken);
+            }
         }
 
         protected virtual Task RemoveItems(PlaylistItemStatus status, ITransactionSource transaction)

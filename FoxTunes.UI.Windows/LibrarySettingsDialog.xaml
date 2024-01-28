@@ -142,6 +142,8 @@
                     <Setter Property="Margin" Value="7,7,0,0"></Setter>
                 </Style>
             </StackPanel.Resources>
+            <Button Command="{Binding ClearCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Clear</Button>
+            <Button Command="{Binding RescanCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Rescan</Button>
             <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
             <Button Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
         </StackPanel>

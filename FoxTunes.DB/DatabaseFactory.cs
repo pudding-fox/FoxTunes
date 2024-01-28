@@ -7,7 +7,15 @@ namespace FoxTunes
 {
     public abstract class DatabaseFactory : StandardFactory, IDatabaseFactory
     {
+        public ICore Core { get; private set; }
+
         public IConfig Config { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Core = core;
+            base.InitializeComponent(core);
+        }
 
         public IDatabaseComponent Create()
         {
@@ -19,16 +27,17 @@ namespace FoxTunes
             else
             {
                 this.Config = database.Config;
-                this.Configure();
+                this.Configure(database);
             }
+            database.InitializeComponent(this.Core);
             return database;
         }
 
         protected abstract IDatabaseComponent OnCreate();
 
-        protected virtual void Configure()
+        protected virtual void Configure(IDatabase database)
         {
-            this.Config.Table<PlaylistItem>().With(table =>
+            database.Config.Table<PlaylistItem>().With(table =>
             {
                 table.Relation(item => item.MetaDatas).With(relation =>
                 {
@@ -37,13 +46,13 @@ namespace FoxTunes
                     relation.Expression.Right = relation.CreateConstraint().With(constraint =>
                     {
                         constraint.Left = relation.CreateConstraint(
-                            this.Config.Table<PlaylistItem>().Column("LibraryItem_Id"),
-                            this.Config.Table<LibraryItem, MetaDataItem>().Column("LibraryItem_Id")
+                            database.Config.Table<PlaylistItem>().Column("LibraryItem_Id"),
+                            database.Config.Table<LibraryItem, MetaDataItem>().Column("LibraryItem_Id")
                         );
                         constraint.Operator = constraint.CreateOperator(QueryOperator.AndAlso);
                         constraint.Right = relation.CreateConstraint(
-                            this.Config.Table<LibraryItem, MetaDataItem>().Column("MetaDataItem_Id"),
-                            this.Config.Table<MetaDataItem>().Column("Id")
+                            database.Config.Table<LibraryItem, MetaDataItem>().Column("MetaDataItem_Id"),
+                            database.Config.Table<MetaDataItem>().Column("Id")
                         );
                     });
                 });

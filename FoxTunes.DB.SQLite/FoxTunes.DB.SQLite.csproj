@@ -55,6 +55,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SQLiteDatabase.cs" />
+    <Compile Include="SQLiteDatabaseFactory.cs" />
     <Compile Include="SQLiteDatabaseQueries.cs" />
     <Compile Include="Templates\LibraryHierarchyBuilder.cs">
       <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>

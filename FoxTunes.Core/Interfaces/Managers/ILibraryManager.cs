@@ -9,6 +9,8 @@ namespace FoxTunes.Interfaces
 
         Task Add(IEnumerable<string> paths);
 
+        Task Rescan();
+
         Task Clear();
     }
 }

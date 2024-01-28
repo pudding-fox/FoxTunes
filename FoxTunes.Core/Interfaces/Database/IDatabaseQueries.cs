@@ -7,6 +7,8 @@ namespace FoxTunes.Interfaces
     {
         IDatabaseQuery RemovePlaylistItems { get; }
 
+        IDatabaseQuery RemoveLibraryHierarchyItems { get; }
+
         IDatabaseQuery RemoveLibraryItems { get; }
 
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }

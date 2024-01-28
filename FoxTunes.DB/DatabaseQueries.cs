@@ -30,7 +30,18 @@ namespace FoxTunes
         {
             get
             {
-                return this.Database.QueryFactory.Create(Resources.RemoveLibraryItems);
+                return this.Database.QueryFactory.Create(
+                    Resources.RemoveLibraryItems,
+                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
+
+        public IDatabaseQuery RemoveLibraryHierarchyItems
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(Resources.RemoveLibraryHierarchyItems);
             }
         }
 

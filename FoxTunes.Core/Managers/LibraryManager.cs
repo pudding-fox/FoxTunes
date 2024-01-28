@@ -119,6 +119,16 @@ namespace FoxTunes.Managers
             }
         }
 
+        public async Task Rescan()
+        {
+            using (var task = new RescanLibraryTask())
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run();
+            }
+        }
+
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)
