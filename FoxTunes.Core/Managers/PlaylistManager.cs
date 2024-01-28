@@ -22,11 +22,15 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
+
+        public PlaylistNavigationStrategy NavigationStrategy { get; private set; }
 
         private bool _CanNavigate { get; set; }
 
@@ -60,6 +64,22 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                PlaylistBehaviourConfiguration.SECTION,
+                PlaylistBehaviourConfiguration.SHUFFLE_ELEMENT
+            ).ConnectValue(value =>
+            {
+                if (value)
+                {
+                    this.NavigationStrategy = new ShufflePlaylistNavigationStrategy();
+                }
+                else
+                {
+                    this.NavigationStrategy = new StandardPlaylistNavigationStrategy();
+                }
+                this.NavigationStrategy.InitializeComponent(this.Core);
+            });
             this.DatabaseFactory = core.Factories.Database;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
@@ -256,7 +276,7 @@ namespace FoxTunes
 
         public async Task<int> GetInsertIndex()
         {
-            var playlistItem = await this.GetLastPlaylistItem();
+            var playlistItem = await this.NavigationStrategy.GetLastPlaylistItem();
             if (playlistItem == null)
             {
                 return 0;
@@ -267,29 +287,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task<PlaylistItem> GetNext()
+        public Task<PlaylistItem> GetNext(bool navigate)
         {
-            var playlistItem = default(PlaylistItem);
-            if (this.CurrentItem == null)
-            {
-                Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                playlistItem = await this.GetFirstPlaylistItem();
-            }
-            else
-            {
-                Logger.Write(this, LogLevel.Debug, "Current playlist item is sequence: {0}", this.CurrentItem.Sequence);
-                playlistItem = await this.GetNextPlaylistItem(this.CurrentItem.Sequence);
-                if (playlistItem == null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
-                    playlistItem = await this.GetFirstPlaylistItem();
-                }
-            }
-            if (playlistItem == null)
-            {
-                Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
-            }
-            return playlistItem;
+            return this.NavigationStrategy.GetNext(navigate);
         }
 
         public async Task Next()
@@ -307,7 +307,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.GetNext();
+                var playlistItem = await this.GetNext(true);
                 if (playlistItem == null)
                 {
                     return;
@@ -321,29 +321,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task<PlaylistItem> GetPrevious()
+        public Task<PlaylistItem> GetPrevious(bool navigate)
         {
-            var playlistItem = default(PlaylistItem);
-            if (this.CurrentItem == null)
-            {
-                Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming last item.");
-                playlistItem = await this.GetLastPlaylistItem();
-            }
-            else
-            {
-                Logger.Write(this, LogLevel.Debug, "Previous playlist item is sequence: {0}", this.CurrentItem.Sequence);
-                playlistItem = await this.GetPreviousPlaylistItem(this.CurrentItem.Sequence);
-                if (playlistItem == null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
-                    playlistItem = await this.GetLastPlaylistItem();
-                }
-            }
-            if (playlistItem == null)
-            {
-                Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
-            }
-            return playlistItem;
+            return this.NavigationStrategy.GetPrevious(navigate);
         }
 
         public async Task Previous()
@@ -361,7 +341,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.GetPrevious();
+                var playlistItem = await this.GetPrevious(true);
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem);
             }
@@ -371,7 +351,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task<PlaylistItem> GetPlaylistItem(int sequence)
+        public virtual async Task<PlaylistItem> Get(int sequence)
         {
             using (var database = this.DatabaseFactory.Create())
             {
@@ -385,7 +365,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task<PlaylistItem> GetPlaylistItem(string fileName)
+        public virtual async Task<PlaylistItem> Get(string fileName)
         {
             using (var database = this.DatabaseFactory.Create())
             {
@@ -393,64 +373,6 @@ namespace FoxTunes
                 {
                     return await database.AsQueryable<PlaylistItem>(transaction)
                         .Where(playlistItem => playlistItem.FileName == fileName)
-                        .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
-                }
-            }
-        }
-
-        protected virtual async Task<PlaylistItem> GetFirstPlaylistItem()
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    return await database.AsQueryable<PlaylistItem>(transaction)
-                        .OrderBy(playlistItem => playlistItem.Sequence)
-                        .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
-                }
-            }
-        }
-
-        protected virtual async Task<PlaylistItem> GetLastPlaylistItem()
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    return await database.AsQueryable<PlaylistItem>(transaction)
-                        .OrderByDescending(playlistItem => playlistItem.Sequence)
-                        .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
-                }
-            }
-        }
-
-        protected virtual async Task<PlaylistItem> GetNextPlaylistItem(int sequence)
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    return await database.AsQueryable<PlaylistItem>(transaction)
-                        .Where(playlistItem => playlistItem.Sequence > sequence)
-                        .OrderBy(playlistItem => playlistItem.Sequence)
-                        .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
-                }
-            }
-        }
-
-        protected virtual async Task<PlaylistItem> GetPreviousPlaylistItem(int sequence)
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    return await database.AsQueryable<PlaylistItem>(transaction)
-                        .Where(playlistItem => playlistItem.Sequence < sequence)
-                        .OrderByDescending(playlistItem => playlistItem.Sequence)
                         .Take(1)
                         .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
                 }
@@ -474,7 +396,7 @@ namespace FoxTunes
 
         public async Task Play(string fileName)
         {
-            var playlistItem = await this.GetPlaylistItem(fileName);
+            var playlistItem = await this.Get(fileName);
             if (playlistItem == null)
             {
                 return;
@@ -484,7 +406,7 @@ namespace FoxTunes
 
         public async Task Play(int sequence)
         {
-            var playlistItem = await this.GetPlaylistItem(sequence);
+            var playlistItem = await this.Get(sequence);
             if (playlistItem == null)
             {
                 return;
