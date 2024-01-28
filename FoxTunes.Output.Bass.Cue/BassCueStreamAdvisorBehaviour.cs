@@ -226,7 +226,7 @@ namespace FoxTunes
                 {
                     //Always append for now.
                     this.Sequence = this.PlaylistBrowser.GetInsertIndex(playlist);
-                    await this.AddPlaylistItems(playlistItems).ConfigureAwait(false);
+                    await this.AddPlaylistItems(playlist, playlistItems).ConfigureAwait(false);
                     await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
                     await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
                 }))
@@ -236,7 +236,7 @@ namespace FoxTunes
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new[] { this.Playlist })).ConfigureAwait(false);
             }
 
-            private async Task AddPlaylistItems(IEnumerable<PlaylistItem> playlistItems)
+            private async Task AddPlaylistItems(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
@@ -245,6 +245,7 @@ namespace FoxTunes
                     foreach (var playlistItem in playlistItems)
                     {
                         Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        playlistItem.Playlist_Id = playlist.Id;
                         playlistItem.Sequence = this.Sequence + position;
                         playlistItem.Status = PlaylistItemStatus.Import;
                         await set.AddAsync(playlistItem).ConfigureAwait(false);
