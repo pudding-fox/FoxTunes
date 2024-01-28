@@ -24,6 +24,8 @@ namespace FoxTunes
 
         public ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<IList<LibraryHierarchyNode>>> Nodes { get; private set; }
 
+        public IFilterParser FilterParser { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public LibraryHierarchyCache()
@@ -33,6 +35,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.FilterParser = core.Components.FilterParser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
@@ -43,12 +46,25 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    //Just reset caches with filters.
-                    var keys = this.Keys.Where(
-                        key => !string.IsNullOrEmpty(key.Filter)
-                    );
-                    foreach (var key in keys)
+                    var names = signal.State as IEnumerable<string>;
+                    var appliesTo = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var key in this.Keys)
                     {
+                        if (string.IsNullOrEmpty(key.Filter))
+                        {
+                            //No filter.
+                            continue;
+                        }
+                        if (names != null && names.Any())
+                        {
+                            //If we know what meta data was updated then check if the filter applies to it.
+                            if (!appliesTo.GetOrAdd(key.Filter, filter => this.FilterParser.AppliesTo(filter, names)))
+                            {
+                                //It's unrelated.
+                                continue;
+                            }
+                        }
+                        //The cache entry is affected by the meta data update, invalidate it.
                         this.Evict(key);
                     }
                     break;

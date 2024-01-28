@@ -63,6 +63,26 @@ namespace FoxTunes
             return string.IsNullOrEmpty(filter);
         }
 
+        public bool AppliesTo(string filter, IEnumerable<string> names)
+        {
+            var result = default(IFilterParserResult);
+            if (!this.TryParse(filter, out result))
+            {
+                return false;
+            }
+            foreach (var group in result.Groups)
+            {
+                foreach (var entry in group.Entries)
+                {
+                    if (names.Contains(entry.Name, true))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return FilterParserConfiguration.GetConfigurationSections();

@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IFilterParser FilterParser { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         private string _Filter { get; set; }
@@ -93,6 +95,7 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
             this.DatabaseFactory = core.Factories.Database;
+            this.FilterParser = core.Components.FilterParser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
@@ -104,9 +107,16 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
                     if (!string.IsNullOrEmpty(this.Filter))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Meta data was updated and there is an active filter, refreshing.");
+                        if (names != null && names.Any() && !this.FilterParser.AppliesTo(this.Filter, names))
+                        {
+                            //There is a filter but the meta data update does not apply to it.
+                            //Nothing to do.
+                            break;
+                        }
+                        Logger.Write(this, LogLevel.Debug, "Meta data was updated and there is an active filter which applies to it, refreshing.");
                         return this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
                     }
                     break;
