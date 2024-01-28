@@ -238,7 +238,10 @@ namespace FoxTunes
 
                 if (item is FrameworkElement frameworkElement)
                 {
-                    return new Size(frameworkElement.Width, frameworkElement.Height);
+                    if (!double.IsNaN(frameworkElement.Width) && !double.IsNaN(frameworkElement.Height))
+                    {
+                        return new Size(frameworkElement.Width, frameworkElement.Height);
+                    }
                 }
             }
 
