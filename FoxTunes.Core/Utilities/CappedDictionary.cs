@@ -21,6 +21,24 @@ namespace FoxTunes
 
         public int Capacity { get; private set; }
 
+        public TValue GetOrAdd(TKey key, Func<TValue> factory)
+        {
+            lock (SyncRoot)
+            {
+                var value = default(TValue);
+                if (this.TryGetValue(key, out value))
+                {
+                    return value;
+                }
+                else
+                {
+                    value = factory();
+                }
+                this.Add(key, value);
+                return value;
+            }
+        }
+
         public void Add(TKey key, TValue value)
         {
             this.Store[key] = value;
