@@ -83,10 +83,22 @@ CREATE INDEX [IDX_PlaylistItem_MetaDataItem_PlaylistItem_Id] ON [PlaylistItem_Me
 	[PlaylistItem_Id]
 );
 
+CREATE INDEX [IDX_PlaylistItem_MetaDataItem_MetaDataItem_Id] ON [PlaylistItem_MetaDataItem](
+	[MetaDataItem_Id]
+);
+
 CREATE INDEX [IDX_LibraryItem_MetaDataItem_LibraryItem_Id] ON [LibraryItem_MetaDataItem](
 	[LibraryItem_Id]
 );
 
+CREATE INDEX [IDX_LibraryItem_MetaDataItem_MetaDataItem_Id] ON [LibraryItem_MetaDataItem](
+	[MetaDataItem_Id]
+);
+
 CREATE INDEX [IDX_LibraryHierarchyItems_LibraryHierarchy_Id)] ON [LibraryHierarchyItems](
 	[LibraryHierarchy_Id]
+);
+
+CREATE INDEX [IXD_LibraryHierarchyItem_LibraryItem_LibraryHierarchyItem_Id] ON [LibraryHierarchyItem_LibraryItem](
+	[LibraryHierarchyItem_Id]
 );

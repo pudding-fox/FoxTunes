@@ -66,7 +66,7 @@ namespace FoxTunes
             }
         }
 
-        public bool IsCancellationRequested { get; private set; }
+        public bool IsCancellationRequested { get; protected set; }
 
         protected virtual void OnCancellationRequested()
         {

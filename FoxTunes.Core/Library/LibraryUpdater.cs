@@ -31,6 +31,31 @@ namespace FoxTunes
 
         public ITransactionSource Transaction { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public IntegerConfigurationElement Threads { get; private set; }
+
+        public override ParallelOptions ParallelOptions
+        {
+            get
+            {
+                return new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = this.Threads.Value
+                };
+            }
+        }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Configuration = core.Components.Configuration;
+            this.Threads = this.Configuration.GetElement<IntegerConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.THREADS_ELEMENT
+            );
+            base.InitializeComponent(core);
+        }
+
         public async Task Populate(CancellationToken cancellationToken)
         {
             var set = this.Database.Set<LibraryItem>(this.Transaction);
@@ -44,12 +69,9 @@ namespace FoxTunes
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
-            foreach (var libraryItem in set)
+
+            await AsyncParallel.ForEach(set, async libraryItem =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
                 if (this.Predicate(libraryItem))
                 {
                     await this.Task(set, libraryItem);
@@ -74,9 +96,9 @@ namespace FoxTunes
                             this.Semaphore.Release();
                         }
                     }
+                    Interlocked.Increment(ref position);
                 }
-                Interlocked.Increment(ref position);
-            }
+            }, cancellationToken, this.Threads);
         }
     }
 }

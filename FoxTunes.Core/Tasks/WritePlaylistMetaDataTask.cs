@@ -111,7 +111,7 @@ namespace FoxTunes
                     }
                 }, transaction);
 
-                using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, transaction))
+                using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, transaction))
                 {
                     await writer.Write(playlistItem.Id, playlistItem.MetaDatas);
                 }
@@ -137,7 +137,7 @@ namespace FoxTunes
                     }
                 }, transaction);
 
-                using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddLibraryMetaDataItems, transaction))
+                using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddLibraryMetaDataItem, transaction))
                 {
                     await writer.Write(playlistItem.LibraryItem_Id.Value, playlistItem.MetaDatas);
                 }

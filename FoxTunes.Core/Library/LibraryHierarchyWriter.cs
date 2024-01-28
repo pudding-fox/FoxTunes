@@ -1,16 +1,14 @@
-﻿#pragma warning disable 612, 618
-using FoxDb;
+﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class LibraryHierarchyWriter : Disposable
     {
-        const int CACHE_SIZE = 512;
+        const int CACHE_SIZE = 5120;
 
         private LibraryHierarchyWriter()
         {
@@ -91,26 +89,15 @@ namespace FoxTunes
         {
             public Cache(int capacity)
             {
-                this.Keys = new Queue<Key>(capacity);
-                this.Store = new Dictionary<Key, int>(capacity);
-                this.Capacity = capacity;
+                this.Store = new CappedDictionary<Key, int>(capacity);
             }
 
-            public Queue<Key> Keys { get; private set; }
-
-            public IDictionary<Key, int> Store { get; private set; }
-
-            public int Capacity { get; private set; }
+            public CappedDictionary<Key, int> Store { get; private set; }
 
             public void Add(int libraryHierarchyId, int? parentId, string value, int libraryHierarchyItemId)
             {
                 var key = new Key(libraryHierarchyId, parentId, value);
-                this.Store[key] = libraryHierarchyItemId;
-                if (this.Keys.Count >= this.Capacity)
-                {
-                    this.Store.Remove(this.Keys.Dequeue());
-                }
-                this.Keys.Enqueue(key);
+                this.Store.Add(key, libraryHierarchyItemId);
             }
 
             public bool TryGetValue(int libraryHierarchyId, int? parentId, string value, out int libraryHierarchyItemId)

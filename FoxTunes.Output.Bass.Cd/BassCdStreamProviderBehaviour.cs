@@ -321,7 +321,7 @@ namespace FoxTunes
                     var strategy = this.GetStrategy();
                     var metaDataSource = new BassCdMetaDataSource(strategy);
                     BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
-                    using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, transaction))
+                    using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, transaction))
                     {
                         foreach (var playlistItem in query)
                         {

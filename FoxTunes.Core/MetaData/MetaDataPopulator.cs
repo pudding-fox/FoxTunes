@@ -15,7 +15,7 @@ namespace FoxTunes
 
         public readonly object SyncRoot = new object();
 
-        public MetaDataPopulator(IDatabase database, IDatabaseQuery query, bool reportProgress, ITransactionSource transaction)
+        public MetaDataPopulator(IDatabaseComponent database, IDatabaseQuery query, bool reportProgress, ITransactionSource transaction)
             : base(reportProgress)
         {
             this.Database = database;
@@ -24,7 +24,7 @@ namespace FoxTunes
             this.Writer = new MetaDataWriter(this.Database, this.Query, this.Transaction);
         }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseComponent Database { get; private set; }
 
         public ITransactionSource Transaction { get; private set; }
 

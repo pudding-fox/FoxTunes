@@ -63,12 +63,23 @@ namespace FoxTunes
             {
                 await task.Run();
             }
+            var complete = default(bool);
+            if (this.IsCancellationRequested)
+            {
+                //Reset cancellation as the next phases should finish quickly.
+                //Cancelling again will still work.
+                this.IsCancellationRequested = false;
+            }
+            else
+            {
+                complete = true;
+            }
             await this.UpdateVariousArtists();
             if (buildHierarchies)
             {
                 await this.BuildHierarchies(LibraryItemStatus.Import);
             }
-            if (!this.IsCancellationRequested)
+            if (complete)
             {
                 await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None);
             }
@@ -94,7 +105,7 @@ namespace FoxTunes
                 var query = this.Database
                     .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
                     .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
-                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, this.Visible, transaction))
+                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItem, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithPopulator(metaDataPopulator, async () => await metaDataPopulator.Populate(query, cancellationToken));

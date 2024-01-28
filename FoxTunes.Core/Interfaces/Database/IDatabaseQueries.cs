@@ -5,29 +5,19 @@ namespace FoxTunes.Interfaces
 {
     public interface IDatabaseQueries : IBaseComponent
     {
-        IDatabaseQuery MovePlaylistItem { get; }
-
-        IDatabaseQuery RemovePlaylistItems { get; }
-
-        IDatabaseQuery RemoveLibraryHierarchyItems { get; }
-
-        IDatabaseQuery RemoveLibraryItems { get; }
-
         IDatabaseQuery AddLibraryHierarchyNode { get; }
-
-        IDatabaseQuery UpdateLibraryHierarchyNode { get; }
 
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }
 
-        IDatabaseQuery AddPlaylistSequenceRecord { get; }
+        IDatabaseQuery AddLibraryMetaDataItem { get; }
 
-        IDatabaseQuery AddLibraryMetaDataItems { get; }
+        IDatabaseQuery AddPlaylistMetaDataItem { get; }
+
+        IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
 
         IDatabaseQuery CleanupLibraryHierarchyNodes { get; }
 
         IDatabaseQuery ClearLibraryMetaDataItems { get; }
-
-        IDatabaseQuery AddPlaylistMetaDataItems { get; }
 
         IDatabaseQuery ClearPlaylistMetaDataItems { get; }
 
@@ -37,12 +27,22 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetLibraryHierarchyNodesWithFilter { get; }
 
-        IDatabaseQuery UpdatePlaylistVariousArtists { get; }
+        IDatabaseQuery GetOrAddMetaDataItem { get; }
 
-        IDatabaseQuery UpdateLibraryVariousArtists { get; }
+        IDatabaseQuery MovePlaylistItem { get; }
+
+        IDatabaseQuery RemoveLibraryHierarchyItems { get; }
+
+        IDatabaseQuery RemoveLibraryItems { get; }
+
+        IDatabaseQuery RemovePlaylistItems { get; }
 
         IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
 
-        IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
+        IDatabaseQuery UpdateLibraryHierarchyNode { get; }
+
+        IDatabaseQuery UpdateLibraryVariousArtists { get; }
+
+        IDatabaseQuery UpdatePlaylistVariousArtists { get; }
     }
 }

@@ -102,76 +102,32 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH 
-        ///&quot;MetaDataItems_Lookup&quot; AS
-        ///(
+        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryItem_MetaDataItem&quot; (&quot;LibraryItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
+        ///SELECT @itemId, @metaDataItemId
+        ///WHERE NOT EXISTS(
         ///	SELECT *
-        ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
-        ///)
-        ///
-        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
-        ///SELECT @name, @type, @value
-        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems_Lookup&quot;);
-        ///
-        ///WITH 
-        ///&quot;MetaDataItems_Lookup&quot; AS
-        ///(
-        ///	SELECT *
-        ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
-        ///),
-        ///
-        ///&quot;LibraryItem_MetaDataItem_Lookup&quot; AS 
-        ///(
-        ///	SELECT &quot;LibraryItem_MetaDataItem&quot;.*
-        ///	FROM &quot; [rest of string was truncated]&quot;;.
+        ///	FROM &quot;LibraryItem_MetaDataItem&quot; 
+        ///	WHERE &quot;LibraryItem_Id&quot; = @itemId AND &quot;MetaDataItem_Id&quot; = @metaDataItemId
+        ///);.
         /// </summary>
-        internal static string AddLibraryMetaDataItems {
+        internal static string AddLibraryMetaDataItem {
             get {
-                return ResourceManager.GetString("AddLibraryMetaDataItems", resourceCulture);
+                return ResourceManager.GetString("AddLibraryMetaDataItem", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH 
-        ///&quot;MetaDataItems_Lookup&quot; AS
-        ///(
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItem_MetaDataItem&quot; (&quot;PlaylistItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
+        ///SELECT @itemId, @metaDataItemId
+        ///WHERE NOT EXISTS(
         ///	SELECT *
-        ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
-        ///)
-        ///
-        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
-        ///SELECT @name, @type, @value
-        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems_Lookup&quot;);
-        ///
-        ///WITH 
-        ///&quot;MetaDataItems_Lookup&quot; AS
-        ///(
-        ///	SELECT *
-        ///	FROM &quot;MetaDataItems&quot; 
-        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
-        ///),
-        ///
-        ///&quot;PlaylistItem_MetaDataItem_Lookup&quot; AS 
-        ///(
-        ///	SELECT &quot;PlaylistItem_MetaDataItem&quot;.*
-        ///	FROM [rest of string was truncated]&quot;;.
+        ///	FROM &quot;PlaylistItem_MetaDataItem&quot; 
+        ///	WHERE &quot;PlaylistItem_Id&quot; = @itemId AND &quot;MetaDataItem_Id&quot; = @metaDataItemId
+        ///);.
         /// </summary>
-        internal static string AddPlaylistMetaDataItems {
+        internal static string AddPlaylistMetaDataItem {
             get {
-                return ResourceManager.GetString("AddPlaylistMetaDataItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistSort&quot; (&quot;PlaylistItem_Id&quot;, &quot;Value1&quot;, &quot;Value2&quot;, &quot;Value3&quot;, &quot;Value4&quot;, &quot;Value5&quot;, &quot;Value6&quot;, &quot;Value7&quot;, &quot;Value8&quot;, &quot;Value9&quot;, &quot;Value10&quot;)
-        ///VALUES (@playlistItemId, @value1, @value2, @value3, @value4, @value5, @value6, @value7, @value8, @value9, @value10);.
-        /// </summary>
-        internal static string AddPlaylistSequenceRecord {
-            get {
-                return ResourceManager.GetString("AddPlaylistSequenceRecord", resourceCulture);
+                return ResourceManager.GetString("AddPlaylistMetaDataItem", resourceCulture);
             }
         }
         
@@ -247,6 +203,25 @@ namespace FoxTunes {
         internal static string GetLibraryHierarchyNodesWithFilter {
             get {
                 return ResourceManager.GetString("GetLibraryHierarchyNodesWithFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
+        ///SELECT @name, @type, @value
+        ///WHERE NOT EXISTS(
+        ///	SELECT *
+        ///	FROM &quot;MetaDataItems&quot; 
+        ///	WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value
+        ///);
+        ///
+        ///SELECT &quot;Id&quot;
+        ///FROM &quot;MetaDataItems&quot; 
+        ///WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;Value&quot; = @value;.
+        /// </summary>
+        internal static string GetOrAddMetaDataItem {
+            get {
+                return ResourceManager.GetString("GetOrAddMetaDataItem", resourceCulture);
             }
         }
         
