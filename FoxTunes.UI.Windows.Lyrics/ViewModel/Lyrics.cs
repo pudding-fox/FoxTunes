@@ -13,6 +13,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -171,6 +173,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = this.Core.Managers.Playback;
+            this.OnDemandMetaDataProvider = this.Core.Components.OnDemandMetaDataProvider;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = this.Core.Components.Configuration;
@@ -250,25 +253,20 @@ namespace FoxTunes.ViewModel
             return this.Refresh();
         }
 
-        protected virtual Task Refresh()
+        protected virtual async Task Refresh()
         {
             var data = default(string);
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream != null)
             {
-                var metaDataItem = default(MetaDataItem);
-                lock (outputStream.PlaylistItem.MetaDatas)
-                {
-                    metaDataItem = outputStream.PlaylistItem.MetaDatas.FirstOrDefault(
-                        element => string.Equals(element.Name, CommonMetaData.Lyrics, StringComparison.OrdinalIgnoreCase)
-                    );
-                }
-                if (metaDataItem != null)
-                {
-                    data = metaDataItem.Value;
-                }
+                data = await this.OnDemandMetaDataProvider.GetMetaData(
+                    outputStream.PlaylistItem,
+                    CommonMetaData.Lyrics,
+                    MetaDataItemType.Tag,
+                    false
+                ).ConfigureAwait(false);
             }
-            return Windows.Invoke(() =>
+            await Windows.Invoke(() =>
             {
                 if (!string.IsNullOrEmpty(data))
                 {
@@ -282,7 +280,7 @@ namespace FoxTunes.ViewModel
                 }
                 this.OnPositionChanged();
                 this.OnLengthChanged();
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override Freezable CreateInstanceCore()

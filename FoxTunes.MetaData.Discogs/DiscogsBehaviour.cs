@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class DiscogsBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
+    public class DiscogsBehaviour : StandardBehaviour, IOnDemandMetaDataSource, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
     {
-        public const string FETCH_ARTWORK = "LLMM";
+        public const string LOOKUP = "LLMM";
 
         public ICore Core { get; private set; }
 
@@ -20,9 +21,17 @@ namespace FoxTunes
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
+        public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
+        public BooleanConfigurationElement MetaData { get; private set; }
+
         public BooleanConfigurationElement Enabled { get; private set; }
+
+        public BooleanConfigurationElement AutoLookup { get; private set; }
+
+        public BooleanConfigurationElement WriteTags { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -30,10 +39,23 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.Configuration = core.Components.Configuration;
+            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
+            );
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
                 DiscogsBehaviourConfiguration.ENABLED
+            );
+            this.AutoLookup = this.Configuration.GetElement<BooleanConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.AUTO_LOOKUP
+            );
+            this.WriteTags = this.Configuration.GetElement<BooleanConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.WRITE_TAGS
             );
             base.InitializeComponent(core);
         }
@@ -42,15 +64,15 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled.Value)
+                if (this.MetaData.Value && this.Enabled.Value)
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, FETCH_ARTWORK, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, LOOKUP, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
                     }
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, FETCH_ARTWORK, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOOKUP, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
                     }
                 }
             }
@@ -60,8 +82,15 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case FETCH_ARTWORK:
-                    return this.FetchArtwork();
+                case LOOKUP:
+                    switch (component.Category)
+                    {
+                        case InvocationComponent.CATEGORY_LIBRARY:
+                            return this.FetchArtworkLibrary();
+                        case InvocationComponent.CATEGORY_PLAYLIST:
+                            return this.FetchArtworkPlaylist();
+                    }
+                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -70,15 +99,11 @@ namespace FoxTunes
 #endif
         }
 
-        public Task FetchArtwork()
+        public async Task FetchArtworkLibrary()
         {
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
             //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
             var libraryItems = this.LibraryHierarchyBrowser.GetItems(
@@ -87,16 +112,40 @@ namespace FoxTunes
             ).ToArray();
             if (!libraryItems.Any())
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
-            return this.FetchArtwork(libraryItems);
+            var releaseLookups = await this.FetchArtwork(libraryItems).ConfigureAwait(false);
+            this.OnReport(releaseLookups);
+            await this.OnDemandMetaDataProvider.SetMetaData(
+                CommonMetaData.Lyrics,
+                this.GetMetaDataValues(releaseLookups),
+                MetaDataItemType.Tag,
+                true
+            ).ConfigureAwait(false);
         }
 
-        public async Task FetchArtwork(IFileData[] fileDatas)
+        public async Task FetchArtworkPlaylist()
+        {
+            if (this.PlaylistManager.SelectedItems == null)
+            {
+                return;
+            }
+            var playlistItems = this.PlaylistManager.SelectedItems.ToArray();
+            if (!playlistItems.Any())
+            {
+                return;
+            }
+            var releaseLookups = await this.FetchArtwork(playlistItems).ConfigureAwait(false);
+            this.OnReport(releaseLookups);
+            await this.OnDemandMetaDataProvider.SetMetaData(
+                CommonMetaData.Lyrics,
+                this.GetMetaDataValues(releaseLookups),
+                MetaDataItemType.Tag,
+                true
+            ).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchArtwork(IEnumerable<IFileData> fileDatas)
         {
             var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
             using (var task = new FetchArtworkTask(releaseLookups))
@@ -104,8 +153,30 @@ namespace FoxTunes
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport(task.LookupItems);
             }
+            return releaseLookups;
+        }
+
+        protected virtual OnDemandMetaDataValues GetMetaDataValues(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
+        {
+            var values = new List<OnDemandMetaDataValue>();
+            foreach (var releaseLookup in releaseLookups)
+            {
+                if (releaseLookup.Status != Discogs.ReleaseLookupStatus.Complete)
+                {
+                    continue;
+                }
+                var value = default(string);
+                if (!releaseLookup.MetaData.TryGetValue(FetchArtworkTask.FRONT_COVER, out value))
+                {
+                    continue;
+                }
+                foreach (var fileData in releaseLookup.FileDatas)
+                {
+                    values.Add(new OnDemandMetaDataValue(fileData, value));
+                }
+            }
+            return new OnDemandMetaDataValues(values, this.WriteTags.Value);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -124,7 +195,7 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        protected virtual void OnReport(Discogs.ReleaseLookup[] releaseLookups)
+        protected virtual void OnReport(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
         {
             var report = new ReleaseLookupReport(releaseLookups);
             report.InitializeComponent(this.Core);
@@ -141,6 +212,40 @@ namespace FoxTunes
         }
 
         public event ReportEventHandler Report;
+
+        #region IOnDemandMetaDataSource
+
+        bool IOnDemandMetaDataSource.Enabled
+        {
+            get
+            {
+                return this.Enabled.Value && this.AutoLookup.Value;
+            }
+        }
+
+        string IOnDemandMetaDataSource.Name
+        {
+            get
+            {
+                return FetchArtworkTask.FRONT_COVER;
+            }
+        }
+
+        MetaDataItemType IOnDemandMetaDataSource.Type
+        {
+            get
+            {
+                return MetaDataItemType.Image;
+            }
+        }
+
+        async Task<OnDemandMetaDataValues> IOnDemandMetaDataSource.GetValues(IEnumerable<IFileData> fileDatas, object state = null)
+        {
+            var releaseLookups = await this.FetchArtwork(fileDatas).ConfigureAwait(false);
+            return this.GetMetaDataValues(releaseLookups);
+        }
+
+        #endregion
 
         public class FetchArtworkTask : DiscogsLookupTask
         {
@@ -160,7 +265,7 @@ namespace FoxTunes
                 ).ConfigureAwait(false);
                 if (!string.IsNullOrEmpty(value))
                 {
-                    this.UpdateMetaData(releaseLookup, FRONT_COVER, value, MetaDataItemType.Image);
+                    releaseLookup.MetaData[FRONT_COVER] = value;
                     return true;
                 }
                 else
@@ -203,141 +308,6 @@ namespace FoxTunes
                     }
                 }
                 return null;
-            }
-
-            protected override async Task OnCompleted()
-            {
-                await base.OnCompleted().ConfigureAwait(false);
-                await this.SaveMetaData(FRONT_COVER).ConfigureAwait(false);
-            }
-        }
-
-        public class ReleaseLookupReport : BaseComponent, IReport
-        {
-            public ReleaseLookupReport(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
-            {
-                this.LookupItems = releaseLookups.ToDictionary(releaseLookup => Guid.NewGuid());
-            }
-
-            public Dictionary<Guid, Discogs.ReleaseLookup> LookupItems { get; private set; }
-
-            public IUserInterface UserInterface { get; private set; }
-
-            public override void InitializeComponent(ICore core)
-            {
-                this.UserInterface = core.Components.UserInterface;
-                base.InitializeComponent(core);
-            }
-
-            public string Title
-            {
-                get
-                {
-                    return Strings.ReleaseLookupReport_Title;
-                }
-            }
-
-            public string Description
-            {
-                get
-                {
-                    return string.Join(
-                        Environment.NewLine,
-                        this.LookupItems.Values.Select(
-                            releaseLookup => this.GetDescription(releaseLookup)
-                        )
-                    );
-                }
-            }
-
-            protected virtual string GetDescription(Discogs.ReleaseLookup releaseLookup)
-            {
-                var builder = new StringBuilder();
-                builder.AppendFormat("{0} - {1}", releaseLookup.Artist, releaseLookup.Album);
-                if (releaseLookup.Status != Discogs.ReleaseLookupStatus.Complete && releaseLookup.Errors.Any())
-                {
-                    builder.AppendLine(" -> Error");
-                    foreach (var error in releaseLookup.Errors)
-                    {
-                        builder.AppendLine('\t' + error);
-                    }
-                }
-                else
-                {
-                    builder.AppendLine(" -> OK");
-                }
-                return builder.ToString();
-            }
-
-            public string[] Headers
-            {
-                get
-                {
-                    return new[]
-                    {
-                        Strings.ReleaseLookupReport_Album,
-                        Strings.ReleaseLookupReport_Artist,
-                        Strings.ReleaseLookupReport_Status,
-                        Strings.ReleaseLookupReport_Release
-                    };
-                }
-            }
-
-            public IEnumerable<IReportRow> Rows
-            {
-                get
-                {
-                    return this.LookupItems.Select(element => new ReportRow(element.Key, element.Value));
-                }
-            }
-
-            public Action<Guid> Action
-            {
-                get
-                {
-                    return key =>
-                    {
-                        var releaseLookup = default(Discogs.ReleaseLookup);
-                        if (!this.LookupItems.TryGetValue(key, out releaseLookup) || releaseLookup.Release == null)
-                        {
-                            return;
-                        }
-                        var url = new Uri(new Uri("https://www.discogs.com"), releaseLookup.Release.Url).ToString();
-                        this.UserInterface.OpenInShell(url);
-                    };
-                }
-            }
-
-            public class ReportRow : IReportRow
-            {
-                public ReportRow(Guid id, Discogs.ReleaseLookup releaseLookup)
-                {
-                    this.Id = id;
-                    this.ReleaseLookup = releaseLookup;
-                }
-
-                public Guid Id { get; private set; }
-
-                public Discogs.ReleaseLookup ReleaseLookup { get; private set; }
-
-                public string[] Values
-                {
-                    get
-                    {
-                        var url = default(string);
-                        if (this.ReleaseLookup.Release != null)
-                        {
-                            url = this.ReleaseLookup.Release.Url;
-                        }
-                        return new[]
-                        {
-                            this.ReleaseLookup.Artist,
-                            this.ReleaseLookup.Album,
-                            Enum.GetName(typeof(Discogs.ReleaseLookupStatus), this.ReleaseLookup.Status),
-                            url
-                        };
-                    }
-                }
             }
         }
     }

@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Output.Bass.ReplayGain.Tests
 {

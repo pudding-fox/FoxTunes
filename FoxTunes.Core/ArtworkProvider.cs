@@ -24,6 +24,8 @@ namespace FoxTunes
 
         public Cache Store { get; private set; }
 
+        public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -38,6 +40,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
@@ -143,20 +146,17 @@ namespace FoxTunes
             return null;
         }
 
-        public string Find(IFileData fileData, ArtworkType type)
+        public async Task<string> Find(IFileData fileData, ArtworkType type)
         {
-            lock (fileData.MetaDatas)
+            var fileName = await this.OnDemandMetaDataProvider.GetMetaData(
+                fileData,
+                Enum.GetName(typeof(ArtworkType), type),
+                MetaDataItemType.Image,
+                false
+            ).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
             {
-                var result = fileData.MetaDatas.FirstOrDefault(
-                     metaDataItem =>
-                         metaDataItem.Type == MetaDataItemType.Image &&
-                         string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) &&
-                         File.Exists(metaDataItem.Value)
-                 );
-                if (result != null)
-                {
-                    return result.Value;
-                }
+                return fileName;
             }
             return this.Find(fileData.FileName, type);
         }

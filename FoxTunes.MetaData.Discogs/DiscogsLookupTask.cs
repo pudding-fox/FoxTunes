@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,31 +30,16 @@ namespace FoxTunes
 
         public Discogs.ReleaseLookup[] LookupItems { get; private set; }
 
-        public ILibraryManager LibraryManager { get; private set; }
-
-        public IMetaDataManager MetaDataManager { get; private set; }
-
-        public IHierarchyManager HierarchyManager { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         public DoubleConfigurationElement MinConfidence { get; private set; }
 
-        public BooleanConfigurationElement WriteTags { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            this.LibraryManager = core.Managers.Library;
-            this.MetaDataManager = core.Managers.MetaData;
-            this.HierarchyManager = core.Managers.Hierarchy;
             this.Configuration = core.Components.Configuration;
             this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
                 DiscogsBehaviourConfiguration.MIN_CONFIDENCE
-            );
-            this.WriteTags = this.Configuration.GetElement<BooleanConfigurationElement>(
-                DiscogsBehaviourConfiguration.SECTION,
-                DiscogsBehaviourConfiguration.WRITE_TAGS
             );
             base.InitializeComponent(core);
         }
@@ -154,66 +138,5 @@ namespace FoxTunes
         }
 
         protected abstract Task<bool> OnLookupSuccess(Discogs.ReleaseLookup releaseLookup);
-
-        protected virtual void UpdateMetaData(Discogs.ReleaseLookup releaseLookup, string name, string value, MetaDataItemType type)
-        {
-            foreach (var fileData in releaseLookup.FileDatas)
-            {
-                lock (fileData.MetaDatas)
-                {
-                    bool updated = false;
-                    foreach (var metaDataItem in fileData.MetaDatas)
-                    {
-                        if (string.Equals(metaDataItem.Name, name, StringComparison.OrdinalIgnoreCase) && metaDataItem.Type == type)
-                        {
-                            metaDataItem.Value = value;
-                            updated = true;
-                            break;
-                        }
-                    }
-                    if (!updated)
-                    {
-                        fileData.MetaDatas.Add(new MetaDataItem(name, type)
-                        {
-                            Value = value
-                        });
-                    }
-                }
-            }
-        }
-
-        protected virtual async Task SaveMetaData(params string[] names)
-        {
-            var libraryItems = new List<LibraryItem>();
-            var playlistItems = new List<PlaylistItem>();
-            var hasChanges = default(bool);
-            foreach (var releaseLookup in this.LookupItems)
-            {
-                if (releaseLookup.Status != Discogs.ReleaseLookupStatus.Complete)
-                {
-                    continue;
-                }
-
-                libraryItems.AddRange(releaseLookup.FileDatas.OfType<LibraryItem>());
-                playlistItems.AddRange(releaseLookup.FileDatas.OfType<PlaylistItem>());
-                hasChanges = true;
-            }
-            if (!hasChanges)
-            {
-                //Nothing to save.
-                return;
-            }
-            if (libraryItems.Any())
-            {
-                await this.MetaDataManager.Save(libraryItems, this.WriteTags.Value, false, names).ConfigureAwait(false);
-            }
-            if (playlistItems.Any())
-            {
-                await this.MetaDataManager.Save(playlistItems, this.WriteTags.Value, false, names).ConfigureAwait(false);
-            }
-            await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-            await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-            await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
-        }
     }
 }

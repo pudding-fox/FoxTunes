@@ -144,7 +144,7 @@ namespace FoxTunes
             this.Dispatch(this.ShowNotification);
         }
 
-        protected virtual void ShowNotification()
+        protected virtual async Task ShowNotification()
         {
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream == null)
@@ -153,7 +153,7 @@ namespace FoxTunes
             }
             try
             {
-                var notification = this.CreateNotification(outputStream);
+                var notification = await this.CreateNotification(outputStream).ConfigureAwait(false);
                 ToastNotificationHelper.Invoke(new Action(() => this.ToastNotifier.Show(notification)), null);
             }
             catch (Exception e)
@@ -162,9 +162,9 @@ namespace FoxTunes
             }
         }
 
-        protected virtual ToastNotification CreateNotification(IOutputStream outputStream)
+        protected virtual async Task<ToastNotification> CreateNotification(IOutputStream outputStream)
         {
-            var document = this.CreateNotificationDocument(outputStream);
+            var document = await this.CreateNotificationDocument(outputStream).ConfigureAwait(false);
             var notification = new ToastNotification(document);
             notification.Group = GROUP;
             notification.Tag = TAG;
@@ -172,7 +172,7 @@ namespace FoxTunes
             return notification;
         }
 
-        protected virtual XmlDocument CreateNotificationDocument(IOutputStream outputStream)
+        protected virtual async Task<XmlDocument> CreateNotificationDocument(IOutputStream outputStream)
         {
             var metaData = default(IDictionary<string, string>);
             lock (outputStream.PlaylistItem.MetaDatas)
@@ -183,10 +183,10 @@ namespace FoxTunes
                     StringComparer.OrdinalIgnoreCase
                 );
             }
-            var fileName = this.ArtworkProvider.Find(
+            var fileName = await this.ArtworkProvider.Find(
                 outputStream.PlaylistItem,
                 ArtworkType.FrontCover
-            );
+            ).ConfigureAwait(false);
             var hasArtwork = !string.IsNullOrEmpty(fileName) && File.Exists(fileName);
             var xml = default(string);
             if (hasArtwork)

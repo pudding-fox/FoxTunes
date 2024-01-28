@@ -79,6 +79,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto Lookup.
+        /// </summary>
+        internal static string DiscogsBehaviourConfiguration_AutoLookup {
+            get {
+                return ResourceManager.GetString("DiscogsBehaviourConfiguration.AutoLookup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Base Url.
         /// </summary>
         internal static string DiscogsBehaviourConfiguration_BaseUrl {
