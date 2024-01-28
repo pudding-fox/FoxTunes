@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -40,12 +41,39 @@ namespace FoxTunes
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
+            this.TrackVisibility();
             this.FixFocus();
         }
 
         protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
         {
             this.FixFocus();
+        }
+
+        protected virtual void TrackVisibility()
+        {
+            var viewModel = this.FindResource("ViewModel") as global::FoxTunes.ViewModel.LibraryBrowser;
+            if (viewModel == null)
+            {
+                return;
+            }
+            var listBox = this.ItemsControl.GetVisualChild<ListBox>();
+            if (listBox == null)
+            {
+                return;
+            }
+            switch (viewModel.ViewMode)
+            {
+                default:
+                case LibraryBrowserViewMode.Grid:
+                    ItemsControlExtensions.SetTrackItemVisibility(listBox, true);
+                    ItemsControlExtensions.AddIsItemVisibleChangedHandler(listBox, this.OnIsItemVisibleChanged);
+                    break;
+                case LibraryBrowserViewMode.List:
+                    ItemsControlExtensions.SetTrackItemVisibility(listBox, false);
+                    ItemsControlExtensions.RemoveIsItemVisibleChangedHandler(listBox, this.OnIsItemVisibleChanged);
+                    break;
+            }
         }
 
         protected virtual void FixFocus()
@@ -107,7 +135,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnIsItemVisibleChanged(object sender, ListBoxExtensions.IsItemVisibleChangedEventArgs e)
+        protected virtual void OnIsItemVisibleChanged(object sender, ItemsControlExtensions.IsItemVisibleChangedEventArgs e)
         {
             var element = e.OriginalSource as FrameworkElement;
             if (element == null)
@@ -129,14 +157,9 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnItemLoaded(object sender, RoutedEventArgs e)
+        protected virtual void OnItemLoaded_Low(object sender, RoutedEventArgs e)
         {
-            var element = e.OriginalSource as FrameworkElement;
-            if (element == null)
-            {
-                return;
-            }
-            var artworkGrid = element.GetVisualChild<ArtworkGrid>();
+            var artworkGrid = e.OriginalSource as ArtworkGrid;
             if (artworkGrid == null)
             {
                 return;
@@ -149,6 +172,38 @@ namespace FoxTunes
             {
                 ArtworkGridLoader.Cancel(artworkGrid, ArtworkGridLoaderPriority.Low);
             }
+        }
+
+        protected virtual void OnItemLoaded_High(object sender, RoutedEventArgs e)
+        {
+            var artworkGrid = e.OriginalSource as ArtworkGrid;
+            if (artworkGrid == null)
+            {
+                return;
+            }
+            if (artworkGrid.Background == null)
+            {
+                ArtworkGridLoader.Load(artworkGrid, ArtworkGridLoaderPriority.High);
+            }
+            else
+            {
+                ArtworkGridLoader.Cancel(artworkGrid, ArtworkGridLoaderPriority.High);
+            }
+        }
+
+        protected virtual void OnCleanUpVirtualizedItem(object sender, CleanUpVirtualizedItemEventArgs e)
+        {
+            var element = e.UIElement as FrameworkElement;
+            if (element == null)
+            {
+                return;
+            }
+            var artworkGrid = element.GetVisualChild<ArtworkGrid>();
+            if (artworkGrid == null)
+            {
+                return;
+            }
+            artworkGrid.Background = null;
         }
     }
 }

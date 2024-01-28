@@ -23,6 +23,78 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
         <System:Boolean x:Key="False">False</System:Boolean>
+        <ItemsPanelTemplate x:Key="GridItemsPanelTemplate">
+            <WrapPanel Orientation="Horizontal" IsItemsHost="True"></WrapPanel>
+        </ItemsPanelTemplate>
+        <ItemsPanelTemplate x:Key="ListItemsPanelTemplate">
+            <VirtualizingStackPanel IsItemsHost="True"></VirtualizingStackPanel>
+        </ItemsPanelTemplate>
+        <LocalWindows:LibraryBrowserTemplateSelector x:Key="GridLibraryBrowserTemplateSelector">
+            <LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
+                <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
+                    <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
+                        <Border Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50">
+                            <Viewbox  Stretch="Uniform">
+                                <Canvas Width="48" Height="48">
+                                    <Path>
+                                        <Path.Data>
+                                            <PathGeometry Figures="M0 0h48v48h-48z" FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{DynamicResource TextBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M40 22h-24.34l11.17-11.17-2.83-2.83-16 16 16 16 2.83-2.83-11.17-11.17h24.34v-4z" FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <TextBlock HorizontalAlignment="Center" Text="Back" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
+            <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
+                <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
+                    <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
+                        <LocalWindows:ArtworkGrid Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Loaded="OnItemLoaded_Low"></LocalWindows:ArtworkGrid>
+                        <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
+        </LocalWindows:LibraryBrowserTemplateSelector>
+        <LocalWindows:LibraryBrowserTemplateSelector x:Key="ListLibraryBrowserTemplateSelector">
+            <LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
+                <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50" Margin="0,0,5,0">
+                            <Viewbox  Stretch="Uniform">
+                                <Canvas Width="48" Height="48">
+                                    <Path>
+                                        <Path.Data>
+                                            <PathGeometry Figures="M0 0h48v48h-48z" FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{DynamicResource TextBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M40 22h-24.34l11.17-11.17-2.83-2.83-16 16 16 16 2.83-2.83-11.17-11.17h24.34v-4z" FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <TextBlock VerticalAlignment="Center" Text="Back" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
+            <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
+                <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
+                    <StackPanel Orientation="Horizontal">
+                        <LocalWindows:ArtworkGrid Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Margin="0,0,5,0" Loaded="OnItemLoaded_High"></LocalWindows:ArtworkGrid>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
+        </LocalWindows:LibraryBrowserTemplateSelector>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -72,8 +144,15 @@
                         Unloaded="OnUnloaded"
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
-                        Windows:ListBoxExtensions.TrackItemVisibility="True"
-                        Windows:ListBoxExtensions.IsItemVisibleChanged="OnIsItemVisibleChanged"
+                        LocalWindows:LibraryBrowserExtensions.ItemsPanelSelector="{Binding ViewMode, Source={StaticResource ViewModel}}"
+                        LocalWindows:LibraryBrowserExtensions.GridItemsPanel="{StaticResource GridItemsPanelTemplate}"
+                        LocalWindows:LibraryBrowserExtensions.ListItemsPanel="{StaticResource ListItemsPanelTemplate}"
+                        LocalWindows:LibraryBrowserExtensions.ItemTemplateSelector="{Binding ViewMode, Source={StaticResource ViewModel}}"
+                        LocalWindows:LibraryBrowserExtensions.GridItemTemplateSelector="{StaticResource GridLibraryBrowserTemplateSelector}"
+                        LocalWindows:LibraryBrowserExtensions.ListItemTemplateSelector="{StaticResource ListLibraryBrowserTemplateSelector}"
+                        VirtualizingStackPanel.IsVirtualizing="True"
+                        VirtualizingStackPanel.VirtualizationMode="Standard"
+                        VirtualizingStackPanel.CleanUpVirtualizedItem="OnCleanUpVirtualizedItem"
                         TextSearch.TextPath="Value">
                         <Interactivity:Interaction.Triggers>
                             <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type ListBoxItem}">
@@ -88,46 +167,6 @@
                         <ListBox.ContextMenu>
                             <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
                         </ListBox.ContextMenu>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" IsItemsHost="True"></WrapPanel>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemTemplateSelector>
-                            <Windows:LibraryBrowserTemplateSelector>
-                                <Windows:LibraryBrowserTemplateSelector.UpTemplate>
-                                    <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                                        <StackPanel Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
-                                            <Border Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Height="{Binding TileSize.Value, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50">
-                                                <Viewbox  Stretch="Uniform">
-                                                    <Canvas Width="48" Height="48">
-                                                        <Path>
-                                                            <Path.Data>
-                                                                <PathGeometry Figures="M0 0h48v48h-48z" FillRule="NonZero"/>
-                                                            </Path.Data>
-                                                        </Path>
-                                                        <Path Fill="{DynamicResource TextBrush}">
-                                                            <Path.Data>
-                                                                <PathGeometry Figures="M40 22h-24.34l11.17-11.17-2.83-2.83-16 16 16 16 2.83-2.83-11.17-11.17h24.34v-4z" FillRule="NonZero"/>
-                                                            </Path.Data>
-                                                        </Path>
-                                                    </Canvas>
-                                                </Viewbox>
-                                            </Border>
-                                            <TextBlock HorizontalAlignment="Center" Text="Back" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </Windows:LibraryBrowserTemplateSelector.UpTemplate>
-                                <Windows:LibraryBrowserTemplateSelector.DefaultTemplate>
-                                    <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                                        <StackPanel Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0" Loaded="OnItemLoaded">
-                                            <LocalWindows:ArtworkGrid Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Height="{Binding TileSize.Value, Source={StaticResource ViewModel}}"></LocalWindows:ArtworkGrid>
-                                            <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </Windows:LibraryBrowserTemplateSelector.DefaultTemplate>
-                            </Windows:LibraryBrowserTemplateSelector>
-                        </ListBox.ItemTemplateSelector>
                     </ListBox>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
