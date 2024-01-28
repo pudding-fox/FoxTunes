@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace FoxTunes
 {
@@ -30,10 +29,6 @@ namespace FoxTunes
 
         public const string TRANSPARENCY = "NNNN0D57-6E03-4718-ACA3-AD8199F5AC75";
 
-        public const string ARTWORK_ACCENT = "NNOO79AE-C769-47E6-8F48-52B0784FD5EF";
-
-        public const string ACCENT_COLOR = "OOOO5DBB-8ACE-4FFC-B975-9131D4D82947";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)
@@ -50,11 +45,7 @@ namespace FoxTunes
                 .WithElement(
                     new IntegerConfigurationElement(TIMER_FREQUENCY, Strings.WindowsUserInterfaceConfiguration_TimerFrequency, path: Strings.General_Advanced).WithValue(DEFAULT_TIMER_FREQUENCY).WithValidationRule(new IntegerValidationRule(MIN_TIMER_FREQUENCY, MAX_TIMER_FREQUENCY)))
                 .WithElement(
-                    new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency))
-                .WithElement(
-                    new BooleanConfigurationElement(ARTWORK_ACCENT, Strings.WindowsUserInterfaceConfiguration_ArtworkAccent).DependsOn(SECTION, TRANSPARENCY))
-                .WithElement(
-                    new TextConfigurationElement(ACCENT_COLOR, Strings.WindowsUserInterfaceConfiguration_AccentColor).DependsOn(SECTION, TRANSPARENCY).DependsOn(SECTION, ARTWORK_ACCENT, true)
+                    new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency)
             );
         }
 

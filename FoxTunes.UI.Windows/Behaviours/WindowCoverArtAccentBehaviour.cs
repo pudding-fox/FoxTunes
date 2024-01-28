@@ -10,8 +10,9 @@ using System.Windows.Media.Animation;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
+    //Requires Windows 11 22H2.
     [PlatformDependency(Major = 6, Minor = 2, Build = 22621)]
-    public class WindowCoverArtAccentBehaviour : StandardBehaviour, IDisposable
+    public class WindowCoverArtAccentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public WindowCoverArtAccentBehaviour()
         {
@@ -42,8 +43,8 @@ namespace FoxTunes
             this.ImageResizer = ComponentRegistry.Instance.GetComponent<ImageResizer>();
             this.Configuration = core.Components.Configuration;
             this.ArtworkAccent = this.Configuration.GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.ARTWORK_ACCENT
+                WindowCoverArtAccentBehaviourConfiguration.SECTION,
+                WindowCoverArtAccentBehaviourConfiguration.ARTWORK_ACCENT
             );
             this.ArtworkAccent.ValueChanged += this.OnValueChanged;
             base.InitializeComponent(core);
@@ -142,6 +143,11 @@ namespace FoxTunes
             return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return WindowCoverArtAccentBehaviourConfiguration.GetConfigurationSections();
+        }
+
         public bool IsDisposed { get; private set; }
 
         public void Dispose()
@@ -162,7 +168,11 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-
+            WindowBase.ActiveChanged -= this.OnActiveChanged;
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
         }
 
         ~WindowCoverArtAccentBehaviour()

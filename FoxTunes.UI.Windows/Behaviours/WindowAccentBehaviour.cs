@@ -9,7 +9,7 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     //Requires Windows 11 22H2.
     [PlatformDependency(Major = 6, Minor = 2, Build = 22621)]
-    public class WindowAccentBehaviour : StandardBehaviour
+    public class WindowAccentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public WindowAccentBehaviour()
         {
@@ -33,8 +33,8 @@ namespace FoxTunes
                 WindowsUserInterfaceConfiguration.TRANSPARENCY
             );
             this.AccentColor = this.Configuration.GetElement<TextConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.ACCENT_COLOR
+                WindowAccentBehaviourConfiguration.SECTION,
+                WindowAccentBehaviourConfiguration.ACCENT_COLOR
             );
             this.AccentColor.ValueChanged += this.OnValueChanged;
             base.InitializeComponent(core);
@@ -94,6 +94,47 @@ namespace FoxTunes
         protected virtual void Refresh(WindowBase window, Color color)
         {
             WindowExtensions.EnableAcrylicBlur(window.Handle, color);
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return WindowAccentBehaviourConfiguration.GetConfigurationSections();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            WindowBase.ActiveChanged -= this.OnActiveChanged;
+        }
+
+        ~WindowAccentBehaviour()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

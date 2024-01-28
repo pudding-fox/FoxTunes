@@ -8,7 +8,7 @@ namespace FoxTunes
     //TODO: SetWindowCompositionAttribute is undocumented.
     //TODO: Assuming Windows 8.
     [PlatformDependency(Major = 6, Minor = 2)]
-    public class WindowBlurBehaviour : StandardBehaviour
+    public class WindowBlurBehaviour : StandardBehaviour, IDisposable
     {
         public IConfiguration Configuration { get; private set; }
 
@@ -39,6 +39,42 @@ namespace FoxTunes
             foreach (var window in WindowBase.Active)
             {
                 WindowExtensions.EnableBlur(window.Handle);
+            }
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            WindowBase.ActiveChanged -= this.OnActiveChanged;
+        }
+
+        ~WindowBlurBehaviour()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
             }
         }
     }
