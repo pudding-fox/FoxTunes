@@ -13,8 +13,6 @@ namespace FoxTunes
             this.Output = output;
             this.Manager = manager;
             this.Stream = stream;
-            this.Stream.Ending += this.Ending;
-            this.Stream.Ended += this.Ended;
             if (!BassOutputStreams.Add(this))
             {
                 //TODO: Warn.
@@ -205,19 +203,36 @@ namespace FoxTunes
             return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(this.ChannelHandle, position));
         }
 
-        public override event EventHandler Ended;
+        public override event EventHandler Ending
+        {
+            add
+            {
+                this.Stream.Ending += value;
+            }
+            remove
+            {
+                this.Stream.Ending -= value;
+            }
+        }
 
-        public override event EventHandler Ending;
+        public override event EventHandler Ended
+        {
+            add
+            {
+                this.Stream.Ended += value;
+            }
+            remove
+            {
+                this.Stream.Ended -= value;
+            }
+        }
 
         protected override void OnDisposing()
         {
-
             try
             {
                 if (this.Stream != null)
                 {
-                    this.Stream.Ending -= this.Ending;
-                    this.Stream.Ended -= this.Ended;
                     this.Stream.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
                 }
             }

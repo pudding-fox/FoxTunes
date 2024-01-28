@@ -112,8 +112,8 @@ namespace FoxTunes
         {
             if (this.CurrentStream != null)
             {
-                this.CurrentStream.Ending -= this.Ending;
-                this.CurrentStream.Ended -= this.Ended;
+                this.CurrentStream.Ending -= this.OnEnding;
+                this.CurrentStream.Ended -= this.OnEnded;
             }
         }
 
@@ -121,8 +121,8 @@ namespace FoxTunes
         {
             if (this.CurrentStream != null)
             {
-                this.CurrentStream.Ending += this.Ending;
-                this.CurrentStream.Ended += this.Ended;
+                this.CurrentStream.Ending += this.OnEnding;
+                this.CurrentStream.Ended += this.OnEnded;
             }
             if (this.CurrentStreamChanged != null)
             {
@@ -133,7 +133,23 @@ namespace FoxTunes
 
         public event EventHandler CurrentStreamChanged;
 
+        protected virtual void OnEnding(object sender, EventArgs e)
+        {
+            if (this.Ending != null)
+            {
+                this.Ending(this, EventArgs.Empty);
+            }
+        }
+
         public event EventHandler Ending;
+
+        protected virtual void OnEnded(object sender, EventArgs e)
+        {
+            if (this.Ended != null)
+            {
+                this.Ended(this, EventArgs.Empty);
+            }
+        }
 
         public event EventHandler Ended;
 
