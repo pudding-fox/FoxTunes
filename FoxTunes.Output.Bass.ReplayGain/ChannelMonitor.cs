@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class ChannelMonitor : BaseComponent, IDisposable
     {
-        public static readonly int INTERVAL = 1000;
+        public static readonly int INTERVAL = 500;
 
         public static readonly object SyncRoot = new object();
 
@@ -59,7 +59,7 @@ namespace FoxTunes
             if (position == length)
             {
                 this.ScannerItem.Progress = ScannerItem.PROGRESS_COMPLETE;
-                this.ScannerItem.Status = ScannerItemStatus.Complete;
+                this.Stop();
             }
             else
             {
