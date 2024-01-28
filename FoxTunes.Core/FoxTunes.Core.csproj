@@ -44,6 +44,7 @@
     <Compile Include="AsyncEventArgs.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
     <Compile Include="Behaviours\ExecutionStateBehaviour.cs" />
+    <Compile Include="Behaviours\ExecutionStateBehaviourConfiguration.cs" />
     <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
