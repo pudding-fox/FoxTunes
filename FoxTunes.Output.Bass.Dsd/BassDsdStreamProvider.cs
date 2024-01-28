@@ -38,16 +38,21 @@ namespace FoxTunes
             if (this.IsDsdRawSupported())
             {
                 channelHandle = this.CreateDsdRawStream(playlistItem, advice, flags);
+                if (channelHandle == 0)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create DSD RAW stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                }
+                return this.CreateInteractiveStream(channelHandle, advice, flags | BassFlags.DSDRaw);
             }
             else
             {
                 channelHandle = this.CreateDsdStream(playlistItem, advice, flags);
+                if (channelHandle == 0)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                }
+                return this.CreateInteractiveStream(channelHandle, advice, flags);
             }
-            if (channelHandle == 0)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
-            }
-            return this.CreateBasicStream(channelHandle, advice, flags | BassFlags.DSDRaw);
         }
 
         protected virtual int CreateDsdStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
