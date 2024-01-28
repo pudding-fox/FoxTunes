@@ -29,6 +29,38 @@ namespace FoxTunes
 
         new public bool IsInitialized { get; private set; }
 
+        private int _BufferMin { get; set; }
+
+        public int BufferMin
+        {
+            get
+            {
+                return this._BufferMin;
+            }
+            set
+            {
+                this._BufferMin = value;
+                BassZipStream.SetConfig(BassZipStreamAttribute.BufferMin, value);
+                Logger.Write(this, LogLevel.Debug, "BufferMin = {0}", this.BufferMin);
+            }
+        }
+
+        private int _BufferTimeout { get; set; }
+
+        public int BufferTimeout
+        {
+            get
+            {
+                return this._BufferTimeout;
+            }
+            set
+            {
+                this._BufferTimeout = value;
+                BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, value);
+                Logger.Write(this, LogLevel.Debug, "BufferTimeout = {0}", this.BufferTimeout);
+            }
+        }
+
         private bool _Enabled { get; set; }
 
         public bool Enabled
@@ -53,6 +85,14 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
             this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassArchiveStreamProviderBehaviourConfiguration.SECTION,
+                BassArchiveStreamProviderBehaviourConfiguration.BUFFER_MIN_ELEMENT
+            ).ConnectValue(value => this.BufferMin = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassArchiveStreamProviderBehaviourConfiguration.SECTION,
+                BassArchiveStreamProviderBehaviourConfiguration.BUFFER_TIMEOUT_ELEMENT
+            ).ConnectValue(value => this.BufferTimeout = value);
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassArchiveStreamProviderBehaviourConfiguration.SECTION,
                 BassArchiveStreamProviderBehaviourConfiguration.ENABLED_ELEMENT
@@ -72,6 +112,8 @@ namespace FoxTunes
                 flags |= BassFlags.Float;
             }
             BassUtils.OK(BassZipStream.Init());
+            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, this.BufferTimeout));
+            BassUtils.OK(BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, this.BufferTimeout));
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS ZIPSTREAM Initialized.");
         }
