@@ -11,6 +11,7 @@ namespace FoxTunes
         public const string Artist = "Artist";
         public const string BeatsPerMinute = "BeatsPerMinute";
         public const string Comment = "Comment";
+        public const string IsCompilation = "IsCompilation";
         public const string Composer = "Composer";
         public const string Conductor = "Conductor";
         public const string Copyright = "Copyright";

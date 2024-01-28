@@ -282,6 +282,33 @@ namespace FoxTunes
             return FileTypes.AvailableTypes.ContainsKey(mimeType);
         }
 
+        protected virtual bool IsCompilation(Tag tag)
+        {
+            var isCompilation = default(bool);
+
+            //Check tags which support this.
+            if (tag is global::TagLib.Id3v2.Tag id3v2Tag)
+            {
+                isCompilation = id3v2Tag.IsCompilation;
+            }
+            else if (tag is global::TagLib.Mpeg4.AppleTag appleTag)
+            {
+                isCompilation = appleTag.IsCompilation;
+            }
+            else if (tag is global::TagLib.Ogg.XiphComment xiphComment)
+            {
+                isCompilation = xiphComment.IsCompilation;
+            }
+
+            //Check MB release type.
+            if (string.Equals(tag.MusicBrainzReleaseType, "Compilation", StringComparison.OrdinalIgnoreCase))
+            {
+                isCompilation = true;
+            }
+
+            return isCompilation;
+        }
+
         private void AddTags(IList<MetaDataItem> metaData, Tag tag)
         {
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Album, tag.Album), this.ErrorHandler);
@@ -308,6 +335,15 @@ namespace FoxTunes
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Year, tag.Year.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.InitialKey, tag.InitialKey), this.ErrorHandler);
+            (this).Try(() =>
+            {
+                var isCompilation = this.IsCompilation(tag);
+                if (isCompilation)
+                {
+                    this.AddTag(metaData, CommonMetaData.IsCompilation, bool.TrueString);
+                    this.AddTag(metaData, CustomMetaData.VariousArtists, bool.TrueString);
+                }
+            }, this.ErrorHandler);
 
             if (this.Extended.Value)
             {
