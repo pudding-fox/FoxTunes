@@ -1,7 +1,7 @@
 # FoxTunes
 A modular music player using the BASS framework.
 
-The main release is [FoxTunes-2.0.2-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.0.1/FoxTunes-2.0.2-net461.zip)
+The main release is [FoxTunes-2.0.4-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.0.4/FoxTunes-2.0.4-net461.zip)
 
 ![Main](Media/Screenshots/Main.PNG)
 
@@ -23,6 +23,8 @@ Includes a mini player with optional artwork and playlist.
 ![Mini A](Media/Screenshots/MiniPlayerA.PNG)
 ![Mini B](Media/Screenshots/MiniPlayerB.PNG)
 
+Can be used with file associations and the "Send to" explorer action. 
+
 A Windows XP compatibile .NET 4.0 build is available, can be configured minimally.
 It needs at least;
 * [KB2468871](http://support.microsoft.com/kb/2468871) - Portable class libraries patch.
@@ -30,23 +32,20 @@ It needs at least;
 
 ![Minimal](Media/Screenshots/Minimal.PNG)
 
-Stock plugins;
+Various optional plugins are available;
 
-* SQLite - Use SQLite for database functions.
-* TagLib - Use TagLib for meta data functions.
+* ASIO - Low latency exclusive output, supports DSD direct.
+* CD - Play audio CDs from a physical drive.
+* DSD - Required for DSD direct.
+* DTS - Play .dts multi channel format.
 * DirectSound - Use standard windows audio session for output.
 * Javascript - Use JS for scriptable elements.
 * Logging - Use Log4Net logging back-end. Can be configured and disabled.
-* Config - Use binary config file.
-
-Various optional plugins are available;
-
-* Windows - Global key bindings (Multi media keys), system tray icon.
-* SqlServer - Use Microsoft SQL Server for database functions.
-* SimpleMetaData - A meta data provider using the file path and regular expressions. Recommended for older systems.
-* ASIO - Low latency exclusive output, supports DSD direct.
-* WASAPI - Windows Audio Session API output.
-* DSD - Required for DSD direct.
-* DTS - Play .dts multi channel format.
-* CD - Play audio CDs from a physical drive.
+* ParametricEqualizer - A ten band parametric equalizer.
 * Resampler - SOXR based high quality configurable resampler. Can perform up/down sampling.
+* SQLite - Use SQLite for database functions.
+* SimpleMetaData - A meta data provider using the file path and regular expressions. Recommended for older systems.
+* SqlServer - Use Microsoft SQL Server for database functions.
+* TagLib - Use TagLib for meta data functions.
+* WASAPI - Windows Audio Session API output.
+* Windows - Global key bindings (Multi media keys), system tray icon, system media transport controls, taskbar controls.
