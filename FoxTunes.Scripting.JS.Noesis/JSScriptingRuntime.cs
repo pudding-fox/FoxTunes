@@ -4,7 +4,7 @@ using Noesis.Javascript;
 namespace FoxTunes
 {
     [Component("8D4693E0-6416-4B33-9DE7-89116D15F5EA", ComponentSlots.ScriptingRuntime, @default: true)]
-    //TODO: This component (Noesis.Javascript) was unstable on amd64 platforms.
+    //TODO: Noesis.Javascript.dll targets x86 
     [PlatformDependency(Architecture = ProcessorArchitecture.X86)]
     public class JSScriptingRuntime : ScriptingRuntime
     {
