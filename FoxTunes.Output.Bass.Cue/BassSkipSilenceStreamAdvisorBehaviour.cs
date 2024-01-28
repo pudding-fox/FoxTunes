@@ -5,7 +5,13 @@ namespace FoxTunes
 {
     public class BassSkipSilenceStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent
     {
+        public ICore Core { get; private set; }
+
+        public IBassOutput Output { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
+
+        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         private bool _Enabled { get; set; }
 
@@ -39,6 +45,8 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
+            this.Output = ComponentRegistry.Instance.GetComponent<IBassOutput>();
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -48,7 +56,23 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassSkipSilenceStreamAdvisorBehaviourConfiguration.SENSITIVITY_ELEMENT
             ).ConnectValue(option => this.Threshold = BassSkipSilenceStreamAdvisorBehaviourConfiguration.GetSensitivity(option));
+            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
+        {
+            if (!this.Enabled)
+            {
+                return;
+            }
+            var component = new BassSkipSilenceStreamComponent(this, e.Stream);
+            component.InitializeComponent(this.Core);
+            e.Components.Add(component);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
