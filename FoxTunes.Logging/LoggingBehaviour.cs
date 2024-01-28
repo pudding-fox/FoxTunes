@@ -11,38 +11,38 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public bool Enabled { get; private set; }
+
+        public LogLevel Level { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 LoggingBehaviourConfiguration.SECTION,
-                LoggingBehaviourConfiguration.TRACE_ELEMENT
-            ).ConnectValue(value =>
-            {
-                if (value)
-                {
-                    this.EnableTracing();
-                }
-                else
-                {
-                    this.DisableTracing();
-                }
-            });
+                LoggingBehaviourConfiguration.ENABLED_ELEMENT
+            ).ConnectValue(value => { this.Enabled = value; this.Refresh(); });
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                LoggingBehaviourConfiguration.SECTION,
+                LoggingBehaviourConfiguration.LEVEL_ELEMENT
+            ).ConnectValue(value => { this.Level = LoggingBehaviourConfiguration.GetLogLevel(value); this.Refresh(); });
             base.InitializeComponent(core);
         }
 
-        public virtual void EnableTracing()
+        public void Refresh()
         {
-            AppDomain.CurrentDomain.FirstChanceException += this.OnFirstChanceException;
-            AppDomain.CurrentDomain.UnhandledException += this.OnUnhandledException;
-            Logger.Write(this, LogLevel.Debug, "Tracing enabled.");
-        }
-
-        public virtual void DisableTracing()
-        {
-            AppDomain.CurrentDomain.FirstChanceException -= this.OnFirstChanceException;
-            AppDomain.CurrentDomain.UnhandledException -= this.OnUnhandledException;
-            Logger.Write(this, LogLevel.Debug, "Tracing disabled.");
+            if (this.Enabled && this.Level.HasFlag(LogLevel.Trace))
+            {
+                AppDomain.CurrentDomain.FirstChanceException += this.OnFirstChanceException;
+                AppDomain.CurrentDomain.UnhandledException += this.OnUnhandledException;
+                Logger.Write(this, LogLevel.Debug, "Tracing enabled.");
+            }
+            else
+            {
+                AppDomain.CurrentDomain.FirstChanceException -= this.OnFirstChanceException;
+                AppDomain.CurrentDomain.UnhandledException -= this.OnUnhandledException;
+                Logger.Write(this, LogLevel.Debug, "Tracing disabled.");
+            }
         }
 
         protected virtual void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs e)

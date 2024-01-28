@@ -79,6 +79,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
                 return;
             }
+            Logger.Write(this, LogLevel.Trace, "Adding file to playlist: {0}", fileName);
             var playlistItem = new PlaylistItem()
             {
                 DirectoryName = Path.GetDirectoryName(fileName),
