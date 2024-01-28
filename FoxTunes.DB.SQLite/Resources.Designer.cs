@@ -179,12 +179,13 @@ namespace FoxTunes {
         ///	FROM &quot;LibraryHierarchyItems&quot;
         ///		LEFT JOIN &quot;LibraryHierarchyItem_Parent&quot;
         ///			ON &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Id&quot; = &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;
+        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
         ///),
         ///
         ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
         ///AS
         ///(
-        ///	SELECT LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Id&quot;, LibraryHierarchyParent.&quot;Pare [rest of string was truncated]&quot;;.
+        ///	SELECT LibraryHierarchyParent.&quot;Id&quot;, Libra [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyNodesWithFilter {
             get {

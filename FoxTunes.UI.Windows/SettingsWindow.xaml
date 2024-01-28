@@ -17,35 +17,32 @@
     <Window.Resources>
         <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
     </Window.Resources>
-    <Grid>
+    <Grid Background="{DynamicResource NormalBrush}">
         <Grid.LayoutTransform>
             <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
         </Grid.LayoutTransform>
-        <Grid Background="{DynamicResource NormalBrush}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <Windows:Titlebar></Windows:Titlebar>
-            <Border Grid.Row="1" Padding="2,0,2,2">
-                <TabControl>
-                    <Windows:CommandExtensions.Decorator>
-                        <Windows:CommandDecorator Command="{Binding HideCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Phase="{x:Static ViewModel:CommandPhase.After}" Tag="{x:Static ViewModel:CommandHints.DISMISS}"></Windows:CommandDecorator>
-                    </Windows:CommandExtensions.Decorator>
-                    <TabItem Header="General">
-                        <Windows:SettingsDialog></Windows:SettingsDialog>
-                    </TabItem>
-                    <TabItem Header="Library">
-                        <Windows:LibrarySettingsDialog></Windows:LibrarySettingsDialog>
-                    </TabItem>
-                    <TabItem Header="Playlist">
-                        <Windows:PlaylistSettingsDialog></Windows:PlaylistSettingsDialog>
-                    </TabItem>
-                    <TabItem Header="File Types">
-                        <Windows:AssociationsDialog></Windows:AssociationsDialog>
-                    </TabItem>
-                </TabControl>
-            </Border>
-        </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Windows:Titlebar></Windows:Titlebar>
+        <TabControl Grid.Row="1" Margin="2,0,2,2">
+            <Windows:CommandExtensions.Decorator>
+                <Windows:CommandDecorator Command="{Binding HideCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Phase="{x:Static ViewModel:CommandPhase.After}" Tag="{x:Static ViewModel:CommandHints.DISMISS}"></Windows:CommandDecorator>
+            </Windows:CommandExtensions.Decorator>
+            <TabItem Header="General">
+                <Windows:SettingsDialog></Windows:SettingsDialog>
+            </TabItem>
+            <TabItem Header="Library">
+                <Windows:LibrarySettingsDialog></Windows:LibrarySettingsDialog>
+            </TabItem>
+            <TabItem Header="Playlist">
+                <Windows:PlaylistSettingsDialog></Windows:PlaylistSettingsDialog>
+            </TabItem>
+            <TabItem Header="File Types">
+                <Windows:AssociationsDialog></Windows:AssociationsDialog>
+            </TabItem>
+        </TabControl>
+        <Rectangle Grid.RowSpan="2"  Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
 </Window>

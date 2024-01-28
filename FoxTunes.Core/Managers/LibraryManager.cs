@@ -44,31 +44,31 @@ namespace FoxTunes
 
         public event EventHandler SelectedHierarchyChanged;
 
-        private LibraryHierarchyNode _SelectedNode { get; set; }
+        private LibraryHierarchyNode _SelectedItem { get; set; }
 
-        public LibraryHierarchyNode SelectedNode
+        public LibraryHierarchyNode SelectedItem
         {
             get
             {
-                return this._SelectedNode;
+                return this._SelectedItem;
             }
             set
             {
-                this._SelectedNode = value;
-                this.OnSelectedNodeChanged();
+                this._SelectedItem = value;
+                this.OnSelectedItemChanged();
             }
         }
 
-        protected virtual void OnSelectedNodeChanged()
+        protected virtual void OnSelectedItemChanged()
         {
-            if (this.SelectedNodeChanged != null)
+            if (this.SelectedItemChanged != null)
             {
-                this.SelectedNodeChanged(this, EventArgs.Empty);
+                this.SelectedItemChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("SelectedNode");
+            this.OnPropertyChanged("SelectedItem");
         }
 
-        public event EventHandler SelectedNodeChanged;
+        public event EventHandler SelectedItemChanged;
 
         private bool _CanNavigate { get; set; }
 

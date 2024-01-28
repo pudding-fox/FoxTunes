@@ -59,5 +59,7 @@ namespace FoxTunes
         public event EventHandler NameChanged;
 
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
+
+        public static readonly LibraryHierarchy Empty = new LibraryHierarchy();
     }
 }

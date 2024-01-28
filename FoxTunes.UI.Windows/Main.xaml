@@ -11,75 +11,68 @@
              d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
-        <Style x:Key="LibraryStyle" TargetType="{x:Type Windows:Library}">
-            <Setter Property="Visibility" Value="Visible"></Setter>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed"></Setter>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style x:Key="ArtworkStyle" TargetType="{x:Type Windows:Artwork}">
-            <Setter Property="Visibility" Value="Visible"></Setter>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding ShowArtwork.Value, Source={StaticResource ViewModel}}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed"></Setter>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
         <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
+        <ViewModel:SelectionConfigurationOptionConverter x:Key="SelectionConfigurationOptionConverter"></ViewModel:SelectionConfigurationOptionConverter>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource NormalBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition></RowDefinition>
-        </Grid.RowDefinitions>
-        <Windows:Titlebar></Windows:Titlebar>
-        <Border Grid.Row="1" Padding="2,0,2,2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid Grid.ColumnSpan="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition>
-                            <ColumnDefinition.Style>
-                                <Style TargetType="{x:Type ColumnDefinition}">
-                                    <Setter Property="Width" Value="{Binding ColumnWidth_FC87DEC38708, Source={x:Static Properties:Settings.Default}, Converter={StaticResource GridLengthConverter}, Mode=TwoWay}"></Setter>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
-                                            <Setter Property="Width" Value="0"></Setter>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ColumnDefinition.Style>
-                        </ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Windows:Library Style="{StaticResource LibraryStyle}" Margin="2,2,4,2"></Windows:Library>
-                    <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}" Margin="2,0,4,2"></Windows:Artwork>
-                    <Windows:BackgroundTasks Grid.RowSpan="2" VerticalAlignment="Bottom"></Windows:BackgroundTasks>
-                    <GridSplitter Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="4"></GridSplitter>
-                    <Windows:Playlist Grid.Column="1" Grid.RowSpan="2" Margin="0,2,2,2"></Windows:Playlist>
-                </Grid>
-                <Windows:Playback Grid.Row="1" ></Windows:Playback>
-                <Windows:StreamPosition Grid.Column="1" Grid.Row="1" Margin="2,0,2,0"></Windows:StreamPosition>
-                <Windows:MiniPlayer Grid.Column="2" Grid.Row="1" Margin="0,0,2,0"></Windows:MiniPlayer>
-                <Windows:Settings Grid.Column="3" Grid.Row="1"></Windows:Settings>
-                <Windows:Components></Windows:Components>
-            </Grid>
-        </Border>
-        <Rectangle Grid.RowSpan="2"  Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
-    </Grid>
+    <DockPanel Background="{DynamicResource NormalBrush}">
+        <Windows:Titlebar DockPanel.Dock="Top"></Windows:Titlebar>
+        <DockPanel DockPanel.Dock="Bottom" Margin="2,0,2,2">
+            <Windows:Playback></Windows:Playback>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Windows:MiniPlayer Margin="0,0,2,0"></Windows:MiniPlayer>
+                <Windows:Settings ></Windows:Settings>
+            </StackPanel>
+            <Windows:StreamPosition Margin="2,0,2,0"></Windows:StreamPosition>
+        </DockPanel>
+        <Grid Margin="2,0,2,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="{x:Type ColumnDefinition}">
+                            <Setter Property="Width" Value="{Binding ColumnWidth_FC87DEC38708, Source={x:Static Properties:Settings.Default}, Converter={StaticResource GridLengthConverter}, Mode=TwoWay}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Visibility, ElementName=LeftPanel}" Value="Collapsed">
+                                    <Setter Property="Width" Value="0"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="{x:Type ColumnDefinition}">
+                            <Setter Property="Width" Value="{Binding ColumnWidth_427FFD701CC2, Source={x:Static Properties:Settings.Default}, Converter={StaticResource GridLengthConverter}, Mode=TwoWay}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Visibility, ElementName=RightPanel}" Value="Collapsed">
+                                    <Setter Property="Width" Value="0"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Windows:VerticalSplitPanel 
+                x:Name="LeftPanel"
+                Grid.Column="0"
+                Margin="0,0,4,0"
+                ControlType1="{Binding LayoutManager.TopLeft.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}" 
+                ControlType2="{Binding LayoutManager.BottomLeft.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}"/>
+            <GridSplitter Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="4"></GridSplitter>
+            <Windows:VerticalSplitPanel 
+                Grid.Column="1"
+                ControlType1="{Binding LayoutManager.TopCenter.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}" 
+                ControlType2="{Binding LayoutManager.BottomCenter.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}"
+                SplitterHeight="{Binding ColumnHeight_6F3FDC8521DA, Source={x:Static Properties:Settings.Default}, Converter={StaticResource GridLengthConverter}, Mode=TwoWay}"/>
+            <GridSplitter Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="4"></GridSplitter>
+            <Windows:VerticalSplitPanel 
+                x:Name="RightPanel"
+                Grid.Column="2"
+                Margin="4,0,0,0"
+                ControlType1="{Binding LayoutManager.TopRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}" 
+                ControlType2="{Binding LayoutManager.BottomRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={StaticResource ViewModel}}"/>
+            <Windows:BackgroundTasks Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="200"></Windows:BackgroundTasks>
+            <Windows:Components></Windows:Components>
+        </Grid>
+    </DockPanel>
 </UserControl>

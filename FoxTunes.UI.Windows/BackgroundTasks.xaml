@@ -34,8 +34,8 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"></TextBlock>
-                        <TextBlock Grid.Row="1" Text="{Binding Description, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                        <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
+                        <TextBlock Grid.Row="1" Text="{Binding Description, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
                         <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}">
                             <ProgressBar.Style>
                                 <Style TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">

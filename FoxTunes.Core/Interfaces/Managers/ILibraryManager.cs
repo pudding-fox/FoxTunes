@@ -10,9 +10,9 @@ namespace FoxTunes.Interfaces
 
         event EventHandler SelectedHierarchyChanged;
 
-        LibraryHierarchyNode SelectedNode { get; set; }
+        LibraryHierarchyNode SelectedItem { get; set; }
 
-        event EventHandler SelectedNodeChanged;
+        event EventHandler SelectedItemChanged;
 
         bool CanNavigate { get; }
 

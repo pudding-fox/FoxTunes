@@ -12,6 +12,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:LibraryBrowser x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryBrowser>
+        <ViewModel:NegavingBooleanToVisibilityConverter x:Key="NegavingBooleanToVisibilityConverter"></ViewModel:NegavingBooleanToVisibilityConverter>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -30,7 +31,8 @@
         <ComboBox 
             ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" 
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
-            DisplayMemberPath="Name"/>
+            DisplayMemberPath="Name"
+            Visibility="{Binding IsSlave, Converter={StaticResource NegavingBooleanToVisibilityConverter}, Source={StaticResource ViewModel}}"/>
         <ListBox 
                 x:Name="TreeView" 
                 Grid.Row="1" 
@@ -47,17 +49,20 @@
                     <Interactivity:InvokeCommandAction Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}"/>
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
+            <ListBox.ContextMenu>
+                <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
+            </ListBox.ContextMenu>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel IsItemsHost="True" Orientation="Horizontal"></WrapPanel>
+                    <WrapPanel Orientation="Horizontal" IsItemsHost="True"></WrapPanel>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.ItemTemplateSelector>
                 <Windows:LibraryBrowserTemplateSelector>
                     <Windows:LibraryBrowserTemplateSelector.UpTemplate>
                         <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                            <StackPanel Width="150" Orientation="Vertical" Margin="0,0,5,0">
-                                <Border Width="150" Height="150" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1">
+                            <StackPanel Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
+                                <Border Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Height="{Binding TileSize.Value, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50">
                                     <Viewbox  Stretch="Uniform">
                                         <Canvas Width="48" Height="48">
                                             <Path>
@@ -79,8 +84,8 @@
                     </Windows:LibraryBrowserTemplateSelector.UpTemplate>
                     <Windows:LibraryBrowserTemplateSelector.DefaultTemplate>
                         <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                            <StackPanel Width="150" Orientation="Vertical" Margin="0,0,5,0">
-                                <Windows:ArtworkGrid Width="150" Height="150"></Windows:ArtworkGrid>
+                            <StackPanel Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
+                                <Windows:ArtworkGrid Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Height="{Binding TileSize.Value, Source={StaticResource ViewModel}}"></Windows:ArtworkGrid>
                                 <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                             </StackPanel>
                         </DataTemplate>
@@ -100,7 +105,10 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Windows:SearchBox Grid.Row="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
+        <Windows:SearchBox 
+            Grid.Row="2" 
+            SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"
+            Visibility="{Binding IsSlave, Converter={StaticResource NegavingBooleanToVisibilityConverter}, Source={StaticResource ViewModel}}"/>
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner">
             <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>

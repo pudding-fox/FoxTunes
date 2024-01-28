@@ -10,23 +10,27 @@ namespace FoxTunes
 
         public const string THEME_ELEMENT = "AAAA9DEE-1168-4D96-9355-31ECC0666820";
 
-        public const string SHOW_ARTWORK_ELEMENT = "BBBBCE34-1C79-4B44-A5A9-5134B503B062";
+        public const string TOP_LEFT_ELEMENT = "BBBBBF2-DA76-4696-A4E1-F1E77D169C4F";
 
-        public const string SHOW_LIBRARY_ELEMENT = "CCCCDA77-129F-4988-99EC-6A21EB9096D8";
+        public const string BOTTOM_LEFT_ELEMENT = "CCCC515-DC31-4DAD-8EF2-273AEE88A627";
 
-        public const string LIBRARY_VIEW_ELEMENT = "DDDD4100-3796-4A97-9F84-1976760927C8";
+        public const string TOP_CENTER_ELEMENT = "DDDD122D-45D9-4463-8BE3-E706CBB2FF67";
 
-        public const string LIBRARY_TREE_OPTION = "AAAA996B-57B8-4B7E-A0AF-C632B341D3C5";
+        public const string BOTTOM_CENTER_ELEMENT = "EEEE00E8-5BC8-465D-A5CE-BB93938B43C6";
 
-        public const string LIBRARY_BROWSER_OPTION = "BBBB4708-2F1B-46E5-B4E3-C321F01640EC";
+        public const string TOP_RIGHT_ELEMENT = "FFFF12F1-1F4E-414B-B437-E9422C440CC0";
 
-        public const string UI_SCALING_ELEMENT = "EEEEFB85-BA70-4412-87BA-E4DC58AD9BA8";
+        public const string BOTTOM_RIGHT_ELEMENT = "GGGGEC8-4D19-4E0F-9D65-44A15288B22A";
 
-        public const string MARQUEE_INTERVAL_ELEMENT = "FFFF685A-4D15-4AE1-B7AD-3E5786CB8EDB";
+        public const string LIBRARY_BROWSER_TILE_SIZE = "HHHH0E5E-FB67-43D3-AE30-BF7571A1A8B1";
 
-        public const string MARQUEE_STEP_ELEMENT = "GGGGDCB3-69C3-4F73-966C-6A7738E359A1";
+        public const string UI_SCALING_ELEMENT = "IIIIFB85-BA70-4412-87BA-E4DC58AD9BA8";
 
-        public const string EXTEND_GLASS_ELEMENT = "HHHH7881-D4F6-484C-8E4E-E3CD5802F8B5";
+        public const string MARQUEE_INTERVAL_ELEMENT = "JJJJ685A-4D15-4AE1-B7AD-3E5786CB8EDB";
+
+        public const string MARQUEE_STEP_ELEMENT = "KKKKDCB3-69C3-4F73-966C-6A7738E359A1";
+
+        public const string EXTEND_GLASS_ELEMENT = "LLLL7881-D4F6-484C-8E4E-E3CD5802F8B5";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -34,13 +38,21 @@ namespace FoxTunes
                 .WithElement(
                     new SelectionConfigurationElement(THEME_ELEMENT, "Theme").WithOptions(GetThemeOptions()))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
+                    new SelectionConfigurationElement(TOP_LEFT_ELEMENT, "Top Left", path: "Layout").WithOptions(GetControlOptions(TOP_LEFT_ELEMENT)))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_LIBRARY_ELEMENT, "Show Library").WithValue(true))
+                    new SelectionConfigurationElement(BOTTOM_LEFT_ELEMENT, "Bottom Left", path: "Layout").WithOptions(GetControlOptions(BOTTOM_LEFT_ELEMENT)))
                 .WithElement(
-                    new SelectionConfigurationElement(LIBRARY_VIEW_ELEMENT, "Library View").WithOptions(GetLibraryViewOptions()))
+                    new SelectionConfigurationElement(TOP_CENTER_ELEMENT, "Top Center", path: "Layout").WithOptions(GetControlOptions(TOP_CENTER_ELEMENT)))
+                .WithElement(
+                    new SelectionConfigurationElement(BOTTOM_CENTER_ELEMENT, "Bottom Center", path: "Layout").WithOptions(GetControlOptions(BOTTOM_CENTER_ELEMENT)))
+                .WithElement(
+                    new SelectionConfigurationElement(TOP_RIGHT_ELEMENT, "Top Right", path: "Layout").WithOptions(GetControlOptions(TOP_RIGHT_ELEMENT)))
+                .WithElement(
+                    new SelectionConfigurationElement(BOTTOM_RIGHT_ELEMENT, "Bottom Right", path: "Layout").WithOptions(GetControlOptions(BOTTOM_RIGHT_ELEMENT)))
                 .WithElement(
                     new DoubleConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue(1.0).WithValidationRule(new DoubleValidationRule(0.5, 10)))
+                .WithElement(
+                    new IntegerConfigurationElement(LIBRARY_BROWSER_TILE_SIZE, "Library Tile Size", path: "Advanced").WithValue(150).WithValidationRule(new IntegerValidationRule(50, 300)))
                 .WithElement(
                     new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, "Marquee Interval", path: "Advanced").WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
                 .WithElement(
@@ -65,22 +77,54 @@ namespace FoxTunes
             return themes.FirstOrDefault(theme => string.Equals(theme.Id, option.Id, StringComparison.OrdinalIgnoreCase));
         }
 
-        private static IEnumerable<SelectionConfigurationOption> GetLibraryViewOptions()
+        private static IEnumerable<SelectionConfigurationOption> GetControlOptions(string id)
         {
-            yield return new SelectionConfigurationOption(LIBRARY_TREE_OPTION, "Tree");
-            yield return new SelectionConfigurationOption(LIBRARY_BROWSER_OPTION, "Browser");
+            var types = new[]
+            {
+                typeof(object),
+                typeof(Playlist),
+                typeof(LibraryTree),
+                typeof(LibraryBrowser),
+                typeof(Artwork)
+            };
+            foreach (var type in types)
+            {
+                var option = default(SelectionConfigurationOption);
+                if (type != typeof(object))
+                {
+                    option = new SelectionConfigurationOption(type.FullName, type.Name);
+                }
+                else
+                {
+                    option = new SelectionConfigurationOption(type.FullName, "Empty");
+                }
+                if (string.Equals(id, TOP_LEFT_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(LibraryTree))
+                {
+                    option.Default();
+                }
+                if (string.Equals(id, BOTTOM_LEFT_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(Artwork))
+                {
+                    option.Default();
+                }
+                if (string.Equals(id, TOP_CENTER_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(LibraryBrowser))
+                {
+                    option.Default();
+                }
+                if (string.Equals(id, BOTTOM_CENTER_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(Playlist))
+                {
+                    option.Default();
+                }
+                yield return option;
+            }
         }
 
-        public static object GetLibraryView(SelectionConfigurationOption option)
+        public static Type GetControl(SelectionConfigurationOption option)
         {
-            switch (option.Id)
+            if (option == null)
             {
-                case LIBRARY_TREE_OPTION:
-                    return new LibraryTree();
-                case LIBRARY_BROWSER_OPTION:
-                    return new LibraryBrowser();
+                return typeof(object);
             }
-            return null;
+            return typeof(WindowsUserInterfaceConfiguration).Assembly.GetType(option.Id) ?? typeof(object);
         }
     }
 }

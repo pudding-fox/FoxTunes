@@ -54,15 +54,15 @@ namespace FoxTunes
 
         protected virtual void Enable()
         {
-            this.LibraryManager.SelectedNodeChanged += this.OnSelectedNodeChanged;
+            this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
         }
 
         protected virtual void Disable()
         {
-            this.LibraryManager.SelectedNodeChanged -= this.OnSelectedNodeChanged;
+            this.LibraryManager.SelectedItemChanged -= this.OnSelectedItemChanged;
         }
 
-        protected virtual void OnSelectedNodeChanged(object sender, EventArgs e)
+        protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
         {
 #if NET40
             var task = TaskEx.Run(async () =>
@@ -70,13 +70,9 @@ namespace FoxTunes
             var task = Task.Run(async () =>
 #endif
             {
-                if (this.LibraryManager.SelectedNode != null)
+                if (this.LibraryManager.SelectedItem != null && !LibraryHierarchyNode.Empty.Equals(this.LibraryManager.SelectedItem))
                 {
-                    await this.PlaylistManager.Add(this.LibraryManager.SelectedNode, true);
-                }
-                else
-                {
-                    await this.PlaylistManager.Clear();
+                    await this.PlaylistManager.Add(this.LibraryManager.SelectedItem, true);
                 }
             });
         }

@@ -97,5 +97,29 @@ namespace FoxTunes
             var source = new WindowInteropHelper(window);
             return source.EnsureHandle();
         }
+
+        public static Size GetElementPixelSize(this UIElement element)
+        {
+            var matrix = default(Matrix);
+            var presentationSource = PresentationSource.FromVisual(element);
+            if (presentationSource != null)
+            {
+                matrix = presentationSource.CompositionTarget.TransformToDevice;
+            }
+            else
+            {
+                using (var hwndSource = new HwndSource(new HwndSourceParameters()))
+                {
+                    matrix = hwndSource.CompositionTarget.TransformToDevice;
+                }
+            }
+
+            if (element.DesiredSize.Width == 0 && element.DesiredSize.Height == 0)
+            {
+                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            }
+
+            return (Size)matrix.Transform((Vector)element.DesiredSize);
+        }
     }
 }

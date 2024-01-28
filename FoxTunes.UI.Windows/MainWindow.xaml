@@ -31,5 +31,6 @@
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_NOTIFY_ICON}}"></Windows:Menu>
             </Windows:NotifyIconElement.ContextMenu>
         </Windows:NotifyIconElement>
+        <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
 </Window>

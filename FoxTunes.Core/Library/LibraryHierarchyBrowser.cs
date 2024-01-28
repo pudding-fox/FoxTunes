@@ -12,6 +12,8 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
+        public ILibraryHierarchyCache LibraryHierarchyCache { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         private string _Filter { get; set; }
@@ -43,11 +45,17 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
             this.DatabaseFactory = core.Factories.Database;
             base.InitializeComponent(core);
         }
 
         public IEnumerable<LibraryHierarchy> GetHierarchies()
+        {
+            return this.LibraryHierarchyCache.GetHierarchies(this.GetHierarchiesCore);
+        }
+
+        private IEnumerable<LibraryHierarchy> GetHierarchiesCore()
         {
             using (var database = this.DatabaseFactory.Create())
             {
@@ -66,12 +74,26 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
         {
+            return this.LibraryHierarchyCache.GetNodes(libraryHierarchy, this.Filter, () => this.GetNodesCore(libraryHierarchy));
+        }
+
+        private IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchy libraryHierarchy)
+        {
             return this.GetNodes(libraryHierarchy.Id);
         }
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
-            return this.GetNodes(libraryHierarchyNode.LibraryHierarchyId, libraryHierarchyNode.Id);
+            return this.LibraryHierarchyCache.GetNodes(libraryHierarchyNode, this.Filter, () => this.GetNodesCore(libraryHierarchyNode));
+        }
+
+        private IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            foreach (var child in this.GetNodes(libraryHierarchyNode.LibraryHierarchyId, libraryHierarchyNode.Id))
+            {
+                child.Parent = libraryHierarchyNode;
+                yield return child;
+            }
         }
 
         protected virtual IEnumerable<LibraryHierarchyNode> GetNodes(int libraryHierarchyId, int? libraryHierarchyItemId = null)

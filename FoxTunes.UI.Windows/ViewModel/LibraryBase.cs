@@ -11,6 +11,8 @@ namespace FoxTunes.ViewModel
 {
     public abstract class LibraryBase : ViewModelBase
     {
+        public bool IsNavigating { get; private set; }
+
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -25,11 +27,11 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.LibraryHierarchyBrowser != null)
+                if (this.LibraryHierarchyBrowser == null)
                 {
-                    return this.LibraryHierarchyBrowser.GetHierarchies();
+                    return Enumerable.Empty<LibraryHierarchy>();
                 }
-                return Enumerable.Empty<LibraryHierarchy>();
+                return this.LibraryHierarchyBrowser.GetHierarchies();
             }
         }
 
@@ -48,16 +50,27 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.LibraryManager != null)
+                if (this.LibraryManager == null)
                 {
-                    return this.LibraryManager.SelectedHierarchy;
+                    return LibraryHierarchy.Empty;
                 }
-                return null;
+                return this.LibraryManager.SelectedHierarchy;
             }
             set
             {
-                this.LibraryManager.SelectedHierarchy = value;
-                this.OnSelectedHierarchyChanged();
+                if (this.LibraryManager == null)
+                {
+                    return;
+                }
+                this.IsNavigating = true;
+                try
+                {
+                    this.LibraryManager.SelectedHierarchy = value;
+                }
+                finally
+                {
+                    this.IsNavigating = false;
+                }
             }
         }
 
@@ -68,10 +81,75 @@ namespace FoxTunes.ViewModel
                 this.SelectedHierarchyChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("SelectedHierarchy");
-            this.Refresh();
         }
 
-        public abstract void Refresh();
+        public virtual IEnumerable<LibraryHierarchyNode> Items
+        {
+            get
+            {
+                if (this.LibraryHierarchyBrowser == null || this.SelectedHierarchy == null)
+                {
+                    return Enumerable.Empty<LibraryHierarchyNode>();
+                }
+                return this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy);
+            }
+        }
+
+        protected virtual void OnItemsChanged()
+        {
+            if (this.ItemsChanged != null)
+            {
+                this.ItemsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Items");
+        }
+
+        public event EventHandler ItemsChanged;
+
+        public virtual LibraryHierarchyNode SelectedItem
+        {
+            get
+            {
+                if (this.LibraryManager == null)
+                {
+                    return LibraryHierarchyNode.Empty;
+                }
+                return this.LibraryManager.SelectedItem;
+            }
+            set
+            {
+                if (this.LibraryManager == null)
+                {
+                    return;
+                }
+                this.IsNavigating = true;
+                try
+                {
+                    this.LibraryManager.SelectedItem = value;
+                }
+                finally
+                {
+                    this.IsNavigating = false;
+                }
+            }
+        }
+
+        protected virtual void OnSelectedItemChanged()
+        {
+            if (this.SelectedItemChanged != null)
+            {
+                this.SelectedItemChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedItem");
+        }
+
+        public event EventHandler SelectedItemChanged;
+
+        public virtual void Refresh()
+        {
+            this.OnItemsChanged();
+            this.OnSelectedItemChanged();
+        }
 
         public virtual Task Reload()
         {
@@ -86,9 +164,8 @@ namespace FoxTunes.ViewModel
             }
             return Windows.Invoke(() =>
             {
-                this.SelectedHierarchy = selectedHierarchy;
                 this.OnHierarchiesChanged();
-                this.Refresh();
+                this.SelectedHierarchy = selectedHierarchy;
             });
         }
 
@@ -101,16 +178,42 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.LibraryManager = this.Core.Managers.Library;
+            this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
+            this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
             var task = this.Reload();
             base.InitializeComponent(core);
         }
 
         protected virtual void OnFilterChanged(object sender, EventArgs e)
         {
-            //Nothing to do.
+            this.Refresh();
+            if (!string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter))
+            {
+                this.OnSearchCompleted();
+            }
         }
 
-        protected abstract LibraryHierarchyNode GetSelectedItem();
+        protected virtual void OnSearchCompleted()
+        {
+            if (this.SearchCompleted == null)
+            {
+                return;
+            }
+            this.SearchCompleted(this, EventArgs.Empty);
+        }
+
+        public event EventHandler SearchCompleted;
+
+        protected virtual void OnSelectedHierarchyChanged(object sender, EventArgs e)
+        {
+            this.OnSelectedHierarchyChanged();
+            this.Refresh();
+        }
+
+        protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
+        {
+            this.OnSelectedItemChanged();
+        }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
         {
@@ -128,9 +231,9 @@ namespace FoxTunes.ViewModel
                                 switch (invocation.Id)
                                 {
                                     case LibraryActionsBehaviour.APPEND_PLAYLIST:
-                                        return this.AddToPlaylist(this.GetSelectedItem(), false);
+                                        return this.AddToPlaylist(this.SelectedItem, false);
                                     case LibraryActionsBehaviour.REPLACE_PLAYLIST:
-                                        return this.AddToPlaylist(this.GetSelectedItem(), true);
+                                        return this.AddToPlaylist(this.SelectedItem, true);
                                 }
                                 break;
                         }
@@ -149,8 +252,8 @@ namespace FoxTunes.ViewModel
             get
             {
                 return CommandFactory.Instance.CreateCommand(
-                    () => this.AddToPlaylist(this.GetSelectedItem(), false),
-                    () => this.GetSelectedItem() != null && this.GetSelectedItem().IsLeaf
+                    () => this.AddToPlaylist(this.SelectedItem, false),
+                    () => this.SelectedItem != null && this.SelectedItem.IsLeaf
                 );
             }
         }
@@ -227,6 +330,11 @@ namespace FoxTunes.ViewModel
             if (this.SignalEmitter != null)
             {
                 this.SignalEmitter.Signal -= this.OnSignal;
+            }
+            if (this.LibraryManager != null)
+            {
+                this.LibraryManager.SelectedHierarchyChanged -= this.OnSelectedHierarchyChanged;
+                this.LibraryManager.SelectedItemChanged -= this.OnSelectedItemChanged;
             }
             base.Dispose(disposing);
         }

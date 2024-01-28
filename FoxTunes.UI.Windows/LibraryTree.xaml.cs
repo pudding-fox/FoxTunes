@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace FoxTunes
 {
@@ -8,6 +11,8 @@ namespace FoxTunes
     /// </summary>
     public partial class LibraryTree : UserControl
     {
+        const int EXPAND_ALL_LIMIT = 3;
+
         public LibraryTree()
         {
             this.InitializeComponent();
@@ -27,6 +32,47 @@ namespace FoxTunes
             finally
             {
                 this.MouseCursorAdorner.Hide();
+            }
+        }
+
+        protected virtual void OnSearchCompleted(object sender, System.EventArgs e)
+        {
+            var view = CollectionViewSource.GetDefaultView(this.TreeView.ItemsSource) as CollectionView;
+            if (view == null || view.Count > EXPAND_ALL_LIMIT)
+            {
+                return;
+            }
+            this.ExpandAll(view.OfType<LibraryHierarchyNode>());
+        }
+
+        protected virtual void OnSelected(object sender, RoutedEventArgs e)
+        {
+            var treeViewItem = sender as TreeViewItem;
+            if (treeViewItem == null)
+            {
+                return;
+            }
+            treeViewItem.BringIntoView();
+        }
+
+        public void ExpandAll(IEnumerable<LibraryHierarchyNode> sequence)
+        {
+            var stack = new Stack<LibraryHierarchyNode>(sequence);
+            while (stack.Count > 0)
+            {
+                var node = stack.Pop();
+                if (!node.IsExpanded)
+                {
+                    node.IsExpanded = true;
+                }
+                foreach (var child in node.Children)
+                {
+                    if (child.IsLeaf)
+                    {
+                        continue;
+                    }
+                    stack.Push(child);
+                }
             }
         }
     }

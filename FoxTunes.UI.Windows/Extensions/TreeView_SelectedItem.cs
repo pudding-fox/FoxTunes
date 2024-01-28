@@ -51,6 +51,11 @@ namespace FoxTunes
             protected virtual void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
             {
                 SetSelectedItem(this.TreeView, this.TreeView.SelectedItem);
+                if (GetSelectedItem(this.TreeView) != this.TreeView.SelectedItem)
+                {
+                    //TODO: Sometimes the value doesn't stick. Don't know why. Second attempt probably works.
+                    SetSelectedItem(this.TreeView, this.TreeView.SelectedItem);
+                }
             }
         }
     }

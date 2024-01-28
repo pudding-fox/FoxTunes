@@ -5,21 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
-             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
-        <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}" ShowPlaceholder="{Binding ShowPlaceholder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}"/>
-    </UserControl.Resources>
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="{Binding ImageSource, Source={StaticResource ViewModel}}"/>
+            <ImageBrush ImageSource="{Binding ImageSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}"/>
         </Grid.Background>
         <Grid.Style>
             <Style TargetType="{x:Type Grid}">
                 <Setter Property="Height" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding ImageSource, Source={StaticResource ViewModel}}" Value="{x:Null}">
+                    <DataTrigger Binding="{Binding ImageSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}" Value="{x:Null}">
+                        <Setter Property="Background" Value="Transparent"></Setter>
                         <Setter Property="Visibility" Value="Collapsed"/>
                     </DataTrigger>
                 </Style.Triggers>
