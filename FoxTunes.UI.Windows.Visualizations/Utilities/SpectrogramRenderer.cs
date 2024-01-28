@@ -439,7 +439,9 @@ namespace FoxTunes
             }
 
             var position = history.Position - 1;
-            for (int a = 0, x = data.Width - 1; a < history.Count && x > 0; a++, x--)
+            var count = Math.Min(data.Width, history.Count);
+            var elements = new Int32Pixel[count * info.Height];
+            for (int a = 0, x = data.Width - 1; a < count; a++, x--)
             {
                 history.Read(data, position);
 
@@ -456,7 +458,7 @@ namespace FoxTunes
                         break;
                 }
 
-                BitmapHelper.DrawDots(ref info, data.Elements, data.Elements.Length);
+                Array.Copy(data.Elements, 0, elements, a * data.Elements.Length, data.Elements.Length);
 
                 if (position > 0)
                 {
@@ -464,9 +466,11 @@ namespace FoxTunes
                 }
                 else
                 {
-                    position = history.Count - 1;
+                    position = count - 1;
                 }
             }
+
+            BitmapHelper.DrawDots(ref info, elements, elements.Length);
         }
 
         public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing)
