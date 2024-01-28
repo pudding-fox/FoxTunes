@@ -49,17 +49,7 @@ namespace FoxTunes
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                foreach (var path in paths)
-                {
-                    if (Directory.Exists(path))
-                    {
-                        this.Core.Managers.Playlist.AddDirectory(path);
-                    }
-                    else if (File.Exists(path))
-                    {
-                        this.Core.Managers.Playlist.AddFiles(path);
-                    }
-                }
+                this.Core.Managers.Playlist.Add(paths);
                 this.Core.Components.Database.SaveChanges();
             }
         }

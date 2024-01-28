@@ -20,7 +20,7 @@
     </UserControl.Resources>
     <Grid>
         <ToggleButton IsChecked="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}">&#x2699;</ToggleButton>
-        <Popup PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Placement="Center" AllowsTransparency="True" IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}">
+        <Popup PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Placement="Center" AllowsTransparency="True" IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" StaysOpen="False">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="Closed">
                     <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=SaveCommand}" CommandParameter="{Binding Components.Configuration}"></Interactivity:InvokeCommandAction>

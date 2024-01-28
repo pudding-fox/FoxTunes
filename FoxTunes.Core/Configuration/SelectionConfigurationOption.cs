@@ -31,5 +31,15 @@ namespace FoxTunes
         {
             return this.Equals(obj as SelectionConfigurationOption);
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            if (!string.IsNullOrEmpty(this.Id))
+            {
+                hashCode += this.Id.GetHashCode();
+            }
+            return hashCode;
+        }
     }
 }
