@@ -51,7 +51,7 @@ namespace FoxTunes
             var endian = settings.Format.BinaryEndian;
             var depth = settings.GetDepth(encoderItem, stream);
             var rate = settings.GetRate(encoderItem, stream);
-            var channels = channelInfo.Channels;
+            var channels = settings.GetChannels(encoderItem, stream);
             return new Resampler.ResamplerFormat(format, endian, depth, rate, channels);
         }
     }

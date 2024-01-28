@@ -327,8 +327,6 @@ namespace FoxTunes
             }
         }
 
-
-
         protected virtual Process CreateEncoderProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
             Logger.Write(this, LogLevel.Debug, "Creating encoder process for file \"{0}\".", encoderItem.InputFileName);
@@ -421,6 +419,7 @@ namespace FoxTunes
             var binaryEndian = BassEncoderBinaryEndian.Little;
             var depth = default(int);
             var rate = channelInfo.Frequency;
+            var channels = channelInfo.Channels;
             if (channelInfo.Flags.HasFlag(BassFlags.Float))
             {
                 binaryFormat = BassEncoderBinaryFormat.FloatingPoint;
@@ -450,6 +449,11 @@ namespace FoxTunes
             if (settings.GetRate(encoderItem, stream) != rate)
             {
                 Logger.Write(this, LogLevel.Debug, "Resampling required for rate: {0} => {1}", rate, settings.GetRate(encoderItem, stream));
+                result = true;
+            }
+            if (settings.GetChannels(encoderItem, stream) != channels)
+            {
+                Logger.Write(this, LogLevel.Debug, "Resampling required for channels: {0} => {1}", channels, settings.GetChannels(encoderItem, stream));
                 result = true;
             }
             return result;
