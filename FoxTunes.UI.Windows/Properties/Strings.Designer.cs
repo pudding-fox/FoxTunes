@@ -358,6 +358,78 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FFT Size.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_FFTSize {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.FFTSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Interval.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_Interval {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quality.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_Quality {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_Quality_High {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality.High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_Quality_Low {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality.Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visualizations.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Smooth.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_Smooth {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Smooth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Smooth Factor.
+        /// </summary>
+        public static string VisualizationBehaviourConfiguration_SmoothFactor {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.SmoothFactor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Counters.
         /// </summary>
         public static string WindowsUserInterfaceConfiguration_Counters {

@@ -43,6 +43,35 @@ namespace FoxTunes
 
         public static event EventHandler IsPlayingChanged;
 
+        private static bool _IsPaused { get; set; }
+
+        public static bool IsPaused
+        {
+            get
+            {
+                return _IsPaused;
+            }
+            set
+            {
+                if (IsPaused == value)
+                {
+                    return;
+                }
+                _IsPaused = value;
+                OnIsPausedChanged();
+            }
+        }
+
+        private static void OnIsPausedChanged()
+        {
+            if (IsPausedChanged != null)
+            {
+                IsPausedChanged(typeof(PlaybackStateNotifier), EventArgs.Empty);
+            }
+        }
+
+        public static event EventHandler IsPausedChanged;
+
         static PlaybackStateNotifier()
         {
             PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
@@ -75,10 +104,12 @@ namespace FoxTunes
                 if (outputStream != null)
                 {
                     IsPlaying = outputStream.IsPlaying;
+                    IsPaused = outputStream.IsPaused;
                 }
                 else
                 {
                     IsPlaying = false;
+                    IsPaused = false;
                 }
                 OnNotify();
             }
