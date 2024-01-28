@@ -39,23 +39,20 @@ namespace FoxTunes
                     .WithValue(false)
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION))
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "ASIO")
+                    .WithHandler(() =>
+                    {
+                        var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
+                            BassOutputConfiguration.SECTION,
+                            ELEMENT_ASIO_DEVICE
+                        );
+                        if (element == null)
+                        {
+                            return;
+                        }
+                        element.WithOptions(GetASIODevices(), true);
+                    })
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_ASIO_OPTION)
             );
-            StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                ELEMENT_REFRESH
-            ).WithHandler(() =>
-            {
-                var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
-                    BassOutputConfiguration.SECTION,
-                    ELEMENT_ASIO_DEVICE
-                );
-                if (element == null)
-                {
-                    return;
-                }
-                element.WithOptions(GetASIODevices(), true);
-            });
         }
 
         public static int GetAsioDevice(SelectionConfigurationOption option)

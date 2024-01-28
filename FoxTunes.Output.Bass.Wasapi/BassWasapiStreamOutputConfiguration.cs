@@ -52,23 +52,20 @@ namespace FoxTunes
                     .WithValue(true)
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION))
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "WASAPI")
+                    .WithHandler(() =>
+                    {
+                        var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
+                            BassOutputConfiguration.SECTION,
+                            ELEMENT_WASAPI_DEVICE
+                        );
+                        if (element == null)
+                        {
+                            return;
+                        }
+                        element.WithOptions(GetWASAPIDevices(), true);
+                    })
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION)
             );
-            StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                ELEMENT_REFRESH
-            ).WithHandler(() =>
-            {
-                var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
-                    BassOutputConfiguration.SECTION,
-                    ELEMENT_WASAPI_DEVICE
-                );
-                if (element == null)
-                {
-                    return;
-                }
-                element.WithOptions(GetWASAPIDevices(), true);
-            });
         }
 
         public static int GetWasapiDevice(SelectionConfigurationOption option)
