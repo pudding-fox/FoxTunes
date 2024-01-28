@@ -51,7 +51,7 @@ namespace FoxTunes
 
         private void ClearHierarchy(LibraryHierarchy libraryHierarchy)
         {
-            this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => libraryHierarchy.Items.Clear()));
+            this.Database.Interlocked(() => libraryHierarchy.Items.Clear());
         }
 
         private IEnumerable<LibraryHierarchyItem> BuildHierarchy(LibraryHierarchy libraryHierarchy)

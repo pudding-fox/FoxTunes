@@ -205,6 +205,11 @@ namespace FoxTunes
             this.Interlocked(action, Timeout.InfiniteTimeSpan);
         }
 
+        public override T Interlocked<T>(Func<T> func)
+        {
+            return this.Interlocked(func, Timeout.InfiniteTimeSpan);
+        }
+
         public override void Interlocked(Action action, TimeSpan timeout)
         {
             if (!Monitor.TryEnter(this.SyncRoot, timeout))
@@ -214,6 +219,22 @@ namespace FoxTunes
             try
             {
                 action();
+            }
+            finally
+            {
+                Monitor.Exit(this.SyncRoot);
+            }
+        }
+
+        public override T Interlocked<T>(Func<T> func, TimeSpan timeout)
+        {
+            if (!Monitor.TryEnter(this.SyncRoot, timeout))
+            {
+                throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));
+            }
+            try
+            {
+                return func();
             }
             finally
             {

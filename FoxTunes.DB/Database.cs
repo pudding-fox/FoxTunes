@@ -24,7 +24,11 @@ namespace FoxTunes
 
         public abstract void Interlocked(Action action);
 
+        public abstract T Interlocked<T>(Func<T> func);
+
         public abstract void Interlocked(Action action, TimeSpan timeout);
+
+        public abstract T Interlocked<T>(Func<T> func, TimeSpan timeout);
 
         public abstract void WithAutoDetectChanges(Action action);
 

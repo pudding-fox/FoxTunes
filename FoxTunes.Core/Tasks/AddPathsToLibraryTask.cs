@@ -77,10 +77,10 @@ namespace FoxTunes
             this.SetCount(fileNames.Count);
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
-            for (var a = 0; a < fileNames.Count; )
+            for (var a = 0; a < fileNames.Count;)
             {
                 var fileName = fileNames[a];
-                if (this.Library.LibraryItemSet.Any(libraryItem => libraryItem.FileName == fileName))
+                if (this.Database.Interlocked(() => this.Library.LibraryItemSet.Any(libraryItem => libraryItem.FileName == fileName)))
                 {
                     fileNames.RemoveAt(a);
                 }
