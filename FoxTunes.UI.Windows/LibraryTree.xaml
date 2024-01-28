@@ -48,6 +48,11 @@
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
+                    <!-- System -->
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Padding" Value="1,0,0,0" />
+                    <Setter Property="Template" Value="{DynamicResource TreeViewItemTemplate}"></Setter>
                 </Style>
             </TreeView.Resources>
             <Interactivity:Interaction.Triggers>

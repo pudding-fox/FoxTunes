@@ -1850,7 +1850,7 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
-    
+
     <Style TargetType="{x:Type Separator}">
         <Setter Property="Height" Value="1" />
         <Setter Property="Margin" Value="0,2,0,2" />
@@ -2294,91 +2294,87 @@
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="1,0,0,0" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TreeViewItem}">
-                    <ControlTemplate.Resources>
-                        <Storyboard x:Key="SelectedOn">
-                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectionBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                <SplineDoubleKeyFrame KeyTime="00:00:00.1000000" Value="1"/>
-                            </DoubleAnimationUsingKeyFrames>
-                        </Storyboard>
-                        <Storyboard x:Key="SelectedOff">
-                            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectionBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                <SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0"/>
-                            </DoubleAnimationUsingKeyFrames>
-                        </Storyboard>
-                    </ControlTemplate.Resources>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition MinWidth="19" Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <ToggleButton x:Name="Expander" Style="{DynamicResource NuclearTreeViewItemToggleButton}" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" />
-                        <Border Grid.Column="1" x:Name="Selection_Border" BorderThickness="1,1,1,1" CornerRadius="3,3,3,3">
-                            <Grid Width="Auto" Height="Auto">
-                                <Border x:Name="MainBorder" Opacity="0.25" Background="{DynamicResource NormalBrush}" CornerRadius="2,2,2,2"/>
-                                <Border x:Name="SelectionBorder" Opacity="0" Background="{DynamicResource SelectedBackgroundBrush}" CornerRadius="2,2,2,2"/>
-                                <Border x:Name="HoverBorder" Opacity="0" Background="{DynamicResource NormalBrush}" CornerRadius="2,2,2,2"/>
-                                <ContentPresenter x:Name="PART_Header" ContentSource="Header" d:LayoutOverrides="Width" Height="Auto" Margin="2,0,2,0" />
-                            </Grid>
-                        </Border>
-                        <ItemsPresenter Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" x:Name="ItemsHost" />
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsExpanded" Value="false">
-                            <Setter Property="Visibility" Value="Collapsed" TargetName="ItemsHost" />
-                        </Trigger>
-                        <Trigger Property="HasItems" Value="false">
-                            <Setter Property="Visibility" Value="Hidden" TargetName="Expander" />
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="true">
-                            <Trigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource SelectedOff}" x:Name="SelectedOn_BeginStoryboard1"/>
-                            </Trigger.ExitActions>
-                            <Trigger.EnterActions>
-                                <BeginStoryboard Storyboard="{StaticResource SelectedOn}" x:Name="SelectedOn_BeginStoryboard"/>
-                            </Trigger.EnterActions>
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsSelected" Value="true" />
-                                <Condition Property="IsSelectionActive" Value="false" />
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
-                            <Setter Property="Background" TargetName="Selection_Border" Value="{DynamicResource SelectedBackgroundBrush}" />
-                            <Setter Property="Opacity" TargetName="Selection_Border" Value="0.5" />
-                            <Setter Property="BorderBrush" TargetName="Selection_Border" Value="{DynamicResource NormalBorderBrush}" />
-                        </MultiTrigger>
-                        <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsSelected" Value="false" />
-                                <Condition Property="IsMouseOver" SourceName="Selection_Border" Value="true" />
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="HoverBorder" Property="Opacity" Value="1"/>
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsSelected" Value="true" />
-                                <Condition Property="IsMouseOver" Value="true" SourceName="Selection_Border" />
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Background" TargetName="Selection_Border" Value="{DynamicResource SelectedBackgroundBrush}" />
-                            <Setter Property="Opacity" TargetName="Selection_Border" Value="0.8" />
-                            <Setter Property="BorderBrush" TargetName="Selection_Border" Value="{DynamicResource NormalBorderBrush}" />
-                        </MultiTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{DynamicResource TreeViewItemTemplate}"></Setter>
     </Style>
+    <ControlTemplate x:Key="TreeViewItemTemplate" TargetType="{x:Type TreeViewItem}">
+        <ControlTemplate.Resources>
+            <Storyboard x:Key="SelectedOn">
+                <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectionBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                    <SplineDoubleKeyFrame KeyTime="00:00:00.1000000" Value="0.5"/>
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+            <Storyboard x:Key="SelectedOff">
+                <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="SelectionBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                    <SplineDoubleKeyFrame KeyTime="00:00:00.3000000" Value="0"/>
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+        </ControlTemplate.Resources>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="19" Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <ToggleButton x:Name="Expander" Style="{DynamicResource NuclearTreeViewItemToggleButton}" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" />
+            <Border Grid.Column="1" x:Name="Selection_Border" BorderThickness="1,1,1,1" CornerRadius="3,3,3,3">
+                <Grid Width="Auto" Height="Auto">
+                    <Border x:Name="SelectionBorder" Opacity="0" Background="{DynamicResource SelectedBackgroundBrush}" CornerRadius="2,2,2,2"/>
+                    <Border x:Name="HoverBorder" Opacity="0" Background="{DynamicResource NormalBrush}" CornerRadius="2,2,2,2"/>
+                    <ContentPresenter x:Name="PART_Header" ContentSource="Header" d:LayoutOverrides="Width" Height="Auto" Margin="2,0,2,0" />
+                </Grid>
+            </Border>
+            <ItemsPresenter Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" x:Name="ItemsHost" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="false">
+                <Setter Property="Visibility" Value="Collapsed" TargetName="ItemsHost" />
+            </Trigger>
+            <Trigger Property="HasItems" Value="false">
+                <Setter Property="Visibility" Value="Hidden" TargetName="Expander" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="true">
+                <Trigger.ExitActions>
+                    <BeginStoryboard Storyboard="{StaticResource SelectedOff}" x:Name="SelectedOn_BeginStoryboard1"/>
+                </Trigger.ExitActions>
+                <Trigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource SelectedOn}" x:Name="SelectedOn_BeginStoryboard"/>
+                </Trigger.EnterActions>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="true" />
+                    <Condition Property="IsSelectionActive" Value="false" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                <Setter Property="Background" TargetName="Selection_Border" Value="{DynamicResource SelectedBackgroundBrush}" />
+                <Setter Property="Opacity" TargetName="Selection_Border" Value="0.5" />
+                <Setter Property="BorderBrush" TargetName="Selection_Border" Value="{DynamicResource NormalBorderBrush}" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="false" />
+                    <Condition Property="IsMouseOver" SourceName="Selection_Border" Value="true" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="HoverBorder" Property="Opacity" Value="1"/>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="true" />
+                    <Condition Property="IsMouseOver" Value="true" SourceName="Selection_Border" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" TargetName="Selection_Border" Value="{DynamicResource SelectedBackgroundBrush}" />
+                <Setter Property="Opacity" TargetName="Selection_Border" Value="0.8" />
+                <Setter Property="BorderBrush" TargetName="Selection_Border" Value="{DynamicResource NormalBorderBrush}" />
+            </MultiTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
 
     <Style x:Key="ButtonFocusVisual">
         <Setter Property="Control.Template">
@@ -2748,7 +2744,7 @@
     </Style>
 
     <Style x:Key="GridViewColumnHeaderGripper" TargetType="{x:Type Thumb}">
-        <Setter Property="Canvas.Right" Value="-8.5" />
+        <Setter Property="Canvas.Right" Value="-12.5" />
         <Setter Property="Width" Value="18" />
         <Setter Property="Height" Value="{Binding Path=ActualHeight, RelativeSource={RelativeSource TemplatedParent}}" />
         <Setter Property="Padding" Value="0,3,0,4" />
@@ -2757,11 +2753,14 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Border Padding="{TemplateBinding Padding}">
-                        <Rectangle HorizontalAlignment="Center" Width="0.5">
-                            <Rectangle.Fill>
-                                <SolidColorBrush Color="{DynamicResource WhiteColor}" />
-                            </Rectangle.Fill>
-                        </Rectangle>
+                        <Grid>
+                            <Rectangle HorizontalAlignment="Center" Width="0.5">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{DynamicResource WhiteColor}" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Rectangle Width="10" Fill="Transparent"></Rectangle>
+                        </Grid>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
