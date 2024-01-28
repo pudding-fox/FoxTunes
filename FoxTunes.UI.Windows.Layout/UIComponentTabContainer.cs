@@ -24,11 +24,11 @@ namespace FoxTunes
 
         public UIComponentTabContainer()
         {
-            this.TabControl = new TabControl();
+            this.TabControl = new global::System.Windows.Controls.TabControl();
             this.Content = this.TabControl;
         }
 
-        public TabControl TabControl { get; private set; }
+        public global::System.Windows.Controls.TabControl TabControl { get; private set; }
 
         protected override void OnComponentChanged()
         {
