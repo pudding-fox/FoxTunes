@@ -142,6 +142,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Detect Compilations.
+        /// </summary>
+        internal static string MetaDataBehaviourConfiguration_DetectCompilations {
+            get {
+                return ResourceManager.GetString("MetaDataBehaviourConfiguration.DetectCompilations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Embedded Images.
         /// </summary>
         internal static string MetaDataBehaviourConfiguration_EmbeddedImages {

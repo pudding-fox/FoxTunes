@@ -235,22 +235,25 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to DELETE FROM [LibraryHierarchyItem_LibraryItem]
-        ///WHERE [LibraryItem_Id] IN
-        ///(
-        ///	SELECT [Id] 
-        ///	FROM [LibraryItems]
-        ///	WHERE @status IS NULL OR [Status] = @status
-        ///);
+        ///WHERE (@libraryHierarchyId IS NULL OR [LibraryHierarchyItem_Id] IN
+        ///	(
+        ///		SELECT [Id]
+        ///		FROM [LibraryHierarchyItems]
+        ///		WHERE [LibraryHierarchy_Id] = @libraryHierarchyId
+        ///	))
+        ///	AND (@status IS NULL OR [LibraryItem_Id] IN
+        ///	(
+        ///		SELECT [Id] 
+        ///		FROM [LibraryItems]
+        ///		WHERE @status IS NULL OR [Status] = @status
+        ///	));
         ///
         ///DELETE FROM [LibraryHierarchyItems]
         ///WHERE [Id] IN
         ///(
         ///	SELECT [LibraryHierarchyItems].[Id]
         ///	FROM [LibraryHierarchyItems]
-        ///		 LEFT JOIN [LibraryHierarchyItem_LibraryItem]
-        ///			ON [LibraryHierarchyItems].[Id] = [LibraryHierarchyItem_LibraryItem].[LibraryHierarchyItem_Id]
-        ///	WHERE [LibraryHierarchyItem_LibraryItem].[Id] IS NULL
-        ///);.
+        ///		 LEFT JOIN [Libra [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string RemoveLibraryHierarchyItems {
             get {
@@ -288,20 +291,76 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to WITH &quot;MetaData&quot;
+        ///AS
+        ///(
+        ///	SELECT &quot;MetaDataItems&quot;.&quot;Id&quot;
+        ///	FROM &quot;LibraryItem_MetaDataItem&quot;
+        ///		JOIN &quot;MetaDataItems&quot; 
+        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
+        ///		JOIN &quot;LibraryItems&quot;
+        ///			ON &quot;LibraryItems&quot;.&quot;Id&quot; =  &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot;
+        ///	WHERE &quot;MetaDataItems&quot;.&quot;Name&quot; = @name 
+        ///		AND  &quot;MetaDataItems&quot;.&quot;Type&quot; = @type
+        ///		AND &quot;LibraryItems&quot;.&quot;Status&quot; = @status
+        ///)
+        ///	
+        ///DELETE FROM &quot;LibraryItem_MetaDataItem&quot;
+        ///WHERE &quot;MetaDataItem_Id&quot; IN
+        ///(
+        ///	SELECT &quot;Id&quot;
+        ///	FROM &quot;MetaData&quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string RemoveLibraryVariousArtists {
+            get {
+                return ResourceManager.GetString("RemoveLibraryVariousArtists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DELETE FROM [PlaylistItem_MetaDataItem]
         ///WHERE [PlaylistItem_Id] IN
         ///(
         ///	SELECT [Id]
         ///	FROM [PlaylistItems]
-        ///	WHERE [Status] = @status
+        ///	WHERE [Playlist_Id] = @playlistId 
+        ///		AND [Status] = @status
         ///);
         ///
         ///DELETE FROM [PlaylistItems]
-        ///WHERE [Status] = @status.
+        ///WHERE [Playlist_Id] = @playlistId 
+        ///	AND [Status] = @status.
         /// </summary>
         internal static string RemovePlaylistItems {
             get {
                 return ResourceManager.GetString("RemovePlaylistItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WITH &quot;MetaData&quot;
+        ///AS
+        ///(
+        ///	SELECT &quot;MetaDataItems&quot;.&quot;Id&quot;
+        ///	FROM &quot;PlaylistItem_MetaDataItem&quot;
+        ///		JOIN &quot;MetaDataItems&quot; 
+        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;PlaylistItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
+        ///		JOIN &quot;PlaylistItems&quot;
+        ///			ON &quot;PlaylistItems&quot;.&quot;Id&quot; =  &quot;PlaylistItem_MetaDataItem&quot;.&quot;PlaylistItem_Id&quot;
+        ///	WHERE &quot;MetaDataItems&quot;.&quot;Name&quot; = @name 
+        ///		AND  &quot;MetaDataItems&quot;.&quot;Type&quot; = @type
+        ///		AND &quot;PlaylistItems&quot;.&quot;Status&quot; = @status
+        ///)
+        ///	
+        ///DELETE FROM &quot;PlaylistItem_MetaDataItem&quot;
+        ///WHERE &quot;MetaDataItem_Id&quot; IN
+        ///(
+        ///	SELECT &quot;Id&quot;
+        ///	FROM &quot;M [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string RemovePlaylistVariousArtists {
+            get {
+                return ResourceManager.GetString("RemovePlaylistVariousArtists", resourceCulture);
             }
         }
         

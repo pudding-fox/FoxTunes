@@ -144,6 +144,9 @@
   <data name="MetaDataBehaviourConfiguration.BackCover" xml:space="preserve">
     <value>Back Cover</value>
   </data>
+  <data name="MetaDataBehaviourConfiguration.DetectCompilations" xml:space="preserve">
+    <value>Detect Compilations</value>
+  </data>
   <data name="MetaDataBehaviourConfiguration.EmbeddedImages" xml:space="preserve">
     <value>Embedded Images</value>
   </data>
