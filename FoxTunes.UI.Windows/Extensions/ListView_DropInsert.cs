@@ -1,7 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -117,7 +119,16 @@ namespace FoxTunes
 
         private class DropInsertBehaviour : UIBehaviour
         {
-            public DropInsertBehaviour(ListView listView)
+            public static readonly TimeSpan INTERVAL = TimeSpan.FromSeconds(1);
+
+            private DropInsertBehaviour()
+            {
+                this.Timer = new global::System.Windows.Threading.DispatcherTimer();
+                this.Timer.Interval = INTERVAL;
+                this.Timer.Tick += this.OnTick;
+            }
+
+            public DropInsertBehaviour(ListView listView) : this()
             {
                 this.ListView = listView;
                 this.ListView.DragEnter += this.OnDragEnter;
@@ -128,9 +139,22 @@ namespace FoxTunes
                 this.Adorner = new DropInsertAdorner(listView);
             }
 
+            public global::System.Windows.Threading.DispatcherTimer Timer { get; private set; }
+
             public ListView ListView { get; private set; }
 
             public DropInsertAdorner Adorner { get; private set; }
+
+            protected virtual void OnTick(object sender, EventArgs e)
+            {
+                //TODO: Use only WPF frameworks.
+                //if (global::System.Windows.Input.Mouse.LeftButton.HasFlag(global::System.Windows.Input.MouseButtonState.Pressed))
+                if (global::System.Windows.Forms.Control.MouseButtons.HasFlag(global::System.Windows.Forms.MouseButtons.Left))
+                {
+                    return;
+                }
+                this.RemoveAdorner();
+            }
 
             protected virtual void OnDragEnter(object sender, DragEventArgs e)
             {
@@ -179,6 +203,7 @@ namespace FoxTunes
                     layer.IsHitTestVisible = false;
                     layer.Add(this.Adorner);
                 }
+                this.Timer.Start();
             }
 
             protected virtual void Remove()
@@ -196,6 +221,7 @@ namespace FoxTunes
                     var layer = AdornerLayer.GetAdornerLayer(this.ListView);
                     layer.Remove(this.Adorner);
                 }
+                this.Timer.Stop();
             }
 
             protected virtual void UpdateDropInsertIndex(DragEventArgs e)
@@ -242,6 +268,15 @@ namespace FoxTunes
                     }
                 }
                 return null;
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.Timer != null)
+                {
+                    this.Timer.Tick -= this.OnTick;
+                }
+                base.OnDisposing();
             }
         }
 
