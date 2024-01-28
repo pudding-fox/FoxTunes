@@ -502,7 +502,7 @@ namespace FoxTunes
             }
             else
             {
-                Logger.Write(this, LogLevel.Debug, "Taskbar button image list created.");
+                Logger.Write(this, LogLevel.Debug, "Taskbar buttons created.");
                 this.Windows[handle] |= TaskbarButtonsWindowFlags.ButtonsCreated;
                 return true;
             }

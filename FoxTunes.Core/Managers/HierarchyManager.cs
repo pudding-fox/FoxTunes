@@ -122,6 +122,14 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
             this.CanNavigate = this.DatabaseFactory != null && await this.HasItems().ConfigureAwait(false);
+            if (this.CanNavigate)
+            {
+                Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Navigation is not possible, library is empty.");
+            }
         }
 
         public async Task Build(LibraryItemStatus? status)

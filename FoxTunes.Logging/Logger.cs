@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [Component("3DC2C04A-CE99-4416-BC27-068E8AC02F56", ComponentSlots.Logger, priority: ComponentAttribute.PRIORITY_HIGH)]
-    public class Logger : StandardComponent, ILogger
+    public class Logger : StandardComponent, ILogger, IDisposable
     {
         const int TIMEOUT = 1;
 
@@ -40,7 +40,24 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public bool Enabled { get; private set; }
+        public bool Enabled
+        {
+            get
+            {
+                return object.ReferenceEquals(LogManager.Logger, this);
+            }
+            set
+            {
+                if (value)
+                {
+                    LogManager.Logger = this;
+                }
+                else
+                {
+                    LogManager.Logger = null;
+                }
+            }
+        }
 
         public LogLevel Level { get; private set; }
 
@@ -221,6 +238,49 @@ namespace FoxTunes
                 Enum.GetName(typeof(LogLevel), level),
                 message
             );
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Writer.IsValueCreated)
+            {
+                this.Writer.Value.Flush();
+            }
+            if (this.Stream.IsValueCreated)
+            {
+                this.Stream.Value.Flush();
+            }
+        }
+
+        ~Logger()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

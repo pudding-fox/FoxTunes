@@ -20,13 +20,13 @@ namespace FoxTunes
             {
                 if (_Logger == null)
                 {
-                    _Logger = ComponentRegistry.Instance.GetComponent<ILogger>();
-                    if (_Logger == null)
-                    {
-                        _Logger = NullLogger.Instance;
-                    }
+                    return NullLogger.Instance;
                 }
                 return _Logger;
+            }
+            set
+            {
+                _Logger = value;
             }
         }
 
