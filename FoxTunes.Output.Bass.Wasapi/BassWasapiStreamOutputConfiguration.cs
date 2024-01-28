@@ -19,6 +19,8 @@ namespace FoxTunes
 
         public const string MIXER_ELEMENT = "FFFF34F9-BB72-4DB6-BDD0-F5C9BFD2F9EE";
 
+        public const string ELEMENT_REFRESH = "GGGG5945-E6DA-48FD-B89C-F1F35C4822FB";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
@@ -29,13 +31,29 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EXCLUSIVE, "Exclusive", path: "WASAPI").WithValue(true))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EVENT, "Event", path: "WASAPI").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_DITHER, "Dither", path: "WASAPI").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(MIXER_ELEMENT, "Mixer", path: "WASAPI").WithValue(false)
+                .WithElement(new BooleanConfigurationElement(MIXER_ELEMENT, "Mixer", path: "WASAPI").WithValue(false))
+                .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "WASAPI")
             );
+            StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                ELEMENT_REFRESH
+            ).WithHandler(() =>
+            {
+                var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
+                    BassOutputConfiguration.SECTION,
+                    ELEMENT_WASAPI_DEVICE
+                );
+                if (element == null)
+                {
+                    return;
+                }
+                element.WithOptions(GetWASAPIDevices(), true);
+            });
         }
 
         public static int GetWasapiDevice(SelectionConfigurationOption option)
         {
-            if (!string.Equals(option.Id, BassWasapi.DefaultDevice.ToString()))
+            if (option != null && !string.Equals(option.Id, BassWasapi.DefaultDevice.ToString()))
             {
                 for (int a = 0, b = BassWasapi.DeviceCount; a < b; a++)
                 {
