@@ -51,6 +51,8 @@ namespace FoxTunes
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public SelectionConfigurationElement Write { get; private set; }
@@ -59,6 +61,7 @@ namespace FoxTunes
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -167,6 +170,12 @@ namespace FoxTunes
             {
                 await task.Run().ConfigureAwait(false);
             }
+        }
+
+        protected override async Task OnCompleted()
+        {
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 
         private async Task WritePlaylistMetaData(PlaylistItem playlistItem)
