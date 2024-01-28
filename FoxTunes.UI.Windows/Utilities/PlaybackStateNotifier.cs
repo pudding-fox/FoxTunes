@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -12,6 +13,35 @@ namespace FoxTunes
         public static readonly IPlaybackManager PlaybackManager;
 
         public static readonly DispatcherTimer Timer;
+
+        private static bool _IsPlaying { get; set; }
+
+        public static bool IsPlaying
+        {
+            get
+            {
+                return _IsPlaying;
+            }
+            set
+            {
+                if (IsPlaying == value)
+                {
+                    return;
+                }
+                _IsPlaying = value;
+                OnIsPlayingChanged();
+            }
+        }
+
+        private static void OnIsPlayingChanged()
+        {
+            if (IsPlayingChanged != null)
+            {
+                IsPlayingChanged(typeof(PlaybackStateNotifier), EventArgs.Empty);
+            }
+        }
+
+        public static event EventHandler IsPlayingChanged;
 
         static PlaybackStateNotifier()
         {
@@ -38,8 +68,17 @@ namespace FoxTunes
 
         private static void OnTick(object sender, EventArgs e)
         {
+            var outputStream = PlaybackManager.CurrentStream;
             try
             {
+                if (outputStream != null)
+                {
+                    IsPlaying = outputStream.IsPlaying;
+                }
+                else
+                {
+                    IsPlaying = false;
+                }
                 OnNotify();
             }
             catch

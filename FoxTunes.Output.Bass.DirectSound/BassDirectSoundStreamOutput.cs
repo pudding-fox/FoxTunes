@@ -60,6 +60,11 @@ namespace FoxTunes
 
         public HashSet<int> MixerChannelHandles { get; protected set; }
 
+        protected override IEnumerable<int> GetMixerChannelHandles()
+        {
+            return this.MixerChannelHandles;
+        }
+
         public override bool CheckFormat(int rate, int channels)
         {
             return true;
@@ -225,30 +230,6 @@ namespace FoxTunes
                 this.OnError(e);
                 throw;
             }
-        }
-
-        public override int GetData(float[] buffer)
-        {
-            var length = default(uint);
-            switch (buffer.Length)
-            {
-                case 128:
-                    length = FFT256;
-                    break;
-                case 256:
-                    length = FFT512;
-                    break;
-                case 512:
-                    length = FFT1024;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-            foreach (var channelHandle in this.MixerChannelHandles)
-            {
-                return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
-            }
-            return 0;
         }
 
         protected override float GetVolume()

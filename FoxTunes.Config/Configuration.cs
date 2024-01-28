@@ -152,6 +152,7 @@ namespace FoxTunes
         {
             this.Debouncer.Exec(() =>
             {
+                Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", ConfigurationFileName);
                 try
                 {
                     using (var stream = File.Create(ConfigurationFileName))
