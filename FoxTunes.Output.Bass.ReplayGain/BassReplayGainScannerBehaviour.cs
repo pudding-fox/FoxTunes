@@ -315,7 +315,7 @@ namespace FoxTunes
                                 metaDataItem = new MetaDataItem(CommonMetaData.ReplayGainAlbumPeak, MetaDataItemType.Tag);
                                 playlistItem.MetaDatas.Add(metaDataItem);
                             }
-                            metaDataItem.Value = Convert.ToString(scannerItem.ItemPeak);
+                            metaDataItem.Value = Convert.ToString(scannerItem.GroupPeak);
                             names.Add(CommonMetaData.ReplayGainAlbumPeak);
                         }
                         if (scannerItem.ItemGain != 0)
