@@ -105,7 +105,7 @@ namespace FoxTunes
                     }
                 }
             });
-            return position;
+            return Math.Max(position, 0);
         }
 
         protected virtual void SetPosition(long position)
@@ -132,7 +132,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Stream.Length;
+                return Math.Max(this.Stream.Length, 0);
             }
         }
 
@@ -430,14 +430,7 @@ namespace FoxTunes
             {
                 if (this.Stream != null)
                 {
-                    if (this.Stream.Syncs != null)
-                    {
-                        foreach (var sync in this.Stream.Syncs)
-                        {
-                            Bass.ChannelRemoveSync(this.ChannelHandle, sync);
-                        }
-                    }
-                    this.Stream.Provider.FreeStream(this.ChannelHandle);
+                    this.Stream.Dispose();
                 }
             }
             finally

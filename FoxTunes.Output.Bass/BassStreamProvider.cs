@@ -44,7 +44,7 @@ namespace FoxTunes
             if (channelHandle == 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
-                return BassStream.Error(Bass.LastError);
+                return BassStream.Error(this, Bass.LastError);
             }
             try
             {
@@ -58,11 +58,11 @@ namespace FoxTunes
             }
             catch (BassException e)
             {
-                return BassStream.Error(e.Error);
+                return BassStream.Error(this, e.Error);
             }
         }
 
-        public virtual IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        public virtual IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, bool immidiate, BassFlags flags)
         {
             var fileName = this.GetFileName(playlistItem, advice);
             var channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
@@ -74,7 +74,7 @@ namespace FoxTunes
             if (channelHandle == 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
-                return BassStream.Error(Bass.LastError);
+                return BassStream.Error(this, Bass.LastError);
             }
             try
             {
@@ -84,12 +84,12 @@ namespace FoxTunes
                 {
                     stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
                 }
-                stream.RegisterSyncHandlers();
+                stream.AddSyncHandlers();
                 return stream;
             }
             catch (BassException e)
             {
-                return BassStream.Error(e.Error);
+                return BassStream.Error(this, e.Error);
             }
         }
 
@@ -123,8 +123,7 @@ namespace FoxTunes
 
         public virtual long GetPosition(int channelHandle)
         {
-            var position = Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
-            return Math.Max(position, 0);
+            return Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
         }
 
         public virtual void SetPosition(int channelHandle, long value)

@@ -67,7 +67,7 @@ namespace FoxTunes
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
-            if (!this.Enabled)
+            if (!this.Enabled || e.Input != null)
             {
                 return;
             }

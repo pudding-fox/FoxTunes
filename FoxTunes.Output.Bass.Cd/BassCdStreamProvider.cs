@@ -18,11 +18,11 @@ namespace FoxTunes
             }
         }
 
-        public BassCdStreamProviderBehaviour Behaviour { get; private set; }
+        public BassCdBehaviour Behaviour { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassCdStreamProviderBehaviour>();
+            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassCdBehaviour>();
             base.InitializeComponent(core);
         }
 
@@ -47,15 +47,15 @@ namespace FoxTunes
             }
             this.AssertDiscId(drive, id);
             var channelHandle = default(int);
+            var input = this.GetInput();
+            if (input != null)
+            {
+                return BassStream.Pending(this);
+            }
             lock (SyncRoot)
             {
-                if (this.GetCurrentStream(drive, track, out channelHandle))
-                {
-                    return this.CreateBasicStream(channelHandle, advice, flags);
-                }
                 if (BassCd.FreeOld)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
                     BassCd.FreeOld = false;
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
@@ -67,7 +67,7 @@ namespace FoxTunes
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
-        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, bool immidiate, BassFlags flags)
         {
             var drive = default(int);
             var id = default(string);
@@ -80,15 +80,25 @@ namespace FoxTunes
             }
             this.AssertDiscId(drive, id);
             var channelHandle = default(int);
+            var input = this.GetInput();
+            if (input != null)
+            {
+                if (immidiate)
+                {
+                    if (input.SetTrack(track, out channelHandle))
+                    {
+                        return this.CreateInteractiveStream(channelHandle, advice, flags);
+                    }
+                }
+                else
+                {
+                    return BassStream.Pending(this);
+                }
+            }
             lock (SyncRoot)
             {
-                if (this.GetCurrentStream(drive, track, out channelHandle))
-                {
-                    return this.CreateInteractiveStream(channelHandle, advice, flags);
-                }
                 if (BassCd.FreeOld)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
                     BassCd.FreeOld = false;
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
@@ -119,36 +129,20 @@ namespace FoxTunes
             throw new InvalidOperationException(string.Format("Found disc with identifier \"{0}\" when \"{1}\" was required.", actual, expected));
         }
 
-        protected virtual bool GetCurrentStream(int drive, int track, out int channelHandle)
+        protected virtual BassCdStreamInput GetInput()
         {
+            var input = default(BassCdStreamInput);
             if (this.Output != null && this.Output.IsStarted)
             {
-                var enqueuedChannelHandle = default(int);
                 this.PipelineManager.WithPipeline(pipeline =>
                 {
                     if (pipeline != null)
                     {
-                        using (var sequence = pipeline.Input.Queue.GetEnumerator())
-                        {
-                            while (sequence.MoveNext())
-                            {
-                                if (BassCd.StreamGetTrack(sequence.Current) == track)
-                                {
-                                    enqueuedChannelHandle = sequence.Current;
-                                    break;
-                                }
-                            }
-                        }
+                        input = pipeline.Input as BassCdStreamInput;
                     }
                 });
-                if (enqueuedChannelHandle != 0)
-                {
-                    channelHandle = enqueuedChannelHandle;
-                    return true;
-                }
             }
-            channelHandle = 0;
-            return false;
+            return input;
         }
     }
 }

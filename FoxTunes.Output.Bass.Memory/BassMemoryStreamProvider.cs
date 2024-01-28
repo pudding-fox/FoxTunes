@@ -26,7 +26,7 @@ namespace FoxTunes
             return base.CanCreateStream(playlistItem);
         }
 
-        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, bool immidiate, BassFlags flags)
         {
             var fileName = this.GetFileName(playlistItem, advice);
             Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);

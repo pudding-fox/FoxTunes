@@ -359,11 +359,6 @@ namespace FoxTunes
             {
                 await this.Start().ConfigureAwait(false);
             }
-            //TODO: Why do we do this? Multiple streams for the same file are valid.
-            if (this.StreamFactory.HasActiveStream(playlistItem.FileName))
-            {
-                Logger.Write(this, LogLevel.Warn, "The stream is already loaded: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            }
             Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             var flags = BassFlags.Default;
             if (this.Float)
@@ -381,7 +376,7 @@ namespace FoxTunes
             return outputStream;
         }
 
-        public override Task<IOutputStream> Duplicate(IOutputStream stream)
+        public override IOutputStream Duplicate(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
             if (outputStream.Provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
@@ -401,11 +396,7 @@ namespace FoxTunes
             }
             outputStream = new BassOutputStream(this, this.PipelineManager, result, stream.PlaylistItem);
             outputStream.InitializeComponent(this.Core);
-#if NET40
-            return TaskEx.FromResult<IOutputStream>(outputStream);
-#else
-            return Task.FromResult<IOutputStream>(outputStream);
-#endif
+            return outputStream;
         }
 
         public override Task<bool> Preempt(IOutputStream stream)
@@ -448,28 +439,6 @@ namespace FoxTunes
 #endif
         }
 
-        public override Task<bool> IsPlaying(IOutputStream stream)
-        {
-            var outputStream = stream as BassOutputStream;
-            if (this.IsStarted)
-            {
-                return this.PipelineManager.WithPipelineExclusive(pipeline =>
-                {
-                    if (pipeline != null)
-                    {
-                        var isPlaying = pipeline.Input.Position(outputStream) == 0;
-                        return isPlaying;
-                    }
-                    return false;
-                });
-            }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.FromResult(false);
-#endif
-        }
-
         public override async Task Unload(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
@@ -480,23 +449,15 @@ namespace FoxTunes
                 {
                     if (pipeline != null)
                     {
-                        var isPlaying = pipeline.Input.Position(outputStream) == 0;
-                        if (pipeline.Input.Remove(outputStream, this.Unload))
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Pipeline unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
-                            if (isPlaying && !pipeline.Input.PreserveBuffer)
-                            {
-                                //For the normal gapless input we should clear the buffer when the current stream is removed.
-                                //This reduces latency when skipping tracks.
-                                //The crossfade input disables this as it would prevent fade out.
-                                Logger.Write(this, LogLevel.Debug, "The current stream was removed, clearing the buffer.");
-                                pipeline.ClearBuffer();
-                            }
-                        }
-                        else
+                        if (!pipeline.Input.Remove(outputStream, this.Unload))
                         {
                             //Probably not in the queue.
                             this.Unload(outputStream);
+                        }
+                        if (!outputStream.IsEnded && !pipeline.Input.PreserveBuffer)
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Track was manually skipped, clearing the playback buffer.");
+                            pipeline.ClearBuffer();
                         }
                     }
                 }).ConfigureAwait(false);

@@ -10,7 +10,7 @@ namespace FoxTunes.Output.Bass.Tests
         [Test]
         public async Task CanOpenCd()
         {
-            var behaviour = ComponentRegistry.Instance.GetComponent<BassCdStreamProviderBehaviour>();
+            var behaviour = ComponentRegistry.Instance.GetComponent<BassCdBehaviour>();
             await behaviour.OpenCd(0).ConfigureAwait(false);
         }
     }
