@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Media;
 
@@ -29,6 +32,10 @@ namespace FoxTunes
         public const int SMOOTHING_DEFAULT = 1;
 
         public const string COLOR_PALETTE_ELEMENT = "DDDDBAFC-0C99-4329-9DA2-C041E674597E";
+
+        public const string COLOR_PALETTE_VALUE = "VALUE";
+
+        public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";
 
         public const string HISTORY_ELEMENT = "EEEE2EBD-4483-4281-A4AD-E042E0367996";
 
@@ -95,21 +102,29 @@ namespace FoxTunes
 
         public static Color[] GetColorPalette(string value)
         {
-            if (!string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
             {
-                try
+                value = GetDefaultColorPalette();
+            }
+            var palettes = value.ToNamedColorStops().ToDictionary(
+                pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
+                pair => pair.Value.ToGradient(),
+                StringComparer.OrdinalIgnoreCase
+            );
+            var valueColors = default(Color[]);
+            if (palettes.TryGetValue(COLOR_PALETTE_VALUE, out valueColors))
+            {
+                var backgroundColors = default(Color[]);
+                if (palettes.TryGetValue(COLOR_PALETTE_BACKGROUND, out backgroundColors))
                 {
-                    var colors = value.ToColorStops().ToGradient();
-                    if (colors != null && colors.Length > 1)
-                    {
-                        return colors;
-                    }
+                    valueColors = backgroundColors.Concat(valueColors).ToArray().ToGradient(1000);
                 }
-                catch
+                if (valueColors.Length > 1)
                 {
-                    //Nothing can be done.
+                    return valueColors;
                 }
             }
+            //Configuration did not produce enough colors, fall back to the default.
             return GetDefaultColorPalette().ToColorStops().ToGradient();
         }
     }

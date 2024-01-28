@@ -965,6 +965,16 @@ namespace FoxTunes
             return result;
         }
 
+        public static Color[] ToGradient(this Color[] colors, int count)
+        {
+            var position = default(int);
+            return colors.Select(color =>
+            {
+                var index = count * (position++);
+                return new ColorStop(index, color);
+            }).ToArray().ToGradient();
+        }
+
         public static Color[] MirrorGradient(this Color[] colors, bool invert)
         {
             return new[]

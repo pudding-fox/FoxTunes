@@ -75,13 +75,14 @@ namespace FoxTunes
             {
                 return false;
             }
-            var colors = SpectrogramConfiguration.GetColorPalette(this.ColorPalette.Value);
+            var count = default(int);
+            var colors = this.GetColorPalette(this.GetColorPaletteOrDefault(this.ColorPalette.Value), out count);
             this.RendererData = Create(
                 width,
                 height,
-                colors.Length,
+                count,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                BitmapHelper.CreatePalette(0, GetAlphaBlending(colors), colors),
+                colors,
                 SpectrogramConfiguration.GetMode(this.Mode.Value),
                 SpectrogramConfiguration.GetScale(this.Scale.Value),
                 this.Smoothing.Value
@@ -100,6 +101,13 @@ namespace FoxTunes
                 this.RendererHistory = null;
             }
             return true;
+        }
+
+        protected virtual IntPtr GetColorPalette(string value, out int count)
+        {
+            var palette = SpectrogramConfiguration.GetColorPalette(value);
+            count = palette.Length;
+            return BitmapHelper.CreatePalette(0, false, palette);
         }
 
         protected override WriteableBitmap CreateBitmap(int width, int height)
