@@ -62,12 +62,14 @@ namespace FoxTunes
                 {
                     source = ImageLoader.Load(stream);
                 }
+                var brush = new ImageBrush(source)
+                {
+                    Stretch = Stretch.Uniform
+                };
+                brush.Freeze();
                 await Windows.Invoke(() =>
                 {
-                    this.Background = new ImageBrush(source)
-                    {
-                        Stretch = Stretch.Uniform
-                    };
+                    this.Background = brush;
                     this.IsComponentEnabled = false;
                 }).ConfigureAwait(false);
             }
