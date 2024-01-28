@@ -278,7 +278,7 @@ namespace FoxTunes.ViewModel
         protected override void OnSelectedItemChanged(object sender, EventArgs e)
         {
             this.IsPlaceholderSelected = false;
-            this.Synchronize();
+            var task = Windows.Invoke(this.Synchronize);
             base.OnSelectedItemChanged(sender, e);
         }
 

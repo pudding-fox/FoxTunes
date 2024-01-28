@@ -536,10 +536,6 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Creating window: {0}", this.Id);
                     var window = factory();
                     Logger.Write(this, LogLevel.Debug, "Created window: {0}/{1}", window.GetType().Name, window.Title);
-                    if (this.Role != UserInterfaceWindowRole.Main)
-                    {
-                        window.Owner = ActiveWindow;
-                    }
                     window.IsVisibleChanged += this.OnIsVisibleChanged;
                     window.Closed += this.OnClosed;
                     this.OnCreated(window, EventArgs.Empty);
@@ -633,7 +629,6 @@ namespace FoxTunes
                 var content = new T();
                 var window = new DialogWindow<T>(content)
                 {
-                    Owner = ActiveWindow,
                     Topmost = true,
                     Title = title
                 };
@@ -649,7 +644,6 @@ namespace FoxTunes
             {
                 var window = new DialogWindow<T>(content)
                 {
-                    Owner = ActiveWindow,
                     Topmost = true,
                     Title = title
                 };

@@ -123,8 +123,7 @@ namespace FoxTunes
             {
                 var window = new MetaDataEditorWindow()
                 {
-                    ShowActivated = true,
-                    Owner = Windows.ActiveWindow,
+                    ShowActivated = true
                 };
                 window.Show(fileDatas);
             });

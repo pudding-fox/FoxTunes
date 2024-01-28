@@ -109,9 +109,6 @@ namespace FoxTunes
                     window = new ToolWindow();
                     window.Configuration = config;
                     window.ShowActivated = false;
-                    //Don't set owner as it causes an "always on top" type of behaviour.
-                    //We have an option for that.
-                    //window.Owner = global::FoxTunes.Windows.ActiveWindow;
                     window.Closed += this.OnClosed;
                 }).ConfigureAwait(false);
                 this.Windows[config] = window;
