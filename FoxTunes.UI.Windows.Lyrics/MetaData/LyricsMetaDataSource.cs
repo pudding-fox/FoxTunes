@@ -71,7 +71,7 @@ namespace FoxTunes
             lock (fileData.MetaDatas)
             {
                 var metaDataItem = fileData.MetaDatas.FirstOrDefault(
-                    element => string.Equals(element.Name, CustomMetaData.DiscogsRelease, StringComparison.OrdinalIgnoreCase) && element.Type == MetaDataItemType.Tag
+                    element => string.Equals(element.Name, CustomMetaData.LyricsRelease, StringComparison.OrdinalIgnoreCase) && element.Type == MetaDataItemType.Tag
                 );
                 if (metaDataItem != null && string.Equals(metaDataItem.Value, provider.None, StringComparison.OrdinalIgnoreCase))
                 {
