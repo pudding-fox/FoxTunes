@@ -9,8 +9,6 @@ namespace FoxTunes
 {
     public class FileNameMetaDataSource : BaseComponent, IMetaDataSource
     {
-        public static MetaDataCategory Categories = MetaDataCategory.Standard;
-
         public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
 
         public static SemaphoreSlim Semaphore { get; private set; }

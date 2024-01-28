@@ -12,16 +12,6 @@ namespace FoxTunes.Interfaces
     }
 
     [Flags]
-    public enum MetaDataCategory : byte
-    {
-        None = 0,
-        Standard = 1,
-        Extended = 2,
-        MusicBrainz = 4,
-        MultiMedia = 8
-    }
-
-    [Flags]
     public enum ArtworkType : byte
     {
         None = 0,
