@@ -22,6 +22,16 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
+        public bool IsInitialized { get; private set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this.CdDrive != BassCdStreamProviderBehaviourConfiguration.CD_NO_DRIVE;
+            }
+        }
+
         private int _CdDrive { get; set; }
 
         public int CdDrive
@@ -34,6 +44,7 @@ namespace FoxTunes
             {
                 this._CdDrive = value;
                 Logger.Write(this, LogLevel.Debug, "CD Drive = {0}", this.CdDrive);
+                this.Output.Shutdown();
             }
         }
 
@@ -92,6 +103,10 @@ namespace FoxTunes
 
         protected virtual void OnInit(object sender, EventArgs e)
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             var flags = BassFlags.Decode;
             if (this.Output.Float)
             {
@@ -100,13 +115,19 @@ namespace FoxTunes
             BassUtils.OK(BassGaplessCd.Init());
             BassUtils.OK(BassGaplessCd.Enable(this.CdDrive, flags));
             BassCd.FreeOld = false;
+            this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS CD Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
         {
+            if (!this.IsInitialized)
+            {
+                return;
+            }
             BassGaplessCd.Disable();
             BassGaplessCd.Free();
+            this.IsInitialized = false;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -118,7 +139,10 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, "Open CD");
+                if (this.Enabled)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, "Open CD");
+                }
             }
         }
 
