@@ -20,6 +20,8 @@ namespace FoxTunes.ViewModel
             this.SelectedItems = new ObservableCollection<PlaylistItem>();
         }
 
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
+
         public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
@@ -166,6 +168,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
+            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.Database = this.Core.Components.Database;
@@ -176,7 +179,18 @@ namespace FoxTunes.ViewModel
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.OnGridColumnsChanged();
+            this.OnCommandsChanged();
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnCommandsChanged()
+        {
+            this.OnPropertyChanged("PlaySelectedItemCommand");
+            this.OnPropertyChanged("LocateCommand");
+            this.OnPropertyChanged("ClearCommand");
+            this.OnPropertyChanged("SettingsCommand");
+            this.OnPropertyChanged("DragEnterCommand");
+            this.OnPropertyChanged("DropCommand");
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
@@ -193,12 +207,15 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(() =>
-                {
-                    var playlistItem = this.SelectedItems[0] as PlaylistItem;
-                    return this.PlaylistManager.Play(playlistItem);
-                },
-                () => this.PlaybackManager != null && this.SelectedItems.Count > 0);
+                return new AsyncCommand(
+                    this.BackgroundTaskRunner,
+                    () =>
+                    {
+                        var playlistItem = this.SelectedItems[0] as PlaylistItem;
+                        return this.PlaylistManager.Play(playlistItem);
+                    },
+                    () => this.PlaybackManager != null && this.SelectedItems.Count > 0
+                );
             }
         }
 
@@ -219,7 +236,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(() => this.Core.Managers.Playlist.Clear());
+                return new AsyncCommand(this.BackgroundTaskRunner, () => this.Core.Managers.Playlist.Clear());
             }
         }
 
@@ -257,7 +274,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand<DragEventArgs>(this.OnDrop);
+                return new AsyncCommand<DragEventArgs>(this.BackgroundTaskRunner, this.OnDrop);
             }
         }
 

@@ -16,5 +16,7 @@ namespace FoxTunes.Interfaces
         Task Preempt(IOutputStream stream);
 
         Task Unload(IOutputStream stream);
+
+        Task Shutdown();
     }
 }

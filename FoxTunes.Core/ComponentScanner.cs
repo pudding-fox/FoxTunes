@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace FoxTunes
 {
-    public class ComponentScanner : IComponentScanner
+    public class ComponentScanner : BaseComponent, IComponentScanner
     {
         private ComponentScanner()
         {
@@ -32,15 +32,27 @@ namespace FoxTunes
 
         public IEnumerable<Type> GetComponents(Type interfaceType)
         {
+            Logger.Write(this, LogLevel.Debug, "Scanning for components of type: {0}", interfaceType.FullName);
             foreach (var fileName in this.FileNames)
             {
+                var assemblyName = default(AssemblyName);
+                try
+                {
+                    assemblyName = AssemblyName.GetAssemblyName(fileName);
+                }
+                catch
+                {
+                    //Not a .NET assembly.
+                    continue;
+                }
                 var assembly = default(Assembly);
                 try
                 {
                     assembly = AssemblyRegistry.Instance.GetOrLoadReflectionAssembly(fileName);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Write(this, LogLevel.Warn, "Failed to load assembly {0}: {1}", fileName, e.Message);
                     continue;
                 }
                 var types = default(IEnumerable<Type>);
@@ -48,20 +60,23 @@ namespace FoxTunes
                 {
                     types = assembly.GetExportedTypes();
                 }
-                catch
+                catch (ReflectionTypeLoadException e)
                 {
+                    Logger.Write(this, LogLevel.Trace, "Error was handled while getting exported types for assembly {0}: {1}", fileName, e.Message);
+                    types = e.Types;
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to get exported types for assembly {0}: {1}", fileName, e.Message);
                     continue;
                 }
                 foreach (var type in types)
                 {
-                    if (!type.IsClass || type.IsAbstract)
+                    if (!type.IsClass || type.IsAbstract || !this.ImplementsInterface(type, interfaceType.FullName))
                     {
                         continue;
                     }
-                    if (!this.ImplementsInterface(type, interfaceType.FullName))
-                    {
-                        continue;
-                    }
+                    Logger.Write(this, LogLevel.Debug, "Scanning component of type {0} in assembly {1}: {2}", interfaceType.FullName, fileName, type.FullName);
                     yield return type;
                 }
             }

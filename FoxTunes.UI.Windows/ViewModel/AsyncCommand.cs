@@ -7,20 +7,23 @@ namespace FoxTunes.ViewModel
 {
     public class AsyncCommand : ICommand
     {
-        public AsyncCommand(Func<Task> func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func)
         {
+            this.BackgroundTaskRunner = backgroundTaskRunner;
             this.Func = func;
         }
 
-        public AsyncCommand(Func<Task> func, Func<bool> predicate) : this(func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func, Func<bool> predicate) : this(backgroundTaskRunner, func)
         {
             this.Predicate = predicate;
         }
 
-        public AsyncCommand(Func<Task> func, Func<Task<bool>> predicate) : this(func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func, Func<Task<bool>> predicate) : this(backgroundTaskRunner, func)
         {
             this.AsyncPredicate = predicate;
         }
+
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
 
         public Func<Task> Func { get; private set; }
 
@@ -38,15 +41,18 @@ namespace FoxTunes.ViewModel
             }
             else if (this.AsyncPredicate != null)
             {
-                ComponentRegistry.Instance.GetComponent<IBackgroundTaskRunner>().Run(() => this.AsyncPredicate().ContinueWith(async task =>
+                if (this.BackgroundTaskRunner != null)
                 {
-                    if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
+                    this.BackgroundTaskRunner.Run(() => this.AsyncPredicate().ContinueWith(async task =>
                     {
-                        return;
-                    }
-                    this.CanExecute = task.Result;
-                    await InvalidateRequerySuggested();
-                })).Wait();
+                        if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
+                        {
+                            return;
+                        }
+                        this.CanExecute = task.Result;
+                        await InvalidateRequerySuggested();
+                    })).Wait();
+                }
                 if (this.CanExecute.HasValue)
                 {
                     return this.CanExecute.Value;
@@ -99,7 +105,16 @@ namespace FoxTunes.ViewModel
 
         public static Task InvalidateRequerySuggested()
         {
-            return ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>().RunAsync(() => CommandManager.InvalidateRequerySuggested());
+            var foregroundTaskRunner = ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>();
+            if (foregroundTaskRunner != null)
+            {
+                return foregroundTaskRunner.RunAsync(() => CommandManager.InvalidateRequerySuggested());
+            }
+            else
+            {
+                CommandManager.InvalidateRequerySuggested();
+                return Task.CompletedTask;
+            }
         }
 
         public static readonly ICommand Disabled = new Command(() => { /*Nothing to do.*/ }, () => false);
@@ -107,20 +122,23 @@ namespace FoxTunes.ViewModel
 
     public class AsyncCommand<T> : ICommand
     {
-        public AsyncCommand(Func<T, Task> func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func)
         {
+            this.BackgroundTaskRunner = backgroundTaskRunner;
             this.Func = func;
         }
 
-        public AsyncCommand(Func<T, Task> func, Func<T, bool> predicate) : this(func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func, Func<T, bool> predicate) : this(backgroundTaskRunner, func)
         {
             this.Predicate = predicate;
         }
 
-        public AsyncCommand(Func<T, Task> func, Func<T, Task<bool>> predicate) : this(func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func, Func<T, Task<bool>> predicate) : this(backgroundTaskRunner, func)
         {
             this.AsyncPredicate = predicate;
         }
+
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
 
         public Func<T, Task> Func { get; private set; }
 
@@ -138,15 +156,18 @@ namespace FoxTunes.ViewModel
             }
             else if (this.AsyncPredicate != null)
             {
-                ComponentRegistry.Instance.GetComponent<IBackgroundTaskRunner>().Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
+                if (this.BackgroundTaskRunner != null)
                 {
-                    if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
+                    this.BackgroundTaskRunner.Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
                     {
-                        return;
-                    }
-                    this.CanExecute = task.Result;
-                    await Command.InvalidateRequerySuggested();
-                })).Wait();
+                        if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
+                        {
+                            return;
+                        }
+                        this.CanExecute = task.Result;
+                        await Command.InvalidateRequerySuggested();
+                    })).Wait();
+                }
                 if (this.CanExecute.HasValue)
                 {
                     return this.CanExecute.Value;

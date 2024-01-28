@@ -3,7 +3,6 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Layout;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace FoxTunes

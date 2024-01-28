@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IComponentScanner
+    public interface IComponentScanner : IBaseComponent
     {
         string Location { get; }
 

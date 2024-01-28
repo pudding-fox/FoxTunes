@@ -16,6 +16,8 @@ namespace FoxTunes.ViewModel
             this._SelectedItem = LibraryHierarchyNode.Empty;
         }
 
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
+
         public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
@@ -122,13 +124,21 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
+            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Refresh();
+            this.OnCommandsChanged();
             base.OnCoreChanged();
+        }
+
+        protected virtual void OnCommandsChanged()
+        {
+            this.OnPropertyChanged("DragEnterCommand");
+            this.OnPropertyChanged("DropCommand");
         }
 
         protected virtual void OnFilterChanged(object sender, EventArgs e)
@@ -168,7 +178,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand<DragEventArgs>(this.OnDrop);
+                return new AsyncCommand<DragEventArgs>(this.BackgroundTaskRunner, this.OnDrop);
             }
         }
 
