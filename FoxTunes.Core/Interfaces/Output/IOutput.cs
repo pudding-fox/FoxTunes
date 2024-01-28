@@ -52,9 +52,9 @@ namespace FoxTunes.Interfaces
 
         int GetData(float[] buffer);
 
-        float[] GetBuffer(int fftSize);
+        float[] GetBuffer(int fftSize, bool individual = false);
 
-        int GetData(float[] buffer, int fftSize);
+        int GetData(float[] buffer, int fftSize, bool individual = false);
     }
 
     public delegate void OutputStreamEventHandler(object sender, OutputStreamEventArgs e);

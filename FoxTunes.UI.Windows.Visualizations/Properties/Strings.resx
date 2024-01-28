@@ -189,6 +189,21 @@
   <data name="Speakers.Unknown" xml:space="preserve">
     <value>?</value>
   </data>
+  <data name="Spectrogram.Name" xml:space="preserve">
+    <value>Spectrogram</value>
+  </data>
+  <data name="SpectrogramBehaviourConfiguration.Mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="SpectrogramBehaviourConfiguration.Mode.Mono" xml:space="preserve">
+    <value>Mono</value>
+  </data>
+  <data name="SpectrogramBehaviourConfiguration.Mode.Seperate" xml:space="preserve">
+    <value>Seperate</value>
+  </data>
+  <data name="SpectrogramBehaviourConfiguration.Path" xml:space="preserve">
+    <value>Spectrogram</value>
+  </data>
   <data name="Spectrum.Name" xml:space="preserve">
     <value>Spectrum</value>
   </data>

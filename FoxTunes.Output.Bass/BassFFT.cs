@@ -49,5 +49,7 @@
         public const uint FFT16384_MASK = 0x80000006;
 
         public const uint FFT32768_MASK = 0x80000007;
+
+        public const uint INDIVIDUAL = 0x10;
     }
 }

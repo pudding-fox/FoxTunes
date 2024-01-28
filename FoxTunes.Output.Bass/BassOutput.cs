@@ -636,49 +636,65 @@ namespace FoxTunes
         }
 
 
-        public override float[] GetBuffer(int fftSize)
+        public override float[] GetBuffer(int fftSize, bool individual = false)
         {
-            var length = default(int);
-            switch (fftSize)
+            var result = default(float[]);
+            if (individual)
             {
-                case BassFFT.FFT256:
-                    length = BassFFT.FFT256_SIZE;
-                    break;
-                case BassFFT.FFT512:
-                    length = BassFFT.FFT512_SIZE;
-                    break;
-                case BassFFT.FFT1024:
-                    length = BassFFT.FFT1024_SIZE;
-                    break;
-                case BassFFT.FFT2048:
-                    length = BassFFT.FFT2048_SIZE;
-                    break;
-                case BassFFT.FFT4096:
-                    length = BassFFT.FFT4096_SIZE;
-                    break;
-                case BassFFT.FFT8192:
-                    length = BassFFT.FFT8192_SIZE;
-                    break;
-                case BassFFT.FFT16384:
-                    length = BassFFT.FFT16384_SIZE;
-                    break;
-                case BassFFT.FFT32768:
-                    length = BassFFT.FFT32768_SIZE;
-                    break;
-                default:
-                    throw new NotImplementedException();
+                this.PipelineManager.WithPipeline(pipeline =>
+                {
+                    if (pipeline != null)
+                    {
+                        result = pipeline.Output.GetBuffer(fftSize, individual);
+                    }
+                });
             }
-            return new float[length];
+            else
+            {
+                //TODO: This code is duplicated by BassStreamOutput.GetBuffer.
+                var length = default(int);
+                switch (fftSize)
+                {
+                    case BassFFT.FFT256:
+                        length = BassFFT.FFT256_SIZE;
+                        break;
+                    case BassFFT.FFT512:
+                        length = BassFFT.FFT512_SIZE;
+                        break;
+                    case BassFFT.FFT1024:
+                        length = BassFFT.FFT1024_SIZE;
+                        break;
+                    case BassFFT.FFT2048:
+                        length = BassFFT.FFT2048_SIZE;
+                        break;
+                    case BassFFT.FFT4096:
+                        length = BassFFT.FFT4096_SIZE;
+                        break;
+                    case BassFFT.FFT8192:
+                        length = BassFFT.FFT8192_SIZE;
+                        break;
+                    case BassFFT.FFT16384:
+                        length = BassFFT.FFT16384_SIZE;
+                        break;
+                    case BassFFT.FFT32768:
+                        length = BassFFT.FFT32768_SIZE;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+                result = new float[length];
+            }
+            return result;
         }
 
-        public override int GetData(float[] buffer, int fftSize)
+        public override int GetData(float[] buffer, int fftSize, bool individual = false)
         {
             var result = default(int);
             this.PipelineManager.WithPipeline(pipeline =>
             {
                 if (pipeline != null)
                 {
-                    result = pipeline.Output.GetData(buffer, fftSize);
+                    result = pipeline.Output.GetData(buffer, fftSize, individual);
                 }
             });
             return result;

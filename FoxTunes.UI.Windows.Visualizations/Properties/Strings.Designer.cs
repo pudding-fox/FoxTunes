@@ -277,6 +277,51 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Spectrogram.
+        /// </summary>
+        internal static string Spectrogram_Name {
+            get {
+                return ResourceManager.GetString("Spectrogram.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mode.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Mode {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mono.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Mode_Mono {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Mode.Mono", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Seperate.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Mode_Seperate {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Mode.Seperate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spectrogram.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Path {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string Spectrum_Name {
