@@ -102,14 +102,20 @@ namespace FoxTunes
                 metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
             ).ConfigureAwait(false);
 
-            //Update the import date otherwise the file might be re-scanned and changes lost.
-            await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow).ConfigureAwait(false);
-            await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.None).ConfigureAwait(false);
+            await this.Deschedule(libraryItem).ConfigureAwait(false);
         }
 
         protected virtual Task Schedule(LibraryItem libraryItem)
         {
-            return LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Export);
+            libraryItem.Flags |= LibraryItemFlags.Export;
+            return LibraryTaskBase.UpdateLibraryItem(this.Database, libraryItem);
+        }
+
+        protected virtual Task Deschedule(LibraryItem libraryItem)
+        {
+            libraryItem.ImportDate = DateTimeHelper.ToString(DateTime.UtcNow.AddSeconds(30));
+            libraryItem.Flags &= ~LibraryItemFlags.Export;
+            return LibraryTaskBase.UpdateLibraryItem(this.Database, libraryItem);
         }
 
         protected virtual void AddError(LibraryItem libraryItem, string message)

@@ -309,57 +309,68 @@ namespace FoxTunes
             }
         }
 
-        public static async Task SetLibraryItemImportDate(IDatabaseComponent database, LibraryItem libraryItem, DateTime importDate)
+        public static async Task UpdateLibraryItem(IDatabaseComponent database, LibraryItem libraryItem)
         {
             using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
             {
-                await SetLibraryItemImportDate(database, libraryItem, importDate, transaction).ConfigureAwait(false);
-                transaction.Commit();
+                await UpdateLibraryItem(database, libraryItem, transaction).ConfigureAwait(false);
+                if (transaction.HasTransaction)
+                {
+                    transaction.Commit();
+                }
             }
         }
 
-        public static async Task SetLibraryItemImportDate(IDatabaseComponent database, LibraryItem libraryItem, DateTime importDate, ITransactionSource transaction)
+        public static Task UpdateLibraryItem(IDatabaseComponent database, LibraryItem libraryItem, ITransactionSource transaction)
         {
             var table = database.Tables.LibraryItem;
             var builder = database.QueryFactory.Build();
             builder.Update.SetTable(table);
-            builder.Update.AddColumn(table.Column("ImportDate"));
-            builder.Filter.AddColumn(table.PrimaryKey);
-            //This is kind of dumb but it seems that file access times "lag" a little.
-            importDate = importDate.AddSeconds(30);
-            await database.ExecuteAsync(builder, (parameters, phase) =>
+            builder.Update.AddColumns(table.UpdatableColumns);
+            builder.Filter.AddColumns(table.PrimaryKeys);
+            var query = builder.Build();
+            var parameters = new ParameterHandlerStrategy(table, libraryItem).Handler;
+            return database.ExecuteAsync(query, parameters, transaction);
+        }
+
+        public static async Task UpdateLibraryItem(IDatabaseComponent database, int libraryItemId, Action<LibraryItem> action)
+        {
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            {
+                await UpdateLibraryItem(database, libraryItemId, action, transaction).ConfigureAwait(false);
+                if (transaction.HasTransaction)
+                {
+                    transaction.Commit();
+                }
+            }
+        }
+
+        public static async Task UpdateLibraryItem(IDatabaseComponent database, int libraryItemId, Action<LibraryItem> action, ITransactionSource transaction)
+        {
+            var table = database.Tables.LibraryItem;
+            var builder = database.QueryFactory.Build();
+            builder.Output.AddColumns(table.Columns);
+            builder.Source.AddTable(table);
+            builder.Filter.AddColumns(table.PrimaryKeys);
+            var query = builder.Build();
+            var libraryItem = default(LibraryItem);
+            using (var sequence = database.ExecuteAsyncEnumerator<LibraryItem>(query, (parameters, phase) =>
             {
                 switch (phase)
                 {
                     case DatabaseParameterPhase.Fetch:
-                        parameters["id"] = libraryItem.Id;
-                        parameters["importDate"] = DateTimeHelper.ToString(importDate);
+                        parameters[table.PrimaryKey] = libraryItemId;
                         break;
                 }
-            }, transaction).ConfigureAwait(false);
-            libraryItem.SetImportDate(importDate);
-        }
-
-        public static async Task SetLibraryItemStatus(IDatabaseComponent database, int libraryItemId, LibraryItemStatus status)
-        {
-            var builder = database.QueryFactory.Build();
-            builder.Update.AddColumn(database.Tables.LibraryItem.Column("Status"));
-            builder.Update.SetTable(database.Tables.LibraryItem);
-            builder.Filter.AddColumn(database.Tables.LibraryItem.Column("Id"));
-            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            }, transaction))
             {
-                await database.ExecuteAsync(builder, (parameters, phase) =>
+                if (await sequence.MoveNextAsync().ConfigureAwait(false))
                 {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["status"] = status;
-                            parameters["id"] = libraryItemId;
-                            break;
-                    }
-                }, transaction).ConfigureAwait(false);
-                transaction.Commit();
+                    libraryItem = sequence.Current;
+                }
             }
+            action(libraryItem);
+            await UpdateLibraryItem(database, libraryItem, transaction).ConfigureAwait(false);
         }
 
         protected override void OnDisposing()

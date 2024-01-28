@@ -315,26 +315,68 @@ namespace FoxTunes
             return result;
         }
 
-        public static async Task SetPlaylistItemStatus(IDatabaseComponent database, int playlistItemId, PlaylistItemStatus status)
+        public static async Task UpdatePlaylistItem(IDatabaseComponent database, PlaylistItem playlistItem)
         {
-            var builder = database.QueryFactory.Build();
-            builder.Update.AddColumn(database.Tables.PlaylistItem.Column("Status"));
-            builder.Update.SetTable(database.Tables.PlaylistItem);
-            builder.Filter.AddColumn(database.Tables.PlaylistItem.Column("Id"));
             using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
             {
-                await database.ExecuteAsync(builder, (parameters, phase) =>
+                await UpdatePlaylistItem(database, playlistItem, transaction).ConfigureAwait(false);
+                if (transaction.HasTransaction)
                 {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["status"] = status;
-                            parameters["id"] = playlistItemId;
-                            break;
-                    }
-                }, transaction).ConfigureAwait(false);
-                transaction.Commit();
+                    transaction.Commit();
+                }
             }
+        }
+
+        public static Task UpdatePlaylistItem(IDatabaseComponent database, PlaylistItem playlistItem, ITransactionSource transaction)
+        {
+            var table = database.Tables.PlaylistItem;
+            var builder = database.QueryFactory.Build();
+            builder.Update.SetTable(table);
+            builder.Update.AddColumns(table.UpdatableColumns);
+            builder.Filter.AddColumns(table.PrimaryKeys);
+            var query = builder.Build();
+            var parameters = new ParameterHandlerStrategy(table, playlistItem).Handler;
+            return database.ExecuteAsync(query, parameters, transaction);
+        }
+
+        public static async Task UpdatePlaylistItem(IDatabaseComponent database, int playlistItemId, Action<PlaylistItem> action)
+        {
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            {
+                await UpdatePlaylistItem(database, playlistItemId, action, transaction).ConfigureAwait(false);
+                if (transaction.HasTransaction)
+                {
+                    transaction.Commit();
+                }
+            }
+        }
+
+        public static async Task UpdatePlaylistItem(IDatabaseComponent database, int playlistItemId, Action<PlaylistItem> action, ITransactionSource transaction)
+        {
+            var table = database.Tables.PlaylistItem;
+            var builder = database.QueryFactory.Build();
+            builder.Output.AddColumns(table.Columns);
+            builder.Source.AddTable(table);
+            builder.Filter.AddColumns(table.PrimaryKeys);
+            var query = builder.Build();
+            var playlistItem = default(PlaylistItem);
+            using (var sequence = database.ExecuteAsyncEnumerator<PlaylistItem>(query, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters[table.PrimaryKey] = playlistItemId;
+                        break;
+                }
+            }, transaction))
+            {
+                if (await sequence.MoveNextAsync().ConfigureAwait(false))
+                {
+                    playlistItem = sequence.Current;
+                }
+            }
+            action(playlistItem);
+            await UpdatePlaylistItem(database, playlistItem, transaction).ConfigureAwait(false);
         }
 
         protected override void OnDisposing()

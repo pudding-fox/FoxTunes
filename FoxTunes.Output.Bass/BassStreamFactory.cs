@@ -79,7 +79,7 @@ namespace FoxTunes
                             if (immidiate)
                             {
                                 Logger.Write(this, LogLevel.Debug, "Device is in use (probably a CD player), releasing active streams.");
-                                if (this.FreeActiveStreams())
+                                if (BassOutputStreams.Clear())
                                 {
                                     Logger.Write(this, LogLevel.Debug, "Active streams were released, retrying.");
                                     continue;
@@ -133,22 +133,6 @@ namespace FoxTunes
                 this.Semaphore.Release();
             }
             return BassStream.Empty;
-        }
-
-        protected virtual bool FreeActiveStreams()
-        {
-            foreach (var pair in BassOutputStream.ActiveStreams)
-            {
-                try
-                {
-                    pair.Value.Dispose();
-                }
-                catch
-                {
-                    //Nothing can be done.
-                }
-            }
-            return BassOutputStream.ActiveStreams.Count == 0;
         }
 
         /// <summary>

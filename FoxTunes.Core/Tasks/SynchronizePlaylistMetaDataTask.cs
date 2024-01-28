@@ -103,26 +103,39 @@ namespace FoxTunes
                 metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
             ).ConfigureAwait(false);
 
-            //Update the import date otherwise the file might be re-scanned and changes lost.
-            if (playlistItem.LibraryItem_Id.HasValue)
-            {
-                var libraryItem = new LibraryItem()
-                {
-                    Id = playlistItem.LibraryItem_Id.Value
-                };
-                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow).ConfigureAwait(false);
-            }
-
-            await PlaylistTaskBase.SetPlaylistItemStatus(this.Database, playlistItem.Id, PlaylistItemStatus.None).ConfigureAwait(false);
+            await this.Deschedule(playlistItem).ConfigureAwait(false);
         }
 
         protected virtual Task Schedule(PlaylistItem playlistItem)
         {
+            playlistItem.Flags |= PlaylistItemFlags.Export;
             if (playlistItem.LibraryItem_Id.HasValue)
             {
-                return LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Export);
+                return LibraryTaskBase.UpdateLibraryItem(
+                    this.Database,
+                    playlistItem.LibraryItem_Id.Value,
+                    libraryItem => libraryItem.Flags |= LibraryItemFlags.Export
+                );
             }
-            return PlaylistTaskBase.SetPlaylistItemStatus(this.Database, playlistItem.Id, PlaylistItemStatus.Export);
+            return PlaylistTaskBase.UpdatePlaylistItem(this.Database, playlistItem);
+        }
+
+        protected virtual async Task Deschedule(PlaylistItem playlistItem)
+        {
+            playlistItem.Flags &= ~PlaylistItemFlags.Export;
+            if (playlistItem.LibraryItem_Id.HasValue)
+            {
+                await LibraryTaskBase.UpdateLibraryItem(
+                    this.Database,
+                    playlistItem.LibraryItem_Id.Value,
+                    libraryItem =>
+                    {
+                        libraryItem.ImportDate = DateTimeHelper.ToString(DateTime.UtcNow.AddSeconds(30));
+                        libraryItem.Flags &= ~LibraryItemFlags.Export;
+                    }
+                ).ConfigureAwait(false);
+            }
+            await PlaylistTaskBase.UpdatePlaylistItem(this.Database, playlistItem);
         }
 
         protected virtual void AddError(PlaylistItem playlistItem, string message)

@@ -37,7 +37,7 @@ AS
 #>
 )
 
-INSERT INTO "PlaylistItems" ("LibraryItem_Id", "Sequence", "DirectoryName", "FileName", "Status") 
+INSERT INTO "PlaylistItems" ("LibraryItem_Id", "Sequence", "DirectoryName", "FileName", "Status", "Flags") 
 SELECT "LibraryItems"."Id", @sequence + ROW_NUMBER() OVER
 (
 	ORDER BY
@@ -50,7 +50,7 @@ SELECT "LibraryItems"."Id", @sequence + ROW_NUMBER() OVER
 		CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Disc)) #> AS int), 
 		CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Track)) #> AS int), 
 		"HorizontalMetaData"."FileName"
-) - 1, "LibraryItems"."DirectoryName", "LibraryItems"."FileName", @status
+) - 1, "LibraryItems"."DirectoryName", "LibraryItems"."FileName", @status, 0
 FROM "LibraryHierarchyItems"
 	JOIN "LibraryHierarchyItem_LibraryItem" 
 		ON "LibraryHierarchyItems"."Id" = "LibraryHierarchyItem_LibraryItem"."LibraryHierarchyItem_Id"

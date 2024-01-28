@@ -101,14 +101,18 @@ namespace FoxTunes
                         this.Position = position;
                     }
 
-                    if (!playlistItem.LibraryItem_Id.HasValue)
+                    if (playlistItem.LibraryItem_Id.HasValue)
                     {
-                        await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
+                        await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
+                        await LibraryTaskBase.UpdateLibraryItem(
+                            this.Database,
+                            playlistItem.LibraryItem_Id.Value,
+                            libraryItem => libraryItem.Status = LibraryItemStatus.Import
+                        ).ConfigureAwait(false);
                     }
                     else
                     {
-                        await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
-                        await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
+                        await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
                     }
 
                     if (this.WriteToFiles)

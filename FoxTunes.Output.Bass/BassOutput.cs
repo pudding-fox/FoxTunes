@@ -347,7 +347,7 @@ namespace FoxTunes
 
         public override bool IsLoaded(string fileName)
         {
-            return this.IsStarted && BassOutputStream.IsActive(fileName);
+            return this.IsStarted && BassOutputStreams.Contains(fileName);
         }
 
         public override async Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate)
