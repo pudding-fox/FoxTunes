@@ -138,7 +138,7 @@ namespace FoxTunes
             {
                 this.CreatePipelineCore(stream);
             }
-            else if (!this.Pipeline.Input.CheckFormat(stream.Rate, stream.Channels))
+            else if (!this.Pipeline.Input.CheckFormat(stream.ChannelHandle))
             {
                 Logger.Write(this, LogLevel.Debug, "Current pipeline cannot accept stream, shutting it down: {0}", stream.ChannelHandle);
                 this.FreePipelineCore();

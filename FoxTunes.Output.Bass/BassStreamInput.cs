@@ -47,7 +47,7 @@ namespace FoxTunes
 
         public event EventHandler Invalidate;
 
-        public abstract bool CheckFormat(int rate, int channels);
+        public abstract bool CheckFormat(int channelHandle);
 
         public abstract bool Contains(int channelHandle);
 

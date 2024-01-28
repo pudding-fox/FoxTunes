@@ -6,7 +6,7 @@ namespace FoxTunes.Interfaces
     {
         IEnumerable<int> Queue { get; }
 
-        bool CheckFormat(int rate, int channels);
+        bool CheckFormat(int channelHandle);
 
         bool Contains(int channelHandle);
 

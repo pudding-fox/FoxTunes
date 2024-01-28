@@ -114,9 +114,9 @@ namespace FoxTunes
 
         protected virtual void ConfigureASIO(IBassStreamComponent previous)
         {
-            if (BassUtils.GetChannelDsdRaw(previous.ChannelHandle))
+            if (previous.Flags.HasFlag(BassFlags.DSDRaw))
             {
-                this.Rate = BassUtils.GetChannelDsdRate(previous.ChannelHandle);
+                this.Rate = previous.Rate;
                 this.Flags |= BassFlags.DSDRaw;
             }
             else
@@ -183,6 +183,11 @@ namespace FoxTunes
 
         protected virtual bool ShouldCreateMixer(IBassStreamComponent previous)
         {
+            if (previous.Flags.HasFlag(BassFlags.DSDRaw))
+            {
+                //Can't create mixer for DSD.
+                return false;
+            }
             if (this.Behaviour.Mixer)
             {
                 //Mixer is forced on, probably so visualizations work.
