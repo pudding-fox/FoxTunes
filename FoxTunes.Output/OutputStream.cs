@@ -151,6 +151,22 @@ namespace FoxTunes
 
         public event StoppedEventHandler Stopped = delegate { };
 
+        public virtual void BeginSeek()
+        {
+            if (this.IsPlaying)
+            {
+                this.Stop();
+            }
+        }
+
+        public virtual void EndSeek()
+        {
+            if (this.IsStopped)
+            {
+                this.Play();
+            }
+        }
+
         protected virtual void EmitState()
         {
             this.OnIsPlayingChanged();

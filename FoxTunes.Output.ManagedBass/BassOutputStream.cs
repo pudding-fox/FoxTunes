@@ -27,13 +27,11 @@ namespace FoxTunes
         {
             get
             {
-                //return Bass.ChannelGetPosition(this.ChannelHandle);
-                return this.Output.OutputChannel.Position;
+                return Bass.ChannelGetPosition(this.ChannelHandle);
             }
             set
             {
                 Bass.ChannelSetPosition(this.ChannelHandle, value);
-                this.Output.OutputChannel.ClearBuffer();
                 if (value > this.NotificationSource.EndingPosition)
                 {
                     Logger.Write(this, LogLevel.Debug, "Channel {0} was manually seeked past the \"Ending\" sync, raising it manually.", this.ChannelHandle);
@@ -201,6 +199,15 @@ namespace FoxTunes
             this.Output.OutputChannel.Stop();
             this.EmitState();
             this.OnStopped(true);
+        }
+
+        public override void EndSeek()
+        {
+            if (this.Output.OutputChannel != null)
+            {
+                this.Output.OutputChannel.ClearBuffer();
+            }
+            base.EndSeek();
         }
 
         protected virtual void ChannelSyncEnd(int handle, int channel, int data, IntPtr user)

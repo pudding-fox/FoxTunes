@@ -6,33 +6,23 @@ namespace FoxTunes.ViewModel
 {
     public class StreamPosition : ViewModelBase
     {
-        public ICommand StopCommand
+        public ICommand BeginSeekCommand
         {
             get
             {
-                return new Command<IPlaybackManager>(playback =>
-                    {
-                        if (playback.CurrentStream.IsPlaying)
-                        {
-                            playback.CurrentStream.Stop();
-                        }
-                    },
+                return new Command<IPlaybackManager>(
+                    playback => playback.CurrentStream.BeginSeek(),
                     playback => playback != null && playback.CurrentStream != null
                 );
             }
         }
 
-        public ICommand PlayCommand
+        public ICommand EndSeekCommand
         {
             get
             {
-                return new Command<IPlaybackManager>(playback =>
-                    {
-                        if (playback.CurrentStream.IsStopped)
-                        {
-                            playback.CurrentStream.Play();
-                        }
-                    },
+                return new Command<IPlaybackManager>(
+                    playback => playback.CurrentStream.EndSeek(),
                     playback => playback != null && playback.CurrentStream != null
                 );
             }
