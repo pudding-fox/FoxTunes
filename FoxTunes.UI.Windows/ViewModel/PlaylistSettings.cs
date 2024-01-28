@@ -85,11 +85,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var command = CommandFactory.Instance.CreateCommand(
-                    new Func<Task>(this.Save)
-                );
-                command.Tag = CommandHints.DISMISS;
-                return command;
+                return CommandFactory.Instance.CreateCommand(this.Save);
             }
         }
 

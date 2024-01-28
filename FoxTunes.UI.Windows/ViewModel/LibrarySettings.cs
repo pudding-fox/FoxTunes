@@ -108,11 +108,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var command = CommandFactory.Instance.CreateCommand(
-                    new Func<Task>(this.Save)
-                );
-                command.Tag = CommandHints.DISMISS;
-                return command;
+                return CommandFactory.Instance.CreateCommand(this.Save);
             }
         }
 
@@ -151,16 +147,6 @@ namespace FoxTunes.ViewModel
             throw exception;
         }
 
-        public ICommand RebuildCommand
-        {
-            get
-            {
-                return CommandFactory.Instance.CreateCommand(
-                    new Func<Task>(this.Rebuild)
-                );
-            }
-        }
-
         public async Task Rebuild()
         {
             await this.HierarchyManager.Clear(null, true).ConfigureAwait(false);
@@ -186,9 +172,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(
-                    new Func<Task>(this.Clear)
-                );
+                return CommandFactory.Instance.CreateCommand(this.Clear);
             }
         }
 
