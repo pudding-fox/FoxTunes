@@ -22,7 +22,7 @@
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="{x:Static ViewModel:StringResources.LibrarySettingsDialog_GroupHeader}" Padding="0,7,0,0">
+        <GroupBox Grid.Row="0" Header="{x:Static ViewModel:StringResources.LibrarySettingsDialog_GroupHeader}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -70,7 +70,7 @@
                     <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding LibraryHierarchies.SelectedValue.Type, Source={StaticResource ViewModel}}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyTypes}}" Margin="0,0,0,5"></ComboBox>
                     <Label Grid.Column="0" Grid.Row="2" Content="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Enabled}"></Label>
                     <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding LibraryHierarchies.SelectedValue.Enabled, Source={StaticResource ViewModel}}" Margin="0,0,0,5" VerticalAlignment="Center" ></CheckBox>
-                    <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Header="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Levels}" Margin="4,0,0,0" Padding="0,7,0,0">
+                    <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Header="{x:Static ViewModel:StringResources.LibrarySettingsDialog_Levels}" Margin="4,0,0,0">
                         <DockPanel>
                             <DockPanel DockPanel.Dock="Left">
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
