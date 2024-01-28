@@ -23,10 +23,15 @@
                     <ColumnDefinition Width="200"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
                 <TreeView 
                         ItemsSource="{Binding Sections, Source={StaticResource ViewModel}}" 
                         Windows:TreeViewExtensions.SelectedItem="{Binding SelectedSection, Source={StaticResource ViewModel}}"
-                        Windows:TreeViewExtensions.RightButtonSelect="True">
+                        Windows:TreeViewExtensions.RightButtonSelect="True"
+                        Margin="0,0,0,3">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                             <Setter Property="TreeViewItem.IsSelected" Value="{Binding IsSelected}"></Setter>
@@ -39,7 +44,8 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-                <ScrollViewer Grid.Column="1" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto" Margin="4,0,0,0" Padding="4" Background="{DynamicResource NormalBrush}">
+                <Windows:SearchBox Grid.Row="1" SearchText="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
+                <ScrollViewer Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto" Margin="4,0,0,0" Padding="4" Background="{DynamicResource NormalBrush}">
                     <ItemsControl ItemsSource="{Binding SelectedSection.Elements, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemContainerStyle>
                             <Style TargetType="{x:Type ContentPresenter}">
