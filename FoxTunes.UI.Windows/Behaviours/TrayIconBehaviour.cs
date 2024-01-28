@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -74,9 +75,20 @@ namespace FoxTunes
         protected virtual void OnClose(object sender, EventArgs e)
         {
             this.Disable();
-            if (Application.Current != null && Application.Current.MainWindow != null)
+            //We have to close the main window as a low priority task otherwise the dispatcher 
+            //running *this* task is shut down which causes an exception.
+            if (Application.Current != null && Application.Current.Dispatcher != null)
             {
-                Application.Current.MainWindow.Close();
+                Application.Current.Dispatcher.BeginInvoke(
+                    DispatcherPriority.ApplicationIdle,
+                    new Action(() =>
+                    {
+                        if (Application.Current != null && Application.Current.MainWindow != null)
+                        {
+                            Application.Current.MainWindow.Close();
+                        }
+                    })
+                );
             }
         }
 
