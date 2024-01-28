@@ -61,9 +61,9 @@ namespace FoxTunes.ViewModel
 
         private IConfiguration Configuration { get; set; }
 
-        private LibraryHierarchyNodeCollection _Items { get; set; }
+        private LibraryHierarchyNode[] _Items { get; set; }
 
-        public virtual LibraryHierarchyNodeCollection Items
+        public virtual LibraryHierarchyNode[] Items
         {
             get
             {
@@ -93,7 +93,7 @@ namespace FoxTunes.ViewModel
             {
                 return LOADING;
             }
-            if (this.Items.Count > 0)
+            if (this.Items.Length > 0)
             {
                 return null;
             }
@@ -210,7 +210,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Items == null || this.Items.Count == 0)
+                if (this.Items == null || this.Items.Length == 0)
                 {
                     return true;
                 }
@@ -267,14 +267,7 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var items = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
-            if (this.Items == null)
-            {
-                await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
-            }
-            else
-            {
-                await Windows.Invoke(this.Items.Reset(items)).ConfigureAwait(false);
-            }
+            await Windows.Invoke(() => this.Items = items).ConfigureAwait(false);
             await this.RefreshStatus().ConfigureAwait(false);
         }
 

@@ -210,9 +210,6 @@
   <data name="LibraryBase.Loading" xml:space="preserve">
     <value>Chargement...</value>
   </data>
-  <data name="LibraryBase.UnvirtualizedTooLarge" xml:space="preserve">
-    <value>La vue de la bibliothèque contient {0} éléments qui dépassent les {1} éléments autorisés sans virtualisation. Veuillez activer le paramètre "Virtualisation des listes".</value>
-  </data>
   <data name="LibraryBase.Updating" xml:space="preserve">
     <value>Mise à jour...</value>
   </data>
@@ -362,9 +359,6 @@
   </data>
   <data name="PlaylistBase.Loading" xml:space="preserve">
     <value>Chargement...</value>
-  </data>
-  <data name="PlaylistBase.UnvirtualizedTooLarge" xml:space="preserve">
-    <value>La liste de lecture contient {0} éléments qui dépassent les {1} éléments autorisés sans virtualisation. Veuillez activer le paramètre "Virtualisation des listes".</value>
   </data>
   <data name="PlaylistBase.Updating" xml:space="preserve">
     <value>Mise à jour...</value>
@@ -557,8 +551,5 @@
   </data>
   <data name="WindowsUserInterfaceConfiguration.Theme" xml:space="preserve">
     <value>Theme</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.VirtualLists" xml:space="preserve">
-    <value>Virtualisation des listes</value>
   </data>
 </root>

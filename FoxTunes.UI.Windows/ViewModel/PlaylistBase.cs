@@ -45,9 +45,9 @@ namespace FoxTunes.ViewModel
 
         public IErrorEmitter ErrorEmitter { get; private set; }
 
-        private PlaylistItemCollection _Items { get; set; }
+        private PlaylistItem[] _Items { get; set; }
 
-        public PlaylistItemCollection Items
+        public PlaylistItem[] Items
         {
             get
             {
@@ -77,7 +77,7 @@ namespace FoxTunes.ViewModel
             {
                 return LOADING;
             }
-            if (this.Items.Count > 0)
+            if (this.Items.Length > 0)
             {
                 return null;
             }
@@ -130,7 +130,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Items == null || this.Items.Count == 0)
+                if (this.Items == null || this.Items.Length == 0)
                 {
                     return true;
                 }
@@ -236,14 +236,7 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var items = this.PlaylistBrowser.GetItems(playlist);
-            if (this.Items == null)
-            {
-                await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);
-            }
-            else
-            {
-                await Windows.Invoke(this.Items.Reset(items)).ConfigureAwait(false);
-            }
+            await Windows.Invoke(() => this.Items = items).ConfigureAwait(false);
             await this.RefreshStatus().ConfigureAwait(false);
         }
 
