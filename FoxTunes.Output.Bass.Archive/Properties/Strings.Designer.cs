@@ -88,6 +88,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Double Buffer.
+        /// </summary>
+        internal static string BassArchiveStreamProviderBehaviourConfiguration_DoubleBuffer {
+            get {
+                return ResourceManager.GetString("BassArchiveStreamProviderBehaviourConfiguration.DoubleBuffer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         internal static string BassArchiveStreamProviderBehaviourConfiguration_Enabled {
