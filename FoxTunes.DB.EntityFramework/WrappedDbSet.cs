@@ -77,6 +77,11 @@ namespace FoxTunes
             return this.Set.Add(item);
         }
 
+        public IEnumerable<T> AddRange(IEnumerable<T> items)
+        {
+            return this.Set.AddRange(items);
+        }
+
         public int IndexOf(T item)
         {
             return this.Set.Local.IndexOf(item);
