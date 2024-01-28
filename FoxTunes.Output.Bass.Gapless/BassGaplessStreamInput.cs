@@ -11,16 +11,20 @@ namespace FoxTunes
         public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour, BassOutputStream stream)
         {
             this.Behaviour = behaviour;
-            this.Rate = stream.Rate;
             this.Channels = stream.Channels;
             this.Flags = BassFlags.Decode;
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
+                this.Rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
                 this.Flags |= BassFlags.DSDRaw;
             }
-            else if (behaviour.Output.Float)
+            else
             {
-                this.Flags |= BassFlags.Float;
+                this.Rate = stream.Rate;
+                if (behaviour.Output.Float)
+                {
+                    this.Flags |= BassFlags.Float;
+                }
             }
         }
 
