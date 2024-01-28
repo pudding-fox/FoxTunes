@@ -177,6 +177,10 @@ namespace FoxTunes
                     if (!this.Container.Configuration.Component.IsEmpty)
                     {
                         components.Add(new InvocableComponentWrapper(this.Container, this.Container.Configuration.Component.Name));
+                        if (this.Container.Content is IInvocableComponent component)
+                        {
+                            components.Add(new InvocableComponentWrapper(component, this.Container.Configuration.Component.Name));
+                        }
                     }
                     else
                     {
@@ -186,7 +190,6 @@ namespace FoxTunes
                 components.Add(this);
                 this.ContextMenu = new Menu()
                 {
-                    Category = InvocationComponent.CATEGORY_GLOBAL,
                     Components = new ObservableCollection<IInvocableComponent>(components),
                     Source = this.Container
                 };
