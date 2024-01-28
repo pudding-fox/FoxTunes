@@ -62,6 +62,14 @@ CREATE TABLE [LibraryHierarchyItem_LibraryItem] (
 	[LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) 
 );
 
+CREATE INDEX [IDX_MetaDataItems_Name] ON [MetaDataItems](
+	[Name]
+);
+
+CREATE INDEX [IDX_MetaDataItems_Value] ON [MetaDataItems](
+	[Value]
+);
+
 CREATE INDEX [IDX_LibraryHierarchyLevels_LibraryHierarchy_Id] ON [LibraryHierarchyLevels](
 	[LibraryHierarchy_Id]
 );

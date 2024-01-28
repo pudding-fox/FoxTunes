@@ -38,7 +38,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async Task AddPaths(IEnumerable<string> paths)
+        protected virtual async Task AddPaths(IEnumerable<string> paths, bool buildHierarchies)
         {
             using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
@@ -65,7 +65,11 @@ namespace FoxTunes
                 await task.Run();
             }
             await this.UpdateVariousArtists();
-            await this.SetLibraryItemsStatus(LibraryItemStatus.None);
+            if (buildHierarchies)
+            {
+                await this.BuildHierarchies(LibraryItemStatus.Import);
+            }
+            await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None);
         }
 
         protected virtual async Task AddLibraryItems(IEnumerable<string> paths, CancellationToken cancellationToken)
@@ -101,7 +105,15 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                await this.Database.ExecuteAsync(this.Database.Queries.BeginBuildLibraryHierarchies, transaction);
+                await this.Database.ExecuteAsync(this.Database.Queries.BeginBuildLibraryHierarchies, (parameters, phase) =>
+                {
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = status;
+                            break;
+                    }
+                }, transaction);
                 transaction.Commit();
             }
             using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
@@ -147,8 +159,6 @@ namespace FoxTunes
 
         protected virtual async Task RemoveItems(LibraryItemStatus status)
         {
-            await this.SetIsIndeterminate(true);
-            Logger.Write(this, LogLevel.Debug, "Removing library items.");
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryItems, (parameters, phase) =>
@@ -164,15 +174,14 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task SetLibraryItemsStatus(LibraryItemStatus status)
+        public static async Task SetLibraryItemsStatus(IDatabaseComponent database, LibraryItemStatus status)
         {
-            await this.SetIsIndeterminate(true);
-            var query = this.Database.QueryFactory.Build();
-            query.Update.SetTable(this.Database.Tables.LibraryItem);
-            query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            var query = database.QueryFactory.Build();
+            query.Update.SetTable(database.Tables.LibraryItem);
+            query.Update.AddColumn(database.Tables.LibraryItem.Column("Status"));
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
             {
-                await this.Database.ExecuteAsync(query, (parameters, phase) =>
+                await database.ExecuteAsync(query, (parameters, phase) =>
                 {
                     switch (phase)
                     {
@@ -185,11 +194,33 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task SetLibraryItemsStatus(Func<LibraryItem, bool> predicate, LibraryItemStatus status)
+        public static async Task SetLibraryItemStatus(IDatabaseComponent database, int libraryItemId, LibraryItemStatus status)
         {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            var builder = database.QueryFactory.Build();
+            builder.Update.AddColumn(database.Tables.LibraryItem.Column("Status"));
+            builder.Update.SetTable(database.Tables.LibraryItem);
+            builder.Filter.AddColumn(database.Tables.LibraryItem.Column("Id"));
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
             {
-                var set = this.Database.Set<LibraryItem>(transaction);
+                await database.ExecuteAsync(builder, (parameters, phase) =>
+                {
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = status;
+                            parameters["id"] = libraryItemId;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
+            }
+        }
+
+        protected static async Task SetLibraryItemsStatus(IDatabaseComponent database, Func<LibraryItem, bool> predicate, LibraryItemStatus status)
+        {
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            {
+                var set = database.Set<LibraryItem>(transaction);
                 foreach (var libraryItem in set)
                 {
                     if (!predicate(libraryItem))

@@ -1,4 +1,5 @@
-﻿using FoxDb.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.IO;
@@ -78,6 +79,7 @@ namespace FoxTunes
                     else
                     {
                         await this.WriteLibraryMetaData(playlistItem);
+                        await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import);
                     }
 
                     position++;
