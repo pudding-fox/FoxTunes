@@ -43,6 +43,5 @@ namespace FoxTunes
         {
             return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, REFRESH_IMAGES));
         }
-
     }
 }

@@ -36,14 +36,7 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
-            ).ConnectValue(option =>
-            {
-                this.ImageMode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(option);
-                if (this.IsInitialized)
-                {
-                    this.OnCleared();
-                }
-            });
+            ).ConnectValue(option => this.ImageMode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(option));
             base.InitializeComponent(core);
         }
 
@@ -297,21 +290,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", PREFIX, e.Message);
             }
-            finally
-            {
-                this.OnCleared();
-            }
         }
-
-        protected virtual void OnCleared()
-        {
-            if (this.Cleared != null)
-            {
-                this.Cleared(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler Cleared;
 
         public bool IsDisposed { get; private set; }
 

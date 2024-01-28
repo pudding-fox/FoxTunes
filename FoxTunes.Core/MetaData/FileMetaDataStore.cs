@@ -126,18 +126,21 @@ namespace FoxTunes
 
         public static void Clear(string prefix)
         {
-            var directoryName = Path.Combine(DataStoreDirectoryName, prefix);
-            if (!Directory.Exists(directoryName))
+            lock (SyncRoot)
             {
-                return;
-            }
-            try
-            {
-                Directory.Delete(directoryName, true);
-            }
-            catch (Exception e)
-            {
-                LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to clear data: {0} => {1}", prefix, e.Message);
+                var directoryName = Path.Combine(DataStoreDirectoryName, prefix);
+                if (!Directory.Exists(directoryName))
+                {
+                    return;
+                }
+                try
+                {
+                    Directory.Delete(directoryName, true);
+                }
+                catch (Exception e)
+                {
+                    LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to clear data: {0} => {1}", prefix, e.Message);
+                }
             }
         }
 

@@ -19,6 +19,18 @@ namespace FoxTunes.ViewModel
 
         public static readonly ISignalEmitter SignalEmitter = ComponentRegistry.Instance.GetComponent<ISignalEmitter>();
 
+        public static readonly IConfiguration Configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+
+        public static readonly DoubleConfigurationElement ScalingFactor = Configuration.GetElement<DoubleConfigurationElement>(
+            WindowsUserInterfaceConfiguration.SECTION,
+            WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+        );
+
+        public static readonly IntegerConfigurationElement TileSize = Configuration.GetElement<IntegerConfigurationElement>(
+            WindowsUserInterfaceConfiguration.SECTION,
+            LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
+        );
+
         public static TaskFactory Factory { get; private set; }
 
         public static CappedDictionary<LibraryHierarchyNode, Lazy<ImageBrush>> Store { get; private set; }
@@ -29,52 +41,19 @@ namespace FoxTunes.ViewModel
 
         public static ResettableLazy<ImageBrush> FallbackValue { get; private set; }
 
-        static LibraryBrowserImageConverter()
+        public static void InitializeComponent()
         {
-            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
-            if (configuration == null)
-            {
-                return;
-            }
-            configuration.GetElement<IntegerConfigurationElement>(
+            Configuration.GetElement<IntegerConfigurationElement>(
                 ImageBehaviourConfiguration.SECTION,
                 ImageLoaderConfiguration.THREADS
             ).ConnectValue(value => Factory = new TaskFactory(new TaskScheduler(new ParallelOptions()
             {
                 MaxDegreeOfParallelism = value
             })));
-            configuration.GetElement<IntegerConfigurationElement>(
+            Configuration.GetElement<IntegerConfigurationElement>(
                 ImageBehaviourConfiguration.SECTION,
                 ImageLoaderConfiguration.CACHE_SIZE
             ).ConnectValue(value => Store = new CappedDictionary<LibraryHierarchyNode, Lazy<ImageBrush>>(value));
-            configuration.GetElement<SelectionConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_VIEW
-            ).ConnectValue(option => Store.Clear());
-            var scalingFactor = configuration.GetElement<DoubleConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
-            var tileSize = configuration.GetElement<IntegerConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
-            );
-            if (scalingFactor == null || tileSize == null)
-            {
-                return;
-            }
-            var handler = new EventHandler((sender, e) =>
-            {
-                var size = Windows.ActiveWindow.GetElementPixelSize(
-                    tileSize.Value * scalingFactor.Value,
-                    tileSize.Value * scalingFactor.Value
-                );
-                TileWidth = global::System.Convert.ToInt32(size.Width);
-                TileHeight = global::System.Convert.ToInt32(size.Height);
-            });
-            scalingFactor.ValueChanged += handler;
-            tileSize.ValueChanged += handler;
-            handler(typeof(LibraryBrowserImageConverter), EventArgs.Empty);
             SignalEmitter.Signal += (sender, signal) =>
             {
                 switch (signal.Name)
@@ -83,8 +62,9 @@ namespace FoxTunes.ViewModel
                         switch (signal.State as string)
                         {
                             case ImageBehaviour.REFRESH_IMAGES:
+                                FallbackValue.Reset();
                                 Store.Clear();
-                                break;
+                                return Windows.Invoke(() => CalculateTileSize());
                         }
                         break;
                 }
@@ -110,10 +90,16 @@ namespace FoxTunes.ViewModel
                 brush.Freeze();
                 return brush;
             });
-            ThemeLoader.ThemeChanged += (sender, e) =>
-            {
-                FallbackValue.Reset();
-            };
+        }
+
+        public static void CalculateTileSize()
+        {
+            var size = Windows.ActiveWindow.GetElementPixelSize(
+                TileSize.Value * ScalingFactor.Value,
+                TileSize.Value * ScalingFactor.Value
+            );
+            TileWidth = global::System.Convert.ToInt32(size.Width);
+            TileHeight = global::System.Convert.ToInt32(size.Height);
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -126,6 +112,10 @@ namespace FoxTunes.ViewModel
             if (Store.TryGetValue(libraryHierarchyNode, out cachedBrush))
             {
                 return AsyncResult<ImageBrush>.FromValue(cachedBrush.Value);
+            }
+            if (TileWidth == 0 || TileHeight == 0)
+            {
+                CalculateTileSize();
             }
             return new AsyncResult<ImageBrush>(FallbackValue.Value, Factory.StartNew(() =>
             {
