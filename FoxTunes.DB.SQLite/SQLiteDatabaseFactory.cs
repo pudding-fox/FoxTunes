@@ -9,15 +9,9 @@ namespace FoxTunes
     [Component("13A75018-8A24-413D-A731-C558C8FAF08F", ComponentSlots.Database)]
     public class SQLiteDatabaseFactory : DatabaseFactory
     {
-        public IDatabaseComponent Database { get; private set; }
-
         protected override IDatabaseComponent OnCreate()
         {
-            if (this.Database == null)
-            {
-                this.Database = new SQLiteDatabase();
-            }
-            return this.Database;
+            return new SQLiteDatabase();
         }
 
         protected override void Configure(IDatabase database)

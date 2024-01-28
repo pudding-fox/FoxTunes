@@ -45,7 +45,14 @@ namespace FoxTunes.Launcher
                             return;
                         }
                     }
-                    core.Components.UserInterface.Show();
+                    try
+                    {
+                        core.Components.UserInterface.Show();
+                    }
+                    catch (Exception e)
+                    {
+                        core.Components.UserInterface.Fatal(e);
+                    }
                 }
             }
         }

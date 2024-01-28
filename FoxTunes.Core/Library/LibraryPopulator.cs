@@ -8,7 +8,10 @@ namespace FoxTunes
 {
     public class LibraryPopulator : PopulatorBase
     {
-        public LibraryPopulator(IDatabaseComponent database, IPlaybackManager playbackManager, bool reportProgress, ITransactionSource transaction) : base(reportProgress)
+        public const string ID = "00672118-A730-4CD8-8B0A-F3DA42712165";
+
+        public LibraryPopulator(IDatabaseComponent database, IPlaybackManager playbackManager, bool reportProgress, ITransactionSource transaction)
+            : base(reportProgress)
         {
             this.Database = database;
             this.PlaybackManager = playbackManager;
@@ -21,8 +24,10 @@ namespace FoxTunes
 
         public ITransactionSource Transaction { get; private set; }
 
-        public async Task Populate(IEnumerable<string> paths)
+        public async Task Populate(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
+            var interval = 10;
+            var position = 0;
             using (var writer = new LibraryWriter(this.Database, this.Transaction))
             {
                 foreach (var path in paths)
@@ -31,7 +36,20 @@ namespace FoxTunes
                     {
                         foreach (var fileName in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
                         {
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                return;
+                            }
                             await this.AddLibraryItem(writer, fileName);
+                            if (this.ReportProgress)
+                            {
+                                if (position % interval == 0)
+                                {
+                                    this.Description = new FileInfo(fileName).Name;
+                                    this.Position = position;
+                                }
+                                position++;
+                            }
                         }
                     }
                     else if (File.Exists(path))

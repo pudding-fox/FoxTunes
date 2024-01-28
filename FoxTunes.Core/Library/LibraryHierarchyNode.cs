@@ -3,6 +3,7 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 
 namespace FoxTunes
@@ -213,7 +214,7 @@ namespace FoxTunes
                             this,
                             META_DATA_TYPE,
                             transaction
-                        ).Take(META_DATA_COUNT)
+                        ).Where(metaDataItem => File.Exists(metaDataItem.FileValue)).Take(META_DATA_COUNT)
                     );
                 }
             }

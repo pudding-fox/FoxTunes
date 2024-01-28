@@ -44,6 +44,16 @@ namespace FoxTunes
             }
         }
 
+        public virtual bool Cancellable
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        protected bool IsCancellationRequested { get; set; }
+
         public virtual int Concurrency
         {
             get
@@ -345,6 +355,15 @@ namespace FoxTunes
             this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
+        }
+
+        public virtual void Cancel()
+        {
+            if (!this.Cancellable)
+            {
+                throw new NotImplementedException();
+            }
+            this.IsCancellationRequested = true;
         }
 
         public bool IsDisposed { get; private set; }

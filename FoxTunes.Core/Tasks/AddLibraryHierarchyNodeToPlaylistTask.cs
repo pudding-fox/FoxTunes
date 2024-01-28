@@ -28,36 +28,36 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            if (this.Clear)
             {
-                if (this.Clear)
-                {
-                    await this.RemoveItems(PlaylistItemStatus.None, transaction);
-                }
-                await this.AddPlaylistItems(transaction);
-                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
-                await this.SequenceItems(CancellationToken.None, transaction);
-                await this.SetPlaylistItemsStatus(transaction);
-                transaction.Commit();
+                await this.RemoveItems(PlaylistItemStatus.None);
             }
+            await this.AddPlaylistItems();
+            await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+            await this.SequenceItems();
+            await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
-        private async Task AddPlaylistItems(ITransactionSource transaction)
+        private async Task AddPlaylistItems()
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
-            this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                switch (phase)
+                this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
-                        parameters["sequence"] = this.Sequence;
-                        parameters["status"] = PlaylistItemStatus.Import;
-                        break;
-                }
-            }, transaction);
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
+                            parameters["sequence"] = this.Sequence;
+                            parameters["status"] = PlaylistItemStatus.Import;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
+            }
         }
     }
 }

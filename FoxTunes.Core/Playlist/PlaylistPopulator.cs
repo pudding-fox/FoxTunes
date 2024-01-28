@@ -30,6 +30,8 @@ namespace FoxTunes
 
         public async Task Populate(IEnumerable<string> paths)
         {
+            var interval = 10;
+            var position = 0;
             using (var writer = new PlaylistWriter(this.Database, this.Transaction))
             {
                 foreach (var path in paths)
@@ -40,6 +42,15 @@ namespace FoxTunes
                         {
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                             await this.AddPlaylistItem(writer, fileName);
+                            if (this.ReportProgress)
+                            {
+                                if (position % interval == 0)
+                                {
+                                    this.Description = new FileInfo(fileName).Name;
+                                    this.Position = position;
+                                }
+                                position++;
+                            }
                         }
                     }
                     else if (File.Exists(path))

@@ -20,5 +20,9 @@ namespace FoxTunes.Interfaces
         event AsyncEventHandler Faulted;
 
         Task Run();
+
+        bool Cancellable { get; }
+
+        void Cancel();
     }
 }

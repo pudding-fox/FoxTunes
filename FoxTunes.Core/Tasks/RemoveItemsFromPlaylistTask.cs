@@ -1,7 +1,4 @@
-﻿using FoxDb;
-using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -20,18 +17,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            this.IsIndeterminate = true;
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                foreach (var playlistItem in this.PlaylistItems)
-                {
-                    playlistItem.Status = PlaylistItemStatus.Remove;
-                }
-                var set = this.Database.Set<PlaylistItem>(transaction);
-                await set.AddOrUpdateAsync(this.PlaylistItems);
-                await this.RemoveItems(PlaylistItemStatus.Remove, transaction);
-                transaction.Commit();
-            }
+            await this.RemoveItems(this.PlaylistItems);
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
     }

@@ -2,7 +2,9 @@
 using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,12 +37,11 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async Task AddPaths(IEnumerable<string> paths, ITransactionSource transaction)
+        protected virtual async Task AddPaths(IEnumerable<string> paths)
         {
-            await this.AddLibraryItems(paths, transaction);
-            using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
-                await this.AddOrUpdateMetaData(cancellationToken, transaction);
+                await this.AddLibraryItems(paths, cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     this.Name = "Waiting..";
@@ -50,85 +51,200 @@ namespace FoxTunes
             {
                 await task.Run();
             }
-            await this.UpdateVariousArtists(transaction);
-            await this.SetLibraryItemsStatus(transaction);
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            {
+                await this.AddOrUpdateMetaData(cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    this.Name = "Waiting..";
+                    this.Description = string.Empty;
+                }
+            }))
+            {
+                await task.Run();
+            }
+            await this.UpdateVariousArtists();
+            await this.SetLibraryItemsStatus(LibraryItemStatus.None);
         }
 
-        protected virtual async Task AddLibraryItems(IEnumerable<string> paths, ITransactionSource transaction)
+        protected virtual async Task AddLibraryItems(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
-            using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, false, transaction))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                await libraryPopulator.Populate(paths);
+                using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, true, transaction))
+                {
+                    libraryPopulator.InitializeComponent(this.Core);
+                    libraryPopulator.NameChanged += (sender, e) => this.Name = libraryPopulator.Name;
+                    libraryPopulator.DescriptionChanged += (sender, e) => this.Description = libraryPopulator.Description;
+                    libraryPopulator.PositionChanged += (sender, e) => this.Position = libraryPopulator.Position;
+                    libraryPopulator.CountChanged += (sender, e) => this.Count = libraryPopulator.Count;
+                    await libraryPopulator.Populate(paths, cancellationToken);
+                }
+                transaction.Commit();
             }
         }
 
-        protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken, ITransactionSource transaction)
+        protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken)
         {
-            var query = this.Database
-                .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
-                .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, true, transaction))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                metaDataPopulator.InitializeComponent(this.Core);
-                metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
-                metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
-                metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
-                metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                await metaDataPopulator.Populate(query, cancellationToken);
+                var query = this.Database
+                    .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
+                    .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
+                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, true, transaction))
+                {
+                    metaDataPopulator.InitializeComponent(this.Core);
+                    metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
+                    metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
+                    metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
+                    metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
+                    await metaDataPopulator.Populate(query, cancellationToken);
+                }
+                transaction.Commit();
             }
         }
 
-        protected virtual Task RemoveHierarchies(ITransactionSource transaction)
+        protected virtual async Task BuildHierarchies()
         {
-            return this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryHierarchyItems);
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                await this.Database.ExecuteAsync(this.Database.Queries.BeginBuildLibraryHierarchies, transaction);
+                transaction.Commit();
+            }
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            {
+                var metaDataNames = default(IEnumerable<string>);
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction).ToArray();
+                }
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    using (var reader = this.Database.ExecuteReader(this.Database.Queries.BuildLibraryHierarchies(metaDataNames), null, transaction))
+                    {
+                        await this.AddHiearchies(reader, cancellationToken, transaction);
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            this.Name = "Waiting..";
+                            this.Description = string.Empty;
+                        }
+                        else
+                        {
+                            this.Description = "Finalizing";
+                            this.IsIndeterminate = true;
+                        }
+                    }
+                    transaction.Commit();
+                }
+            }))
+            {
+                await task.Run();
+            }
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                await this.Database.ExecuteAsync(this.Database.Queries.EndBuildLibraryHierarchies, transaction);
+                transaction.Commit();
+            }
         }
 
-        protected virtual Task RemoveItems(LibraryItemStatus status, ITransactionSource transaction)
+        private async Task AddHiearchies(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)
+        {
+            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, true, transaction))
+            {
+                libraryHierarchyPopulator.InitializeComponent(this.Core);
+                libraryHierarchyPopulator.NameChanged += (sender, e) => this.Name = libraryHierarchyPopulator.Name;
+                libraryHierarchyPopulator.DescriptionChanged += (sender, e) => this.Description = libraryHierarchyPopulator.Description;
+                libraryHierarchyPopulator.PositionChanged += (sender, e) => this.Position = libraryHierarchyPopulator.Position;
+                libraryHierarchyPopulator.CountChanged += (sender, e) => this.Count = libraryHierarchyPopulator.Count;
+                await libraryHierarchyPopulator.Populate(reader, cancellationToken, transaction);
+            }
+        }
+
+        protected virtual async Task RemoveHierarchies()
+        {
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryHierarchyItems, transaction);
+                transaction.Commit();
+            }
+        }
+
+        protected virtual async Task RemoveItems(LibraryItemStatus status)
         {
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Removing library items.");
-            return this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryItems, (parameters, phase) =>
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                switch (phase)
+                await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryItems, (parameters, phase) =>
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = status;
-                        break;
-                }
-            }, transaction);
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = status;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
+            }
         }
 
-        protected virtual Task SetLibraryItemsStatus(ITransactionSource transaction)
+        protected virtual async Task SetLibraryItemsStatus(LibraryItemStatus status)
         {
             this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.LibraryItem);
             query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
-            return this.Database.ExecuteAsync(query, (parameters, phase) =>
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                switch (phase)
+                await this.Database.ExecuteAsync(query, (parameters, phase) =>
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = LibraryItemStatus.None;
-                        break;
-                }
-            }, transaction);
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = status;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
+            }
         }
 
-        protected virtual Task UpdateVariousArtists(ITransactionSource transaction)
+        protected virtual async Task SetLibraryItemsStatus(Func<LibraryItem, bool> predicate, LibraryItemStatus status)
         {
-            return this.Database.ExecuteAsync(this.Database.Queries.UpdateLibraryVariousArtists, (parameters, phase) =>
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                switch (phase)
+                var set = this.Database.Set<LibraryItem>(transaction);
+                foreach (var libraryItem in set)
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["name"] = CustomMetaData.VariousArtists;
-                        parameters["type"] = MetaDataItemType.Tag;
-                        parameters["numericValue"] = 1;
-                        parameters["status"] = LibraryItemStatus.Import;
-                        break;
+                    if (!predicate(libraryItem))
+                    {
+                        continue;
+                    }
+                    libraryItem.Status = status;
+                    await set.AddOrUpdateAsync(libraryItem);
                 }
-            }, transaction);
+                transaction.Commit();
+            }
+        }
+
+        protected virtual async Task UpdateVariousArtists()
+        {
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                await this.Database.ExecuteAsync(this.Database.Queries.UpdateLibraryVariousArtists, (parameters, phase) =>
+                {
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["name"] = CustomMetaData.VariousArtists;
+                            parameters["type"] = MetaDataItemType.Tag;
+                            parameters["numericValue"] = 1;
+                            parameters["status"] = LibraryItemStatus.Import;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
+            }
         }
 
         protected override void OnDisposing()

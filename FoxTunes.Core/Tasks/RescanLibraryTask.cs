@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -33,27 +34,15 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                var set = this.Database.Set<LibraryItem>(transaction);
-                foreach (var libraryItem in set)
-                {
-                    if (File.Exists(libraryItem.FileName))
-                    {
-                        continue;
-                    }
-                    libraryItem.Status = LibraryItemStatus.Remove;
-                    await set.AddOrUpdateAsync(libraryItem);
-                }
-                await this.RemoveHierarchies(transaction);
-                await this.RemoveItems(LibraryItemStatus.Remove, transaction);
-                await this.AddPaths(this.GetLibraryDirectories(transaction), transaction);
-                transaction.Commit();
-            }
+            await this.RemoveHierarchies();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+            await this.SetLibraryItemsStatus(libraryItem => !File.Exists(libraryItem.FileName), LibraryItemStatus.Remove);
+            await this.RemoveItems(LibraryItemStatus.Remove);
+            await this.AddPaths(this.GetLibraryDirectories().ToArray());
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
-        protected virtual IEnumerable<string> GetLibraryDirectories(ITransactionSource transaction)
+        protected virtual IEnumerable<string> GetLibraryDirectories()
         {
             var table = this.Database.Tables.LibraryItem;
             var column = table.GetColumn(ColumnConfig.By("DirectoryName", ColumnFlags.None));
@@ -61,11 +50,14 @@ namespace FoxTunes
             query.Output.AddColumn(column);
             query.Source.AddTable(table);
             query.Aggregate.AddColumn(column);
-            using (var reader = this.Database.ExecuteReader(query, null, transaction))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                foreach (var record in reader)
+                using (var reader = this.Database.ExecuteReader(query, null, transaction))
                 {
-                    yield return record.Get<string>(column.Identifier);
+                    foreach (var record in reader)
+                    {
+                        yield return record.Get<string>(column.Identifier);
+                    }
                 }
             }
         }

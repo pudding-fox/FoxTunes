@@ -5,8 +5,8 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -45,68 +45,107 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async Task AddPaths(IEnumerable<string> paths, ITransactionSource transaction)
+        protected virtual async Task AddPaths(IEnumerable<string> paths)
         {
-            await this.AddPlaylistItems(paths, transaction);
-            await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
-            using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
-                await this.AddOrUpdateMetaData(cancellationToken, transaction);
-                if (cancellationToken.IsCancellationRequested)
+                await this.AddItems(paths);
+                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                await this.AddOrUpdateMetaData(cancellationToken);
+                await this.UpdateVariousArtists();
+                await this.SequenceItems();
+                await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+            }))
+            {
+                await task.Run();
+            }
+        }
+
+        protected virtual async Task AddItems(IEnumerable<string> paths)
+        {
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, true, transaction))
                 {
-                    this.Name = "Waiting..";
-                    this.Description = string.Empty;
+                    playlistPopulator.InitializeComponent(this.Core);
+                    playlistPopulator.NameChanged += (sender, e) => this.Name = playlistPopulator.Name;
+                    playlistPopulator.DescriptionChanged += (sender, e) => this.Description = playlistPopulator.Description;
+                    playlistPopulator.PositionChanged += (sender, e) => this.Position = playlistPopulator.Position;
+                    playlistPopulator.CountChanged += (sender, e) => this.Count = playlistPopulator.Count;
+                    await playlistPopulator.Populate(paths);
+                    this.Offset = playlistPopulator.Offset;
+                }
+                transaction.Commit();
+            }
+        }
+
+        protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken)
+        {
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                var query = this.Database
+                   .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
+                   .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
+                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, true, transaction))
+                {
+                    metaDataPopulator.InitializeComponent(this.Core);
+                    metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
+                    metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
+                    metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
+                    metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
+                    await metaDataPopulator.Populate(query, cancellationToken);
+                }
+                transaction.Commit();
+            }
+        }
+
+        protected virtual async Task RemoveItems(IEnumerable<PlaylistItem> playlistItems)
+        {
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            {
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    foreach (var playlistItem in playlistItems)
+                    {
+                        playlistItem.Status = PlaylistItemStatus.Remove;
+                    }
+                    var set = this.Database.Set<PlaylistItem>(transaction);
+                    await set.AddOrUpdateAsync(playlistItems);
+                    transaction.Commit();
                 }
             }))
             {
                 await task.Run();
             }
-            await this.UpdateVariousArtists(transaction);
-            await this.SequenceItems(CancellationToken.None, transaction);
-            await this.SetPlaylistItemsStatus(transaction);
+            await this.RemoveItems(PlaylistItemStatus.Remove);
         }
 
-        protected virtual async Task AddPlaylistItems(IEnumerable<string> paths, ITransactionSource transaction)
-        {
-            using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, false, transaction))
-            {
-                await playlistPopulator.Populate(paths);
-                this.Offset = playlistPopulator.Offset;
-            }
-        }
-
-        protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken, ITransactionSource transaction)
-        {
-            var query = this.Database
-               .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
-               .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, true, transaction))
-            {
-                metaDataPopulator.InitializeComponent(this.Core);
-                metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
-                metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
-                metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
-                metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                await metaDataPopulator.Populate(query, cancellationToken);
-            }
-        }
-
-        protected virtual Task RemoveItems(PlaylistItemStatus status, ITransactionSource transaction)
+        protected virtual async Task RemoveItems(PlaylistItemStatus status)
         {
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
-            return this.Database.ExecuteAsync(this.Database.Queries.RemovePlaylistItems, (parameters, phase) =>
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
-                switch (phase)
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = status;
-                        break;
+                    await this.Database.ExecuteAsync(this.Database.Queries.RemovePlaylistItems, (parameters, phase) =>
+                    {
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["status"] = status;
+                                break;
+                        }
+                    }, transaction);
+                    transaction.Commit();
                 }
-            }, transaction);
+            }))
+            {
+                await task.Run();
+            }
         }
 
-        protected virtual Task ShiftItems(QueryOperator @operator, int at, int by, ITransactionSource transaction)
+        protected virtual async Task ShiftItems(QueryOperator @operator, int at, int by)
         {
             Logger.Write(
                 this,
@@ -133,89 +172,105 @@ namespace FoxTunes
                 expression.Operator = expression.CreateOperator(@operator);
                 expression.Right = expression.CreateParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             });
-            return this.Database.ExecuteAsync(query, (parameters, phase) =>
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                switch (phase)
+                await this.Database.ExecuteAsync(query, (parameters, phase) =>
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = PlaylistItemStatus.None;
-                        parameters["sequence"] = at;
-                        parameters["offset"] = by;
-                        break;
-                }
-            }, transaction);
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = PlaylistItemStatus.None;
+                            parameters["sequence"] = at;
+                            parameters["offset"] = by;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
+            }
         }
 
-        protected virtual async Task SequenceItems(CancellationToken cancellationToken, ITransactionSource transaction)
+        protected virtual async Task SequenceItems()
         {
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             this.IsIndeterminate = true;
-            var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
-            await this.Database.ExecuteAsync(this.Database.Queries.BeginSequencePlaylistItems, transaction);
-            using (var reader = this.Database.ExecuteReader(this.Database.Queries.SequencePlaylistItems(metaDataNames), (parameters, phase) =>
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                switch (phase)
+                var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
+                await this.Database.ExecuteAsync(this.Database.Queries.BeginSequencePlaylistItems, transaction);
+                using (var reader = this.Database.ExecuteReader(this.Database.Queries.SequencePlaylistItems(metaDataNames), (parameters, phase) =>
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = PlaylistItemStatus.Import;
-                        break;
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = PlaylistItemStatus.Import;
+                            break;
+                    }
+                }, transaction))
+                {
+                    await this.SequenceItems(reader, transaction);
                 }
-            }, transaction))
-            {
-                await this.SequenceItems(reader, cancellationToken, transaction);
+                await this.Database.ExecuteAsync(this.Database.Queries.EndSequencePlaylistItems, (parameters, phase) =>
+                {
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = PlaylistItemStatus.Import;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
             }
-            await this.Database.ExecuteAsync(this.Database.Queries.EndSequencePlaylistItems, (parameters, phase) =>
-            {
-                switch (phase)
-                {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = PlaylistItemStatus.Import;
-                        break;
-                }
-            }, transaction);
         }
 
-        protected virtual async Task SequenceItems(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)
+        protected virtual async Task SequenceItems(IDatabaseReader reader, ITransactionSource transaction)
         {
             using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, transaction))
             {
                 playlistSequencePopulator.InitializeComponent(this.Core);
-                await playlistSequencePopulator.Populate(reader, cancellationToken);
+                await playlistSequencePopulator.Populate(reader, CancellationToken.None);
             }
         }
 
-        protected virtual Task SetPlaylistItemsStatus(ITransactionSource transaction)
+        protected virtual async Task SetPlaylistItemsStatus(PlaylistItemStatus status)
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
-            return this.Database.ExecuteAsync(query, (parameters, phase) =>
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                switch (phase)
+                await this.Database.ExecuteAsync(query, (parameters, phase) =>
                 {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = LibraryItemStatus.None;
-                        break;
-                }
-            }, transaction);
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = status;
+                            break;
+                    }
+                }, transaction);
+                transaction.Commit();
+            }
         }
 
-        protected virtual Task UpdateVariousArtists(ITransactionSource transaction)
+        protected virtual async Task UpdateVariousArtists()
         {
-            return this.Database.ExecuteAsync(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
-             {
-                 switch (phase)
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                await this.Database.ExecuteAsync(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
                  {
-                     case DatabaseParameterPhase.Fetch:
-                         parameters["name"] = CustomMetaData.VariousArtists;
-                         parameters["type"] = MetaDataItemType.Tag;
-                         parameters["numericValue"] = 1;
-                         parameters["status"] = PlaylistItemStatus.Import;
-                         break;
-                 }
-             }, transaction);
+                     switch (phase)
+                     {
+                         case DatabaseParameterPhase.Fetch:
+                             parameters["name"] = CustomMetaData.VariousArtists;
+                             parameters["type"] = MetaDataItemType.Tag;
+                             parameters["numericValue"] = 1;
+                             parameters["status"] = PlaylistItemStatus.Import;
+                             break;
+                     }
+                 }, transaction);
+                transaction.Commit();
+            }
         }
 
         protected override void OnDisposing()
