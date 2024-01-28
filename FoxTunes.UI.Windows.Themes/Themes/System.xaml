@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
   mc:Ignorable="d">
 
     <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource {x:Static SystemColors.ControlTextColorKey}}" />
@@ -16,7 +17,7 @@
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF9BDDFB"/>
 
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
-    
+
     <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
         <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
         <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
@@ -29,6 +30,11 @@
 
     <Style TargetType="{x:Type ListViewItem}">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Style.Triggers>
+            <Trigger Property="Windows:ListViewItemExtensions.IsDragging" Value="true">
+                <Setter Property="Background" Value="{StaticResource ResourceKey={x:Static SystemColors.HighlightBrushKey}}"></Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

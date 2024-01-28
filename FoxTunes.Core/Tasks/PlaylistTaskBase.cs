@@ -122,13 +122,14 @@ namespace FoxTunes
                 {
                     foreach (var playlistItem in playlistItems)
                     {
+                        playlistItem.Sequence = this.Sequence;
                         await this.Database.ExecuteAsync(this.Database.Queries.MovePlaylistItem, (parameters, phase) =>
                         {
                             switch (phase)
                             {
                                 case DatabaseParameterPhase.Fetch:
                                     parameters["id"] = playlistItem.Id;
-                                    parameters["sequence"] = this.Sequence;
+                                    parameters["sequence"] = playlistItem.Sequence;
                                     break;
                             }
                         }, transaction).ConfigureAwait(false);
