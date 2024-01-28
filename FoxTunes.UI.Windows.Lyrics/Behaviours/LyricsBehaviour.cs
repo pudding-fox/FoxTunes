@@ -19,10 +19,10 @@ namespace FoxTunes
 
         public LyricsBehaviour()
         {
-            this.Providers = new List<LyricsProvider>();
+            this.Providers = new List<ILyricsProvider>();
         }
 
-        public IList<LyricsProvider> Providers { get; private set; }
+        public IList<ILyricsProvider> Providers { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -40,7 +40,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Providers.AddRange(ComponentRegistry.Instance.GetComponents<LyricsProvider>());
+            this.Providers.AddRange(ComponentRegistry.Instance.GetComponents<ILyricsProvider>());
             this.PlaybackManager = core.Managers.Playback;
             this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.Configuration = core.Components.Configuration;
@@ -217,7 +217,7 @@ namespace FoxTunes
             }
         }
 
-        public Task Lookup(LyricsProvider provider, MetaDataUpdateType updateType)
+        public Task Lookup(ILyricsProvider provider, MetaDataUpdateType updateType)
         {
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream == null)

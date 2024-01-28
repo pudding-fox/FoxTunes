@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,9 +10,7 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     public class LayoutDesignerBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
-        public const string LOAD = "AAAA";
-
-        public const string DESIGN = "BBBB";
+        public const string DESIGN = "ZZZZ";
 
         public LayoutDesignerBehaviour()
         {
@@ -72,15 +69,7 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public IUserInterface UserInterface { get; private set; }
-
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
-
-        public IConfiguration Configuration { get; private set; }
-
-        public SelectionConfigurationElement MainPreset { get; private set; }
-
-        public TextConfigurationElement MainLayout { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -88,17 +77,7 @@ namespace FoxTunes
             UIComponentRoot.ActiveChanged += this.OnActiveChanged;
             Windows.Registrations.AddIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
             this.Core = core;
-            this.UserInterface = core.Components.UserInterface;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
-            this.Configuration = core.Components.Configuration;
-            this.MainPreset = this.Configuration.GetElement<SelectionConfigurationElement>(
-                UIComponentLayoutProviderConfiguration.SECTION,
-                UIComponentLayoutProviderConfiguration.MAIN_PRESET
-            );
-            this.MainLayout = this.Configuration.GetElement<TextConfigurationElement>(
-                UIComponentLayoutProviderConfiguration.SECTION,
-                UIComponentLayoutProviderConfiguration.MAIN_LAYOUT
-            );
             base.InitializeComponent(core);
         }
 
@@ -172,26 +151,8 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled && !Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
+                if (this.Enabled)
                 {
-                    foreach (var option in this.MainPreset.Options)
-                    {
-                        var preset = UIComponentLayoutProviderPresets.GetPresetById(UIComponentLayoutProviderPresets.Main.Presets, option.Id);
-                        var isActive = UIComponentLayoutProviderPresets.IsLoaded(
-                            UIComponentLayoutProviderConfiguration.SECTION,
-                            UIComponentLayoutProviderConfiguration.MAIN_PRESET,
-                            UIComponentLayoutProviderConfiguration.MAIN_LAYOUT,
-                            UIComponentLayoutProviderPresets.Main.Presets,
-                            preset
-                        );
-                        yield return new InvocationComponent(
-                            InvocationComponent.CATEGORY_SETTINGS,
-                            LOAD,
-                            option.Name,
-                            path: Path.Combine(Strings.LayoutDesignerBehaviour_Path, Strings.LayoutDesignerBehaviour_Load),
-                            attributes: isActive ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                        );
-                    }
                     yield return new InvocationComponent(
                         InvocationComponent.CATEGORY_SETTINGS,
                         DESIGN,
@@ -207,38 +168,9 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case LOAD:
-                    return this.Load(component.Name);
                 case DESIGN:
                     return this.Design();
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
-        }
-
-        public Task Load(string name)
-        {
-            var preset = UIComponentLayoutProviderPresets.GetActivePreset(
-                UIComponentLayoutProviderConfiguration.SECTION,
-                UIComponentLayoutProviderConfiguration.MAIN_PRESET,
-                UIComponentLayoutProviderConfiguration.MAIN_LAYOUT,
-                UIComponentLayoutProviderPresets.Main.Presets
-            );
-            if (preset == null)
-            {
-                if (!this.UserInterface.Confirm(Strings.LayoutDesignerBehaviour_Overwrite))
-                {
-#if NET40
-                    return TaskEx.FromResult(false);
-#else
-                    return Task.CompletedTask;
-#endif
-                }
-            }
-            this.MainPreset.Value = this.MainPreset.Options.FirstOrDefault(option => string.Equals(option.Name, name));
 #if NET40
             return TaskEx.FromResult(false);
 #else

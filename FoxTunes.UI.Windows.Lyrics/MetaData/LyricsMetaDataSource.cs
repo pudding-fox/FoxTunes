@@ -58,7 +58,7 @@ namespace FoxTunes
 
         public bool CanGetValue(IFileData fileData, OnDemandMetaDataRequest request)
         {
-            var provider = request.State as LyricsProvider ?? this.GetAutoLookupProvider();
+            var provider = request.State as ILyricsProvider ?? this.GetAutoLookupProvider();
             if (provider == null)
             {
                 return false;
@@ -84,7 +84,7 @@ namespace FoxTunes
 
         public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request)
         {
-            var provider = request.State as LyricsProvider ?? this.GetAutoLookupProvider();
+            var provider = request.State as ILyricsProvider ?? this.GetAutoLookupProvider();
             if (provider == null)
             {
                 return null;
@@ -110,9 +110,9 @@ namespace FoxTunes
             return new OnDemandMetaDataValues(values, flags);
         }
 
-        protected virtual LyricsProvider GetAutoLookupProvider()
+        protected virtual ILyricsProvider GetAutoLookupProvider()
         {
-            var provider = default(LyricsProvider);
+            var provider = default(ILyricsProvider);
             if (this.AutoLookupProvider.Value != null)
             {
                 provider = this.Behaviour.Providers.FirstOrDefault(
