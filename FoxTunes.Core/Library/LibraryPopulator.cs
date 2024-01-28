@@ -42,7 +42,7 @@ namespace FoxTunes
                 {
                     if (Directory.Exists(path))
                     {
-                        foreach (var fileName in FileSystemHelper.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
+                        foreach (var fileName in FileSystemHelper.EnumerateFiles(path, "*.*", FileSystemHelper.SearchOption.Recursive))
                         {
                             if (cancellationToken.IsCancellationRequested)
                             {

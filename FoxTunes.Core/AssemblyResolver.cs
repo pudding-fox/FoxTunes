@@ -7,6 +7,11 @@ namespace FoxTunes
 {
     public class AssemblyResolver : IAssemblyResolver
     {
+        const FileSystemHelper.SearchOption SEARCH_OPTIONS =
+            FileSystemHelper.SearchOption.Recursive |
+            FileSystemHelper.SearchOption.UseSystemCache |
+            FileSystemHelper.SearchOption.UseSystemExclusions;
+
         private AssemblyResolver()
         {
 
@@ -80,7 +85,7 @@ namespace FoxTunes
 
         protected virtual bool TryResolve(string directoryName, string name, bool tryLoad, out string result)
         {
-            foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, "*.dll", SearchOption.AllDirectories))
+            foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, "*.dll", SEARCH_OPTIONS))
             {
                 var assemblyName = AssemblyRegistry.Instance.GetAssemblyName(fileName);
                 if (assemblyName == null)
