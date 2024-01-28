@@ -833,9 +833,17 @@ namespace FoxTunes
                 }
                 var offset = colors[a].Key;
                 var color = colors[a].Value;
-                for (int b = previousOffset; b < offset; b++)
+                for (int b = 0, c = previousOffset; c < offset; b++, c++)
                 {
-                    result[b] = Interpolate(previousColor, color, (float)b / (offset - 1));
+                    if (offset > 1)
+                    {
+                        var ratio = (float)b / (offset - previousOffset - 1);
+                        result[c] = Interpolate(previousColor, color, ratio);
+                    }
+                    else
+                    {
+                        result[c] = previousColor;
+                    }
                 }
             }
             return result;
@@ -846,10 +854,10 @@ namespace FoxTunes
             var ratio1 = 1 - ratio;
             var ratio2 = ratio;
             return Color.FromArgb(
-                (byte)Math.Round(color1.A * ratio1 + color2.A * ratio2),
-                (byte)Math.Round(color1.R * ratio1 + color2.R * ratio2),
-                (byte)Math.Round(color1.G * ratio1 + color2.G * ratio2),
-                (byte)Math.Round(color1.B * ratio1 + color2.B * ratio2)
+                (byte)Math.Round((color1.A * ratio1) + (color2.A * ratio2)),
+                (byte)Math.Round((color1.R * ratio1) + (color2.R * ratio2)),
+                (byte)Math.Round((color1.G * ratio1) + (color2.G * ratio2)),
+                (byte)Math.Round((color1.B * ratio1) + (color2.B * ratio2))
             );
         }
     }

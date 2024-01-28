@@ -1,9 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Data;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -150,7 +148,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+                info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors);
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)
@@ -400,13 +398,9 @@ namespace FoxTunes
             {
                 var value1 = values[0, h - y];
                 var value2 = Convert.ToInt32(value1 * (colors.Length - 1));
-                var color = colors[value2];
                 elements[y].X = x;
                 elements[y].Y = y;
-                elements[y].Blue = color.B;
-                elements[y].Green = color.G;
-                elements[y].Red = color.R;
-                elements[y].Alpha = color.A;
+                elements[y].Color = value2;
             }
         }
 
@@ -420,13 +414,9 @@ namespace FoxTunes
                 {
                     var value1 = values[channel, h - y];
                     var value2 = Convert.ToInt32(value1 * (colors.Length - 1));
-                    var color = colors[value2];
                     elements[offset + y].X = x;
                     elements[offset + y].Y = offset + y;
-                    elements[offset + y].Blue = color.B;
-                    elements[offset + y].Green = color.G;
-                    elements[offset + y].Red = color.R;
-                    elements[offset + y].Alpha = color.A;
+                    elements[offset + y].Color = value2;
                 }
             }
         }

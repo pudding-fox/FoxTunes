@@ -1,5 +1,28 @@
 #include <wtypes.h>
 
+typedef struct Int32Color
+{
+	INT32 Blue;
+
+	INT32 Green;
+
+	INT32 Red;
+
+	INT32 Alpha;
+} Int32Color;
+
+#define COLOR_FROM_X 1
+#define COLOR_FROM_Y 2
+
+typedef struct ColorPalette
+{
+	Int32Color* Colors;
+
+	INT32 Count;
+
+	INT32 Flags;
+} ColorPalette;
+
 typedef struct RenderInfo
 {
 	INT32 BytesPerPixel;
@@ -12,13 +35,7 @@ typedef struct RenderInfo
 
 	BYTE* Buffer;
 
-	INT32 Blue;
-
-	INT32 Green;
-
-	INT32 Red;
-
-	INT32 Alpha;
+	ColorPalette* Palette;
 } RenderInfo;
 
 typedef struct Int32Rect
@@ -39,32 +56,30 @@ typedef struct Int32Point
 	INT32 Y;
 } Int32Point;
 
-typedef struct  Int32Pixel
+typedef struct Int32Pixel
 {
 	INT32 X;
 
 	INT32 Y;
 
-	INT32 Blue;
-
-	INT32 Green;
-
-	INT32 Red;
-
-	INT32 Alpha;
+	INT32 Color;
 } Int32Pixel;
 
-BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, size_t count);
+ColorPalette* WINAPI create_palette(Int32Color* colors, INT32 count, INT32 flags);
+
+BOOL WINAPI destroy_palette(ColorPalette** palette);
+
+BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, INT32 count);
 
 BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height);
 
-BOOL WINAPI draw_lines(RenderInfo* info, Int32Point* points, size_t dimentions, size_t count);
+BOOL WINAPI draw_lines(RenderInfo* info, Int32Point* points, INT32 dimentions, INT32 count);
 
 BOOL WINAPI draw_line(RenderInfo* info, INT32 x1, INT32 y1, INT32 x2, INT32 y2);
 
-BOOL WINAPI  draw_dots(RenderInfo* info, Int32Pixel* pixels, size_t count);
+BOOL WINAPI  draw_pixels(RenderInfo* info, Int32Pixel* points, INT32 count);
 
-BOOL WINAPI  draw_dot(RenderInfo* info, INT32 x, INT32 y);
+BOOL WINAPI  draw_pixel(RenderInfo* info, INT32 color, INT32 x, INT32 y);
 
 BOOL WINAPI shift_left(RenderInfo* info, INT32 count);
 

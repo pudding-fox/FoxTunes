@@ -55,7 +55,7 @@ namespace FoxTunes
 
         protected virtual void Update()
         {
-            if (!PlaybackStateNotifier.IsStarted && this.Enabled)
+            if (!PlaybackStateNotifier.IsStarted)
             {
                 var task = this.Clear();
             }
