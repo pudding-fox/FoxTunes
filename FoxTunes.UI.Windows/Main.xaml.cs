@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Windows;
 
 namespace FoxTunes
@@ -19,6 +20,19 @@ namespace FoxTunes
             {
                 return this.DataContext as ICore;
             }
+        }
+
+        public Log Log { get; private set; }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            this.Log = new Log() { DataContext = this.Core };
+        }
+
+        protected virtual void OnClosed(object sender, EventArgs e)
+        {
+            this.Log.PreventClose = false;
+            this.Log.Close();
         }
     }
 }
