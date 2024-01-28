@@ -159,4 +159,10 @@
   <data name="BassReplayGainScannerReport.Title" xml:space="preserve">
     <value>Scanner Output</value>
   </data>
+  <data name="BassReplayGainStreamComponent.Name" xml:space="preserve">
+    <value>Replay Gain</value>
+  </data>
+  <data name="BassReplayGainStreamComponent.None" xml:space="preserve">
+    <value>none</value>
+  </data>
 </root>

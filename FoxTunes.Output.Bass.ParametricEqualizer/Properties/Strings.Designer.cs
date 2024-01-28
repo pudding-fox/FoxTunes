@@ -97,6 +97,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parametric Equalizer.
+        /// </summary>
+        internal static string BassParametricEqualizerStreamComponent_Name {
+            get {
+                return ResourceManager.GetString("BassParametricEqualizerStreamComponent.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to none.
+        /// </summary>
+        internal static string BassParametricEqualizerStreamComponent_None {
+            get {
+                return ResourceManager.GetString("BassParametricEqualizerStreamComponent.None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bandwidth.
         /// </summary>
         internal static string BassParametricEqualizerStreamComponentConfiguration_Bandwidth {

@@ -9,7 +9,7 @@ namespace FoxTunes
 {
     public class BassCrossfadeStreamInput : BassStreamInput, IBassStreamControllable
     {
-        public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour)
+        public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
         }
@@ -19,7 +19,7 @@ namespace FoxTunes
         {
             get
             {
-                return "Fading";
+                return Strings.BassCrossfadeStreamInput_Name;
             }
         }
 

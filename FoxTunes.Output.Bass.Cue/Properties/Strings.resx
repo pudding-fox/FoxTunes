@@ -126,4 +126,10 @@
   <data name="BassCueStreamAdvisorBehaviourConfiguration.Section" xml:space="preserve">
     <value>CUE</value>
   </data>
+  <data name="BassSkipSilenceStreamComponent.Name" xml:space="preserve">
+    <value>Skip Silence</value>
+  </data>
+  <data name="BassSkipSilenceStreamComponent.None" xml:space="preserve">
+    <value>none</value>
+  </data>
 </root>

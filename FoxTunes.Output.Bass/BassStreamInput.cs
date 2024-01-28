@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using System;
 using System.Collections.Generic;
 
@@ -6,6 +7,11 @@ namespace FoxTunes
 {
     public abstract class BassStreamInput : BassStreamComponent, IBassStreamInput
     {
+        protected BassStreamInput(BassFlags flags) : base(flags)
+        {
+
+        }
+
         public abstract IEnumerable<int> Queue { get; }
 
         public virtual bool PreserveBuffer

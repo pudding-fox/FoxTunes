@@ -185,5 +185,23 @@ namespace FoxTunes {
                 return ResourceManager.GetString("BassReplayGainScannerReport.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replay Gain.
+        /// </summary>
+        internal static string BassReplayGainStreamComponent_Name {
+            get {
+                return ResourceManager.GetString("BassReplayGainStreamComponent.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to none.
+        /// </summary>
+        internal static string BassReplayGainStreamComponent_None {
+            get {
+                return ResourceManager.GetString("BassReplayGainStreamComponent.None", resourceCulture);
+            }
+        }
     }
 }

@@ -9,12 +9,12 @@ namespace FoxTunes
 {
     public class BassDirectSoundStreamOutput : BassStreamOutput
     {
-        private BassDirectSoundStreamOutput()
+        private BassDirectSoundStreamOutput(BassFlags flags) : base(flags)
         {
             this.MixerChannelHandles = new HashSet<int>();
         }
 
-        public BassDirectSoundStreamOutput(BassDirectSoundStreamOutputBehaviour behaviour, BassOutputStream stream) : this()
+        public BassDirectSoundStreamOutput(BassDirectSoundStreamOutputBehaviour behaviour, BassFlags flags) : this(flags)
         {
             this.Behaviour = behaviour;
         }

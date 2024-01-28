@@ -83,7 +83,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var component = new BassResamplerStreamComponent(this, e.Query);
+            var component = new BassResamplerStreamComponent(this, e.Query, e.Stream.Flags);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

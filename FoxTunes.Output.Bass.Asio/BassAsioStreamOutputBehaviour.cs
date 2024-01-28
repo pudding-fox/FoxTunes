@@ -179,7 +179,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var output = new BassAsioStreamOutput(this, e.Stream);
+            var output = new BassAsioStreamOutput(this, e.Stream.Flags);
             output.InitializeComponent(this.Core);
             e.Output = output;
         }

@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public class BassReplayGainStreamComponent : BassStreamComponent
     {
-        public BassReplayGainStreamComponent(BassReplayGainBehaviour behaviour, BassOutputStream stream)
+        public BassReplayGainStreamComponent(BassReplayGainBehaviour behaviour, BassFlags flags) : base(flags)
         {
             this.Behaviour = behaviour;
         }
@@ -15,7 +15,7 @@ namespace FoxTunes
         {
             get
             {
-                return "ReplayGain";
+                return Strings.BassReplayGainStreamComponent_Name;
             }
         }
 
@@ -26,12 +26,12 @@ namespace FoxTunes
                 var currentStream = this.PlaybackManager.CurrentStream as BassOutputStream;
                 if (currentStream == null)
                 {
-                    return string.Format("{0} (none)", this.Name);
+                    return string.Format("{0} ({1})", this.Name, Strings.BassReplayGainStreamComponent_None);
                 }
                 var effect = default(ReplayGainEffect);
                 if (!this.Behaviour.Effects.TryGetValue(currentStream, out effect))
                 {
-                    return string.Format("{0} (none)", this.Name);
+                    return string.Format("{0} ({1})", this.Name, Strings.BassReplayGainStreamComponent_None);
                 }
                 return string.Format(
                     "{0} ({1}{2}%/{3}dB/{4})",
