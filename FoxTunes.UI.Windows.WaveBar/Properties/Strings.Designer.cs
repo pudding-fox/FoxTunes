@@ -79,6 +79,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cleanup Temp Files.
+        /// </summary>
+        internal static string WaveBarBehaviourConfiguration_Cleanup {
+            get {
+                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Cleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mode.
         /// </summary>
         internal static string WaveBarBehaviourConfiguration_Mode {
