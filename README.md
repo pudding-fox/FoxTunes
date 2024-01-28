@@ -3,32 +3,32 @@ A modular music player using the BASS framework.
 
 The main release is [FoxTunes-1.3-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/1.3/FoxTunes-1.3-net461.zip)
 
-![Main](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/Main.PNG)
+![Main](Media/Screenshots/Main.PNG)
 
 The UI components can be relocated and removed.
 
-![Main](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/Browser.PNG)
+![Main](Media/Screenshots/Browser.PNG)
 
 Library, playlist and other elements can be customized using Javascript.
 
-![Hierarchy](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/HierarchyBuilder.PNG)
-![Playlist](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/PlaylistBuilder.PNG)
+![Hierarchy](Media/Screenshots/HierarchyBuilder.PNG)
+![Playlist](Media/Screenshots/PlaylistBuilder.PNG)
 
 DirectSound, ASIO and WASAPI output modes are supported.
 
-![Settings](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/Settings.PNG)
+![Settings](Media/Screenshots/Settings.PNG)
 
 Includes a mini player with optional artwork and playlist.
 
-![Mini A](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/MiniPlayerA.PNG)
-![Mini B](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/MiniPlayerB.PNG)
+![Mini A](Media/Screenshots/MiniPlayerA.PNG)
+![Mini B](Media/Screenshots/MiniPlayerB.PNG)
 
 A Windows XP compatibile .NET 4.0 build is available, can be configured minimally.
 It needs at least;
 1) [KB2468871](http://support.microsoft.com/kb/2468871) - Portable class libraries patch.
 2) [msvcp100.dll and msvcr100.dll](https://github.com/aidan-g/FoxTunes/releases/download/0.8/FoxTunes-0.8-Dependencies.tar.gz) - Microsoft Visual C++ 2010
 
-![Minimal](https://github.com/aidan-g/FoxTunes/blob/master/Media/Screenshots/Minimal.PNG)
+![Minimal](Media/Screenshots/Minimal.PNG)
 
 Stock plugins;
 
