@@ -10,6 +10,10 @@ namespace FoxTunes
 {
     public static class Serializer
     {
+        const string MetaDataEntry = "MetaDataEntry";
+        const string Name = "Name";
+        const string Value = "Value";
+
         private static ILogger Logger
         {
             get
@@ -27,9 +31,7 @@ namespace FoxTunes
                 writer.WriteStartElement(Publication.Product);
                 foreach (var config in configs)
                 {
-                    Logger.Write(typeof(Serializer), LogLevel.Trace, "Saving tool window configuration: \"{0}\".", config.Id);
                     writer.WriteStartElement(nameof(ToolWindowConfiguration));
-                    writer.WriteAttributeString(nameof(ToolWindowConfiguration.Id), config.Id);
                     writer.WriteAttributeString(nameof(ToolWindowConfiguration.Title), config.Title);
                     writer.WriteAttributeString(nameof(ToolWindowConfiguration.Left), Convert.ToString(config.Left));
                     writer.WriteAttributeString(nameof(ToolWindowConfiguration.Top), Convert.ToString(config.Top));
@@ -64,28 +66,24 @@ namespace FoxTunes
             writer.WriteStartElement(nameof(UIComponentConfiguration));
             if (config != null)
             {
-                Logger.Write(typeof(Serializer), LogLevel.Trace, "Saving component configuration: \"{0}\".", config.Id);
-                writer.WriteAttributeString(nameof(UIComponentConfiguration.Id), config.Id);
                 writer.WriteAttributeString(nameof(UIComponentConfiguration.Component), config.Component);
                 foreach (var child in config.Children)
                 {
                     SaveComponent(writer, child);
                 }
-                foreach (var metaData in config.MetaData)
+                foreach (var pair in config.MetaData)
                 {
-                    SaveMetaData(writer, metaData);
+                    SaveMetaData(writer, pair.Key, pair.Value);
                 }
             }
             writer.WriteEndElement();
         }
 
-        private static void SaveMetaData(XmlTextWriter writer, UIComponentConfiguration.MetaDataEntry metaData)
+        private static void SaveMetaData(XmlTextWriter writer, string key, string value)
         {
-            Logger.Write(typeof(Serializer), LogLevel.Trace, "Saving meta data: \"{0}\": \"{1}\" = \"{2}\".", metaData.Id, metaData.Name, metaData.Value);
-            writer.WriteStartElement(nameof(UIComponentConfiguration.MetaDataEntry));
-            writer.WriteAttributeString(nameof(UIComponentConfiguration.MetaDataEntry.Id), metaData.Id);
-            writer.WriteAttributeString(nameof(UIComponentConfiguration.MetaDataEntry.Name), metaData.Name);
-            writer.WriteAttributeString(nameof(UIComponentConfiguration.MetaDataEntry.Value), metaData.Value);
+            writer.WriteStartElement(nameof(Serializer.MetaDataEntry));
+            writer.WriteAttributeString(nameof(Serializer.Name), key);
+            writer.WriteAttributeString(nameof(Serializer.Value), value);
             writer.WriteEndElement();
         }
 
@@ -97,7 +95,6 @@ namespace FoxTunes
                 reader.ReadStartElement(Publication.Product);
                 while (reader.IsStartElement(nameof(ToolWindowConfiguration)))
                 {
-                    var id = reader.GetAttribute(nameof(ToolWindowConfiguration.Id));
                     var title = reader.GetAttribute(nameof(ToolWindowConfiguration.Title));
                     var left = reader.GetAttribute(nameof(ToolWindowConfiguration.Left));
                     var top = reader.GetAttribute(nameof(ToolWindowConfiguration.Top));
@@ -107,8 +104,7 @@ namespace FoxTunes
                     var showWithMiniWindow = reader.GetAttribute(nameof(ToolWindowConfiguration.ShowWithMiniWindow));
                     var alwaysOnTop = reader.GetAttribute(nameof(ToolWindowConfiguration.AlwaysOnTop));
                     reader.ReadStartElement(nameof(ToolWindowConfiguration));
-                    Logger.Write(typeof(Serializer), LogLevel.Trace, "Loading tool window configuration: \"{0}\".", id);
-                    yield return new ToolWindowConfiguration(id)
+                    yield return new ToolWindowConfiguration()
                     {
                         Title = title,
                         Left = Convert.ToInt32(left),
@@ -154,24 +150,32 @@ namespace FoxTunes
             {
                 return null;
             }
-            var id = reader.GetAttribute(nameof(UIComponentConfiguration.Id));
             var component = reader.GetAttribute(nameof(UIComponentConfiguration.Component));
             var children = new List<UIComponentConfiguration>();
-            var metaData = new List<UIComponentConfiguration.MetaDataEntry>();
+            var metaDatas = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var isEmptyElement = reader.IsEmptyElement;
             reader.ReadStartElement(nameof(UIComponentConfiguration));
-            Logger.Write(typeof(Serializer), LogLevel.Trace, "Loading component configuration: \"{0}\".", id);
             if (!isEmptyElement)
             {
                 while (reader.IsStartElement())
                 {
                     if (reader.IsStartElement(nameof(UIComponentConfiguration)))
                     {
-                        children.Add(LoadComponent(reader));
+                        var child = LoadComponent(reader);
+                        if (child == null)
+                        {
+                            continue;
+                        }
+                        children.Add(child);
                     }
-                    else if (reader.IsStartElement(nameof(UIComponentConfiguration.MetaDataEntry)))
+                    else if (reader.IsStartElement(nameof(Serializer.MetaDataEntry)))
                     {
-                        metaData.Add(LoadMetaData(reader));
+                        var metaData = LoadMetaData(reader);
+                        if (EqualityComparer<KeyValuePair<string, string>>.Default.Equals(metaData, default(KeyValuePair<string, string>)))
+                        {
+                            continue;
+                        }
+                        metaDatas[metaData.Key] = metaData.Value;
                     }
                     else
                     {
@@ -184,34 +188,28 @@ namespace FoxTunes
             {
                 reader.ReadEndElement();
             }
-            return new UIComponentConfiguration(id)
+            return new UIComponentConfiguration()
             {
                 Component = component,
                 Children = new ObservableCollection<UIComponentConfiguration>(children),
-                MetaData = new ObservableCollection<UIComponentConfiguration.MetaDataEntry>(metaData)
+                MetaData = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(metaDatas)
             };
         }
 
-        private static UIComponentConfiguration.MetaDataEntry LoadMetaData(XmlReader reader)
+        private static KeyValuePair<string, string> LoadMetaData(XmlReader reader)
         {
-            if (!reader.IsStartElement(nameof(UIComponentConfiguration.MetaDataEntry)))
+            if (!reader.IsStartElement(nameof(Serializer.MetaDataEntry)))
             {
-                return null;
+                return default(KeyValuePair<string, string>);
             }
-            var id = reader.GetAttribute(nameof(UIComponentConfiguration.MetaDataEntry.Id));
-            var name = reader.GetAttribute(nameof(UIComponentConfiguration.MetaDataEntry.Name));
-            var value = reader.GetAttribute(nameof(UIComponentConfiguration.MetaDataEntry.Value));
-            reader.ReadStartElement(nameof(UIComponentConfiguration.MetaDataEntry));
-            Logger.Write(typeof(Serializer), LogLevel.Trace, "Loading meta data: \"{0}\": \"{1}\" = \"{2}\".", id, name, value);
-            if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, nameof(UIComponentConfiguration.MetaDataEntry)))
+            var name = reader.GetAttribute(nameof(Serializer.Name));
+            var value = reader.GetAttribute(nameof(Serializer.Value));
+            reader.ReadStartElement(nameof(Serializer.MetaDataEntry));
+            if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, nameof(Serializer.MetaDataEntry)))
             {
                 reader.ReadEndElement();
             }
-            return new UIComponentConfiguration.MetaDataEntry(id)
-            {
-                Name = name,
-                Value = value
-            };
+            return new KeyValuePair<string, string>(name, value);
         }
     }
 }

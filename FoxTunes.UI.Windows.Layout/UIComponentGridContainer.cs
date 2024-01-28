@@ -59,7 +59,7 @@ namespace FoxTunes
             return this.Component.Children.Where(component =>
             {
                 var value = default(string);
-                if (component.TryGet(Alignment, out value))
+                if (component.MetaData.TryGetValue(Alignment, out value))
                 {
                     return string.Equals(value, alignment, StringComparison.OrdinalIgnoreCase);
                 }
@@ -296,7 +296,7 @@ namespace FoxTunes
                 {
                     container.Component = new UIComponentConfiguration();
                 }
-                container.Component.AddOrUpdate(Alignment, alignment);
+                container.Component.MetaData.AddOrUpdate(Alignment, alignment);
                 this.UpdateChildren();
             });
         }

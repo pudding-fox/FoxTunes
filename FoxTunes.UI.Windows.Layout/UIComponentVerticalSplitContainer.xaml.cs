@@ -376,7 +376,7 @@ namespace FoxTunes
             var splitterDirection = default(string);
             var collapseLeft = default(string);
             var collapseRight = default(string);
-            if (this.Component.TryGet(nameof(this.SplitterDistance), out splitterDistance))
+            if (this.Component.MetaData.TryGetValue(nameof(this.SplitterDistance), out splitterDistance))
             {
                 this.SplitterDistance = splitterDistance;
             }
@@ -384,7 +384,7 @@ namespace FoxTunes
             {
                 this.SplitterDistance = "1*";
             }
-            if (this.Component.TryGet(nameof(this.SplitterDirection), out splitterDirection))
+            if (this.Component.MetaData.TryGetValue(nameof(this.SplitterDirection), out splitterDirection))
             {
                 this.SplitterDirection = splitterDirection;
             }
@@ -392,7 +392,7 @@ namespace FoxTunes
             {
                 this.SplitterDirection = DirectionLeft;
             }
-            if (this.Component.TryGet(nameof(this.CollapseLeft), out collapseLeft))
+            if (this.Component.MetaData.TryGetValue(nameof(this.CollapseLeft), out collapseLeft))
             {
                 this.CollapseLeft = Convert.ToBoolean(collapseLeft);
             }
@@ -400,7 +400,7 @@ namespace FoxTunes
             {
                 this.CollapseLeft = false;
             }
-            if (this.Component.TryGet(nameof(this.CollapseRight), out collapseRight))
+            if (this.Component.MetaData.TryGetValue(nameof(this.CollapseRight), out collapseRight))
             {
                 this.CollapseRight = Convert.ToBoolean(collapseRight);
             }
@@ -528,7 +528,7 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
-                this.Component.AddOrUpdate(
+                this.Component.MetaData.AddOrUpdate(
                     nameof(this.SplitterDistance),
                     this.SplitterDistance
                 );
@@ -558,7 +558,7 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
-                this.Component.AddOrUpdate(
+                this.Component.MetaData.AddOrUpdate(
                     nameof(this.SplitterDirection),
                     this.SplitterDirection
                 );
@@ -589,7 +589,7 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
-                this.Component.AddOrUpdate(
+                this.Component.MetaData.AddOrUpdate(
                     nameof(this.CollapseLeft),
                     Convert.ToString(this.CollapseLeft)
                 );
@@ -620,7 +620,7 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
-                this.Component.AddOrUpdate(
+                this.Component.MetaData.AddOrUpdate(
                     nameof(this.CollapseRight),
                     Convert.ToString(this.CollapseRight)
                 );

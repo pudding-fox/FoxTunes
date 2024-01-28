@@ -205,15 +205,15 @@ namespace FoxTunes
         {
             var dockLocation = default(string);
             var collapse = default(string);
-            if (this.Component.TryGet(nameof(this.DockLocation), out dockLocation))
+            if (this.Component.MetaData.TryGetValue(nameof(this.DockLocation), out dockLocation))
             {
                 this.DockLocation = dockLocation;
             }
             else
             {
-                this.DockLocation = "Top";
+                this.DockLocation = Enum.GetName(typeof(Dock), Dock.Top);
             }
-            if (this.Component.TryGet(nameof(this.Collapse), out collapse))
+            if (this.Component.MetaData.TryGetValue(nameof(this.Collapse), out collapse))
             {
                 this.Collapse = Convert.ToBoolean(collapse);
             }
@@ -316,7 +316,7 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
-                this.Component.AddOrUpdate(
+                this.Component.MetaData.AddOrUpdate(
                     nameof(this.DockLocation),
                     this.DockLocation
                 );
@@ -346,7 +346,7 @@ namespace FoxTunes
         {
             if (this.Component != null)
             {
-                this.Component.AddOrUpdate(
+                this.Component.MetaData.AddOrUpdate(
                     nameof(this.Collapse),
                     Convert.ToString(this.Collapse)
                 );

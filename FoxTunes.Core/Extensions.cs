@@ -405,5 +405,14 @@ namespace FoxTunes
             }
             return subject;
         }
+
+        public static void AddOrUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> sequence, TKey key, TValue value)
+        {
+            sequence.AddOrUpdate(
+                key,
+                _key => value,
+                (_key, _value) => value
+            );
+        }
     }
 }
