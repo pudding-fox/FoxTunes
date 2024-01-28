@@ -12,6 +12,8 @@ namespace FoxTunes.Interfaces
 
         void Previous();
 
+        void Clear();
+
         IEnumerable<PlaylistItem> Items { get; }
     }
 }
