@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -45,7 +44,7 @@ namespace FoxTunes
                 return;
             }
             var behaviour = default(IsVirtualizingBehaviour);
-            if (!IsVirtualizingBehaviours.TryGetValue(frameworkElement, out behaviour))
+            if (GetIsVirtualizing(frameworkElement).GetValueOrDefault() && !IsVirtualizingBehaviours.TryGetValue(frameworkElement, out behaviour))
             {
                 IsVirtualizingBehaviours.Add(frameworkElement, new IsVirtualizingBehaviour(frameworkElement));
             }

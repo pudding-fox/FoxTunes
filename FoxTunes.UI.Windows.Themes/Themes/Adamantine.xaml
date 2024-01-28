@@ -456,7 +456,7 @@
                 <ControlTemplate TargetType="{x:Type ListBox}">
                     <Grid>
                         <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                            <ScrollViewer Style="{DynamicResource NuclearScrollViewer}" Focusable="False" Padding="4" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
+                            <ScrollViewer Style="{DynamicResource NuclearScrollViewer}" Focusable="False" Padding="4" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" CanContentScroll="True" Foreground="{DynamicResource TextBrush}">
                                 <ItemsPresenter />
                             </ScrollViewer>
                         </Border>
@@ -602,7 +602,7 @@
                 <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" x:Name="Popup" Focusable="False" AllowsTransparency="True" PopupAnimation="Slide">
                     <Grid MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{TemplateBinding ActualWidth}" x:Name="DropDown" SnapsToDevicePixels="True">
                         <Border x:Name="DropDownBorder" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1" Background="{DynamicResource ControlBrush}" />
-                        <ScrollViewer Margin="2,4,2,2" Style="{DynamicResource NuclearScrollViewer}" SnapsToDevicePixels="True" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
+                        <ScrollViewer Margin="2,4,2,2" Style="{DynamicResource NuclearScrollViewer}" SnapsToDevicePixels="True" Foreground="{DynamicResource TextBrush}">
                             <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"  SnapsToDevicePixels="True" />
                         </ScrollViewer>
                     </Grid>
@@ -930,7 +930,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style TargetType="{x:Type MenuItem}">
         <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
@@ -1272,16 +1272,30 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TreeView}">
-                    <Grid>
-                        <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                            <ScrollViewer Style="{DynamicResource NuclearScrollViewer}" Focusable="False" Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="False" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </Border>
-                    </Grid>
+                    <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                        <ScrollViewer x:Name="ScrollViewer" Style="{DynamicResource NuclearScrollViewer}" Focusable="False" Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="False" Foreground="{DynamicResource TextBrush}">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="VirtualizingStackPanel.IsVirtualizing" Value="True">
+                            <Setter Property="CanContentScroll" TargetName="ScrollViewer" Value="True"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="VirtualizingStackPanel.IsVirtualizing" Value="True">
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="NuclearTreeViewItemToggleButton" d:IsControlPart="True" TargetType="{x:Type ToggleButton}">
