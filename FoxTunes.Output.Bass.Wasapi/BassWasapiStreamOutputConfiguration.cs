@@ -37,8 +37,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT, Strings.BassWasapiStreamOutputConfiguration_Mode)
-                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_WASAPI_OPTION, Strings.WASAPI) })
-                    .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION))
+                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_WASAPI_OPTION, Strings.WASAPI) }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_WASAPI_DEVICE, Strings.BassWasapiStreamOutputConfiguration_Device, path: Strings.WASAPI)
                     .WithOptions(GetWASAPIDevices())
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION))
