@@ -10,8 +10,6 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
         public IEnumerable<IFileNameMetaDataExtractor> Extractors { get; private set; }
 
         public string _Patterns { get; private set; }
@@ -36,20 +34,19 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            base.InitializeComponent(core);
             this.Core = core;
-            this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 FileNameMetaDataSourceFactoryConfiguration.PATTERNS_ELEMENT
             ).ConnectValue(value => this.Patterns = value);
-            base.InitializeComponent(core);
         }
 
         public override bool Enabled
         {
             get
             {
-                return this.Extractors != null && this.Extractors.Any();
+                return base.Enabled && this.Extractors != null && this.Extractors.Any();
             }
         }
 

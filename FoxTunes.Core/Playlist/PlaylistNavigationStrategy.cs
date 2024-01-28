@@ -180,7 +180,7 @@ namespace FoxTunes
             {
                 var table = database.Tables.PlaylistItem;
                 var query = database.QueryFactory.Build();
-                var column = table.Column("Sequence");
+                var column = table.GetColumn(ColumnConfig.By("Sequence"));
                 query.Output.AddColumn(column);
                 query.Source.AddTable(table);
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))

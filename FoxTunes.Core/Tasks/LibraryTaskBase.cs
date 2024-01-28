@@ -154,7 +154,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task RemoveItems(LibraryItemStatus status)
+        protected virtual async Task RemoveItems(LibraryItemStatus? status)
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {

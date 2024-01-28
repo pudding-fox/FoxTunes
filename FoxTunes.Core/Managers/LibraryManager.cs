@@ -222,9 +222,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task Clear()
+        public async Task Clear(LibraryItemStatus? status)
         {
-            using (var task = new ClearLibraryTask())
+            using (var task = new ClearLibraryTask(status))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task);

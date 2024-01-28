@@ -4,11 +4,13 @@ namespace FoxTunes
 {
     public class ClearLibraryTask : LibraryTaskBase
     {
-        public ClearLibraryTask()
+        public ClearLibraryTask(LibraryItemStatus? status)
             : base()
         {
-
+            this.Status = status;
         }
+
+        public LibraryItemStatus? Status { get; private set; }
 
         public override bool Visible
         {
@@ -27,7 +29,7 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            return this.RemoveItems(LibraryItemStatus.None);
+            return this.RemoveItems(this.Status);
         }
 
         protected override async Task OnCompleted()

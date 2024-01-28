@@ -1,12 +1,24 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class FileNameMetaDataSource : BaseComponent, IMetaDataSource
     {
+        public static MetaDataCategory Categories = MetaDataCategory.Standard;
+
+        public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
+
+        public static SemaphoreSlim Semaphore { get; private set; }
+
+        static FileNameMetaDataSource()
+        {
+            Semaphore = new SemaphoreSlim(1, 1);
+        }
+
         public FileNameMetaDataSource(IEnumerable<IFileNameMetaDataExtractor> extractors)
         {
             this.Extractors = extractors;
@@ -14,10 +26,25 @@ namespace FoxTunes
 
         public IEnumerable<IFileNameMetaDataExtractor> Extractors { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement LooseImages { get; private set; }
+
+        public BooleanConfigurationElement CopyImages { get; private set; }
+
         public IArtworkProvider ArtworkProvider { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Configuration = core.Components.Configuration;
+            this.LooseImages = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_LOOSE_IMAGES
+            );
+            this.CopyImages = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.COPY_IMAGES_ELEMENT
+            );
             this.ArtworkProvider = core.Components.ArtworkProvider;
             base.InitializeComponent(core);
         }
@@ -43,10 +70,24 @@ namespace FoxTunes
                 }
                 break;
             }
-            var metaDataItem = await this.ArtworkProvider.Find(fileName, ArtworkType.FrontCover);
-            if (metaDataItem != null)
+            if (this.LooseImages.Value)
             {
-                result.Add(metaDataItem);
+                foreach (var type in new[] { ArtworkType.FrontCover, ArtworkType.BackCover })
+                {
+                    if (!ArtworkTypes.HasFlag(type))
+                    {
+                        continue;
+                    }
+                    var metaDataItem = await this.ArtworkProvider.Find(fileName, type);
+                    if (metaDataItem != null)
+                    {
+                        if (this.CopyImages.Value)
+                        {
+                            metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false);
+                        }
+                        result.Add(metaDataItem);
+                    }
+                }
             }
             return result;
         }
@@ -57,6 +98,32 @@ namespace FoxTunes
             {
                 Value = value
             };
+        }
+
+        private async Task<string> ImportImage(string fileName, string id, bool overwrite)
+        {
+            var prefix = this.GetType().Name;
+            var result = default(string);
+            if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
+            {
+#if NET40
+                Semaphore.Wait();
+#else
+                await Semaphore.WaitAsync();
+#endif
+                try
+                {
+                    if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
+                    {
+                        return await FileMetaDataStore.WriteAsync(prefix, id, fileName);
+                    }
+                }
+                finally
+                {
+                    Semaphore.Release();
+                }
+            }
+            return result;
         }
 
         public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems)
