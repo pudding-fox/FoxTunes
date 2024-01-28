@@ -57,7 +57,10 @@ namespace FoxTunes
         {
             private ColumnHeaderContainerStyleBehaviour()
             {
-                Windows.ActiveWindowChanged += this.OnActiveWindowChanged;
+                Windows.Registrations.AddCreated(
+                    new[] { MainWindow.ID, MiniWindow.ID },
+                    this.OnWindowCreated
+                );
             }
 
             public ColumnHeaderContainerStyleBehaviour(GridView GridView) : this()
@@ -68,7 +71,7 @@ namespace FoxTunes
 
             public GridView GridView { get; private set; }
 
-            protected virtual void OnActiveWindowChanged(object sender, EventArgs e)
+            protected virtual void OnWindowCreated(object sender, EventArgs e)
             {
                 this.Apply();
             }
@@ -79,7 +82,10 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Windows.ActiveWindowChanged -= this.OnActiveWindowChanged;
+                Windows.Registrations.RemoveCreated(
+                    new[] { MainWindow.ID, MiniWindow.ID },
+                    this.OnWindowCreated
+                );
                 this.GridView.ColumnHeaderContainerStyle = this.CreateStyle(
                     GetColumnHeaderContainerStyle(this.GridView),
                     (Style)Windows.ActiveWindow.TryFindResource(typeof(GridViewColumnHeader))
@@ -88,7 +94,10 @@ namespace FoxTunes
 
             protected override void OnDisposing()
             {
-                Windows.ActiveWindowChanged -= this.OnActiveWindowChanged;
+                Windows.Registrations.RemoveCreated(
+                    new[] { MainWindow.ID, MiniWindow.ID },
+                    this.OnWindowCreated
+                );
                 base.OnDisposing();
             }
         }

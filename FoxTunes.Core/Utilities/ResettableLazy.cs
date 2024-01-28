@@ -14,6 +14,18 @@ namespace FoxTunes
 
         public Lazy<T> Lazy { get; private set; }
 
+        public bool IsValueCreated
+        {
+            get
+            {
+                if (this.Lazy == null)
+                {
+                    return false;
+                }
+                return this.Lazy.IsValueCreated;
+            }
+        }
+
         public T Value
         {
             get

@@ -15,13 +15,7 @@ namespace FoxTunes
     {
         const int STARTUP_LOCATION_OFFSET = 90;
 
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
+        public const string ID = "5AB7D852-198E-465C-BA26-11237E1A6B2A";
 
         public ReportWindow()
         {
@@ -59,7 +53,7 @@ namespace FoxTunes
         {
             get
             {
-                return "5AB7D852-198E-465C-BA26-11237E1A6B2A";
+                return ID;
             }
         }
 
@@ -88,7 +82,7 @@ namespace FoxTunes
                 foreach (var viewModel in this.ViewModels)
                 {
                     viewModel.Source = value;
-                }                
+                }
             }
         }
 

@@ -14,7 +14,7 @@
     <UserControl.IsEnabled>
         <Binding Mode="OneWay" Path="Available" Source="{StaticResource ViewModel}"/>
     </UserControl.IsEnabled>
-    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding TempoVisible, Source={StaticResource ViewModel}}">
+    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding WindowState.Visible, Source={StaticResource ViewModel}}">
         <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="24" Height="24">
             <Canvas Width="24" Height="32">
                 <Path Stroke="{DynamicResource TextBrush}" StrokeThickness="2">

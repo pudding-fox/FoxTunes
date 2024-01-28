@@ -10,9 +10,10 @@ namespace FoxTunes.ViewModel
     {
         public Tempo()
         {
-            Windows.TempoWindowCreated += this.OnTempoWindowCreated;
-            Windows.TempoWindowClosed += this.OnTempoWindowClosed;
+            this.WindowState = new WindowState(TempoWindow.ID);
         }
+
+        public WindowState WindowState { get; private set; }
 
         public bool Available
         {
@@ -340,16 +341,6 @@ namespace FoxTunes.ViewModel
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnTempoWindowCreated(object sender, EventArgs e)
-        {
-            this.OnTempoVisibleChanged();
-        }
-
-        protected virtual void OnTempoWindowClosed(object sender, EventArgs e)
-        {
-            this.OnTempoVisibleChanged();
-        }
-
         protected virtual void OnAvailableChanged(object sender, EventArgs e)
         {
             this.Dispatch(this.Refresh);
@@ -393,60 +384,6 @@ namespace FoxTunes.ViewModel
             });
         }
 
-        public bool TempoVisible
-        {
-            get
-            {
-                return Windows.IsTempoWindowCreated;
-            }
-            set
-            {
-                if (value)
-                {
-                    Windows.TempoWindow.Show();
-                }
-                else if (Windows.IsTempoWindowCreated)
-                {
-                    Windows.TempoWindow.Close();
-                }
-            }
-        }
-
-        protected virtual void OnTempoVisibleChanged()
-        {
-            if (this.TempoVisibleChanged != null)
-            {
-                this.TempoVisibleChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("TempoVisible");
-        }
-
-        public event EventHandler TempoVisibleChanged;
-
-        public ICommand ShowCommand
-        {
-            get
-            {
-                return new Command(() => this.TempoVisible = true);
-            }
-        }
-
-        public ICommand HideCommand
-        {
-            get
-            {
-                return new Command(() => this.TempoVisible = false);
-            }
-        }
-
-        public ICommand ToggleCommand
-        {
-            get
-            {
-                return new Command(() => this.TempoVisible = !this.TempoVisible);
-            }
-        }
-
         public ICommand ResetCommand
         {
             get
@@ -464,8 +401,6 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            Windows.TempoWindowCreated -= this.OnTempoWindowCreated;
-            Windows.TempoWindowClosed -= this.OnTempoWindowClosed;
             if (this.Effects != null && this.Effects.Tempo != null)
             {
                 this.Effects.Tempo.AvailableChanged -= this.OnAvailableChanged;

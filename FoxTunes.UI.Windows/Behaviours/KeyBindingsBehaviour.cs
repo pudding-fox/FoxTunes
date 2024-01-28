@@ -58,8 +58,10 @@ namespace FoxTunes
             this._Playback = new global::FoxTunes.ViewModel.Playback(false);
             this._Settings = new global::FoxTunes.ViewModel.Settings();
             this._MiniPlayer = new global::FoxTunes.ViewModel.MiniPlayer();
-            Windows.MainWindowCreated += this.OnWindowCreated;
-            Windows.MiniWindowCreated += this.OnWindowCreated;
+            Windows.Registrations.AddCreated(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowCreated
+            );
             this.PlaybackManager = core.Managers.Playback;
             this.PlaylistManager = core.Managers.Playlist;
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -101,8 +103,15 @@ namespace FoxTunes
                 }
                 element.ValueChanged += this.OnValueChanged;
             }
-            this.Update();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnWindowCreated(object sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                this.Update(window);
+            }
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -110,25 +119,11 @@ namespace FoxTunes
             this.Update();
         }
 
-        protected virtual void OnWindowCreated(object sender, EventArgs e)
-        {
-            var window = sender as Window;
-            if (window == null)
-            {
-                return;
-            }
-            this.Update(window);
-        }
-
         protected virtual void Update()
         {
-            if (Windows.IsMainWindowCreated)
+            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
             {
-                this.Update(Windows.MainWindow);
-            }
-            if (Windows.IsMiniWindowCreated)
-            {
-                this.Update(Windows.MiniWindow);
+                this.Update(window);
             }
         }
 
@@ -173,6 +168,7 @@ namespace FoxTunes
             {
                 var gesture = new KeyGesture(key, modifiers);
                 window.InputBindings.Add(new InputBinding(command, gesture));
+                Logger.Write(this, LogLevel.Debug, "AddCommandBinding: {0}/{1} => {2}", window.GetType().Name, window.Title, keys);
             }
             else
             {
@@ -182,19 +178,17 @@ namespace FoxTunes
 
         protected virtual void RemoveCommandBindings()
         {
-            if (Windows.IsMainWindowCreated)
+            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
             {
-                this.RemoveCommandBindings(Windows.MainWindow);
-            }
-            if (Windows.IsMiniWindowCreated)
-            {
-                this.RemoveCommandBindings(Windows.MiniWindow);
+                this.RemoveCommandBindings(window);
             }
         }
 
         protected virtual void RemoveCommandBindings(Window window)
         {
+            //TODO: We should only remove command bindings that *we* created.
             window.CommandBindings.Clear();
+            Logger.Write(this, LogLevel.Debug, "RemoveCommandBindings: {0}/{1}", window.GetType().Name, window.Title);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -222,8 +216,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            Windows.MainWindowCreated -= this.OnWindowCreated;
-            Windows.MiniWindowCreated -= this.OnWindowCreated;
+            Windows.Registrations.RemoveCreated(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowCreated
+            );
             foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.MiniPlayer, this.Search })
             {
                 if (element == null)

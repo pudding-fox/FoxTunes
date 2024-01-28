@@ -112,18 +112,17 @@ namespace FoxTunes
 
         protected virtual void AddWindowHooks()
         {
-            Windows.MainWindowCreated += this.OnWindowCreated;
-            Windows.MainWindowClosed += this.OnWindowClosed;
-            Windows.MiniWindowCreated += this.OnWindowCreated;
-            Windows.MiniWindowClosed += this.OnWindowClosed;
-            Logger.Write(this, LogLevel.Debug, "Registered window events.");
-            if (Windows.IsMainWindowCreated)
+            Windows.Registrations.AddCreated(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowCreated
+            );
+            Windows.Registrations.AddClosed(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowClosed
+            );
+            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
             {
-                this.AddWindowHooks(Windows.MainWindow);
-            }
-            if (Windows.IsMiniWindowCreated)
-            {
-                this.AddWindowHooks(Windows.MiniWindow);
+                this.AddWindowHooks(window);
             }
         }
 
@@ -136,18 +135,17 @@ namespace FoxTunes
 
         protected virtual void RemoveWindowHooks()
         {
-            Windows.MainWindowCreated -= this.OnWindowCreated;
-            Windows.MainWindowClosed -= this.OnWindowClosed;
-            Windows.MiniWindowCreated -= this.OnWindowCreated;
-            Windows.MiniWindowClosed -= this.OnWindowClosed;
-            Logger.Write(this, LogLevel.Debug, "Unregistered window events.");
-            if (Windows.IsMainWindowCreated)
+            Windows.Registrations.RemoveCreated(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowCreated
+            );
+            Windows.Registrations.RemoveClosed(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowClosed
+            );
+            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
             {
-                this.RemoveWindowHooks(Windows.MainWindow);
-            }
-            if (Windows.IsMiniWindowCreated)
-            {
-                this.RemoveWindowHooks(Windows.MiniWindow);
+                this.RemoveWindowHooks(window);
             }
         }
 

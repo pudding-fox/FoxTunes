@@ -8,6 +8,8 @@ namespace FoxTunes
     /// </summary>
     public partial class EqualizerWindow : WindowBase
     {
+        public const string ID = "57C395DF-35A2-4EEB-B20A-5D6B11375BE1";
+
         public EqualizerWindow()
         {
             if (!global::FoxTunes.Properties.Settings.Default.EqualizerWindowBounds.IsEmpty())
@@ -29,7 +31,7 @@ namespace FoxTunes
         {
             get
             {
-                return "57C395DF-35A2-4EEB-B20A-5D6B11375BE1";
+                return ID;
             }
         }
 

@@ -10,6 +10,8 @@ namespace FoxTunes
     /// </summary>
     public partial class InputBox : WindowBase
     {
+        public const string ID = "1EC1A063-DC6A-4264-8882-0A01B8F6B80E";
+
         public InputBox()
         {
             this.InitializeComponent();
@@ -19,7 +21,7 @@ namespace FoxTunes
         {
             get
             {
-                return "1EC1A063-DC6A-4264-8882-0A01B8F6B80E";
+                return ID;
             }
         }
 
@@ -57,26 +59,25 @@ namespace FoxTunes
 
         public static string ShowDialog(string prompt, string value, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None)
         {
-            var instance = new InputBox()
+            var registration = default(Windows.WindowRegistration);
+            if (Windows.Registrations.TryGet(ID, out registration))
             {
-                Owner = Windows.ActiveWindow
-            };
-
-            var viewModel = instance.TryFindResource("ViewModel") as global::FoxTunes.ViewModel.InputBox;
-            if (viewModel != null)
-            {
-                viewModel.Prompt = prompt;
-                viewModel.Flags = flags;
-                if (!string.IsNullOrEmpty(value) && viewModel.Result != null)
+                var instance = registration.GetInstance();
+                var viewModel = instance.TryFindResource("ViewModel") as global::FoxTunes.ViewModel.InputBox;
+                if (viewModel != null)
                 {
-                    viewModel.Result.SetResult(value);
-                }
-                if (instance.ShowDialog().GetValueOrDefault())
-                {
-                    return viewModel.Result.GetResult();
+                    viewModel.Prompt = prompt;
+                    viewModel.Flags = flags;
+                    if (!string.IsNullOrEmpty(value) && viewModel.Result != null)
+                    {
+                        viewModel.Result.SetResult(value);
+                    }
+                    if (instance.ShowDialog().GetValueOrDefault())
+                    {
+                        return viewModel.Result.GetResult();
+                    }
                 }
             }
-
             return null;
         }
     }

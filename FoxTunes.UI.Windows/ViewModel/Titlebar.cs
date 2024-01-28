@@ -111,7 +111,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler TitleChanged;
 
-        public WindowState WindowState
+        public global::System.Windows.WindowState WindowState
         {
             get
             {
@@ -119,7 +119,7 @@ namespace FoxTunes.ViewModel
                 {
                     return this.Window.WindowState;
                 }
-                return WindowState.Normal;
+                return global::System.Windows.WindowState.Normal;
             }
             set
             {
@@ -152,7 +152,7 @@ namespace FoxTunes.ViewModel
 
         public void Minimize()
         {
-            this.WindowState = WindowState.Minimized;
+            this.WindowState = global::System.Windows.WindowState.Minimized;
         }
 
         public ICommand MaximizeRestoreCommand
@@ -167,11 +167,11 @@ namespace FoxTunes.ViewModel
         {
             switch (this.WindowState)
             {
-                case WindowState.Normal:
-                    this.WindowState = WindowState.Maximized;
+                case global::System.Windows.WindowState.Normal:
+                    this.WindowState = global::System.Windows.WindowState.Maximized;
                     break;
-                case WindowState.Maximized:
-                    this.WindowState = WindowState.Normal;
+                case global::System.Windows.WindowState.Maximized:
+                    this.WindowState = global::System.Windows.WindowState.Normal;
                     break;
             }
         }

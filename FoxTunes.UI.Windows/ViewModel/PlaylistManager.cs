@@ -12,6 +12,13 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistManager : ViewModelBase
     {
+        public PlaylistManager()
+        {
+            this.WindowState = new WindowState(PlaylistManagerWindow.ID);
+        }
+
+        public WindowState WindowState { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
@@ -123,17 +130,17 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return Windows.IsPlaylistManagerWindowCreated;
+                return Windows.Registrations.IsVisible(PlaylistManagerWindow.ID);
             }
             set
             {
                 if (value)
                 {
-                    Windows.PlaylistManagerWindow.Show();
+                    Windows.Registrations.Show(PlaylistManagerWindow.ID);
                 }
-                else if (Windows.IsPlaylistManagerWindowCreated)
+                else
                 {
-                    Windows.PlaylistManagerWindow.Close();
+                    Windows.Registrations.Hide(PlaylistManagerWindow.ID);
                 }
             }
         }
@@ -225,30 +232,6 @@ namespace FoxTunes.ViewModel
         public void Cancel()
         {
             this.Dispatch(this.Refresh);
-        }
-
-        public ICommand ShowCommand
-        {
-            get
-            {
-                return new Command(() => this.PlaylistManagerVisible = true);
-            }
-        }
-
-        public ICommand HideCommand
-        {
-            get
-            {
-                return new Command(() => this.PlaylistManagerVisible = false);
-            }
-        }
-
-        public ICommand ToggleCommand
-        {
-            get
-            {
-                return new Command(() => this.PlaylistManagerVisible = !this.PlaylistManagerVisible);
-            }
         }
 
         protected override void OnDisposing()

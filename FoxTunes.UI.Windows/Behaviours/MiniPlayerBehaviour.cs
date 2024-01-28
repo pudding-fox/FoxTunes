@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace FoxTunes
 {
@@ -31,21 +30,12 @@ namespace FoxTunes
 
         public BooleanConfigurationElement ShowPlaylist { get; private set; }
 
-        public DoubleConfigurationElement ScalingFactor { get; private set; }
-
         protected virtual Task Enable()
         {
             return Windows.Invoke(() =>
             {
-                if (Windows.IsMainWindowCreated)
-                {
-                    Windows.MainWindow.Hide();
-                }
-                Windows.MiniWindow.Topmost = this.Topmost.Value;
-                Windows.MiniWindow.Show();
-                Windows.MiniWindow.BringToFront();
-                Windows.MiniWindow.Focus();
-                Windows.ActiveWindow = Windows.MiniWindow;
+                Windows.Registrations.Hide(MainWindow.ID);
+                Windows.Registrations.Show(MiniWindow.ID);
             });
         }
 
@@ -53,14 +43,8 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (Windows.IsMiniWindowCreated)
-                {
-                    Windows.MiniWindow.Hide();
-                }
-                Windows.MainWindow.Show();
-                Windows.MainWindow.BringToFront();
-                Windows.MainWindow.Focus();
-                Windows.ActiveWindow = Windows.MainWindow;
+                Windows.Registrations.Hide(MiniWindow.ID);
+                Windows.Registrations.Show(MainWindow.ID);
             });
         }
 
@@ -69,17 +53,6 @@ namespace FoxTunes
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.Core = core;
             this.Configuration = core.Components.Configuration;
-            this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.SECTION,
-                MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
-            );
-            this.Topmost.ConnectValue(value =>
-            {
-                if (Windows.IsMiniWindowCreated)
-                {
-                    Windows.Invoke(() => Windows.MiniWindow.Topmost = value);
-                }
-            });
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
@@ -103,6 +76,10 @@ namespace FoxTunes
                     this.Configuration.Save();
                 }
             });
+            this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MiniPlayerBehaviourConfiguration.SECTION,
+                MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
+            );
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.SHOW_ARTWORK_ELEMENT
@@ -111,24 +88,6 @@ namespace FoxTunes
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.SHOW_PLAYLIST_ELEMENT
             );
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
-            if (this.ScalingFactor != null)
-            {
-                this.ScalingFactor.ConnectValue(value =>
-                {
-                    if (this.IsInitialized && Windows.IsMiniWindowCreated && Windows.MiniWindow.SizeToContent == SizeToContent.WidthAndHeight)
-                    {
-                        //Auto size goes to shit when the scaling factor is changed.
-                        Windows.MiniWindow.SizeToContent = SizeToContent.Manual;
-                        Windows.MiniWindow.Width = 0;
-                        Windows.MiniWindow.Height = 0;
-                        Windows.MiniWindow.SizeToContent = SizeToContent.WidthAndHeight;
-                    }
-                });
-            }
             base.InitializeComponent(core);
         }
 

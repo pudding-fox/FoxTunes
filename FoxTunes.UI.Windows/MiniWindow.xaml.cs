@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FoxTunes
@@ -9,6 +10,10 @@ namespace FoxTunes
     /// </summary>
     public partial class MiniWindow : WindowBase
     {
+        public const string ID = "95FA900C-2B6C-4571-B119-D24834E2FC22";
+
+        public const UserInterfaceWindowRole ROLE = UserInterfaceWindowRole.Main;
+
         public MiniWindow()
         {
             if (!global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.IsEmpty())
@@ -26,7 +31,7 @@ namespace FoxTunes
         {
             get
             {
-                return "95FA900C-2B6C-4571-B119-D24834E2FC22";
+                return ID;
             }
         }
 
@@ -34,7 +39,7 @@ namespace FoxTunes
         {
             get
             {
-                return UserInterfaceWindowRole.Main;
+                return ROLE;
             }
         }
 

@@ -323,6 +323,17 @@ namespace FoxTunes
             return true;
         }
 
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> sequence, TKey key, TValue value)
+        {
+            var current = default(TValue);
+            if (sequence.TryGetValue(key, out current))
+            {
+                return current;
+            }
+            sequence.Add(key, value);
+            return value;
+        }
+
         public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> sequence, TKey key, Func<TValue> factory)
         {
             var value = default(TValue);

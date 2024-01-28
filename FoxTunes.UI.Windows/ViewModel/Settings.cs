@@ -7,30 +7,23 @@ namespace FoxTunes.ViewModel
 {
     public class Settings : ViewModelBase
     {
-        public Settings()
-        {
-            Windows.SettingsWindowCreated += this.OnSettingsWindowCreated;
-            Windows.SettingsWindowClosed += this.OnSettingsWindowClosed;
-        }
-
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public bool SettingsVisible
         {
             get
             {
-                return Windows.IsSettingsWindowCreated;
+                return Windows.Registrations.IsVisible(SettingsWindow.ID);
             }
             set
             {
                 if (value)
                 {
-                    this.SignalEmitter.Send(new Signal(this, CommonSignals.SettingsUpdated));
-                    Windows.SettingsWindow.Show();
+                    Windows.Registrations.Show(SettingsWindow.ID);
                 }
-                else if (Windows.IsSettingsWindowCreated)
+                else
                 {
-                    Windows.SettingsWindow.Close();
+                    Windows.Registrations.Hide(SettingsWindow.ID);
                 }
             }
         }
@@ -72,24 +65,26 @@ namespace FoxTunes.ViewModel
 
         protected override void InitializeComponent(ICore core)
         {
+            Windows.Registrations.AddCreated(SettingsWindow.ID, this.OnWindowCreated);
+            Windows.Registrations.AddClosed(SettingsWindow.ID, this.OnWindowClosed);
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnSettingsWindowCreated(object sender, EventArgs e)
+        protected virtual void OnWindowCreated(object sender, EventArgs e)
         {
             this.OnSettingsVisibleChanged();
         }
 
-        protected virtual void OnSettingsWindowClosed(object sender, EventArgs e)
+        protected virtual void OnWindowClosed(object sender, EventArgs e)
         {
             this.OnSettingsVisibleChanged();
         }
 
         protected override void OnDisposing()
         {
-            Windows.SettingsWindowCreated -= this.OnSettingsWindowCreated;
-            Windows.SettingsWindowClosed -= this.OnSettingsWindowClosed;
+            Windows.Registrations.RemoveCreated(SettingsWindow.ID, this.OnWindowCreated);
+            Windows.Registrations.RemoveClosed(SettingsWindow.ID, this.OnWindowClosed);
             base.OnDisposing();
         }
 

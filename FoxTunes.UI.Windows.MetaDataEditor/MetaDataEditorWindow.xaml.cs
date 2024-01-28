@@ -14,13 +14,7 @@ namespace FoxTunes
     {
         const int STARTUP_LOCATION_OFFSET = 90;
 
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
+        public const string ID = "82C7DF3A-5DD4-463D-B53C-A38DC1B9FF69";
 
         public MetaDataEditorWindow()
         {
@@ -58,7 +52,7 @@ namespace FoxTunes
         {
             get
             {
-                return "82C7DF3A-5DD4-463D-B53C-A38DC1B9FF69";
+                return ID;
             }
         }
 

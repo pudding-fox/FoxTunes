@@ -19,6 +19,18 @@ namespace FoxTunes
             typeof(global::System.Windows.Interactivity.Interaction)
         };
 
+        static WindowsUserInterface()
+        {
+            //Main windows.
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(MainWindow.ID, MainWindow.ROLE, () => new MainWindow()));
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(MiniWindow.ID, MiniWindow.ROLE, () => new MiniWindow()));
+            //Common dialogs.
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(EqualizerWindow.ID, UserInterfaceWindowRole.None, () => new EqualizerWindow()));
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(PlaylistManagerWindow.ID, UserInterfaceWindowRole.None, () => new PlaylistManagerWindow()));
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(SettingsWindow.ID, UserInterfaceWindowRole.None, () => new SettingsWindow()));
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(TempoWindow.ID, UserInterfaceWindowRole.None, () => new TempoWindow()));
+        }
+
         public WindowsUserInterface()
         {
             this.Application = new Application();
@@ -74,14 +86,19 @@ namespace FoxTunes
 
         public override Task Show()
         {
-            if (global::FoxTunes.Windows.IsMiniWindowCreated)
+            var registrations = global::FoxTunes.Windows.Registrations.RegistrationsByRole(UserInterfaceWindowRole.Main);
+            foreach (var registration in registrations)
             {
-                this.Application.Run(global::FoxTunes.Windows.MiniWindow);
+                var window = default(Window);
+                if (registration.TryGetInstance(out window))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Found window instance with role {0}, running.", Enum.GetName(typeof(UserInterfaceWindowRole), UserInterfaceWindowRole.Main));
+                    this.Application.Run(window);
+                    goto done;
+                }
             }
-            else
-            {
-                this.Application.Run(global::FoxTunes.Windows.MainWindow);
-            }
+            this.Application.Run(global::FoxTunes.Windows.Registrations.Show(MainWindow.ID));
+        done:
             return global::FoxTunes.Windows.Shutdown();
         }
 

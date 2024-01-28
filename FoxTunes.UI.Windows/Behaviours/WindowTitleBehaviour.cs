@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -46,6 +47,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            Windows.Registrations.AddCreated(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowCreated
+            );
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
@@ -55,10 +60,16 @@ namespace FoxTunes
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowTitleBehaviourConfiguration.WINDOW_TITLE_SCRIPT_ELEMENT
             ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
-            Windows.MainWindowCreated += this.OnWindowCreated;
-            Windows.SettingsWindowCreated += this.OnWindowCreated;
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnWindowCreated(object sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                var task = this.Refresh(window);
+            }
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -67,12 +78,19 @@ namespace FoxTunes
             this.Dispatch(this.Refresh);
         }
 
-        protected virtual void OnWindowCreated(object sender, EventArgs e)
+        protected virtual Task Refresh()
         {
-            this.Dispatch(this.Refresh);
+            var title = this.GetWindowTitle();
+            return Windows.Invoke(() => this.SetWindowTitle(title));
         }
 
-        protected virtual Task Refresh()
+        protected virtual Task Refresh(Window window)
+        {
+            var title = this.GetWindowTitle();
+            return Windows.Invoke(() => this.SetWindowTitle(window, title));
+        }
+
+        protected virtual string GetWindowTitle()
         {
             var outputStream = this.PlaybackManager.CurrentStream;
             var runner = new PlaylistItemScriptRunner(
@@ -81,20 +99,20 @@ namespace FoxTunes
                 this.Script
             );
             runner.Prepare();
-            var value = Convert.ToString(runner.Run());
-            return Windows.Invoke(() => this.SetWindowTitle(value));
+            return Convert.ToString(runner.Run());
         }
 
         protected virtual void SetWindowTitle(string title)
         {
-            if (Windows.IsMainWindowCreated)
+            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
             {
-                Windows.MainWindow.Title = title;
+                this.SetWindowTitle(window, title);
             }
-            if (Windows.IsMiniWindowCreated)
-            {
-                Windows.MiniWindow.Title = title;
-            }
+        }
+
+        protected virtual void SetWindowTitle(Window window, string title)
+        {
+            window.Title = title;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -122,6 +140,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            Windows.Registrations.RemoveCreated(
+                new[] { MainWindow.ID, MiniWindow.ID },
+                this.OnWindowCreated
+            );
             if (this.PlaybackManager != null)
             {
                 this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
@@ -130,8 +152,6 @@ namespace FoxTunes
             {
                 this.ScriptingContext.Dispose();
             }
-            Windows.MainWindowCreated -= this.OnWindowCreated;
-            Windows.SettingsWindowCreated -= this.OnWindowCreated;
         }
 
         ~WindowTitleBehaviour()

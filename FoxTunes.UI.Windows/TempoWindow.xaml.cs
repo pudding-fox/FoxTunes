@@ -8,6 +8,8 @@ namespace FoxTunes
     /// </summary>
     public partial class TempoWindow : WindowBase
     {
+        public const string ID = "82AD2BC9-AFE3-4A79-A7D4-D2CE2A88F256";
+
         public TempoWindow()
         {
             if (!global::FoxTunes.Properties.Settings.Default.TempoWindowBounds.IsEmpty())
@@ -29,7 +31,7 @@ namespace FoxTunes
         {
             get
             {
-                return "82AD2BC9-AFE3-4A79-A7D4-D2CE2A88F256";
+                return ID;
             }
         }
 

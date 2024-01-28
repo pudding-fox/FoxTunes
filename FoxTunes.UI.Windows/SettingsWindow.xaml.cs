@@ -9,6 +9,8 @@ namespace FoxTunes
     /// </summary>
     public partial class SettingsWindow : WindowBase
     {
+        public const string ID = "35A7051F-AF3D-48D8-96B3-A63E1D17437E";
+
         public SettingsWindow()
         {
             if (!global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.IsEmpty())
@@ -37,7 +39,7 @@ namespace FoxTunes
         {
             get
             {
-                return "35A7051F-AF3D-48D8-96B3-A63E1D17437E";
+                return ID;
             }
         }
 
