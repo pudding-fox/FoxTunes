@@ -391,7 +391,7 @@ namespace FoxTunes
                 if (this.OutputChannel.CanPlay(outputStream))
                 {
                     Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
-                    if (!this.OutputChannel.Contains(outputStream))
+                    if (!this.OutputChannel.QueueContains(outputStream))
                     {
                         this.OutputChannel.Enqueue(outputStream);
                     }
