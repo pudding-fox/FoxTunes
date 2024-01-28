@@ -36,6 +36,15 @@ namespace FoxTunes
 
         protected virtual void DragSourceInitialized(object sender, ListBoxExtensions.DragSourceInitializedEventArgs e)
         {
+            var viewModel = this.FindResource<global::FoxTunes.ViewModel.LibraryBrowser>("ViewModel");
+            if (viewModel != null)
+            {
+                if (!viewModel.SelectedItem.IsMetaDatasLoaded)
+                {
+                    viewModel.SelectedItem.LoadMetaDatas();
+                }
+                this.MouseCursorAdorner.DataContext = viewModel.SelectedItem;
+            }
             this.MouseCursorAdorner.Show();
             try
             {
