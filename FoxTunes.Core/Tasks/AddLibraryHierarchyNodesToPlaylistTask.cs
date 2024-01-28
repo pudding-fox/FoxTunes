@@ -2,7 +2,6 @@
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -69,8 +68,8 @@ namespace FoxTunes
 
         private async Task AddPlaylistItems()
         {
-            await this.SetName("Creating playlist").ConfigureAwait(false);
-            await this.SetCount(this.LibraryHierarchyNodes.Count()).ConfigureAwait(false);
+            this.Name = "Creating playlist";
+            this.Count = this.LibraryHierarchyNodes.Count();
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
@@ -82,9 +81,9 @@ namespace FoxTunes
                         {
                             break;
                         }
-                        await this.SetDescription(libraryHierarchyNode.Value).ConfigureAwait(false);
+                        this.Description = libraryHierarchyNode.Value;
                         await this.AddPlaylistItems(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist(this.LibraryHierarchyBrowser.Filter), libraryHierarchyNode, transaction).ConfigureAwait(false);
-                        await this.SetPosition(++position).ConfigureAwait(false);
+                        this.Position = ++position;
                     }
                     if (transaction.HasTransaction)
                     {

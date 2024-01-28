@@ -33,8 +33,8 @@ namespace FoxTunes
         {
             if (this.ReportProgress)
             {
-                await this.SetName("Populating library").ConfigureAwait(false);
-                await this.SetPosition(0).ConfigureAwait(false);
+                this.Name = "Populating library";
+                this.Position = 0;
                 this.Timer.Interval = FAST_INTERVAL;
                 this.Timer.Start();
             }
@@ -99,17 +99,17 @@ namespace FoxTunes
             }
         }
 
-        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
             var position = Interlocked.Exchange(ref this.position, 0);
             if (position != 0)
             {
                 //Interval is fixed at 100ms.
                 position *= 10;
-                await this.SetName(string.Format("Populating library: {0} items/s", this.CountMetric.Average(position))).ConfigureAwait(false);
+                this.Name = string.Format("Populating library: {0} items/s", this.CountMetric.Average(position));
                 if (this.Current != null)
                 {
-                    await this.SetDescription(Path.GetFileName(this.Current)).ConfigureAwait(false);
+                    this.Description = Path.GetFileName(this.Current);
                 }
             }
             base.OnElapsed(sender, e);

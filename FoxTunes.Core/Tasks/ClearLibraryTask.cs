@@ -22,8 +22,8 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Clearing library").ConfigureAwait(false);
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.Name = "Clearing library";
+            this.IsIndeterminate = true;
             await base.OnStarted().ConfigureAwait(false);
         }
 

@@ -109,11 +109,11 @@ namespace FoxTunes
             }
         }
 
-        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
             if (this.Current != null)
             {
-                await this.SetDescription(Path.GetFileName(this.Current)).ConfigureAwait(false);
+                this.Description = Path.GetFileName(this.Current);
             }
             base.OnElapsed(sender, e);
         }

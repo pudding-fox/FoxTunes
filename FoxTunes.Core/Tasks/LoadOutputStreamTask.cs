@@ -48,9 +48,9 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Buffering").ConfigureAwait(false);
-            await this.SetDescription(this.PlaylistItem.FileName.GetName()).ConfigureAwait(false);
-            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            this.Name = "Buffering";
+            this.Description = this.PlaylistItem.FileName.GetName();
+            this.IsIndeterminate = true;
             await base.OnStarted().ConfigureAwait(false);
         }
 

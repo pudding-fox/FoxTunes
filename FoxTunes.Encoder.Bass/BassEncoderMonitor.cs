@@ -44,14 +44,14 @@ namespace FoxTunes
 
         protected virtual async Task Monitor(Task task)
         {
-            await this.SetName("Converting files").ConfigureAwait(false);
+            this.Name = "Converting files";
             while (!task.IsCompleted)
             {
                 if (this.CancellationToken.IsCancellationRequested)
                 {
                     Logger.Write(this, LogLevel.Debug, "Requesting cancellation from encoder.");
                     this.Encoder.Cancel();
-                    await this.SetName("Cancelling").ConfigureAwait(false);
+                    this.Name = "Cancelling";
                     break;
                 }
                 this.Encoder.Update();
@@ -74,14 +74,14 @@ namespace FoxTunes
                 }
                 if (builder.Length > 0)
                 {
-                    await this.SetDescription(builder.ToString()).ConfigureAwait(false);
+                    this.Description = builder.ToString();
                 }
                 else
                 {
-                    await this.SetDescription("Waiting for encoder").ConfigureAwait(false);
+                    this.Description = "Waiting for encoder";
                 }
-                await this.SetPosition(position).ConfigureAwait(false);
-                await this.SetCount(count).ConfigureAwait(false);
+                this.Position = position;
+                this.Count = count;
 #if NET40
                 await TaskEx.Delay(INTERVAL).ConfigureAwait(false);
 #else

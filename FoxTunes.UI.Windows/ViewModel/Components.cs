@@ -79,22 +79,19 @@ namespace FoxTunes.ViewModel
             e.BackgroundTask.Faulted += this.OnFaulted;
         }
 
-        protected virtual async void OnFaulted(object sender, AsyncEventArgs e)
+        protected virtual async void OnFaulted(object sender, EventArgs e)
         {
-            using (e.Defer())
+            var backgroundTask = sender as IBackgroundTask;
+            if (backgroundTask.Exception is AggregateException)
             {
-                var backgroundTask = sender as IBackgroundTask;
-                if (backgroundTask.Exception is AggregateException)
+                foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
                 {
-                    foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
-                    {
-                        await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException)).ConfigureAwait(false);
-                    }
+                    await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException)).ConfigureAwait(false);
                 }
-                else
-                {
-                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Exception.Message, backgroundTask.Exception)).ConfigureAwait(false);
-                }
+            }
+            else
+            {
+                await this.Add(new ComponentError(backgroundTask, backgroundTask.Exception.Message, backgroundTask.Exception)).ConfigureAwait(false);
             }
         }
 

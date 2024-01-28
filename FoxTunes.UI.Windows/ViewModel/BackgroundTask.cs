@@ -30,19 +30,16 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnNameChanged(object sender, AsyncEventArgs e)
+        protected virtual async void OnNameChanged(object sender, EventArgs e)
         {
-            using (e.Defer())
+            await Windows.Invoke(() =>
             {
-                await Windows.Invoke(() =>
+                if (this.NameChanged != null)
                 {
-                    if (this.NameChanged != null)
-                    {
-                        this.NameChanged(sender, e);
-                    }
-                    this.OnPropertyChanged("Name");
-                }).ConfigureAwait(false);
-            }
+                    this.NameChanged(sender, e);
+                }
+                this.OnPropertyChanged("Name");
+            }).ConfigureAwait(false);
         }
 
         public event EventHandler NameChanged;
@@ -55,19 +52,16 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnDescriptionChanged(object sender, AsyncEventArgs e)
+        protected virtual async void OnDescriptionChanged(object sender, EventArgs e)
         {
-            using (e.Defer())
+            await Windows.Invoke(() =>
             {
-                await Windows.Invoke(() =>
+                if (this.DescriptionChanged != null)
                 {
-                    if (this.DescriptionChanged != null)
-                    {
-                        this.DescriptionChanged(sender, e);
-                    }
-                    this.OnPropertyChanged("Description");
-                }).ConfigureAwait(false);
-            }
+                    this.DescriptionChanged(sender, e);
+                }
+                this.OnPropertyChanged("Description");
+            }).ConfigureAwait(false);
         }
 
         public event EventHandler DescriptionChanged;
@@ -80,19 +74,16 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnPositionChanged(object sender, AsyncEventArgs e)
+        protected virtual async void OnPositionChanged(object sender, EventArgs e)
         {
-            using (e.Defer())
+            await Windows.Invoke(() =>
             {
-                await Windows.Invoke(() =>
+                if (this.PositionChanged != null)
                 {
-                    if (this.PositionChanged != null)
-                    {
-                        this.PositionChanged(sender, e);
-                    }
-                    this.OnPropertyChanged("Position");
-                }).ConfigureAwait(false);
-            }
+                    this.PositionChanged(sender, e);
+                }
+                this.OnPropertyChanged("Position");
+            }).ConfigureAwait(false);
         }
 
         public event EventHandler PositionChanged;
@@ -105,19 +96,16 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnCountChanged(object sender, AsyncEventArgs e)
+        protected virtual async void OnCountChanged(object sender, EventArgs e)
         {
-            using (e.Defer())
+            await Windows.Invoke(() =>
             {
-                await Windows.Invoke(() =>
+                if (this.CountChanged != null)
                 {
-                    if (this.CountChanged != null)
-                    {
-                        this.CountChanged(sender, e);
-                    }
-                    this.OnPropertyChanged("Count");
-                }).ConfigureAwait(false);
-            }
+                    this.CountChanged(sender, e);
+                }
+                this.OnPropertyChanged("Count");
+            }).ConfigureAwait(false);
         }
 
         public event EventHandler CountChanged;
@@ -130,19 +118,16 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnIsIndeterminateChanged(object sender, AsyncEventArgs e)
+        protected virtual async void OnIsIndeterminateChanged(object sender, EventArgs e)
         {
-            using (e.Defer())
+            await Windows.Invoke(() =>
             {
-                await Windows.Invoke(() =>
+                if (this.IsIndeterminateChanged != null)
                 {
-                    if (this.IsIndeterminateChanged != null)
-                    {
-                        this.IsIndeterminateChanged(sender, e);
-                    }
-                    this.OnPropertyChanged("IsIndeterminate");
-                }).ConfigureAwait(false);
-            }
+                    this.IsIndeterminateChanged(sender, e);
+                }
+                this.OnPropertyChanged("IsIndeterminate");
+            }).ConfigureAwait(false);
         }
 
         public event EventHandler IsIndeterminateChanged;

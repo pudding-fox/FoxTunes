@@ -77,15 +77,15 @@ namespace FoxTunes
 
             if (this.ReportProgress)
             {
-                await this.SetName("Updating library").ConfigureAwait(false);
-                await this.SetPosition(0).ConfigureAwait(false);
+                this.Name = "Updating library";
+                this.Position = 0;
                 if (this.Items != null && this.Items.Any())
                 {
-                    await this.SetCount(this.Items.Count()).ConfigureAwait(false);
+                    this.Count = this.Items.Count();
                 }
                 else
                 {
-                    await this.SetCount(set.Count).ConfigureAwait(false);
+                    this.Count = set.Count;
                 }
                 if (this.Count <= 100)
                 {
@@ -126,7 +126,7 @@ namespace FoxTunes
             }, cancellationToken, this.ParallelOptions).ConfigureAwait(false);
         }
 
-        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
             var count = this.position - this.Position;
             if (count != 0)
@@ -144,12 +144,12 @@ namespace FoxTunes
                     }
                 }
                 var eta = this.GetEta(count);
-                await this.SetName(string.Format("Updating library: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
+                this.Name = string.Format("Updating library: {0} remaining @ {1} items/s", eta, count);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(Path.GetFileName(this.Current.FileName)).ConfigureAwait(false);
+                    this.Description = Path.GetFileName(this.Current.FileName);
                 }
-                await this.SetPosition(this.position).ConfigureAwait(false);
+                this.Position = this.position;
             }
             base.OnElapsed(sender, e);
         }

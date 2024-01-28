@@ -1,25 +1,27 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System;
+
+namespace FoxTunes.Interfaces
 {
     public interface IReportsProgress
     {
         string Name { get; }
 
-        event AsyncEventHandler NameChanged;
+        event EventHandler NameChanged;
 
         string Description { get; }
 
-        event AsyncEventHandler DescriptionChanged;
+        event EventHandler DescriptionChanged;
 
         int Position { get; }
 
-        event AsyncEventHandler PositionChanged;
+        event EventHandler PositionChanged;
 
         int Count { get; }
 
-        event AsyncEventHandler CountChanged;
+        event EventHandler CountChanged;
 
         bool IsIndeterminate { get; }
 
-        event AsyncEventHandler IsIndeterminateChanged;
+        event EventHandler IsIndeterminateChanged;
     }
 }
