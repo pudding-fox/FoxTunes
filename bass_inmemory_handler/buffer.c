@@ -68,7 +68,7 @@ QWORD buffer_read_segment(BUFFER* buffer, QWORD position, QWORD length, DWORD* s
 			(BYTE*)buffer->segments[*segment_position].data + *segment_offset,
 			(size_t)segment_remaining
 		);
-		*segment_position++;
+		(*segment_position)++;
 		*segment_offset = 0;
 		return segment_remaining;
 	}
@@ -100,7 +100,7 @@ QWORD buffer_write_segment(BUFFER* buffer, QWORD position, QWORD length, DWORD* 
 			(BYTE*)data + position,
 			(size_t)segment_remaining
 		);
-		*segment_position++;
+		(*segment_position)++;
 		*segment_offset = 0;
 		return segment_remaining;
 	}
