@@ -218,17 +218,34 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                await this.Database.ExecuteAsync(this.Database.Queries.RemoveLibraryHierarchyItems, (parameters, phase) =>
-                {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["status"] = status;
-                            break;
-                    }
-                }, transaction).ConfigureAwait(false);
+                await RemoveHierarchies(this.Database, status, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
+        }
+
+        public static Task RemoveHierarchies(IDatabaseComponent database, LibraryItemStatus? status, ITransactionSource transaction)
+        {
+            return RemoveHierarchies(database, null, status, transaction);
+        }
+
+        public static Task RemoveHierarchies(IDatabaseComponent database, LibraryHierarchy libraryHierarchy, LibraryItemStatus? status, ITransactionSource transaction)
+        {
+            return database.ExecuteAsync(database.Queries.RemoveLibraryHierarchyItems, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        if (libraryHierarchy != null)
+                        {
+                            parameters["libraryHierarchyId"] = libraryHierarchy.Id;
+                        }
+                        if (status.HasValue)
+                        {
+                            parameters["status"] = status;
+                        }
+                        break;
+                }
+            }, transaction);
         }
 
         protected virtual async Task RemoveItems(LibraryItemStatus? status)

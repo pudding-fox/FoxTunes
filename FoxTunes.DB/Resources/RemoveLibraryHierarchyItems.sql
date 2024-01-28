@@ -1,10 +1,16 @@
 ﻿DELETE FROM [LibraryHierarchyItem_LibraryItem]
-WHERE [LibraryItem_Id] IN
-(
-	SELECT [Id] 
-	FROM [LibraryItems]
-	WHERE @status IS NULL OR [Status] = @status
-);
+WHERE (@libraryHierarchyId IS NULL OR [LibraryHierarchyItem_Id] IN
+	(
+		SELECT [Id]
+		FROM [LibraryHierarchyItems]
+		WHERE [LibraryHierarchy_Id] = @libraryHierarchyId
+	))
+	AND (@status IS NULL OR [LibraryItem_Id] IN
+	(
+		SELECT [Id] 
+		FROM [LibraryItems]
+		WHERE @status IS NULL OR [Status] = @status
+	));
 
 DELETE FROM [LibraryHierarchyItems]
 WHERE [Id] IN
