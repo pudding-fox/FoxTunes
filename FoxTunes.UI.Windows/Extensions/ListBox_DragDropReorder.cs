@@ -146,7 +146,10 @@ namespace FoxTunes
                 var position = e.GetPosition(this.ListBox);
                 if (this.ShouldInitializeDrag(e.OriginalSource, position))
                 {
-                    this.ListBox.SelectedItem = this.DragData;
+                    if (!object.ReferenceEquals(this.ListBox.SelectedItem, this.DragData))
+                    {
+                        this.ListBox.SelectedItem = this.DragData;
+                    }
                     this.DragStartPosition = default(Point);
                     this.DoDragDrop();
                 }

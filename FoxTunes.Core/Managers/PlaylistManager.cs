@@ -143,10 +143,11 @@ namespace FoxTunes
 
         protected virtual void RefreshSelectedPlaylist()
         {
-            if (this.SelectedPlaylist != null)
+            var selectedPlaylist = this.SelectedPlaylist;
+            if (selectedPlaylist != null)
             {
-                this.SelectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == this.SelectedPlaylist.Id);
-                if (this.SelectedPlaylist != null)
+                selectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == this.SelectedPlaylist.Id);
+                if (selectedPlaylist != null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Refreshed selected playlist: {0} => {1}", this.SelectedPlaylist.Id, this.SelectedPlaylist.Name);
                 }
@@ -155,18 +156,23 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Failed to refresh selected playlist, it was removed or disabled.");
                 }
             }
-            if (this.SelectedPlaylist == null)
+            if (selectedPlaylist == null)
             {
-                this.SelectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault();
-                if (this.SelectedPlaylist == null)
+                selectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault();
+                if (selectedPlaylist == null)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to select a playlist, perhaps none are enabled?");
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Debug, "Selected first playlist: {0} => {1}", this.SelectedPlaylist.Id, this.SelectedPlaylist.Name);
+                    Logger.Write(this, LogLevel.Debug, "Selected first playlist: {0} => {1}", selectedPlaylist.Id, selectedPlaylist.Name);
                 }
             }
+            if (object.ReferenceEquals(this.SelectedPlaylist, selectedPlaylist))
+            {
+                return;
+            }
+            this.SelectedPlaylist = selectedPlaylist;
         }
 
         protected virtual void RefreshCurrentPlaylist()
