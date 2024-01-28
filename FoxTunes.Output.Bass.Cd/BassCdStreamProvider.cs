@@ -3,7 +3,6 @@ using ManagedBass;
 using ManagedBass.Cd;
 using System;
 using System.Collections.Generic;
-using System.Data.Odbc;
 
 namespace FoxTunes
 {
@@ -27,10 +26,11 @@ namespace FoxTunes
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
-            if (this.Behaviour == null || !this.Behaviour.Enabled)
-            {
-                return false;
-            }
+            //The behaviour is not loaded for utilities so we can't check whether it's enabled.
+            //if (this.Behaviour == null || !this.Behaviour.Enabled)
+            //{
+            //    return false;
+            //}
             var drive = default(int);
             var id = default(string);
             var track = default(int);
