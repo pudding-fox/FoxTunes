@@ -98,11 +98,11 @@ namespace FoxTunes.ViewModel
 
         public override void Refresh()
         {
-            this.Frames = new ObservableCollection<LibraryBrowserFrame>(new[]
+            this.Synchronize(new List<LibraryBrowserFrame>(new[]
             {
                 new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-            });
-            base.Refresh();
+            }));
+            this.OnItemsChanged();
         }
 
         protected virtual void OnActiveComponentsChanged(object sender, EventArgs e)
@@ -151,12 +151,17 @@ namespace FoxTunes.ViewModel
 
         private void Up()
         {
-            var frame = this.Frames.LastOrDefault();
+            this.Up(this.Frames);
+        }
+
+        private void Up(IList<LibraryBrowserFrame> frames)
+        {
+            var frame = frames.LastOrDefault();
             if (frame == null)
             {
                 return;
             }
-            this.Frames.Remove(frame);
+            frames.Remove(frame);
             this.SelectedItem = frame.ItemsSource;
         }
 
@@ -167,7 +172,12 @@ namespace FoxTunes.ViewModel
 
         private void Down(LibraryHierarchyNode libraryHierarchyNode)
         {
-            this.Frames.Add(
+            this.Down(libraryHierarchyNode, this.Frames);
+        }
+
+        private void Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames)
+        {
+            frames.Add(
                 new LibraryBrowserFrame(
                     libraryHierarchyNode,
                     new[] { LibraryHierarchyNode.Empty }.Concat(this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode))
@@ -177,8 +187,14 @@ namespace FoxTunes.ViewModel
 
         private void Synchronize()
         {
+            this.Synchronize(this.Frames);
+        }
+
+        private void Synchronize(IList<LibraryBrowserFrame> frames)
+        {
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
+                this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames);
                 return;
             }
             var stack = new Stack<LibraryHierarchyNode>();
@@ -193,27 +209,31 @@ namespace FoxTunes.ViewModel
             while (stack.Count > 0)
             {
                 libraryHierarchyNode = stack.Pop();
-                if (position >= this.Frames.Count)
+                if (position >= frames.Count)
                 {
-                    this.Down(libraryHierarchyNode);
+                    this.Down(libraryHierarchyNode, frames);
                 }
                 else
                 {
-                    var frame = this.Frames[position];
+                    var frame = frames[position];
                     if (!frame.ItemsSource.Equals(libraryHierarchyNode))
                     {
-                        for (; position < this.Frames.Count; position++)
+                        for (; position < frames.Count; position++)
                         {
-                            this.Frames.RemoveAt(this.Frames.Count - 1);
+                            frames.RemoveAt(frames.Count - 1);
                         }
-                        this.Down(libraryHierarchyNode);
+                        this.Down(libraryHierarchyNode, frames);
                     }
                 }
                 position++;
             }
-            for (; position < this.Frames.Count; position++)
+            for (; position < frames.Count; position++)
             {
-                this.Frames.RemoveAt(this.Frames.Count - 1);
+                frames.RemoveAt(frames.Count - 1);
+            }
+            if (!object.ReferenceEquals(this.Frames, frames))
+            {
+                this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames);
             }
         }
 

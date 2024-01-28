@@ -78,7 +78,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var task = libraryHierarchyNode.LoadChildren();
+            var task = libraryHierarchyNode.LoadChildrenAsync();
         }
 
         public async Task ExpandAll(IEnumerable<LibraryHierarchyNode> sequence)
@@ -89,7 +89,7 @@ namespace FoxTunes
                 var node = stack.Pop();
                 if (!node.IsExpanded)
                 {
-                    await node.LoadChildren();
+                    await node.LoadChildrenAsync();
                     await Windows.Invoke(() => node.IsExpanded = true);
                 }
                 foreach (var child in node.Children)

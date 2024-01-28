@@ -86,7 +86,7 @@ namespace FoxTunes
             var nodes = this.LibraryHierarchyCache.GetNodes(libraryHierarchy, this.Filter, () => this.GetNodesCore(libraryHierarchy));
             if (this.LibraryManager.SelectedItem != null)
             {
-                var task = this.ApplySelection(nodes);
+                this.ApplySelection(nodes);
             }
             return nodes;
         }
@@ -161,7 +161,7 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        private async Task ApplySelection(IEnumerable<LibraryHierarchyNode> nodes)
+        private void ApplySelection(IEnumerable<LibraryHierarchyNode> nodes)
         {
             var libraryHierarchyNode = this.LibraryManager.SelectedItem;
             var stack = new Stack<LibraryHierarchyNode>(new[] { libraryHierarchyNode });
@@ -178,13 +178,13 @@ namespace FoxTunes
                     break;
                 }
                 libraryHierarchyNode = node;
-                if (libraryHierarchyNode.IsLeaf)
+                if (stack.Count == 0 || libraryHierarchyNode.IsLeaf)
                 {
                     break;
                 }
                 if (!node.IsExpanded)
                 {
-                    await node.LoadChildren();
+                    node.LoadChildren();
                     node.IsExpanded = true;
                 }
                 nodes = node.Children;

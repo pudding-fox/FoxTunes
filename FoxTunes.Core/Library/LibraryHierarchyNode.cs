@@ -196,12 +196,18 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public virtual Task LoadChildren()
+        public virtual void LoadChildren()
         {
-            return this.LoadChildren(CollectionLoader<LibraryHierarchyNode>.Instance);
+            this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
+            this.IsChildrenLoaded = true;
         }
 
-        public virtual Task LoadChildren(ICollectionLoader<LibraryHierarchyNode> collectionLoader)
+        public virtual Task LoadChildrenAsync()
+        {
+            return this.LoadChildrenAsync(CollectionLoader<LibraryHierarchyNode>.Instance);
+        }
+
+        public virtual Task LoadChildrenAsync(ICollectionLoader<LibraryHierarchyNode> collectionLoader)
         {
             return collectionLoader.Load(
                 () => this.LibraryHierarchyBrowser.GetNodes(this),
@@ -213,41 +219,49 @@ namespace FoxTunes
             );
         }
 
-        public virtual Task LoadMetaDatas()
+        public virtual void LoadMetaDatas()
         {
-            return this.LoadMetaDatas(CollectionLoader<MetaDataItem>.Instance);
+            this.MetaDatas = new ObservableCollection<MetaDataItem>(this.GetMetaDatas());
+            this.IsMetaDatasLoaded = true;
         }
 
-        public virtual Task LoadMetaDatas(ICollectionLoader<MetaDataItem> collectionLoader)
+        public virtual Task LoadMetaDatasAsync()
+        {
+            return this.LoadMetaDatasAsync(CollectionLoader<MetaDataItem>.Instance);
+        }
+
+        public virtual Task LoadMetaDatasAsync(ICollectionLoader<MetaDataItem> collectionLoader)
         {
             return collectionLoader.Load(
-                () =>
-                {
-                    using (var database = this.DatabaseFactory.Create())
-                    {
-                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                        {
-                            using (var reader = MetaDataInfo.GetMetaData(database, this, META_DATA_TYPE, transaction))
-                            {
-                                var metaDatas = new List<MetaDataItem>();
-                                foreach (var record in reader)
-                                {
-                                    metaDatas.Add(new MetaDataItem()
-                                    {
-                                        Value = record.Get<string>("Value")
-                                    });
-                                }
-                                return metaDatas;
-                            }
-                        }
-                    }
-                },
+                this.GetMetaDatas,
                 metaDatas =>
                 {
                     this.MetaDatas = metaDatas;
                     this.IsMetaDatasLoaded = true;
                 }
             );
+        }
+
+        protected virtual IEnumerable<MetaDataItem> GetMetaDatas()
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    using (var reader = MetaDataInfo.GetMetaData(database, this, META_DATA_TYPE, transaction))
+                    {
+                        var metaDatas = new List<MetaDataItem>();
+                        foreach (var record in reader)
+                        {
+                            metaDatas.Add(new MetaDataItem()
+                            {
+                                Value = record.Get<string>("Value")
+                            });
+                        }
+                        return metaDatas;
+                    }
+                }
+            }
         }
 
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();

@@ -139,7 +139,7 @@ namespace FoxTunes
             {
                 if (!libraryHierarchyNode.IsMetaDatasLoaded)
                 {
-                    await libraryHierarchyNode.LoadMetaDatas();
+                    await libraryHierarchyNode.LoadMetaDatasAsync();
                 }
                 await Windows.Invoke(() => this.ImageSource = Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight));
             });
