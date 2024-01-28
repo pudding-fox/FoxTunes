@@ -62,7 +62,7 @@ namespace FoxTunes
             return string.Format("{0} bit", depth);
         }
 
-        public static IEnumerable<string> GetMetaDataNames(IDatabaseComponent database, ITransactionSource transaction = null)
+        public static IEnumerable<string> GetMetaDataNames(IDatabaseComponent database, ITransactionSource transaction)
         {
             var query = database.QueryFactory.Build();
             var name = database.Tables.MetaDataItem.Column("Name");
@@ -78,7 +78,7 @@ namespace FoxTunes
             }
         }
 
-        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryItem libraryItem, MetaDataItemType metaDataItemType, ITransactionSource transaction = null)
+        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryItem libraryItem, MetaDataItemType metaDataItemType, ITransactionSource transaction)
         {
             return database.ExecuteReader(database.Queries.GetLibraryMetaData, (parameters, phase) =>
             {
@@ -92,7 +92,7 @@ namespace FoxTunes
             }, transaction);
         }
 
-        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType, ITransactionSource transaction = null)
+        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType, ITransactionSource transaction)
         {
             return database.ExecuteReader(database.Queries.GetLibraryHierarchyMetaData, (parameters, phase) =>
             {

@@ -57,7 +57,6 @@ namespace FoxTunes
                  if (this.MetaDataSourceFactory.Enabled)
                  {
                      await this.AddOrUpdateMetaData(cancellationToken);
-                     await this.UpdateVariousArtists();
                  }
                  await this.SequenceItems();
                  await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
@@ -92,14 +91,11 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                var query = this.Database
-                   .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
-                   .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
-                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, this.Visible, transaction))
+                using (var metaDataPopulator = new PlaylistMetaDataPopulator(this.Database, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(metaDataPopulator,
-                        async () => await metaDataPopulator.Populate(query, cancellationToken)
+                        async () => await metaDataPopulator.Populate(PlaylistItemStatus.Import, cancellationToken)
                     );
                 }
                 transaction.Commit();
@@ -270,26 +266,6 @@ namespace FoxTunes
                             break;
                     }
                 }, transaction);
-                transaction.Commit();
-            }
-        }
-
-        protected virtual async Task UpdateVariousArtists()
-        {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                await this.Database.ExecuteAsync(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
-                 {
-                     switch (phase)
-                     {
-                         case DatabaseParameterPhase.Fetch:
-                             parameters["name"] = CustomMetaData.VariousArtists;
-                             parameters["type"] = MetaDataItemType.Tag;
-                             parameters["value"] = bool.TrueString;
-                             parameters["status"] = PlaylistItemStatus.Import;
-                             break;
-                     }
-                 }, transaction);
                 transaction.Commit();
             }
         }

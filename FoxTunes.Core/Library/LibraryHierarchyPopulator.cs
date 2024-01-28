@@ -53,13 +53,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public async Task Populate(LibraryItemStatus? status, CancellationToken cancellationToken, ITransactionSource transaction = null)
+        public async Task Populate(LibraryItemStatus? status, CancellationToken cancellationToken)
         {
-            var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction).ToArray();
+            var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, this.Transaction).ToArray();
 
-            var libraryHierarchies = this.GetHierarchies(transaction);
+            var libraryHierarchies = this.GetHierarchies(this.Transaction);
             var libraryHierarchyLevels = this.GetLevels(libraryHierarchies);
-            var libraryItems = this.GetItems(status, transaction);
+            var libraryItems = this.GetItems(status, this.Transaction);
 
             if (this.ReportProgress)
             {

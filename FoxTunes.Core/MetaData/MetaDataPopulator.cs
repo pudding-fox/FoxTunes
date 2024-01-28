@@ -9,11 +9,11 @@ using System.Timers;
 
 namespace FoxTunes
 {
-    public class MetaDataPopulator : PopulatorBase
+    public abstract class MetaDataPopulator : PopulatorBase
     {
         public const string ID = "EA40EA65-6F49-48A6-9469-DD5FC2E36EC0";
 
-        public MetaDataPopulator(IDatabaseComponent database, IDatabaseQuery query, bool reportProgress, ITransactionSource transaction)
+        protected MetaDataPopulator(IDatabaseComponent database, IDatabaseQuery query, bool reportProgress, ITransactionSource transaction)
             : base(reportProgress)
         {
             this.Database = database;
