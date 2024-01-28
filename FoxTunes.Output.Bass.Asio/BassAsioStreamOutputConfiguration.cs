@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const string MODE_ASIO_OPTION = "CCCC87DA-EE55-467A-B2F5-61480F2F12F6";
 
+        public const string ELEMENT_REFRESH = "DDDDC8BE-2909-42C1-AC82-790EAEE2FB07";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
@@ -22,18 +24,38 @@ namespace FoxTunes
                     .WithOptions(new[] { new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO") }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device", path: "ASIO")
                     .WithOptions(GetASIODevices()))
-                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO").WithValue(false));
+                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO").WithValue(false))
+                .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "ASIO")
+            );
+            StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                ELEMENT_REFRESH
+            ).WithHandler(() =>
+            {
+                var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
+                    BassOutputConfiguration.SECTION,
+                    ELEMENT_ASIO_DEVICE
+                );
+                if (element == null)
+                {
+                    return;
+                }
+                element.WithOptions(GetASIODevices(), true);
+            });
         }
 
         public static int GetAsioDevice(SelectionConfigurationOption option)
         {
-            for (int a = 0, b = BassAsio.DeviceCount; a < b; a++)
+            if (option != null)
             {
-                var deviceInfo = default(AsioDeviceInfo);
-                BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
-                if (string.Equals(deviceInfo.Name, option.Id, StringComparison.OrdinalIgnoreCase))
+                for (int a = 0, b = BassAsio.DeviceCount; a < b; a++)
                 {
-                    return a;
+                    var deviceInfo = default(AsioDeviceInfo);
+                    BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
+                    if (string.Equals(deviceInfo.Name, option.Id, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return a;
+                    }
                 }
             }
             return ASIO_NO_DEVICE;
