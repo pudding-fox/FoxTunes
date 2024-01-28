@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassSkipSilenceStreamAdvisor : BassStreamAdvisor
     {
         //50ms
@@ -280,6 +282,14 @@ namespace FoxTunes
 
         public static bool TryGetMetaData(BassSkipSilenceStreamAdvisorBehaviour behaviour, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
         {
+            if (playlistItem.MetaDatas == null)
+            {
+                //This shouldn't happen.
+                leadIn = default(TimeSpan);
+                leadOut = default(TimeSpan);
+                return false;
+            }
+
             Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Attempting to fetch lead in/out for file \"{0}\" from meta data.", playlistItem.FileName);
 
             var leadInMetaDataItem = default(MetaDataItem);
