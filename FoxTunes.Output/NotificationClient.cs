@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -15,7 +16,8 @@ namespace FoxTunes
             {
                 return;
             }
-            this.DeviceStateChanged(this, new NotificationClientEventArgs(null, null, deviceId, state, PropertyKey.Empty));
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            var task = Task.Run(() => this.DeviceStateChanged(this, new NotificationClientEventArgs(null, null, deviceId, state, PropertyKey.Empty)));
         }
 
         public event NotificationClientEventHandler DeviceStateChanged = delegate { };
@@ -26,7 +28,8 @@ namespace FoxTunes
             {
                 return;
             }
-            this.DeviceAdded(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty));
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            var task = Task.Run(() => this.DeviceAdded(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty)));
         }
 
         public event NotificationClientEventHandler DeviceAdded = delegate { };
@@ -37,7 +40,8 @@ namespace FoxTunes
             {
                 return;
             }
-            this.DeviceRemoved(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty));
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            var task = Task.Run(() => this.DeviceRemoved(this, new NotificationClientEventArgs(null, null, deviceId, null, PropertyKey.Empty)));
         }
 
         public event NotificationClientEventHandler DeviceRemoved = delegate { };
@@ -48,7 +52,8 @@ namespace FoxTunes
             {
                 return;
             }
-            this.DefaultDeviceChanged(this, new NotificationClientEventArgs(flow, role, deviceId, null, PropertyKey.Empty));
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            var task = Task.Run(() => this.DefaultDeviceChanged(this, new NotificationClientEventArgs(flow, role, deviceId, null, PropertyKey.Empty)));
         }
 
         public event NotificationClientEventHandler DefaultDeviceChanged = delegate { };
@@ -59,7 +64,8 @@ namespace FoxTunes
             {
                 return;
             }
-            this.PropertyValueChanged(this, new NotificationClientEventArgs(null, null, deviceId, null, key));
+            //Critical: Don't block in this event handler, it causes a deadlock.
+            var task = Task.Run(() => this.PropertyValueChanged(this, new NotificationClientEventArgs(null, null, deviceId, null, key)));
         }
 
         public event NotificationClientEventHandler PropertyValueChanged = delegate { };
