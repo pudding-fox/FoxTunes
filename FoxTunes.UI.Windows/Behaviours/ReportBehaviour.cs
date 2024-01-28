@@ -26,7 +26,14 @@ namespace FoxTunes
                     ShowActivated = true,
                     Owner = Windows.ActiveWindow,
                 };
-                window.Show();
+                if (report.IsDialog)
+                {
+                    window.ShowDialog();
+                }
+                else
+                {
+                    window.Show();
+                }
             });
         }
 

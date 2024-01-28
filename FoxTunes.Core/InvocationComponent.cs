@@ -101,12 +101,16 @@ namespace FoxTunes
             return invocation != null;
         }
 
-        public static async Task<bool> TryInvoke(this IInvocableComponent component, string id)
+        public static async Task<bool> TryInvoke(this IInvocableComponent component, string id, object source = null)
         {
             var invocation = default(IInvocationComponent);
             if (!component.TryGetInvocation(id, out invocation))
             {
                 return false;
+            }
+            if (source != null)
+            {
+                invocation.Source = source;
             }
             await component.InvokeAsync(invocation);
             return true;

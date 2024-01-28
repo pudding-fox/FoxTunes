@@ -62,6 +62,14 @@ namespace FoxTunes
 
         public event EventHandler RowsChanged;
 
+        public virtual bool IsDialog
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public virtual IEnumerable<IInvocationComponent> Invocations
         {
             get
@@ -81,6 +89,8 @@ namespace FoxTunes
 
         public abstract class ReportComponentRow : BaseComponent, IReportComponentRow
         {
+            public const string SELECT = "6631B189-1D2B-42F6-9984-87ECEA24D7FB";
+
             public const string ACTIVATE = "4F1B5CF2-8302-42A9-B7CB-D4306FF124D2";
 
             public abstract string[] Values { get; }

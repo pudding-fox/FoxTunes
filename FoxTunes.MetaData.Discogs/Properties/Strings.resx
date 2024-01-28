@@ -186,4 +186,19 @@
   <data name="ReleaseLookupReport.Title" xml:space="preserve">
     <value>Release Lookup</value>
   </data>
+  <data name="ReleaseSelectionReport.Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ReleaseSelectionReport.ReleaseId" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="ReleaseSelectionReport.ReleaseTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="ReleaseSelectionReport.ReleaseUrl" xml:space="preserve">
+    <value>Url</value>
+  </data>
+  <data name="ReleaseSelectionReport.Title" xml:space="preserve">
+    <value>Release Selection: {0} - {1} ({2} tracks)</value>
+  </data>
 </root>
