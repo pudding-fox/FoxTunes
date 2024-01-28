@@ -369,6 +369,14 @@ namespace FoxTunes
                     PackageFlags.Default
                 ),
                 new Package(
+                    "discogs",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.MetaData.Discogs.dll"
+                    },
+                    PackageFlags.Default
+                ),
+                new Package(
                     "dsd",
                     new PackageElement[]
                     {
