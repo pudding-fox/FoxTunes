@@ -82,18 +82,25 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task<bool> Handle(string fileName)
+        public bool CanHandle(string path)
         {
             if (!this.Enabled)
             {
                 return false;
             }
-            if (!string.Equals(Path.GetExtension(fileName), CUE, StringComparison.OrdinalIgnoreCase))
+            if (!File.Exists(path) || !string.Equals(Path.GetExtension(path), CUE, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
-            await this.OpenCue(fileName);
             return true;
+        }
+
+        public async Task Handle(IEnumerable<string> paths)
+        {
+            foreach (var path in paths)
+            {
+                await this.OpenCue(path);
+            }
         }
 
         public Task OpenCue()

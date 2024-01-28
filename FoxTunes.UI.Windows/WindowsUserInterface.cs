@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -20,7 +19,7 @@ namespace FoxTunes
         {
             this.Application = new Application();
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
-            this.Queue = new PendingQueue<string>(TimeSpan.FromSeconds(1));
+            this.Queue = new PendingQueue<KeyValuePair<IFileActionHandler, string>>(TimeSpan.FromSeconds(1));
             this.Queue.Complete += this.OnComplete;
             Windows.MainWindowCreated += this.OnWindowCreated;
             Windows.MiniWindowCreated += this.OnWindowCreated;
@@ -54,7 +53,7 @@ namespace FoxTunes
 
         public event EventHandler ApplicationChanged;
 
-        public PendingQueue<string> Queue { get; private set; }
+        public PendingQueue<KeyValuePair<IFileActionHandler, string>> Queue { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -105,7 +104,7 @@ namespace FoxTunes
             });
         }
 
-        public override async void Run(string message)
+        public override void Run(string message)
         {
             var mode = default(CommandLineParser.OpenMode);
             var paths = default(IEnumerable<string>);
@@ -116,18 +115,12 @@ namespace FoxTunes
             this.OpenMode = mode;
             foreach (var path in paths)
             {
-                if (Directory.Exists(path) || this.Output.IsSupported(path))
+                foreach (var handler in this.FileActionHandlers)
                 {
-                    this.Queue.Enqueue(path);
-                }
-                else
-                {
-                    foreach (var fileActionHandler in this.FileActionHandlers)
+                    if (handler.CanHandle(path))
                     {
-                        if (await fileActionHandler.Handle(path))
-                        {
-                            break;
-                        }
+                        this.Queue.Enqueue(new KeyValuePair<IFileActionHandler, string>(handler, path));
+                        break;
                     }
                 }
             }
@@ -148,17 +141,25 @@ namespace FoxTunes
             MessageBox.Show("Restart is required.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
-        protected virtual void OnComplete(object sender, PendingQueueEventArgs<string> e)
+        protected virtual void OnComplete(object sender, PendingQueueEventArgs<KeyValuePair<IFileActionHandler, string>> e)
         {
             var task = this.OnOpen(e.Sequence);
         }
 
-        protected virtual async Task OnOpen(IEnumerable<string> paths)
+        protected virtual async Task OnOpen(IEnumerable<KeyValuePair<IFileActionHandler, string>> sequence)
         {
             try
             {
                 var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-                await this.PlaylistManager.Add(paths, false).ConfigureAwait(false);
+                var handlers = new Dictionary<IFileActionHandler, IList<string>>();
+                foreach (var element in sequence)
+                {
+                    handlers.GetOrAdd(element.Key, key => new List<string>()).Add(element.Value);
+                }
+                foreach (var pair in handlers)
+                {
+                    await pair.Key.Handle(pair.Value);
+                }
                 if (this.OpenMode == CommandLineParser.OpenMode.Play)
                 {
                     await this.PlaylistManager.Play(index).ConfigureAwait(false);
