@@ -10,6 +10,7 @@ namespace FoxTunes
     public partial class Spectrum : UIComponentBase
     {
         public static readonly SelectionConfigurationElement BarCount;
+
         static Spectrum()
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
@@ -29,7 +30,7 @@ namespace FoxTunes
             if (BarCount != null)
             {
                 //Fix the width so all 2d math is integer.
-                this.MinWidth = SpectrumBehaviourConfiguration.GetWidth(BarCount.Value);
+                this.MinWidth = SpectrumBehaviourConfiguration.GetWidthForBars(BarCount.Value);
                 BarCount.ValueChanged += this.OnValueChanged;
             }
         }
@@ -39,7 +40,7 @@ namespace FoxTunes
             var task = Windows.Invoke(() =>
             {
                 //Fix the width so all 2d math is integer.
-                this.MinWidth = SpectrumBehaviourConfiguration.GetWidth(BarCount.Value);
+                this.MinWidth = SpectrumBehaviourConfiguration.GetWidthForBars(BarCount.Value);
             });
         }
     }

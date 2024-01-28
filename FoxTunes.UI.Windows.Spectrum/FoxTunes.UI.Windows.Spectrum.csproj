@@ -32,6 +32,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <UpToDateCheckInput Remove="Axis.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
 	</ItemGroup>
 
@@ -45,6 +49,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Axis.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
 	</ItemGroup>
 
 	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />

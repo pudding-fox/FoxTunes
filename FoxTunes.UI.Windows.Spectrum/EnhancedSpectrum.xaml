@@ -7,6 +7,7 @@
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
              xmlns:LocalWindows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
+             xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
              Foreground="{DynamicResource TextBrush}"
@@ -15,14 +16,44 @@
              MinHeight="90">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-        <LocalWindows:EnhancedSpectrumRenderer x:Key="Renderer"
-            Core="{Binding}"                                  
-            Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:EnhancedSpectrum}}}" 
-            Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:EnhancedSpectrum}}}" 
-            Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:EnhancedSpectrum}}}"></LocalWindows:EnhancedSpectrumRenderer>
+        <LocalViewModel:SpectrumBandsConverter x:Key="SpectrumBandsConverter"></LocalViewModel:SpectrumBandsConverter>
+        <LocalWindows:RangeAxisLabelProvider x:Key="dBAxis"  
+            Minimum="{x:Static LocalWindows:EnhancedSpectrumRenderer.DB_MIN}" 
+            Maximum="{x:Static LocalWindows:EnhancedSpectrumRenderer.DB_MAX}"/>
+        <LocalWindows:FixedAxisLabelProvider x:Key="freqAxis">
+            <LocalWindows:FixedAxisLabelProvider.Values>
+                <Binding Path="Value" Source="{x:Static LocalWindows:EnhancedSpectrum.BandCount}" Converter="{StaticResource SpectrumBandsConverter}"></Binding>
+            </LocalWindows:FixedAxisLabelProvider.Values>
+        </LocalWindows:FixedAxisLabelProvider>
     </UserControl.Resources>
-    <UserControl.Background>
-        <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
-    </UserControl.Background>
-    <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+    <UserControl.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.ENHANCED_CATEGORY}}"></Windows:Menu>
+    </UserControl.ContextMenu>
+    <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="32"></RowDefinition>
+            </Grid.RowDefinitions>
+            <LocalWindows:Axis Grid.Column="0" Grid.Row="0" Orientation="Vertical" Foreground="{DynamicResource NormalBorderBrush}" LabelProvider="{StaticResource dBAxis}"></LocalWindows:Axis>
+            <Rectangle Grid.Column="1" Grid.Row="0">
+                <Rectangle.Resources>
+                    <LocalWindows:EnhancedSpectrumRenderer x:Key="Renderer"
+                        Core="{Binding}"                                  
+                        Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
+                        Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
+                        Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:EnhancedSpectrum}}}"></LocalWindows:EnhancedSpectrumRenderer>
+                </Rectangle.Resources>
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <LocalWindows:Axis Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Foreground="{DynamicResource NormalBorderBrush}" LabelProvider="{StaticResource freqAxis}"></LocalWindows:Axis>
+        </Grid>
+        <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+    </Grid>
 </Windows:UIComponentBase>

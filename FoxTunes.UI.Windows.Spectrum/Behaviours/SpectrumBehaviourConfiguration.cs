@@ -27,6 +27,16 @@ namespace FoxTunes
 
         public const string BARS_256_OPTION = "EEEEFFC1-592E-4EC6-9CCD-5182935AD12E";
 
+        public const string BANDS_ELEMENT = "AABBF573-83D3-498E-BEF8-F1DB5A329B9D";
+
+        public const string BANDS_10_OPTION = "AAAA058C-2C96-4540-9ABE-10A584A17CE4";
+
+        public const string BANDS_14_OPTION = "BBBB2B6D-E6FE-43F1-8358-AEE0299F0F8E";
+
+        public const string BANDS_21_OPTION = "CCCCC739-B777-474B-B4A8-F96375254FAC";
+
+        public const string BANDS_31_OPTION = "DDDDDA9D-0512-4F9F-903D-9AC33A9C6CFD";
+
         public const string QUALITY_ELEMENT = "BBBBB7B8-FEE1-4D3E-A7EB-D2DF8765EED0";
 
         public const string QUALITY_HIGH_OPTION = "AAAAF4FD-5A1A-4243-9015-BF76ABDEADBA";
@@ -67,7 +77,8 @@ namespace FoxTunes
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, "Spectrum")
-                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions()))
+                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars (Basic)").WithOptions(GetBarsOptions()))
+                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, "Bands (Enhanced)").WithOptions(GetBandsOptions()))
                 .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality").WithOptions(GetQualityOptions()))
                 .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks", path: "Advanced"))
                 .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, "Peak Hold", path: "Advanced").WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
@@ -136,9 +147,9 @@ namespace FoxTunes
         {
             switch (option.Id)
             {
-                default:
                 case BARS_16_OPTION:
                     return 16;
+                default:
                 case BARS_32_OPTION:
                     return 32;
                 case BARS_64_OPTION:
@@ -147,6 +158,113 @@ namespace FoxTunes
                     return 128;
                 case BARS_256_OPTION:
                     return 256;
+            }
+        }
+
+        private static IEnumerable<SelectionConfigurationOption> GetBandsOptions()
+        {
+            yield return new SelectionConfigurationOption(BANDS_10_OPTION, "10");
+            yield return new SelectionConfigurationOption(BANDS_14_OPTION, "14").Default();
+            yield return new SelectionConfigurationOption(BANDS_21_OPTION, "21");
+            yield return new SelectionConfigurationOption(BANDS_31_OPTION, "31");
+        }
+
+        public static int[] GetBands(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
+            {
+                case BANDS_10_OPTION:
+                    return new[]
+                    {
+                        20,
+                        50,
+                        100,
+                        200,
+                        500,
+                        1000,
+                        2000,
+                        5000,
+                        10000,
+                        20000
+                    };
+                default:
+                case BANDS_14_OPTION:
+                    return new[]
+                    {
+                        20,
+                        50,
+                        100,
+                        200,
+                        500,
+                        1000,
+                        1400,
+                        2000,
+                        3000,
+                        5000,
+                        7500,
+                        10000,
+                        17000,
+                        20000
+                    };
+                case BANDS_21_OPTION:
+                    return new[]
+                    {
+                        20,
+                        35,
+                        50,
+                        70,
+                        100,
+                        160,
+                        200,
+                        360,
+                        500,
+                        760,
+                        1000,
+                        1400,
+                        2000,
+                        2600,
+                        3000,
+                        5000,
+                        7500,
+                        10000,
+                        13000,
+                        17000,
+                        20000
+                    };
+                case BANDS_31_OPTION:
+                    return new[]
+                    {
+                        20,
+                        35,
+                        50,
+                        70,
+                        100,
+                        120,
+                        160,
+                        200,
+                        300,
+                        360,
+                        440,
+                        500,
+                        600,
+                        760,
+                        1000,
+                        1200,
+                        1400,
+                        1600,
+                        2000,
+                        2600,
+                        3000,
+                        3600,
+                        4000,
+                        5000,
+                        7500,
+                        10000,
+                        12000,
+                        14000,
+                        17000,
+                        20000
+                    };
             }
         }
 
@@ -200,7 +318,7 @@ namespace FoxTunes
             }
         }
 
-        public static int GetWidth(SelectionConfigurationOption option)
+        public static int GetWidthForBars(SelectionConfigurationOption option)
         {
             switch (option.Id)
             {
@@ -215,6 +333,22 @@ namespace FoxTunes
                     return 256;
                 case BARS_256_OPTION:
                     return 256;
+            }
+        }
+
+        public static int GetWidthForBands(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
+            {
+                default:
+                case BANDS_10_OPTION:
+                    return 160;
+                case BANDS_14_OPTION:
+                    return 196;
+                case BANDS_21_OPTION:
+                    return 252;
+                case BANDS_31_OPTION:
+                    return 372;
             }
         }
     }

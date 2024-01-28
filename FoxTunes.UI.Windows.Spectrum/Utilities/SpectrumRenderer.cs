@@ -267,27 +267,31 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-
+            var data = this.RendererData;
+            if (data == null)
+            {
+                return;
+            }
             try
             {
-                if (!this.RendererData.Update())
+                if (!data.Update())
                 {
                     this.Clear();
                 }
                 else
                 {
-                    UpdateValues(this.RendererData);
+                    UpdateValues(data);
                     if (this.Smooth.Value)
                     {
-                        UpdateElementsSmooth(this.RendererData);
+                        UpdateElementsSmooth(data);
                     }
                     else
                     {
-                        UpdateElementsFast(this.RendererData);
+                        UpdateElementsFast(data);
                     }
                     if (this.ShowPeaks.Value)
                     {
-                        UpdatePeaks(this.RendererData);
+                        UpdatePeaks(data);
                     }
                 }
                 var task = this.Render();
