@@ -46,6 +46,7 @@
 
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
     <BorderGapMaskConverter x:Key="BorderGapMaskConverter" />
+    <DropShadowBitmapEffect x:Key="PopupDropShadow" ShadowDepth="1.5" Softness="0.15" />
 
     <Style x:Key="FocusVisualStyle">
         <Setter Property="Control.Template">
@@ -822,9 +823,10 @@
     </Style>
 
     <Style TargetType="{x:Type ContextMenu}">
-        <Setter Property="Background" Value="{DynamicResource ShadeBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ShadeBrush}" />
+        <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template" Value="{DynamicResource ContextMenuTemplate}"></Setter>
     </Style>
 
@@ -853,8 +855,9 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type Menu}">
-        <Setter Property="Background" Value="{DynamicResource ControlBrush}" />
+        <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
@@ -873,14 +876,14 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <DropShadowBitmapEffect x:Key="PopupDropShadow" ShadowDepth="1.5" Softness="0.15" />
-
+    
     <Style TargetType="{x:Type MenuItem}">
+        <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
         <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="Template" Value="{DynamicResource MenuItemTemplate}"></Setter>
     </Style>
 
@@ -916,7 +919,7 @@
                 <Popup IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Right" x:Name="SubMenuPopup" Focusable="false" AllowsTransparency="true" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}">
                     <Grid x:Name="SubMenu">
                         <Border x:Name="SubMenuBorder">
-                            <Border BorderBrush="{DynamicResource ShadeBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{DynamicResource ShadeBrush}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
                                 <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
                             </Border>
                         </Border>
