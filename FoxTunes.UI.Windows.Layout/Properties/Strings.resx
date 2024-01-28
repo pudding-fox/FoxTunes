@@ -223,7 +223,7 @@
     <value>Stack Grid</value>
   </data>
   <data name="UIComponentTabContainer.Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Add Tab</value>
   </data>
   <data name="UIComponentTabContainer.MoveLeft" xml:space="preserve">
     <value>Move Left</value>
@@ -238,7 +238,7 @@
     <value>New Tab</value>
   </data>
   <data name="UIComponentTabContainer.Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Remove Tab</value>
   </data>
   <data name="UIComponentTabContainer.Rename" xml:space="preserve">
     <value>Rename</value>

@@ -376,7 +376,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add.
+        ///   Looks up a localized string similar to Add Tab.
         /// </summary>
         internal static string UIComponentTabContainer_Add {
             get {
@@ -421,7 +421,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove.
+        ///   Looks up a localized string similar to Remove Tab.
         /// </summary>
         internal static string UIComponentTabContainer_Remove {
             get {

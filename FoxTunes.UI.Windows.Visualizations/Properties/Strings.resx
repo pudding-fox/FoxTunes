@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EnhancedSpectrum.Name" xml:space="preserve">
-    <value>Enhanced Spectrum</value>
+    <value>Spectrum</value>
   </data>
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
@@ -223,10 +223,10 @@
     <value>Off</value>
   </data>
   <data name="Spectrum.Name" xml:space="preserve">
-    <value>Spectrum</value>
+    <value>Spectrum (Basic)</value>
   </data>
   <data name="SpectrumBehaviourConfiguration.Bands" xml:space="preserve">
-    <value>Bands (Enhanced)</value>
+    <value>Bands</value>
   </data>
   <data name="SpectrumBehaviourConfiguration.Bars" xml:space="preserve">
     <value>Bars (Basic)</value>

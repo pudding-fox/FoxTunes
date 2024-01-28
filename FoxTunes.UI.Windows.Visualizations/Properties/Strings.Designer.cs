@@ -61,7 +61,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enhanced Spectrum.
+        ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string EnhancedSpectrum_Name {
             get {
@@ -376,7 +376,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Spectrum.
+        ///   Looks up a localized string similar to Spectrum (Basic).
         /// </summary>
         internal static string Spectrum_Name {
             get {
@@ -385,7 +385,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bands (Enhanced).
+        ///   Looks up a localized string similar to Bands.
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Bands {
             get {
