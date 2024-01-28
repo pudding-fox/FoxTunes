@@ -41,6 +41,14 @@ namespace FoxTunes
             }
         }
 
+        public IVisualizationDataSource VisualizationDataSource
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IVisualizationDataSource>();
+            }
+        }
+
         public IOutputEffects OutputEffects
         {
             get
