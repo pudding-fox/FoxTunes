@@ -178,7 +178,7 @@ namespace FoxTunes
                 () => this.LibraryHierarchyBrowser.GetNodes(this).ToArray()
             );
             this._MetaDatas = new Lazy<MetaDataItem[]>(
-                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image, Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover)).ToArray()
+                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image, Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover))
             );
             base.InitializeComponent(core);
         }

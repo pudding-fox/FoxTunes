@@ -1,6 +1,7 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -20,10 +21,16 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public IEnumerable<MetaDataItem> GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
+        public MetaDataItem[] GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
         {
             var key = new MetaDataCacheKey(libraryHierarchyNode, metaDataItemType, metaDataItemName, this.LibraryHierarchyBrowser.Filter);
             return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCore(libraryHierarchyNode, metaDataItemType, metaDataItemName));
+        }
+
+        public Task<MetaDataItem[]> GetMetaDatasAsync(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
+        {
+            var key = new MetaDataCacheKey(libraryHierarchyNode, metaDataItemType, metaDataItemName, this.LibraryHierarchyBrowser.Filter);
+            return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCoreAsync(libraryHierarchyNode, metaDataItemType, metaDataItemName));
         }
 
         private IEnumerable<MetaDataItem> GetMetaDatasCore(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
@@ -42,6 +49,33 @@ namespace FoxTunes
                                 Type = metaDataItemType.GetValueOrDefault(),
                                 Value = record.Get<string>("Value")
                             };
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task<IEnumerable<MetaDataItem>> GetMetaDatasCoreAsync(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName)
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    using (var reader = this.GetReader(database, libraryHierarchyNode, metaDataItemType, metaDataItemName, transaction))
+                    {
+                        using (var sequence = reader.GetAsyncEnumerator())
+                        {
+                            var result = new List<MetaDataItem>();
+                            while (await sequence.MoveNextAsync().ConfigureAwait(false))
+                            {
+                                result.Add(new MetaDataItem()
+                                {
+                                    Name = metaDataItemName,
+                                    Type = metaDataItemType.GetValueOrDefault(),
+                                    Value = sequence.Current.Get<string>("Value")
+                                });
+                            }
+                            return result;
                         }
                     }
                 }
