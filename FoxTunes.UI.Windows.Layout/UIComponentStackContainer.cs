@@ -171,7 +171,7 @@ namespace FoxTunes
                     InvocationComponent.CATEGORY_GLOBAL,
                     ADD,
                     "Add"
-                    );
+                );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     REMOVE,

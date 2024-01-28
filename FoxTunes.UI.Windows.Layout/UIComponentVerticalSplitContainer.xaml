@@ -1,4 +1,4 @@
-<LocalWindows:UIComponentPanel x:Class="FoxTunes.UIComponentVerticalSplitContainer"
+<LocalWindows:UIComponentSplitPanel x:Class="FoxTunes.UIComponentVerticalSplitContainer"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -24,4 +24,4 @@
         <GridSplitter x:Name="Splitter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"></GridSplitter>
         <LocalWindows:UIComponentContainer x:Name="RightContainer" Grid.Column="2" Component="{Binding RightComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentVerticalSplitContainer}}}"></LocalWindows:UIComponentContainer>
     </Grid>
-</LocalWindows:UIComponentPanel>
+</LocalWindows:UIComponentSplitPanel>
