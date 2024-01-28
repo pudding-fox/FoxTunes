@@ -41,6 +41,11 @@ namespace FoxTunes
             return warnings;
         }
 
+        public void AddWarning(string fileName, string warning)
+        {
+            this.Warnings.GetOrAdd(fileName, key => new List<string>()).Add(warning);
+        }
+
         public void AddWarnings(string fileName, IEnumerable<string> warnings)
         {
             this.Warnings.GetOrAdd(fileName, key => new List<string>()).AddRange(warnings);
@@ -125,6 +130,7 @@ namespace FoxTunes
             if (!this.IsSupported(fileName))
             {
                 Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+                this.AddWarning(fileName, "Unsupported file format.");
                 return Enumerable.Empty<MetaDataItem>();
             }
             var collect = default(bool);
@@ -168,10 +174,20 @@ namespace FoxTunes
             catch (UnsupportedFormatException)
             {
                 Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+                this.AddWarning(fileName, "Unsupported file format.");
+            }
+            catch (OutOfMemoryException)
+            {
+                //This can happen with really big embedded images.
+                //It's tricky to avoid because we can't check InvariantStartPosition without parsing.
+                Logger.Write(this, LogLevel.Warn, "Out of memory: {0}", fileName);
+                this.AddWarning(fileName, "Out of memory.");
+                collect = true;
             }
             catch (Exception e)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to read meta data: {0} => {1}", fileName, e.Message);
+                this.AddWarning(fileName, string.Format("Failed to read meta data: {0}", e.Message));
             }
             finally
             {
