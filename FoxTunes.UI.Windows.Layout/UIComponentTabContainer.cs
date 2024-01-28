@@ -50,9 +50,13 @@ namespace FoxTunes
                 {
                     this.AddComponent(component);
                 }
-                if (index > 0 && this.TabControl.Items.Count > index)
+                if (index >= 0 && this.TabControl.Items.Count > index)
                 {
                     this.TabControl.SelectedIndex = index;
+                }
+                else
+                {
+                    this.TabControl.SelectedIndex = 0;
                 }
             }
             else

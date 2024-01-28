@@ -175,10 +175,14 @@ namespace FoxTunes
                     return;
                 }
                 var value = GetSelectedItem(this.TreeView);
-                if (value != null)
+                if (value is IHierarchical)
                 {
                     this.TreeView.ItemContainerGenerator.StatusChanged += this.OnStatusChanged;
                     this.Status = BehaviourStatus.Restoring;
+                }
+                else
+                {
+                    //Can only restore selection for IHierarchical data.
                 }
             }
 
