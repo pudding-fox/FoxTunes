@@ -100,9 +100,19 @@ namespace FoxTunes
             }
             lock (SyncRoot)
             {
-                if (BassCd.FreeOld)
+                if (immidiate)
                 {
-                    BassCd.FreeOld = false;
+                    if (!BassCd.FreeOld)
+                    {
+                        BassCd.FreeOld = true;
+                    }
+                }
+                else
+                {
+                    if (BassCd.FreeOld)
+                    {
+                        BassCd.FreeOld = false;
+                    }
                 }
                 channelHandle = BassCd.CreateStream(drive, track, flags);
             }
