@@ -10,7 +10,7 @@
         parts.push(zeropad(tag.track, 2));
     }
     if (tag.artist) {
-        parts.push(artist);
+        parts.push(tag.artist);
     }
     if (tag.album) {
         parts.push(tag.album);
