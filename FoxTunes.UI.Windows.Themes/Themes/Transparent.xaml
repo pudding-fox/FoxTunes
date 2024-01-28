@@ -607,15 +607,27 @@
     </Style>
 
     <ControlTemplate x:Key="ComboBoxTemplate" TargetType="{x:Type ComboBox}">
+        <ControlTemplate.Resources>
+            <Storyboard x:Key="HoverOn">
+                <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="HoverBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                    <SplineDoubleKeyFrame KeyTime="00:00:00.1000000" Value="0.5" />
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+            <Storyboard x:Key="HoverOff">
+                <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="HoverBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                    <SplineDoubleKeyFrame KeyTime="00:00:00.2000000" Value="0" />
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+        </ControlTemplate.Resources>
         <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
             <Grid x:Name="grid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <ToggleButton Grid.ColumnSpan="2" Template="{DynamicResource ComboBoxToggleButton}" x:Name="ToggleButton" Focusable="false" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Background="{TemplateBinding Background}" />
+                <ToggleButton Grid.ColumnSpan="2" Template="{DynamicResource ComboBoxToggleButton}" x:Name="ToggleButton" Focusable="false" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Background="Transparent" />
                 <ContentPresenter HorizontalAlignment="Left" Margin="3,3,23,3" x:Name="ContentSite" VerticalAlignment="Center" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" IsHitTestVisible="False" />
-                <TextBox Visibility="Hidden" Template="{DynamicResource ComboBoxTextBox}" HorizontalAlignment="Left" Margin="3,3,23,3" x:Name="PART_EditableTextBox" Style="{x:Null}" VerticalAlignment="Center" Focusable="True" Background="{DynamicResource NormalBorderBrush}" IsReadOnly="{TemplateBinding IsReadOnly}" BorderBrush="{DynamicResource NormalBorderBrush}" Foreground="{DynamicResource TextBrush}" />
+                <Border x:Name="HoverBorder" IsHitTestVisible="False" Opacity="0" BorderBrush="{DynamicResource GlyphBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
                 <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" x:Name="Popup" Focusable="False" PopupAnimation="Slide" AllowsTransparency="True">
                     <Grid MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{TemplateBinding ActualWidth}" x:Name="DropDown" SnapsToDevicePixels="True">
                         <Border x:Name="DropDownBorder" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1" Background="{DynamicResource ControlBrush}" />
@@ -627,6 +639,18 @@
             </Grid>
         </Border>
         <ControlTemplate.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.ExitActions>
+                    <BeginStoryboard Storyboard="{StaticResource HoverOff}" />
+                </MultiTrigger.ExitActions>
+                <MultiTrigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource HoverOn}" />
+                </MultiTrigger.EnterActions>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="True" />
+                    <Condition Property="IsFocused" Value="False" />
+                </MultiTrigger.Conditions>
+            </MultiTrigger>
             <Trigger Property="HasItems" Value="false">
                 <Setter Property="MinHeight" Value="95" TargetName="DropDownBorder" />
             </Trigger>
@@ -637,11 +661,6 @@
             </Trigger>
             <Trigger Property="IsGrouping" Value="true">
                 <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
-            </Trigger>
-            <Trigger Property="IsEditable" Value="true">
-                <Setter Property="IsTabStop" Value="false" />
-                <Setter Property="Visibility" Value="Visible" TargetName="PART_EditableTextBox" />
-                <Setter Property="Visibility" Value="Hidden" TargetName="ContentSite" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
