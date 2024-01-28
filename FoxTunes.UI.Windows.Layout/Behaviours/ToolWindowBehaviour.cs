@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -233,7 +231,6 @@ namespace FoxTunes
                     return;
                 }
                 this.Element.Value = value;
-                this.Configuration.Save();
                 Logger.Write(this, LogLevel.Debug, "Saved config for {0} windows.", configs.Length);
             }
             catch (Exception e)
@@ -258,9 +255,9 @@ namespace FoxTunes
             global::FoxTunes.Windows.ActiveWindowChanged += this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
             global::FoxTunes.Windows.Registrations.AddIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
-            LayoutDesignerBehaviour.Instance.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Core = core;
             this.Configuration = core.Components.Configuration;
+            this.Configuration.Saving += this.OnSaving;
             this.Layout = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.LAYOUT_ELEMENT
@@ -292,7 +289,6 @@ namespace FoxTunes
             }
             else if (this.IsLoaded)
             {
-                this.Save();
                 var task = this.Shutdown();
             }
         }
@@ -327,15 +323,6 @@ namespace FoxTunes
             LayoutDesignerBehaviour.Instance.IsDesigning = global::FoxTunes.Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID);
         }
 
-        protected virtual void OnIsDesigningChanged(object sender, EventArgs e)
-        {
-            if (LayoutDesignerBehaviour.Instance.IsDesigning)
-            {
-                return;
-            }
-            this.Save();
-        }
-
         protected void OnValueChanged(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(this.Element.Value))
@@ -344,6 +331,11 @@ namespace FoxTunes
             }
             //Looks like the config was reset.
             var task = this.Reset();
+        }
+
+        protected virtual void OnSaving(object sender, EventArgs e)
+        {
+            this.Save();
         }
 
         public IEnumerable<string> InvocationCategories
@@ -431,7 +423,6 @@ namespace FoxTunes
                     pair.Value.Closed -= this.OnClosed;
                     pair.Value.Close();
                 }
-                this.Save();
                 this.Windows.Clear();
             });
         }
@@ -486,7 +477,10 @@ namespace FoxTunes
             global::FoxTunes.Windows.ActiveWindowChanged -= this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
             global::FoxTunes.Windows.Registrations.RemoveIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
-            LayoutDesignerBehaviour.Instance.IsDesigningChanged -= this.OnIsDesigningChanged;
+            if (this.Configuration != null)
+            {
+                this.Configuration.Saving -= this.OnSaving;
+            }
         }
 
         ~ToolWindowBehaviour()

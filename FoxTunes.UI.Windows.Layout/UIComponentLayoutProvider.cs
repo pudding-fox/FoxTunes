@@ -70,9 +70,8 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
-            LayoutDesignerBehaviour.Instance.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Configuration = core.Components.Configuration;
+            this.Configuration.Saving += this.OnSaving;
             this.Main = this.Configuration.GetElement<TextConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 UIComponentLayoutProviderConfiguration.MAIN_LAYOUT
@@ -81,18 +80,8 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnShuttingDown(object sender, EventArgs e)
+        protected virtual void OnSaving(object sender, EventArgs e)
         {
-            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
-            this.Save();
-        }
-
-        protected virtual void OnIsDesigningChanged(object sender, EventArgs e)
-        {
-            if (LayoutDesignerBehaviour.Instance.IsDesigning)
-            {
-                return;
-            }
             this.Save();
         }
 
@@ -153,7 +142,6 @@ namespace FoxTunes
                     return;
                 }
                 this.Main.Value = value;
-                this.Configuration.Save();
             }
             catch (Exception e)
             {
@@ -192,8 +180,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
-            LayoutDesignerBehaviour.Instance.IsDesigningChanged -= this.OnIsDesigningChanged;
+            if (this.Configuration != null)
+            {
+                this.Configuration.Saving -= this.OnSaving;
+            }
         }
 
         ~UIComponentLayoutProvider()

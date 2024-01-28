@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class UIComponentConfigurationProvider : BaseComponent, IConfiguration
+    public class UIComponentConfigurationProvider : BaseComponent, IConfiguration, IDisposable
     {
         public const string PREFIX = "Configuration_";
 
@@ -60,11 +60,17 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
+            this.Configuration.Saving += this.OnSaving;
             foreach (var section in this.Configuration.Sections)
             {
                 this.WithSection(section);
             }
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnSaving(object sender, EventArgs e)
+        {
+            this.Save();
         }
 
         public void Load()
@@ -105,6 +111,17 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Loading configuration element: \"{0}\".", id);
             element.SetPersistentValue(value);
         }
+
+        protected virtual void OnSaving()
+        {
+            if (this.Saving == null)
+            {
+                return;
+            }
+            this.Saving(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Saving;
 
         protected virtual void OnSaved()
         {
@@ -175,13 +192,7 @@ namespace FoxTunes
 
         public void Save(string profile)
         {
-            foreach (var pair in this.Component.MetaData)
-            {
-                if (pair.Key.StartsWith(PREFIX, StringComparison.OrdinalIgnoreCase))
-                {
-                    this.Component.MetaData.TryRemove(pair.Key);
-                }
-            }
+            this.OnSaving();
             foreach (var element in this.Elements.Values)
             {
                 if (!element.IsModified)
@@ -190,7 +201,7 @@ namespace FoxTunes
                 }
                 var key = string.Concat(PREFIX, element.Id);
                 var value = element.GetPersistentValue();
-                this.Component.MetaData.TryAdd(key, value);
+                this.Component.MetaData.AddOrUpdate(key, value);
             }
             this.OnSaved();
         }
@@ -225,6 +236,45 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
             var existing = this.GetSection(section.Id);
             existing.Update(section);
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Configuration != null)
+            {
+                this.Configuration.Saving -= this.OnSaving;
+            }
+        }
+
+        ~UIComponentConfigurationProvider()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
 
         public class ConfigurationSectionWrapper : ConfigurationSection

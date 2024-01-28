@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Design;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -212,6 +213,7 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
                 }
             });
+            this.OnSaving();
             if (immidiate)
             {
                 this.Debouncer.ExecNow(action);
@@ -223,6 +225,17 @@ namespace FoxTunes
             //Configuration not technically saved *yet* but it doesn't matter.
             this.OnSaved();
         }
+
+        protected virtual void OnSaving()
+        {
+            if (this.Saving == null)
+            {
+                return;
+            }
+            this.Saving(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Saving;
 
         protected virtual void OnSaved()
         {
