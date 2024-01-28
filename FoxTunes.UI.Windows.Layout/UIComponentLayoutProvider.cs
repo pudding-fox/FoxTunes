@@ -55,11 +55,11 @@ namespace FoxTunes
                 WindowsUserInterfaceConfiguration.SECTION,
                 UIComponentLayoutProviderConfiguration.MAIN
             );
-            this.Main.ConnectValue(value => this.MainComponent = this.LoadComponent(value, UILayoutTemplate.Main));
+            this.Main.ConnectValue(value => this.MainComponent = this.LoadComponent(value));
             base.InitializeComponent(core);
         }
 
-        protected virtual UIComponentConfiguration LoadComponent(string value, UILayoutTemplate template)
+        protected virtual UIComponentConfiguration LoadComponent(string value)
         {
             if (!string.IsNullOrEmpty(value))
             {
@@ -74,27 +74,6 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to load component: {0}", e.Message);
                 }
-            }
-            switch (template)
-            {
-                case UILayoutTemplate.Main:
-                    return this.GetMainComponent();
-            }
-            throw new NotImplementedException();
-        }
-
-        protected virtual UIComponentConfiguration GetMainComponent()
-        {
-            try
-            {
-                using (var stream = new MemoryStream(Encoding.Default.GetBytes(Resources.Main)))
-                {
-                    return Serializer.LoadComponent(stream);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to load component: {0}", e.Message);
             }
             return null;
         }

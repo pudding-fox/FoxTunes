@@ -14,7 +14,11 @@ namespace FoxTunes
 {
     public class UIComponentContainer : DockPanel, IInvocableComponent, IUIComponent, IValueConverter
     {
-        public const string CLEAR = "ZZZZ";
+        public const string CLEAR = "YYYY";
+
+        public const string EXIT = "ZZZZ";
+
+        public static readonly LayoutDesignerBehaviour Behaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
 
         public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
@@ -219,6 +223,7 @@ namespace FoxTunes
             get
             {
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, "Done");
             }
         }
 
@@ -228,6 +233,8 @@ namespace FoxTunes
             {
                 case CLEAR:
                     return this.Clear();
+                case EXIT:
+                    return this.Exit();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -239,6 +246,11 @@ namespace FoxTunes
         public Task Clear()
         {
             return Windows.Invoke(() => this.Component = null);
+        }
+
+        public Task Exit()
+        {
+            return Windows.Invoke(() => Behaviour.IsDesigning = false);
         }
 
         protected virtual void Dispatch(Func<Task> function)
