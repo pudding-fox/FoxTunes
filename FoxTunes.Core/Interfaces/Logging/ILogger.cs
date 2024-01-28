@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface ILogger : IStandardComponent
+    public interface ILogger : IBaseComponent
     {
         bool IsTraceEnabled(IBaseComponent component);
 
