@@ -53,7 +53,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this._Playback = new global::FoxTunes.ViewModel.Playback(true)
+            this._Playback = new global::FoxTunes.ViewModel.Playback(false)
             {
                 Core = core,
             };

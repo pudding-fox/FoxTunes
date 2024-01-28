@@ -101,6 +101,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <CustomToolNamespace>FoxTunes.Properties</CustomToolNamespace>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Update="Resources\Rating.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
