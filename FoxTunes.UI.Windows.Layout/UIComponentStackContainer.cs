@@ -117,8 +117,11 @@ namespace FoxTunes
                     continue;
                 }
                 this.Component.Children[a] = newComponent;
-                break;
+                this.UpdateChildren();
+                return;
             }
+            //TODO: Component was not found.
+            throw new NotImplementedException();
         }
 
         protected virtual void OnComponentChanged(object sender, EventArgs e)
@@ -265,6 +268,8 @@ namespace FoxTunes
                     this.UpdateChildren();
                     return;
                 }
+                //TODO: Component was not found.
+                throw new NotImplementedException();
             });
         }
 
@@ -286,6 +291,8 @@ namespace FoxTunes
                     }
                     return;
                 }
+                //TODO: Component was not found.
+                throw new NotImplementedException();
             });
         }
 
@@ -307,6 +314,8 @@ namespace FoxTunes
                     }
                     return;
                 }
+                //TODO: Component was not found.
+                throw new NotImplementedException();
             });
         }
 

@@ -117,29 +117,34 @@ namespace FoxTunes
             }
             foreach (var component in components)
             {
-                var margin = default(Thickness);
-                if (this.Grid.ColumnDefinitions.Count > 0)
-                {
-                    margin = new Thickness(2, 0, 0, 0);
-                }
-                this.Grid.ColumnDefinitions.Add(new ColumnDefinition()
-                {
-                    Width = width
-                });
-                var container = new UIComponentContainer()
-                {
-                    Component = component,
-                    Margin = margin,
-                    HorizontalAlignment = alignment,
-                };
-                //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
-                container.ComponentChanged += (sender, e) =>
-                {
-                    this.UpdateComponent(component, container.Component);
-                };
-                Grid.SetColumn(container, this.Grid.ColumnDefinitions.Count - 1);
-                this.Grid.Children.Add(container);
+                this.AddContainer(alignment, width, component);
             }
+        }
+
+        protected virtual void AddContainer(HorizontalAlignment alignment, GridLength width, UIComponentConfiguration component)
+        {
+            var margin = default(Thickness);
+            if (this.Grid.ColumnDefinitions.Count > 0)
+            {
+                margin = new Thickness(2, 0, 0, 0);
+            }
+            this.Grid.ColumnDefinitions.Add(new ColumnDefinition()
+            {
+                Width = width
+            });
+            var container = new UIComponentContainer()
+            {
+                Component = component,
+                Margin = margin,
+                HorizontalAlignment = alignment,
+            };
+            //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
+            container.ComponentChanged += (sender, e) =>
+            {
+                this.UpdateComponent(component, container.Component);
+            };
+            Grid.SetColumn(container, this.Grid.ColumnDefinitions.Count - 1);
+            this.Grid.Children.Add(container);
         }
 
         protected virtual void UpdateComponent(UIComponentConfiguration originalComponent, UIComponentConfiguration newComponent)
@@ -151,8 +156,11 @@ namespace FoxTunes
                     continue;
                 }
                 this.Component.Children[a] = newComponent;
-                break;
+                this.UpdateChildren();
+                return;
             }
+            //TODO: Component was not found.
+            throw new NotImplementedException();
         }
 
         protected virtual void OnComponentChanged(object sender, EventArgs e)
@@ -229,6 +237,8 @@ namespace FoxTunes
                     this.UpdateChildren();
                     return;
                 }
+                //TODO: Component was not found.
+                throw new NotImplementedException();
             });
         }
 
@@ -250,6 +260,8 @@ namespace FoxTunes
                     }
                     return;
                 }
+                //TODO: Component was not found.
+                throw new NotImplementedException();
             });
         }
 
@@ -271,6 +283,8 @@ namespace FoxTunes
                     }
                     return;
                 }
+                //TODO: Component was not found.
+                throw new NotImplementedException();
             });
         }
 
