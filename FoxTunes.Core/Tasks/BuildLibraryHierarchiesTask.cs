@@ -34,7 +34,7 @@ namespace FoxTunes
         protected override void OnRun()
         {
             this.SetPosition(0);
-            this.SetCount(this.Library.LibraryHierarchyQuery.Count());
+            this.SetCount(this.Library.LibraryItemQuery.Count() * this.Library.LibraryHierarchyQuery.Count());
             foreach (var libraryHierarchy in this.Library.LibraryHierarchyQuery)
             {
                 this.SetDescription(libraryHierarchy.Name);
@@ -42,12 +42,8 @@ namespace FoxTunes
                 var libraryHierarchyItems = this.BuildHierarchy(libraryHierarchy);
                 foreach (var libraryHierarchyItem in libraryHierarchyItems)
                 {
-                    this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => 
-                    {
-                        libraryHierarchy.Items.Add(libraryHierarchyItem);
-                    }));
+                    this.Database.Interlocked(() => libraryHierarchy.Items.Add(libraryHierarchyItem));
                 }
-                this.SetPosition(this.Position + 1);
             }
             this.SetPosition(this.Count);
             this.SaveChanges();
@@ -89,6 +85,10 @@ namespace FoxTunes
                     );
                 }
             }
+            else
+            {
+                this.SetPosition(this.Position + libraryHierarchyItems.Count);
+            }
             return libraryHierarchyItems;
         }
 
@@ -96,7 +96,7 @@ namespace FoxTunes
         {
             this.SetName("Saving changes");
             this.SetPosition(this.Count);
-            this.Database.Interlocked(() => this.Database.SaveChanges());
+            this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(() => this.Database.SaveChanges()));
         }
 
         private string ExecuteScript(LibraryItem libraryItem, string script)

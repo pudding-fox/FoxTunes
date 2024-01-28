@@ -22,6 +22,8 @@ namespace FoxTunes.Interfaces
 
         void Interlocked(Action action, TimeSpan timeout);
 
+        void WithAutoDetectChanges(Action action);
+
         int SaveChanges();
     }
 }
