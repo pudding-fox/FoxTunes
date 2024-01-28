@@ -11,26 +11,48 @@ namespace FoxTunes
 
         public const string ELEMENT_DS_DEVICE = "BBBBD4A5-4DD5-4985-A373-565335084B80";
 
+        public const string ELEMENT_REFRESH = "CCCC104A-4E97-4BDC-A246-65D21EF22DE4";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
                     .WithOptions(new[] { new SelectionConfigurationOption(MODE_DS_OPTION, "Direct Sound").Default() }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_DS_DEVICE, "Device", path: "Direct Sound")
-                    .WithOptions(GetDSDevices()));
+                    .WithOptions(GetDSDevices()))
+                .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: "Direct Sound")
+            );
+            StandardComponents.Instance.Configuration.GetElement<CommandConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                ELEMENT_REFRESH
+            ).WithHandler(() =>
+            {
+                var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
+                    BassOutputConfiguration.SECTION,
+                    ELEMENT_DS_DEVICE
+                );
+                if (element == null)
+                {
+                    return;
+                }
+                element.WithOptions(GetDSDevices(), true);
+            });
         }
 
         public static int GetDsDevice(SelectionConfigurationOption option)
         {
-            if (!string.Equals(option.Id, Bass.DefaultDevice.ToString()))
+            if (option != null)
             {
-                for (int a = 0, b = Bass.DeviceCount; a < b; a++)
+                if (!string.Equals(option.Id, Bass.DefaultDevice.ToString()))
                 {
-                    var deviceInfo = default(DeviceInfo);
-                    BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
-                    if (string.Equals(deviceInfo.Name, option.Id, StringComparison.OrdinalIgnoreCase))
+                    for (int a = 0, b = Bass.DeviceCount; a < b; a++)
                     {
-                        return a;
+                        var deviceInfo = default(DeviceInfo);
+                        BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
+                        if (string.Equals(deviceInfo.Name, option.Id, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return a;
+                        }
                     }
                 }
             }
