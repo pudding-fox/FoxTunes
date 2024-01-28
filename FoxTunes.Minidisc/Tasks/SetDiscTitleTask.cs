@@ -1,20 +1,20 @@
-﻿using MD.Net;
-using System;
-using System.Linq;
+﻿using FoxTunes.Interfaces;
+using MD.Net;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class SetDiscTitleTask : MinidiscTask, IStatus
+    public class SetDiscTitleTask : MinidiscActionTask
     {
-        public SetDiscTitleTask(string title)
+        public SetDiscTitleTask(IDevice device, string title)
         {
+            this.Device = device;
             this.Title = title;
         }
 
-        public string Title { get; private set; }
+        public IDevice Device { get; private set; }
 
-        public IResult Result { get; private set; }
+        public string Title { get; private set; }
 
         protected override Task OnStarted()
         {
@@ -24,21 +24,21 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            var device = this.DeviceManager.GetDevices().FirstOrDefault();
-            if (device != null)
+            Logger.Write(this, LogLevel.Debug, "Reading disc..");
+            var currentDisc = this.DiscManager.GetDisc(this.Device);
+            if (currentDisc != null)
             {
-                var currentDisc = this.DiscManager.GetDisc(device);
-                if (currentDisc != null)
-                {
-                    var updatedDisc = currentDisc.Clone();
-                    updatedDisc.Title = this.Title;
-                    var actions = this.ActionBuilder.GetActions(device, currentDisc, updatedDisc);
-                    this.Result = this.DiscManager.ApplyActions(device, actions, this, true);
-                    if (this.Result.Status != ResultStatus.Success)
-                    {
-                        throw new Exception(this.Result.Message);
-                    }
-                }
+                Logger.Write(this, LogLevel.Debug, "Current disc \"{0}\" has {1} tracks.", currentDisc.Title, currentDisc.Tracks.Count);
+                Logger.Write(this, LogLevel.Debug, "Setting title: {0}", this.Title);
+                var updatedDisc = currentDisc.Clone();
+                updatedDisc.Title = this.Title;
+                var actions = this.ActionBuilder.GetActions(this.Device, currentDisc, updatedDisc);
+                this.ApplyActions(this.Device, actions);
+                Logger.Write(this, LogLevel.Debug, "Successfully set title.");
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Warn, "Disc could not be read.");
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -46,23 +46,5 @@ namespace FoxTunes
             return Task.CompletedTask;
 #endif
         }
-
-        public void Update(string message, int position, int count, StatusType type)
-        {
-            switch (type)
-            {
-                case StatusType.Action:
-                    this.Description = message;
-                    this.Position = position;
-                    this.Count = count;
-                    break;
-            }
-        }
-
-#pragma warning disable 0067
-
-        public event StatusEventHandler Updated;
-
-#pragma warning restore 0067
     }
 }
