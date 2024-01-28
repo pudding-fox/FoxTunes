@@ -231,5 +231,39 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler SelectedHierarchyChanged = delegate { };
+
+        public ICommand SettingsCommand
+        {
+            get
+            {
+                return new Command(() => this.SettingsVisible = true);
+            }
+        }
+
+        private bool _SettingsVisible { get; set; }
+
+        public bool SettingsVisible
+        {
+            get
+            {
+                return this._SettingsVisible;
+            }
+            set
+            {
+                this._SettingsVisible = value;
+                this.OnSettingsVisibleChanged();
+            }
+        }
+
+        protected virtual void OnSettingsVisibleChanged()
+        {
+            if (this.SettingsVisibleChanged != null)
+            {
+                this.SettingsVisibleChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SettingsVisible");
+        }
+
+        public event EventHandler SettingsVisibleChanged = delegate { };
     }
 }

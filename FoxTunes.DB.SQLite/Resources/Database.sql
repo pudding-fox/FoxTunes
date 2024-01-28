@@ -15,17 +15,18 @@ CREATE TABLE [PlaylistItem_MetaDataItem](
     [MetaDataItem_Id] INTEGER NOT NULL REFERENCES MetaDataItems([Id]) ON DELETE CASCADE);
 CREATE TABLE [PlaylistColumns] ( 
   [Id] INTEGER NOT NULL 
+, [Sequence] INTEGER NOT NULL
 , [Name] text NOT NULL 
 , [DisplayScript] text NOT NULL 
 , [IsDynamic] INTEGER NOT NULL 
 , [Width] numeric(53,0) NULL 
 , CONSTRAINT [sqlite_master_PK_PlaylistColumns] PRIMARY KEY ([Id]) 
 );
-INSERT INTO `PlaylistColumns` VALUES (1,'Playing','playing != null && item.Id == playing.Id && item.FileName == playing.FileName ? "\u2022" : ""',1,NULL);
-INSERT INTO `PlaylistColumns` VALUES (2,'Artist / album','(function(){ var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist]; if(tag.album) { parts.push(tag.album); } return parts.join(" - "); })()',0,NULL);
-INSERT INTO `PlaylistColumns` VALUES (3,'Track no','(function(){ var parts = []; if (tag.disccount != 1 && tag.disc) { parts.push(tag.disc); } if (tag.track) { parts.push(zeropad(tag.track, 2)); } return parts.join(" - "); })()',0,NULL);
-INSERT INTO `PlaylistColumns` VALUES (4,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) { parts.push(tag.firstperformer); } if (parts.length) { return parts.join(" - "); } else { return filename(item.FileName); } })()',0,NULL);
-INSERT INTO `PlaylistColumns` VALUES (5,'Duration','timestamp(property.duration)',0,NULL);
+INSERT INTO `PlaylistColumns` VALUES (1,0,'Playing','playing != null && item.Id == playing.Id && item.FileName == playing.FileName ? "\u2022" : ""',1,NULL);
+INSERT INTO `PlaylistColumns` VALUES (2,1,'Artist / album','(function(){ var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist]; if(tag.album) { parts.push(tag.album); } return parts.join(" - "); })()',0,NULL);
+INSERT INTO `PlaylistColumns` VALUES (3,2,'Track no','(function(){ var parts = []; if (tag.disccount != 1 && tag.disc) { parts.push(tag.disc); } if (tag.track) { parts.push(zeropad(tag.track, 2)); } return parts.join(" - "); })()',0,NULL);
+INSERT INTO `PlaylistColumns` VALUES (4,3,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) { parts.push(tag.firstperformer); } if (parts.length) { return parts.join(" - "); } else { return filename(item.FileName); } })()',0,NULL);
+INSERT INTO `PlaylistColumns` VALUES (5,4,'Duration','timestamp(property.duration)',0,NULL);
 CREATE TABLE [MetaDataItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
     [Name] text NOT NULL, 
@@ -45,6 +46,8 @@ CREATE TABLE [LibraryHierarchy_LibraryHierarchyItem](
 CREATE TABLE "LibraryHierarchyLevels" (
 	`Id`	INTEGER NOT NULL,
 	`LibraryHierarchy_Id` INTEGER NOT NULL,
+	`Sequence` INTEGER NOT NULL,
+	`Name` text NOT NULL,
 	`DisplayScript`	TEXT NOT NULL,
 	`SortScript`	TEXT,
 	PRIMARY KEY(`Id`)
@@ -52,12 +55,12 @@ CREATE TABLE "LibraryHierarchyLevels" (
 CREATE INDEX [IDX_LibraryHierarchyLevels]
 ON [LibraryHierarchyLevels](
 	[LibraryHierarchy_Id]);
-INSERT INTO `LibraryHierarchyLevels` VALUES (1,1,'(function(){if(tag.__ft_variousartists) { return "Various Artists"; } return  tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist||"No Artist";})()',NULL);
-INSERT INTO `LibraryHierarchyLevels` VALUES (2,1,'(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
-INSERT INTO `LibraryHierarchyLevels` VALUES (3,1,'(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
-INSERT INTO `LibraryHierarchyLevels` VALUES (4,2,'ucfirst(tag.firstgenre)||"No Genre"',NULL);
-INSERT INTO `LibraryHierarchyLevels` VALUES (5,2,'(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
-INSERT INTO `LibraryHierarchyLevels` VALUES (6,2,'(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (1,1,0,'Artist','(function(){if(tag.__ft_variousartists) { return "Various Artists"; } return  tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist||"No Artist";})()',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (2,1,1,'Year - Album','(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (3,1,2,'Disk - Track - Title','(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (4,2,0,'Genre','ucfirst(tag.firstgenre)||"No Genre"',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (5,2,1,'Year - Album','(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (6,2,2,'Disk - Track - Title','(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
 CREATE TABLE [LibraryHierarchyItems](
     [Id] INTEGER CONSTRAINT [sqlite_master_PK_LibraryHierarchyItems] PRIMARY KEY NOT NULL, 
     [Parent_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]) ON DELETE CASCADE, 

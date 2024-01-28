@@ -6,10 +6,9 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
-        <ViewModel:DataGridSelectedItemConverter x:Key="DataGridSelectedItemConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>

@@ -73,9 +73,12 @@ namespace FoxTunes.ViewModel
                 return new Command(
                     () =>
                     {
-                        var playlistColumn = new PlaylistColumn();
-                        this.PlaylistColumns.Add(playlistColumn);
-                        this.SelectedPlaylistColumn = playlistColumn;
+                        this.Database.Sets.PlaylistColumn.Create().With(playlistColumn =>
+                        {
+                            playlistColumn.Name = "New";
+                            this.PlaylistColumns.Add(playlistColumn);
+                            this.SelectedPlaylistColumn = playlistColumn;
+                        });
                     },
                     () => this.PlaylistColumns != null
                 );

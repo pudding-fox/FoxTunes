@@ -31,12 +31,10 @@ namespace FoxTunes
 
         public override int GetHashCode()
         {
-            if (this.Id == 0)
-            {
-                //Un-persisted data uses default hash code implementation. 
-                return base.GetHashCode();
-            }
-            return this.Id.GetHashCode();
+            //This is awkward. I'd like to return this.Id.GetHashCode() but WPF gets mad when 
+            //new data is persisted (thus changing it's hash code).
+            //Everything seems to "work" with a fixed value.
+            return 0;
         }
 
         public static bool operator ==(PersistableComponent a, PersistableComponent b)

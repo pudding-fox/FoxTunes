@@ -28,7 +28,13 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Windows:LibraryViewMode SelectedLibraryHierarchy="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"></Windows:LibraryViewMode>
+        <Windows:LibraryViewMode SelectedLibraryHierarchy="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}">
+            <Windows:LibraryViewMode.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Settings" Command="{Binding SettingsCommand, Mode=OneWay, Source={StaticResource ViewModel}}"></MenuItem>
+                </ContextMenu>
+            </Windows:LibraryViewMode.ContextMenu>
+        </Windows:LibraryViewMode>
         <TreeView x:Name="TreeView" Grid.Row="1" 
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
@@ -69,6 +75,19 @@
             </TextBlock.Style>
         </TextBlock>
         <Windows:SearchBox Grid.Row="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
+        <Popup PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}" 
+              Placement="Center" 
+              AllowsTransparency="True" 
+              IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" 
+              StaysOpen="False">
+            <Border Background="{DynamicResource NormalBrush}" 
+                    BorderBrush="{DynamicResource NormalBorderBrush}" 
+                    BorderThickness="1" 
+                    CornerRadius="8,8,3,3" 
+                    Padding="10">
+                <Windows:LibrarySettingsDialog></Windows:LibrarySettingsDialog>
+            </Border>
+        </Popup>
         <Utilities:MouseCursorAdorner x:Name="MouseCursorAdorner">
             <Utilities:MouseCursorAdorner.Template>
                 <DataTemplate>

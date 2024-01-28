@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class LibraryHierarchySettings : ViewModelBase
+    public class LibrarySettings : ViewModelBase
     {
         public IDatabaseComponent Database { get; private set; }
 
@@ -31,6 +31,14 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnSelectedLibraryHierarchyChanged()
         {
+            if (this.SelectedLibraryHierarchy != null)
+            {
+                this.SelectedHierarchyLevel = this.SelectedLibraryHierarchy.Levels.FirstOrDefault();
+            }
+            else
+            {
+                this.SelectedHierarchyLevel = null;
+            }
             if (this.SelectedLibraryHierarchyChanged != null)
             {
                 this.SelectedLibraryHierarchyChanged(this, EventArgs.Empty);
@@ -118,24 +126,64 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SettingsVisibleChanged = delegate { };
 
-        public ICommand NewCommand
+        public ICommand NewHierarchyCommand
         {
             get
             {
                 return new Command(
-                    () => this.LibraryHierarchies.Add(this.Database.Sets.LibraryHierarchy.Create().With(libraryHierarchy => libraryHierarchy.Name = "New")),
+                    () => this.Database.Sets.LibraryHierarchy.Create().With(libraryHierarchy =>
+                    {
+                        libraryHierarchy.Name = "New";
+                        this.LibraryHierarchies.Add(libraryHierarchy);
+                        this.SelectedLibraryHierarchy = libraryHierarchy;
+                    }),
                     () => this.LibraryHierarchies != null
                 );
             }
         }
 
-        public ICommand DeleteCommand
+        public ICommand DeleteHierarchyCommand
         {
             get
             {
                 return new Command(
-                    () => this.LibraryHierarchies.Remove(this.SelectedLibraryHierarchy),
+                    () =>
+                    {
+                        this.LibraryHierarchies.Remove(this.SelectedLibraryHierarchy);
+                        this.SelectedLibraryHierarchy = null;
+                    },
                     () => this.LibraryHierarchies != null && this.SelectedLibraryHierarchy != null
+                );
+            }
+        }
+
+        public ICommand NewHierarchyLevelCommand
+        {
+            get
+            {
+                return new Command(
+                    () => this.Database.Sets.LibraryHierarchyLevel.Create().With(libraryHierarchyLevel =>
+                    {
+                        libraryHierarchyLevel.Name = "New";
+                        this.SelectedLibraryHierarchy.Levels.Add(libraryHierarchyLevel);
+                        this.SelectedHierarchyLevel = libraryHierarchyLevel;
+                    }),
+                    () => this.SelectedLibraryHierarchy != null
+                );
+            }
+        }
+
+        public ICommand DeleteHierarchyLevelCommand
+        {
+            get
+            {
+                return new Command(
+                    () =>
+                    {
+                        this.SelectedLibraryHierarchy.Levels.Remove(this.SelectedHierarchyLevel);
+                        this.SelectedHierarchyLevel = null;
+                    },
+                    () => this.SelectedHierarchyLevel != null
                 );
             }
         }
@@ -150,16 +198,22 @@ namespace FoxTunes.ViewModel
 
         public void Save()
         {
-            using (var transaction = this.Database.BeginTransaction())
+            try
             {
-                var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction);
-                libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies));
-                libraryHierarchies.AddOrUpdate(this.LibraryHierarchies);
-                transaction.Commit();
+                using (var transaction = this.Database.BeginTransaction())
+                {
+                    var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction);
+                    libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies));
+                    libraryHierarchies.AddOrUpdate(this.LibraryHierarchies);
+                    transaction.Commit();
+                }
+                this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+                this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
             }
-            this.Refresh();
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+            catch (Exception e)
+            {
+                this.OnError("Save", e);
+            }
         }
 
         protected override void OnCoreChanged()
@@ -173,11 +227,12 @@ namespace FoxTunes.ViewModel
         protected virtual void Refresh()
         {
             this.LibraryHierarchies = new ObservableCollection<LibraryHierarchy>(this.Database.Sets.LibraryHierarchy);
+            this.SelectedLibraryHierarchy = this.LibraryHierarchies.FirstOrDefault();
         }
 
         protected override Freezable CreateInstanceCore()
         {
-            return new LibraryHierarchySettings();
+            return new LibrarySettings();
         }
     }
 }
