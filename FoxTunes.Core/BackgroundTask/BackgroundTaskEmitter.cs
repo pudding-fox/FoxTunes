@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BackgroundTaskEmitter : StandardComponent, IBackgroundTaskEmitter
     {
         public Task Send(IBackgroundTask backgroundTask)

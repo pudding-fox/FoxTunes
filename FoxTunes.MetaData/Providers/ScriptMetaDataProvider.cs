@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class ScriptMetaDataProvider : StandardComponent, IMetaDataProvider, IDisposable
     {
         public IScriptingRuntime ScriptingRuntime { get; private set; }
