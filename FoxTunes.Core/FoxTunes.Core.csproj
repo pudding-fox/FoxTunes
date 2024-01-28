@@ -21,6 +21,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>..\distribution\Release\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -169,6 +172,7 @@
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistSequencePopulator.cs" />
     <Compile Include="Utilities\PopulatorBase.cs" />
+    <Compile Include="Utilities\Sample.cs" />
     <Compile Include="Utilities\SQL.cs" />
     <Compile Include="Utilities\Templates\LibraryHierarchyBuilder.cs">
       <AutoGen>True</AutoGen>

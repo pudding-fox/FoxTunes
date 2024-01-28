@@ -80,18 +80,6 @@ namespace FoxTunes
             return BassAsio.CheckRate(rate);
         }
 
-        public override int BufferLength
-        {
-            get
-            {
-                if (this.IsResampling)
-                {
-                    return SOX_BUFFER_LENGTH;
-                }
-                return base.BufferLength;
-            }
-        }
-
         public override bool CheckFormat(int rate, int channels)
         {
             if (!this.CheckRate(channels) || channels > BassAsio.Info.Outputs)
@@ -196,6 +184,9 @@ namespace FoxTunes
                     //If we get here some drivers (at least Creative) will crash when BassAsio.Start is called.
                     //I can't find a way to prevent it but it seems to be related to the allocated buffer size
                     //not being what the driver *thinks* it is and over-flowing.
+                    //
+                    //It should be unlikely in real life as the device would have to report capability of some
+                    //very high PCM frequencies.
                     Logger.Write(this, LogLevel.Error, "Failed to enable DSD RAW on the device. Creative ASIO driver becomes unstable and usually crashes soon...");
                     return false;
                 }
@@ -223,7 +214,7 @@ namespace FoxTunes
         {
             base.CreateResamplingChannel();
             Logger.Write(this, LogLevel.Debug, "Configuring BASS SOX: Buffer Length = {0}, Background = {1}", SOX_BUFFER_LENGTH, SOX_BACKGROUND);
-            BassUtils.OK(BassSox.ChannelSetAttribute(this.ResamplerChannelHandle, SoxChannelAttribute.BufferLength, this.BufferLength));
+            BassUtils.OK(BassSox.ChannelSetAttribute(this.ResamplerChannelHandle, SoxChannelAttribute.BufferLength, SOX_BUFFER_LENGTH));
             BassUtils.OK(BassSox.ChannelSetAttribute(this.ResamplerChannelHandle, SoxChannelAttribute.Background, SOX_BACKGROUND));
         }
 
@@ -344,6 +335,10 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Starting ASIO.");
             try
             {
+                if (this.IsResampling)
+                {
+                    BassUtils.OK(BassSox.ChannelSetAttribute(this.ResamplerChannelHandle, SoxChannelAttribute.Background, true));
+                }
                 BassUtils.OK(this.StartAsio());
             }
             catch (Exception e)
@@ -388,6 +383,10 @@ namespace FoxTunes
             try
             {
                 BassUtils.OK(BassAsio.Stop());
+                if (this.IsResampling)
+                {
+                    BassUtils.OK(BassSox.ChannelSetAttribute(this.ResamplerChannelHandle, SoxChannelAttribute.Background, false));
+                }
             }
             catch (Exception e)
             {

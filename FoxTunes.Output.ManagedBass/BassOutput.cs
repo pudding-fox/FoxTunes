@@ -349,8 +349,9 @@ namespace FoxTunes
                     var channels = BassUtils.GetChannelCount(channelHandle);
                     if (!this.OutputChannel.CheckFormat(rate, channels))
                     {
-                        Logger.Write(this, LogLevel.Warn, "The output reported that DSD RAW with rate {0} and {1} channels could not be played, removing DSD RAW flag from channel: {2}", rate, channels, channelHandle);
-                        Bass.ChannelRemoveFlag(channelHandle, BassFlags.DSDRaw);
+                        Logger.Write(this, LogLevel.Warn, "The output reported that DSD RAW with rate {0} and {1} channels could not be played. Are you sure you have a DSD capable device?", rate, channels);
+                        this.FreeStream(channelHandle);
+                        channelHandle = 0;
                     }
                 }
             }

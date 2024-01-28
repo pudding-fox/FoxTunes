@@ -45,8 +45,9 @@ namespace FoxTunes
 
         public override ConfigurationElement ConnectValue<T>(Action<T> action)
         {
-            action((T)Convert.ChangeType(this.Value, typeof(T)));
-            this.ValueChanged += (sender, e) => this.ConnectValue(action);
+            var payload = new Action(() => action((T)Convert.ChangeType(this.Value, typeof(T))));
+            payload();
+            this.ValueChanged += (sender, e) => payload();
             return this;
         }
     }

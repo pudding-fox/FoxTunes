@@ -42,7 +42,7 @@
                                             <ContentControl.Resources>
                                                 <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
                                                     <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name">
-                                                        <ComboBox.ItemContainerStyle>
+                                                        <!--<ComboBox.ItemContainerStyle>
                                                             <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding IsHidden}" Value="True">
@@ -50,7 +50,7 @@
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
-                                                        </ComboBox.ItemContainerStyle>
+                                                        </ComboBox.ItemContainerStyle>-->
                                                     </ComboBox>
                                                 </DataTemplate>
                                                 <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
