@@ -230,13 +230,9 @@ namespace FoxTunes
                         case MetaDataItemType.Image:
                             if (file.InvariantStartPosition > MAX_TAG_SIZE)
                             {
-                                Logger.Write(this, LogLevel.Warn, "Not exporting images to file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
                                 collect = true;
                             }
-                            else
-                            {
-                                await this.SetImage(metaDataItem, file, file.Tag).ConfigureAwait(false);
-                            }
+                            await this.SetImage(metaDataItem, file, file.Tag).ConfigureAwait(false);
                             break;
                     }
                 }
