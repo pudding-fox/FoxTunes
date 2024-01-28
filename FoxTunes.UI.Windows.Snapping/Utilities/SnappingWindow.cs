@@ -344,15 +344,23 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                if (!resize && this.StickyWindows.ContainsKey(snappingWindow))
-                {
-                    continue;
-                }
                 if (!snappingWindow.Adapter.IsVisible)
                 {
                     continue;
                 }
-                direction |= SnappingHelper.Snap(ref bounds, snappingWindow.Adapter.Bounds, false, resize);
+                var to = snappingWindow.Adapter.Bounds;
+                //if (this.StickyWindows.ContainsKey(snappingWindow))
+                //{
+                //    if (SnappingHelper.IsSnapped(bounds, to) == SnapDirection.None)
+                //    {
+                //        this.StickyWindows.Remove(snappingWindow);
+                //    }
+                //    else
+                //    {
+                //        continue;
+                //    }
+                //}
+                direction |= SnappingHelper.Snap(ref bounds, to, false, resize);
             }
             return direction;
         }
@@ -440,7 +448,7 @@ namespace FoxTunes
                     }
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
                     {
-                        bounds.Height = snappingWindow.PreviousBounds.Height - offset.Y;
+                        bounds.Height = snappingWindow.PreviousBounds.Height + offset.Y;
                     }
                 }
                 else if (direction.HasFlag(SnapDirection.Top))
@@ -449,9 +457,17 @@ namespace FoxTunes
                     {
                         bounds.Y = snappingWindow.PreviousBounds.Y + offset.Y;
                     }
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
+                    {
+                        bounds.Y = snappingWindow.PreviousBounds.Y + offset.Y;
+                    }
                 }
                 else if (direction.HasFlag(SnapDirection.Bottom))
                 {
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
+                    {
+                        bounds.Y = snappingWindow.PreviousBounds.Y + offset.Y;
+                    }
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
                     {
                         bounds.Y = snappingWindow.PreviousBounds.Y - offset.Y;
@@ -469,7 +485,7 @@ namespace FoxTunes
                     }
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
                     {
-                        bounds.Width = snappingWindow.PreviousBounds.Width - offset.X;
+                        bounds.Width = snappingWindow.PreviousBounds.Width + offset.X;
                     }
                 }
                 else if (direction.HasFlag(SnapDirection.Left))
@@ -478,12 +494,16 @@ namespace FoxTunes
                     {
                         bounds.X = snappingWindow.PreviousBounds.X + offset.X;
                     }
+                    if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
+                    {
+                        bounds.X = snappingWindow.PreviousBounds.X + offset.X;
+                    }
                 }
                 else if (direction.HasFlag(SnapDirection.Right))
                 {
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
                     {
-                        bounds.X = snappingWindow.PreviousBounds.X - offset.X;
+                        bounds.X = snappingWindow.PreviousBounds.X + offset.X;
                     }
                 }
             }
@@ -538,21 +558,24 @@ namespace FoxTunes
 
         protected virtual Point GetOffset(Rectangle bounds)
         {
-            if (this.ResizeDirection.HasFlag(ResizeDirection.Left) || this.ResizeDirection.HasFlag(ResizeDirection.Top))
+            var point = Point.Empty;
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
             {
-                return new Point(
-                    bounds.X - this.PreviousBounds.X,
-                    bounds.Y - this.PreviousBounds.Y
-                );
+                point.X = bounds.X - this.PreviousBounds.X;
             }
-            if (this.ResizeDirection.HasFlag(ResizeDirection.Right) || this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
             {
-                return new Point(
-                    this.PreviousBounds.Width - bounds.Width,
-                    this.PreviousBounds.Height - bounds.Height
-                );
+                point.Y = bounds.Y - this.PreviousBounds.Y;
             }
-            return Point.Empty;
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
+            {
+                point.X = bounds.Width - this.PreviousBounds.Width;
+            }
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
+            {
+                point.Y = bounds.Height - this.PreviousBounds.Height;
+            }
+            return point;
         }
 
         public bool IsDisposed { get; private set; }
@@ -640,7 +663,7 @@ namespace FoxTunes
                         continue;
                     }
                     var to = snappingWindow.Adapter.Bounds;
-                    var direction = SnappingHelper.IsSnapped(from, to);
+                    var direction = SnappingHelper.IsSnapped(from, to, 0);
                     if (direction == SnapDirection.None)
                     {
                         continue;
