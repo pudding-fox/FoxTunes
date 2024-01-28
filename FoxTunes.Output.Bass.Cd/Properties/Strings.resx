@@ -120,4 +120,22 @@
   <data name="BassCdStreamProviderBehaviour.Path" xml:space="preserve">
     <value>Open CD</value>
   </data>
+  <data name="BassCdStreamProviderBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="BassCdStreamProviderBehaviourConfiguration.Host" xml:space="preserve">
+    <value>Lookup Hosts</value>
+  </data>
+  <data name="BassCdStreamProviderBehaviourConfiguration.Host1" xml:space="preserve">
+    <value>gnudb.gnudb.org</value>
+  </data>
+  <data name="BassCdStreamProviderBehaviourConfiguration.Host2" xml:space="preserve">
+    <value>freedb.dbpoweramp.com</value>
+  </data>
+  <data name="BassCdStreamProviderBehaviourConfiguration.Lookup" xml:space="preserve">
+    <value>Lookup Tags</value>
+  </data>
+  <data name="BassCdStreamProviderBehaviourConfiguration.Section" xml:space="preserve">
+    <value>CD</value>
+  </data>
 </root>

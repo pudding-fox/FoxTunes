@@ -68,5 +68,59 @@ namespace FoxTunes {
                 return ResourceManager.GetString("BassCdStreamProviderBehaviour.Path", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string BassCdStreamProviderBehaviourConfiguration_Enabled {
+            get {
+                return ResourceManager.GetString("BassCdStreamProviderBehaviourConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lookup Hosts.
+        /// </summary>
+        internal static string BassCdStreamProviderBehaviourConfiguration_Host {
+            get {
+                return ResourceManager.GetString("BassCdStreamProviderBehaviourConfiguration.Host", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to gnudb.gnudb.org.
+        /// </summary>
+        internal static string BassCdStreamProviderBehaviourConfiguration_Host1 {
+            get {
+                return ResourceManager.GetString("BassCdStreamProviderBehaviourConfiguration.Host1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to freedb.dbpoweramp.com.
+        /// </summary>
+        internal static string BassCdStreamProviderBehaviourConfiguration_Host2 {
+            get {
+                return ResourceManager.GetString("BassCdStreamProviderBehaviourConfiguration.Host2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lookup Tags.
+        /// </summary>
+        internal static string BassCdStreamProviderBehaviourConfiguration_Lookup {
+            get {
+                return ResourceManager.GetString("BassCdStreamProviderBehaviourConfiguration.Lookup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CD.
+        /// </summary>
+        internal static string BassCdStreamProviderBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("BassCdStreamProviderBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
     }
 }
