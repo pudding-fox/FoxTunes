@@ -20,9 +20,9 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+    #line 1 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class AddLibraryHierarchyNodeToPlaylist : AddLibraryHierarchyNodeToPlaylistBase
+    public partial class PlaylistSortBuilder : PlaylistSortBuilderBase
     {
 #line hidden
         /// <summary>
@@ -30,106 +30,92 @@ namespace FoxTunes.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"
-WITH ""VerticalMetaData""
-AS
-(
-	SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", ""MetaDataItems"".""Value""
-	FROM ""LibraryHierarchyItems""
-		JOIN ""LibraryHierarchyItem_LibraryItem"" 
-			ON ""LibraryHierarchyItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryHierarchyItem_Id""
-		JOIN ""LibraryItems""
-			ON ""LibraryItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id""
-		LEFT OUTER JOIN ""LibraryItem_MetaDataItem""
-			ON ""LibraryItem_MetaDataItem"".""LibraryItem_Id"" = ""LibraryItems"".""Id"" 
-		LEFT OUTER JOIN ""MetaDataItems"" 
-			ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
-	WHERE ""LibraryHierarchyItems"".""Id"" = @libraryHierarchyItemId
-		AND
-		(
-");
+            this.Write("\r\n");
             
-            #line 25 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            #line 9 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
 
-var first = true;
-foreach (var name in this.Names)
+foreach (var expression in this.Sort.Expressions)
 {
-	if (first)
+	switch (expression.Operator)
 	{
-		first = false;
+		default:
+
+            
+            #line default
+            #line hidden
+            
+            #line 15 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(expression.Name))));
+            
+            #line default
+            #line hidden
+            
+            #line 15 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+			
+			break;
+		case SortParserResultOperator.Numeric:
+
+            
+            #line default
+            #line hidden
+            this.Write("CAST(");
+            
+            #line 18 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(expression.Name))));
+            
+            #line default
+            #line hidden
+            this.Write(" AS int)");
+            
+            #line 18 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+
+			break;
+		case SortParserResultOperator.NullCoalesce:
+
+            
+            #line default
+            #line hidden
+            this.Write("CASE WHEN ");
+            
+            #line 21 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(expression.Name))));
+            
+            #line default
+            #line hidden
+            this.Write(" IS NOT NULL \r\n\t\tTHEN ");
+            
+            #line 22 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String("1")));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\tELSE ");
+            
+            #line 23 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(expression.Child.Name))));
+            
+            #line default
+            #line hidden
+            this.Write("\r\nEND");
+            
+            #line 24 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
+
+			break;
 	}
-	else
-	{
 
             
             #line default
             #line hidden
-            this.Write(" OR ");
+            this.Write(", ");
             
-            #line 35 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-
-	}
-
-            
-            #line default
-            #line hidden
-            this.Write("\"MetaDataItems\".\"Name\" = ");
-            
-            #line 37 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(name)));
-            
-            #line default
-            #line hidden
-            
-            #line 37 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            #line 27 "C:\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistSortBuilder.tt"
 
 }
 
             
             #line default
             #line hidden
-            this.Write("\t\t)\r\n)\r\n,\r\n\"HorizontalMetaData\"\r\nAS\r\n(\r\n");
-            
-            #line 46 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
-		this.Database,
-		"VerticalMetaData", 
-		new[] { "Id", "FileName" }, 
-		new[] { "Name" }, 
-		new[] { "Value" }, 
-		this.Names
-	).TransformText()));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n)\r\n\r\nINSERT INTO \"PlaylistItems\" (\"Playlist_Id\", \"LibraryItem_Id\", \"Sequence\", " +
-                    "\"DirectoryName\", \"FileName\", \"Status\", \"Flags\") \r\nSELECT @playlistId, \"LibraryIt" +
-                    "ems\".\"Id\", @sequence + ROW_NUMBER() OVER\r\n(\r\n\tORDER BY\r\n");
-            
-            #line 62 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(new PlaylistSortBuilder(this.Database, this.Sort).TransformText()));
-            
-            #line default
-            #line hidden
-            this.Write(@"
-) - 1, ""LibraryItems"".""DirectoryName"", ""LibraryItems"".""FileName"", @status, 0
-FROM ""LibraryHierarchyItems""
-	JOIN ""LibraryHierarchyItem_LibraryItem"" 
-		ON ""LibraryHierarchyItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryHierarchyItem_Id""
-	JOIN ""LibraryItems""
-		ON ""LibraryItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id""
-	JOIN ""HorizontalMetaData""
-		ON ""HorizontalMetaData"".""Id"" = ""LibraryItems"".""Id""
-WHERE ""LibraryHierarchyItems"".""Id"" = @libraryHierarchyItemId
-");
-            
-            #line 72 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText()));
-            
-            #line default
-            #line hidden
-            this.Write(";\r\n\r\nSELECT COUNT(*)\r\nFROM \"PlaylistItems\"\r\nWHERE \"Playlist_Id\" = @playlistId\r\n\tA" +
-                    "ND \"Status\" = @status");
+            this.Write("\"HorizontalMetaData\".\"FileName\"");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -141,7 +127,7 @@ WHERE ""LibraryHierarchyItems"".""Id"" = @libraryHierarchyItemId
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class AddLibraryHierarchyNodeToPlaylistBase
+    public class PlaylistSortBuilderBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
