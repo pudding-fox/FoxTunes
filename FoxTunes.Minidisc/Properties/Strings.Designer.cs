@@ -142,6 +142,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The disc UTOC (Text) capacity is exceeded ({0}%), are you sure?.
+        /// </summary>
+        internal static string MinidiscBehaviour_ConfirmWriteDiscWithoutUTOC {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.ConfirmWriteDiscWithoutUTOC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The encoder component was not found, only WAV 16/44.1 is supported..
         /// </summary>
         internal static string MinidiscBehaviour_EncoderMissing {
