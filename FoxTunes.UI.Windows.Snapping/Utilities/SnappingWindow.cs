@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -10,6 +9,8 @@ namespace FoxTunes
 {
     public class SnappingWindow : BaseComponent, IDisposable
     {
+        public const int WM_ACTIVATE = 0x0006;
+
         public const int WM_NCLBUTTONDOWN = 0x00A1;
 
         public const int WM_KEYDOWN = 0x0100;
@@ -17,6 +18,10 @@ namespace FoxTunes
         public const int WM_MOUSEMOVE = 0x0200;
 
         public const int WM_LBUTTONUP = 0x0202;
+
+        public const int WA_ACTIVE = 1;
+
+        public const int WA_CLICKACTIVE = 2;
 
         public const int HT_CAPTION = 2;
 
@@ -115,6 +120,8 @@ namespace FoxTunes
             }
             OnActiveChanged(this);
 
+            UpdateStickyWindows();
+
             base.InitializeComponent(core);
         }
 
@@ -133,6 +140,12 @@ namespace FoxTunes
         {
             switch (msg)
             {
+                case WM_ACTIVATE:
+                    if (wParam.ToInt32() == WA_ACTIVE || wParam.ToInt32() == WA_CLICKACTIVE)
+                    {
+                        this.OnActivate();
+                    }
+                    break;
                 case WM_NCLBUTTONDOWN:
                     this.Adapter.Activate();
                     if (this.OnNonClientLeftButtonDown(wParam.ToInt32()))
@@ -205,7 +218,24 @@ namespace FoxTunes
             return IntPtr.Zero;
         }
 
-        private bool OnNonClientLeftButtonDown(int area)
+        protected virtual void OnActivate()
+        {
+            var queue = new Queue<SnappingWindow>(this.StickyWindows.Keys);
+            var activated = new HashSet<SnappingWindow>(new[] { this });
+            while (queue.Count > 0)
+            {
+                var snappingWindow = queue.Dequeue();
+                if (!activated.Add(snappingWindow))
+                {
+                    //Already activated.
+                    continue;
+                }
+                queue.EnqueueRange(snappingWindow.StickyWindows.Keys);
+                snappingWindow.Adapter.BringToFront();
+            }
+        }
+
+        protected virtual bool OnNonClientLeftButtonDown(int area)
         {
             switch (area)
             {
@@ -241,7 +271,7 @@ namespace FoxTunes
             return false;
         }
 
-        private void StartMove()
+        protected virtual void StartMove()
         {
             if (!this.Adapter.Capture)
             {
@@ -259,7 +289,7 @@ namespace FoxTunes
             this.SetHook(this.MoveHook);
         }
 
-        private void Move()
+        protected virtual void Move()
         {
             var mousePosition = GetMousePosition();
             var mouseOffset = new Point(
@@ -281,20 +311,24 @@ namespace FoxTunes
                 this.Adapter.Bounds = bounds;
                 if (this.IsSticky)
                 {
+                    var offset = new Point(
+                        this.PreviousBounds.X - bounds.X,
+                        this.PreviousBounds.Y - bounds.Y
+                    );
                     foreach (var pair in this.StickyWindows)
                     {
-                        this.Move(pair.Key, pair.Value, mouseOffset);
+                        this.Move(pair.Key, offset, pair.Value);
                     }
                 }
             }
         }
 
-        protected virtual void Move(SnappingWindow snappingWindow, SnapDirection direction, Point mouseOffset)
+        protected virtual void Move(SnappingWindow snappingWindow, Point offset, SnapDirection direction)
         {
             var bounds = snappingWindow.Adapter.Bounds;
             var location = new Point(
-                snappingWindow.PreviousBounds.X + mouseOffset.X,
-                snappingWindow.PreviousBounds.Y + mouseOffset.Y
+                snappingWindow.PreviousBounds.X - offset.X,
+                snappingWindow.PreviousBounds.Y - offset.Y
             );
             bounds.Location = location;
             if (snappingWindow.Adapter.Bounds != bounds)
@@ -392,15 +426,19 @@ namespace FoxTunes
                 this.Adapter.Bounds = bounds;
                 if (this.IsSticky)
                 {
+                    var offset = new Point(
+                       this.PreviousBounds.X - bounds.X,
+                       this.PreviousBounds.Y - bounds.Y
+                   );
                     foreach (var pair in this.StickyWindows)
                     {
-                        this.Resize(pair.Key, pair.Value, mouseOffset);
+                        this.Resize(pair.Key, offset, pair.Value);
                     }
                 }
             }
         }
 
-        protected virtual void Resize(SnappingWindow snappingWindow, SnapDirection direction, Point mouseOffset)
+        protected virtual void Resize(SnappingWindow snappingWindow, Point offset, SnapDirection direction)
         {
             var bounds = snappingWindow.Adapter.Bounds;
             if (direction.HasFlag(SnapDirection.Left) || direction.HasFlag(SnapDirection.Right))
@@ -409,26 +447,26 @@ namespace FoxTunes
                 {
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
                     {
-                        bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
-                        bounds.Height = snappingWindow.PreviousBounds.Height - mouseOffset.Y;
+                        bounds.Y = snappingWindow.PreviousBounds.Y + offset.Y;
+                        bounds.Height = snappingWindow.PreviousBounds.Height - offset.Y;
                     }
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
                     {
-                        bounds.Height = snappingWindow.PreviousBounds.Height + mouseOffset.Y;
+                        bounds.Height = snappingWindow.PreviousBounds.Height + offset.Y;
                     }
                 }
                 else if (direction.HasFlag(SnapDirection.Top))
                 {
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
                     {
-                        bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
+                        bounds.Y = snappingWindow.PreviousBounds.Y + offset.Y;
                     }
                 }
                 else if (direction.HasFlag(SnapDirection.Bottom))
                 {
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
                     {
-                        bounds.Y = snappingWindow.PreviousBounds.Y + mouseOffset.Y;
+                        bounds.Y = snappingWindow.PreviousBounds.Y + offset.Y;
                     }
                 }
             }
@@ -438,26 +476,26 @@ namespace FoxTunes
                 {
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
                     {
-                        bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
-                        bounds.Width = snappingWindow.PreviousBounds.Width - mouseOffset.X;
+                        bounds.X = snappingWindow.PreviousBounds.X + offset.X;
+                        bounds.Width = snappingWindow.PreviousBounds.Width - offset.X;
                     }
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
                     {
-                        bounds.Width = snappingWindow.PreviousBounds.Width + mouseOffset.X;
+                        bounds.Width = snappingWindow.PreviousBounds.Width + offset.X;
                     }
                 }
                 else if (direction.HasFlag(SnapDirection.Left))
                 {
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
                     {
-                        bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
+                        bounds.X = snappingWindow.PreviousBounds.X + offset.X;
                     }
                 }
                 else if (direction.HasFlag(SnapDirection.Right))
                 {
                     if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
                     {
-                        bounds.X = snappingWindow.PreviousBounds.X + mouseOffset.X;
+                        bounds.X = snappingWindow.PreviousBounds.X + offset.X;
                     }
                 }
             }
@@ -574,11 +612,14 @@ namespace FoxTunes
             foreach (var stickyWindow in Active)
             {
                 stickyWindow.StickyWindows.Clear();
+            }
+            foreach (var stickyWindow in Active)
+            {
                 if (!stickyWindow.IsSticky || !stickyWindow.Adapter.IsVisible)
                 {
                     continue;
                 }
-                var bounds = stickyWindow.Adapter.Bounds;
+                var from = stickyWindow.Adapter.Bounds;
                 foreach (var snappingWindow in Active)
                 {
                     if (object.ReferenceEquals(stickyWindow, snappingWindow))
@@ -590,12 +631,14 @@ namespace FoxTunes
                         //Don't stick sticky windows together or they can't be separated!
                         continue;
                     }
-                    var direction = SnappingHelper.IsSnapped(bounds, snappingWindow.Adapter.Bounds);
+                    var to = snappingWindow.Adapter.Bounds;
+                    var direction = SnappingHelper.IsSnapped(from, to);
                     if (direction == SnapDirection.None)
                     {
                         continue;
                     }
                     stickyWindow.StickyWindows[snappingWindow] = direction;
+                    snappingWindow.StickyWindows[stickyWindow] = SnappingHelper.IsSnapped(to, from);
                 }
             }
         }

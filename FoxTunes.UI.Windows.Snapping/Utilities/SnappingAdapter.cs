@@ -119,6 +119,17 @@ namespace FoxTunes
             this.Window.Activate();
         }
 
+        public void BringToFront()
+        {
+            if (this.Window.Topmost)
+            {
+                //Already on top.
+                return;
+            }
+            this.Window.Topmost = true;
+            this.Window.Topmost = false;
+        }
+
         public static global::System.Windows.Window GetWindow(IntPtr handle)
         {
             var windows = System.Windows.Application.Current.Windows;
