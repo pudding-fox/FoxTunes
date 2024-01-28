@@ -171,7 +171,7 @@ namespace FoxTunes.ViewModel
                 await this.Synchronize(new List<LibraryBrowserFrame>()
                 {
                     new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                });
+                }).ConfigureAwait(false);
                 this.OnItemsChanged();
             }
             finally
@@ -190,7 +190,7 @@ namespace FoxTunes.ViewModel
                 await this.Synchronize(new List<LibraryBrowserFrame>()
                 {
                     new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-                });
+                }).ConfigureAwait(false);
                 await base.Reload().ConfigureAwait(false);
             }
             finally
@@ -260,7 +260,7 @@ namespace FoxTunes.ViewModel
             }
             if (object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => frames.Remove(frame));
+                await Windows.Invoke(() => frames.Remove(frame)).ConfigureAwait(false);
             }
             else
             {
@@ -268,7 +268,7 @@ namespace FoxTunes.ViewModel
             }
             if (updateSelection && object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => this.SelectedItem = frame.ItemsSource);
+                await Windows.Invoke(() => this.SelectedItem = frame.ItemsSource).ConfigureAwait(false);
             }
         }
 
@@ -298,7 +298,7 @@ namespace FoxTunes.ViewModel
             );
             if (object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => frames.Add(frame));
+                await Windows.Invoke(() => frames.Add(frame)).ConfigureAwait(false);
             }
             else
             {
@@ -306,7 +306,7 @@ namespace FoxTunes.ViewModel
             }
             if (updateSelection && object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => this.SelectedItem = libraryHierarchyNodes.FirstOrDefault());
+                await Windows.Invoke(() => this.SelectedItem = libraryHierarchyNodes.FirstOrDefault()).ConfigureAwait(false);
             }
             return true;
         }
@@ -320,7 +320,7 @@ namespace FoxTunes.ViewModel
         {
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
-                await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames));
+                await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames)).ConfigureAwait(false);
                 return;
             }
             var path = new List<LibraryHierarchyNode>();
@@ -340,23 +340,23 @@ namespace FoxTunes.ViewModel
                     {
                         while (frames.Count > a)
                         {
-                            await this.Up(frames, false);
+                            await this.Up(frames, false).ConfigureAwait(false);
                         }
-                        await this.Down(libraryHierarchyNode, frames, false);
+                        await this.Down(libraryHierarchyNode, frames, false).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    await this.Down(libraryHierarchyNode, frames, false);
+                    await this.Down(libraryHierarchyNode, frames, false).ConfigureAwait(false);
                 }
             }
             while (frames.Count > path.Count)
             {
-                await this.Up(frames, false);
+                await this.Up(frames, false).ConfigureAwait(false);
             }
             if (!object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames));
+                await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames)).ConfigureAwait(false);
             }
         }
 
