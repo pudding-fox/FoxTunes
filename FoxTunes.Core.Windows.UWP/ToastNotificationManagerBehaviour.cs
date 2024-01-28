@@ -211,9 +211,12 @@ namespace FoxTunes
 
         protected virtual string CreateNotificationXml_1(IDictionary<string, string> metaData)
         {
-            var title = metaData[CommonMetaData.Title];
-            var album = metaData[CommonMetaData.Album];
-            var artist = metaData[CommonMetaData.Artist];
+            var title = default(string);
+            var album = default(string);
+            var artist = default(string);
+            metaData.TryGetValue(CommonMetaData.Title, out title);
+            metaData.TryGetValue(CommonMetaData.Album, out album);
+            metaData.TryGetValue(CommonMetaData.Artist, out artist);
             return @"
 <toast>
     <visual>
@@ -229,9 +232,12 @@ namespace FoxTunes
 
         protected virtual string CreateNotificationXml_2(IDictionary<string, string> metaData, string fileName)
         {
-            var title = metaData[CommonMetaData.Title];
-            var album = metaData[CommonMetaData.Album];
-            var artist = metaData[CommonMetaData.Artist];
+            var title = default(string);
+            var album = default(string);
+            var artist = default(string);
+            metaData.TryGetValue(CommonMetaData.Title, out title);
+            metaData.TryGetValue(CommonMetaData.Album, out album);
+            metaData.TryGetValue(CommonMetaData.Artist, out artist);
             return @"
 <toast>
     <visual>
@@ -251,9 +257,12 @@ namespace FoxTunes
 
         protected virtual string CreateNotificationXml_3(IDictionary<string, string> metaData, string fileName)
         {
-            var title = metaData[CommonMetaData.Title];
-            var album = metaData[CommonMetaData.Album];
-            var artist = metaData[CommonMetaData.Artist];
+            var title = default(string);
+            var album = default(string);
+            var artist = default(string);
+            metaData.TryGetValue(CommonMetaData.Title, out title);
+            metaData.TryGetValue(CommonMetaData.Album, out album);
+            metaData.TryGetValue(CommonMetaData.Artist, out artist);
             return @"
 <toast>
     <visual>
