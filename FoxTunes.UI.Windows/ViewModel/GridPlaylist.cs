@@ -1,4 +1,5 @@
-﻿using FoxDb;
+﻿#define FILE_ACTION_MANAGER_DROP_ACTION
+using FoxDb;
 using FoxTunes.Integration;
 using FoxTunes.Interfaces;
 using System;
@@ -15,6 +16,8 @@ namespace FoxTunes.ViewModel
     public abstract class GridPlaylist : PlaylistBase
     {
         public PlaylistColumn SortColumn { get; private set; }
+
+        public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -214,6 +217,7 @@ namespace FoxTunes.ViewModel
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.ScriptingRuntime);
             this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
+            this.FileActionHandlerManager = core.Managers.FileActionHandler;
             this.Configuration = core.Components.Configuration;
 #if NET40
             //ListView grouping is too slow under net40 due to lack of virtualization.
@@ -424,7 +428,11 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
+#if FILE_ACTION_MANAGER_DROP_ACTION
+                    return this.FileActionHandlerManager.RunPaths(paths);
+#else
                     return this.AddToPlaylist(paths);
+#endif
                 }
                 if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
                 {
@@ -442,7 +450,11 @@ namespace FoxTunes.ViewModel
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
                     var paths = ShellIDListHelper.GetData(e.Data);
+#if FILE_ACTION_MANAGER_DROP_ACTION
+                    return this.FileActionHandlerManager.RunPaths(paths);
+#else
                     return this.AddToPlaylist(paths);
+#endif
                 }
 #endif
             }
