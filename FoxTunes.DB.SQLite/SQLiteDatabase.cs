@@ -2,6 +2,7 @@
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.ComponentModel;
+using System.Data;
 using System.Data.SQLite;
 using System.IO;
 
@@ -15,14 +16,18 @@ namespace FoxTunes
             "Database.db"
         );
 
-        public SQLiteDatabase() : base(GetProvider())
+        public SQLiteDatabase()
+            : base(GetProvider())
         {
 
         }
 
-        public override IDatabaseComponent New()
+        public override IsolationLevel PreferredIsolationLevel
         {
-            return this;
+            get
+            {
+                return IsolationLevel.Unspecified;
+            }
         }
 
         protected override void Configure()

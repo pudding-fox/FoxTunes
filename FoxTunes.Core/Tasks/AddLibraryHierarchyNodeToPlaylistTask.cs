@@ -38,7 +38,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 if (this.Clear)
                 {

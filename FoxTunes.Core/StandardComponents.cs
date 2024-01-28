@@ -18,14 +18,6 @@ namespace FoxTunes
             }
         }
 
-        public IDatabaseComponent Database
-        {
-            get
-            {
-                return ComponentRegistry.Instance.GetComponent<IDatabaseComponent>();
-            }
-        }
-
         public IUserInterface UserInterface
         {
             get

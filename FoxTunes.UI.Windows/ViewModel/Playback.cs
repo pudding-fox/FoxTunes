@@ -1,5 +1,4 @@
-﻿using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -9,8 +8,6 @@ namespace FoxTunes.ViewModel
     public class Playback : ViewModelBase
     {
         public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
-        public IDatabase Database { get; private set; }
 
         public IOutput Output { get; private set; }
 
@@ -119,7 +116,6 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
-            this.Database = this.Core.Components.Database;
             this.Output = this.Core.Components.Output;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;

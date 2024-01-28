@@ -11,7 +11,7 @@ namespace FoxTunes.Managers
     {
         public ICore Core { get; private set; }
 
-        public IDatabaseComponent Database { get; private set; }
+        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -44,7 +44,7 @@ namespace FoxTunes.Managers
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Database = core.Components.Database;
+            this.DatabaseFactory = core.Factories.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             //TODO: Bad .Wait().
@@ -64,9 +64,9 @@ namespace FoxTunes.Managers
 
         public Task<bool> HasItems()
         {
-            using (var database = this.Database.New())
+            using (var database = this.DatabaseFactory.Create())
             {
-                using (var transaction = database.BeginTransaction())
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     return database.ExecuteScalarAsync<bool>(database.QueryFactory.Build().With(query1 =>
                     {
@@ -96,7 +96,7 @@ namespace FoxTunes.Managers
         public async Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.Database != null && await this.HasItems();
+            this.CanNavigate = this.DatabaseFactory != null && await this.HasItems();
         }
 
         public async Task Add(IEnumerable<string> paths)

@@ -4,6 +4,14 @@ namespace FoxTunes
 {
     public class StandardFactories : IStandardFactories
     {
+        public IDatabaseFactory Database
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IDatabaseFactory>();
+            }
+        }
+
         public IMetaDataSourceFactory MetaDataSource
         {
             get

@@ -31,7 +31,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Database = core.Components.Database.New();
+            this.Database = core.Factories.Database.Create();
             this.SignalEmitter = core.Components.SignalEmitter;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             base.InitializeComponent(core);
@@ -166,10 +166,7 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (!object.ReferenceEquals(this.Core.Components.Database, this.Database))
-            {
-                this.Database.Dispose();
-            }
+            this.Database.Dispose();
             base.OnDisposing();
         }
     }

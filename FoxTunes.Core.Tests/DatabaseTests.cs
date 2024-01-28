@@ -42,9 +42,9 @@ namespace FoxTunes
         [Explicit]
         public void CanAddUpdateDeleteRecords()
         {
-            using (var database = this.Core.Components.Database.New())
+            using (var database = this.Core.Factories.Database.Create())
             {
-                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     var set = database.Set<PlaylistColumn>(transaction);
                     set.Remove(set);

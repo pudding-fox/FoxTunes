@@ -2,6 +2,8 @@
 {
     public interface IStandardFactories
     {
+        IDatabaseFactory Database { get; }
+
         IMetaDataSourceFactory MetaDataSource { get; }
     }
 }

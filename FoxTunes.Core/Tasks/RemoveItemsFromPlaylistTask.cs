@@ -21,7 +21,7 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             this.IsIndeterminate = true;
-            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 foreach (var playlistItem in this.PlaylistItems)
                 {

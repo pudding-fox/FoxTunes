@@ -2,7 +2,6 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -11,7 +10,7 @@ namespace FoxTunes.ViewModel
 {
     public class LibrarySettings : ViewModelBase
     {
-        public IDatabaseComponent Database { get; private set; }
+        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -96,9 +95,9 @@ namespace FoxTunes.ViewModel
         {
             try
             {
-                using (var database = this.Database.New())
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
                         var libraryHierarchies = database.Set<LibraryHierarchy>(transaction);
                         libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
@@ -134,16 +133,22 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
-            this.Database = this.Core.Components.Database;
+            this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.LibraryHierarchyLevels = new CollectionManager<LibraryHierarchyLevel>()
             {
-                ItemFactory = () => this.Database.Set<LibraryHierarchyLevel>().Create().With(libraryHierarchyLevel =>
+                ItemFactory = () =>
                 {
-                    libraryHierarchyLevel.Name = "New";
-                    libraryHierarchyLevel.DisplayScript = "'New'";
-                    libraryHierarchyLevel.Sequence = this.LibraryHierarchyLevels.ItemsSource.Count();
-                }),
+                    using (var database = this.DatabaseFactory.Create())
+                    {
+                        return database.Set<LibraryHierarchyLevel>().Create().With(libraryHierarchyLevel =>
+                        {
+                            libraryHierarchyLevel.Name = "New";
+                            libraryHierarchyLevel.DisplayScript = "'New'";
+                            libraryHierarchyLevel.Sequence = this.LibraryHierarchyLevels.ItemsSource.Count();
+                        });
+                    }
+                },
                 ExchangeHandler = (item1, item2) =>
                 {
                     var temp = item1.Sequence;
@@ -153,11 +158,17 @@ namespace FoxTunes.ViewModel
             };
             this.LibraryHierarchies = new CollectionManager<LibraryHierarchy>()
             {
-                ItemFactory = () => this.Database.Set<LibraryHierarchy>().Create().With(libraryHierarchy =>
+                ItemFactory = () =>
                 {
-                    libraryHierarchy.Name = "New";
-                    libraryHierarchy.Sequence = this.LibraryHierarchies.ItemsSource.Count();
-                }),
+                    using (var database = this.DatabaseFactory.Create())
+                    {
+                        return database.Set<LibraryHierarchy>().Create().With(libraryHierarchy =>
+                        {
+                            libraryHierarchy.Name = "New";
+                            libraryHierarchy.Sequence = this.LibraryHierarchies.ItemsSource.Count();
+                        });
+                    }
+                },
                 ExchangeHandler = (item1, item2) =>
                 {
                     var temp = item1.Sequence;
@@ -182,9 +193,9 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            using (var database = this.Database.New())
+            using (var database = this.DatabaseFactory.Create())
             {
-                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     this.LibraryHierarchies.ItemsSource = new ObservableCollection<LibraryHierarchy>(
                         database.Set<LibraryHierarchy>(transaction)

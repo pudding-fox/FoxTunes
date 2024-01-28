@@ -1,8 +1,7 @@
-﻿using NUnit.Framework;
-using System.Threading.Tasks;
+﻿using FoxDb;
+using NUnit.Framework;
 using System.Linq;
-using FoxDb;
-using System.Data;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -125,9 +124,9 @@ namespace FoxTunes
 
         protected virtual async Task<PlaylistItem> GetPlaylistItem(string fileName)
         {
-            using (var database = this.Core.Components.Database.New())
+            using (var database = this.Core.Factories.Database.Create())
             {
-                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     return await database.AsQueryable<PlaylistItem>(transaction)
                         .Where(playlistItem => playlistItem.FileName == fileName)
@@ -139,16 +138,22 @@ namespace FoxTunes
 
         protected virtual void AssertPlaylistItems(params string[] fileNames)
         {
-            var set = this.Core.Components.Database.Set<PlaylistItem>();
-            var query = (
-                from element in set
-                orderby element.Sequence
-                select element
-            ).ToArray();
-            Assert.AreEqual(fileNames.Length, query.Length);
-            for (var a = 0; a < fileNames.Length; a++)
+            using (var database = this.Core.Factories.Database.Create())
             {
-                Assert.AreEqual(fileNames[a], query[a].FileName);
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var set = database.Set<PlaylistItem>(transaction);
+                    var query = (
+                        from element in set
+                        orderby element.Sequence
+                        select element
+                    ).ToArray();
+                    Assert.AreEqual(fileNames.Length, query.Length);
+                    for (var a = 0; a < fileNames.Length; a++)
+                    {
+                        Assert.AreEqual(fileNames[a], query[a].FileName);
+                    }
+                }
             }
         }
     }

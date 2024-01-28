@@ -1,14 +1,13 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
-using FoxDb;
 using System.Windows.Input;
-using System.Collections;
 
 namespace FoxTunes.ViewModel
 {
@@ -28,7 +27,7 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
-        public IDatabaseComponent Database { get; private set; }
+        public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -38,11 +37,11 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Database != null)
+                if (this.DatabaseFactory != null)
                 {
-                    using (var database = this.Database.New())
+                    using (var database = this.DatabaseFactory.Create())
                     {
-                        using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var set = database.Set<LibraryHierarchy>(transaction);
                             set.Fetch.Sort.Expressions.Clear();
@@ -162,9 +161,9 @@ namespace FoxTunes.ViewModel
 
         public virtual void Reload()
         {
-            using (var database = this.Core.Components.Database.New())
+            using (var database = this.DatabaseFactory.Create())
             {
-                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     var queryable = database.AsQueryable<LibraryHierarchy>(transaction);
                     this.SelectedHierarchy = queryable.OrderBy(libraryHierarchy => libraryHierarchy.Sequence).FirstOrDefault();
@@ -182,7 +181,7 @@ namespace FoxTunes.ViewModel
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.PlaylistManager = this.Core.Managers.Playlist;
-            this.Database = this.Core.Components.Database;
+            this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.LibraryManager = this.Core.Managers.Library;

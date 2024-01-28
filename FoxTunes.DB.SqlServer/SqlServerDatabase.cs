@@ -9,17 +9,10 @@ using System.Threading;
 
 namespace FoxTunes
 {
-    [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database)]
     public class SqlServerDatabase : Database
     {
         public SqlServerDatabase()
             : base(GetProvider())
-        {
-
-        }
-
-        protected SqlServerDatabase(IConfig config) 
-            : base(GetProvider(), config)
         {
 
         }
@@ -32,9 +25,12 @@ namespace FoxTunes
             }
         }
 
-        public override IDatabaseComponent New()
+        public override IsolationLevel PreferredIsolationLevel
         {
-            return new SqlServerDatabase(this.Config).With(database => database.InitializeComponent(this.Core));
+            get
+            {
+                return IsolationLevel.ReadUncommitted;
+            }
         }
 
         protected override void Configure()

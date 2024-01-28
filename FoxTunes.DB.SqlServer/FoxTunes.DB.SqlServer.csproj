@@ -55,6 +55,7 @@
     </Compile>
     <Compile Include="SqlServerDatabase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlServerDatabaseFactory.cs" />
     <Compile Include="SqlServerDatabaseQueries.cs" />
     <Compile Include="Templates\LibraryHierarchyBuilder.cs">
       <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>

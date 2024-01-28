@@ -228,7 +228,7 @@ namespace FoxTunes
                     }
                     //Always append for now.
                     this.Sequence = await this.PlaylistManager.GetInsertIndex();
-                    using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                    using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                     {
                         await this.AddPlaylistItems(transaction);
                         await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
