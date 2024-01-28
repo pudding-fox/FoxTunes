@@ -39,6 +39,60 @@ namespace FoxTunes.ViewModel
             menu.OnCategoryChanged();
         }
 
+        public static readonly DependencyProperty ComponentsProperty = DependencyProperty.Register(
+            "Components",
+            typeof(ObservableCollection<IInvocableComponent>),
+            typeof(Menu),
+            new PropertyMetadata(new PropertyChangedCallback(OnComponentsChanged))
+        );
+
+        public static ObservableCollection<IInvocableComponent> GetComponents(Menu source)
+        {
+            return (ObservableCollection<IInvocableComponent>)source.GetValue(ComponentsProperty);
+        }
+
+        public static void SetComponents(Menu source, ObservableCollection<IInvocableComponent> value)
+        {
+            source.SetValue(ComponentsProperty, value);
+        }
+
+        public static void OnComponentsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var menu = sender as Menu;
+            if (menu == null)
+            {
+                return;
+            }
+            menu.OnComponentsChanged();
+        }
+
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
+            "Source",
+            typeof(object),
+            typeof(Menu),
+            new PropertyMetadata(new PropertyChangedCallback(OnSourceChanged))
+        );
+
+        public static object GetSource(Menu source)
+        {
+            return source.GetValue(SourceProperty);
+        }
+
+        public static void SetSource(Menu source, object value)
+        {
+            source.SetValue(SourceProperty, value);
+        }
+
+        public static void OnSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var menu = sender as Menu;
+            if (menu == null)
+            {
+                return;
+            }
+            menu.OnSourceChanged();
+        }
+
         public static readonly DependencyProperty MenuVisibleProperty = DependencyProperty.Register(
             "MenuVisible",
             typeof(bool),
@@ -68,13 +122,6 @@ namespace FoxTunes.ViewModel
 
         public Menu()
         {
-            this.InvocableComponents = new ObservableCollection<IInvocableComponent>(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
-            this.Items = new ObservableCollection<MenuItem>();
-        }
-
-        public Menu(IEnumerable<IInvocableComponent> components)
-        {
-            this.InvocableComponents = new ObservableCollection<IInvocableComponent>(components);
             this.Items = new ObservableCollection<MenuItem>();
         }
 
@@ -100,6 +147,52 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler CategoryChanged;
+
+        public ObservableCollection<IInvocableComponent> Components
+        {
+            get
+            {
+                return this.GetValue(ComponentsProperty) as ObservableCollection<IInvocableComponent>;
+            }
+            set
+            {
+                this.SetValue(ComponentsProperty, value);
+            }
+        }
+
+        protected virtual void OnComponentsChanged()
+        {
+            if (this.ComponentsChanged != null)
+            {
+                this.ComponentsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Components");
+        }
+
+        public event EventHandler ComponentsChanged;
+
+        public object Source
+        {
+            get
+            {
+                return this.GetValue(SourceProperty);
+            }
+            set
+            {
+                this.SetValue(SourceProperty, value);
+            }
+        }
+
+        protected virtual void OnSourceChanged()
+        {
+            if (this.SourceChanged != null)
+            {
+                this.SourceChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Source");
+        }
+
+        public event EventHandler SourceChanged;
 
         public bool MenuVisible
         {
@@ -128,14 +221,16 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler MenuVisibleChanged;
 
-        public ObservableCollection<IInvocableComponent> InvocableComponents { get; set; }
-
         public ObservableCollection<MenuItem> Items { get; set; }
 
         public virtual IEnumerable<MenuItem> GetItems()
         {
+            if (this.Components == null)
+            {
+                this.Components = new ObservableCollection<IInvocableComponent>(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
+            }
             var items = new List<MenuItem>();
-            foreach (var component in this.InvocableComponents)
+            foreach (var component in this.Components)
             {
                 foreach (var invocation in component.Invocations)
                 {
@@ -143,6 +238,10 @@ namespace FoxTunes.ViewModel
                     {
                         continue;
                     }
+
+                    //TODO: Hack to set some kind of invocation context.
+                    invocation.Source = this.Source;
+
                     var item = new MenuItem(component, invocation);
                     item.Core = this.Core;
                     if (string.IsNullOrEmpty(invocation.Path))

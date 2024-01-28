@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -204,7 +205,7 @@ namespace FoxTunes
 
                 public UIComponentContainer Container { get; private set; }
 
-                protected virtual global::FoxTunes.ViewModel.Menu GetMenu()
+                protected virtual void InitializeComponent()
                 {
                     //TODO: Max depth should be about 2.
                     var panel = this.Container.FindAncestor<UIComponentPanel>();
@@ -214,30 +215,12 @@ namespace FoxTunes
                         components.Add(panel);
                     }
                     components.Add(this.Container);
-                    return new global::FoxTunes.ViewModel.Menu(components);
-                }
-
-                protected virtual void InitializeComponent()
-                {
-                    this.ContextMenu = new ContextMenu();
-                    using (var menu = this.GetMenu())
+                    this.ContextMenu = new Menu()
                     {
-                        foreach (var menuItem in menu.GetItems())
-                        {
-                            if (menuItem == null)
-                            {
-                                this.ContextMenu.Items.Add(new Separator());
-                                continue;
-                            }
-                            menuItem.Invocation.Source = this.Container;
-                            this.ContextMenu.Items.Add(new MenuItem()
-                            {
-                                Header = menuItem.Invocation.Name,
-                                Command = menuItem.Command,
-                                IsChecked = menuItem.Selected
-                            });
-                        }
-                    }
+                        Category = InvocationComponent.CATEGORY_GLOBAL,
+                        Components = new ObservableCollection<IInvocableComponent>(components),
+                        Source = this.Container
+                    };
                     this.ContextMenu.Opened += this.OnOpened;
                     this.ContextMenu.Closed += this.OnClosed;
                     this.ContextMenu.IsOpen = true;

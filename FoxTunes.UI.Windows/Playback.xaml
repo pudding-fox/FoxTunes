@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="FoxTunes.Playback"
+﻿<Windows:UIComponentBase x:Class="FoxTunes.Playback"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -20,4 +20,4 @@
         <Button Command="{Binding PreviousCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Margin="0,0,2,0" Content="9"></Button>
         <Button Command="{Binding NextCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Width="30" Height="30" FontFamily="Webdings" FontSize="20" Content=":"></Button>
     </StackPanel>
-</UserControl>
+</Windows:UIComponentBase>
