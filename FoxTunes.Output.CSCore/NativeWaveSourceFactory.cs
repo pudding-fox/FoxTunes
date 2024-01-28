@@ -15,9 +15,10 @@ namespace FoxTunes
             {
                 return false;
             }
+            extension = extension.Substring(1);
             return CodecFactory.Instance
                 .GetSupportedFileExtensions()
-                .Contains(extension.Substring(1), StringComparer.OrdinalIgnoreCase);
+                .Contains(extension, StringComparer.OrdinalIgnoreCase);
         }
 
         public override IWaveSource CreateWaveSource(string fileName)

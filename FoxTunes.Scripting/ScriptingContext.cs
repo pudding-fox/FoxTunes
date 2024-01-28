@@ -31,6 +31,13 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            //Nothing to do.
+        }
+
+        ~ScriptingContext()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 
 namespace FoxTunes
 {
-    public class EnumerableDataReader : IEnumerable<EnumerableDataReader.EnumerableDataReaderRow>, IDisposable
+    public class EnumerableDataReader : BaseComponent, IEnumerable<EnumerableDataReader.EnumerableDataReaderRow>, IDisposable
     {
         public EnumerableDataReader(IDataReader reader)
         {
@@ -48,6 +49,12 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             this.Reader.Dispose();
+        }
+
+        ~EnumerableDataReader()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
 
         public static EnumerableDataReader Create(IDataReader reader)
