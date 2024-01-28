@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <Grid>
-        <Slider Value="{Binding Managers.Playback.CurrentStream.Position}" Maximum="{Binding Managers.Playback.CurrentStream.Length}"></Slider>
+        <Slider VerticalAlignment="Center" Value="{Binding Managers.Playback.CurrentStream.Position}" Maximum="{Binding Managers.Playback.CurrentStream.Length}"></Slider>
     </Grid>
 </UserControl>

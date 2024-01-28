@@ -24,7 +24,7 @@ namespace FoxTunes.Behaviours
             {
                 return;
             }
-            this.PlaybackManager.Stop();
+            this.PlaybackManager.CurrentStream.Stop();
             this.PlaybackManager.Unload();
         }
 
@@ -35,7 +35,7 @@ namespace FoxTunes.Behaviours
                 return;
             }
             this.PlaybackManager.Load(this.Playlist.SelectedItem.FileName);
-            this.PlaybackManager.Play();
+            this.PlaybackManager.CurrentStream.Play();
         }
     }
 }

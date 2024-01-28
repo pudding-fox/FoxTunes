@@ -61,22 +61,27 @@ namespace FoxTunes
             }
         }
 
-        public override bool Paused
+        public override bool IsPlaying
+        {
+            get
+            {
+                return this.SoundOut.PlaybackState == PlaybackState.Playing;
+            }
+        }
+
+        public override bool IsPaused
         {
             get
             {
                 return this.SoundOut.PlaybackState == PlaybackState.Paused;
             }
-            set
+        }
+
+        public override bool IsStopped
+        {
+            get
             {
-                if (value)
-                {
-                    this.SoundOut.Pause();
-                }
-                else
-                {
-                    this.SoundOut.Resume();
-                }
+                return this.SoundOut.PlaybackState == PlaybackState.Stopped;
             }
         }
 
@@ -102,20 +107,44 @@ namespace FoxTunes
         {
             var manual = this.StopRequested;
             this.StopRequested = false;
+            this.EmitState();
             this.OnStopped(manual);
         }
-
 
         public override void Play()
         {
             this.SoundOut.Initialize(this.NotificationSource.ToWaveSource());
             this.SoundOut.Play();
+            this.EmitState();
+            this.OnPlayed(true);
+        }
+
+        public override void Pause()
+        {
+            this.SoundOut.Pause();
+            this.EmitState();
+            this.OnPaused();
+        }
+
+        public override void Resume()
+        {
+            this.SoundOut.Resume();
+            this.EmitState();
+            this.OnResumed();
         }
 
         public override void Stop()
         {
             this.StopRequested = true;
             this.SoundOut.Stop();
+            this.EmitState();
+        }
+
+        private void EmitState()
+        {
+            this.OnIsPlayingChanged();
+            this.OnIsPausedChanged();
+            this.OnIsStoppedChanged();
         }
 
         public override void Dispose()

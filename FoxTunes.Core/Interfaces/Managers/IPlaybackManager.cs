@@ -15,15 +15,5 @@ namespace FoxTunes.Interfaces
         void Load(string fileName);
 
         void Unload();
-
-        void Play();
-
-        bool Paused { get; set; }
-
-        event EventHandler PausedChanging;
-
-        event EventHandler PausedChanged;
-
-        void Stop();
     }
 }

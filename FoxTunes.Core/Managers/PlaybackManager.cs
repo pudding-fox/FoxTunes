@@ -66,51 +66,5 @@ namespace FoxTunes.Managers
             this.CurrentStream.Dispose();
             this.CurrentStream = null;
         }
-
-        public void Play()
-        {
-            this.CurrentStream.Play();
-        }
-
-        public bool Paused
-        {
-            get
-            {
-                return this.CurrentStream.Paused;
-            }
-            set
-            {
-                this.OnPausedChanging();
-                this.CurrentStream.Paused = value;
-                this.OnPausedChanged();
-            }
-        }
-
-        protected virtual void OnPausedChanging()
-        {
-            if (this.PausedChanging != null)
-            {
-                this.PausedChanging(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanging("Paused");
-        }
-
-        public event EventHandler PausedChanging = delegate { };
-
-        protected virtual void OnPausedChanged()
-        {
-            if (this.PausedChanged != null)
-            {
-                this.PausedChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Paused");
-        }
-
-        public event EventHandler PausedChanged = delegate { };
-
-        public void Stop()
-        {
-            this.CurrentStream.Stop();
-        }
     }
 }
