@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -44,7 +45,7 @@ namespace FoxTunes
             return value.OutputStream;
         }
 
-        public void Enqueue(IOutputStream outputStream, bool dequeue)
+        public Task Enqueue(IOutputStream outputStream, bool dequeue)
         {
             if (!this.Queue.TryAdd(outputStream.PlaylistItem, new OutputStreamQueueValue(outputStream)))
             {
@@ -53,9 +54,9 @@ namespace FoxTunes
             this.EnsureCapacity(outputStream.PlaylistItem);
             if (!dequeue)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Dequeue(outputStream.PlaylistItem);
+            return this.Dequeue(outputStream.PlaylistItem);
         }
 
         private void EnsureCapacity(PlaylistItem playlistItem)
@@ -84,26 +85,28 @@ namespace FoxTunes
             }
         }
 
-        public void Dequeue(PlaylistItem playlistItem)
+        public Task Dequeue(PlaylistItem playlistItem)
         {
             var value = default(OutputStreamQueueValue);
             if (!this.Queue.TryRemove(playlistItem, out value))
             {
                 throw new InvalidOperationException("Failed to locate the specified playlist item in the queue.");
             }
-            this.OnDequeued(value.OutputStream);
+            return this.OnDequeued(value.OutputStream);
         }
 
-        protected virtual void OnDequeued(IOutputStream outputStream)
+        protected virtual Task OnDequeued(IOutputStream outputStream)
         {
             if (this.Dequeued == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Dequeued(this, new OutputStreamQueueEventArgs(outputStream));
+            var e = new OutputStreamQueueEventArgs(outputStream);
+            this.Dequeued(this, e);
+            return e.Complete();
         }
 
-        public event OutputStreamQueueEventHandler Dequeued;
+        public event OutputStreamQueueEventHandler Dequeued = delegate { };
 
         public void Clear()
         {

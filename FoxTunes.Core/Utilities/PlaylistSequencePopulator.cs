@@ -51,7 +51,7 @@ namespace FoxTunes
             {
                 return this.Writers.Value;
             }
-            return this.Writers.Value = new PlaylistSequenceWriter(this.Database, this.Transaction, this.ScriptingRuntime);
+            return this.Writers.Value = new PlaylistSequenceWriter(this.Database, this.ScriptingRuntime, this.Transaction);
         }
 
         protected override void OnDisposing()

@@ -29,17 +29,22 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnStarted()
         {
             this.Name = "Building hierarchies";
             this.Description = "Preparing";
             this.IsIndeterminate = true;
+            return base.OnStarted();
+        }
+
+        protected override async Task OnRun()
+        {
             using (var transaction = this.Database.BeginTransaction())
             {
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
                 using (var reader = this.Database.ExecuteReader(this.Database.Queries.LibraryHierarchyBuilder(metaDataNames), null, transaction))
                 {
-                    this.AddHiearchies(transaction, reader);
+                    this.AddHiearchies(reader, transaction);
                     this.Description = "Finalizing";
                     this.IsIndeterminate = true;
                 }
@@ -48,9 +53,9 @@ namespace FoxTunes
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
 
-        private void AddHiearchies(ITransactionSource transaction, IDatabaseReader reader)
+        private void AddHiearchies(IDatabaseReader reader, ITransactionSource transaction)
         {
-            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, transaction, true))
+            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, true, transaction))
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
                 libraryHierarchyPopulator.NameChanged += (sender, e) => this.Name = libraryHierarchyPopulator.Name;

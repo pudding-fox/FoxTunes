@@ -222,8 +222,8 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Running background task.");
             return this.BackgroundTaskRunner.Run(async () =>
             {
-                await Semaphore.WaitAsync();
                 await this.OnStarted();
+                await Semaphore.WaitAsync();
                 try
                 {
                     await this.OnRun().ContinueWith(async task =>

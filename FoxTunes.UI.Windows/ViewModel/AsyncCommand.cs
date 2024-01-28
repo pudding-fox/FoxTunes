@@ -42,16 +42,7 @@ namespace FoxTunes.ViewModel
             {
                 if (this.BackgroundTaskRunner != null)
                 {
-                    //TODO: Bad .Wait()
-                    this.BackgroundTaskRunner.Run(() => this.AsyncPredicate().ContinueWith(async task =>
-                    {
-                        if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
-                        {
-                            return;
-                        }
-                        this._CanExecute = task.Result;
-                        await InvalidateRequerySuggested();
-                    })).Wait();
+                    this.OnCanExecute();
                 }
                 if (this._CanExecute.HasValue)
                 {
@@ -66,6 +57,19 @@ namespace FoxTunes.ViewModel
             {
                 return true;
             }
+        }
+
+        protected virtual async void OnCanExecute()
+        {
+            await this.BackgroundTaskRunner.Run(() => this.AsyncPredicate().ContinueWith(async task =>
+            {
+                if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
+                {
+                    return;
+                }
+                this._CanExecute = task.Result;
+                await InvalidateRequerySuggested();
+            }));
         }
 
         public override void Execute(object parameter)
@@ -127,16 +131,7 @@ namespace FoxTunes.ViewModel
             {
                 if (this.BackgroundTaskRunner != null)
                 {
-                    //TODO: Bad .Wait()
-                    this.BackgroundTaskRunner.Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
-                    {
-                        if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
-                        {
-                            return;
-                        }
-                        this._CanExecute = task.Result;
-                        await InvalidateRequerySuggested();
-                    })).Wait();
+                    this.OnCanExecute(parameter);
                 }
                 if (this._CanExecute.HasValue)
                 {
@@ -151,6 +146,19 @@ namespace FoxTunes.ViewModel
             {
                 return true;
             }
+        }
+
+        protected virtual async void OnCanExecute(object parameter)
+        {
+            await this.BackgroundTaskRunner.Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
+            {
+                if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
+                {
+                    return;
+                }
+                this._CanExecute = task.Result;
+                await InvalidateRequerySuggested();
+            }));
         }
 
         public override void Execute(object parameter)

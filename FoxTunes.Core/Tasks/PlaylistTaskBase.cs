@@ -46,7 +46,7 @@ namespace FoxTunes
             this.CleanupMetaData(transaction);
         }
 
-        protected virtual void ShiftItems(ITransactionSource transaction, QueryOperator @operator, int at, int by)
+        protected virtual void ShiftItems(QueryOperator @operator, int at, int by, ITransactionSource transaction)
         {
             Logger.Write(
                 this,
@@ -101,11 +101,11 @@ namespace FoxTunes
                 }
             }, transaction))
             {
-                this.SequenceItems(transaction, reader);
+                this.SequenceItems(reader, transaction);
             }
         }
 
-        protected virtual void SequenceItems(ITransactionSource transaction, IDatabaseReader reader)
+        protected virtual void SequenceItems(IDatabaseReader reader, ITransactionSource transaction)
         {
             using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, transaction))
             {
@@ -127,6 +127,22 @@ namespace FoxTunes
                 {
                     case DatabaseParameterPhase.Fetch:
                         parameters["status"] = LibraryItemStatus.None;
+                        break;
+                }
+            }, transaction);
+        }
+
+        protected virtual void UpdateVariousArtists(ITransactionSource transaction)
+        {
+            this.Database.Execute(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["name"] = CustomMetaData.VariousArtists;
+                        parameters["type"] = MetaDataItemType.Tag;
+                        parameters["numericValue"] = 1;
+                        parameters["status"] = PlaylistItemStatus.Import;
                         break;
                 }
             }, transaction);

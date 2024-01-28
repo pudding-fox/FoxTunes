@@ -5,9 +5,9 @@ namespace FoxTunes
 {
     public class MetaDataWriter : Disposable
     {
-        public MetaDataWriter(IDatabase database, ITransactionSource transaction, IDatabaseQuery query)
+        public MetaDataWriter(IDatabase database, IDatabaseQuery query, ITransactionSource transaction)
         {
-            this.Command = CreateCommand(database, transaction, query);
+            this.Command = CreateCommand(database, query, transaction);
         }
 
         public IDatabaseCommand Command { get; private set; }
@@ -29,7 +29,7 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static IDatabaseCommand CreateCommand(IDatabase database, ITransactionSource transaction, IDatabaseQuery query)
+        private static IDatabaseCommand CreateCommand(IDatabase database, IDatabaseQuery query, ITransactionSource transaction)
         {
             return database.CreateCommand(query, DatabaseCommandFlags.NoCache, transaction);
         }

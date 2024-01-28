@@ -311,9 +311,9 @@ namespace FoxTunes.Managers
                 .FirstOrDefault();
         }
 
-        public async Task Play(PlaylistItem playlistItem)
+        public Task Play(PlaylistItem playlistItem)
         {
-            await this.PlaybackManager.Load(playlistItem, true)
+            return this.PlaybackManager.Load(playlistItem, true)
                 .ContinueWith(_ =>
                 {
                     if (this.CurrentItem == null)

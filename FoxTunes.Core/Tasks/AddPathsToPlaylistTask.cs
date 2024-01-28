@@ -43,17 +43,25 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected override Task OnStarted()
+        {
+            this.Name = "Getting file list";
+            this.IsIndeterminate = true;
+            return base.OnStarted();
+        }
+
         protected override async Task OnRun()
         {
-            using (ITransactionSource transaction = this.Database.BeginTransaction())
+            using (var transaction = this.Database.BeginTransaction())
             {
                 if (this.Clear)
                 {
                     this.ClearItems(transaction);
                 }
                 this.AddPlaylistItems(transaction);
-                this.ShiftItems(transaction, QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
                 this.AddOrUpdateMetaData(transaction);
+                this.UpdateVariousArtists(transaction);
                 this.SequenceItems(transaction);
                 this.SetPlaylistItemsStatus(transaction);
                 transaction.Commit();
@@ -63,8 +71,6 @@ namespace FoxTunes
 
         private void AddPlaylistItems(ITransactionSource transaction)
         {
-            this.Name = "Getting file list";
-            this.IsIndeterminate = true;
             using (var writer = new PlaylistWriter(this.Database, transaction))
             {
                 var addPlaylistItem = new Action<string>(fileName =>
@@ -105,10 +111,10 @@ namespace FoxTunes
         private void AddOrUpdateMetaData(ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
-            using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddPlaylistMetaDataItems, true))
+            using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddPlaylistMetaDataItems, true, transaction))
             {
                 var query = this.Database
-                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database)))
+                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
                     .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;

@@ -212,9 +212,32 @@ namespace FoxTunes {
         ///		JOIN &quot;MetaDataItems&quot; 
         ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_Me [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string VariousArtists {
+        internal static string UpdateLibraryVariousArtists {
             get {
-                return ResourceManager.GetString("VariousArtists", resourceCulture);
+                return ResourceManager.GetString("UpdateLibraryVariousArtists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;)
+        ///SELECT @name, @type, @numericValue
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;NumericValue&quot; = @numericValue);
+        ///
+        ///WITH &quot;MetaData&quot;
+        ///AS
+        ///(
+        ///	SELECT 
+        ///		&quot;PlaylistItem_MetaDataItem&quot;.&quot;PlaylistItem_Id&quot; AS &quot;Id&quot;,
+        ///		&quot;MetaDataItems&quot;.&quot;Name&quot;,
+        ///		&quot;MetaDataItems&quot;.&quot;NumericValue&quot;,
+        ///		&quot;MetaDataItems&quot;.&quot;TextValue&quot;
+        ///	FROM &quot;PlaylistItem_MetaDataItem&quot; 
+        ///		JOIN &quot;MetaDataItems&quot; 
+        ///			ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;PlaylistIte [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string UpdatePlaylistVariousArtists {
+            get {
+                return ResourceManager.GetString("UpdatePlaylistVariousArtists", resourceCulture);
             }
         }
     }
