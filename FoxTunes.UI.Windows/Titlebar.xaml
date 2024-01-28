@@ -18,7 +18,7 @@
             <Setter Property="FontFamily" Value="Marlett"/>
             <Setter Property="FontSize" Value="12"/>
             <!-- System -->
-            <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ControlBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
         </Style>

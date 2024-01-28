@@ -20,7 +20,7 @@
     <Window.Topmost>
         <Binding Path="Topmost.Value" Source="{StaticResource ViewModel}"/>
     </Window.Topmost>
-    <Border Padding="5" Background="{DynamicResource NormalBrush}" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1">
+    <Border Padding="5" Background="{DynamicResource ControlBrush}" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1">
         <Grid>
             <LocalWindows:Mini MouseDown="OnMouseDown"></LocalWindows:Mini>
             <Windows:Components></Windows:Components>

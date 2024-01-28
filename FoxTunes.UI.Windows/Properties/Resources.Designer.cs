@@ -139,7 +139,7 @@ namespace FoxTunes {
         ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
         ///    xmlns:Windows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows&quot;
         ///    TargetType=&quot;{x:Type Window}&quot;&gt;
-        ///    &lt;Grid Background=&quot;{DynamicResource NormalBrush}&quot;&gt;
+        ///    &lt;Grid Background=&quot;{DynamicResource ControlBrush}&quot;&gt;
         ///        &lt;Grid.RowDefinitions&gt;
         ///            &lt;RowDefinition Height=&quot;Auto&quot;&gt;&lt;/RowDefinition&gt;
         ///            &lt;RowDefinition&gt;&lt;/RowDefinition&gt;

@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows"
     TargetType="{x:Type Window}">
-    <Grid Background="{DynamicResource NormalBrush}">
+    <Grid Background="{DynamicResource ControlBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
@@ -12,6 +12,6 @@
         <AdornerDecorator Grid.Row="1" Margin="2,0,2,2">
             <ContentPresenter Margin="2,0,2,2"></ContentPresenter>
         </AdornerDecorator>
-        <Rectangle Grid.RowSpan="2"  Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+        <Rectangle Grid.RowSpan="2"  Stroke="{DynamicResource ControlBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
 </ControlTemplate>

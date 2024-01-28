@@ -66,7 +66,7 @@
                                             <RepeatButton Background="Transparent" Command="Slider.IncreaseLarge"/>
                                         </Track.IncreaseRepeatButton>
                                     </Track>
-                                    <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+                                    <Rectangle Stroke="{DynamicResource ControlBorderBrush}" StrokeThickness="1"></Rectangle>
                                 </Grid>
                             </ControlTemplate>
                         </Setter.Value>

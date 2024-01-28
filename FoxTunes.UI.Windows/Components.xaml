@@ -26,8 +26,8 @@
             </Style>
         </Popup.Style>
         <Border 
-                Background="{DynamicResource NormalBrush}" 
-			    BorderBrush="{DynamicResource NormalBorderBrush}" 
+                Background="{DynamicResource ControlBrush}" 
+			    BorderBrush="{DynamicResource ControlBorderBrush}" 
 			    BorderThickness="1" 
 			    CornerRadius="{Binding CornerRadius, Mode=OneWay, Source={StaticResource ThemeInfo}}" 
 			    Padding="10">
@@ -38,7 +38,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Error" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,5"></TextBlock>
-                <Border Grid.Row="1" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" Padding="3">
+                <Border Grid.Row="1" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1" Padding="3">
                     <ScrollViewer  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Padding="5">
                         <ItemsControl  ItemsSource="{Binding Errors, Source={StaticResource ViewModel}}" FontFamily="Consolas">
                             <ItemsControl.ItemTemplate>

@@ -43,7 +43,7 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
-                <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+                <Rectangle Stroke="{DynamicResource ControlBorderBrush}" StrokeThickness="1"></Rectangle>
             </Grid>
         </ControlTemplate>
     </Windows:UIComponentBase.Template>

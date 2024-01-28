@@ -7,8 +7,8 @@
   mc:Ignorable="d">
 
     <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource {x:Static SystemColors.ControlTextColorKey}}" />
-    <SolidColorBrush x:Key="NormalBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
-    <SolidColorBrush x:Key="NormalBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
+    <SolidColorBrush x:Key="ControlBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="ControlBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
     <SolidColorBrush x:Key="HoverBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
     <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
     <SolidColorBrush x:Key="SolidBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />

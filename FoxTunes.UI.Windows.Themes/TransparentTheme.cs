@@ -68,8 +68,6 @@ namespace FoxTunes
         {
             var names = new[]
             {
-                "NormalBrush",
-                "NormalBorderBrush",
                 "ControlBrush",
                 "ControlBackgroundBrush",
                 "ControlBorderBrush"
