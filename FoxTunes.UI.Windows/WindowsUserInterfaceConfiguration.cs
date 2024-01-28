@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const string SHOW_LIBRARY_ELEMENT = "E21CDA77-129F-4988-99EC-6A21EB9096D8";
 
+        public const string UI_SCALING_ELEMENT = "CBA3FB85-BA70-4412-87BA-E4DC58AD9BA8";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var themeOptions = GetThemeOptions().ToArray();
@@ -27,7 +29,9 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_LIBRARY_ELEMENT, "Show Library").WithValue(true)
+                    new BooleanConfigurationElement(SHOW_LIBRARY_ELEMENT, "Show Library").WithValue(true))
+                .WithElement(
+                    new TextConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor").WithValue("1").WithValidationRule(new ScalingFactorValidationRule())
             );
         }
 
@@ -44,6 +48,33 @@ namespace FoxTunes
         {
             var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
             return themes.FirstOrDefault(theme => string.Equals(theme.Id, id, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private class ScalingFactorValidationRule : ValidationRule
+        {
+            public override bool Validate(object value, out string message)
+            {
+                var scalingFactor = default(double);
+                if (value is double)
+                {
+                    scalingFactor = (double)value;
+                }
+                else if (value is string)
+                {
+                    if (!double.TryParse((string)value, out scalingFactor))
+                    {
+                        message = "Numeric value expected.";
+                        return false;
+                    }
+                }
+                if (scalingFactor < 0.5 || scalingFactor > 10)
+                {
+                    message = "Value between 0.5 and 10 expected.";
+                    return false;
+                }
+                message = null;
+                return true;
+            }
         }
     }
 }

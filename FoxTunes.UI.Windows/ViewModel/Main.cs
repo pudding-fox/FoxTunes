@@ -87,6 +87,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowNotifyIconChanged = delegate { };
 
+        private TextConfigurationElement _ScalingFactor { get; set; }
+
+        public TextConfigurationElement ScalingFactor
+        {
+            get
+            {
+                return this._ScalingFactor;
+            }
+            set
+            {
+                this._ScalingFactor = value;
+                this.OnScalingFactorChanged();
+            }
+        }
+
+        protected virtual void OnScalingFactorChanged()
+        {
+            if (this.ScalingFactorChanged != null)
+            {
+                this.ScalingFactorChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ScalingFactor");
+        }
+
+        public event EventHandler ScalingFactorChanged = delegate { };
+
         protected override void OnCoreChanged()
         {
             this.Configuration = this.Core.Components.Configuration;
@@ -101,6 +127,10 @@ namespace FoxTunes.ViewModel
             this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
               NotifyIconConfiguration.NOTIFY_ICON_SECTION,
               NotifyIconConfiguration.ENABLED_ELEMENT
+            );
+            this.ScalingFactor = this.Configuration.GetElement<TextConfigurationElement>(
+              WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
             base.OnCoreChanged();
         }
