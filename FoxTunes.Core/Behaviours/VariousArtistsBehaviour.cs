@@ -31,8 +31,12 @@ namespace FoxTunes.Behaviours
         {
             using (var context = this.DataManager.CreateWriteContext())
             {
-                using (var command = context.Connection.CreateCommand(Resources.VariousArtists))
+                var parameters = default(IDbParameterCollection);
+                using (var command = context.Connection.CreateCommand(Resources.VariousArtists, new[] { "name", "type", "numericValue" }, out parameters))
                 {
+                    parameters["name"] = CustomMetaData.VariousArtists;
+                    parameters["type"] = MetaDataItemType.Tag;
+                    parameters["numericValue"] = 1;
                     command.ExecuteNonQuery();
                 }
             }

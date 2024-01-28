@@ -9,12 +9,15 @@ namespace FoxTunes
 
         }
 
-        public MetaDataItem(string name)
+        public MetaDataItem(string name, MetaDataItemType type)
         {
             this.Name = name;
+            this.Type = type;
         }
 
         public string Name { get; set; }
+
+        public MetaDataItemType Type { get; set; }
 
         public int? NumericValue { get; set; }
 
@@ -43,5 +46,14 @@ namespace FoxTunes
         }
 
         public static readonly MetaDataItem Empty = new MetaDataItem();
+    }
+
+    public enum MetaDataItemType : byte
+    {
+        None = 0,
+        Tag,
+        Property,
+        Image,
+        Statistic
     }
 }

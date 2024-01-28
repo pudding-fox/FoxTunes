@@ -173,31 +173,15 @@ namespace FoxTunes
                 var metaDataSource = this.MetaDataSourceFactory.Create(fileData.FileName);
 
                 commands.MetaDataParameters["itemId"] = fileData.Id;
-                commands.PropertyParameters["itemId"] = fileData.Id;
-                commands.ImageParameters["itemId"] = fileData.Id;
 
                 foreach (var metaDataItem in metaDataSource.MetaDatas)
                 {
                     commands.MetaDataParameters["name"] = metaDataItem.Name;
+                    commands.MetaDataParameters["type"] = metaDataItem.Type;
                     commands.MetaDataParameters["numericValue"] = metaDataItem.NumericValue;
                     commands.MetaDataParameters["textValue"] = metaDataItem.TextValue;
                     commands.MetaDataParameters["fileValue"] = metaDataItem.FileValue;
                     commands.MetaDataCommand.ExecuteNonQuery();
-                }
-
-                foreach (var propertyItem in metaDataSource.Properties)
-                {
-                    commands.PropertyParameters["name"] = propertyItem.Name;
-                    commands.PropertyParameters["numericValue"] = propertyItem.NumericValue;
-                    commands.PropertyParameters["textValue"] = propertyItem.TextValue;
-                    commands.PropertyCommand.ExecuteNonQuery();
-                }
-
-                foreach (var imageItem in metaDataSource.Images)
-                {
-                    commands.ImageParameters["fileName"] = imageItem.FileName;
-                    commands.ImageParameters["imageType"] = imageItem.ImageType;
-                    commands.ImageCommand.ExecuteNonQuery();
                 }
 
                 if (position % interval == 0)
@@ -256,45 +240,20 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Creating meta data populator command set.");
 
                 var metaDataParameters = default(IDbParameterCollection);
-                var propertyParameters = default(IDbParameterCollection);
-                var imageParameters = default(IDbParameterCollection);
 
                 this.MetaDataCommand = databaseContext.Connection.CreateCommand(
                     string.Format(Resources.AddMetaDataItems, prefix),
-                    new[] { "itemId", "name", "numericValue", "textValue", "fileValue" },
+                    new[] { "itemId", "name", "type", "numericValue", "textValue", "fileValue" },
                     out metaDataParameters
-                );
-                this.PropertyCommand = databaseContext.Connection.CreateCommand(
-                    string.Format(Resources.AddPropertyItems, prefix),
-                    new[] { "itemId", "name", "numericValue", "textValue" },
-                    out propertyParameters
-                );
-                this.ImageCommand = databaseContext.Connection.CreateCommand(
-                    string.Format(Resources.AddImageItems, prefix),
-                    new[] { "itemId", "fileName", "imageType" },
-                    out imageParameters
                 );
 
                 this.MetaDataCommand.Transaction = transaction;
-                this.PropertyCommand.Transaction = transaction;
-                this.ImageCommand.Transaction = transaction;
-
                 this.MetaDataParameters = metaDataParameters;
-                this.PropertyParameters = propertyParameters;
-                this.ImageParameters = imageParameters;
             }
 
             public IDbCommand MetaDataCommand { get; private set; }
 
-            public IDbCommand PropertyCommand { get; private set; }
-
-            public IDbCommand ImageCommand { get; private set; }
-
             public IDbParameterCollection MetaDataParameters { get; private set; }
-
-            public IDbParameterCollection PropertyParameters { get; private set; }
-
-            public IDbParameterCollection ImageParameters { get; private set; }
 
             public bool IsDisposed { get; private set; }
 
@@ -317,8 +276,6 @@ namespace FoxTunes
             protected virtual void OnDisposing()
             {
                 this.MetaDataCommand.Dispose();
-                this.PropertyCommand.Dispose();
-                this.ImageCommand.Dispose();
             }
         }
     }

@@ -8,7 +8,8 @@ namespace FoxTunes
     {
         private LibraryHierarchyNode()
         {
-
+            this.Children = new ObservableCollection<LibraryHierarchyNode>();
+            this.MetaDatas = new ObservableCollection<MetaDataItem>();
         }
 
         public LibraryHierarchyNode(int libraryHierarchyId, int libraryHierarchyLevelId, string value, bool isLeaf)
@@ -62,6 +63,36 @@ namespace FoxTunes
 
         public event EventHandler ChildrenChanged = delegate { };
 
+        private ObservableCollection<MetaDataItem> _MetaDatas { get; set; }
+
+        public ObservableCollection<MetaDataItem> MetaDatas
+        {
+            get
+            {
+                if (this._MetaDatas == null)
+                {
+                    this.LoadMetaDatas();
+                }
+                return this._MetaDatas;
+            }
+            set
+            {
+                this._MetaDatas = value;
+                this.OnMetaDatasChanged();
+            }
+        }
+
+        protected virtual void OnMetaDatasChanged()
+        {
+            if (this.MetaDatasChanged != null)
+            {
+                this.MetaDatasChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MetaDatas");
+        }
+
+        public event EventHandler MetaDatasChanged = delegate { };
+
         private bool _IsLoaded { get; set; }
 
         public bool IsLoaded
@@ -107,7 +138,7 @@ namespace FoxTunes
         {
             if (this.IsExpanded && !this.IsLoaded)
             {
-                this.Load();
+                this.LoadChildren();
             }
             if (this.IsExpandedChanged != null)
             {
@@ -150,10 +181,15 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void Load()
+        public void LoadChildren()
         {
             this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
             this.IsLoaded = true;
+        }
+
+        public void LoadMetaDatas()
+        {
+            this.MetaDatas = new ObservableCollection<MetaDataItem>(this.LibraryHierarchyBrowser.GetMetaData(this, MetaDataItemType.Image));
         }
 
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();

@@ -3,14 +3,14 @@
 (
 	SELECT *
 	FROM "MetaDataItems" 
-	WHERE "Name" = @name 
+	WHERE "Name" = @name AND "Type" = @type
 		AND (("NumericValue" IS NULL AND @numericValue IS NULL) OR "NumericValue" = @numericValue)
 		AND (("TextValue" IS NULL AND @textValue IS NULL) OR "TextValue" = @textValue) 
 		AND (("FileValue" IS NULL AND @fileValue IS NULL) OR "FileValue" = @fileValue)
 )
 
-INSERT INTO "MetaDataItems" ("Name", "NumericValue", "TextValue", "FileValue") 
-SELECT @name, @numericValue, @textValue, @fileValue
+INSERT INTO "MetaDataItems" ("Name", "Type", "NumericValue", "TextValue", "FileValue") 
+SELECT @name, @type, @numericValue, @textValue, @fileValue
 WHERE NOT EXISTS(SELECT * FROM "MetaDataItems_Lookup");
 
 WITH 
@@ -18,7 +18,7 @@ WITH
 (
 	SELECT *
 	FROM "MetaDataItems" 
-	WHERE "Name" = @name 
+	WHERE "Name" = @name AND "Type" = @type
 		AND (("NumericValue" IS NULL AND @numericValue IS NULL) OR "NumericValue" = @numericValue)
 		AND (("TextValue" IS NULL AND @textValue IS NULL) OR "TextValue" = @textValue) 
 		AND (("FileValue" IS NULL AND @fileValue IS NULL) OR "FileValue" = @fileValue)
