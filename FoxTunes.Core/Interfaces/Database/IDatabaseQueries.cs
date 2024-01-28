@@ -39,8 +39,6 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
 
-        IDatabaseQuery BeginBuildLibraryHierarchies { get; }
-
         IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
     }
 }

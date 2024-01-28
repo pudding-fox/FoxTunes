@@ -1,4 +1,6 @@
 ﻿using FoxDb;
+using FoxDb.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,11 +33,44 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            await this.RemoveHierarchies();
-            await SetLibraryItemsStatus(this.Database, libraryItem => !File.Exists(libraryItem.FileName), LibraryItemStatus.Remove);
+            var paths = this.GetLibraryDirectories().ToArray();
+            await this.RescanLibrary();
+            await this.RemoveHierarchies(LibraryItemStatus.Remove);
             await this.RemoveItems(LibraryItemStatus.Remove);
-            await this.AddPaths(this.GetLibraryDirectories().ToArray(), false);
-            await this.BuildHierarchies(null);
+            await this.AddPaths(paths, true);
+        }
+
+        protected virtual async Task RescanLibrary()
+        {
+            var predicate = new Func<LibraryItem, bool>(libraryItem =>
+            {
+                var file = new FileInfo(libraryItem.FileName);
+                if (!file.Exists)
+                {
+                    return true;
+                }
+                if (file.LastWriteTimeUtc > libraryItem.GetImportDate())
+                {
+                    return true;
+                }
+                return false;
+            });
+            var action = new Func<IDatabaseSet<LibraryItem>, LibraryItem, Task>((set, libraryItem) =>
+            {
+                libraryItem.Status = LibraryItemStatus.Remove;
+                return set.AddOrUpdateAsync(libraryItem);
+            });
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                using (var libraryUpdater = new LibraryUpdater(this.Database, predicate, action, this.Visible, transaction))
+                {
+                    libraryUpdater.InitializeComponent(this.Core);
+                    await this.WithPopulator(libraryUpdater,
+                        async () => await libraryUpdater.Populate()
+                    );
+                }
+                transaction.Commit();
+            }
         }
 
         protected override async Task OnCompleted()

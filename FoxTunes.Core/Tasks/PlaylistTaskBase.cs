@@ -103,28 +103,34 @@ namespace FoxTunes
 
         protected virtual async Task MoveItems(IEnumerable<PlaylistItem> playlistItems)
         {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
-                foreach (var playlistItem in playlistItems)
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    await this.Database.ExecuteAsync(this.Database.Queries.MovePlaylistItem, (parameters, phase) =>
+                    foreach (var playlistItem in playlistItems)
                     {
-                        switch (phase)
+                        await this.Database.ExecuteAsync(this.Database.Queries.MovePlaylistItem, (parameters, phase) =>
                         {
-                            case DatabaseParameterPhase.Fetch:
-                                parameters["id"] = playlistItem.Id;
-                                parameters["sequence"] = this.Sequence;
-                                break;
+                            switch (phase)
+                            {
+                                case DatabaseParameterPhase.Fetch:
+                                    parameters["id"] = playlistItem.Id;
+                                    parameters["sequence"] = this.Sequence;
+                                    break;
+                            }
+                        }, transaction);
+                        if (playlistItem.Sequence > this.Sequence)
+                        {
+                            //TODO: If the current sequence is less than the target sequence we don't have to increment the counter.
+                            //TODO: I don't really understand why.
+                            this.Sequence++;
                         }
-                    }, transaction);
-                    if (playlistItem.Sequence > this.Sequence)
-                    {
-                        //TODO: If the current sequence is less than the target sequence we don't have to increment the counter.
-                        //TODO: I don't really understand why.
-                        this.Sequence++;
                     }
+                    transaction.Commit();
                 }
-                transaction.Commit();
+            }))
+            {
+                await task.Run();
             }
         }
 

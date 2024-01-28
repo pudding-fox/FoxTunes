@@ -26,7 +26,7 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            return this.RemoveHierarchies();
+            return this.RemoveHierarchies(null);
         }
 
         protected override async Task OnCompleted()

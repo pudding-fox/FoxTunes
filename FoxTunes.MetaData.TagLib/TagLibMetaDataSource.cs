@@ -319,6 +319,7 @@ namespace FoxTunes
             {
                 await this.AddImage(metaDataItem, tag, pictures);
             }
+            pictures.Sort(PictureComparer.Instance);
             tag.Pictures = pictures.ToArray();
         }
 
@@ -403,6 +404,41 @@ namespace FoxTunes
                 return artworkType;
             }
             return ArtworkType.Unknown;
+        }
+
+        private class PictureComparer : IComparer<IPicture>
+        {
+            public int Compare(IPicture x, IPicture y)
+            {
+                var a = this.GetPriority(x);
+                var b = this.GetPriority(y);
+                if (a == b)
+                {
+                    return 0;
+                }
+                if (a > b)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+
+            protected virtual byte GetPriority(IPicture picture)
+            {
+                switch (picture.Type)
+                {
+                    case PictureType.FrontCover:
+                        return 0;
+                    case PictureType.BackCover:
+                        return 1;
+                }
+                return 255;
+            }
+
+            public static readonly IComparer<IPicture> Instance = new PictureComparer();
         }
     }
 }

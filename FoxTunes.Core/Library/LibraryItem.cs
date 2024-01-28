@@ -2,14 +2,19 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace FoxTunes
 {
     public class LibraryItem : PersistableComponent, IFileData
     {
+        public const string DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+
         public string DirectoryName { get; set; }
 
         public string FileName { get; set; }
+
+        public string ImportDate { get; set; }
 
         public LibraryItemStatus Status { get; set; }
 
@@ -26,6 +31,20 @@ namespace FoxTunes
         }
 
         public event EventHandler MetaDatasChanged;
+
+        public DateTime GetImportDate()
+        {
+            if (string.IsNullOrEmpty(this.ImportDate))
+            {
+                return default(DateTime);
+            }
+            return DateTime.ParseExact(this.ImportDate, DATE_FORMAT, CultureInfo.InvariantCulture);
+        }
+
+        public void SetImportDate(DateTime value)
+        {
+            this.ImportDate = value.ToString(DATE_FORMAT, CultureInfo.InvariantCulture);
+        }
 
         public override bool Equals(IPersistableComponent other)
         {
