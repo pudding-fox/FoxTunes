@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace FoxTunes
 {
@@ -267,31 +268,21 @@ namespace FoxTunes
 
         private static void UpdateValues(SpectrogramRendererData data)
         {
-            var formatter = default(Func<float, float>);
-            switch (data.Scale)
-            {
-                case SpectrogramRendererScale.Linear:
-                    formatter = sample => ToDecibelFixed(sample);
-                    break;
-                default:
-                case SpectrogramRendererScale.Logarithmic:
-                    formatter = sample => 1f - (float)Math.Pow(1.0 - ToDecibelFixed(sample), 3);
-                    break;
-            }
             switch (data.Mode)
             {
                 default:
                 case SpectrogramRendererMode.Mono:
-                    UpdateValuesMono(data.Width, data.Height, data.Samples, data.Values, formatter);
+                    UpdateValuesMono(data.Width, data.Height, data.Samples, data.Values, data.Scale);
                     break;
                 case SpectrogramRendererMode.Seperate:
-                    UpdateValuesSeperate(data.Width, data.Height, data.Samples, data.Values, data.Channels, formatter);
+                    UpdateValuesSeperate(data.Width, data.Height, data.Samples, data.Values, data.Channels, data.Scale);
                     break;
             }
         }
 
-        private static void UpdateValuesMono(int width, int height, float[] samples, float[,] values, Func<float, float> formatter)
+        private static void UpdateValuesMono(int width, int height, float[] samples, float[,] values, SpectrogramRendererScale scale)
         {
+            var dB = 0f;
             var num1 = 0f;
             var num2 = 0f;
             var num3 = 0f;
@@ -302,10 +293,22 @@ namespace FoxTunes
 
             for (var a = 1; a < samples.Length; a++)
             {
-                num3 = formatter(samples[a]);
-                num4 = Math.Max(num3, num4);
-                num4 = Math.Max(num4, 0);
+                dB = ToDecibelFixed(samples[a]);
                 num1 = (float)a / num5;
+                switch (scale)
+                {
+                    default:
+                    case SpectrogramRendererScale.Linear:
+                        num3 = dB;
+                        break;
+                    case SpectrogramRendererScale.Logarithmic:
+                        //TODO: Implement me.
+                        num3 = 0f;
+                        break;
+                }
+                num4 = Math.Max(num3, num4);
+                num4 = Math.Min(num4, 1);
+                num4 = Math.Max(num4, 0);
                 if (num1 > num2)
                 {
                     values[0, Convert.ToInt32(num2)] = num4;
@@ -315,8 +318,9 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateValuesSeperate(int width, int height, float[] samples, float[,] values, int channels, Func<float, float> formatter)
+        private static void UpdateValuesSeperate(int width, int height, float[] samples, float[,] values, int channels, SpectrogramRendererScale scale)
         {
+            var dB = 0f;
             var num1 = 0f;
             var num2 = 0f;
             var num3 = 0f;
@@ -330,10 +334,21 @@ namespace FoxTunes
                 num2 = 0f;
                 for (var a = channel; a < samples.Length; a += channels)
                 {
-                    num3 = formatter(samples[a]);
+                    dB = ToDecibelFixed(samples[a]);
+                    num1 = (float)a / num5;
+                    switch (scale)
+                    {
+                        default:
+                        case SpectrogramRendererScale.Linear:
+                            num3 = dB;
+                            break;
+                        case SpectrogramRendererScale.Logarithmic:
+                            //TODO: Implement me.
+                            num3 = 0f;
+                            break;
+                    }
                     num4 = Math.Max(num3, num4);
                     num4 = Math.Max(num4, 0);
-                    num1 = (float)a / num5;
                     if (num1 > num2)
                     {
                         values[channel, Convert.ToInt32(num2)] = num4;

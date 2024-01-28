@@ -56,17 +56,17 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetScaleOptions()
         {
-            yield return new SelectionConfigurationOption(SCALE_LINEAR_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Linear);
-            yield return new SelectionConfigurationOption(SCALE_LOGARITHMIC_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Logarithmic).Default();
+            yield return new SelectionConfigurationOption(SCALE_LINEAR_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Linear).Default();
+            yield return new SelectionConfigurationOption(SCALE_LOGARITHMIC_OPTION, Strings.SpectrogramBehaviourConfiguration_Scale_Logarithmic);
         }
 
         public static SpectrogramRendererScale GetScale(SelectionConfigurationOption option)
         {
             switch (option.Id)
             {
+                default:
                 case SCALE_LINEAR_OPTION:
                     return SpectrogramRendererScale.Linear;
-                default:
                 case SCALE_LOGARITHMIC_OPTION:
                     return SpectrogramRendererScale.Logarithmic;
             }
