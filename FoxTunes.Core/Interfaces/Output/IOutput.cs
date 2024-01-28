@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
@@ -30,5 +31,9 @@ namespace FoxTunes.Interfaces
         Task Shutdown();
 
         int GetData(float[] buffer);
+
+        float Volume { get; set; }
+
+        event EventHandler VolumeChanged;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -56,5 +57,18 @@ namespace FoxTunes
         public abstract Task Shutdown();
 
         public abstract int GetData(float[] buffer);
+
+        public abstract float Volume { get; set; }
+
+        protected virtual void OnVolumeChanged()
+        {
+            if (this.VolumeChanged != null)
+            {
+                this.VolumeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Volume");
+        }
+
+        public event EventHandler VolumeChanged;
     }
 }
