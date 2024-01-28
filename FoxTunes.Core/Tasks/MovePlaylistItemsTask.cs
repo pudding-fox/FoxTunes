@@ -2,6 +2,7 @@
 using FoxDb;
 using FoxDb.Interfaces;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction())
+            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
                 var sequence = 0;
                 var fetch = this.Database.QueryFactory.Build().With(query =>

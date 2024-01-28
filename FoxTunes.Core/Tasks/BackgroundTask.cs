@@ -346,5 +346,34 @@ namespace FoxTunes
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
         }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            //Nothing to do.
+        }
+
+        ~BackgroundTask()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace FoxTunes
             {
                 if (!await this.Instance.Semaphore.WaitAsync(this.Timeout))
                 {
-                    Logger.Write(this, LogLevel.Trace, "Failed to aquire lock after {0}ms", this.Timeout);
+                    Logger.Write(this, LogLevel.Trace, "Failed to acquire lock after {0}ms", this.Timeout);
                     if (object.ReferenceEquals(this, this.Instance.Instances.OrderBy(instance => instance.Priority).FirstOrDefault()))
                     {
                         Logger.Write(this, LogLevel.Trace, "Cancelling other tasks.");
@@ -67,11 +67,11 @@ namespace FoxTunes
                     }
                     else
                     {
-                        Logger.Write(this, LogLevel.Trace, "Yielding to ther tasks.");
+                        Logger.Write(this, LogLevel.Trace, "Yielding to other tasks.");
                     }
                     continue;
                 }
-                Logger.Write(this, LogLevel.Trace, "Aquired lock.");
+                Logger.Write(this, LogLevel.Trace, "Acquired lock.");
                 var success = true;
                 try
                 {

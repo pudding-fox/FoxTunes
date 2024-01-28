@@ -1,5 +1,7 @@
-﻿using FoxDb.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -21,14 +23,6 @@ namespace FoxTunes
             }
         }
 
-        public ICore Core { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.Core = core;
-            base.InitializeComponent(core);
-        }
-
         protected override Task OnStarted()
         {
             this.Name = "Building hierarchies";
@@ -39,15 +33,17 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction())
+            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
-                using (var reader = this.Database.ExecuteReader(this.Database.Queries.LibraryHierarchyBuilder(metaDataNames), null, transaction))
+                await this.Database.ExecuteAsync(this.Database.Queries.BeginBuildLibraryHierarchies, transaction);
+                using (var reader = this.Database.ExecuteReader(this.Database.Queries.BuildLibraryHierarchies(metaDataNames), null, transaction))
                 {
                     await this.AddHiearchies(reader, new CancellationToken(), transaction);
                     this.Description = "Finalizing";
                     this.IsIndeterminate = true;
                 }
+                await this.Database.ExecuteAsync(this.Database.Queries.EndBuildLibraryHierarchies, transaction);
                 transaction.Commit();
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
@@ -62,7 +58,7 @@ namespace FoxTunes
                 libraryHierarchyPopulator.DescriptionChanged += (sender, e) => this.Description = libraryHierarchyPopulator.Description;
                 libraryHierarchyPopulator.PositionChanged += (sender, e) => this.Position = libraryHierarchyPopulator.Position;
                 libraryHierarchyPopulator.CountChanged += (sender, e) => this.Count = libraryHierarchyPopulator.Count;
-                await libraryHierarchyPopulator.Populate(reader, cancellationToken);
+                await libraryHierarchyPopulator.Populate(reader, cancellationToken, transaction);
             }
         }
     }

@@ -1,10 +1,12 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,6 +24,37 @@ namespace FoxTunes
                 return default(T);
             }
             return (T)Convert.ChangeType(item.Value, typeof(T));
+        }
+
+        public static bool HasCustomAttribute<T>(this Type type, bool inherit = false) where T : Attribute
+        {
+            var attribute = default(T);
+            return type.HasCustomAttribute<T>(out attribute);
+        }
+
+        public static bool HasCustomAttribute<T>(this Type type, out T attribute) where T : Attribute
+        {
+            return type.HasCustomAttribute<T>(false, out attribute);
+        }
+
+        public static bool HasCustomAttribute<T>(this Type type, bool inherit, out T attribute) where T : Attribute
+        {
+            if (!type.Assembly.ReflectionOnly)
+            {
+                return (attribute = type.GetCustomAttribute<T>(inherit)) != null;
+            }
+            var sequence = type.GetCustomAttributesData();
+            foreach (var element in sequence)
+            {
+                if (!string.Equals(element.AttributeType.FullName, typeof(T).FullName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                attribute = AssemblyRegistry.Instance.GetExecutableType(type).GetCustomAttribute<T>();
+                return true;
+            }
+            attribute = default(T);
+            return false;
         }
 
         public static T GetCustomAttribute<T>(this Type type, bool inherit = false) where T : Attribute

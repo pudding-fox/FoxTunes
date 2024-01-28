@@ -36,10 +36,10 @@ AS
 
 "VariousArtists" AS
 (
-	SELECT "DirectoryName", "Album", COUNT(DISTINCT "FirstArtist") AS "ArtistCount"
+	SELECT "DirectoryName", "Album"
 	FROM "AlbumArtist"
 	GROUP BY "DirectoryName", "Album"
-	HAVING "ArtistCount" > 1
+	HAVING COUNT(DISTINCT "FirstArtist") > 1
 ),
 
 "VA_MetaDataItem" AS

@@ -31,30 +31,25 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Database = core.Components.Database;
+            this.Database = core.Components.Database.New();
             this.SignalEmitter = core.Components.SignalEmitter;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             base.InitializeComponent(core);
         }
 
-        protected virtual async Task ClearItems(ITransactionSource transaction)
+        protected virtual Task RemoveItems(PlaylistItemStatus status, ITransactionSource transaction)
         {
             this.IsIndeterminate = true;
-            Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
-            var query = this.Database.QueryFactory.Build();
-            query.Delete.Touch();
-            query.Source.AddTable(this.Database.Tables.PlaylistItem);
-            query.Filter.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
-            await this.Database.ExecuteAsync(query, (parameters, phase) =>
+            Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
+            return this.Database.ExecuteAsync(this.Database.Queries.RemovePlaylistItems, (parameters, phase) =>
             {
                 switch (phase)
                 {
                     case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = PlaylistItemStatus.None;
+                        parameters["status"] = status;
                         break;
                 }
             }, transaction);
-            await this.CleanupMetaData(transaction);
         }
 
         protected virtual Task ShiftItems(QueryOperator @operator, int at, int by, ITransactionSource transaction)
@@ -102,7 +97,8 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             this.IsIndeterminate = true;
             var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
-            using (var reader = this.Database.ExecuteReader(this.Database.Queries.PlaylistSequenceBuilder(metaDataNames), (parameters, phase) =>
+            await this.Database.ExecuteAsync(this.Database.Queries.BeginSequencePlaylistItems, transaction);
+            using (var reader = this.Database.ExecuteReader(this.Database.Queries.SequencePlaylistItems(metaDataNames), (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -114,6 +110,15 @@ namespace FoxTunes
             {
                 await this.SequenceItems(reader, cancellationToken, transaction);
             }
+            await this.Database.ExecuteAsync(this.Database.Queries.EndSequencePlaylistItems, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = PlaylistItemStatus.Import;
+                        break;
+                }
+            }, transaction);
         }
 
         protected virtual async Task SequenceItems(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)
@@ -159,29 +164,13 @@ namespace FoxTunes
              }, transaction);
         }
 
-        protected virtual Task CleanupMetaData(ITransactionSource transaction)
+        protected override void OnDisposing()
         {
-            Logger.Write(this, LogLevel.Debug, "Cleaning up unused meta data.");
-            this.IsIndeterminate = true;
-            var table = this.Database.Config.Table("PlaylistItem_MetaDataItem", TableFlags.None);
-            var column = table.Column("PlaylistItem_Id");
-            var query = this.Database.QueryFactory.Build();
-            query.Delete.Touch();
-            query.Source.AddTable(table);
-            query.Filter.Add().With(expression =>
+            if (!object.ReferenceEquals(this.Core.Components.Database, this.Database))
             {
-                expression.Left = expression.CreateColumn(column);
-                expression.Operator = expression.CreateOperator(QueryOperator.Not);
-                expression.Right = expression.CreateUnary(
-                    QueryOperator.In,
-                    expression.CreateSubQuery(this.Database.QueryFactory.Build().With(subQuery =>
-                    {
-                        subQuery.Output.AddColumn(this.Database.Tables.PlaylistItem.PrimaryKey);
-                        subQuery.Source.AddTable(this.Database.Tables.PlaylistItem);
-                    }))
-                );
-            });
-            return this.Database.ExecuteAsync(query, transaction);
+                this.Database.Dispose();
+            }
+            base.OnDisposing();
         }
     }
 }

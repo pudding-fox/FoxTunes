@@ -11,6 +11,7 @@ using FoxDb;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Data;
 
 namespace FoxTunes.ViewModel
 {
@@ -36,6 +37,40 @@ namespace FoxTunes.ViewModel
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
+
+        public IEnumerable Items
+        {
+            get
+            {
+                if (this.Database != null)
+                {
+                    using (var database = this.Database.New())
+                    {
+                        using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                        {
+                            var set = database.Set<PlaylistItem>(transaction);
+                            set.Fetch.Sort.Expressions.Clear();
+                            set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
+                            foreach (var element in set)
+                            {
+                                yield return element;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        protected virtual void OnItemsChanged()
+        {
+            if (this.ItemsChanged != null)
+            {
+                this.ItemsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Items");
+        }
+
+        public event EventHandler ItemsChanged = delegate { };
 
         public IList SelectedItems { get; set; }
 
@@ -178,11 +213,12 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
-            this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.Refresh();
+            this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.RefreshColumns();
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
-            this.Refresh();
+            this.RefreshColumns();
+            this.ReloadItems();
             this.OnCommandsChanged();
             base.OnCoreChanged();
         }
@@ -201,8 +237,10 @@ namespace FoxTunes.ViewModel
         {
             switch (signal.Name)
             {
+                case CommonSignals.PlaylistUpdated:
+                    return this.ForegroundTaskRunner.Run(() => this.ReloadItems());
                 case CommonSignals.PlaylistColumnsUpdated:
-                    return this.ForegroundTaskRunner.Run(() => this.Reload());
+                    return this.ForegroundTaskRunner.Run(() => this.ReloadColumns());
                 case CommonSignals.PluginInvocation:
                     var invocation = signal.State as IInvocationComponent;
                     if (invocation != null)
@@ -384,19 +422,25 @@ namespace FoxTunes.ViewModel
         {
             if (this.Database != null && this.GridViewColumnFactory != null)
             {
-                var queryable = this.Database.AsQueryable<PlaylistColumn>();
-                foreach (var column in queryable.OrderBy(playlistColumn => playlistColumn.Sequence))
+                using (var database = this.Database.New())
                 {
-                    yield return this.GridViewColumnFactory.Create(column);
+                    using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                    {
+                        var queryable = database.AsQueryable<PlaylistColumn>(transaction);
+                        foreach (var column in queryable.OrderBy(playlistColumn => playlistColumn.Sequence))
+                        {
+                            yield return this.GridViewColumnFactory.Create(column);
+                        }
+                    }
                 }
             }
         }
 
-        protected virtual void Refresh()
+        protected virtual void RefreshColumns()
         {
             if (this.GridColumns == null)
             {
-                this.Reload();
+                this.ReloadColumns();
             }
             if (this.GridColumns != null)
             {
@@ -415,9 +459,14 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void Reload()
+        protected virtual void ReloadColumns()
         {
             this.GridColumns = new ObservableCollection<GridViewColumn>(this.GetGridColumns());
+        }
+
+        protected virtual void ReloadItems()
+        {
+            this.OnItemsChanged();
         }
 
         protected override Freezable CreateInstanceCore()

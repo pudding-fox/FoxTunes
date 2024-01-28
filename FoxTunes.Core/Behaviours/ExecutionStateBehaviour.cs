@@ -55,7 +55,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            this.Timer.Dispose();
+            if (this.Timer != null)
+            {
+                this.Timer.Dispose();
+            }
         }
 
         ~ExecutionStateBehaviour()

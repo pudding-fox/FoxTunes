@@ -1,9 +1,10 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
-    public class LibraryHierarchy : PersistableComponent
+    public class LibraryHierarchy : PersistableComponent, ISequenceableComponent
     {
         private int _Sequence { get; set; }
 

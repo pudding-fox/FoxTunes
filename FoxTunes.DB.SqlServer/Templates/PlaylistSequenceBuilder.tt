@@ -1,0 +1,55 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+WITH "VerticalMetaData"
+AS
+(
+	SELECT TOP 100 PERCENT "PlaylistItems"."Id", "PlaylistItems"."FileName", "MetaDataItems"."Name", 
+		CASE 
+			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN 'Numeric' 
+			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN 'Text' 
+			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN 'File' 
+		END AS "ValueType",
+			CASE 
+			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN CAST("MetaDataItems"."NumericValue" AS nvarchar(255))
+			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN "MetaDataItems"."TextValue" 
+			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN "MetaDataItems"."FileValue"
+		END AS "Value"
+	FROM "PlaylistItems"
+		LEFT OUTER JOIN "PlaylistItem_MetaDataItem" 
+			ON "PlaylistItems"."Id" = "PlaylistItem_MetaDataItem"."PlaylistItem_Id"
+          LEFT JOIN "LibraryItem_MetaDataItem"
+                ON "LibraryItem_MetaDataItem"."LibraryItem_Id" = "PlaylistItems"."LibraryItem_Id"
+		LEFT OUTER JOIN "MetaDataItems" 
+			ON "MetaDataItems"."Id" = "PlaylistItem_MetaDataItem"."MetaDataItem_Id"
+                    OR "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
+	WHERE "PlaylistItems"."Status" = @status
+	ORDER BY "PlaylistItems"."Id"
+)
+,
+"HorizontalMetaData"
+AS
+(
+<#= 
+	new PivotViewBuilder(
+		this.Database,
+		"VerticalMetaData", 
+		new[] { "Id", "FileName" }, 
+		new[] { "Name" }, 
+		new[] { "ValueType", "Value" }, 
+		this.MetaDataNames
+	).TransformText() 
+#>
+)
+
+SELECT "HorizontalMetaData"."Id" AS "PlaylistItem_Id", "HorizontalMetaData"."FileName" AS "FileName"
+<#
+	for(var index = 0; index < this.MetaDataNames.Length; index++)
+	{
+		#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
+	}
+#>
+FROM "HorizontalMetaData";

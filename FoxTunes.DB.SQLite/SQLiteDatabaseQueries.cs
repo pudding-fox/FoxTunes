@@ -1,112 +1,69 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
 using FoxTunes.Templates;
 using System.Collections.Generic;
 using System.Data;
 
 namespace FoxTunes
 {
-    public class SQLiteDatabaseQueries : BaseComponent, IDatabaseQueries
+    public class SQLiteDatabaseQueries : DatabaseQueries
     {
         public SQLiteDatabaseQueries(IDatabase database)
+            : base(database)
         {
-            this.Database = database;
         }
 
-        public IDatabase Database { get; private set; }
+        public override IDatabaseQuery BeginSequencePlaylistItems
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(Resources.BeginSequencePlaylistItems);
+            }
+        }
 
-        public IDatabaseQuery AddLibraryHierarchyNodeToPlaylist
+        public override IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames)
+        {
+            var playlistSequenceBuilder = new PlaylistSequenceBuilder(this.Database, metaDataNames);
+            return this.Database.QueryFactory.Create(
+                playlistSequenceBuilder.TransformText(),
+                new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+            );
+        }
+
+        public override IDatabaseQuery EndSequencePlaylistItems
         {
             get
             {
                 return this.Database.QueryFactory.Create(
-                    Resources.AddLibraryHierarchyNodeToPlaylist,
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    Resources.EndSequencePlaylistItems,
                     new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
 
-        public IDatabaseQuery AddPlaylistSequenceRecord
+        public override IDatabaseQuery BeginBuildLibraryHierarchies
         {
             get
             {
-                return this.Database.QueryFactory.Create(
-                    Resources.AddPlaylistSequenceRecord,
-                    new DatabaseQueryParameter("playlistItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value1", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value2", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value3", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value4", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value5", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value6", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value7", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value8", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value9", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("value10", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
+                return this.Database.QueryFactory.Create(Resources.BeginBuildLibraryHierarchies);
             }
         }
 
-        public IDatabaseQuery AddLibraryMetaDataItems
+        public override IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames)
+        {
+            var playlistSequenceBuilder = new LibraryHierarchyBuilder(this.Database, metaDataNames);
+            return this.Database.QueryFactory.Create(playlistSequenceBuilder.TransformText());
+        }
+
+        public override IDatabaseQuery EndBuildLibraryHierarchies
         {
             get
             {
-                return this.Database.QueryFactory.Create(
-                    Resources.AddLibraryMetaDataItems,
-                    new DatabaseQueryParameter("itemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("textValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("fileValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
+                return this.Database.QueryFactory.Create(Resources.EndBuildLibraryHierarchies);
             }
         }
 
-        public IDatabaseQuery AddPlaylistMetaDataItems
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.AddPlaylistMetaDataItems,
-                    new DatabaseQueryParameter("itemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("textValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("fileValue", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
-
-        public IDatabaseQuery GetLibraryHierarchyMetaDataItems
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.GetLibraryHierarchyMetaDataItems,
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
-
-        public IDatabaseQuery GetLibraryHierarchyNodes
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.GetLibraryHierarchyNodes,
-                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
-
-        public IDatabaseQuery GetLibraryHierarchyNodesWithFilter
+        public override IDatabaseQuery GetLibraryHierarchyNodesWithFilter
         {
             get
             {
@@ -117,49 +74,6 @@ namespace FoxTunes
                     new DatabaseQueryParameter("filter", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
-        }
-
-        public IDatabaseQuery UpdatePlaylistVariousArtists
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.UpdatePlaylistVariousArtists,
-                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
-
-        public IDatabaseQuery UpdateLibraryVariousArtists
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.UpdateLibraryVariousArtists,
-                    new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("numericValue", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
-
-        public IDatabaseQuery PlaylistSequenceBuilder(IEnumerable<string> metaDataNames)
-        {
-            var playlistSequenceBuilder = new PlaylistSequenceBuilder(this.Database, metaDataNames);
-            return this.Database.QueryFactory.Create(
-                playlistSequenceBuilder.TransformText(),
-                new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-            );
-        }
-
-        public IDatabaseQuery LibraryHierarchyBuilder(IEnumerable<string> metaDataNames)
-        {
-            var playlistSequenceBuilder = new LibraryHierarchyBuilder(this.Database, metaDataNames);
-            return this.Database.QueryFactory.Create(playlistSequenceBuilder.TransformText());
         }
     }
 }

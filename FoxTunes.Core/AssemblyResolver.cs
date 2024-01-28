@@ -62,14 +62,14 @@ namespace FoxTunes
         public IEnumerable<string> GetFiles(string directoryName)
         {
             //Prefer assemblies in the base directory.
-            foreach (var fileName in Directory.GetFiles(ComponentScanner.Instance.Location, "*.dll"))
+            foreach (var fileName in Directory.EnumerateFiles(ComponentScanner.Instance.Location, "*.dll"))
             {
                 yield return fileName;
             }
             //If the requesting assembly is in another folder then check that too.
             if (Directory.Exists(directoryName) && !string.Equals(Path.GetFullPath(ComponentScanner.Instance.Location), Path.GetFullPath(directoryName)))
             {
-                foreach (var fileName in Directory.GetFiles(directoryName, "*.dll"))
+                foreach (var fileName in Directory.EnumerateFiles(directoryName, "*.dll"))
                 {
                     yield return fileName;
                 }

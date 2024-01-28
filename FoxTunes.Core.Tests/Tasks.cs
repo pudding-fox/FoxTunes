@@ -9,11 +9,13 @@ namespace FoxTunes
         [Test]
         public async Task BackgroundTaskBlocks()
         {
-            var task = new TestTask();
-            task.InitializeComponent(this.Core);
-            await task.Run();
-            Assert.IsTrue(task.CompletedA);
-            Assert.IsTrue(task.CompletedB);
+            using (var task = new TestTask())
+            {
+                task.InitializeComponent(this.Core);
+                await task.Run();
+                Assert.IsTrue(task.CompletedA);
+                Assert.IsTrue(task.CompletedB);
+            }
         }
 
         private class TestTask : BackgroundTask

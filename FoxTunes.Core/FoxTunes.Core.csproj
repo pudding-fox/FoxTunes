@@ -33,6 +33,7 @@
       <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
@@ -46,22 +47,24 @@
     <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
+    <Compile Include="Configuration\ComponentResolver.cs" />
     <Compile Include="Configuration\FileAssociation.cs" />
     <Compile Include="Configuration\FileAssociations.cs" />
     <Compile Include="Configuration\TextConfigurationElement.cs" />
     <Compile Include="CoreValidator.cs" />
     <Compile Include="Deferral.cs" />
+    <Compile Include="Interfaces\Configuration\IComponentResolver.cs" />
     <Compile Include="Interfaces\Configuration\IFileAssociation.cs" />
     <Compile Include="Interfaces\Configuration\IFileAssociations.cs" />
     <Compile Include="Interfaces\IInvocableComponent.cs" />
     <Compile Include="Interfaces\IInvocationComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseQueries.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseSets.cs" />
     <Compile Include="Interfaces\Database\IDatabaseTables.cs" />
     <Compile Include="Interfaces\ICoreValidator.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />
+    <Compile Include="Interfaces\ISequenceableComponent.cs" />
     <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
     <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
@@ -76,8 +79,11 @@
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="Library\LibraryHierarchyNode.cs" />
     <Compile Include="Library\LibraryHierarchyWriter.cs" />
+    <Compile Include="Library\LibraryPopulator.cs" />
+    <Compile Include="Library\LibraryWriter.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="Managers\HierarchyManager.cs" />
+    <Compile Include="Managers\PlaylistManager.cs" />
     <Compile Include="MetaData\CommonImageTypes.cs" />
     <Compile Include="MetaData\CustomMetaData.cs" />
     <Compile Include="MetaData\Extensions.cs" />
@@ -87,6 +93,7 @@
     <Compile Include="Tasks\MovePlaylistItemsTask.cs" />
     <Compile Include="Utilities\AsyncParallel.cs" />
     <Compile Include="Utilities\CancellationToken.cs" />
+    <Compile Include="Utilities\NetworkDrive.cs" />
     <Compile Include="Utilities\PendingQueue.cs" />
     <Compile Include="Playlist\PlaylistColumn.cs" />
     <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
@@ -136,7 +143,6 @@
     <Compile Include="ComponentLoader.cs" />
     <Compile Include="Managers\LibraryManager.cs" />
     <Compile Include="Managers\PlaybackManager.cs" />
-    <Compile Include="Managers\PlaylistManager.cs" />
     <Compile Include="MetaData\CommonMetaData.cs" />
     <Compile Include="MetaData\CommonProperties.cs" />
     <Compile Include="MetaData\MetaDataItem.cs" />
@@ -180,14 +186,15 @@
     <Compile Include="Tasks\LibraryTaskBase.cs" />
     <Compile Include="Tasks\RemoveItemsFromPlaylistTask.cs" />
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
-    <Compile Include="Utilities\LibraryHierarchyPopulator.cs" />
-    <Compile Include="Utilities\MetaDataPopulator.cs" />
+    <Compile Include="Library\LibraryHierarchyPopulator.cs" />
+    <Compile Include="MetaData\MetaDataPopulator.cs" />
     <Compile Include="Tasks\PlaylistTaskBase.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
-    <Compile Include="Utilities\PlaylistSequencePopulator.cs" />
+    <Compile Include="Playlist\PlaylistPopulator.cs" />
+    <Compile Include="Playlist\PlaylistSequencePopulator.cs" />
     <Compile Include="Utilities\PopulatorBase.cs" />
-    <Compile Include="Utilities\Sample.cs" />
-    <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
+    <Compile Include="Utilities\Metric.cs" />
+    <Compile Include="Playlist\PlaylistItemScriptRunner.cs" />
     <Compile Include="Utilities\Shell.cs" />
     <Compile Include="Utilities\SingletonReentrantTask.cs" />
     <Compile Include="Utilities\TwoWayConcurrentDictionary.cs" />

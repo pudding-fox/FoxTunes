@@ -12,6 +12,10 @@ namespace FoxTunes
             var components = new List<T>();
             foreach (var type in ComponentScanner.Instance.GetComponents(typeof(T)))
             {
+                if (!this.IncludeType(type))
+                {
+                    continue;
+                }
                 var component = default(T);
                 try
                 {
@@ -26,6 +30,21 @@ namespace FoxTunes
                 components.Add(component);
             }
             return components.OrderBy(this.ComponentPriority);
+        }
+
+        protected virtual bool IncludeType(Type type)
+        {
+            var component = default(ComponentAttribute);
+            if (!type.HasCustomAttribute<ComponentAttribute>(out component))
+            {
+                return true;
+            }
+            if (component == null)
+            {
+                return true;
+            }
+            var id = ComponentResolver.Instance.Get(component.Slot);
+            return string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase) || string.Equals(id, component.Id, StringComparison.OrdinalIgnoreCase);
         }
 
         public Func<T, byte> ComponentPriority

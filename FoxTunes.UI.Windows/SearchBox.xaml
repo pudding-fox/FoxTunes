@@ -12,7 +12,7 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <TextBox Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <TextBox Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
         <TextBlock Text="Search" Opacity="0.5" FontStyle="Italic" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">

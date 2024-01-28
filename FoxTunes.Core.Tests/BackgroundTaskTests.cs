@@ -12,9 +12,11 @@ namespace FoxTunes
         {
             var tasks = Enumerable.Range(0, 1024).Select(index => Task.Run(async () =>
             {
-                var task = new Task001();
-                task.InitializeComponent(this.Core);
-                await task.Run();
+                using (var task = new Task001())
+                {
+                    task.InitializeComponent(this.Core);
+                    await task.Run();
+                }
             })).ToArray();
             Task.WaitAll(tasks);
             Assert.AreEqual(1024, Task001.Counter);

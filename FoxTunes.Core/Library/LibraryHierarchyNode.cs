@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 
 namespace FoxTunes
@@ -205,14 +206,21 @@ namespace FoxTunes
             {
                 return;
             }
-            this.MetaDatas = new ObservableCollection<MetaDataItem>(
-                MetaDataInfo.GetMetaData(
-                    this.Core,
-                    this.Database,
-                    this,
-                    META_DATA_TYPE
-                ).Take(META_DATA_COUNT)
-            );
+            using (var database = this.Database.New())
+            {
+                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                {
+                    this.MetaDatas = new ObservableCollection<MetaDataItem>(
+                        MetaDataInfo.GetMetaData(
+                            this.Core,
+                            database,
+                            this,
+                            META_DATA_TYPE,
+                            transaction
+                        ).Take(META_DATA_COUNT)
+                    );
+                }
+            }
         }
 
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();

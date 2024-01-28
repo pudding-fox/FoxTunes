@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -8,7 +9,8 @@ namespace FoxTunes
     {
         public const string ID = "4E0DD392-1138-4DA8-84C2-69B27D1E34EA";
 
-        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode, bool clear) : base(ID, sequence)
+        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode, bool clear)
+            : base(ID, sequence)
         {
             this.LibraryHierarchyNode = libraryHierarchyNode;
             this.Clear = clear;
@@ -36,11 +38,11 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction())
+            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
                 if (this.Clear)
                 {
-                    await this.ClearItems(transaction);
+                    await this.RemoveItems(PlaylistItemStatus.None, transaction);
                 }
                 await this.AddPlaylistItems(transaction);
                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);

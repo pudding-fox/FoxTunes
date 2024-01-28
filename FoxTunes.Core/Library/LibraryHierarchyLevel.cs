@@ -1,8 +1,9 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
-    public class LibraryHierarchyLevel : PersistableComponent
+    public class LibraryHierarchyLevel : PersistableComponent, ISequenceableComponent
     {
         public LibraryHierarchyLevel()
         {

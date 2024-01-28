@@ -1,9 +1,8 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -52,11 +51,11 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            using (var transaction = this.Database.BeginTransaction())
+            using (var transaction = this.Database.BeginTransaction(IsolationLevel.ReadUncommitted))
             {
                 if (this.Clear)
                 {
-                    await this.ClearItems(transaction);
+                    await this.RemoveItems(PlaylistItemStatus.None, transaction);
                 }
                 await this.AddPlaylistItems(transaction);
                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
@@ -83,42 +82,11 @@ namespace FoxTunes
 
         protected virtual async Task AddPlaylistItems(ITransactionSource transaction)
         {
-            using (var writer = new PlaylistWriter(this.Database, transaction))
+            using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, false, transaction))
             {
-                foreach (var path in this.Paths)
-                {
-                    if (Directory.Exists(path))
-                    {
-                        foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
-                            await this.AddPlaylistItem(writer, fileName);
-                        }
-                    }
-                    else if (File.Exists(path))
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", path);
-                        await this.AddPlaylistItem(writer, path);
-                    }
-                }
+                await playlistPopulator.Populate(this.Paths);
+                this.Offset = playlistPopulator.Offset;
             }
-        }
-
-        protected virtual async Task AddPlaylistItem(PlaylistWriter writer, string fileName)
-        {
-            if (!this.PlaybackManager.IsSupported(fileName))
-            {
-                Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
-                return;
-            }
-            var playlistItem = new PlaylistItem()
-            {
-                DirectoryName = Path.GetDirectoryName(fileName),
-                FileName = fileName,
-                Sequence = this.Sequence
-            };
-            await writer.Write(playlistItem);
-            this.Offset++;
         }
 
         protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken, ITransactionSource transaction)

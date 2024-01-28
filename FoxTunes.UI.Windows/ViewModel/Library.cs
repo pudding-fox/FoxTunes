@@ -2,9 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Threading.Tasks;
+using System.Linq;
 using System.Windows;
+using FoxDb;
 using System.Windows.Input;
+using System.Collections;
 
 namespace FoxTunes.ViewModel
 {
@@ -24,9 +28,45 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IDatabaseComponent Database { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public ILibraryManager LibraryManager { get; private set; }
+
+        public IEnumerable Hierarchies
+        {
+            get
+            {
+                if (this.Database != null)
+                {
+                    using (var database = this.Database.New())
+                    {
+                        using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                        {
+                            var set = database.Set<LibraryHierarchy>(transaction);
+                            set.Fetch.Sort.Expressions.Clear();
+                            set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
+                            foreach (var element in set)
+                            {
+                                yield return element;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        protected virtual void OnHierarchiesChanged()
+        {
+            if (this.HierarchiesChanged != null)
+            {
+                this.HierarchiesChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Hierarchies");
+        }
+
+        public event EventHandler HierarchiesChanged = delegate { };
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 
@@ -122,6 +162,15 @@ namespace FoxTunes.ViewModel
 
         public virtual void Reload()
         {
+            using (var database = this.Core.Components.Database.New())
+            {
+                using (var transaction = database.BeginTransaction(IsolationLevel.ReadUncommitted))
+                {
+                    var queryable = database.AsQueryable<LibraryHierarchy>(transaction);
+                    this.SelectedHierarchy = queryable.OrderBy(libraryHierarchy => libraryHierarchy.Sequence).FirstOrDefault();
+                }
+            }
+            this.OnHierarchiesChanged();
             this._Items.Clear();
             this.Refresh();
         }
@@ -133,10 +182,11 @@ namespace FoxTunes.ViewModel
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.PlaylistManager = this.Core.Managers.Playlist;
+            this.Database = this.Core.Components.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.LibraryManager = this.Core.Managers.Library;
-            this.Refresh();
+            this.Reload();
             this.OnCommandsChanged();
             base.OnCoreChanged();
         }

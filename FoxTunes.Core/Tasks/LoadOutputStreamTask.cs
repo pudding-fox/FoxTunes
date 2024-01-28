@@ -66,6 +66,13 @@ namespace FoxTunes
                 }
                 return;
             }
+            if (!File.Exists(this.PlaylistItem.FileName))
+            {
+                if (!NetworkDrive.IsRemotePath(this.PlaylistItem.FileName) || !await NetworkDrive.ConnectRemotePath(this.PlaylistItem.FileName))
+                {
+                    throw new FileNotFoundException(string.Format("File not found: {0}", this.PlaylistItem.FileName), this.PlaylistItem.FileName);
+                }
+            }
             var outputStream = await this.Output.Load(this.PlaylistItem, this.Immediate);
             if (outputStream == null)
             {
