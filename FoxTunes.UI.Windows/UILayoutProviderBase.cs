@@ -7,6 +7,10 @@ namespace FoxTunes
     {
         public abstract string Id { get; }
 
+        public abstract string Name { get; }
+
+        public abstract string Description { get; }
+
         public bool Active
         {
             get

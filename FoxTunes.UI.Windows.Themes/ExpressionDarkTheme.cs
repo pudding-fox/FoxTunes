@@ -8,12 +8,13 @@ namespace FoxTunes
 {
     [Component(ID, ComponentSlots.None)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [ComponentRelease(ReleaseType.Default)]
     public class ExpressionDarkTheme : ThemeBase, IConfigurableComponent
     {
         public const string ID = "3E9EFE8C-5245-4F8B-97D1-EB47CC70E373";
 
         public ExpressionDarkTheme()
-            : base(ID, "ExpressionDark")
+            : base(ID, Strings.ExpressionDarkTheme_Name, Strings.ExpressionDarkTheme_Description)
         {
 
         }

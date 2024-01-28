@@ -9,13 +9,32 @@ using System.Windows.Data;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [ComponentRelease(ReleaseType.Default)]
     public class UIComponentLayoutProvider : UILayoutProviderBase, IConfigurableComponent, IDisposable
     {
+        public const string ID = "CCCC083C-3C19-4AAC-97C7-565AF8F83115";
+
         public override string Id
         {
             get
             {
-                return UIComponentLayoutProviderConfiguration.ID;
+                return ID;
+            }
+        }
+
+        public override string Name
+        {
+            get
+            {
+                return Strings.UIComponentLayoutProvider_Name;
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                return Strings.UIComponentLayoutProvider_Description;
             }
         }
 

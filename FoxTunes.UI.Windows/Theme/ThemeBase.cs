@@ -14,12 +14,11 @@ namespace FoxTunes
             this.ResourceDictionaries = new Dictionary<ConfigurationElement, Lazy<ResourceDictionary>>();
         }
 
-        protected ThemeBase(string id, string name = null, string description = null, ReleaseType releaseType = ReleaseType.Default) : this()
+        protected ThemeBase(string id, string name = null, string description = null) : this()
         {
             this.Id = id;
             this.Name = name;
             this.Description = description;
-            this.ReleaseType = releaseType;
         }
 
         public Lazy<ResourceDictionary> ResourceDictionary { get; private set; }
@@ -31,8 +30,6 @@ namespace FoxTunes
         public string Name { get; private set; }
 
         public string Description { get; private set; }
-
-        public ReleaseType ReleaseType { get; }
 
         public bool IsEnabled { get; private set; }
 

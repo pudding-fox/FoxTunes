@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string UIComponentLayoutProvider_Description {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProvider.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Customizable.
         /// </summary>
         internal static string UIComponentLayoutProvider_Name {
