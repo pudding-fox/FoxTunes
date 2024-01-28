@@ -27,5 +27,7 @@
         IPlaylistBrowser PlaylistBrowser { get; }
 
         IPlaylistCache PlaylistCache { get; }
+
+        IFilterParser FilterParser { get; }
     }
 }
