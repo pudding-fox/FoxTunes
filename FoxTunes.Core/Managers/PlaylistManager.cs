@@ -658,6 +658,11 @@ namespace FoxTunes
             {
                 {
                     var set = database.Set<Playlist>(transaction);
+                    foreach (var playlist in set)
+                    {
+                        //TODO: Bad .Wait()
+                        PlaylistTaskBase.RemovePlaylistItems(database, playlist.Id, PlaylistItemStatus.None, transaction).Wait();
+                    }
                     set.Clear();
                     set.Add(new Playlist() { Name = "Default", Type = PlaylistType.None, Enabled = true });
                 }

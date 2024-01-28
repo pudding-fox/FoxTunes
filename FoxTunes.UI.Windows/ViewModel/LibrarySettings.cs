@@ -228,6 +228,7 @@ namespace FoxTunes.ViewModel
                 }
             }
             await this.Refresh().ConfigureAwait(false);
+            await this.HierarchyManager.Build(null).ConfigureAwait(false);
         }
 
         public override void InitializeComponent(ICore core)

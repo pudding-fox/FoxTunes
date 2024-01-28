@@ -221,10 +221,10 @@ namespace FoxTunes.ViewModel
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var playlists = database.Set<Playlist>(transaction);
-                            foreach (var playlist in playlists.Except(this.Playlists.ItemsSource).ToArray())
+                            foreach (var playlist in this.Playlists.Removed)
                             {
                                 await PlaylistTaskBase.RemovePlaylistItems(database, playlist.Id, PlaylistItemStatus.None, transaction).ConfigureAwait(false);
-                                playlists.Remove(playlist);
+                                await playlists.RemoveAsync(playlist).ConfigureAwait(false);
                             }
                             playlists.AddOrUpdate(this.Playlists.ItemsSource);
                             transaction.Commit();
