@@ -34,13 +34,6 @@
             </TextBox.Text>
             <TextBox.Style>
                 <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-                    <!-- System -->
-                    <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
-                    <Setter Property="AllowDrop" Value="true" />
-                    <Setter Property="Template" Value="{DynamicResource TextBoxTemplate}" />
-                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                    <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
-                    <Setter Property="BorderBrush" Value="{DynamicResource SolidBorderBrush}"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsMultiline, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
                             <Setter Property="AcceptsReturn" Value="True"></Setter>
