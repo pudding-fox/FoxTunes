@@ -19,6 +19,13 @@
                         <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.title){var parts=[];if(tag.track){parts.push(tag.track);}parts.push(tag.title);return parts.join(&quot; - &quot;);}return item.FileName;})()"/>
                     </ViewModel:LibraryHierarchy.Levels>
                 </ViewModel:LibraryHierarchy>
+                <ViewModel:LibraryHierarchy Name="Genre/Album/Title">
+                    <ViewModel:LibraryHierarchy.Levels>
+                        <ViewModel:LibraryHierarchyLevel Script="tag.firstgenre||&quot;No Genre&quot;"/>
+                        <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(&quot; - &quot;);}return &quot;No Album&quot;;})()"/>
+                        <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.title){var parts=[];if(tag.track){parts.push(tag.track);}parts.push(tag.title);return parts.join(&quot; - &quot;);}return item.FileName;})()"/>
+                    </ViewModel:LibraryHierarchy.Levels>
+                </ViewModel:LibraryHierarchy>
             </ViewModel:Library.Hierarchies>
         </ViewModel:Library>
         <ViewModel:LibraryHierarchyProvider x:Key="HierarchyProvider" Core="{Binding}" Hierarchy="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"/>
