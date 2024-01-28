@@ -64,6 +64,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Popularimeter { get; private set; }
 
+        public BooleanConfigurationElement Documents { get; private set; }
+
         public SelectionConfigurationElement Write { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -109,6 +111,10 @@ namespace FoxTunes
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
+            );
+            this.Documents = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_DOCUMENTS
             );
             this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -165,6 +171,10 @@ namespace FoxTunes
                     if (this.ReplayGain.Value)
                     {
                         this.Try(() => ReplayGainManager.Read(this, metaData, file), this.ErrorHandler);
+                    }
+                    if (this.Documents.Value)
+                    {
+                        this.Try(() => DocumentManager.Read(this, metaData, file), this.ErrorHandler);
                     }
                     this.Try(() => CompilationManager.Read(this, metaData, file), this.ErrorHandler);
                     if (file is IMetaDataSource metaDataSource)

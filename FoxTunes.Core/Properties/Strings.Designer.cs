@@ -169,6 +169,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Documents.
+        /// </summary>
+        internal static string MetaDataBehaviourConfiguration_Documents {
+            get {
+                return ResourceManager.GetString("MetaDataBehaviourConfiguration.Documents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Embedded Images.
         /// </summary>
         internal static string MetaDataBehaviourConfiguration_EmbeddedImages {

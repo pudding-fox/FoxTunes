@@ -195,6 +195,7 @@ namespace FoxTunes
         Property = 2,
         Image = 4,
         Statistic = 8,
-        All = Tag | Property | Image | Statistic
+        Document = 16,
+        All = Tag | Property | Image | Statistic | Document
     }
 }

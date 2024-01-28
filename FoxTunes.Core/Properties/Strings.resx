@@ -153,6 +153,9 @@
   <data name="MetaDataBehaviourConfiguration.DetectCompilations" xml:space="preserve">
     <value>Detect Compilations</value>
   </data>
+  <data name="MetaDataBehaviourConfiguration.Documents" xml:space="preserve">
+    <value>Documents</value>
+  </data>
   <data name="MetaDataBehaviourConfiguration.EmbeddedImages" xml:space="preserve">
     <value>Embedded Images</value>
   </data>

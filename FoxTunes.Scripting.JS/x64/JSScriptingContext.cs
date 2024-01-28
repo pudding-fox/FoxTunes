@@ -66,7 +66,7 @@ namespace FoxTunes
             {
                 this.SetValue(value, key, dictionary[key]);
             }
-            this.SetValue(name, value);
+            target.SetProperty(name, value);
         }
 
         public override object GetValue(string name)
@@ -93,7 +93,10 @@ namespace FoxTunes
             try
             {
                 var handle = this.Compile(script);
-                return this.GetValue(this.Engine.Execute(handle, throwExceptionOnError: true));
+                using (var result = this.Engine.Execute(handle, throwExceptionOnError: true))
+                {
+                    return this.GetValue(result);
+                }
             }
             catch (V8ExecutionErrorException e)
             {

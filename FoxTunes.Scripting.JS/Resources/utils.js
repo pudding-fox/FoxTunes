@@ -87,3 +87,13 @@ function extension(value) {
         return parts[parts.length - 1];
     }
 }
+
+function content(value) {
+    if (!value || !value.mime || !value.data) {
+        return value;
+    }
+    if (value.mime == "application/json") {
+        return JSON.parse(value.data);
+    }
+    return value.data;
+}

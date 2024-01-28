@@ -36,6 +36,8 @@ namespace FoxTunes
 
         public const string READ_POPULARIMETER_TAGS = "JJJJ6988-D3BF-434F-B326-3354D2922926";
 
+        public const string READ_DOCUMENTS = "JJJK51C0-D530-44B8-B9E9-7280041C0524";
+
         public const string DETECT_COMPILATIONS = "JJKK150D-DB8D-4C64-99E4-10B453B26295";
 
         public const string THREADS_ELEMENT = "KKKK16BD-B4A7-4F9D-B4DA-F81E932F6DD9";
@@ -78,6 +80,8 @@ namespace FoxTunes
                     new BooleanConfigurationElement(READ_REPLAY_GAIN_TAGS, Strings.MetaDataBehaviourConfiguration_ReplayGain).WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
                     new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, Strings.MetaDataBehaviourConfiguration_Popularimeter).WithValue(releaseType == ReleaseType.Default))
+                .WithElement(
+                    new BooleanConfigurationElement(READ_DOCUMENTS, Strings.MetaDataBehaviourConfiguration_Documents).WithValue(false))
                 .WithElement(
                     new BooleanConfigurationElement(DETECT_COMPILATIONS, Strings.MetaDataBehaviourConfiguration_DetectCompilations).WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
