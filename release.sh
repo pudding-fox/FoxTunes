@@ -86,6 +86,12 @@ FoxTunes.Output.Bass.Wasapi.dll
 ManagedBass.Wasapi.dll
 "
 
+SQLSERVER="
+FoxTunes.DB.SqlServer.dll
+FoxDb.SqlServer.dll
+FoxDb.SqlServer.2012.dll
+"
+
 DEPENDENCIES=" 
 x86/Microsoft.VC100.CRT/msvcp100.dll
 x86/Microsoft.VC100.CRT/msvcr100.dll
@@ -118,6 +124,7 @@ mkdir -p "./release/Plugins/dsd"
 mkdir -p "./release/Plugins/dts"
 mkdir -p "./release/Plugins/sox"
 mkdir -p "./release/Plugins/wasapi"
+mkdir -p "./release/Plugins/sqlserver"
 mkdir -p "./release/Dependencies"
 
 echo "Creating main package.."
@@ -172,6 +179,12 @@ for file in $WASAPI
 do
 	echo $file
 	cp "./distribution/Release/$file" "./release/Plugins/wasapi"
+done
+
+for file in $SQLSERVER
+do
+        echo $file
+        cp "./distribution/Release/$file" "./release/Plugins/sqlserver"
 done
 
 tar -zcvf "./release/FoxTunes-$TAG-Plugins.tar.gz" -C "./release/Plugins" . --xform='s!^\./!!'
