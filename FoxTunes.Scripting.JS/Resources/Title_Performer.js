@@ -10,6 +10,6 @@
         return parts.join(" - ");
     }
     else {
-        return filename(item.FileName);
+        return filename(file);
     }
 })()

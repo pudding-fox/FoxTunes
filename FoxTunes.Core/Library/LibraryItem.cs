@@ -1,7 +1,7 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace FoxTunes
@@ -21,7 +21,7 @@ namespace FoxTunes
         public LibraryItemStatus Status { get; set; }
 
         [Relation(Flags = RelationFlags.AutoExpression | RelationFlags.EagerFetch | RelationFlags.ManyToMany)]
-        public ObservableCollection<MetaDataItem> MetaDatas { get; set; }
+        public IList<MetaDataItem> MetaDatas { get; set; }
 
         protected virtual void OnMetaDatasChanged()
         {

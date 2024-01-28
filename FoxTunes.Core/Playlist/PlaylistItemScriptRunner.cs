@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -55,17 +56,26 @@ namespace FoxTunes
                     }
                 }
             }
-            if (this.PlaybackManager != null)
+            var playing = false;
+            if (this.PlaybackManager != null && this.PlaylistItem != null)
             {
-                this.ScriptingContext.SetValue("playing", this.PlaybackManager.CurrentStream);
+                var currentStream = this.PlaybackManager.CurrentStream;
+                if (currentStream != null)
+                {
+                    playing = this.PlaylistItem.Id == currentStream.Id && string.Equals(this.PlaylistItem.FileName, currentStream.FileName, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            this.ScriptingContext.SetValue("playing", playing);
+            this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
+            this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
+            if (this.PlaylistItem != null)
+            {
+                this.ScriptingContext.SetValue("file", this.PlaylistItem.FileName);
             }
             else
             {
-                this.ScriptingContext.SetValue("playing", null);
+                this.ScriptingContext.SetValue("file", null);
             }
-            this.ScriptingContext.SetValue("item", this.PlaylistItem);
-            this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
-            this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
         }
 
         [DebuggerNonUserCode]

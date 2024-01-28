@@ -1,7 +1,4 @@
 ﻿(function () {
-    if (item == null) {
-        return version();
-    }
     var parts = [];
     if (tag.disccount != 1 && tag.disc) {
         parts.push(tag.disc);
@@ -13,7 +10,7 @@
         parts.push(tag.title);
     }
     else {
-        parts.push(filename(item.FileName));
+        parts.push(filename(file));
     }
     return parts.join(" - ");
 })()

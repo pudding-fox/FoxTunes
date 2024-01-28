@@ -90,7 +90,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (extension(item.FileName) || &quot;&quot;).toUpperCase();.
+        ///   Looks up a localized string similar to (extension(file) || &quot;&quot;).toUpperCase();.
         /// </summary>
         internal static string Codec {
             get {
@@ -110,7 +110,7 @@ namespace FoxTunes {
         ///        }
         ///        parts.push(tag.title);
         ///        return parts.join(&quot; - &quot;);
-        ///    } return filename(fileName);
+        ///    } return filename(file);
         ///})().
         /// </summary>
         internal static string Disk_Track_Title {
@@ -138,7 +138,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to playing != null &amp;&amp; item.Id == playing.Id &amp;&amp; item.FileName == playing.FileName ? &quot;\u2022&quot; : &quot;&quot;.
+        ///   Looks up a localized string similar to playing ? &quot;\u2022&quot; : &quot;&quot;.
         /// </summary>
         internal static string Playing {
             get {
@@ -159,7 +159,7 @@ namespace FoxTunes {
         ///        return parts.join(&quot; - &quot;);
         ///    }
         ///    else {
-        ///        return filename(item.FileName);
+        ///        return filename(file);
         ///    }
         ///})().
         /// </summary>
@@ -189,7 +189,8 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to function version() {
-        ///    return &quot;Fox Tunes 2.0.0&quot;;
+        ///    //TODO: Make this return the actual version somehow.
+        ///    return &quot;Fox Tunes&quot;;
         ///}
         ///
         ///function timestamp(value) {
@@ -212,10 +213,7 @@ namespace FoxTunes {
         ///    }
         ///
         ///    if (m &lt; 10) {
-        ///        m = &quot;0&quot; + m;
-        ///    }
-        ///    parts.push(m);
-        ///    if (s &lt; 10) { [rest of string was truncated]&quot;;.
+        ///        m = &quot;0 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string utils {
             get {

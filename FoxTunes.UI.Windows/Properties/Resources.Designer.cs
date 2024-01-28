@@ -62,7 +62,7 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///    if (item == null) {
+        ///    if (!file) {
         ///        return version();
         ///    }
         ///    var parts = [];
@@ -73,7 +73,7 @@ namespace FoxTunes {
         ///        parts.push(zeropad(tag.track, 2));
         ///    }
         ///    if (tag.artist) {
-        ///        parts.push(artist);
+        ///        parts.push(tag.artist);
         ///    }
         ///    if (tag.album) {
         ///        parts.push(tag.album);
@@ -82,9 +82,9 @@ namespace FoxTunes {
         ///        parts.push(tag.title);
         ///    }
         ///    else {
-        ///        parts.push(filename(item.FileName));
+        ///        parts.push(filename(file));
         ///    }
-        ///    if (tag.perf [rest of string was truncated]&quot;;.
+        ///    if (tag.performer &amp;&amp; tag [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NowPlaying {
             get {
@@ -94,9 +94,6 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///    if (item == null) {
-        ///        return version();
-        ///    }
         ///    var parts = [];
         ///    if (tag.disccount != 1 &amp;&amp; tag.disc) {
         ///        parts.push(tag.disc);
@@ -108,7 +105,7 @@ namespace FoxTunes {
         ///        parts.push(tag.title);
         ///    }
         ///    else {
-        ///        parts.push(filename(item.FileName));
+        ///        parts.push(filename(file));
         ///    }
         ///    return parts.join(&quot; - &quot;);
         ///})().

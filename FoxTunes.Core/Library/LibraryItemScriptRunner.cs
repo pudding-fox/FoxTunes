@@ -46,7 +46,6 @@ namespace FoxTunes
                     }
                 }
             }
-            this.ScriptingContext.SetValue("item", this.LibraryItem);
             this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
             this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
         }

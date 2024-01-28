@@ -1,5 +1,5 @@
 ﻿(function () {
-    if (item == null) {
+    if (!file) {
         return version();
     }
     var parts = [];
@@ -19,7 +19,7 @@
         parts.push(tag.title);
     }
     else {
-        parts.push(filename(item.FileName));
+        parts.push(filename(file));
     }
     if (tag.performer && tag.performer != tag.artist) {
         parts.push(tag.performer);

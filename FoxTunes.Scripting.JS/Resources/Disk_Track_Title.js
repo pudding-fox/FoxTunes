@@ -9,5 +9,5 @@
         }
         parts.push(tag.title);
         return parts.join(" - ");
-    } return filename(fileName);
+    } return filename(file);
 })()
