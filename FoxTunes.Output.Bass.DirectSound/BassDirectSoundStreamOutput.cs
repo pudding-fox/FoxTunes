@@ -11,20 +11,12 @@ namespace FoxTunes
     {
         private BassDirectSoundStreamOutput()
         {
-            this.Flags = BassFlags.Default;
             this.MixerChannelHandles = new HashSet<int>();
         }
 
         public BassDirectSoundStreamOutput(BassDirectSoundStreamOutputBehaviour behaviour, BassOutputStream stream) : this()
         {
             this.Behaviour = behaviour;
-            this.Rate = behaviour.Output.Rate;
-            this.Channels = BassDirectSoundDevice.Info.Outputs;
-            this.Flags = BassFlags.Default;
-            if (this.Behaviour.Output.Float)
-            {
-                this.Flags |= BassFlags.Float;
-            }
         }
 
         public override string Name
@@ -39,27 +31,30 @@ namespace FoxTunes
         {
             get
             {
+                var rate = default(int);
+                var channels = default(int);
+                var flags = default(BassFlags);
+                if (!this.GetFormat(out rate, out channels, out flags))
+                {
+                    rate = 0;
+                    channels = 0;
+                    flags = BassFlags.Default;
+                }
                 return string.Format(
                     "{0} ({1}/{2}/{3})",
                     this.Name,
-                    BassUtils.DepthDescription(this.Flags),
-                    MetaDataInfo.SampleRateDescription(this.Rate),
-                    MetaDataInfo.ChannelDescription(this.Channels)
+                    BassUtils.DepthDescription(flags),
+                    MetaDataInfo.SampleRateDescription(rate),
+                    MetaDataInfo.ChannelDescription(channels)
                 );
             }
         }
 
+        public HashSet<int> MixerChannelHandles { get; protected set; }
+
         public BassDirectSoundStreamOutputBehaviour Behaviour { get; private set; }
 
-        public override int Rate { get; protected set; }
-
-        public override int Channels { get; protected set; }
-
-        public override BassFlags Flags { get; protected set; }
-
         public override int ChannelHandle { get; protected set; }
-
-        public HashSet<int> MixerChannelHandles { get; protected set; }
 
         protected override IEnumerable<int> GetMixerChannelHandles()
         {
@@ -73,9 +68,12 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            this.ConfigureDirectSound(previous);
-            Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
-            this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
+            var rate = default(int);
+            var channels = default(int);
+            var flags = default(BassFlags);
+            this.ConfigureDirectSound(previous, out rate, out channels, out flags);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
+            this.ChannelHandle = BassMix.CreateMixerStream(rate, channels, flags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
@@ -86,35 +84,40 @@ namespace FoxTunes
             this.UpdateVolume();
         }
 
-        protected virtual void ConfigureDirectSound(IBassStreamComponent previous)
+        protected virtual void ConfigureDirectSound(IBassStreamComponent previous, out int rate, out int channels, out BassFlags flags)
         {
-            if (this.Behaviour.Output.EnforceRate)
+            previous.GetFormat(out rate, out channels, out flags);
+            if (flags.HasFlag(BassFlags.DSDRaw))
             {
-                if (!BassDirectSoundDevice.Info.SupportedRates.Contains(this.Rate))
-                {
-                    var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(this.Rate);
-                    Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
-                    this.Rate = nearestRate;
-                }
-                else
-                {
-                    //Enfoced rate is supported by the device, nothing to do.
-                }
+                //Nothing to do.
             }
             else
             {
-                if (!BassDirectSoundDevice.Info.SupportedRates.Contains(previous.Rate))
+                if (this.Behaviour.Output.EnforceRate)
                 {
-                    var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(previous.Rate);
-                    Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
-                    this.Rate = nearestRate;
+                    var targetRate = this.Behaviour.Output.Rate;
+                    if (!BassDirectSoundDevice.Info.SupportedRates.Contains(targetRate))
+                    {
+                        var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(targetRate);
+                        Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
+                        rate = nearestRate;
+                    }
+                    else
+                    {
+                        rate = targetRate;
+                    }
                 }
                 else
                 {
-                    //Stream rate is supported by the device, nothing to do.
-                    this.Rate = previous.Rate;
+                    if (!BassDirectSoundDevice.Info.SupportedRates.Contains(rate))
+                    {
+                        var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(rate);
+                        Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
+                        rate = nearestRate;
+                    }
                 }
             }
+            flags = flags & ~BassFlags.Decode;
         }
 
         public override bool IsPlaying

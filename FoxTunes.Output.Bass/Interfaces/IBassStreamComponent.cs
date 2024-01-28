@@ -9,17 +9,13 @@ namespace FoxTunes.Interfaces
 
         string Description { get; }
 
-        int Rate { get; }
-
-        int Channels { get; }
-
-        BassFlags Flags { get; }
-
         int ChannelHandle { get; }
 
         long BufferLength { get; }
 
         bool IsActive { get; }
+
+        bool GetFormat(out int rate, out int channels, out BassFlags flags);
 
         void Connect(IBassStreamComponent previous);
 

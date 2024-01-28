@@ -1,66 +1,76 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net40;net462</TargetFrameworks>
-    <AssemblyName>FoxTunes.Output.Bass.Dsd</AssemblyName>
-    <OutputPath>..\distribution\$(Platform)\</OutputPath>
-    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
-    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
-    <AssemblyVersion>2.3.1.0</AssemblyVersion>
-    <Platforms>x86;x64</Platforms>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net40;net462</TargetFrameworks>
+		<AssemblyName>FoxTunes.Output.Bass.Dsd</AssemblyName>
+		<OutputPath>..\distribution\$(Platform)\</OutputPath>
+		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+		<AssemblyVersion>2.3.1.0</AssemblyVersion>
+		<Platforms>x86;x64</Platforms>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\ManagedBass.dll</HintPath>
-    </Reference>
-    <Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\ManagedBass.Dsd.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
+			<HintPath>..\lib\net40\ManagedBass.dll</HintPath>
+		</Reference>
+		<Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net40'">
+			<HintPath>..\lib\net40\ManagedBass.Dsd.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.dll</HintPath>
-    </Reference>
-    <Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.Dsd.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
+			<HintPath>..\lib\ManagedBass.dll</HintPath>
+		</Reference>
+		<Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net462'">
+			<HintPath>..\lib\ManagedBass.Dsd.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(Platform)' == 'x86'">
-  	<None Include="..\lib\x86\bassdsd.dll" Link="Addon\bassdsd.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  	</None>
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(Platform)' == 'x64'">
-  	<None Include="..\lib\x64\bassdsd.dll" Link="Addon\bassdsd.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  	</None>
-  </ItemGroup>
+	<ItemGroup Condition="'$(Platform)' == 'x86'">
+		<None Include="..\lib\x86\bassdsd.dll" Link="Addon\bassdsd.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(Platform)' == 'x64'">
+		<None Include="..\lib\x64\bassdsd.dll" Link="Addon\bassdsd.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Output\FoxTunes.Output.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.Output\FoxTunes.Output.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ManagedBass.Memory" Version="0.0.1" />
+		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
+		<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
+	</ItemGroup>
 
- <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Strings.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Strings.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>FoxTunes</CustomToolNamespace>
+		</EmbeddedResource>
+		<Compile Update="Properties\Strings.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Strings.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
 </Project>

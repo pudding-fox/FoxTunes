@@ -497,26 +497,36 @@ namespace FoxTunes
         {
             var _rate = default(int);
             var _channels = default(int);
-            var _format = default(OutputStreamFormat);
+            var _flags = default(BassFlags);
+            var _result = default(bool);
             this.PipelineManager.WithPipeline(pipeline =>
             {
                 if (pipeline != null)
                 {
-                    _rate = pipeline.Output.Rate;
-                    _channels = pipeline.Output.Channels;
-                    if (pipeline.Output.Flags.HasFlag(BassFlags.Float))
-                    {
-                        _format = OutputStreamFormat.Float;
-                    }
-                    else
-                    {
-                        _format = OutputStreamFormat.Short;
-                    }
+                    _result = pipeline.Output.GetFormat(out _rate, out _channels, out _flags);
                 }
             });
+            if (!_result)
+            {
+                rate = 0;
+                channels = 0;
+                format = OutputStreamFormat.None;
+                return false;
+            }
             rate = _rate;
             channels = _channels;
-            format = _format;
+            if (_flags.HasFlag(BassFlags.Float))
+            {
+                format = OutputStreamFormat.Float;
+            }
+            else if (_flags.HasFlag(BassFlags.DSDRaw))
+            {
+                format = OutputStreamFormat.DSDRaw;
+            }
+            else
+            {
+                format = OutputStreamFormat.Short;
+            }
             return true;
         }
 

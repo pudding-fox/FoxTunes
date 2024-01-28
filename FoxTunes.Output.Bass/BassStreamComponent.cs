@@ -10,12 +10,6 @@ namespace FoxTunes
 
         public abstract string Description { get; }
 
-        public abstract int Rate { get; protected set; }
-
-        public abstract int Channels { get; protected set; }
-
-        public abstract BassFlags Flags { get; protected set; }
-
         public abstract int ChannelHandle { get; protected set; }
 
         public virtual long BufferLength
@@ -31,6 +25,29 @@ namespace FoxTunes
         }
 
         public abstract bool IsActive { get; }
+
+        public virtual bool GetFormat(out int rate, out int channels, out BassFlags flags)
+        {
+            var info = default(ChannelInfo);
+            if (!Bass.ChannelGetInfo(this.ChannelHandle, out info))
+            {
+                rate = 0;
+                channels = 0;
+                flags = BassFlags.Default;
+                return false;
+            }
+            if (info.Flags.HasFlag(BassFlags.DSDRaw))
+            {
+                rate = BassUtils.GetChannelDsdRate(this.ChannelHandle);
+            }
+            else
+            {
+                rate = info.Frequency;
+            }
+            channels = info.Channels;
+            flags = info.Flags;
+            return true;
+        }
 
         public abstract void Connect(IBassStreamComponent previous);
 

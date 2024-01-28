@@ -12,9 +12,9 @@ namespace FoxTunes
 
         public IBassOutput Output { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
 
         new public bool IsInitialized { get; private set; }
 
@@ -41,16 +41,13 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
+            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassMemoryBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
-            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
             base.InitializeComponent(core);
         }
 
@@ -86,7 +83,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var component = new BassMemoryStreamComponent(this, e.Stream, e.Query);
+            var component = new BassMemoryStreamComponent(this);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
@@ -18,6 +17,10 @@ namespace FoxTunes.ViewModel
             }
             set
             {
+                if (string.Equals(this._Description, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
                 this._Description = value;
                 this.OnDescriptionChanged();
             }
@@ -34,26 +37,28 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler DescriptionChanged;
 
-        public IPlaybackManager PlaybackManager { get; private set; }
-
         public IOutput Output { get; private set; }
 
         protected override void InitializeComponent(ICore core)
         {
-            this.PlaybackManager = core.Managers.Playback;
-            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            PlaybackStateNotifier.Notify += this.OnNotify;
             this.Output = core.Components.Output;
-            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
+        protected virtual void OnNotify(object sender, EventArgs e)
         {
-            //Critical: Don't block in this event handler, it causes a deadlock.
-            this.Dispatch(this.Refresh);
+            try
+            {
+                this.Refresh();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
 
-        protected virtual Task Refresh()
+        protected virtual void Refresh()
         {
             var builder = new StringBuilder();
             builder.AppendLine(string.Format("{0} {1}", Publication.Product, Publication.Version));
@@ -65,10 +70,7 @@ namespace FoxTunes.ViewModel
             {
                 builder.Append(Strings.PlaybackDetails_NoOutput);
             }
-            return Windows.Invoke(() =>
-            {
-                this.Description = builder.ToString();
-            });
+            this.Description = builder.ToString();
         }
 
         protected override Freezable CreateInstanceCore()
@@ -78,10 +80,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.PlaybackManager != null)
-            {
-                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
-            }
+            PlaybackStateNotifier.Notify -= this.OnNotify;
             base.OnDisposing();
         }
     }

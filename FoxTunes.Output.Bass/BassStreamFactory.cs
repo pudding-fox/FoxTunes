@@ -14,44 +14,18 @@ namespace FoxTunes
             this.Providers = new List<IBassStreamProvider>();
         }
 
-        private List<IBassStreamAdvisor> Advisors { get; set; }
+        public List<IBassStreamAdvisor> Advisors { get; private set; }
 
-        private List<IBassStreamProvider> Providers { get; set; }
-
-        IEnumerable<IBassStreamAdvisor> IBassStreamFactory.Advisors
-        {
-            get
-            {
-                return this.Advisors;
-            }
-        }
-
-        IEnumerable<IBassStreamProvider> IBassStreamFactory.Providers
-        {
-            get
-            {
-                return this.Providers;
-            }
-        }
+        public List<IBassStreamProvider> Providers { get; private set; }
 
         public IBassOutput Output { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
+            this.Advisors.AddRange(ComponentRegistry.Instance.GetComponents<IBassStreamAdvisor>());
+            this.Providers.AddRange(ComponentRegistry.Instance.GetComponents<IBassStreamProvider>());
             base.InitializeComponent(core);
-        }
-
-        public void Register(IBassStreamAdvisor advisor)
-        {
-            this.Advisors.Add(advisor);
-            Logger.Write(this, LogLevel.Debug, "Registered bass stream advisor \"{0}\".", advisor.GetType().Name);
-        }
-
-        public void Register(IBassStreamProvider provider)
-        {
-            this.Providers.Add(provider);
-            Logger.Write(this, LogLevel.Debug, "Registered bass stream provider \"{0}\".", provider.GetType().Name);
         }
 
         public IEnumerable<IBassStreamAdvice> GetAdvice(IBassStreamProvider provider, PlaylistItem playlistItem, BassStreamUsageType type)

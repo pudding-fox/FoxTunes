@@ -13,7 +13,7 @@ namespace FoxTunes.Interfaces
 
         long BufferLength { get; }
 
-        void Connect();
+        void Connect(BassOutputStream stream);
 
         void ClearBuffer();
     }

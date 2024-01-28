@@ -6,10 +6,6 @@ namespace FoxTunes.ViewModel
 {
     public class PlaybackState : ViewModelBase
     {
-        public static readonly IPlaybackManager PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
-
-        public static readonly IPlaylistQueue PlaylistQueue = ComponentRegistry.Instance.GetComponent<IPlaylistQueue>();
-
         public static readonly DependencyProperty PlaylistItemProperty = DependencyProperty.Register(
             "PlaylistItem",
             typeof(PlaylistItem),
@@ -35,11 +31,6 @@ namespace FoxTunes.ViewModel
                 return;
             }
             playbackState.OnPlaylistItemChanged();
-        }
-
-        public PlaybackState()
-        {
-            PlaybackStateNotifier.Notify += this.OnNotify;
         }
 
         public PlaylistItem PlaylistItem
@@ -169,6 +160,18 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler QueuePositionChanged;
+
+        public IPlaybackManager PlaybackManager { get; private set; }
+
+        public IPlaylistQueue PlaylistQueue { get; private set; }
+
+        protected override void InitializeComponent(ICore core)
+        {
+            PlaybackStateNotifier.Notify += this.OnNotify;
+            this.PlaybackManager = core.Managers.Playback;
+            this.PlaylistQueue = core.Components.PlaylistQueue;
+            base.InitializeComponent(core);
+        }
 
         protected virtual void OnNotify(object sender, EventArgs e)
         {

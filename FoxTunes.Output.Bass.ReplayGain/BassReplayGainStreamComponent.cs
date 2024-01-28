@@ -9,13 +9,6 @@ namespace FoxTunes
         public BassReplayGainStreamComponent(BassReplayGainBehaviour behaviour, BassOutputStream stream)
         {
             this.Behaviour = behaviour;
-            this.Rate = behaviour.Output.Rate;
-            this.Channels = stream.Channels;
-            this.Flags = BassFlags.Decode;
-            if (this.Behaviour.Output.Float)
-            {
-                this.Flags |= BassFlags.Float;
-            }
         }
 
         public override string Name
@@ -53,12 +46,6 @@ namespace FoxTunes
 
         public BassReplayGainBehaviour Behaviour { get; private set; }
 
-        public override int Rate { get; protected set; }
-
-        public override int Channels { get; protected set; }
-
-        public override BassFlags Flags { get; protected set; }
-
         public override int ChannelHandle { get; protected set; }
 
         public override bool IsActive
@@ -85,8 +72,6 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            this.Rate = previous.Rate;
-            this.Channels = previous.Channels;
             this.ChannelHandle = previous.ChannelHandle;
         }
 

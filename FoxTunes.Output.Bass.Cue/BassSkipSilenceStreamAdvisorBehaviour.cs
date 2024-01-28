@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassSkipSilenceStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent
+    public class BassSkipSilenceStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public ICore Core { get; private set; }
 
@@ -59,16 +60,13 @@ namespace FoxTunes
                 BassSkipSilenceStreamAdvisorBehaviourConfiguration.SENSITIVITY_ELEMENT
             ).ConnectValue(option => this.Threshold = BassSkipSilenceStreamAdvisorBehaviourConfiguration.GetSensitivity(option));
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            if (this.BassStreamPipelineFactory != null)
-            {
-                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
-            }
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
         }
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
-            var component = new BassSkipSilenceStreamComponent(this, e.Stream);
+            var component = new BassSkipSilenceStreamComponent(this);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }
@@ -76,6 +74,45 @@ namespace FoxTunes
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return BassSkipSilenceStreamAdvisorBehaviourConfiguration.GetConfigurationSections();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
+            }
+        }
+
+        ~BassSkipSilenceStreamAdvisorBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

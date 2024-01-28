@@ -11,6 +11,8 @@ namespace FoxTunes.Interfaces
 
         bool CheckFormat(BassOutputStream stream);
 
+        void Connect(BassOutputStream stream);
+
         bool Contains(BassOutputStream stream);
 
         int Position(BassOutputStream stream);

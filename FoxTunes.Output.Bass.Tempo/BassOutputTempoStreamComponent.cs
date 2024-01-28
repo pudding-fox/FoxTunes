@@ -14,13 +14,6 @@ namespace FoxTunes
                 throw new InvalidOperationException("Cannot apply effects to DSD streams.");
             }
             this.Behaviour = behaviour;
-            this.Rate = behaviour.Output.Rate;
-            this.Channels = stream.Channels;
-            this.Flags = BassFlags.Decode;
-            if (this.Behaviour.Output.Float)
-            {
-                this.Flags |= BassFlags.Float;
-            }
         }
 
         public override string Name
@@ -39,7 +32,7 @@ namespace FoxTunes
                 {
                     return string.Format("{0} (none)", this.Name);
                 }
-                var rate = GetTempoFrequency(this.Rate, this.OutputEffects.Tempo.Rate);
+                var rate = GetTempoFrequency(BassUtils.GetChannelPcmRate(this.ChannelHandle), this.OutputEffects.Tempo.Rate);
                 return string.Format(
                     "{0} ({1}%, Pitch {2} semitones, Rate {3}{4}{5})",
                     this.Name,
@@ -53,12 +46,6 @@ namespace FoxTunes
         }
 
         public BassOutputTempoStreamComponentBehaviour Behaviour { get; private set; }
-
-        public override int Rate { get; protected set; }
-
-        public override int Channels { get; protected set; }
-
-        public override BassFlags Flags { get; protected set; }
 
         public override int ChannelHandle { get; protected set; }
 
@@ -143,7 +130,7 @@ namespace FoxTunes
 
         protected virtual void Update()
         {
-            var rate = GetTempoFrequency(this.Rate, this.OutputEffects.Tempo.Rate);
+            var rate = GetTempoFrequency(BassUtils.GetChannelPcmRate(this.ChannelHandle), this.OutputEffects.Tempo.Rate);
             Logger.Write(
                 this,
                 LogLevel.Debug,
@@ -163,10 +150,11 @@ namespace FoxTunes
 
         protected virtual void Stop()
         {
+            var rate = BassUtils.GetChannelPcmRate(this.ChannelHandle);
             Logger.Write(this, LogLevel.Debug, "Tempo effect disabled.");
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, 0));
-            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, this.Rate));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, rate));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, 1));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, 32));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseQuickAlgorithm, 0));
@@ -174,9 +162,11 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            this.Rate = previous.Rate;
-            this.Channels = previous.Channels;
-            this.ChannelHandle = BassFx.TempoCreate(previous.ChannelHandle, previous.Flags);
+            var rate = default(int);
+            var channels = default(int);
+            var flags = default(BassFlags);
+            previous.GetFormat(out rate, out channels, out flags);
+            this.ChannelHandle = BassFx.TempoCreate(previous.ChannelHandle, flags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();

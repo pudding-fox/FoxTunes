@@ -8,17 +8,10 @@ namespace FoxTunes
 {
     public class BassResamplerStreamComponent : BassStreamComponent, IBassStreamControllable
     {
-        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
+        public BassResamplerStreamComponent(BassResamplerStreamComponentBehaviour behaviour, IBassStreamPipelineQueryResult query)
         {
             this.Behaviour = behaviour;
             this.Query = query;
-            this.Rate = behaviour.Output.Rate;
-            this.Channels = stream.Channels;
-            this.Flags = BassFlags.Decode;
-            if (this.Behaviour.Output.Float)
-            {
-                this.Flags |= BassFlags.Float;
-            }
         }
 
         public override string Name
@@ -33,12 +26,21 @@ namespace FoxTunes
         {
             get
             {
+                var rate = default(int);
+                var channels = default(int);
+                var flags = default(BassFlags);
+                if (!this.GetFormat(out rate, out channels, out flags))
+                {
+                    rate = 0;
+                    channels = 0;
+                    flags = BassFlags.Default;
+                }
                 return string.Format(
                     "{0} ({1}/{2} -> {1}/{3})",
                     this.Name,
-                    BassUtils.DepthDescription(this.Flags),
+                    BassUtils.DepthDescription(flags),
                     MetaDataInfo.SampleRateDescription(this.InputRate),
-                    MetaDataInfo.SampleRateDescription(this.Rate)
+                    MetaDataInfo.SampleRateDescription(rate)
                 );
             }
         }
@@ -48,12 +50,6 @@ namespace FoxTunes
         public IBassStreamPipelineQueryResult Query { get; private set; }
 
         public int InputRate { get; protected set; }
-
-        public override int Rate { get; protected set; }
-
-        public override int Channels { get; protected set; }
-
-        public override BassFlags Flags { get; protected set; }
 
         public override int ChannelHandle { get; protected set; }
 
@@ -220,19 +216,22 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            this.InputRate = previous.Rate;
+            var rate = default(int);
+            var channels = default(int);
+            var flags = default(BassFlags);
+            previous.GetFormat(out rate, out channels, out flags);
+            this.InputRate = rate;
             if (this.Behaviour.Output.EnforceRate)
             {
-                //Rate is enforced.
-                this.Rate = this.Behaviour.Output.Rate;
+                rate = this.Behaviour.Output.Rate;
             }
             else
             {
                 //We already established that the output does not support the stream rate so use the closest one.
-                this.Rate = this.Query.GetNearestRate(previous.Rate);
+                rate = this.Query.GetNearestRate(rate);
             }
-            Logger.Write(this, LogLevel.Debug, "Creating BASS SOX stream with rate {0} => {1} and {2} channels.", previous.Rate, this.Rate, this.Channels);
-            this.ChannelHandle = BassSox.StreamCreate(this.Rate, this.Flags, previous.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS SOX stream with rate {0} => {1} and {2} channels.", this.InputRate, rate, channels);
+            this.ChannelHandle = BassSox.StreamCreate(rate, flags, previous.ChannelHandle);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();

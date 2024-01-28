@@ -50,7 +50,7 @@ namespace FoxTunes
             );
             try
             {
-                pipeline.Connect();
+                pipeline.Connect(stream);
                 if (Logger.IsDebugEnabled(this))
                 {
                     if (components.Any())
