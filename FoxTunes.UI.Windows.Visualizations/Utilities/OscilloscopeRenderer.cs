@@ -259,7 +259,7 @@ namespace FoxTunes
             var center = height;
             var peak = peaks[0];
             var minChange = 1;
-            var maxChange = Convert.ToInt32(height * 0.05f);
+            var maxChange = height;
             for (var x = 0; x < width; x++)
             {
                 var y = default(int);
@@ -290,7 +290,7 @@ namespace FoxTunes
             height = height - 1;
             height = (height / channels) / 2;
             var minChange = 1;
-            var maxChange = Convert.ToInt32(height * 0.05f);
+            var maxChange = height;
             for (var channel = 0; channel < channels; channel++)
             {
                 var center = ((height * 2) * channel) + height;
