@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.UI.Windows.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return "Add to collection by dropping files here.";
+                return Strings.LibraryBase_Add;
             }
         }
 
