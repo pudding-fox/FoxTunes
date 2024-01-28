@@ -444,7 +444,10 @@ namespace FoxTunes
         {
             return Invoke(() =>
             {
-                ShuttingDown(typeof(Windows), EventArgs.Empty);
+                if (ShuttingDown != null)
+                {
+                    ShuttingDown(typeof(Windows), EventArgs.Empty);
+                }
                 if (IsMiniWindowCreated)
                 {
                     MiniWindow.Close();
