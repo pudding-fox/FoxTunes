@@ -50,7 +50,10 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            this.Context.Dispose();
+            if (this.Context != null)
+            {
+                this.Context.Dispose();
+            }
             base.OnDisposing();
         }
 
