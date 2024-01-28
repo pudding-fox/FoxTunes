@@ -48,6 +48,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
+            if (!Publication.IsPortable)
+            {
+                return;
+            }
             var fileAssociations = ComponentRegistry.Instance.GetComponent<IFileAssociations>();
             if (fileAssociations == null)
             {
