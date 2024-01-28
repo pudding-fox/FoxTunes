@@ -183,8 +183,29 @@
   <data name="KeyBindingsBehaviourConfiguration.ToggleMiniPlayer" xml:space="preserve">
     <value>Mini lecteur</value>
   </data>
+  <data name="LibraryActionsBehaviour.AppendPlaylist" xml:space="preserve">
+    <value>Ajouter à la liste de lecture</value>
+  </data>
+  <data name="LibraryActionsBehaviour.Library" xml:space="preserve">
+    <value>Bibliothèque</value>
+  </data>
+  <data name="LibraryActionsBehaviour.ReplacePlaylist" xml:space="preserve">
+    <value>Remplacer la liste de lecture</value>
+  </data>
+  <data name="LibraryActionsBehaviour.Rescan" xml:space="preserve">
+    <value>Rescanner les fichiers</value>
+  </data>
+  <data name="LibraryActionsBehaviour.Settings" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
   <data name="LibraryBase.Empty" xml:space="preserve">
     <value>Ajouter des fichiers à la collection en les déposant ici</value>
+  </data>
+  <data name="LibraryBase.Loading" xml:space="preserve">
+    <value>Chargement...</value>
+  </data>
+  <data name="LibraryBase.Updating" xml:space="preserve">
+    <value>Mise à jour...</value>
   </data>
   <data name="LibrarySearch.Name" xml:space="preserve">
     <value>Recherche</value>
@@ -209,6 +230,15 @@
   </data>
   <data name="Playback.Name" xml:space="preserve">
     <value>Commandes de lecture</value>
+  </data>
+  <data name="PlaylistBase.Empty" xml:space="preserve">
+    <value>Ajoutez à la liste de lecture en déposant les fichiers ici.</value>
+  </data>
+  <data name="PlaylistBase.Loading" xml:space="preserve">
+    <value>Chargement...</value>
+  </data>
+  <data name="PlaylistBase.Updating" xml:space="preserve">
+    <value>Mise à jour...</value>
   </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Regroupement</value>

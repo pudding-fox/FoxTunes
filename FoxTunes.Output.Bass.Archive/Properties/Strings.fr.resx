@@ -127,7 +127,7 @@
     <value>Nettoyer les fichiers temporaires</value>
   </data>
   <data name="BassArchiveStreamProviderBehaviourConfiguration.DoubleBuffer" xml:space="preserve">
-    <value>Double mémoire tampon</value>
+    <value>Doubler la mémoire tampon</value>
   </data>
   <data name="BassArchiveStreamProviderBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Activé</value>

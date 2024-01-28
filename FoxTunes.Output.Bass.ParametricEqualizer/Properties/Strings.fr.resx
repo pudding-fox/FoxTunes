@@ -127,6 +127,6 @@
     <value>Nom : </value>
   </data>
   <data name="BassParametricEqualizerPreset.None" xml:space="preserve">
-    <value>Rien</value>
+    <value>Aucun</value>
   </data>
 </root>

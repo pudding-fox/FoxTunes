@@ -148,7 +148,7 @@
     <value>Sortie</value>
   </data>
   <data name="BassOutputConfiguration.Volume" xml:space="preserve">
-    <value>Niveau de volume du logiciel</value>
+    <value>Activer le volume du logiciel</value>
   </data>
   <data name="BassOutputConfiguration.VolumeLevel" xml:space="preserve">
     <value>Niveau de volume du logiciel</value>
