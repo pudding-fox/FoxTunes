@@ -212,7 +212,8 @@ namespace FoxTunes.ViewModel
                 try
                 {
                     await base.Refresh().ConfigureAwait(false);
-                    if (this.Frames == null)
+                    //Refresh frames only if it's the first time or some visible change has been made.
+                    if (this.Frames == null || this.Frames.Any(frame => !this.Validate(frame)))
                     {
                         await this.Synchronize(new List<LibraryBrowserFrame>()
                         {
@@ -233,6 +234,17 @@ namespace FoxTunes.ViewModel
             {
                 return task();
             }
+        }
+
+        protected virtual bool Validate(LibraryBrowserFrame frame)
+        {
+            if (object.ReferenceEquals(frame.ItemsSource, LibraryHierarchyNode.Empty))
+            {
+                //Root frame.
+                return frame.Items.SequenceEqual(this.Items);
+            }
+            //Child frame, first element is "back" button.
+            return frame.Items.Skip(1).SequenceEqual(this.LibraryHierarchyBrowser.GetNodes(frame.ItemsSource));
         }
 
         public bool IsReloading { get; private set; }
@@ -386,7 +398,10 @@ namespace FoxTunes.ViewModel
         {
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
-                await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames)).ConfigureAwait(false);
+                if (!object.ReferenceEquals(this.Frames, frames))
+                {
+                    await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames)).ConfigureAwait(false);
+                }
                 return;
             }
             var path = new List<LibraryHierarchyNode>();
