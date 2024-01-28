@@ -3,8 +3,9 @@ SELECT "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "Value", "IsLeaf"
 FROM "LibraryHierarchy"
 GROUP BY "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "Value", "IsLeaf";
 
-UPDATE "LibraryHierarchyItems"
-SET "LibraryHierarchyItems"."Parent_Id" = "LibraryHierarchyItems_Parent"."Id"
+
+INSERT INTO "LibraryHierarchyItem_Parent" ("LibraryHierarchyItem_Id", "LibraryHierarchyItem_Parent_Id")
+SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchyItems_Parent"."Id"
 FROM "LibraryHierarchyItems" 
 	JOIN "LibraryHierarchy" 
 		ON "LibraryHierarchyItems"."LibraryHierarchyLevel_Id" = "LibraryHierarchy"."LibraryHierarchyLevel_Id" 
@@ -22,7 +23,7 @@ FROM "LibraryHierarchyItems"
 			AND "LibraryHierarchyItems_Parent"."Value" = "LibraryHierarchy_Parent"."Value"
 			AND "LibraryHierarchyItems_Parent"."IsLeaf" = "LibraryHierarchy_Parent"."IsLeaf"
 			AND "LibraryHierarchy"."LibraryItem_Id" = "LibraryHierarchy_Parent"."LibraryItem_Id"
-WHERE "LibraryHierarchyItems"."Parent_Id" IS NULL;
+GROUP BY "LibraryHierarchyItems"."Id", "LibraryHierarchyItems_Parent"."Id";
 
 INSERT INTO "LibraryHierarchyItem_LibraryItem" ("LibraryHierarchyItem_Id", "LibraryItem_Id")
 SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchy"."LibraryItem_Id"

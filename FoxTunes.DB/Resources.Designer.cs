@@ -129,6 +129,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryHierarchyItems&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;)
+        ///SELECT &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;
+        ///FROM &quot;LibraryHierarchy&quot;
+        ///GROUP BY &quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;;
+        ///
+        ///
+        ///INSERT INTO &quot;LibraryHierarchyItem_Parent&quot; (&quot;LibraryHierarchyItem_Id&quot;, &quot;LibraryHierarchyItem_Parent_Id&quot;)
+        ///SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems_Parent&quot;.&quot;Id&quot;
+        ///FROM &quot;LibraryHierarchyItems&quot; 
+        ///	JOIN &quot;L [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EndBuildLibraryHierarchies {
+            get {
+                return ResourceManager.GetString("EndBuildLibraryHierarchies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SELECT &quot;MetaDataItems&quot;.&quot;Id&quot;, &quot;MetaDataItems&quot;.&quot;Name&quot;, &quot;MetaDataItems&quot;.&quot;Type&quot;, &quot;MetaDataItems&quot;.&quot;NumericValue&quot;,  &quot;MetaDataItems&quot;.&quot;TextValue&quot;, &quot;MetaDataItems&quot;.&quot;FileValue&quot;
         ///FROM &quot;LibraryHierarchyItems&quot;
         ///	JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot;
@@ -142,11 +160,13 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;
+        ///   Looks up a localized string similar to SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;
         ///FROM &quot;LibraryHierarchyItems&quot;
+        ///	LEFT JOIN &quot;LibraryHierarchyItem_Parent&quot;
+        ///		ON &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Id&quot; = &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;
         ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///	AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
-        ///ORDER BY &quot;Value&quot;.
+        ///	AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItem_Parent&quot;.&quot;LibraryHierarchyItem_Parent_Id&quot; = @libraryHierarchyItemId)
+        ///ORDER BY [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyNodes {
             get {
@@ -193,6 +213,8 @@ namespace FoxTunes {
         ///   Looks up a localized string similar to DELETE FROM [LibraryHierarchy_LibraryHierarchyItem];
         ///
         ///DELETE FROM [LibraryHierarchyItem_LibraryItem];
+        ///
+        ///DELETE FROM [LibraryHierarchyItem_Parent];
         ///
         ///DELETE FROM [LibraryHierarchyItems];.
         /// </summary>
