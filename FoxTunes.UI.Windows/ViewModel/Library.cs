@@ -205,9 +205,16 @@ namespace FoxTunes.ViewModel
         protected virtual void OnDragEnter(DragEventArgs e)
         {
             var effects = DragDropEffects.None;
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            try
             {
-                effects = DragDropEffects.Copy;
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    effects = DragDropEffects.Copy;
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to query clipboard contents: {0}", exception.Message);
             }
             e.Effects = effects;
         }
@@ -222,10 +229,17 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task OnDrop(DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            try
             {
-                var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                return this.Core.Managers.Library.Add(paths);
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
+                    return this.Core.Managers.Library.Add(paths);
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
             }
             return Task.CompletedTask;
         }

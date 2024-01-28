@@ -1,9 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
     public interface IMetaDataSource : IBaseComponent
     {
-        ObservableCollection<MetaDataItem> MetaDatas { get; }
+        Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName);
     }
 }

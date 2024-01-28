@@ -272,17 +272,24 @@ namespace FoxTunes.ViewModel
         protected virtual void OnDragEnter(DragEventArgs e)
         {
             var effects = DragDropEffects.None;
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            try
             {
-                effects = DragDropEffects.Copy;
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    effects = DragDropEffects.Copy;
+                }
+                if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+                {
+                    effects = DragDropEffects.Copy;
+                }
+                if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
+                {
+                    effects = DragDropEffects.Copy;
+                }
             }
-            if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+            catch (Exception exception)
             {
-                effects = DragDropEffects.Copy;
-            }
-            if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
-            {
-                effects = DragDropEffects.Copy;
+                Logger.Write(this, LogLevel.Warn, "Failed to query clipboard contents: {0}", exception.Message);
             }
             e.Effects = effects;
         }
@@ -297,20 +304,27 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task OnDrop(DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            try
             {
-                var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                return this.AddToPlaylist(paths);
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
+                    return this.AddToPlaylist(paths);
+                }
+                if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+                {
+                    var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
+                    return this.AddToPlaylist(libraryHierarchyNode);
+                }
+                if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
+                {
+                    var playlistItems = e.Data.GetData<IEnumerable<PlaylistItem>>(true);
+                    return this.AddToPlaylist(playlistItems);
+                }
             }
-            if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+            catch (Exception exception)
             {
-                var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
-                return this.AddToPlaylist(libraryHierarchyNode);
-            }
-            if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
-            {
-                var playlistItems = e.Data.GetData<IEnumerable<PlaylistItem>>(true);
-                return this.AddToPlaylist(playlistItems);
+                Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
             }
             return Task.CompletedTask;
         }

@@ -109,6 +109,30 @@ namespace FoxTunes
             }
         }
 
+        private bool _PlayFromMemory { get; set; }
+
+        public bool PlayFromMemory
+        {
+            get
+            {
+                return this._PlayFromMemory;
+            }
+            set
+            {
+                this._PlayFromMemory = value;
+                Logger.Write(this, LogLevel.Debug, "PlayFromMemory = {0}", this.PlayFromMemory);
+                this.Shutdown();
+            }
+        }
+
+        public override bool ShowBuffering
+        {
+            get
+            {
+                return this.PlayFromMemory;
+            }
+        }
+
         public override Task Start()
         {
             return this.PerformCritical(LOCK_TIMEOUT, async () =>
@@ -221,6 +245,10 @@ namespace FoxTunes
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.DEPTH_ELEMENT
             ).ConnectValue<string>(value => this.Float = BassOutputConfiguration.GetFloat(value));
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.PLAY_FROM_RAM_ELEMENT
+            ).ConnectValue<bool>(value => this.PlayFromMemory = value);
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.StreamFactory.Register(new BassStreamProvider());
             this.PipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
@@ -248,20 +276,14 @@ namespace FoxTunes
                 await this.Start();
             }
             Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            var channelHandle = default(int);
-            if (!this.StreamFactory.CreateStream(playlistItem, immidiate, out channelHandle))
+            var stream = await this.StreamFactory.CreateStream(playlistItem, immidiate);
+            if (stream.IsEmpty)
             {
                 return null;
             }
-            var outputStream = new BassOutputStream(this, playlistItem, channelHandle);
+            var outputStream = new BassOutputStream(this, stream.Provider, playlistItem, stream.ChannelHandle);
             outputStream.InitializeComponent(this.Core);
             return outputStream;
-        }
-
-        public void FreeStream(int channelHandle)
-        {
-            Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
-            Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
         }
 
         public override Task<bool> Preempt(IOutputStream stream)

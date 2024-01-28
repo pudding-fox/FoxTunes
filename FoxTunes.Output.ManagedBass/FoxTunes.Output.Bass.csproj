@@ -43,6 +43,7 @@
     <Compile Include="BassOutputConfiguration.cs" />
     <Compile Include="BassOutputStream.cs" />
     <Compile Include="BassPluginLoader.cs" />
+    <Compile Include="BassStream.cs" />
     <Compile Include="BassStreamFactory.cs" />
     <Compile Include="BassStreamPipeline.cs" />
     <Compile Include="BassStreamPipelineFactory.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="BassStreamComponent.cs" />
     <Compile Include="BassStreamInput.cs" />
     <Compile Include="BassDeviceMonitorBehaviour.cs" />
+    <Compile Include="Interfaces\IBassStream.cs" />
     <Compile Include="Interfaces\IBassStreamControllable.cs" />
     <Compile Include="Interfaces\IBassStreamOutput.cs" />
     <Compile Include="Interfaces\IBassOutput.cs" />

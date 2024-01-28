@@ -25,21 +25,15 @@
     <OutputPath>..\distribution\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="policy.2.0.taglib-sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
-      <HintPath>..\packages\taglib.2.1.0.0\lib\policy.2.0.taglib-sharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="taglib-sharp, Version=2.1.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
-      <HintPath>..\packages\taglib.2.1.0.0\lib\taglib-sharp.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\taglib-sharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dsf\File.cs" />
-    <Compile Include="Dsf\StreamHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TagLibMetaDataSource.cs" />
     <Compile Include="TagLibMetaDataSourceFactory.cs" />
@@ -53,9 +47,6 @@
       <Project>{395751a0-49b7-49dc-88a8-02b14a322e99}</Project>
       <Name>FoxTunes.MetaData</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -8,6 +9,6 @@ namespace FoxTunes.Interfaces
 
         void Register(IBassStreamProvider provider);
 
-        bool CreateStream(PlaylistItem playlistItem, bool immidiate, out int channelHandle);
+        Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate);
     }
 }

@@ -34,6 +34,8 @@ namespace FoxTunes
 
         public const string MODE_ELEMENT = "76096B39-2F8A-4667-9C03-9742FF2D1EA7";
 
+        public const string PLAY_FROM_RAM_ELEMENT = "AFE6BED1-7965-47A3-9798-E46124386A8D";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(OUTPUT_SECTION, "Output")
@@ -50,7 +52,8 @@ namespace FoxTunes
                     .WithOption(new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit"), true)
                     .WithOption(new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point")))
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode"))
-                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate").WithValue(false)
+                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory").WithValue(false)
             );
         }
 

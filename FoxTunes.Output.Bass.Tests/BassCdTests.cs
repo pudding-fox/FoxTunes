@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Output.Bass.Tests
 {
+    [Explicit]
     [TestFixture]
     public class BassCdTests : TestBase
     {

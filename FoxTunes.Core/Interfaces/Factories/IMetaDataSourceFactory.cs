@@ -2,6 +2,6 @@
 {
     public interface IMetaDataSourceFactory : IStandardFactory
     {
-        IMetaDataSource Create(string fileName);
+        IMetaDataSource Create();
     }
 }

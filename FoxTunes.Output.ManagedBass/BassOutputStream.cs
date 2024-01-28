@@ -20,15 +20,18 @@ namespace FoxTunes
 
         public static IReadOnlyCollection<BassOutputStream> ActiveStreams { get; private set; }
 
-        public BassOutputStream(BassOutput output, PlaylistItem playlistItem, int channelHandle)
+        public BassOutputStream(IBassOutput output, IBassStreamProvider provider, PlaylistItem playlistItem, int channelHandle)
             : base(playlistItem)
         {
             this.Output = output;
+            this.Provider = provider;
             this.ChannelHandle = channelHandle;
             _ActiveStreams.Add(this);
         }
 
-        public BassOutput Output { get; private set; }
+        public IBassOutput Output { get; private set; }
+
+        public IBassStreamProvider Provider { get; private set; }
 
         public int ChannelHandle { get; private set; }
 
@@ -236,7 +239,7 @@ namespace FoxTunes
         {
             try
             {
-                this.Output.FreeStream(this.ChannelHandle);
+                this.Provider.FreeStream(this.ChannelHandle);
             }
             finally
             {

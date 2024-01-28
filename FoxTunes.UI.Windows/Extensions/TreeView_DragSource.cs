@@ -100,7 +100,7 @@ namespace FoxTunes
             public DragSourceBehaviour(TreeView treeView)
             {
                 this.TreeView = treeView;
-                this.TreeView.MouseDown += this.OnMouseDown;
+                this.TreeView.PreviewMouseDown += this.OnMouseDown;
                 this.TreeView.MouseMove += this.OnMouseMove;
             }
 
@@ -112,19 +112,19 @@ namespace FoxTunes
 
             protected virtual bool ShouldInitializeDrag(object source, Point position)
             {
-                if (source is Thumb)
+                if (this.DragStartPosition.Equals(default(Point)) || source is Thumb)
                 {
                     return false;
                 }
-                if (Math.Abs(position.X - this.DragStartPosition.X) < SystemParameters.MinimumHorizontalDragDistance)
+                if (Math.Abs(position.X - this.DragStartPosition.X) > SystemParameters.MinimumHorizontalDragDistance)
                 {
-                    return false;
+                    return true;
                 }
-                if (Math.Abs(position.Y - this.DragStartPosition.Y) < SystemParameters.MinimumVerticalDragDistance)
+                if (Math.Abs(position.Y - this.DragStartPosition.Y) > SystemParameters.MinimumVerticalDragDistance)
                 {
-                    return false;
+                    return true;
                 }
-                return true;
+                return false;
             }
 
             protected virtual void OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -138,14 +138,19 @@ namespace FoxTunes
 
             protected virtual void OnMouseMove(object sender, MouseEventArgs e)
             {
+                if (e.LeftButton != MouseButtonState.Pressed || this.DragInitialized)
+                {
+                    return;
+                }
                 var selectedItem = GetSelectedItem(this.TreeView);
-                if (e.LeftButton != MouseButtonState.Pressed || this.DragInitialized || selectedItem == null)
+                if (selectedItem == null)
                 {
                     return;
                 }
                 var position = e.GetPosition(null);
                 if (this.ShouldInitializeDrag(e.OriginalSource, position))
                 {
+                    this.DragStartPosition = default(Point);
                     this.TreeView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
                 }
             }

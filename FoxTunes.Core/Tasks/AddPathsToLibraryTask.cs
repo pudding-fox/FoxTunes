@@ -56,15 +56,27 @@ namespace FoxTunes
             using (var transaction = this.Database.BeginTransaction())
             {
                 this.AddLibraryItems(transaction);
-                this.AddOrUpdateMetaData(transaction);
-                this.UpdateVariousArtists(transaction);
-                this.SetLibraryItemsStatus(transaction);
-                transaction.Commit();
+                using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+                {
+                    await this.AddOrUpdateMetaData(cancellationToken, transaction);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        this.Name = "Waiting..";
+                        this.Description = string.Empty;
+                        return;
+                    }
+                    this.UpdateVariousArtists(transaction);
+                    this.SetLibraryItemsStatus(transaction);
+                    transaction.Commit();
+                }))
+                {
+                    await task.Run();
+                }
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
-        private void AddLibraryItems(ITransactionSource transaction)
+        protected virtual void AddLibraryItems(ITransactionSource transaction)
         {
             var query = this.Database.QueryFactory.Build();
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("DirectoryName"));
@@ -128,37 +140,20 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(ITransactionSource transaction)
+        protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken, ITransactionSource transaction)
         {
+            var query = this.Database
+                .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
+                .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
             using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, true, transaction))
             {
-                var query = this.Database
-                    .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
-                    .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
                 metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
                 metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                metaDataPopulator.Populate(query);
+                await metaDataPopulator.Populate(query, cancellationToken);
             }
-        }
-
-        private void SetLibraryItemsStatus(ITransactionSource transaction)
-        {
-            this.IsIndeterminate = true;
-            var query = this.Database.QueryFactory.Build();
-            query.Update.SetTable(this.Database.Tables.LibraryItem);
-            query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
-            this.Database.Execute(query, (parameters, phase) =>
-            {
-                switch (phase)
-                {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = LibraryItemStatus.None;
-                        break;
-                }
-            }, transaction);
         }
     }
 }
