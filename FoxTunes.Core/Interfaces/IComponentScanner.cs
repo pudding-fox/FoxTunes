@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IComponentScanner : IBaseComponent
+    public interface IComponentScanner
     {
-        IEnumerable<Type> GetStandardComponents();
+        IEnumerable<Type> GetComponents();
 
         [Obsolete("This method has no caching, use it sparingly.")]
         IEnumerable<Type> GetComponents(Type interfaceType);

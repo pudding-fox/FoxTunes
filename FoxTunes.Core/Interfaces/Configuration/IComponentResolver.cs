@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace FoxTunes.Interfaces
+﻿namespace FoxTunes.Interfaces
 {
     public interface IComponentResolver
     {
-        string Get(string slot);
+        bool Enabled { get; }
 
-        void Add(string slot, Type component, IEnumerable<Type> components);
+        bool Get(string slot, out string id);
+
+        void Add(string slot, string id);
+
+        void Remove(string slot);
+
+        void Persist(string slot);
+
+        void Save();
     }
 }

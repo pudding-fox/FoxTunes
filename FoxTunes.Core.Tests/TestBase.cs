@@ -53,7 +53,7 @@ namespace FoxTunes
         [SetUp]
         public virtual void SetUp()
         {
-            ComponentResolver.Slots[ComponentSlots.UserInterface] = TestUserInterface.ID;
+            ComponentResolver.Instance.Add(ComponentSlots.UserInterface, TestUserInterface.ID);
             this.Setup = CoreSetup.Default;
             this.Core = new Core(this.Setup);
             this.Core.Load();
@@ -72,7 +72,7 @@ namespace FoxTunes
         [TearDown]
         public virtual void TearDown()
         {
-            ComponentResolver.Slots.Remove(ComponentSlots.Database);
+            ComponentResolver.Instance.Remove(ComponentSlots.Database);
             this.Core.Dispose();
             this.Core = null;
         }

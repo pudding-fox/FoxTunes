@@ -27,18 +27,18 @@ namespace FoxTunes
         {
             if ((this.Configuration & TAGLIB) != 0)
             {
-                ComponentResolver.Slots[ComponentSlots.MetaData] = "679D9459-BBCE-4D95-BB65-DD20C335719C";
+                ComponentResolver.Instance.Add(ComponentSlots.MetaData, "679D9459-BBCE-4D95-BB65-DD20C335719C");
             }
             else if ((this.Configuration & FILENAME) != 0)
             {
-                ComponentResolver.Slots[ComponentSlots.MetaData] = "BDAAF3E1-84CC-4D36-A7CB-278663E65844";
+                ComponentResolver.Instance.Add(ComponentSlots.MetaData, "BDAAF3E1-84CC-4D36-A7CB-278663E65844");
             }
             base.SetUp();
         }
 
         public override void TearDown()
         {
-            ComponentResolver.Slots.Remove(ComponentSlots.MetaData);
+            ComponentResolver.Instance.Remove(ComponentSlots.MetaData);
             base.TearDown();
         }
 

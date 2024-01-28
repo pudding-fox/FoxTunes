@@ -16,13 +16,13 @@ namespace FoxTunes.MetaData.TagLib.Tests
         public override void SetUp()
         {
             this.FileName = Path.Combine(TestInfo.CurrentDirectory, "Audio", "F.m4a");
-            ComponentResolver.Slots[ComponentSlots.MetaData] = "679D9459-BBCE-4D95-BB65-DD20C335719C";
+            ComponentResolver.Instance.Add(ComponentSlots.MetaData, "679D9459-BBCE-4D95-BB65-DD20C335719C");
             base.SetUp();
         }
 
         public override void TearDown()
         {
-            ComponentResolver.Slots.Remove(ComponentSlots.MetaData);
+            ComponentResolver.Instance.Remove(ComponentSlots.MetaData);
             base.TearDown();
         }
 

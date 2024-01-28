@@ -14,6 +14,8 @@ namespace FoxTunes
     {
         const string CONNECTION_STRING = "FoxTunes";
 
+        public static readonly string FileName = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
+
         public SqlServerDatabase()
             : base(GetProvider())
         {
@@ -31,19 +33,19 @@ namespace FoxTunes
             var userInterface = ComponentRegistry.Instance.GetComponent<IUserInterface>();
             if (userInterface != null)
             {
-                userInterface.Warn(string.Format("No connection string found.\nEdit {0} to resolve the create one.", ComponentResolver.FILE_NAME.GetName()));
+                userInterface.Warn(string.Format("No connection string found.\nEdit {0} to resolve the create one.", FileName.GetName()));
             }
             throw new InvalidOperationException("No connection string specified.");
         });
 
         private static void CreateConnectionString()
         {
-            if (!File.Exists(ComponentResolver.FILE_NAME))
+            if (!File.Exists(FileName))
             {
-                Logger.Write(typeof(SqlServerDatabase), LogLevel.Warn, "Config file \"{0}\" does not exist, cannot add connection string.", ComponentResolver.FILE_NAME);
+                Logger.Write(typeof(SqlServerDatabase), LogLevel.Warn, "Config file \"{0}\" does not exist, cannot add connection string.", FileName.GetName());
                 return;
             }
-            var document = XDocument.Load(ComponentResolver.FILE_NAME);
+            var document = XDocument.Load(FileName);
             var connectionStrings = document.Root.Element("connectionStrings");
             if (connectionStrings == null)
             {
@@ -56,7 +58,7 @@ namespace FoxTunes
             }
             connectionStrings.Add(new XComment("Uncomment the next element to use the default connection string."));
             connectionStrings.Add(new XComment(new XElement("add", new XAttribute("name", CONNECTION_STRING), new XAttribute("connectionString", "Data Source=localhost;Integrated Security=true;Initial Catalog=FoxTunes")).ToString()));
-            document.Save(ComponentResolver.FILE_NAME);
+            document.Save(FileName);
         }
 
         public static string ConnectionString
