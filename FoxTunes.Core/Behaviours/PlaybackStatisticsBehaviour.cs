@@ -81,13 +81,22 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnIsStartedChanged(object sender, AsyncEventArgs e)
+        protected virtual async void OnIsStartedChanged(object sender, AsyncEventArgs e)
         {
             if (this.Output.IsStarted)
             {
                 return;
             }
             //When the output is stopped we can empty the queue.
+            if (Core.IsShuttingDown)
+            {
+                //If we're shutting down we need to block while we write our data.
+                using (e.Defer())
+                {
+                    await this.Dequeue().ConfigureAwait(false);
+                    return;
+                }
+            }
 #if NET40
             var task = TaskEx.Run(() => this.Dequeue());
 #else

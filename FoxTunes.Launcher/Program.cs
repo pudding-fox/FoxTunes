@@ -77,6 +77,18 @@ namespace FoxTunes.Launcher
                         {
                             core.Components.UserInterface.Show();
                         }
+                        Core.IsShuttingDown = true;
+                        if (core.Components.Output != null)
+                        {
+                            if (core.Components.Output.IsStarted)
+                            {
+                                //TODO: Bad .Wait().
+                                if (!core.Components.Output.Shutdown().Wait(SHUTDOWN_TIMEOUT))
+                                {
+                                    //TODO: Warn.
+                                }
+                            }
+                        }
                         //TODO: Bad .Result
                         if (!BackgroundTask.Shutdown(SHUTDOWN_INTERVAL, SHUTDOWN_TIMEOUT).Result)
                         {
