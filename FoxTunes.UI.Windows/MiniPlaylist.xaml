@@ -24,7 +24,9 @@
                 SelectionChanged="OnSelectionChanged" 
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                 Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}"
-                Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}">
+                Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}"
+                Background="Transparent"
+                BorderBrush="Transparent">
                 <Interactivity:Interaction.Triggers>
                     <Interactivity:EventTrigger EventName="MouseDoubleClick">
                         <Interactivity:InvokeCommandAction Command="{Binding PlaySelectedItemCommand, Source={StaticResource ViewModel}}"/>
@@ -32,7 +34,7 @@
                 </Interactivity:Interaction.Triggers>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type Core:PlaylistItem}">
-                        <TextBlock Text="{Binding Converter={StaticResource ViewModel}}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                        <Windows:GlassLabel Text="{Binding Converter={StaticResource ViewModel}}" TextTrimming="CharacterEllipsis"></Windows:GlassLabel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
