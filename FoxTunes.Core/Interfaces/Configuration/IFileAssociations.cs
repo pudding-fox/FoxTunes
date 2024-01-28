@@ -8,6 +8,8 @@ namespace FoxTunes.Interfaces
 
         IFileAssociation Create(string extension);
 
+        bool IsAssociated(string extension);
+
         void Enable();
 
         void Enable(IEnumerable<IFileAssociation> associations);

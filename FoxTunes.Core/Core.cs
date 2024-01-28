@@ -5,6 +5,11 @@ namespace FoxTunes
 {
     public class Core : BaseComponent, ICore
     {
+        public Core()
+        {
+            this.Associations = new FileAssociations();
+        }
+
         public IStandardComponents Components
         {
             get
@@ -28,6 +33,8 @@ namespace FoxTunes
                 return StandardFactories.Instance;
             }
         }
+
+        public IFileAssociations Associations { get; private set; }
 
         public void Load()
         {

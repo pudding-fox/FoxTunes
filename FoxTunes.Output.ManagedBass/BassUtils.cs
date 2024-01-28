@@ -1,11 +1,14 @@
 ﻿using ManagedBass;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public static class BassUtils
     {
+        private static readonly ConcurrentDictionary<string, bool> SUPPORTED_FORMATS = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
         public static readonly HashSet<string> BUILT_IN_FORMATS = new HashSet<string>(new[]
         {
             "mp1", "mp2", "mp3", "ogg", "wav", "aif"
@@ -20,7 +23,7 @@ namespace FoxTunes
             for (var a = 0; a < Bass.DeviceCount; a++)
             {
                 var deviceInfo = default(DeviceInfo);
-                BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
+                OK(Bass.GetDeviceInfo(a, out deviceInfo));
                 if (deviceInfo.IsDefault)
                 {
                     return a;
@@ -45,6 +48,17 @@ namespace FoxTunes
                     }
                 }
             }
+        }
+
+        public static bool IsSupported(string extension)
+        {
+            var supported = default(bool);
+            if (!SUPPORTED_FORMATS.TryGetValue(extension, out supported))
+            {
+                supported = GetInputFormats().Contains(extension, true);
+                SUPPORTED_FORMATS.TryAdd(extension, supported);
+            }
+            return supported;
         }
 
         public static string DepthDescription(BassFlags flags)

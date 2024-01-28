@@ -251,6 +251,13 @@ namespace FoxTunes.Managers
             }
         }
 
+        protected virtual PlaylistItem GetPlaylistItem(string fileName)
+        {
+            return this.Database.AsQueryable<PlaylistItem>()
+                .Where(playlistItem => playlistItem.FileName == fileName)
+                .FirstOrDefault();
+        }
+
         protected virtual PlaylistItem GetFirstPlaylistItem()
         {
             return this.Database.AsQueryable<PlaylistItem>()
@@ -311,6 +318,16 @@ namespace FoxTunes.Managers
                         this.OnError(e);
                     }
                 });
+        }
+
+        public async Task Play(string fileName)
+        {
+            var playlistItem = this.GetPlaylistItem(fileName);
+            if (playlistItem == null)
+            {
+                return;
+            }
+            await this.Play(playlistItem);
         }
 
         public Task Clear()

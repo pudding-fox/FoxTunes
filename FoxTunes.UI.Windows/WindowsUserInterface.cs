@@ -2,6 +2,8 @@
 using FoxTunes.Theme;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -34,6 +36,35 @@ namespace FoxTunes
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
             this.ThemeLoader.Application = this.Application;
             this.Application.Run(new MainWindow() { DataContext = this.Core });
+        }
+
+        public override void Run(string message)
+        {
+            var regex = new Regex(@"((?:[a-zA-Z]\:(\\|\/)|file\:\/\/|\\\\|\.(\/|\\))([^\\\/\:\*\?\<\>\""\|]+(\\|\/){0,1})+)");
+            var matches = regex.Matches(message);
+            for (var a = 0; a < matches.Count; a++)
+            {
+                var match = matches[a];
+                if (!match.Success)
+                {
+                    continue;
+                }
+                if (File.Exists(match.Value))
+                {
+                    this.OnOpen(match.Value);
+                }
+            }
+            //TODO: Respect IForegroundTaskRunner component.
+            this.Application.Dispatcher.Invoke(() => this.Application.MainWindow.Activate());
+        }
+
+        protected virtual void OnOpen(string fileName)
+        {
+            if (!this.Core.Components.Output.IsSupported(fileName))
+            {
+                return;
+            }
+            this.Core.Managers.Playlist.Add(new[] { fileName }, false).ContinueWith(result => this.Core.Managers.Playlist.Play(fileName));
         }
 
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

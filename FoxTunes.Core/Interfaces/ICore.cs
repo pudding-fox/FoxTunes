@@ -10,6 +10,8 @@ namespace FoxTunes.Interfaces
 
         IStandardFactories Factories { get; }
 
+        IFileAssociations Associations { get; }
+
         void Load();
     }
 }

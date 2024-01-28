@@ -58,6 +58,9 @@
                     <TabItem Header="Playlist">
                         <Windows:PlaylistSettingsDialog></Windows:PlaylistSettingsDialog>
                     </TabItem>
+                    <TabItem Header="File Types">
+                        <Windows:AssociationsDialog></Windows:AssociationsDialog>
+                    </TabItem>
                 </TabControl>
             </Border>
         </Popup>

@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace FoxTunes
@@ -38,7 +39,19 @@ namespace FoxTunes
 
         public IFileAssociation Create(string extension)
         {
+            if (!string.IsNullOrEmpty(extension))
+            {
+                if (!extension.StartsWith("."))
+                {
+                    extension = "." + extension;
+                }
+            }
             return new FileAssociation(extension, this.Id, this.FileName);
+        }
+
+        public bool IsAssociated(string extension)
+        {
+            return this.Associations.Contains(this.Create(extension));
         }
 
         public void Enable()
@@ -67,7 +80,7 @@ namespace FoxTunes
         private const int SHCNE_ASSOCCHANGED = 0x8000000;
         private const int SHCNF_FLUSH = 0x1000;
 
-        public static IEnumerable<string> GetAssociations(IFileAssociation association)
+        private static IEnumerable<string> GetAssociations(IFileAssociation association)
         {
             foreach (var key in GetKeys(@"Software\Classes", association.ProgId))
             {
@@ -77,7 +90,7 @@ namespace FoxTunes
 
         private static string GetOpenString(string path)
         {
-            return "\"" + path + "\" \"%1\"";
+            return string.Format("\"{0}\" \"%1\"", path);
         }
 
         private static void AddAssociations(IEnumerable<IFileAssociation> associations)
@@ -108,22 +121,26 @@ namespace FoxTunes
 
         private static bool AddProgram(IFileAssociation association)
         {
-            return SetKeyValue(@"Software\Classes\" + association.ProgId + @"\shell\open\command", association.ProgId);
+            var path = string.Format(@"Software\Classes\{0}\shell\open\command", association.ProgId);
+            return SetKeyValue(path, GetOpenString(association.ExecutableFilePath));
         }
 
         private static bool RemoveProgram(IFileAssociation association)
         {
-            return DeleteKey(@"Software\Classes\" + association.ProgId);
+            var path = @"Software\Classes\" + association.ProgId;
+            return DeleteKey(path);
         }
 
         private static bool AddAssociation(IFileAssociation association)
         {
-            return SetKeyValue(@"Software\Classes\" + association.Extension, association.ProgId);
+            var path = @"Software\Classes\" + association.Extension;
+            return SetKeyValue(path, association.ProgId);
         }
 
         private static bool RemoveAssociation(IFileAssociation association)
         {
-            return DeleteKey(@"Software\Classes\" + association.Extension);
+            var path = @"Software\Classes\" + association.Extension;
+            return DeleteKey(path);
         }
 
         private static IEnumerable<string> GetKeys(string path, string value)
@@ -132,7 +149,7 @@ namespace FoxTunes
             {
                 foreach (var name in key.GetSubKeyNames())
                 {
-                    if (string.Equals(GetKeyValue(path + @"\" + name), value, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(GetKeyValue(string.Format(@"{0}\{1}", path, name)), value, StringComparison.OrdinalIgnoreCase))
                     {
                         yield return name;
                     }
