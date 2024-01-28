@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Enabled { get; private set; }
 
+        public BooleanConfigurationElement Topmost { get; private set; }
+
         public BooleanConfigurationElement ShowArtwork { get; private set; }
 
         public BooleanConfigurationElement ShowPlaylist { get; private set; }
@@ -38,6 +40,7 @@ namespace FoxTunes
                 {
                     Windows.MiniWindow.DataContext = this.Core;
                 }
+                Windows.MiniWindow.Topmost = this.Topmost.Value;
                 Windows.MiniWindow.Show();
                 Windows.MiniWindow.BringToFront();
                 Windows.ActiveWindow = Windows.MiniWindow;
@@ -67,6 +70,17 @@ namespace FoxTunes
             this.Core = core;
             this.UserInterface = core.Components.UserInterface;
             this.Configuration = core.Components.Configuration;
+            this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MiniPlayerBehaviourConfiguration.SECTION,
+                MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
+            );
+            this.Topmost.ConnectValue<bool>(value =>
+            {
+                if (Windows.IsMiniWindowCreated)
+                {
+                    Windows.MiniWindow.Topmost = value;
+                }
+            });
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
