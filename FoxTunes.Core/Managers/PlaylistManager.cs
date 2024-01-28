@@ -16,13 +16,40 @@ namespace FoxTunes.Managers
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.DataManager = core.Managers.Data;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
+            this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.PlaylistUpdated:
+                    this.Refresh();
+                    break;
+            }
+        }
+
+        public void Refresh()
+        {
+            if (this.CurrentItem == null)
+            {
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Playlist was updated, refreshing current item.");
+            if ((this.CurrentItem = this.DataManager.ReadContext.Sets.PlaylistItem.Find(this.CurrentItem.Id)) == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+            }
         }
 
         protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
