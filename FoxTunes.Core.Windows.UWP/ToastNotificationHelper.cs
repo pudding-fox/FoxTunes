@@ -164,16 +164,19 @@ namespace FoxTunes
 
             public void Activate(string appUserModelId, string invokedArgs, NotificationUserInputData[] data, uint dataCount)
             {
-                if (string.IsNullOrEmpty(invokedArgs))
-                {
-                    return;
-                }
                 var userInterface = UserInterface.Value;
                 if (userInterface == null)
                 {
                     return;
                 }
-                userInterface.Run(invokedArgs);
+                if (!string.IsNullOrEmpty(invokedArgs))
+                {
+                    userInterface.Run(invokedArgs);
+                }
+                else
+                {
+                    userInterface.Activate();
+                }
             }
 
             public static void Enable()
