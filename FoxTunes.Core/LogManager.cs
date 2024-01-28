@@ -1,12 +1,16 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public static class LogManager
     {
-        public static string FileName = "Log.txt";
+        public static string FileName = Path.Combine(
+            Publication.StoragePath,
+            "Log.txt"
+        );
 
         private static ILogger _Logger { get; set; }
 

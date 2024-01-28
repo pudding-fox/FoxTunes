@@ -11,7 +11,11 @@ namespace FoxTunes
 {
     public static class ToastNotificationHelper
     {
-        public const string ID = "3244075F-8E07-4182-A00D-F113D8BD2194";
+        public static readonly string ID = string.Format(
+            "{0}.{1}",
+            Publication.Company,
+            Publication.Product
+        );
 
         public static string ProcessFileName
         {

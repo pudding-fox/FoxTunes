@@ -12,25 +12,13 @@ namespace FoxTunes
     {
         const int TIMEOUT = 1;
 
-        public static string Location
-        {
-            get
-            {
-                return typeof(Logger).Assembly.Location;
-            }
-        }
-
         public Logger()
         {
             this.Stream = new Lazy<FileStream>(() =>
             {
                 try
                 {
-                    var fileName = Path.Combine(
-                        Path.GetDirectoryName(Location),
-                        LogManager.FileName
-                    );
-                    return File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read);
+                    return File.Open(LogManager.FileName, FileMode.Create, FileAccess.Write, FileShare.Read);
                 }
                 catch
                 {
