@@ -4,6 +4,8 @@ namespace FoxTunes
 {
     public static class BassOutputTempoStreamComponentBehaviourConfiguration
     {
+        public const string SECTION = BassOutputConfiguration.SECTION;
+
         public const string ENABLED = "AAAA1050-B08A-4EDB-9A06-C7A3758F5B7E";
 
         public const string TEMPO = "BBBBBDC6-889F-4461-BA5F-140F551F3F0F";
@@ -20,7 +22,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(
                     new BooleanConfigurationElement(ENABLED, "Enabled", path: "Tempo")
                         .WithValue(false))

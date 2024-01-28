@@ -15,7 +15,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Output")
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(
                     new BooleanConfigurationElement(WRITE_TAGS, "Write Tags", path: "Replay Gain/Scanner")
                         .WithValue(true)

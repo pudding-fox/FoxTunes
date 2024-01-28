@@ -4,6 +4,8 @@ namespace FoxTunes
 {
     public static class BassParametricEqualizerStreamComponentConfiguration
     {
+        public const string SECTION = BassOutputConfiguration.SECTION;
+
         public const string ENABLED = "AAAAF34F-A090-4AEE-BD65-128561960C92";
 
         public const string BANDWIDTH = "AAAB688D-9CA0-41B3-8E11-AC252DF03BE4";
@@ -30,7 +32,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var section = new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
+            var section = new ConfigurationSection(SECTION)
                 .WithElement(
                     new BooleanConfigurationElement(ENABLED, "Enabled", path: "Parametric Equalizer")
                         .WithValue(false))

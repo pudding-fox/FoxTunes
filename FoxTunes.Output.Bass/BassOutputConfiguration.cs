@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -37,18 +36,18 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
-            yield return new ConfigurationSection(SECTION, "Output")
-                .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, "Rate", path: "Advanced").WithOptions(GetRateOptions()))
-                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: "Advanced").WithOptions(GetDepthOptions()))
-                .WithElement(new SelectionConfigurationElement(INPUT_ELEMENT, "Input"))
-                .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT, "Output"))
-                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate", path: "Advanced").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory", path: "Advanced").WithValue(false))
-                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Advanced").WithValue(500).WithValidationRule(new IntegerValidationRule(10, 5000)))
-                .WithElement(new BooleanConfigurationElement(VOLUME_ENABLED_ELEMENT, "Software Volume Control", path: "Advanced").WithValue(false))
-                .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, "Software Volume Level", path: "Advanced").WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT))
-                .WithElement(new IntegerConfigurationElement(RESAMPLE_QUALITY_ELEMENT, "Resampling Quality", path: "Advanced").WithValue(2).WithValidationRule(new IntegerValidationRule(1, 10)))
-                .WithElement(new BooleanConfigurationElement(DEVICE_MONITOR_ELEMENT, "Monitor Device Settings", path: "Advanced").WithValue(releaseType == ReleaseType.Default)
+            yield return new ConfigurationSection(SECTION, Strings.BassOutputConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, Strings.BassOutputConfiguration_Rate, path: Strings.General_Advanced).WithOptions(GetRateOptions()))
+                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, Strings.BassOutputConfiguration_Depth, path: Strings.General_Advanced).WithOptions(GetDepthOptions()))
+                .WithElement(new SelectionConfigurationElement(INPUT_ELEMENT, Strings.BassOutputConfiguration_Input))
+                .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT, Strings.BassOutputConfiguration_Output))
+                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, Strings.BassOutputConfiguration_EnforceRate, path: Strings.General_Advanced).WithValue(false))
+                .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, Strings.BassOutputConfiguration_Ram, path: Strings.General_Advanced).WithValue(false))
+                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, Strings.BassOutputConfiguration_BufferLength, path: Strings.General_Advanced).WithValue(500).WithValidationRule(new IntegerValidationRule(10, 5000)))
+                .WithElement(new BooleanConfigurationElement(VOLUME_ENABLED_ELEMENT, Strings.BassOutputConfiguration_Volume, path: Strings.General_Advanced).WithValue(false))
+                .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, Strings.BassOutputConfiguration_VolumeLevel, path: Strings.General_Advanced).WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT))
+                .WithElement(new IntegerConfigurationElement(RESAMPLE_QUALITY_ELEMENT, Strings.BassOutputConfiguration_ResampleQuality, path: Strings.General_Advanced).WithValue(2).WithValidationRule(new IntegerValidationRule(1, 10)))
+                .WithElement(new BooleanConfigurationElement(DEVICE_MONITOR_ELEMENT, Strings.BassOutputConfiguration_DeviceMonitor, path: Strings.General_Advanced).WithValue(releaseType == ReleaseType.Default)
             );
         }
 

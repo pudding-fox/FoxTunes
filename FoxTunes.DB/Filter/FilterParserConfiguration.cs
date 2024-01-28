@@ -20,8 +20,8 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Search")
-                .WithElement(new TextConfigurationElement(SEARCH_NAMES, "Tag Names")
+            yield return new ConfigurationSection(SECTION)
+                .WithElement(new TextConfigurationElement(SEARCH_NAMES, Strings.FilterParserConfiguration_Names)
                     .WithValue(string.Join(Environment.NewLine, DefaultSearchNames)).WithFlags(ConfigurationElementFlags.MultiLine));
         }
 

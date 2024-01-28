@@ -4,6 +4,8 @@ namespace FoxTunes
 {
     public static class BassReplayGainBehaviourConfiguration
     {
+        public const string SECTION = BassOutputConfiguration.SECTION;
+
         public const string ENABLED = "AAAA1379-60E3-426D-9CF0-61F11343A627";
 
         public const string ON_DEMAND = "AABB8343-832C-4B99-A34C-8D9475D56722";
@@ -16,7 +18,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var section = new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
+            var section = new ConfigurationSection(SECTION)
                 .WithElement(new BooleanConfigurationElement(ENABLED, "Enabled", path: "Replay Gain").WithValue(false))
                 .WithElement(new SelectionConfigurationElement(MODE, "Mode", path: "Replay Gain").WithOptions(GetModeOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED))
                 .WithElement(new BooleanConfigurationElement(ON_DEMAND, "On Demand", path: "Replay Gain").WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED)
