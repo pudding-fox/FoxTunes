@@ -133,6 +133,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Audacity.
+        /// </summary>
+        internal static string ColorPalette_Audacity {
+            get {
+                return ResourceManager.GetString("ColorPalette.Audacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default.
         /// </summary>
         internal static string ColorPalette_Default {
@@ -147,6 +156,15 @@ namespace FoxTunes {
         internal static string ColorPalette_Gradient {
             get {
                 return ResourceManager.GetString("ColorPalette.Gradient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mono Chrome.
+        /// </summary>
+        internal static string ColorPalette_MonoChrome {
+            get {
+                return ResourceManager.GetString("ColorPalette.MonoChrome", resourceCulture);
             }
         }
         

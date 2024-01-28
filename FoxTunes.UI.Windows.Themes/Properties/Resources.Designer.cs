@@ -61,11 +61,35 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BLACK
+        ///INDIGO
+        ///PURPLE
+        ///ORANGE
+        ///YELLOW
+        ///1000:WHITE.
+        /// </summary>
+        internal static string Audacity {
+            get {
+                return ResourceManager.GetString("Audacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to #FF9BDDFB.
         /// </summary>
         internal static string Blue {
             get {
                 return ResourceManager.GetString("Blue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BLACK
+        ///1000:WHITE.
+        /// </summary>
+        internal static string MonoChrome {
+            get {
+                return ResourceManager.GetString("MonoChrome", resourceCulture);
             }
         }
         

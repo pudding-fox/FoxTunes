@@ -168,4 +168,10 @@
   <data name="ColorPalette.TrafficLight" xml:space="preserve">
     <value>Traffic Light</value>
   </data>
+  <data name="ColorPalette.Audacity" xml:space="preserve">
+    <value>Audacity</value>
+  </data>
+  <data name="ColorPalette.MonoChrome" xml:space="preserve">
+    <value>Mono Chrome</value>
+  </data>
 </root>
