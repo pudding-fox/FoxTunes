@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.MetaData;
 using System;
 using System.Collections.ObjectModel;
 using TagLib;
@@ -35,60 +36,60 @@ namespace FoxTunes
 
         private void AddMetaDatas(Tag tag)
         {
-            this.AddMetaData("Album", tag.Album);
-            this.AddMetaData("AlbumArtists", tag.AlbumArtists);
-            this.AddMetaData("AlbumArtistsSort", tag.AlbumArtistsSort);
-            this.AddMetaData("AlbumSort", tag.AlbumSort);
-            this.AddMetaData("AmazonId", tag.AmazonId);
+            this.AddMetaData(CommonMetaData.Album, tag.Album);
+            this.AddMetaData(CommonMetaData.AlbumArtists, tag.AlbumArtists);
+            this.AddMetaData(CommonMetaData.AlbumArtistsSort, tag.AlbumArtistsSort);
+            this.AddMetaData(CommonMetaData.AlbumSort, tag.AlbumSort);
+            this.AddMetaData(CommonMetaData.AmazonId, tag.AmazonId);
 #pragma warning disable 612, 618
-            this.AddMetaData("Artists", tag.Artists);
+            this.AddMetaData(CommonMetaData.Artists, tag.Artists);
 #pragma warning restore 612, 618
-            this.AddMetaData("BeatsPerMinute", tag.BeatsPerMinute);
-            this.AddMetaData("Comment", tag.Comment);
-            this.AddMetaData("Composers", tag.Composers);
-            this.AddMetaData("ComposersSort", tag.ComposersSort);
-            this.AddMetaData("Conductor", tag.Conductor);
-            this.AddMetaData("Copyright", tag.Copyright);
-            this.AddMetaData("Disc", tag.Disc);
-            this.AddMetaData("DiscCount", tag.DiscCount);
-            this.AddMetaData("FirstAlbumArtist", tag.FirstAlbumArtist);
-            this.AddMetaData("FirstAlbumArtistSort", tag.FirstAlbumArtistSort);
+            this.AddMetaData(CommonMetaData.BeatsPerMinute, tag.BeatsPerMinute);
+            this.AddMetaData(CommonMetaData.Comment, tag.Comment);
+            this.AddMetaData(CommonMetaData.Composers, tag.Composers);
+            this.AddMetaData(CommonMetaData.ComposersSort, tag.ComposersSort);
+            this.AddMetaData(CommonMetaData.Conductor, tag.Conductor);
+            this.AddMetaData(CommonMetaData.Copyright, tag.Copyright);
+            this.AddMetaData(CommonMetaData.Disc, tag.Disc);
+            this.AddMetaData(CommonMetaData.DiscCount, tag.DiscCount);
+            this.AddMetaData(CommonMetaData.FirstAlbumArtist, tag.FirstAlbumArtist);
+            this.AddMetaData(CommonMetaData.FirstAlbumArtistSort, tag.FirstAlbumArtistSort);
 #pragma warning disable 612, 618
-            this.AddMetaData("FirstArtist", tag.FirstArtist);
+            this.AddMetaData(CommonMetaData.FirstArtist, tag.FirstArtist);
 #pragma warning restore 612, 618
-            this.AddMetaData("FirstComposer", tag.FirstComposer);
-            this.AddMetaData("FirstComposerSort", tag.FirstComposerSort);
-            this.AddMetaData("FirstGenre", tag.FirstGenre);
-            this.AddMetaData("FirstPerformer", tag.FirstPerformer);
-            this.AddMetaData("FirstPerformerSort", tag.FirstPerformerSort);
-            this.AddMetaData("Genres", tag.Genres);
-            this.AddMetaData("Grouping", tag.Grouping);
-            this.AddMetaData("JoinedAlbumArtists", tag.JoinedAlbumArtists);
+            this.AddMetaData(CommonMetaData.FirstComposer, tag.FirstComposer);
+            this.AddMetaData(CommonMetaData.FirstComposerSort, tag.FirstComposerSort);
+            this.AddMetaData(CommonMetaData.FirstGenre, tag.FirstGenre);
+            this.AddMetaData(CommonMetaData.FirstPerformer, tag.FirstPerformer);
+            this.AddMetaData(CommonMetaData.FirstPerformerSort, tag.FirstPerformerSort);
+            this.AddMetaData(CommonMetaData.Genres, tag.Genres);
+            this.AddMetaData(CommonMetaData.Grouping, tag.Grouping);
+            this.AddMetaData(CommonMetaData.JoinedAlbumArtists, tag.JoinedAlbumArtists);
 #pragma warning disable 612, 618
-            this.AddMetaData("JoinedArtists", tag.JoinedArtists);
+            this.AddMetaData(CommonMetaData.JoinedArtists, tag.JoinedArtists);
 #pragma warning restore 612, 618
-            this.AddMetaData("JoinedComposers", tag.JoinedComposers);
-            this.AddMetaData("JoinedGenres", tag.JoinedGenres);
-            this.AddMetaData("JoinedPerformers", tag.JoinedPerformers);
-            this.AddMetaData("JoinedPerformersSort", tag.JoinedPerformersSort);
-            this.AddMetaData("Lyrics", tag.Lyrics);
-            this.AddMetaData("MusicBrainzArtistId", tag.MusicBrainzArtistId);
-            this.AddMetaData("MusicBrainzDiscId", tag.MusicBrainzDiscId);
-            this.AddMetaData("MusicBrainzReleaseArtistId", tag.MusicBrainzReleaseArtistId);
-            this.AddMetaData("MusicBrainzReleaseCountry", tag.MusicBrainzReleaseCountry);
-            this.AddMetaData("MusicBrainzReleaseId", tag.MusicBrainzReleaseId);
-            this.AddMetaData("MusicBrainzReleaseStatus", tag.MusicBrainzReleaseStatus);
-            this.AddMetaData("MusicBrainzReleaseType", tag.MusicBrainzReleaseType);
-            this.AddMetaData("MusicBrainzTrackId", tag.MusicBrainzTrackId);
-            this.AddMetaData("MusicIpId", tag.MusicIpId);
-            this.AddMetaData("Performers", tag.Performers);
-            this.AddMetaData("PerformersSort", tag.PerformersSort);
-            this.AddMetaData("Pictures", tag.Pictures);
-            this.AddMetaData("Title", tag.Title);
-            this.AddMetaData("TitleSort", tag.TitleSort);
-            this.AddMetaData("Track", tag.Track);
-            this.AddMetaData("TrackCount", tag.TrackCount);
-            this.AddMetaData("Year", tag.Year);
+            this.AddMetaData(CommonMetaData.JoinedComposers, tag.JoinedComposers);
+            this.AddMetaData(CommonMetaData.JoinedGenres, tag.JoinedGenres);
+            this.AddMetaData(CommonMetaData.JoinedPerformers, tag.JoinedPerformers);
+            this.AddMetaData(CommonMetaData.JoinedPerformersSort, tag.JoinedPerformersSort);
+            this.AddMetaData(CommonMetaData.Lyrics, tag.Lyrics);
+            this.AddMetaData(CommonMetaData.MusicBrainzArtistId, tag.MusicBrainzArtistId);
+            this.AddMetaData(CommonMetaData.MusicBrainzDiscId, tag.MusicBrainzDiscId);
+            this.AddMetaData(CommonMetaData.MusicBrainzReleaseArtistId, tag.MusicBrainzReleaseArtistId);
+            this.AddMetaData(CommonMetaData.MusicBrainzReleaseCountry, tag.MusicBrainzReleaseCountry);
+            this.AddMetaData(CommonMetaData.MusicBrainzReleaseId, tag.MusicBrainzReleaseId);
+            this.AddMetaData(CommonMetaData.MusicBrainzReleaseStatus, tag.MusicBrainzReleaseStatus);
+            this.AddMetaData(CommonMetaData.MusicBrainzReleaseType, tag.MusicBrainzReleaseType);
+            this.AddMetaData(CommonMetaData.MusicBrainzTrackId, tag.MusicBrainzTrackId);
+            this.AddMetaData(CommonMetaData.MusicIpId, tag.MusicIpId);
+            this.AddMetaData(CommonMetaData.Performers, tag.Performers);
+            this.AddMetaData(CommonMetaData.PerformersSort, tag.PerformersSort);
+            this.AddMetaData(CommonMetaData.Pictures, tag.Pictures);
+            this.AddMetaData(CommonMetaData.Title, tag.Title);
+            this.AddMetaData(CommonMetaData.TitleSort, tag.TitleSort);
+            this.AddMetaData(CommonMetaData.Track, tag.Track);
+            this.AddMetaData(CommonMetaData.TrackCount, tag.TrackCount);
+            this.AddMetaData(CommonMetaData.Year, tag.Year);
         }
 
         private void AddMetaData(string name, IPicture[] value)

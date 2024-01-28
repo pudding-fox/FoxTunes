@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
 {
@@ -7,7 +6,7 @@ namespace FoxTunes.Interfaces
     {
         void AddDirectory(string directoryName);
 
-        void AddFile(string fileName);
+        void AddFiles(params string[] fileName);
 
         void Next();
 

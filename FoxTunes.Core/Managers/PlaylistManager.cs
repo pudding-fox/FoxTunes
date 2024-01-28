@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace FoxTunes.Managers
 {
@@ -33,19 +34,21 @@ namespace FoxTunes.Managers
 
         public void AddDirectory(string directoryName)
         {
-            foreach (var fileName in Directory.GetFiles(directoryName))
-            {
-                this.AddFile(fileName);
-            }
+            this.AddFiles(Directory.GetFiles(directoryName));
         }
 
-        public void AddFile(string fileName)
+        public void AddFiles(params string[] fileNames)
         {
-            if (!this.PlaybackManager.IsSupported(fileName))
+            var query =
+                from fileName in fileNames
+                where this.PlaybackManager.IsSupported(fileName)
+                select this.PlaylistItemFactory.Create(fileName) into playlistItem
+                orderby playlistItem.MetaDatas.Value<int>(CommonMetaData.Track), playlistItem.FileName
+                select playlistItem;
+            foreach (var playlistItem in query)
             {
-                return;
+                this.Items.Add(playlistItem);
             }
-            this.Playlist.Items.Add(this.PlaylistItemFactory.Create(fileName));
         }
 
         public void Next()

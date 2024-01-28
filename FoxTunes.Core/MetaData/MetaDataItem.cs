@@ -1,6 +1,8 @@
-﻿namespace FoxTunes
+﻿using FoxTunes.Interfaces;
+
+namespace FoxTunes
 {
-    public class MetaDataItem : PersistableComponent
+    public class MetaDataItem : PersistableComponent, INamedValue
     {
         public MetaDataItem()
         {
