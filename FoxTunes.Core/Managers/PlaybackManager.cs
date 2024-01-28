@@ -46,19 +46,42 @@ namespace FoxTunes.Managers
 
         public IOutputStream Load(string fileName)
         {
-            if (this.CurrentStream != null)
-            {
-                this.CurrentStream.Stop();
-                this.CurrentStream.Dispose();
-                this.CurrentStream = null;
-            }
+            this.Unload();
             return this.CurrentStream = this.Output.Load(fileName);
         }
 
         public void Unload()
         {
+            if (this.CurrentStream == null)
+            {
+                return;
+            }
+            this.CurrentStream.Stop();
             this.CurrentStream.Dispose();
             this.CurrentStream = null;
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            this.Unload();
         }
     }
 }
