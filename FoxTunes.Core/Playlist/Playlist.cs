@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
@@ -7,12 +8,12 @@ namespace FoxTunes
     {
         public Playlist()
         {
-            this.Items = new PlaylistItems();
+
         }
 
         public IDatabase Database { get; private set; }
 
-        public IPlaylistItems Items { get; private set; }
+        public ObservableCollection<IPlaylistItem> Items { get; private set; }
 
         private IPlaylistItem _SelectedItem { get; set; }
 
@@ -55,6 +56,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Components.Database;
+            this.Items = this.Database.GetSet<IPlaylistItem>().AsObservable();
             base.InitializeComponent(core);
         }
     }

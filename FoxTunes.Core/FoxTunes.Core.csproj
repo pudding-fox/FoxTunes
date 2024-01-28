@@ -47,9 +47,11 @@
     <Compile Include="BaseLoader.cs" />
     <Compile Include="BaseManager.cs" />
     <Compile Include="FactoryLoader.cs" />
+    <Compile Include="Interfaces\Database\IPersistableSet.cs" />
     <Compile Include="Interfaces\Factories\IMetaDataSourceFactory.cs" />
     <Compile Include="Interfaces\IBaseFactory.cs" />
     <Compile Include="Interfaces\IBaseLoader.cs" />
+    <Compile Include="Interfaces\IPersistableComponent.cs" />
     <Compile Include="Interfaces\IStandardFactories.cs" />
     <Compile Include="Interfaces\IStandardFactory.cs" />
     <Compile Include="Interfaces\MetaData\IMetaDataItem.cs" />
@@ -70,7 +72,6 @@
     <Compile Include="Playlist\Playlist.cs" />
     <Compile Include="Playlist\PlaylistItem.cs" />
     <Compile Include="Factories\PlaylistItemFactory.cs" />
-    <Compile Include="Playlist\PlaylistItems.cs" />
     <Compile Include="StandardBehaviour.cs" />
     <Compile Include="StandardComponent.cs" />
     <Compile Include="StandardComponents.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="Interfaces\Output\IOutputStream.cs" />
     <Compile Include="Interfaces\Playlist\IPlaylist.cs" />
     <Compile Include="Interfaces\Playlist\IPlaylistItem.cs" />
-    <Compile Include="Interfaces\Playlist\IPlaylistItems.cs" />
     <Compile Include="Interfaces\IStandardComponent.cs" />
     <Compile Include="Interfaces\UserInterface\IUserInterface.cs" />
     <Compile Include="StandardFactories.cs" />

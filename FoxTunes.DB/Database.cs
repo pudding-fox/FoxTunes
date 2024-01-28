@@ -9,6 +9,10 @@ namespace FoxTunes
     {
         protected virtual DbConnection Connection { get; set; }
 
+        public abstract IPersistableSet GetSet(Type type);
+
+        public abstract IPersistableSet<T> GetSet<T>() where T : class;
+
         public override void InitializeComponent(ICore core)
         {
             this.Connection = this.CreateConnection();
@@ -16,10 +20,6 @@ namespace FoxTunes
         }
 
         public abstract DbConnection CreateConnection();
-
-        public abstract void Save<T>(T value);
-
-        public abstract void Load<T>(T value);
 
         public bool IsDisposed { get; private set; }
 

@@ -4,8 +4,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IDatabase : IStandardComponent, IDisposable
     {
-        void Save<T>(T value);
+        IPersistableSet GetSet(Type type);
 
-        void Load<T>(T value);
+        IPersistableSet<T> GetSet<T>() where T : class;
     }
 }
