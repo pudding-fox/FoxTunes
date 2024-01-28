@@ -149,7 +149,8 @@ namespace FoxTunes
                 {
                     if (!data.Update())
                     {
-                        data.Clear();
+                        this.Start();
+                        return;
                     }
                     UpdateValues(data);
                 }
@@ -639,23 +640,6 @@ namespace FoxTunes
                     }
                 }
                 return elements;
-            }
-
-            public void Clear()
-            {
-                if (this.Samples16 != null)
-                {
-                    Array.Clear(this.Samples16, 0, this.Samples16.Length);
-                }
-                if (this.Samples32 != null)
-                {
-                    Array.Clear(this.Samples32, 0, this.Samples32.Length);
-                }
-                if (this.Samples != null)
-                {
-                    Array.Clear(this.Samples, 0, this.Samples.Length);
-                }
-                this.SampleCount = 0;
             }
         }
     }

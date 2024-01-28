@@ -209,7 +209,8 @@ namespace FoxTunes
             {
                 if (!data.Update())
                 {
-                    data.Clear();
+                    this.Start();
+                    return;
                 }
                 else
                 {
@@ -655,12 +656,6 @@ namespace FoxTunes
                 }
                 this.SampleCount = this.Renderer.Output.GetData(this.Samples, this.FFTSize);
                 return this.SampleCount > 0;
-            }
-
-            public void Clear()
-            {
-                Array.Clear(this.Samples, 0, this.Samples.Length);
-                this.SampleCount = 0;
             }
         }
     }

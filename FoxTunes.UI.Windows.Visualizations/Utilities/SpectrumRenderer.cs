@@ -181,7 +181,8 @@ namespace FoxTunes
             {
                 if (!data.Update())
                 {
-                    data.Clear();
+                    this.Start();
+                    return;
                 }
                 UpdateValues(data);
                 if (this.Smooth.Value)
@@ -393,12 +394,6 @@ namespace FoxTunes
             {
                 this.SampleCount = this.Output.GetData(this.Samples, this.FFTSize);
                 return this.SampleCount > 0;
-            }
-
-            public void Clear()
-            {
-                Array.Clear(this.Samples, 0, this.Samples.Length);
-                this.SampleCount = 0;
             }
         }
     }
