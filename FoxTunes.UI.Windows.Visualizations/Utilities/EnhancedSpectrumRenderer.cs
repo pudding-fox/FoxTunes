@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -120,22 +119,22 @@ namespace FoxTunes
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
                 this.Duration.Value,
-                this.GetColorPalettes(this.ColorPalette.Value, this.ShowPeak.Value, this.ShowRms.Value, this.ShowCrestFactor.Value, this.Colors)
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.ShowPeak.Value, this.ShowRms.Value, this.ShowCrestFactor.Value)
             );
             return true;
         }
 
-        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, bool showCrest, Color[] colors)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, bool showCrest)
         {
-            var palettes = EnhancedSpectrumConfiguration.GetColorPalette(value, colors);
+            var palettes = EnhancedSpectrumConfiguration.GetColorPalette(value);
             var background = palettes.GetOrAdd(
                 EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
             );
             //Switch the default colors to the VALUE palette if one was provided.
-            colors = palettes.GetOrAdd(
+            var colors = palettes.GetOrAdd(
                 EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE,
-                () => DefaultColors.GetValue(colors)
+                () => DefaultColors.GetValue(new[] { this.ForegroundColor })
             );
             if (showPeak)
             {
@@ -175,7 +174,7 @@ namespace FoxTunes
                     {
                         flags |= BitmapHelper.COLOR_FROM_Y;
                     }
-                    return BitmapHelper.CreatePalette(flags, pair.Value);
+                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, pair.Value), pair.Value);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -204,7 +203,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, false, false, this.Colors);
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), false, false, false);
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);

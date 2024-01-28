@@ -121,6 +121,18 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //BACKGROUND
+        ///#00000000
+        /////VALUE
+        ///#FFFFFFFF.
+        /// </summary>
+        internal static string Transparent {
+            get {
+                return ResourceManager.GetString("Transparent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to #FF9BDDFB
         ///700:#FF9BDDFB
         ///1000:#009BDDFB.

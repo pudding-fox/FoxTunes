@@ -18,13 +18,6 @@ ColorPalette* WINAPI create_palette(Int32Color* colors, INT32 count, INT32 flags
 		return NULL;
 	}
 	memcpy(palette->Colors, colors, sizeof(Int32Color) * count);
-	for (INT32 a = 0; a < count; a++) {
-		if (colors[a].Alpha == 0xff) {
-			continue;
-		}
-		flags |= ALPHA_BLENDING;
-		break;
-	}
 	palette->Count = count;
 	palette->Flags = flags;
 	return palette;

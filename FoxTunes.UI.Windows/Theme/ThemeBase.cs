@@ -98,13 +98,14 @@ namespace FoxTunes
 
         public class ColorPalette : BaseComponent, IColorPalette
         {
-            public ColorPalette(string id, ColorPaletteRole role, string name, string description, string value)
+            public ColorPalette(string id, ColorPaletteRole role, string name, string description, string value, ColorPaletteFlags flags = ColorPaletteFlags.None)
             {
                 this.Id = id;
                 this.Role = role;
                 this.Name = name;
                 this.Description = description;
                 this.Value = value;
+                this.Flags = flags;
             }
 
             public string Id { get; private set; }
@@ -116,6 +117,8 @@ namespace FoxTunes
             public string Description { get; private set; }
 
             public string Value { get; private set; }
+
+            public ColorPaletteFlags Flags { get; private set; }
         }
     }
 }

@@ -17,6 +17,7 @@ namespace FoxTunes
 
         public const int COLOR_FROM_X = 1;
         public const int COLOR_FROM_Y = 2;
+        public const int ALPHA_BLENDING = 4;
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport("bitmap_utilities.dll", EntryPoint = "create_palette")]
@@ -95,13 +96,17 @@ namespace FoxTunes
             };
         }
 
-        public static IntPtr CreatePalette(int flags, params Color[] colors)
+        public static IntPtr CreatePalette(int flags, bool alphaBlending, params Color[] colors)
         {
-            return CreatePalette(flags, colors.Select(color => new Int32Color(color)).ToArray());
+            return CreatePalette(flags, alphaBlending, colors.Select(color => new Int32Color(color)).ToArray());
         }
 
-        public static IntPtr CreatePalette(int flags, params Int32Color[] colors)
+        public static IntPtr CreatePalette(int flags, bool alphaBlending, params Int32Color[] colors)
         {
+            if (alphaBlending)
+            {
+                flags |= ALPHA_BLENDING;
+            }
             return CreatePalette(colors, colors.Length, flags);
         }
 

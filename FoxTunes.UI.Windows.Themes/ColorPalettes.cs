@@ -91,5 +91,23 @@ namespace FoxTunes
                 }.Concat(Custom).ToArray();
             }
         }
+
+        public static IEnumerable<IColorPalette> Transparent
+        {
+            get
+            {
+                return new[]
+                {
+                    new ThemeBase.ColorPalette(
+                        "Transparent_AAAA",
+                        ColorPaletteRole.Visualization | ColorPaletteRole.WaveForm,
+                        Strings.ColorPalette_Transparent,
+                        string.Empty,
+                        Resources.Transparent,
+                        ColorPaletteFlags.System
+                    ),
+                }.Concat(Custom).ToArray();
+            }
+        }
     }
 }

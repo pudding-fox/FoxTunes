@@ -16,8 +16,6 @@ namespace FoxTunes
 
         public const string COLOR_PALETTE_ELEMENT = "ZZZZ579D-F617-41CD-9007-6B0402BBE1AD";
 
-        public const string COLOR_PALETTE_THEME = "THEME";
-
         public const string COLOR_PALETTE_LOW = "LOW";
 
         public const string COLOR_PALETTE_MID = "MID";
@@ -51,29 +49,13 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public static IDictionary<string, Color[]> GetColorPalette(string value, Color[] colors)
+        public static IDictionary<string, Color[]> GetColorPalette(string value)
         {
-            if (!string.IsNullOrEmpty(value))
-            {
-                try
-                {
-                    var palettes = value.ToNamedColorStops().ToDictionary(
-                        pair => pair.Key,
-                        pair => pair.Value.ToGradient(),
-                        StringComparer.OrdinalIgnoreCase
-                    );
-                    palettes[COLOR_PALETTE_THEME] = colors;
-                    return palettes;
-                }
-                catch
-                {
-                    //Nothing can be done.
-                }
-            }
-            return new Dictionary<string, Color[]>(StringComparer.OrdinalIgnoreCase)
-            {
-                { COLOR_PALETTE_THEME, colors }
-            };
+            return value.ToNamedColorStops().ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.ToGradient(),
+                StringComparer.OrdinalIgnoreCase
+            );
         }
     }
 }

@@ -178,6 +178,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color Palette.
+        /// </summary>
+        internal static string OscilloscopeConfiguration_ColorPalette {
+            get {
+                return ResourceManager.GetString("OscilloscopeConfiguration.ColorPalette", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Duration (ms).
         /// </summary>
         internal static string OscilloscopeConfiguration_Duration {

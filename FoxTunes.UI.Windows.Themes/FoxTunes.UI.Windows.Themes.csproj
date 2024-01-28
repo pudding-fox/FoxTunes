@@ -31,9 +31,12 @@
 	  <None Remove="Images\Adamantine_Artwork.png" />
 	  <None Remove="Images\ExpressionDark_Artwork.png" />
 	  <None Remove="Images\System_Artwork.png" />
+	  <None Remove="Images\Transparent_Artwork.png" />
+	  <None Remove="Themes\Transparent.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Images\Transparent_Artwork.png" />
 	  <EmbeddedResource Include="Images\Adamantine_Artwork.png" />
 	  <EmbeddedResource Include="Images\ExpressionDark_Artwork.png" />
 	  <EmbeddedResource Include="Images\System_Artwork.png" />

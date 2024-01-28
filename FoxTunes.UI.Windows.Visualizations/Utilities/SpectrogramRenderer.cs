@@ -9,14 +9,6 @@ namespace FoxTunes
 {
     public class SpectrogramRenderer : VisualizationBase
     {
-        protected override bool LoadColorPalette
-        {
-            get
-            {
-                return false;
-            }
-        }
-
         public SpectrogramRendererData RendererData { get; private set; }
 
         public SpectrogramRendererHistory RendererHistory { get; private set; }
@@ -89,7 +81,7 @@ namespace FoxTunes
                 height,
                 colors.Length,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                BitmapHelper.CreatePalette(0, colors),
+                BitmapHelper.CreatePalette(0, GetAlphaBlending(colors), colors),
                 SpectrogramConfiguration.GetMode(this.Mode.Value),
                 SpectrogramConfiguration.GetScale(this.Scale.Value),
                 this.Smoothing.Value

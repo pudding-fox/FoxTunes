@@ -174,4 +174,13 @@
   <data name="ColorPalette.MonoChrome" xml:space="preserve">
     <value>Mono Chrome</value>
   </data>
+  <data name="TransparentTheme.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="TransparentTheme.Name" xml:space="preserve">
+    <value>Transparent</value>
+  </data>
+  <data name="ColorPalette.Transparent" xml:space="preserve">
+    <value>Transparent</value>
+  </data>
 </root>

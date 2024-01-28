@@ -41,7 +41,8 @@
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   IsTextSearchEnabled="True"
-                  TextSearch.TextPath="Value">
+                  TextSearch.TextPath="Value"
+                  Background="{DynamicResource ControlBackgroundBrush}">
             <Interactivity:Interaction.Triggers>
                 <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TreeViewItem}">
                     <Interactivity:InvokeCommandAction Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource False}"/>

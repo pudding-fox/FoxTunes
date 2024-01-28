@@ -13,19 +13,13 @@ namespace FoxTunes
 {
     public class OscilloscopeRenderer : VisualizationBase
     {
-        protected override bool LoadColorPalette
-        {
-            get
-            {
-                return false;
-            }
-        }
-
         public OscilloscopeRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Mode { get; private set; }
 
         public IntegerConfigurationElement Window { get; private set; }
+
+        public TextConfigurationElement ColorPalette { get; private set; }
 
         public IntegerConfigurationElement Duration { get; private set; }
 
@@ -40,6 +34,10 @@ namespace FoxTunes
                 this.Window = this.Configuration.GetElement<IntegerConfigurationElement>(
                     OscilloscopeConfiguration.SECTION,
                     OscilloscopeConfiguration.WINDOW_ELEMENT
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    OscilloscopeConfiguration.SECTION,
+                    OscilloscopeConfiguration.COLOR_PALETTE
                 );
                 this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                     OscilloscopeConfiguration.SECTION,
@@ -69,23 +67,23 @@ namespace FoxTunes
                 height,
                 OscilloscopeConfiguration.GetWindow(this.Window.Value),
                 OscilloscopeConfiguration.GetDuration(this.Duration.Value),
-                this.GetColorPalettes(this.Colors),
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value)),
                 OscilloscopeConfiguration.GetMode(this.Mode.Value)
             );
             return true;
         }
 
-        protected virtual IDictionary<string, IntPtr> GetColorPalettes(Color[] colors)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value)
         {
-            var palettes = OscilloscopeConfiguration.GetColorPalette(colors);
+            var palettes = OscilloscopeConfiguration.GetColorPalette(value);
             var background = palettes.GetOrAdd(
                 OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
             );
             //Switch the default colors to the VALUE palette if one was provided.
-            colors = palettes.GetOrAdd(
+            var colors = palettes.GetOrAdd(
                 OscilloscopeConfiguration.COLOR_PALETTE_VALUE,
-                () => DefaultColors.GetValue(colors)
+                () => DefaultColors.GetValue(new[] { this.ForegroundColor })
             );
             return palettes.ToDictionary(
                 pair => pair.Key,
@@ -100,7 +98,7 @@ namespace FoxTunes
                     {
                         flags |= BitmapHelper.COLOR_FROM_Y;
                     }
-                    return BitmapHelper.CreatePalette(flags, pair.Value);
+                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, pair.Value), pair.Value);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -129,7 +127,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.Colors);
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value));
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[OscilloscopeConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
@@ -667,10 +665,7 @@ namespace FoxTunes
 
             public static Color[] GetValue(Color[] colors)
             {
-                return new[]
-                {
-                    global::System.Windows.Media.Colors.White
-                };
+                return colors;
             }
         }
     }

@@ -150,7 +150,20 @@ namespace FoxTunes
             }
         }
 
-        public Color Color
+        public Color BackgroundColor
+        {
+            get
+            {
+                if (this.Background is SolidColorBrush brush)
+                {
+                    return brush.Color;
+                }
+                return global::System.Windows.Media.Colors.Transparent;
+            }
+        }
+
+
+        public Color ForegroundColor
         {
             get
             {
@@ -159,21 +172,6 @@ namespace FoxTunes
                     return brush.Color;
                 }
                 return global::System.Windows.Media.Colors.Transparent;
-            }
-        }
-
-        public Color[] Colors { get; private set; }
-
-        protected virtual void OnColorsChanged()
-        {
-            var task = this.CreateData();
-        }
-
-        protected virtual bool LoadColorPalette
-        {
-            get
-            {
-                return true;
             }
         }
 
@@ -188,21 +186,15 @@ namespace FoxTunes
         public virtual void InitializeComponent(ICore core)
         {
             this.PixelSizeConverter = ComponentRegistry.Instance.GetComponent<PixelSizeConverter>();
-            if (this.LoadColorPalette)
-            {
-                this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
-                this.ThemeLoader.ConnectTheme(theme =>
-                {
-                    var raise = this.Colors != null;
-                    this.Colors = theme.ColorPalettes.First().Value.ToColorStops().ToGradient();
-                    if (raise)
-                    {
-                        this.OnColorsChanged();
-                    }
-                });
-            }
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
             this.OutputDataSource = core.Components.OutputDataSource;
             this.VisualizationDataSource = core.Components.VisualizationDataSource;
+        }
+
+        protected virtual void OnThemeChanged(object sender, EventArgs e)
+        {
+            var task = this.CreateData();
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -371,6 +363,20 @@ namespace FoxTunes
             });
         }
 
+        protected virtual string GetColorPaletteOrDefault(string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+            var palette = this.ThemeLoader.Theme.ColorPalettes.FirstOrDefault();
+            if (palette != null)
+            {
+                return palette.Value;
+            }
+            return string.Empty;
+        }
+
         protected virtual void Dispatch(Action action)
         {
 #if NET40
@@ -431,7 +437,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            //Nothing to do.
+            if (this.ThemeLoader != null)
+            {
+                this.ThemeLoader.ThemeChanged -= this.OnThemeChanged;
+            }
         }
 
         ~RendererBase()
@@ -735,6 +744,29 @@ namespace FoxTunes
                 }
             }
             return peak;
+        }
+
+        public static bool GetAlphaBlending(string name, Color[] colors)
+        {
+            if (string.Equals(name, "BACKGROUND", StringComparison.OrdinalIgnoreCase))
+            {
+                //Never alpha blend the background.
+                return false;
+            }
+            return GetAlphaBlending(colors);
+        }
+
+        public static bool GetAlphaBlending(Color[] colors)
+        {
+            foreach (var color in colors)
+            {
+                if (color.A != 255)
+                {
+                    //Alpha channel is defined.
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

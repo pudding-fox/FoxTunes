@@ -117,6 +117,10 @@ namespace FoxTunes
         {
             foreach (var colorPalette in this.Theme.ColorPalettes)
             {
+                if (colorPalette.Flags.HasFlag(ColorPaletteFlags.System))
+                {
+                    continue;
+                }
                 if (predicate != null && !predicate(colorPalette))
                 {
                     continue;

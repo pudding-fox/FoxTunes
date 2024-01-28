@@ -187,6 +187,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Transparent.
+        /// </summary>
+        internal static string ColorPalette_Transparent {
+            get {
+                return ResourceManager.GetString("ColorPalette.Transparent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string ExpressionDarkTheme_Description {
@@ -228,6 +237,24 @@ namespace FoxTunes {
         internal static string RoyaleTheme_Name {
             get {
                 return ResourceManager.GetString("RoyaleTheme.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string TransparentTheme_Description {
+            get {
+                return ResourceManager.GetString("TransparentTheme.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transparent.
+        /// </summary>
+        internal static string TransparentTheme_Name {
+            get {
+                return ResourceManager.GetString("TransparentTheme.Name", resourceCulture);
             }
         }
     }

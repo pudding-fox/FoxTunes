@@ -104,24 +104,24 @@ namespace FoxTunes
                 SpectrumConfiguration.GetBars(this.Bars.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
-                this.GetColorPalettes(this.ColorPalette.Value, this.ShowPeaks.Value, this.Colors),
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.ShowPeaks.Value),
                 this.CutOff.Value,
                 1.0f + FromDecibel(this.PreAmp.Value)
             );
             return true;
         }
 
-        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, Color[] colors)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak)
         {
-            var palettes = SpectrumConfiguration.GetColorPalette(value, colors);
+            var palettes = SpectrumConfiguration.GetColorPalette(value);
             var background = palettes.GetOrAdd(
                 SpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
             );
             //Switch the default colors to the VALUE palette if one was provided.
-            colors = palettes.GetOrAdd(
+            var colors = palettes.GetOrAdd(
                 SpectrumConfiguration.COLOR_PALETTE_VALUE,
-                () => DefaultColors.GetValue(colors)
+                () => DefaultColors.GetValue(new[] { this.ForegroundColor })
             );
             if (showPeak)
             {
@@ -139,7 +139,7 @@ namespace FoxTunes
                     {
                         flags |= BitmapHelper.COLOR_FROM_Y;
                     }
-                    return BitmapHelper.CreatePalette(flags, pair.Value);
+                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, pair.Value), pair.Value);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -168,7 +168,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, this.Colors);
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), false);
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[SpectrumConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);

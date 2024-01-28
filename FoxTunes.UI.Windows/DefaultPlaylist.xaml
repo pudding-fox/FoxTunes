@@ -37,7 +37,8 @@
                   Windows:ListViewExtensions.DragSourceInitialized="DragSourceInitialized"
                   Windows:ListViewExtensions.AutoSizeColumns="True"
                   GridViewColumnHeader.Click="OnHeaderClick"
-                  SelectionChanged="OnSelectionChanged">
+                  SelectionChanged="OnSelectionChanged"
+                  Background="{DynamicResource ControlBackgroundBrush}">
             <ListView.Resources>
                 <Windows:Menu x:Key="ColumnHeaderMenu" Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLIST_HEADER}}"></Windows:Menu>
             </ListView.Resources>

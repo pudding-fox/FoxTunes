@@ -32,7 +32,7 @@ namespace FoxTunes
 
         public const int DURATION_DEFAULT = 400;
 
-        public const string COLOR_PALETTE_THEME = "THEME";
+        public const string COLOR_PALETTE = "CCCC2ACD-1C22-4CFD-8CCE-81CE6778346F";
 
         public const string COLOR_PALETTE_VALUE = "VALUE";
 
@@ -43,6 +43,7 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeConfiguration_Mode, path: Strings.OscilloscopeConfiguration_Path).WithOptions(GetModeOptions()))
                 .WithElement(new IntegerConfigurationElement(WINDOW_ELEMENT, Strings.OscilloscopeConfiguration_Window, path: Strings.OscilloscopeConfiguration_Path).WithValue(WINDOW_DEFAULT).WithValidationRule(new IntegerValidationRule(WINDOW_MIN, WINDOW_MAX, 10)))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.OscilloscopeConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.OscilloscopeConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeConfiguration_Duration, path: Strings.OscilloscopeConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
             );
         }
@@ -75,12 +76,19 @@ namespace FoxTunes
             return TimeSpan.FromMilliseconds(value);
         }
 
-        public static IDictionary<string, Color[]> GetColorPalette(Color[] colors)
+        public static string GetDefaultColorPalette()
         {
-            return new Dictionary<string, Color[]>(StringComparer.OrdinalIgnoreCase)
-            {
-                { COLOR_PALETTE_THEME, colors }
-            };
+            var builder = new StringBuilder();
+            return builder.ToString();
+        }
+
+        public static IDictionary<string, Color[]> GetColorPalette(string value)
+        {
+            return value.ToNamedColorStops().ToDictionary(
+                pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
+                pair => pair.Value.ToGradient(),
+                StringComparer.OrdinalIgnoreCase
+            );
         }
     }
 }

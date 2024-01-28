@@ -122,7 +122,6 @@ namespace FoxTunes
             {
                 return false;
             }
-            var colors = PeakMeterConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
             this.RendererData = Create(
                 this,
                 width,
@@ -130,24 +129,24 @@ namespace FoxTunes
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
                 this.Duration.Value,
-                this.GetColorPalettes(this.ColorPalette.Value, this.ShowPeaks.Value, this.ShowRms.Value, this.Colors, this.Orientation),
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.ShowPeaks.Value, this.ShowRms.Value, this.Orientation),
                 this.Orientation
             );
             return true;
         }
 
-        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, Color[] colors, Orientation orientation)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, Orientation orientation)
         {
             var flags = default(int);
-            var palettes = PeakMeterConfiguration.GetColorPalette(value, colors);
+            var palettes = PeakMeterConfiguration.GetColorPalette(value);
             var background = palettes.GetOrAdd(
                 PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
             );
             //Switch the default colors to the VALUE palette if one was provided.
-            colors = palettes.GetOrAdd(
+            var colors = palettes.GetOrAdd(
                 PeakMeterConfiguration.COLOR_PALETTE_VALUE,
-                () => DefaultColors.GetValue(colors)
+                () => DefaultColors.GetValue(new[] { this.ForegroundColor })
             );
             if (showPeak)
             {
@@ -189,7 +188,7 @@ namespace FoxTunes
                             flags |= BitmapHelper.COLOR_FROM_Y;
                         }
                     }
-                    return BitmapHelper.CreatePalette(flags, colors);
+                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, colors), colors);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -218,7 +217,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, false, this.Colors, this.Orientation);
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), false, false, this.Orientation);
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);

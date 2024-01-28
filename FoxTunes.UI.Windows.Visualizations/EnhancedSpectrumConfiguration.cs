@@ -30,8 +30,6 @@ namespace FoxTunes
 
         public const string COLOR_PALETTE_ELEMENT = "EEEE907A-5812-42CD-9844-89362C96C6AF";
 
-        public const string COLOR_PALETTE_THEME = "THEME";
-
         public const string COLOR_PALETTE_PEAK = "PEAK";
 
         public const string COLOR_PALETTE_RMS = "RMS";
@@ -416,29 +414,14 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public static IDictionary<string, Color[]> GetColorPalette(string value, Color[] colors)
+        public static IDictionary<string, Color[]> GetColorPalette(string value)
         {
-            if (!string.IsNullOrEmpty(value))
-            {
-                try
-                {
-                    var palettes = value.ToNamedColorStops().ToDictionary(
-                        pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
-                        pair => pair.Value.ToGradient(),
-                        StringComparer.OrdinalIgnoreCase
-                    );
-                    palettes[COLOR_PALETTE_THEME] = colors;
-                    return palettes;
-                }
-                catch
-                {
-                    //Nothing can be done.
-                }
-            }
-            return new Dictionary<string, Color[]>(StringComparer.OrdinalIgnoreCase)
-            {
-                { COLOR_PALETTE_THEME, colors }
-            };
+            var palettes = value.ToNamedColorStops().ToDictionary(
+                pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
+                pair => pair.Value.ToGradient(),
+                StringComparer.OrdinalIgnoreCase
+            );
+            return palettes;
         }
 
         public static int GetFFTSize(SelectionConfigurationOption fftSize, SelectionConfigurationOption bands)

@@ -13,6 +13,8 @@ namespace FoxTunes
         string Description { get; }
 
         string Value { get; }
+
+        ColorPaletteFlags Flags { get; }
     }
 
     [Flags]
@@ -21,5 +23,12 @@ namespace FoxTunes
         None = 0,
         Visualization = 1,
         WaveForm = 2
+    }
+
+    [Flags]
+    public enum ColorPaletteFlags : byte
+    {
+        None = 0,
+        System = 1
     }
 }

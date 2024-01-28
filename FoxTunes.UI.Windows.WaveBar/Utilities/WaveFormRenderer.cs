@@ -159,7 +159,7 @@ namespace FoxTunes
                 this.Logarithmic.Value,
                 this.Smoothing.Value,
                 mode,
-                this.GetColorPalettes(this.ColorPalette.Value, this.Rms.Value, generatorData.Channels, this.Colors, mode)
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.Rms.Value, generatorData.Channels, mode)
             );
             if (this.RendererData == null)
             {
@@ -169,18 +169,18 @@ namespace FoxTunes
             return true;
         }
 
-        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showRms, int channels, Color[] colors, WaveFormRendererMode mode)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showRms, int channels, WaveFormRendererMode mode)
         {
             var flags = default(int);
-            var palettes = WaveFormStreamPositionConfiguration.GetColorPalette(value, colors);
+            var palettes = WaveFormStreamPositionConfiguration.GetColorPalette(value);
             var background = palettes.GetOrAdd(
                 WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
             );
             //Switch the default colors to the VALUE palette if one was provided.
-            colors = palettes.GetOrAdd(
+            var colors = palettes.GetOrAdd(
                 WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE,
-                () => DefaultColors.GetValue(colors)
+                () => DefaultColors.GetValue(new[] { this.ForegroundColor })
             );
             if (showRms)
             {
@@ -209,7 +209,7 @@ namespace FoxTunes
                             }
                         }
                     }
-                    return BitmapHelper.CreatePalette(flags, colors);
+                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, colors), colors);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -238,7 +238,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, 0, this.Colors, WaveFormRendererMode.None);
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), false, 0, WaveFormRendererMode.None);
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);

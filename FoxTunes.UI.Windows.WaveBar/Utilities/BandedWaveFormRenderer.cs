@@ -14,14 +14,6 @@ namespace FoxTunes
     {
         public object SyncRoot = new object();
 
-        protected override bool LoadColorPalette
-        {
-            get
-            {
-                return false;
-            }
-        }
-
         public BandedWaveFormGenerator.WaveFormGeneratorData GeneratorData { get; private set; }
 
         public WaveFormRendererData RendererData { get; private set; }
@@ -150,7 +142,7 @@ namespace FoxTunes
                 height,
                 this.Logarithmic.Value,
                 this.Smoothing.Value,
-                this.GetColorPalettes(this.ColorPalette.Value, this.Colors)
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value))
             );
             if (this.RendererData == null)
             {
@@ -160,25 +152,29 @@ namespace FoxTunes
             return true;
         }
 
-        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, Color[] colors)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value)
         {
             var flags = default(int);
-            var palettes = BandedWaveFormStreamPositionConfiguration.GetColorPalette(value, colors);
+            var palettes = BandedWaveFormStreamPositionConfiguration.GetColorPalette(value);
             var background = palettes.GetOrAdd(
                 BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
                 () => DefaultColors.GetBackground()
             );
+            var element = palettes.GetOrAdd(
+                BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT,
+                () => new[] { this.ForegroundColor }
+            ); ;
             palettes.GetOrAdd(
                 BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_LOW,
-                () => DefaultColors.GetLow(colors)
+                () => DefaultColors.GetLow(element)
             );
             palettes.GetOrAdd(
                 BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_MID,
-                () => DefaultColors.GetMid(colors)
+                () => DefaultColors.GetMid(element)
             );
             palettes.GetOrAdd(
                 BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_HIGH,
-                () => DefaultColors.GetHigh(colors)
+                () => DefaultColors.GetHigh(element)
             );
             return palettes.ToDictionary(
                 pair => pair.Key,
@@ -189,7 +185,7 @@ namespace FoxTunes
                         return IntPtr.Zero;
                     }
                     flags = 0;
-                    colors = pair.Value;
+                    var colors = pair.Value;
                     if (colors.Length > 1)
                     {
                         flags |= BitmapHelper.COLOR_FROM_Y;
@@ -198,7 +194,7 @@ namespace FoxTunes
                             colors = colors.MirrorGradient(false);
                         }
                     }
-                    return BitmapHelper.CreatePalette(flags, colors);
+                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, colors), colors);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -227,7 +223,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, this.Colors);
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value));
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
