@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [Component("ABCF439D-DE21-4EC6-BFD8-ECC475C3CA2B", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassSkipSilenceStreamAdvisor : BassStreamAdvisor
@@ -36,20 +37,20 @@ namespace FoxTunes
 
             var leadIn = default(TimeSpan);
             var leadOut = default(TimeSpan);
-            if (!this.TryGetSilence(provider, playlistItem, out leadIn, out leadOut))
+            if (!this.TryGetSilence(provider, playlistItem, advice, out leadIn, out leadOut))
             {
                 return;
             }
             advice.Add(new BassSkipSilenceStreamAdvice(playlistItem.FileName, leadIn, leadOut));
         }
 
-        protected virtual bool TryGetSilence(IBassStreamProvider provider, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
+        protected virtual bool TryGetSilence(IBassStreamProvider provider, PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, out TimeSpan leadIn, out TimeSpan leadOut)
         {
             if (TryGetMetaData(this.Behaviour, playlistItem, out leadIn, out leadOut))
             {
                 return true;
             }
-            if (!this.TryCalculateSilence(provider, playlistItem, out leadIn, out leadOut))
+            if (!this.TryCalculateSilence(provider, playlistItem, advice, out leadIn, out leadOut))
             {
                 return false;
             }
@@ -103,11 +104,11 @@ namespace FoxTunes
             );
         }
 
-        protected virtual bool TryCalculateSilence(IBassStreamProvider provider, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
+        protected virtual bool TryCalculateSilence(IBassStreamProvider provider, PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, out TimeSpan leadIn, out TimeSpan leadOut)
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in/out for file \"{0}\".", playlistItem.FileName);
 
-            var stream = provider.CreateBasicStream(playlistItem, Enumerable.Empty<IBassStreamAdvice>(), BassFlags.Decode | BassFlags.Byte);
+            var stream = provider.CreateBasicStream(playlistItem, advice, BassFlags.Decode | BassFlags.Byte);
             if (stream.IsEmpty)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), Bass.LastError));
@@ -118,7 +119,7 @@ namespace FoxTunes
             }
             try
             {
-                var leadInBytes = this.GetLeadIn(stream.ChannelHandle, this.Behaviour.Threshold);
+                var leadInBytes = this.GetLeadIn(stream, this.Behaviour.Threshold);
                 if (leadInBytes == -1)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to calculate lead in for file \"{0}\": Track was considered silent.", playlistItem.FileName);
@@ -127,7 +128,7 @@ namespace FoxTunes
                     leadOut = default(TimeSpan);
                     return false;
                 }
-                var leadOutBytes = this.GetLeadOut(stream.ChannelHandle, this.Behaviour.Threshold);
+                var leadOutBytes = this.GetLeadOut(stream, this.Behaviour.Threshold);
                 if (leadOutBytes == -1)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to calculate lead out for file \"{0}\": Track was considered silent.", playlistItem.FileName);
@@ -159,18 +160,18 @@ namespace FoxTunes
             }
         }
 
-        protected virtual long GetLeadIn(int channelHandle, int threshold)
+        protected virtual long GetLeadIn(IBassStream stream, int threshold)
         {
-            Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in for channel {0} with window of {1} seconds and threshold of {2}dB.", channelHandle, WINDOW, threshold);
+            Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in for channel {0} with window of {1} seconds and threshold of {2}dB.", stream.ChannelHandle, WINDOW, threshold);
 
             var length = Bass.ChannelSeconds2Bytes(
-                channelHandle,
+                stream.ChannelHandle,
                 WINDOW
             );
             var position = 0;
-            if (!this.TrySetPosition(channelHandle, position))
+            if (!this.TrySetPosition(stream, position))
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", channelHandle);
+                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", stream.ChannelHandle);
 
                 //Track won't synchronize. MOD files seem to have this problem.                
                 return -1;
@@ -178,9 +179,9 @@ namespace FoxTunes
             do
             {
                 var levels = new float[1];
-                if (!Bass.ChannelGetLevel(channelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
+                if (!Bass.ChannelGetLevel(stream.ChannelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", channelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", stream.ChannelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
 
                     break;
                 }
@@ -190,15 +191,15 @@ namespace FoxTunes
                     //TODO: Sometimes this value is less than zero so clamp it.
                     //TODO: Some problem with BASS/ManagedBass, if you have exactly N bytes available call Bass.ChannelGetLevel with Length = Bass.ChannelBytesToSeconds(N) sometimes results in Errors.Ended.
                     //TODO: Nuts.
-                    var leadIn = Math.Max(Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes) - length, 0);
+                    var leadIn = Math.Max(stream.Position - length, 0);
 
                     if (leadIn > 0)
                     {
-                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: {1} bytes.", channelHandle, leadIn);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: {1} bytes.", stream.ChannelHandle, leadIn);
                     }
                     else
                     {
-                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: None.", channelHandle);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: None.", stream.ChannelHandle);
                     }
 
                     return leadIn;
@@ -208,21 +209,17 @@ namespace FoxTunes
             return -1;
         }
 
-        protected virtual long GetLeadOut(int channelHandle, int threshold)
+        protected virtual long GetLeadOut(IBassStream stream, int threshold)
         {
-            Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead out for channel {0} with window of {1} seconds and threshold of {2}dB.", channelHandle, WINDOW, threshold);
+            Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead out for channel {0} with window of {1} seconds and threshold of {2}dB.", stream.ChannelHandle, WINDOW, threshold);
 
             var length = Bass.ChannelSeconds2Bytes(
-                channelHandle,
+                stream.ChannelHandle,
                 WINDOW
             );
-            var position = Bass.ChannelGetLength(
-                channelHandle,
-                PositionFlags.Bytes
-            ) - (length * 2);
-            if (!this.TrySetPosition(channelHandle, position))
+            if (!this.TrySetPosition(stream, stream.Length - (length * 2)))
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", channelHandle);
+                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", stream.ChannelHandle);
 
                 //Track won't synchronize. MOD files seem to have this problem.
                 return -1;
@@ -230,9 +227,9 @@ namespace FoxTunes
             do
             {
                 var levels = new float[1];
-                if (!Bass.ChannelGetLevel(channelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
+                if (!Bass.ChannelGetLevel(stream.ChannelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", channelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", stream.ChannelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
 
                     break;
                 }
@@ -242,27 +239,20 @@ namespace FoxTunes
                     //TODO: Sometimes this value is less than zero so clamp it.
                     //TODO: Some problem with BASS/ManagedBass, if you have exactly N bytes available call Bass.ChannelGetLevel with Length = Bass.ChannelBytesToSeconds(N) sometimes results in Errors.Ended.
                     //TODO: Nuts.
-                    var leadOut = Math.Max(Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes) - Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes) - length, 0);
+                    var leadOut = Math.Max(stream.Length - stream.Position - length, 0);
 
                     if (leadOut > 0)
                     {
-                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: {1} bytes.", channelHandle, leadOut);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: {1} bytes.", stream.ChannelHandle, leadOut);
                     }
                     else
                     {
-                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: None.", channelHandle);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: None.", stream.ChannelHandle);
                     }
 
                     return leadOut;
                 }
-                if (!Bass.ChannelSetPosition(
-                    channelHandle,
-                    Bass.ChannelGetPosition(
-                        channelHandle,
-                        PositionFlags.Bytes
-                    ) - (length * 2),
-                    PositionFlags.Bytes
-                ))
+                if (!this.TrySetPosition(stream, stream.Position - (length * 2)))
                 {
                     break;
                 }
@@ -271,16 +261,9 @@ namespace FoxTunes
             return -1;
         }
 
-        protected virtual bool TrySetPosition(int channelHandle, long position)
+        protected virtual bool TrySetPosition(IBassStream stream, long position)
         {
-            BassUtils.OK(
-                Bass.ChannelSetPosition(
-                    channelHandle,
-                    position,
-                    PositionFlags.Bytes
-                )
-            );
-            return Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes) == position;
+            return (stream.Position = position) == position;
         }
 
         public static bool TryGetMetaData(BassSkipSilenceStreamAdvisorBehaviour behaviour, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
