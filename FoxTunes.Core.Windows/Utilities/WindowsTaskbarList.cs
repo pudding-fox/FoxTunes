@@ -134,10 +134,10 @@ namespace FoxTunes
 
             // ITaskbarList3
             [PreserveSig]
-            void SetProgressValue(IntPtr hwnd, UInt64 ullCompleted, UInt64 ullTotal);
+            HResult SetProgressValue(IntPtr hwnd, UInt64 ullCompleted, UInt64 ullTotal);
 
             [PreserveSig]
-            void SetProgressState(IntPtr hwnd, TaskbarProgressBarStatus tbpFlags);
+            HResult SetProgressState(IntPtr hwnd, TaskbarProgressBarStatus tbpFlags);
 
             [PreserveSig]
             void RegisterTab(IntPtr hwndTab, IntPtr hwndMDI);

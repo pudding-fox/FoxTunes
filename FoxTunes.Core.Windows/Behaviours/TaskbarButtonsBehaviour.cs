@@ -65,6 +65,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Enabled { get; private set; }
 
+        public BooleanConfigurationElement Progress { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             if (TaskbarButtonsBehaviourConfiguration.IsPlatformSupported)
@@ -91,6 +93,10 @@ namespace FoxTunes
                     }
                     this.Update();
                 });
+                this.Progress = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    TaskbarButtonsBehaviourConfiguration.SECTION,
+                    TaskbarButtonsBehaviourConfiguration.PROGRESS_ELEMENT
+                );
             }
             else
             {
@@ -235,12 +241,23 @@ namespace FoxTunes
                         return;
                     }
                 }
+                if (this.Progress.Value)
+                {
+                    await this.UpdateProgress(handle).ConfigureAwait(false);
+                }
             }
             else
             {
                 if (flags.HasFlag(TaskbarButtonsWindowFlags.ButtonsCreated))
                 {
                     if (!await this.UpdateButtons(handle).ConfigureAwait(false))
+                    {
+                        return;
+                    }
+                }
+                if (flags.HasFlag(TaskbarButtonsWindowFlags.ProgressCreated))
+                {
+                    if (!await this.UpdateProgress(handle).ConfigureAwait(false))
                     {
                         return;
                     }
@@ -593,6 +610,152 @@ namespace FoxTunes
             }
         }
 
+        protected virtual async Task<bool> UpdateProgress(IntPtr handle)
+        {
+            if (await this.UpdateTaskProgress(handle).ConfigureAwait(false))
+            {
+                return true;
+            }
+            if (await this.UpdatePlaybackProgress(handle).ConfigureAwait(false))
+            {
+                return true;
+            }
+            if (this.Windows[handle].HasFlag(TaskbarButtonsWindowFlags.ProgressCreated))
+            {
+                return await this.ClearProgress(handle).ConfigureAwait(false);
+            }
+            return true;
+        }
+
+        protected virtual async Task<bool> UpdateTaskProgress(IntPtr handle)
+        {
+            var backgroundTask = BackgroundTask.Active.FirstOrDefault(_backgroundTask => _backgroundTask.Visible);
+            if (backgroundTask == null)
+            {
+                return false;
+            }
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            var result = default(WindowsTaskbarList.HResult);
+            await this.Invoke(
+                source.Dispatcher,
+                () =>
+                {
+                    if (backgroundTask.Count != 0)
+                    {
+                        result = WindowsTaskbarList.Instance.SetProgressValue(
+                            handle,
+                            Convert.ToUInt64(backgroundTask.Position),
+                            Convert.ToUInt64(backgroundTask.Count)
+                        );
+                    }
+                    else
+                    {
+                        result = WindowsTaskbarList.Instance.SetProgressState(
+                            handle,
+                            WindowsTaskbarList.TaskbarProgressBarStatus.Indeterminate
+                        );
+                    }
+                }
+            ).ConfigureAwait(false);
+            if (result != WindowsTaskbarList.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                return false;
+            }
+            else
+            {
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.ProgressCreated;
+                return true;
+            }
+        }
+
+        protected virtual async Task<bool> UpdatePlaybackProgress(IntPtr handle)
+        {
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream == null)
+            {
+                return false;
+            }
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            var result = default(WindowsTaskbarList.HResult);
+            await this.Invoke(
+                source.Dispatcher,
+                () =>
+                {
+                    result = WindowsTaskbarList.Instance.SetProgressValue(
+                        handle,
+                        Convert.ToUInt64(outputStream.Position),
+                        Convert.ToUInt64(outputStream.Length)
+                    );
+                    if (outputStream.IsPaused && result == WindowsTaskbarList.HResult.Ok)
+                    {
+                        result = WindowsTaskbarList.Instance.SetProgressState(
+                            handle,
+                            WindowsTaskbarList.TaskbarProgressBarStatus.Paused
+                        );
+                    }
+                    else
+                    {
+                        result = WindowsTaskbarList.Instance.SetProgressState(
+                            handle,
+                            WindowsTaskbarList.TaskbarProgressBarStatus.Normal
+                        );
+                    }
+                }
+            ).ConfigureAwait(false);
+            if (result != WindowsTaskbarList.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                return false;
+            }
+            else
+            {
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.ProgressCreated;
+                return true;
+            }
+        }
+
+        protected virtual async Task<bool> ClearProgress(IntPtr handle)
+        {
+            var source = HwndSource.FromHwnd(handle);
+            if (source == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                return false;
+            }
+            var result = default(WindowsTaskbarList.HResult);
+            await this.Invoke(
+                source.Dispatcher,
+                () => result = WindowsTaskbarList.Instance.SetProgressState(
+                    handle,
+                    WindowsTaskbarList.TaskbarProgressBarStatus.NoProgress
+                )
+            ).ConfigureAwait(false);
+            if (result != WindowsTaskbarList.HResult.Ok)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
+                return false;
+            }
+            else
+            {
+                this.Windows[handle] &= ~TaskbarButtonsWindowFlags.ProgressCreated;
+                return true;
+            }
+        }
+
         protected virtual IEnumerable<WindowsTaskbarList.ThumbButton> Buttons
         {
             get
@@ -712,7 +875,7 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Previous button was clicked.");
             await this.PlaylistManager.Previous().ConfigureAwait(false);
-            this.UpdateButtons();
+            var task = this.UpdateButtons();
         }
 
         protected virtual async Task PlayPause()
@@ -734,14 +897,14 @@ namespace FoxTunes
                     await currentStream.Pause().ConfigureAwait(false);
                 }
             }
-            this.UpdateButtons();
+            var task = this.UpdateButtons();
         }
 
         protected virtual async Task Next()
         {
             Logger.Write(this, LogLevel.Debug, "Next button was clicked.");
             await this.PlaylistManager.Next().ConfigureAwait(false);
-            this.UpdateButtons();
+            var task = this.UpdateButtons();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -802,6 +965,7 @@ namespace FoxTunes
         ImagesCreated = 2,
         ButtonsCreated = 4,
         Error = 8,
-        Destroyed = 16
+        Destroyed = 16,
+        ProgressCreated = 32
     }
 }

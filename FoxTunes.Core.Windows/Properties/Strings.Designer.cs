@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -111,6 +111,33 @@ namespace FoxTunes {
         internal static string ExecutionStateBehaviourConfiguration_SleepSystem {
             get {
                 return ResourceManager.GetString("ExecutionStateBehaviourConfiguration.SleepSystem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string TaskbarButtonsBehaviourConfiguration_Enabled {
+            get {
+                return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Progress.
+        /// </summary>
+        internal static string TaskbarButtonsBehaviourConfiguration_Progress {
+            get {
+                return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Progress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Taskbar Buttons.
+        /// </summary>
+        internal static string TaskbarButtonsBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Section", resourceCulture);
             }
         }
     }
