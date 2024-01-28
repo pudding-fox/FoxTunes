@@ -23,19 +23,17 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             using (var transaction = this.Database.BeginTransaction())
             {
                 this.AddPlaylistItems(transaction);
                 this.ShiftItems(transaction);
-                this.AddOrUpdateMetaDataFromLibrary(transaction);
                 this.SequenceItems(transaction);
                 this.SetPlaylistItemsStatus(transaction);
                 transaction.Commit();
             }
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
-            return Task.CompletedTask;
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
         private void AddPlaylistItems(ITransactionSource transaction)

@@ -7,8 +7,6 @@ namespace FoxTunes.Interfaces
     {
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }
 
-        IDatabaseQuery AddLibraryHierarchyRecord { get; }
-
         IDatabaseQuery AddPlaylistSequenceRecord { get; }
 
         IDatabaseQuery AddLibraryItem { get; }
@@ -23,8 +21,6 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery ClearLibrary { get; }
 
-        IDatabaseQuery CopyMetaDataItems { get; }
-
         IDatabaseQuery GetPlaylistItemsWithoutMetaData { get; }
 
         IDatabaseQuery GetLibraryItems { get; }
@@ -36,12 +32,6 @@ namespace FoxTunes.Interfaces
         IDatabaseQuery GetLibraryHierarchyNodes { get; }
 
         IDatabaseQuery GetLibraryHierarchyNodesWithFilter { get; }
-
-        IDatabaseQuery SetLibraryItemStatus { get; }
-
-        IDatabaseQuery SetPlaylistItemStatus { get; }
-
-        IDatabaseQuery ShiftPlaylistItems { get; }
 
         IDatabaseQuery VariousArtists { get; }
 

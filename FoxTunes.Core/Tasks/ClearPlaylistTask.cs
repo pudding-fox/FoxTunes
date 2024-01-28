@@ -14,13 +14,12 @@ namespace FoxTunes
 
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
             this.Database.Execute(this.Database.Queries.ClearPlaylist);
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
-            return Task.CompletedTask;
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
     }
 }

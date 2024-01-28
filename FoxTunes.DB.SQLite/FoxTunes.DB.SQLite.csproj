@@ -93,24 +93,20 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
-    <None Include="Resources\AddLibraryHierarchyRecord.sql" />
     <None Include="Resources\AddLibraryItem.sql" />
     <None Include="Resources\AddPlaylistItem.sql" />
     <None Include="Resources\AddPlaylistSequenceRecord.sql" />
     <None Include="Resources\ClearPlaylist.sql" />
-    <None Include="Resources\CopyMetaDataItems.sql" />
     <None Include="Resources\Database.sql" />
     <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
     <None Include="Resources\GetLibraryHierarchyNodes.sql" />
     <None Include="Resources\GetLibraryHierarchyNodesWithFilter.sql" />
-    <None Include="Resources\SetLibraryItemStatus.sql" />
-    <None Include="Resources\SetPlaylistItemStatus.sql" />
-    <None Include="Resources\ShiftPlaylistItems.sql" />
     <None Include="Resources\VariousArtists.sql" />
   </ItemGroup>
   <ItemGroup>

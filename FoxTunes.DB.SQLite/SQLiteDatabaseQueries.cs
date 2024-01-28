@@ -4,7 +4,6 @@ using FoxTunes.Interfaces;
 using FoxTunes.Templates;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -30,15 +29,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.AddLibraryHierarchyNodeToPlaylist, "libraryHierarchyItemId", "sequence", "status");
-            }
-        }
-
-        public IDatabaseQuery AddLibraryHierarchyRecord
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.AddLibraryHierarchyRecord, "libraryHierarchyId", "libraryHierarchyLevelId", "libraryItemId", "displayValue", "sortValue", "isLeaf");
+                return this.Database.QueryFactory.Create(Resources.AddLibraryHierarchyNodeToPlaylist, "libraryHierarchyItemId", "sequence", "status");
             }
         }
 
@@ -46,7 +37,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.AddPlaylistSequenceRecord, "playlistItemId", "value1", "value2", "value3", "value4", "value5", "value6", "value7", "value8", "value9", "value10");
+                return this.Database.QueryFactory.Create(Resources.AddPlaylistSequenceRecord, "playlistItemId", "value1", "value2", "value3", "value4", "value5", "value6", "value7", "value8", "value9", "value10");
             }
         }
 
@@ -54,7 +45,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.AddLibraryItem, "directoryName", "fileName", "status");
+                return this.Database.QueryFactory.Create(Resources.AddLibraryItem, "directoryName", "fileName", "status");
             }
         }
 
@@ -62,7 +53,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.AddLibraryMetaDataItems, "itemId", "name", "type", "numericValue", "textValue", "fileValue");
+                return this.Database.QueryFactory.Create(Resources.AddLibraryMetaDataItems, "itemId", "name", "type", "numericValue", "textValue", "fileValue");
             }
         }
 
@@ -70,7 +61,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.AddPlaylistItem, "sequence", "directoryName", "fileName", "status");
+                return this.Database.QueryFactory.Create(Resources.AddPlaylistItem, "sequence", "directoryName", "fileName", "status");
             }
         }
 
@@ -78,7 +69,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.AddPlaylistMetaDataItems, "itemId", "name", "type", "numericValue", "textValue", "fileValue");
+                return this.Database.QueryFactory.Create(Resources.AddPlaylistMetaDataItems, "itemId", "name", "type", "numericValue", "textValue", "fileValue");
             }
         }
 
@@ -86,7 +77,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.ClearPlaylist);
+                return this.Database.QueryFactory.Create(Resources.ClearPlaylist);
             }
         }
 
@@ -94,15 +85,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.CLearLibrary);
-            }
-        }
-
-        public IDatabaseQuery CopyMetaDataItems
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.CopyMetaDataItems, "status");
+                return this.Database.QueryFactory.Create(Resources.CLearLibrary);
             }
         }
 
@@ -110,7 +93,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.GetPlaylistItemsWithoutMetaData, "status");
+                return this.Database.QueryFactory.Create(Resources.GetPlaylistItemsWithoutMetaData, "status");
             }
         }
 
@@ -118,7 +101,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.GetLibraryItems, "status");
+                return this.Database.QueryFactory.Create(Resources.GetLibraryItems, "status");
             }
         }
 
@@ -126,7 +109,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.GetLibraryHierarchyMetaDataItems, "libraryHierarchyItemId", "type");
+                return this.Database.QueryFactory.Create(Resources.GetLibraryHierarchyMetaDataItems, "libraryHierarchyItemId", "type");
             }
         }
 
@@ -134,7 +117,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.GetPlaylistMetaDataItems, "playlistItemId", "type");
+                return this.Database.QueryFactory.Create(Resources.GetPlaylistMetaDataItems, "playlistItemId", "type");
             }
         }
 
@@ -142,7 +125,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.GetLibraryHierarchyNodes, "libraryHierarchyId", "libraryHierarchyItemId");
+                return this.Database.QueryFactory.Create(Resources.GetLibraryHierarchyNodes, "libraryHierarchyId", "libraryHierarchyItemId");
             }
         }
 
@@ -150,31 +133,7 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.GetLibraryHierarchyNodesWithFilter, "libraryHierarchyId", "libraryHierarchyItemId", "filter");
-            }
-        }
-
-        public IDatabaseQuery SetLibraryItemStatus
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.SetLibraryItemStatus, "status");
-            }
-        }
-
-        public IDatabaseQuery SetPlaylistItemStatus
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.SetPlaylistItemStatus, "status");
-            }
-        }
-
-        public IDatabaseQuery ShiftPlaylistItems
-        {
-            get
-            {
-                return new DatabaseQuery(Resources.ShiftPlaylistItems, "status", "sequence", "offset");
+                return this.Database.QueryFactory.Create(Resources.GetLibraryHierarchyNodesWithFilter, "libraryHierarchyId", "libraryHierarchyItemId", "filter");
             }
         }
 
@@ -182,27 +141,27 @@ namespace FoxTunes
         {
             get
             {
-                return new DatabaseQuery(Resources.VariousArtists, "name", "type", "numericValue");
+                return this.Database.QueryFactory.Create(Resources.VariousArtists, "name", "type", "numericValue");
             }
         }
-        
+
         public IDatabaseQuery PlaylistSequenceBuilder(IEnumerable<string> metaDataNames)
         {
-            var playlistSequenceBuilder = new PlaylistSequenceBuilder(metaDataNames);
-            return new DatabaseQuery(playlistSequenceBuilder.TransformText(), "status");
+            var playlistSequenceBuilder = new PlaylistSequenceBuilder(this.Database, metaDataNames);
+            return this.Database.QueryFactory.Create(playlistSequenceBuilder.TransformText(), "status");
         }
 
         public IDatabaseQuery LibraryHierarchyBuilder(IEnumerable<string> metaDataNames)
         {
-            var playlistSequenceBuilder = new LibraryHierarchyBuilder(metaDataNames);
-            return new DatabaseQuery(playlistSequenceBuilder.TransformText());
+            var playlistSequenceBuilder = new LibraryHierarchyBuilder(this.Database, metaDataNames);
+            return this.Database.QueryFactory.Create(playlistSequenceBuilder.TransformText());
         }
 
         public IDatabaseQuery GetMetaDataNames
         {
             get
             {
-                return new DatabaseQuery(Resources.GetMetaDataNames);
+                return this.Database.QueryFactory.Create(Resources.GetMetaDataNames);
             }
         }
     }

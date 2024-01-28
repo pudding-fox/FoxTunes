@@ -66,6 +66,7 @@ namespace FoxTunes.Templates
             
             #line 92 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
+		this.Database,
 		"VerticalMetaData", 
 		new[] { "Id", "FileName" }, 
 		new[] { "Name" }, 
@@ -81,7 +82,7 @@ namespace FoxTunes.Templates
 SELECT ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_Id"", ""LibraryHierarchyLevels"".""Id"" AS ""LibraryHierarchyLevel_Id"", ""HorizontalMetaData"".""Id"" AS ""LibraryItem_Id"", ""HorizontalMetaData"".""FileName"", ""LibraryHierarchyLevels"".""DisplayScript"", ""LibraryHierarchyLevels"".""SortScript""
 ");
             
-            #line 104 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
+            #line 105 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
 
 	for(var index = 0; index < this.MetaDataNames.Length; index++)
 	{
@@ -91,21 +92,21 @@ SELECT ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_
             #line hidden
             this.Write(",\"Key_");
             
-            #line 107 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
+            #line 108 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 107 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
+            #line 108 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 107 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
+            #line 108 "D:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
 
 	}
 

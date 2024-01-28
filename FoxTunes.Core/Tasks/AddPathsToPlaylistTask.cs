@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -39,20 +40,18 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             using (ITransactionSource transaction = this.Database.BeginTransaction())
             {
                 this.AddPlaylistItems(transaction);
                 this.ShiftItems(transaction);
-                this.AddOrUpdateMetaDataFromLibrary(transaction);
                 this.AddOrUpdateMetaData(transaction);
                 this.SequenceItems(transaction);
                 this.SetPlaylistItemsStatus(transaction);
                 transaction.Commit();
             }
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
-            return Task.CompletedTask;
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
         private void AddPlaylistItems(ITransactionSource transaction)
@@ -60,7 +59,7 @@ namespace FoxTunes
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
             var parameters = default(IDatabaseParameters);
-            using (var command = this.Database.Connection.CreateCommand(this.Database.Queries.AddPlaylistItem, out parameters))
+            using (var command = this.Database.CreateCommand(this.Database.Queries.AddPlaylistItem, out parameters))
             {
                 transaction.Bind(command);
                 var count = 0;
@@ -103,13 +102,15 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Fetching meta data for new playlist items.");
             using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddPlaylistMetaDataItems, true))
             {
-                var enumerable = this.Database.ExecuteEnumerator<PlaylistItem>(this.Database.Queries.GetPlaylistItemsWithoutMetaData, parameters => parameters["status"] = PlaylistItemStatus.Import, transaction);
+                var query = this.Database
+                    .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database)))
+                    .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any());
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
                 metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
                 metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                metaDataPopulator.Populate(enumerable);
+                metaDataPopulator.Populate(query);
             }
         }
     }
