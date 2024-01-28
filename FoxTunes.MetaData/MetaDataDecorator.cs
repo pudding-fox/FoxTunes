@@ -43,6 +43,10 @@ namespace FoxTunes
             var providers = this.MetaDataProviderManager.GetProviders();
             foreach (var provider in providers)
             {
+                if (!provider.Enabled)
+                {
+                    continue;
+                }
                 try
                 {
                     var factory = this.MetaDataProviderManager.GetProvider(provider);
@@ -68,6 +72,10 @@ namespace FoxTunes
             var providers = this.MetaDataProviderManager.GetProviders();
             foreach (var provider in providers)
             {
+                if (!provider.Enabled)
+                {
+                    continue;
+                }
                 try
                 {
                     var factory = this.MetaDataProviderManager.GetProvider(provider);
