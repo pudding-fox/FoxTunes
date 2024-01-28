@@ -60,10 +60,23 @@ namespace FoxTunes
             {
                 roots = await this.GetRoots().ConfigureAwait(false);
             }
+            await this.CheckPaths(roots).ConfigureAwait(false);
             await this.RescanLibrary().ConfigureAwait(false);
             await this.RemoveHierarchies(LibraryItemStatus.Remove).ConfigureAwait(false);
             await this.RemoveItems(LibraryItemStatus.Remove).ConfigureAwait(false);
             await this.AddPaths(roots, true).ConfigureAwait(false);
+        }
+
+        protected virtual async Task CheckPaths(IEnumerable<string> paths)
+        {
+            foreach (var path in paths)
+            {
+                if (!NetworkDrive.IsRemotePath(path))
+                {
+                    continue;
+                }
+                await NetworkDrive.ConnectRemotePath(path).ConfigureAwait(false);
+            }
         }
 
         protected virtual async Task RescanLibrary()
