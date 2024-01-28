@@ -466,6 +466,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Simple.
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Simple_1 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Simple.1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simple (With Library).
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Simple_2 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Simple.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stack Grid.
         /// </summary>
         internal static string UIComponentStackContainer_Name {

@@ -15,6 +15,10 @@ namespace FoxTunes
 
             public const string C = "CCCCEA3C-E75C-48CE-B15D-B11873448DE2";
 
+            public const string D = "DDDD8DCA-65F9-4704-8AAC-17631219E70D";
+
+            public const string E = "EEEE2131-1882-43BE-9FCC-AE0EECA67EFD";
+
             public static readonly IEnumerable<Preset> Presets = new[]
             {
                 new Preset(
@@ -31,6 +35,16 @@ namespace FoxTunes
                     C,
                     Strings.UIComponentLayoutProviderPresets_Main_3,
                     Resources.Main_3
+                ),
+                new Preset(
+                    D,
+                    Strings.UIComponentLayoutProviderPresets_Simple_1,
+                    Resources.Simple_1
+                ),
+                new Preset(
+                    E,
+                    Strings.UIComponentLayoutProviderPresets_Simple_2,
+                    Resources.Simple_2
                 ),
             };
         }
