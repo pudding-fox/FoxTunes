@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public const string NEW = "AAAA";
 
+        public const string MANAGE = "BBBB";
+
         public ToolWindowBehaviour()
         {
             this.Debouncer = new Debouncer(TIMEOUT);
@@ -32,8 +34,12 @@ namespace FoxTunes
 
         public IDictionary<ToolWindowConfiguration, ToolWindow> Windows { get; private set; }
 
+        public bool IsLoaded { get; private set; }
+
         protected virtual async Task Load()
         {
+            //Whatever happens we're ready.
+            this.IsLoaded = true;
             if (!string.IsNullOrEmpty(this.Element.Value))
             {
                 try
@@ -51,7 +57,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task Load(ToolWindowConfiguration config)
+        protected virtual async Task<ToolWindow> Load(ToolWindowConfiguration config)
         {
             try
             {
@@ -62,15 +68,48 @@ namespace FoxTunes
                     window.DataContext = this.Core;
                     window.Configuration = config;
                     window.Closed += this.OnClosed;
-                    window.Show();
                 }).ConfigureAwait(false);
                 this.Windows[config] = window;
                 config.PropertyChanged += this.OnConfigPropertyChanged;
+                return window;
             }
             catch (Exception e)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
+                return null;
             }
+        }
+
+        protected virtual async Task Show()
+        {
+            foreach (var pair in this.Windows)
+            {
+                await this.Show(pair.Key, pair.Value).ConfigureAwait(false);
+            }
+        }
+
+        protected virtual Task Show(ToolWindowConfiguration config, ToolWindow window)
+        {
+            var show = false;
+            var main = global::FoxTunes.Windows.IsMainWindowCreated && global::FoxTunes.Windows.MainWindow.IsVisible;
+            var mini = global::FoxTunes.Windows.IsMiniWindowCreated && global::FoxTunes.Windows.MiniWindow.IsVisible;
+            if (config.ShowWithMainWindow && main)
+            {
+                show = true;
+            }
+            else if (config.ShowWithMiniWindow && mini)
+            {
+                show = true;
+            }
+            if (show)
+            {
+                return global::FoxTunes.Windows.Invoke(window.Show);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected virtual void Unload(ToolWindowConfiguration config)
@@ -116,6 +155,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            global::FoxTunes.Windows.ActiveWindowChanged += this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
             this.Core = core;
             this.Configuration = core.Components.Configuration;
@@ -125,6 +165,15 @@ namespace FoxTunes
             );
             var task = this.Load();
             base.InitializeComponent(core);
+        }
+
+        protected virtual async void OnActiveWindowChanged(object sender, EventArgs e)
+        {
+            if (!this.IsLoaded)
+            {
+                await this.Load().ConfigureAwait(false);
+            }
+            await this.Show().ConfigureAwait(false);
         }
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
@@ -137,6 +186,7 @@ namespace FoxTunes
             get
             {
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
             }
         }
 
@@ -146,6 +196,8 @@ namespace FoxTunes
             {
                 case NEW:
                     return this.New();
+                case MANAGE:
+                    return this.Manage();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -154,13 +206,33 @@ namespace FoxTunes
 #endif
         }
 
-        public Task New()
+        public async Task New()
         {
-            return this.Load(new ToolWindowConfiguration()
+            var config = new ToolWindowConfiguration()
             {
                 Title = "New Window",
                 Width = 400,
-                Height = 250
+                Height = 250,
+                ShowWithMainWindow = true,
+                ShowWithMiniWindow = false
+            };
+            var window = await this.Load(config).ConfigureAwait(false);
+            if (window == null)
+            {
+                return;
+            }
+            await this.Show(config, window).ConfigureAwait(false);
+        }
+
+        public Task Manage()
+        {
+            return global::FoxTunes.Windows.Invoke(() =>
+            {
+                if (!global::FoxTunes.Windows.IsToolWindowManagerWindowCreated)
+                {
+                    global::FoxTunes.Windows.ToolWindowManagerWindow.DataContext = this.Core;
+                    global::FoxTunes.Windows.ToolWindowManagerWindow.Show();
+                }
             });
         }
 
@@ -175,6 +247,19 @@ namespace FoxTunes
                 }
                 this.Windows.Clear();
             });
+        }
+
+        public async Task Update(IEnumerable<ToolWindowConfiguration> configs)
+        {
+            if (this.IsLoaded)
+            {
+                await this.Shutdown().ConfigureAwait(false);
+            }
+            foreach (var config in configs)
+            {
+                await this.Load(config).ConfigureAwait(false);
+            }
+            this.Save();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -357,31 +442,109 @@ namespace FoxTunes
 
         public event EventHandler HeightChanged;
 
-        private string _Content { get; set; }
+        private UIComponentConfiguration _Component { get; set; }
 
-        public string Content
+        public UIComponentConfiguration Component
         {
             get
             {
-                return this._Content;
+                return this._Component;
             }
             set
             {
-                this._Content = value;
-                this.OnContentChanged();
+                this._Component = value;
+                this.OnComponentChanged();
             }
         }
 
-        protected virtual void OnContentChanged()
+        protected virtual void OnComponentChanged()
         {
-            if (this.ContentChanged != null)
+            if (this.ComponentChanged != null)
             {
-                this.ContentChanged(this, EventArgs.Empty);
+                this.ComponentChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Content");
+            this.OnPropertyChanged("Component");
         }
 
-        public event EventHandler ContentChanged;
+        public event EventHandler ComponentChanged;
+
+        private bool _ShowWithMainWindow { get; set; }
+
+        public bool ShowWithMainWindow
+        {
+            get
+            {
+                return this._ShowWithMainWindow;
+            }
+            set
+            {
+                this._ShowWithMainWindow = value;
+                this.OnShowWithMainWindowChanged();
+            }
+        }
+
+        protected virtual void OnShowWithMainWindowChanged()
+        {
+            if (this.ShowWithMainWindowChanged != null)
+            {
+                this.ShowWithMainWindowChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowWithMainWindow");
+        }
+
+        public event EventHandler ShowWithMainWindowChanged;
+
+        private bool _ShowWithMiniWindow { get; set; }
+
+        public bool ShowWithMiniWindow
+        {
+            get
+            {
+                return this._ShowWithMiniWindow;
+            }
+            set
+            {
+                this._ShowWithMiniWindow = value;
+                this.OnShowWithMiniWindowChanged();
+            }
+        }
+
+        protected virtual void OnShowWithMiniWindowChanged()
+        {
+            if (this.ShowWithMiniWindowChanged != null)
+            {
+                this.ShowWithMiniWindowChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowWithMiniWindow");
+        }
+
+        public event EventHandler ShowWithMiniWindowChanged;
+
+        private bool _AlwaysOnTop { get; set; }
+
+        public bool AlwaysOnTop
+        {
+            get
+            {
+                return this._AlwaysOnTop;
+            }
+            set
+            {
+                this._AlwaysOnTop = value;
+                this.OnAlwaysOnTopChanged();
+            }
+        }
+
+        protected virtual void OnAlwaysOnTopChanged()
+        {
+            if (this.AlwaysOnTopChanged != null)
+            {
+                this.AlwaysOnTopChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("AlwaysOnTop");
+        }
+
+        public event EventHandler AlwaysOnTopChanged;
 
         #region ISerializable
 
@@ -392,7 +555,10 @@ namespace FoxTunes
             this.Top = info.GetInt32(nameof(this.Top));
             this.Width = info.GetInt32(nameof(this.Width));
             this.Height = info.GetInt32(nameof(this.Height));
-            this.Content = info.GetString(nameof(this.Content));
+            this.Component = (UIComponentConfiguration)info.GetValue(nameof(this.Component), typeof(UIComponentConfiguration));
+            this.ShowWithMainWindow = info.GetBoolean(nameof(this.ShowWithMainWindow));
+            this.ShowWithMiniWindow = info.GetBoolean(nameof(this.ShowWithMiniWindow));
+            this.AlwaysOnTop = info.GetBoolean(nameof(this.AlwaysOnTop));
         }
 
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
@@ -403,7 +569,10 @@ namespace FoxTunes
             info.AddValue(nameof(this.Top), this.Top);
             info.AddValue(nameof(this.Width), this.Width);
             info.AddValue(nameof(this.Height), this.Height);
-            info.AddValue(nameof(this.Content), this.Content);
+            info.AddValue(nameof(this.Component), this.Component);
+            info.AddValue(nameof(this.ShowWithMainWindow), this.ShowWithMainWindow);
+            info.AddValue(nameof(this.ShowWithMiniWindow), this.ShowWithMiniWindow);
+            info.AddValue(nameof(this.AlwaysOnTop), this.AlwaysOnTop);
         }
 
         #endregion

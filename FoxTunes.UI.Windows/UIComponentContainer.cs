@@ -11,7 +11,7 @@ namespace FoxTunes
 {
     public class UIComponentContainer : ContentControl, IUIComponent, IValueConverter
     {
-        public static readonly IConfiguration Configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
         protected static ILogger Logger
         {
@@ -21,58 +21,31 @@ namespace FoxTunes
             }
         }
 
-        public static readonly DependencyProperty ContentNameProperty = DependencyProperty.Register(
-           "ContentName",
-           typeof(string),
+        public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
+           "Component",
+           typeof(UIComponentConfiguration),
            typeof(UIComponentContainer),
-           new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnContentNameChanged))
+           new PropertyMetadata(new PropertyChangedCallback(OnComponentChanged))
        );
 
-        public static string GetContentName(UIComponentContainer source)
+        public static UIComponentConfiguration GetComponent(UIComponentContainer source)
         {
-            return (string)source.GetValue(ContentNameProperty);
+            return (UIComponentConfiguration)source.GetValue(ComponentProperty);
         }
 
-        public static void SetContentName(UIComponentContainer source, string value)
+        public static void SetComponent(UIComponentContainer source, UIComponentConfiguration value)
         {
-            source.SetValue(ContentNameProperty, value);
+            source.SetValue(ComponentProperty, value);
         }
 
-        private static void OnContentNameChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        public static void OnComponentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var componentContainer = sender as UIComponentContainer;
             if (componentContainer == null)
             {
                 return;
             }
-            componentContainer.OnContentNameChanged();
-        }
-
-        public static readonly DependencyProperty ContentStringProperty = DependencyProperty.Register(
-           "ContentString",
-           typeof(string),
-           typeof(UIComponentContainer),
-           new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnContentStringChanged))
-       );
-
-        public static string GetContentString(UIComponentContainer source)
-        {
-            return (string)source.GetValue(ContentStringProperty);
-        }
-
-        public static void SetContentString(UIComponentContainer source, string value)
-        {
-            source.SetValue(ContentStringProperty, value);
-        }
-
-        private static void OnContentStringChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var componentContainer = sender as UIComponentContainer;
-            if (componentContainer == null)
-            {
-                return;
-            }
-            componentContainer.OnContentStringChanged();
+            componentContainer.OnComponentChanged();
         }
 
         public UIComponentContainer()
@@ -81,85 +54,43 @@ namespace FoxTunes
                 ContentControl.ContentProperty,
                 new Binding()
                 {
+                    Path = new PropertyPath("Component"),
                     Source = this,
-                    Path = new PropertyPath("ContentString"),
                     Converter = this
                 }
             );
         }
 
-        public string ContentName
+        public UIComponentConfiguration Component
         {
             get
             {
-                return GetContentName(this);
+                return GetComponent(this);
             }
             set
             {
-                SetContentName(this, value);
+                SetComponent(this, value);
             }
         }
 
-        protected virtual void OnContentNameChanged()
+        protected virtual void OnComponentChanged()
         {
-            if (this.ContentNameChanged != null)
+            if (this.ComponentChanged != null)
             {
-                this.ContentNameChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ContentName");
-        }
-
-        public event EventHandler ContentNameChanged;
-
-        public string ContentString
-        {
-            get
-            {
-                return GetContentString(this);
-            }
-            set
-            {
-                SetContentString(this, value);
+                this.ComponentChanged(this, EventArgs.Empty);
             }
         }
 
-        protected virtual void OnContentStringChanged()
-        {
-            if (this.ContentStringChanged != null)
-            {
-                this.ContentStringChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ContentString");
-        }
-
-        public event EventHandler ContentStringChanged;
-
-        public virtual void InitializeComponent(ICore core)
-        {
-            //Nothing to do.
-        }
+        public event EventHandler ComponentChanged;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var contentString = value as string;
-            if (string.IsNullOrEmpty(contentString))
+            var configuration = value as UIComponentConfiguration;
+            if (configuration == null)
             {
-                var selector = new UIComponentSelector();
-                selector.HorizontalAlignment = HorizontalAlignment.Center;
-                selector.VerticalAlignment = VerticalAlignment.Center;
-                selector.ComponentChanged += this.OnComponentChanged;
-                return selector;
-            }
-            try
-            {
-                var component = Configuration.LoadValue<UIComponent>(contentString);
-                return ComponentActivator.Instance.Activate<UIComponentBase>(component.Type);
-            }
-            catch (Exception e)
-            {
-                Logger.Write(this, LogLevel.Error, "Error loading component: {0}", e.Message);
                 return null;
             }
+            return Factory.CreateControl(configuration);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -167,30 +98,9 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
-        protected virtual void OnComponentChanged(object sender, EventArgs e)
+        public void InitializeComponent(ICore core)
         {
-            var selector = sender as UIComponentSelector;
-            if (selector == null || selector.Component == null)
-            {
-                return;
-            }
-            this.LoadComponent(selector.Component);
-            selector.ComponentChanged -= this.OnComponentChanged;
-        }
-
-        protected virtual void LoadComponent(UIComponent component)
-        {
-            try
-            {
-                this.ContentName = component.Name;
-                this.ContentString = Configuration.SaveValue(component);
-            }
-            catch (Exception e)
-            {
-                Logger.Write(this, LogLevel.Error, "Error loading component: {0}", e.Message);
-                this.ContentName = null;
-                this.ContentString = null;
-            }
+            throw new NotImplementedException();
         }
 
         protected virtual void Dispatch(Func<Task> function)

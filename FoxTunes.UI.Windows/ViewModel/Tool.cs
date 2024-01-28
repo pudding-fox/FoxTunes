@@ -161,7 +161,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HeightChanged;
 
-        public string Content
+        public UIComponentConfiguration Component
         {
             get
             {
@@ -169,7 +169,7 @@ namespace FoxTunes.ViewModel
                 {
                     return null;
                 }
-                return this.Configuration.Content;
+                return this.Configuration.Component;
             }
             set
             {
@@ -177,20 +177,51 @@ namespace FoxTunes.ViewModel
                 {
                     return;
                 }
-                this.Configuration.Content = value;
+                this.Configuration.Component = value;
             }
         }
 
-        protected virtual void OnContentChanged(object sender, EventArgs e)
+        protected virtual void OnComponentChanged(object sender, EventArgs e)
         {
-            if (this.ContentChanged != null)
+            if (this.ComponentChanged != null)
             {
-                this.ContentChanged(this, EventArgs.Empty);
+                this.ComponentChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Content");
+            this.OnPropertyChanged("Component");
         }
 
-        public event EventHandler ContentChanged;
+        public event EventHandler ComponentChanged;
+
+        public bool AlwaysOnTop
+        {
+            get
+            {
+                if (this.Configuration == null)
+                {
+                    return false;
+                }
+                return this.Configuration.AlwaysOnTop;
+            }
+            set
+            {
+                if (this.Configuration == null)
+                {
+                    return;
+                }
+                this.Configuration.AlwaysOnTop = value;
+            }
+        }
+
+        protected virtual void OnAlwaysOnTopChanged(object sender, EventArgs e)
+        {
+            if (this.AlwaysOnTopChanged != null)
+            {
+                this.AlwaysOnTopChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("AlwaysOnTop");
+        }
+
+        public event EventHandler AlwaysOnTopChanged;
 
         private ToolWindowConfiguration _Configuration { get; set; }
 
@@ -216,14 +247,16 @@ namespace FoxTunes.ViewModel
                 this.Configuration.LeftChanged += this.OnLeftChanged;
                 this.Configuration.WidthChanged += this.OnWidthChanged;
                 this.Configuration.HeightChanged += this.OnHeightChanged;
-                this.Configuration.ContentChanged += this.OnContentChanged;
+                this.Configuration.ComponentChanged += this.OnComponentChanged;
+                this.Configuration.AlwaysOnTopChanged += this.OnAlwaysOnTopChanged;
 
                 this.OnTitleChanged(this, EventArgs.Empty);
                 this.OnTopChanged(this, EventArgs.Empty);
                 this.OnLeftChanged(this, EventArgs.Empty);
                 this.OnWidthChanged(this, EventArgs.Empty);
                 this.OnHeightChanged(this, EventArgs.Empty);
-                this.OnContentChanged(this, EventArgs.Empty);
+                this.OnComponentChanged(this, EventArgs.Empty);
+                this.OnAlwaysOnTopChanged(this, EventArgs.Empty);
             }
             if (this.ConfigurationChanged != null)
             {
@@ -283,7 +316,8 @@ namespace FoxTunes.ViewModel
                 this.Configuration.LeftChanged -= this.OnLeftChanged;
                 this.Configuration.WidthChanged -= this.OnWidthChanged;
                 this.Configuration.HeightChanged -= this.OnHeightChanged;
-                this.Configuration.ContentChanged -= this.OnContentChanged;
+                this.Configuration.ComponentChanged -= this.OnComponentChanged;
+                this.Configuration.AlwaysOnTopChanged -= this.OnAlwaysOnTopChanged;
             }
             base.OnDisposing();
         }

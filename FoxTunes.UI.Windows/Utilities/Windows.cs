@@ -315,6 +315,64 @@ namespace FoxTunes
 
         public static event EventHandler PlaylistManagerWindowClosed;
 
+        private static Lazy<Window> _ToolWindowManagerWindow { get; set; }
+
+        public static bool IsToolWindowManagerWindowCreated
+        {
+            get
+            {
+                return _ToolWindowManagerWindow.IsValueCreated;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public static Window ToolWindowManagerWindow
+        {
+            get
+            {
+                var raiseEvent = !IsToolWindowManagerWindowCreated;
+                try
+                {
+                    return _ToolWindowManagerWindow.Value;
+                }
+                finally
+                {
+                    if (IsToolWindowManagerWindowCreated && raiseEvent)
+                    {
+                        OnToolWindowManagerWindowCreated();
+                    }
+                }
+            }
+        }
+
+        private static void OnToolWindowManagerWindowCreated()
+        {
+            ToolWindowManagerWindow.Closed += OnToolWindowManagerWindowClosed;
+            if (ToolWindowManagerWindowCreated == null)
+            {
+                return;
+            }
+            ToolWindowManagerWindowCreated(ToolWindowManagerWindow, EventArgs.Empty);
+        }
+
+        public static event EventHandler ToolWindowManagerWindowCreated;
+
+        private static void OnToolWindowManagerWindowClosed(object sender, EventArgs e)
+        {
+            if (IsToolWindowManagerWindowCreated)
+            {
+                ResourceDisposer.Dispose(ToolWindowManagerWindow);
+            }
+            _ToolWindowManagerWindow = new Lazy<Window>(() => new ToolWindowManagerWindow() { Owner = ActiveWindow });
+            if (ToolWindowManagerWindowClosed == null)
+            {
+                return;
+            }
+            ToolWindowManagerWindowClosed(typeof(ToolWindowManagerWindow), EventArgs.Empty);
+        }
+
+        public static event EventHandler ToolWindowManagerWindowClosed;
+
         private static Window _ActiveWindow { get; set; }
 
         public static Window ActiveWindow
@@ -404,6 +462,10 @@ namespace FoxTunes
                         {
                             PlaylistManagerWindow.Close();
                         }
+                        if (IsToolWindowManagerWindowCreated)
+                        {
+                            ToolWindowManagerWindow.Close();
+                        }
                         Reset();
                     })
                 );
@@ -419,6 +481,7 @@ namespace FoxTunes
             _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
             _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
             _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
+            _ToolWindowManagerWindow = new Lazy<Window>(() => new ToolWindowManagerWindow() { Owner = ActiveWindow });
         }
 
         public static Task Invoke(Action action)
