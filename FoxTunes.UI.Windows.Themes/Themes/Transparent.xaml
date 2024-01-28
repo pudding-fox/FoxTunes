@@ -45,7 +45,6 @@
     <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{StaticResource ControlColor}" />
 
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
-    <BorderGapMaskConverter x:Key="BorderGapMaskConverter" />
 
     <Style x:Key="FocusVisualStyle">
         <Setter Property="Control.Template">
@@ -1484,6 +1483,7 @@
 
 
     <Style TargetType="{x:Type GroupBox}">
+        <Setter Property="Background" Value="{DynamicResource ControlBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
@@ -1503,17 +1503,7 @@
                             <RowDefinition Height="6" />
                         </Grid.RowDefinitions>
                         <Border Grid.ColumnSpan="4" Grid.RowSpan="4" Background="{DynamicResource ControlBrush}" BorderThickness="1,1,1,1" />
-                        <Border Grid.ColumnSpan="4" Grid.Row="1" Grid.RowSpan="3" BorderThickness="1,1,1,1" BorderBrush="{DynamicResource ControlBorderBrush}">
-                            <Border.OpacityMask>
-                                <MultiBinding Converter="{StaticResource BorderGapMaskConverter}" ConverterParameter="7">
-                                    <Binding Path="ActualWidth" ElementName="Header" />
-                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Self}" />
-                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}" />
-                                </MultiBinding>
-                            </Border.OpacityMask>
-                        </Border>
-                        <Border Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="1" Grid.RowSpan="3" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" />
-                        <Border Grid.ColumnSpan="4" Grid.RowSpan="2" Background="{DynamicResource ControlBrush}" BorderThickness="1,1,1,0" x:Name="Main" BorderBrush="{DynamicResource ControlBorderBrush}" />
+                        <Border Grid.ColumnSpan="4" Grid.RowSpan="2" Background="{DynamicResource ControlBorderBrush}" BorderThickness="1,1,1,0" x:Name="Main" BorderBrush="{DynamicResource ControlBorderBrush}" Opacity=".5" />
                         <Border x:Name="Header" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Padding="3,1,3,0">
                             <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentSource="Header" RecognizesAccessKey="True" Margin="0,4,0,4" />
                         </Border>
