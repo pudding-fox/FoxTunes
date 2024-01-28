@@ -110,7 +110,7 @@ namespace FoxTunes.ViewModel
                         transaction.Commit();
                     }
                 }
-                await this.HierarchyManager.Build(null);
+                await this.Rebuild();
                 return;
             }
             catch (Exception e)
@@ -119,6 +119,24 @@ namespace FoxTunes.ViewModel
             }
             await this.OnError("Save", exception);
             throw exception;
+        }
+
+        public ICommand RebuildCommand
+        {
+            get
+            {
+                var command = CommandFactory.Instance.CreateCommand(
+                    new Func<Task>(this.Rebuild)
+                );
+                command.Tag = CommandHints.DISMISS;
+                return command;
+            }
+        }
+
+        public async Task Rebuild()
+        {
+            await this.HierarchyManager.Clear();
+            await this.HierarchyManager.Build(null);
         }
 
         public ICommand RescanCommand

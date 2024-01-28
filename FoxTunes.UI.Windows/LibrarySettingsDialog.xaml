@@ -29,21 +29,8 @@
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Width" Value="60"></Setter>
-                                <Setter Property="Height" Value="30"></Setter>
-                                <Setter Property="Margin" Value="7,7,0,0"></Setter>
-                                <!-- System -->
-                                <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
-                                <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                                <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                                <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
-                            </Style>
-                        </StackPanel.Resources>
-                        <Button Command="{Binding LibraryHierarchies.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                        <Button Command="{Binding LibraryHierarchies.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                        <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchies.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                        <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchies.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                     </StackPanel>
                     <ListBox 
                         ItemsSource="{Binding LibraryHierarchies.OrderedItemsSource, Source={StaticResource ViewModel}}" 
@@ -55,21 +42,8 @@
                 </DockPanel>
                 <DockPanel Grid.Row="1">
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Width" Value="60"></Setter>
-                                <Setter Property="Height" Value="30"></Setter>
-                                <Setter Property="Margin" Value="7,7,0,0"></Setter>
-                                <!-- System -->
-                                <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
-                                <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                                <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                                <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
-                            </Style>
-                        </StackPanel.Resources>
-                        <Button Command="{Binding LibraryHierarchyLevels.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                        <Button Command="{Binding LibraryHierarchyLevels.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                        <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchyLevels.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                        <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding LibraryHierarchyLevels.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                     </StackPanel>
                     <ListBox 
                         Margin="0,7,0,0" 
@@ -135,6 +109,7 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding ClearCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Clear</Button>
             <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding RescanCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Rescan</Button>
+            <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding RebuildCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Rebuild</Button>
             <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
             <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
         </StackPanel>
