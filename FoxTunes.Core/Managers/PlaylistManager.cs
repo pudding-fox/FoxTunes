@@ -738,6 +738,7 @@ namespace FoxTunes
                     set.Add(new PlaylistColumn() { Name = "Track peak", Type = PlaylistColumnType.Script, Sequence = 10, Script = scriptingRuntime.CoreScripts.ReplayGainTrackPeak, Enabled = false });
                     set.Add(new PlaylistColumn() { Name = "Play count", Type = PlaylistColumnType.Script, Sequence = 11, Script = scriptingRuntime.CoreScripts.PlayCount, Enabled = false });
                     set.Add(new PlaylistColumn() { Name = "Last played", Type = PlaylistColumnType.Script, Sequence = 12, Script = scriptingRuntime.CoreScripts.LastPlayed, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Initial key", Type = PlaylistColumnType.Script, Sequence = 13, Script = scriptingRuntime.CoreScripts.InitialKey, Enabled = false });
                 }
                 transaction.Commit();
             }

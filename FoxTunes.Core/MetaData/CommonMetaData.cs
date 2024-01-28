@@ -18,6 +18,7 @@ namespace FoxTunes
         public const string DiscCount = "DiscCount";
         public const string Genre = "Genre";
         public const string Grouping = "Grouping";
+        public const string InitialKey = "InitialKey";
         public const string LastPlayed = "LastPlayed";
         public const string Lyrics = "Lyrics";
         public const string MusicBrainzArtistId = "MusicBrainzArtistId";

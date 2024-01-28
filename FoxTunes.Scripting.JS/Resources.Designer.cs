@@ -147,6 +147,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to tag.initialkey.
+        /// </summary>
+        internal static string Initial_Key {
+            get {
+                return ResourceManager.GetString("Initial_Key", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (function () {
         ///    var lastplayed = tag.lastplayed;
         ///    if (!lastplayed) {

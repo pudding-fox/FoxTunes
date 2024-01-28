@@ -92,6 +92,13 @@ namespace FoxTunes
             }
         }
 
+        public string InitialKey
+        {
+            get
+            {
+                return Resources.Initial_Key;
+            }
+        }
 
         public string ReplayGainAlbumGain
         {
