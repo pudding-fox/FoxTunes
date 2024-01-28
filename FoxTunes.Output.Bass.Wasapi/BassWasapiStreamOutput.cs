@@ -310,10 +310,10 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.ChannelHandle != 0)
+            foreach (var channelHandle in this.MixerChannelHandles)
             {
-                Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);
-                Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", channelHandle);
+                Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
             this.Stop();
             BassWasapiDevice.Free();

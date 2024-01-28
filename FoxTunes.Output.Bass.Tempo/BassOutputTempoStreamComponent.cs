@@ -7,12 +7,8 @@ namespace FoxTunes
 {
     public class BassOutputTempoStreamComponent : BassStreamComponent
     {
-        public BassOutputTempoStreamComponent(BassOutputTempoStreamComponentBehaviour behaviour, BassOutputStream stream)
+        public BassOutputTempoStreamComponent(BassOutputTempoStreamComponentBehaviour behaviour)
         {
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                throw new InvalidOperationException("Cannot apply effects to DSD streams.");
-            }
             this.Behaviour = behaviour;
         }
 
@@ -208,6 +204,15 @@ namespace FoxTunes
                 return rate;
             }
             return Convert.ToInt32(rate * (1.0f + ((float)multipler / 100)));
+        }
+
+        public static bool ShouldCreate(BassOutputTempoStreamComponentBehaviour behaviour, BassOutputStream stream, IBassStreamPipelineQueryResult query)
+        {
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

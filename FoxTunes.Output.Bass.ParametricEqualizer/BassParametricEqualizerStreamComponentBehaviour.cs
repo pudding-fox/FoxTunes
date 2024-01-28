@@ -67,12 +67,12 @@ namespace FoxTunes
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
-            if (BassUtils.GetChannelDsdRaw(e.Stream.ChannelHandle))
+            if (!BassParametricEqualizerStreamComponent.ShouldCreate(this, e.Stream, e.Query))
             {
-                //Cannot apply effects to DSD.
+                Logger.Write(this, LogLevel.Debug, "Cannot create component, the stream is not supported.");
                 return;
             }
-            var component = new BassParametricEqualizerStreamComponent(this, e.Stream);
+            var component = new BassParametricEqualizerStreamComponent(this);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

@@ -218,7 +218,12 @@ namespace FoxTunes
             {
                 return;
             }
-            e.Input = new BassCrossfadeStreamInput(this, e.Stream);
+            if (!BassCrossfadeStreamInput.CanCreate(this, e.Stream, e.Query))
+            {
+                Logger.Write(this, LogLevel.Warn, "Cannot create input, the stream is not supported.");
+                throw new InvalidOperationException(Strings.BassCrossfadeStreamInputBehaviour_Unsupported);
+            }
+            e.Input = new BassCrossfadeStreamInput(this);
             e.Input.InitializeComponent(this.Core);
         }
 

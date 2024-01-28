@@ -73,12 +73,12 @@ namespace FoxTunes
             {
                 return;
             }
-            if (BassUtils.GetChannelDsdRaw(e.Stream.ChannelHandle))
+            if (!BassOutputTempoStreamComponent.ShouldCreate(this, e.Stream, e.Query))
             {
-                //Cannot apply effects to DSD.
+                Logger.Write(this, LogLevel.Debug, "Cannot create component, the stream is not supported.");
                 return;
             }
-            var component = new BassOutputTempoStreamComponent(this, e.Stream);
+            var component = new BassOutputTempoStreamComponent(this);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

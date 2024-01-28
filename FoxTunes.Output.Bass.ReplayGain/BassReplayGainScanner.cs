@@ -146,17 +146,17 @@ namespace FoxTunes
                 throw new InvalidOperationException(string.Format("Failed to create stream for file \"{0}\": Unknown error.", scannerItem.FileName));
             }
             Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
-            var monitor = new ChannelMonitor(scannerItem, stream);
-            try
+            using (var monitor = new ChannelMonitor(scannerItem, stream))
             {
-                monitor.Start();
-                success = this.ScanTrack(scannerItem, stream);
-            }
-            finally
-            {
-                monitor.Dispose();
-                Logger.Write(this, LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
-                Bass.StreamFree(stream.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
+                try
+                {
+                    monitor.Start();
+                    success = this.ScanTrack(scannerItem, stream);
+                }
+                finally
+                {
+                    stream.Provider.FreeStream(stream.ChannelHandle);
+                }
             }
             if (this.CancellationToken.IsCancellationRequested)
             {
@@ -259,8 +259,7 @@ namespace FoxTunes
                     foreach (var scannerItem in streams.Keys)
                     {
                         var stream = streams[scannerItem];
-                        Logger.Write(this, LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
-                        Bass.StreamFree(stream.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
+                        stream.Provider.FreeStream(stream.ChannelHandle);
                     }
                 }
                 foreach (var scannerItem in streams.Keys)
@@ -376,7 +375,7 @@ namespace FoxTunes
             {
                 FileName = fileName
             };
-            retry:
+        retry:
             if (this.CancellationToken.IsCancellationRequested)
             {
                 return BassStream.Empty;

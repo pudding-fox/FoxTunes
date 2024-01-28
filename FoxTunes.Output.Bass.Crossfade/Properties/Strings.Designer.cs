@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -66,6 +66,15 @@ namespace FoxTunes {
         internal static string BassCrossfadeStreamInput_Name {
             get {
                 return ResourceManager.GetString("BassCrossfadeStreamInput.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fading: The input type is unsupported..
+        /// </summary>
+        internal static string BassCrossfadeStreamInputBehaviour_Unsupported {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputBehaviour.Unsupported", resourceCulture);
             }
         }
     }

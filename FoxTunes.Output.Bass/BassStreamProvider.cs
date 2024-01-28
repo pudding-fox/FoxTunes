@@ -46,13 +46,20 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 return BassStream.Error(Bass.LastError);
             }
-            var stream = default(IBassStream);
-            this.Wrap(channelHandle, advice, flags, out stream);
-            if (stream == null)
+            try
             {
-                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
+                var stream = default(IBassStream);
+                this.Wrap(channelHandle, advice, flags, out stream);
+                if (stream == null)
+                {
+                    stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
+                }
+                return stream;
             }
-            return stream;
+            catch (BassException e)
+            {
+                return BassStream.Error(e.Error);
+            }
         }
 
         public virtual IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
@@ -69,14 +76,21 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 return BassStream.Error(Bass.LastError);
             }
-            var stream = default(IBassStream);
-            this.Wrap(channelHandle, advice, flags, out stream);
-            if (stream == null)
+            try
             {
-                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
+                var stream = default(IBassStream);
+                this.Wrap(channelHandle, advice, flags, out stream);
+                if (stream == null)
+                {
+                    stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice, flags);
+                }
+                stream.RegisterSyncHandlers();
+                return stream;
             }
-            stream.RegisterSyncHandlers();
-            return stream;
+            catch (BassException e)
+            {
+                return BassStream.Error(e.Error);
+            }
         }
 
         protected virtual string GetFileName(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)

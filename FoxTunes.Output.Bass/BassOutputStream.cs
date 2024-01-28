@@ -292,7 +292,11 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Stream.Flags.HasFlag(BassFlags.Float))
+                if (this.Stream.Flags.HasFlag(BassFlags.DSDRaw))
+                {
+                    return OutputStreamFormat.DSDRaw;
+                }
+                else if (this.Stream.Flags.HasFlag(BassFlags.Float))
                 {
                     return OutputStreamFormat.Float;
                 }
@@ -433,7 +437,7 @@ namespace FoxTunes
                             Bass.ChannelRemoveSync(this.ChannelHandle, sync);
                         }
                     }
-                    this.Stream.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
+                    this.Stream.Provider.FreeStream(this.ChannelHandle);
                 }
             }
             finally

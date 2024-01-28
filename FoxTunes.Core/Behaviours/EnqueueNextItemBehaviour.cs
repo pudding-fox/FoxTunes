@@ -17,6 +17,8 @@ namespace FoxTunes
 
         public Debouncer Debouncer { get; private set; }
 
+        public IOutput Output { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
@@ -29,6 +31,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Output = core.Components.Output;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaybackManager = core.Managers.Playback;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
@@ -57,6 +60,11 @@ namespace FoxTunes
             var playlistItem = outputStream.PlaylistItem;
             for (var position = 0; position < this.Count.Value; position++)
             {
+                if (!this.Output.IsStarted)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Output was stopped, cancelling.");
+                    break;
+                }
                 playlistItem = this.PlaylistBrowser.GetNextItem(playlistItem);
                 if (playlistItem == null)
                 {

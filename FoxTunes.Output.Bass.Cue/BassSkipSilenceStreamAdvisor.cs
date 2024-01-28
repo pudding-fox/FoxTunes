@@ -168,7 +168,7 @@ namespace FoxTunes
             }
             finally
             {
-                provider.FreeStream(playlistItem, stream.ChannelHandle);
+                provider.FreeStream(stream.ChannelHandle);
             }
         }
 
