@@ -8,6 +8,7 @@
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>3.0.1.0</AssemblyVersion>
     <Platforms>AnyCPU</Platforms>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
