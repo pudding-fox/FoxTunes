@@ -12,7 +12,6 @@
     </UserControl.Resources>
     <Popup PlacementTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
 		Placement="Center" 
-		AllowsTransparency="True" 
 		StaysOpen="True"
         Width="600"
         Height="400">

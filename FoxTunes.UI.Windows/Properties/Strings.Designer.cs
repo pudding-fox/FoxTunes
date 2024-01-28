@@ -1384,15 +1384,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Transparency.
-        /// </summary>
-        internal static string WindowsUserInterfaceConfiguration_Glass {
-            get {
-                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Glass", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Layout.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Layout {

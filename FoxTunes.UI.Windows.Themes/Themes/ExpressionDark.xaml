@@ -722,9 +722,9 @@
                 <ToggleButton Grid.ColumnSpan="2" Template="{DynamicResource ComboBoxToggleButton}" x:Name="ToggleButton" Focusable="false" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Background="{TemplateBinding Background}" />
                 <ContentPresenter HorizontalAlignment="Left" Margin="3,3,23,3" x:Name="ContentSite" VerticalAlignment="Center" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" IsHitTestVisible="False" />
                 <TextBox Visibility="Hidden" Template="{DynamicResource ComboBoxTextBox}" HorizontalAlignment="Left" Margin="3,3,23,3" x:Name="PART_EditableTextBox" Style="{x:Null}" VerticalAlignment="Center" Focusable="True" Background="{DynamicResource NormalBorderBrush}" IsReadOnly="{TemplateBinding IsReadOnly}" BorderBrush="{DynamicResource NormalBorderBrush}" Foreground="{DynamicResource TextBrush}" />
-                <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" x:Name="Popup" Focusable="False" AllowsTransparency="True" PopupAnimation="Slide">
+                <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" x:Name="Popup" Focusable="False" PopupAnimation="Slide">
                     <Grid MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{TemplateBinding ActualWidth}" x:Name="DropDown" SnapsToDevicePixels="True">
-                        <Border x:Name="DropDownBorder" BorderBrush="{DynamicResource SolidBorderBrush}" BorderThickness="1" Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="3,3,3,3" />
+                        <Border x:Name="DropDownBorder" BorderBrush="{DynamicResource SolidBorderBrush}" BorderThickness="1" Background="{DynamicResource ControlBackgroundBrush}" />
                         <ScrollViewer Margin="2,4,2,2" Style="{DynamicResource NuclearScrollViewer}" SnapsToDevicePixels="True" Foreground="{DynamicResource TextBrush}">
                             <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"  SnapsToDevicePixels="True" />
                         </ScrollViewer>
@@ -743,9 +743,6 @@
             </Trigger>
             <Trigger Property="IsGrouping" Value="true">
                 <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
-            </Trigger>
-            <Trigger Property="AllowsTransparency" SourceName="Popup" Value="true">
-                <Setter Property="Margin" Value="0,2,0,0" TargetName="DropDownBorder" />
             </Trigger>
             <Trigger Property="IsEditable" Value="true">
                 <Setter Property="IsTabStop" Value="false" />
@@ -1037,32 +1034,14 @@
 
     <Style TargetType="{x:Type ContextMenu}">
         <Setter Property="Background" Value="{DynamicResource ShadeBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ShadeBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="Template" Value="{DynamicResource ContextMenuTemplate}"></Setter>
     </Style>
 
     <ControlTemplate x:Key="ContextMenuTemplate" TargetType="{x:Type ContextMenu}">
-        <Border>
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Tag" Value="{DynamicResource {x:Static SystemParameters.DropShadowKey}}"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Padding" Value="0,0,5,5"/>
-                            <Setter Property="Effect">
-                                <Setter.Value>
-                                    <DropShadowEffect BlurRadius="4" Opacity="0.8" ShadowDepth="1"/>
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
-            </Border>
+        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
         </Border>
     </ControlTemplate>
 
@@ -1087,7 +1066,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <DropShadowBitmapEffect x:Key="PopupDropShadow" ShadowDepth="1.5" Softness="0.15" />
     <Style TargetType="{x:Type MenuItem}">
         <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
         <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
@@ -1131,10 +1109,10 @@
                 <Grid Grid.Column="3" Margin="4,0,6,0" x:Name="ArrowPanel" VerticalAlignment="Center">
                     <Path x:Name="ArrowPanelPath" VerticalAlignment="Center" Fill="{TemplateBinding Foreground}" Data="M0,0 L0,8 L4,4 z" />
                 </Grid>
-                <Popup IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Right" x:Name="SubMenuPopup" Focusable="false" AllowsTransparency="true" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}">
+                <Popup IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Right" x:Name="SubMenuPopup" Focusable="false" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}">
                     <Grid x:Name="SubMenu">
                         <Border x:Name="SubMenuBorder">
-                            <Border BorderBrush="{DynamicResource ShadeBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{DynamicResource ShadeBrush}">
+                            <Border BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{DynamicResource ShadeBrush}">
                                 <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
                             </Border>
                         </Border>
@@ -1170,11 +1148,6 @@
             </Trigger>
             <Trigger Property="IsChecked" Value="true">
                 <Setter Property="Visibility" Value="Visible" TargetName="GlyphPanel" />
-            </Trigger>
-            <Trigger Property="AllowsTransparency" SourceName="SubMenuPopup" Value="true">
-                <Setter Property="Margin" Value="0,0,3,3" TargetName="SubMenu" />
-                <Setter Property="SnapsToDevicePixels" Value="true" TargetName="SubMenu" />
-                <Setter Property="BitmapEffect" Value="{DynamicResource PopupDropShadow}" TargetName="SubMenuBorder" />
             </Trigger>
             <Trigger Property="IsHighlighted" Value="true">
                 <Trigger.ExitActions>
@@ -1810,7 +1783,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="ListViewItemFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>

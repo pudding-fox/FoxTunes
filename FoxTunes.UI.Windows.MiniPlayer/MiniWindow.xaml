@@ -20,20 +20,7 @@
     <Window.Topmost>
         <Binding Path="Topmost.Value" Source="{StaticResource ViewModel}"/>
     </Window.Topmost>
-    <Border Margin="8" Padding="5" CornerRadius="{Binding CornerRadius, Mode=OneWay, Source={StaticResource ThemeInfo}}" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1">
-        <Border.Style>
-            <Style TargetType="{x:Type Border}">
-                <Setter Property="Background" Value="{DynamicResource NormalBrush}"></Setter>
-                <Setter Property="LocalWindows:GlassLabel.IsGlassEnabled" Value="False"></Setter>
-                <Setter Property="BitmapEffect" Value="{DynamicResource PopupDropShadow}"></Setter>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding ExtendGlass.Value, Source={StaticResource ViewModel}}" Value="True">
-                        <Setter Property="Background" Value="#3FFFFFFF"></Setter>
-                        <Setter Property="LocalWindows:GlassLabel.IsGlassEnabled" Value="True"></Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
+    <Border Padding="5" Background="{DynamicResource NormalBrush}" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1">
         <Grid>
             <LocalWindows:Mini MouseDown="OnMouseDown"></LocalWindows:Mini>
             <Windows:Components></Windows:Components>

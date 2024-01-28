@@ -19,8 +19,6 @@ namespace FoxTunes
 
         public const string MARQUEE_STEP_ELEMENT = "KKKKDCB3-69C3-4F73-966C-6A7738E359A1";
 
-        public const string EXTEND_GLASS_ELEMENT = "LLLL7881-D4F6-484C-8E4E-E3CD5802F8B5";
-
         public const string SHOW_CURSOR_ADORNERS_ELEMENT = "NNNN7E23-A1E4-4BB6-9291-B553F4F7AD12";
 
         public const string VIRTUAL_LISTS_ELEMENT = "MMMM474D-7915-45E5-9265-85C406343CA8";
@@ -38,8 +36,6 @@ namespace FoxTunes
                     new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeInterval, path: Strings.General_Advanced).WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
                 .WithElement(
                     new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeStep, path: Strings.General_Advanced).WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
-                .WithElement(
-                    new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Glass, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(

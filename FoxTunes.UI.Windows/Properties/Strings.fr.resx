@@ -543,9 +543,6 @@
   <data name="WindowsUserInterfaceConfiguration.Cursors" xml:space="preserve">
     <value>Afficher les ornements du curseur</value>
   </data>
-  <data name="WindowsUserInterfaceConfiguration.Glass" xml:space="preserve">
-    <value>Transparence</value>
-  </data>
   <data name="WindowsUserInterfaceConfiguration.Layout" xml:space="preserve">
     <value>Disposition</value>
   </data>

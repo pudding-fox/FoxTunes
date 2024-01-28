@@ -9,7 +9,7 @@
 			 d:DesignHeight="300" d:DesignWidth="300" SizeChanged="OnSizeChanged">
     <Grid>
         <Canvas Height="{Binding ActualHeight, ElementName=TextBlock, Mode=OneWay}" ClipToBounds="True">
-            <LocalWindows:GlassLabel x:Name="TextBlock" Content="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Marquee}}}" SizeChanged="OnSizeChanged"></LocalWindows:GlassLabel>
+            <TextBlock x:Name="TextBlock" Foreground="{DynamicResource TextBrush}" Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Marquee}}}" TextTrimming="CharacterEllipsis" SizeChanged="OnSizeChanged"></TextBlock>
         </Canvas>
         <Rectangle Fill="Transparent"></Rectangle>
     </Grid>
