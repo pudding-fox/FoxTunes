@@ -23,5 +23,13 @@
         string Year_Album { get; }
 
         string BPM { get; }
+
+        string ReplayGainAlbumGain { get; }
+
+        string ReplayGainAlbumPeak { get; }
+
+        string ReplayGainTrackGain { get; }
+
+        string ReplayGainTrackPeak { get; }
     }
 }

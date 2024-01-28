@@ -142,6 +142,18 @@
   <data name="Playing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\playing.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="ReplayGainAlbumGain" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\replaygainalbumgain.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReplayGainAlbumPeak" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\replaygainalbumpeak.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReplayGainTrackGain" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\replaygaintrackgain.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ReplayGainTrackPeak" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\replaygaintrackpeak.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="Title_Performer" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\title_performer.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

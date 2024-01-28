@@ -260,6 +260,8 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            //Don't accept any more messages.
+            this.Enabled = false;
             if (this.Writer.IsValueCreated)
             {
                 this.Writer.Value.Flush();
