@@ -108,6 +108,14 @@ namespace FoxTunes
                     yield return new KeyValuePair<string, MetaDataItemType>(CommonStatistics.LastPlayed, MetaDataItemType.Statistic);
                     yield return new KeyValuePair<string, MetaDataItemType>(CommonStatistics.PlayCount, MetaDataItemType.Statistic);
                 }
+
+                //File system.
+                yield return new KeyValuePair<string, MetaDataItemType>(FileSystemProperties.FileName, MetaDataItemType.Property);
+                yield return new KeyValuePair<string, MetaDataItemType>(FileSystemProperties.DirectoryName, MetaDataItemType.Property);
+                yield return new KeyValuePair<string, MetaDataItemType>(FileSystemProperties.FileExtension, MetaDataItemType.Property);
+                yield return new KeyValuePair<string, MetaDataItemType>(FileSystemProperties.FileSize, MetaDataItemType.Property);
+                yield return new KeyValuePair<string, MetaDataItemType>(FileSystemProperties.FileCreationTime, MetaDataItemType.Property);
+                yield return new KeyValuePair<string, MetaDataItemType>(FileSystemProperties.FileModificationTime, MetaDataItemType.Property);
             }
         }
 
