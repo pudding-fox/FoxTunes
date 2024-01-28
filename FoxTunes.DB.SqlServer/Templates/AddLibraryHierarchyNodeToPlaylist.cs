@@ -20,7 +20,7 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+    #line 1 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class AddLibraryHierarchyNodeToPlaylist : AddLibraryHierarchyNodeToPlaylistBase
     {
@@ -52,7 +52,7 @@ AS
 (
 ");
             
-            #line 28 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            #line 28 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 		this.Database,
 		"VerticalMetaData", 
@@ -64,11 +64,60 @@ AS
             
             #line default
             #line hidden
-            this.Write(@"
-)
-
-INSERT INTO ""PlaylistItems"" (""LibraryItem_Id"", ""Sequence"", ""DirectoryName"", ""FileName"", ""Status"") 
-SELECT ""LibraryItems"".""Id"", @sequence, ""LibraryItems"".""DirectoryName"", ""LibraryItems"".""FileName"", @status
+            this.Write("\r\n)\r\n\r\nINSERT INTO \"PlaylistItems\" (\"LibraryItem_Id\", \"Sequence\", \"DirectoryName\"" +
+                    ", \"FileName\", \"Status\") \r\nSELECT \"LibraryItems\".\"Id\", @sequence + ROW_NUMBER() O" +
+                    "VER\r\n(\r\n\tORDER BY\r\n\t\tCASE \r\n\t\t\t\tWHEN ");
+            
+            #line 45 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CustomMetaData.VariousArtists))));
+            
+            #line default
+            #line hidden
+            this.Write(" IS NOT NULL THEN ");
+            
+            #line 45 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String("1")));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\t\t\tELSE ");
+            
+            #line 46 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Artist))));
+            
+            #line default
+            #line hidden
+            this.Write(" \r\n\t\tEND, \r\n\t\t");
+            
+            #line 48 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Year))));
+            
+            #line default
+            #line hidden
+            this.Write(", \r\n\t\t");
+            
+            #line 49 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Album))));
+            
+            #line default
+            #line hidden
+            this.Write(", \r\n\t\tCAST(");
+            
+            #line 50 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Disc))));
+            
+            #line default
+            #line hidden
+            this.Write(" AS int), \r\n\t\tCAST(");
+            
+            #line 51 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Track))));
+            
+            #line default
+            #line hidden
+            this.Write(@" AS int), 
+		""HorizontalMetaData"".""FileName""
+) - 1, ""LibraryItems"".""DirectoryName"", ""LibraryItems"".""FileName"", @status
 FROM ""LibraryHierarchyItems""
 	JOIN ""LibraryHierarchyItem_LibraryItem"" 
 		ON ""LibraryHierarchyItems"".""Id"" = ""LibraryHierarchyItem_LibraryItem"".""LibraryHierarchyItem_Id""
@@ -79,62 +128,12 @@ FROM ""LibraryHierarchyItems""
 WHERE ""LibraryHierarchyItems"".""Id"" = @libraryHierarchyItemId
 ");
             
-            #line 50 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
+            #line 62 "C:\personal\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText()));
             
             #line default
             #line hidden
-            this.Write("\r\nORDER BY\r\n\tCASE \r\n\t\tWHEN ");
-            
-            #line 53 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CustomMetaData.VariousArtists))));
-            
-            #line default
-            #line hidden
-            this.Write(" IS NOT NULL THEN ");
-            
-            #line 53 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String("1")));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n\t\tELSE ");
-            
-            #line 54 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Artist))));
-            
-            #line default
-            #line hidden
-            this.Write(" \r\n\tEND, \r\n\t");
-            
-            #line 56 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Year))));
-            
-            #line default
-            #line hidden
-            this.Write(", \r\n\t");
-            
-            #line 57 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Album))));
-            
-            #line default
-            #line hidden
-            this.Write(", \r\n\tCAST(");
-            
-            #line 58 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Disc))));
-            
-            #line default
-            #line hidden
-            this.Write(" AS int), \r\n\tCAST(");
-            
-            #line 59 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\AddLibraryHierarchyNodeToPlaylist.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(CommonMetaData.Track))));
-            
-            #line default
-            #line hidden
-            this.Write(" AS int), \r\n\t\"HorizontalMetaData\".\"FileName\";\r\n\r\nSELECT COUNT(*)\r\nFROM \"PlaylistI" +
-                    "tems\"\r\nWHERE \"Status\" = @status");
+            this.Write(";\r\n\r\nSELECT COUNT(*)\r\nFROM \"PlaylistItems\"\r\nWHERE \"Status\" = @status");
             return this.GenerationEnvironment.ToString();
         }
     }
