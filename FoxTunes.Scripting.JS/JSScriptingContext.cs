@@ -1,45 +1,61 @@
 ﻿using FoxTunes.Interfaces;
-using Noesis.Javascript;
-using System;
+using System.Collections;
 using System.Diagnostics;
+using System.Linq;
+using System.Xml;
+using V8.Net;
 
 namespace FoxTunes
 {
     public class JSScriptingContext : ScriptingContext
     {
-        public JSScriptingContext(JavascriptContext context)
+        public JSScriptingContext(V8Engine engine)
         {
-            this.Context = context;
+            this.Engine = engine;
+            this.Context = this.Engine.CreateContext();
+            this.Engine.SetContext(this.Context);
         }
 
-        public JavascriptContext Context { get; private set; }
+        public V8Engine Engine { get; private set; }
+
+        public Context Context { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Context.Run(Resources.utils);
-            //TODO: We need to update the runtime to support Date.toLocaleDateString().
-            this.Context.SetParameter("toLocaleDateString", new Func<string, string>(
-                value =>
-                {
-                    var date = DateTimeHelper.FromString(value);
-                    if (date == default(DateTime))
-                    {
-                        return null;
-                    }
-                    return date.ToShortDateString() + " " + date.ToShortTimeString();
-                }
-            ));
+            this.Engine.Execute(Resources.utils, throwExceptionOnError: true);
             base.InitializeComponent(core);
         }
 
         public override void SetValue(string name, object value)
         {
-            this.Context.SetParameter(name, value);
+            this.SetValue(this.Engine.GlobalObject, name, value);
+        }
+
+        protected virtual void SetValue(InternalHandle target, string name, object value)
+        {
+            if (value is IDictionary dictionary)
+            {
+                this.SetValue(target, name, dictionary);
+            }
+            else
+            {
+                target.SetProperty(name, value);
+            }
+        }
+
+        protected virtual void SetValue(InternalHandle target, string name, IDictionary dictionary)
+        {
+            var value = this.Engine.CreateObject();
+            foreach (var key in dictionary.Keys.OfType<string>())
+            {
+                this.SetValue(value, key, dictionary[key]);
+            }
+            this.SetValue(name, value);
         }
 
         public override object GetValue(string name)
         {
-            return this.Context.GetParameter(name);
+            return this.Engine.GlobalObject.GetProperty(name);
         }
 
         [DebuggerNonUserCode]
@@ -47,17 +63,18 @@ namespace FoxTunes
         {
             try
             {
-                return this.Context.Run(script);
+                return this.Engine.Execute(script, throwExceptionOnError: true);
             }
-            catch (JavascriptException e)
+            catch (V8ExecutionErrorException e)
             {
-                throw new ScriptingException(e.Line, e.StartColumn, e.EndColumn, e.Message);
+                throw;
             }
         }
 
         protected override void OnDisposing()
         {
             this.Context.Dispose();
+            this.Engine.Dispose();
             base.OnDisposing();
         }
     }

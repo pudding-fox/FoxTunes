@@ -15,19 +15,13 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Platform)' == 'x86'">
-    <None Include="..\lib\x86\msvcp100.dll" Link="msvcp100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\lib\x86\msvcr100.dll" Link="msvcr100.dll">
+    <None Include="..\lib\x64\V8_Net_Proxy_x86.dll" Link="V8_Net_Proxy_x86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   
   <ItemGroup Condition="'$(Platform)' == 'x64'">
-    <None Include="..\lib\x64\msvcp100.dll" Link="msvcp100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\lib\x64\msvcr100.dll" Link="msvcr100.dll">
+    <None Include="..\lib\x64\V8_Net_Proxy_x64.dll" Link="V8_Net_Proxy_x64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -53,15 +47,9 @@
     <ProjectReference Include="..\FoxTunes.Scripting\FoxTunes.Scripting.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Platform)' == 'x86'">
-    <Reference Include="Noesis.Javascript">
-      <HintPath>../lib/x86/Noesis.Javascript.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Platform)' == 'x64'">
-    <Reference Include="Noesis.Javascript">
-      <HintPath>../lib/x64/Noesis.Javascript.dll</HintPath>
+  <ItemGroup>
+    <Reference Include="V8.Net">
+      <HintPath>../lib/V8.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
 
