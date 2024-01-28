@@ -7,6 +7,14 @@ namespace FoxTunes
 {
     public class ComponentRegistry : IComponentRegistry
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         private ComponentRegistry()
         {
             this.Clear();

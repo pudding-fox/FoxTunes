@@ -78,17 +78,34 @@ namespace FoxTunes
         {
             ComponentRegistry.Instance.ForEach<IConfigurableComponent>(component =>
             {
-                var sections = (component as IConfigurableComponent).GetConfigurationSections();
-                foreach (var section in sections)
+                try
                 {
-                    this.Components.Configuration.RegisterSection(section);
+                    var sections = (component as IConfigurableComponent).GetConfigurationSections();
+                    foreach (var section in sections)
+                    {
+                        this.Components.Configuration.RegisterSection(section);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to register configuration for component {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
         }
 
         protected virtual void InitializeComponents()
         {
-            ComponentRegistry.Instance.ForEach(component => component.InitializeComponent(this));
+            ComponentRegistry.Instance.ForEach(component =>
+            {
+                try
+                {
+                    component.InitializeComponent(this);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to initialize component {0}: {1}", component.GetType().Name, e.Message);
+                }
+            });
         }
 
         public bool IsDisposed { get; private set; }
