@@ -435,27 +435,55 @@ namespace FoxTunes
             var types = ArtworkType.None;
             try
             {
-                foreach (var picture in pictures.OrderBy(picture => GetPicturePriority(picture)))
+                foreach (var fallback in new[] { false, true })
                 {
-                    var type = GetArtworkType(picture.Type);
-                    if (!ArtworkTypes.HasFlag(type) || types.HasFlag(type))
+                    foreach (var picture in pictures.OrderBy(picture => GetPicturePriority(picture)))
                     {
-                        continue;
-                    }
-                    if (picture.Data.Count > this.MaxImageSize.Value * 1024000)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to size.");
-                        this.AddWarning(file.Name, string.Format("Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Count, this.MaxImageSize.Value * 1024000));
-                        continue;
-                    }
-                    metaData.Add(new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
-                    {
-                        Value = await this.ImportImage(file, tag, picture, type, false).ConfigureAwait(false)
-                    });
-                    if (ArtworkTypes.HasFlag(types |= type))
-                    {
-                        //We have everything we need.
-                        return true;
+                        var type = GetArtworkType(picture.Type, fallback);
+                        if (!ArtworkTypes.HasFlag(type) || types.HasFlag(type))
+                        {
+                            continue;
+                        }
+
+                        if (fallback)
+                        {
+                            if (!string.IsNullOrEmpty(picture.Description))
+                            {
+                                //If we're in fallback (i.e the picture type isn't right) then ignore "pictures" with a description as it likely means the data has a specific purpose.
+                                Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to description: {1}", file.Name, picture.Description);
+                                continue;
+                            }
+                            Logger.Write(this, LogLevel.Warn, "Importing image from file \"{0}\" with bad type: {1}.", file.Name, Enum.GetName(typeof(PictureType), picture.Type));
+                            this.AddWarning(file.Name, string.Format("Image has bad type: {0}.", Enum.GetName(typeof(PictureType), picture.Type)));
+                        }
+
+                        if (string.IsNullOrEmpty(picture.MimeType))
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Importing image from file \"{0}\" with empty mime type.", file.Name);
+                            this.AddWarning(file.Name, "Image has empty mime type.");
+                        }
+                        else if (!picture.MimeType.StartsWith("image", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Importing image from file \"{0}\" with bad mime type: {1}", file.Name, picture.MimeType);
+                            this.AddWarning(file.Name, string.Format("Image has bad mime type: {0}", picture.MimeType));
+                        }
+
+                        if (picture.Data.Count > this.MaxImageSize.Value * 1024000)
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Count, this.MaxImageSize.Value * 1024000);
+                            this.AddWarning(file.Name, string.Format("Image was not imported due to size: {0} > {1}", picture.Data.Count, this.MaxImageSize.Value * 1024000));
+                            continue;
+                        }
+
+                        metaData.Add(new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
+                        {
+                            Value = await this.ImportImage(file, tag, picture, type, false).ConfigureAwait(false)
+                        });
+                        if (ArtworkTypes.HasFlag(types |= type))
+                        {
+                            //We have everything we need.
+                            return true;
+                        }
                     }
                 }
             }
@@ -677,7 +705,7 @@ namespace FoxTunes
             var type = GetArtworkType(name);
             for (var a = 0; a < pictures.Count; a++)
             {
-                if (pictures[a] != null && GetArtworkType(pictures[a].Type) == type)
+                if (pictures[a] != null && GetArtworkType(pictures[a].Type, false) == type)
                 {
                     index = a;
                     return true;
@@ -762,18 +790,34 @@ namespace FoxTunes
         {
             switch (picture.Type)
             {
+                //Prefer covers.
                 case PictureType.FrontCover:
                 case PictureType.BackCover:
                     return 0;
             }
+            if (!string.IsNullOrEmpty(picture.MimeType))
+            {
+                if (picture.MimeType.StartsWith("image", StringComparison.OrdinalIgnoreCase))
+                {
+                    //Then images.
+                    return 100;
+                }
+            }
+            //Everything else.
             return 255;
         }
 
-        public static readonly IDictionary<PictureType, ArtworkType> PictureTypeMapping = new Dictionary<PictureType, ArtworkType>()
+        public static readonly IDictionary<PictureType, ArtworkType> PrimaryPictureTypeMapping = new Dictionary<PictureType, ArtworkType>()
         {
             { PictureType.FrontCover, ArtworkType.FrontCover },
             { PictureType.BackCover, ArtworkType.BackCover },
-            { PictureType.NotAPicture, ArtworkType.FrontCover } //This seems to be pretty common...
+        };
+
+        //Embedded images are sometimes misconfigured, try these if nothing else works.
+        public static readonly IDictionary<PictureType, ArtworkType> SecondaryPictureTypeMapping = new Dictionary<PictureType, ArtworkType>()
+        {
+            { PictureType.Other, ArtworkType.FrontCover },
+            { PictureType.NotAPicture, ArtworkType.FrontCover }
         };
 
         public static ArtworkType GetArtworkType(string name)
@@ -786,10 +830,17 @@ namespace FoxTunes
             return ArtworkType.Unknown;
         }
 
-        public static ArtworkType GetArtworkType(PictureType pictureType)
+        public static ArtworkType GetArtworkType(PictureType pictureType, bool fallback)
         {
             var artworkType = default(ArtworkType);
-            if (PictureTypeMapping.TryGetValue(pictureType, out artworkType))
+            if (fallback)
+            {
+                if (SecondaryPictureTypeMapping.TryGetValue(pictureType, out artworkType))
+                {
+                    return artworkType;
+                }
+            }
+            if (PrimaryPictureTypeMapping.TryGetValue(pictureType, out artworkType))
             {
                 return artworkType;
             }
