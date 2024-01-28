@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -52,7 +53,7 @@ namespace FoxTunes
                 await this.AddPlaylistItems(this.LibraryHierarchyNode, this.LibraryHierarchyBrowser.Filter).ConfigureAwait(false);
                 await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
             }
-            else if (this.PlaylistItems != null)
+            else if (this.PlaylistItems != null && this.PlaylistItems.Any())
             {
                 await this.AddPlaylistItems(this.PlaylistItems).ConfigureAwait(false);
                 await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);

@@ -174,7 +174,10 @@ namespace FoxTunes
                         position++;
                     }
                     this.Offset += position;
-                    transaction.Commit();
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
                 }
             }))
             {
