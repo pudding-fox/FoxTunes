@@ -178,6 +178,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowCursorAdornersChanged;
 
+        private bool _IsVirtualizing { get; set; }
+
+        public bool IsVirtualizing
+        {
+            get
+            {
+                return this._IsVirtualizing;
+            }
+            set
+            {
+                this._IsVirtualizing = value;
+                this.OnIsVirtualizingChanged();
+            }
+        }
+
+        protected virtual void OnIsVirtualizingChanged()
+        {
+            if (this.IsVirtualizingChanged != null)
+            {
+                this.IsVirtualizingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsVirtualizing");
+        }
+
+        public event EventHandler IsVirtualizingChanged;
+
         private string _StatusMessage { get; set; }
 
         public virtual string StatusMessage
@@ -300,6 +326,10 @@ namespace FoxTunes.ViewModel
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.SHOW_CURSOR_ADORNERS_ELEMENT
             ).ConnectValue(value => this.ShowCursorAdorners = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.VIRTUAL_LISTS_ELEMENT
+            ).ConnectValue(value => this.IsVirtualizing = value);
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }

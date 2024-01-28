@@ -127,14 +127,13 @@
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
                         Windows:ListBoxExtensions.EnsureSelectedItemVisible="True"
+                        Windows:ListBoxExtensions.IsVirtualizing="{Binding IsVirtualizing, Source={StaticResource ViewModel}}"
                         LocalWindows:LibraryBrowserExtensions.ItemsPanelSelector="{Binding ViewMode, Source={StaticResource ViewModel}}"
                         LocalWindows:LibraryBrowserExtensions.GridItemsPanel="{StaticResource GridItemsPanelTemplate}"
                         LocalWindows:LibraryBrowserExtensions.ListItemsPanel="{StaticResource ListItemsPanelTemplate}"
                         LocalWindows:LibraryBrowserExtensions.ItemTemplateSelector="{Binding ViewMode, Source={StaticResource ViewModel}}"
                         LocalWindows:LibraryBrowserExtensions.GridItemTemplateSelector="{StaticResource GridLibraryBrowserTemplateSelector}"
                         LocalWindows:LibraryBrowserExtensions.ListItemTemplateSelector="{StaticResource ListLibraryBrowserTemplateSelector}"
-                        VirtualizingStackPanel.IsVirtualizing="True"
-                        VirtualizingStackPanel.VirtualizationMode="Standard"
                         TextSearch.TextPath="Value">
                         <Interactivity:Interaction.Triggers>
                             <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type ListBoxItem}">

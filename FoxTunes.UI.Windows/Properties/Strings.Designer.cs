@@ -1355,5 +1355,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Theme", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Virtualizing Lists.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_VirtualLists {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.VirtualLists", resourceCulture);
+            }
+        }
     }
 }

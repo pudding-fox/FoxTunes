@@ -53,6 +53,34 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        private bool _IsVirtualizing { get; set; }
+
+        public bool IsVirtualizing
+        {
+            get
+            {
+                return this._IsVirtualizing;
+            }
+            set
+            {
+                this._IsVirtualizing = value;
+                this.OnIsVirtualizingChanged();
+            }
+        }
+
+        protected virtual void OnIsVirtualizingChanged()
+        {
+            if (this.IsVirtualizingChanged != null)
+            {
+                this.IsVirtualizingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsVirtualizing");
+        }
+
+        public event EventHandler IsVirtualizingChanged;
+
         private PlaylistItemCollection _Items { get; set; }
 
         public PlaylistItemCollection Items
@@ -196,6 +224,11 @@ namespace FoxTunes.ViewModel
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.VIRTUAL_LISTS_ELEMENT
+            ).ConnectValue(value => this.IsVirtualizing = value);
             //TODO: Bad .Wait().
             this.RefreshStatus().Wait();
             base.InitializeComponent(core);

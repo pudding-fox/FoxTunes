@@ -38,8 +38,7 @@
                   Windows:TreeViewExtensions.DragSource="True"
                   Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized"
                   Windows:TreeViewExtensions.AutoExpand="True"
-                  VirtualizingStackPanel.IsVirtualizing="True"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  Windows:TreeViewExtensions.IsVirtualizing="{Binding IsVirtualizing, Source={StaticResource ViewModel}}"
                   IsTextSearchEnabled="True"
                   TextSearch.TextPath="Value">
             <Interactivity:Interaction.Triggers>
