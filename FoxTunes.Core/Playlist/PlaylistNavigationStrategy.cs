@@ -29,9 +29,33 @@ namespace FoxTunes
             return this.PlaylistBrowser.GetPlaylist(playlistItem) ?? this.PlaylistManager.SelectedPlaylist;
         }
 
-        public abstract PlaylistItem GetNext(PlaylistItem playlistItem);
+        public PlaylistItem GetNext(PlaylistItem playlistItem)
+        {
+            var playlist = this.GetPlaylist(playlistItem);
+            if (playlist == null)
+            {
+                return null;
+            }
+            //TODO: Bad .Result
+            return
+                this.PlaylistQueue.Dequeue(playlist).Result ??
+                this.GetNext(playlist, playlistItem);
+        }
 
-        public abstract PlaylistItem GetPrevious(PlaylistItem playlistItem);
+        protected abstract PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem);
+
+        public PlaylistItem GetPrevious(PlaylistItem playlistItem)
+        {
+            var playlist = this.GetPlaylist(playlistItem);
+            if (playlist == null)
+            {
+                return null;
+            }
+            return
+                this.GetPrevious(playlist, playlistItem);
+        }
+
+        protected abstract PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem);
 
         public Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
         {
@@ -62,13 +86,8 @@ namespace FoxTunes
 
         public ConcurrentDictionary<Tuple<QueryOperator, OrderByDirection>, IDatabaseQuery> SequenceQueries { get; private set; }
 
-        public override PlaylistItem GetNext(PlaylistItem playlistItem)
+        protected override PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem)
         {
-            var playlist = this.GetPlaylist(playlistItem);
-            if (playlist == null)
-            {
-                return null;
-            }
             if (playlistItem == null)
             {
                 return this.PlaylistBrowser.GetFirstItem(playlist);
@@ -89,13 +108,8 @@ namespace FoxTunes
             return playlistItem;
         }
 
-        public override PlaylistItem GetPrevious(PlaylistItem playlistItem)
+        protected override PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem)
         {
-            var playlist = this.GetPlaylist(playlistItem);
-            if (playlist == null)
-            {
-                return null;
-            }
             if (playlistItem == null)
             {
                 return this.PlaylistBrowser.GetLastItem(playlist);
@@ -270,13 +284,8 @@ namespace FoxTunes
             }
         }
 
-        public override PlaylistItem GetNext(PlaylistItem playlistItem)
+        protected override PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem)
         {
-            var playlist = this.GetPlaylist(playlistItem);
-            if (playlist == null)
-            {
-                return null;
-            }
             if (this.Playlist == null || this.Playlist != playlist)
             {
                 this.Refresh(playlist);
@@ -306,13 +315,8 @@ namespace FoxTunes
             return this.PlaylistBrowser.GetItemBySequence(playlist, sequence);
         }
 
-        public override PlaylistItem GetPrevious(PlaylistItem playlistItem)
+        protected override PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem)
         {
-            var playlist = this.GetPlaylist(playlistItem);
-            if (playlist == null)
-            {
-                return null;
-            }
             if (this.Playlist == null || this.Playlist != playlist)
             {
                 this.Refresh(playlist);
