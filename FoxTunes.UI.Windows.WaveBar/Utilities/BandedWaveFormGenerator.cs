@@ -73,9 +73,18 @@ namespace FoxTunes
 
         protected virtual void Allocate(IOutputStream stream, WaveFormGeneratorData data)
         {
+            var max = Convert.ToInt32(
+                Math.Ceiling(
+                    stream.GetDuration(stream.Length).TotalMilliseconds / this.Resolution.Value
+                )
+            ).ToNearestPower();
             var length = Convert.ToInt32(
                 stream.Length / ((FFT_SIZE * 4) * stream.Channels)
             );
+            while (length > max)
+            {
+                length /= 2;
+            }
             data.Data = new WaveFormDataElement[length];
             data.Capacity = length;
         }
@@ -134,48 +143,54 @@ namespace FoxTunes
             var length = dataSource.GetData(visualizationData.Samples, FFT_SIZE);
             var interval = data.Capacity / 10;
             var values = new float[BANDS.Length];
+            var samplesPerValue = (dataSource.Stream.Length / length) / data.Capacity;
 
             dataSource.GetFormat(out visualizationData.Rate, out visualizationData.Channels, out visualizationData.Format);
 
             do
             {
-                if (length == 0)
+                for (var a = 0; a < samplesPerValue; a++)
                 {
-                    continue;
-                }
+                    if (length == 0)
+                    {
+                        continue;
+                    }
 
-                switch (length)
-                {
-                    case BASS_STREAMPROC_END:
-                    case BASS_ERROR_UNKNOWN:
+                    switch (length)
+                    {
+                        case BASS_STREAMPROC_END:
+                        case BASS_ERROR_UNKNOWN:
+                            return;
+                    }
+
+                    if (data.Position >= data.Capacity)
+                    {
                         return;
-                }
+                    }
 
-                if (data.Position >= data.Capacity)
-                {
-                    break;
-                }
+                    for (var b = 0; b < visualizationData.Samples.Length; b++)
+                    {
+                        visualizationData.Data[0, b] = visualizationData.Samples[b];
+                    }
+                    dataTransformer.Transform(visualizationData, values, null, null);
 
-                for (var b = 0; b < visualizationData.Samples.Length; b++)
-                {
-                    visualizationData.Data[0, b] = visualizationData.Samples[b];
-                }
-                dataTransformer.Transform(visualizationData, values, null, null);
+                    data.Data[data.Position].Low = Math.Max(data.Data[data.Position].Low, values[LOW]);
+                    data.Data[data.Position].Mid = Math.Max(data.Data[data.Position].Mid, values[MID]);
+                    data.Data[data.Position].High = Math.Max(data.Data[data.Position].High, values[HIGH]);
 
-                data.Data[data.Position].Low = values[LOW];
-                data.Data[data.Position].Mid = values[MID];
-                data.Data[data.Position].High = values[HIGH];
-
-                data.Peak = Math.Max(
-                    data.Peak,
-                    Math.Max(
-                        values[LOW],
+                    data.Peak = Math.Max(
+                        data.Peak,
                         Math.Max(
-                            values[MID],
-                            values[HIGH]
+                            values[LOW],
+                            Math.Max(
+                                values[MID],
+                                values[HIGH]
+                            )
                         )
-                    )
-                );
+                    );
+
+                    length = dataSource.GetData(visualizationData.Samples, FFT_SIZE);
+                }
 
                 data.Position++;
 
@@ -183,8 +198,6 @@ namespace FoxTunes
                 {
                     data.Update();
                 }
-
-                length = dataSource.GetData(visualizationData.Samples, FFT_SIZE);
 
             } while (!data.CancellationToken.IsCancellationRequested);
         }

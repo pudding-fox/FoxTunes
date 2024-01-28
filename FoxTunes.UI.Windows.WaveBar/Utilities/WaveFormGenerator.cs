@@ -147,7 +147,7 @@ namespace FoxTunes
 
                 if (data.Position >= data.Capacity)
                 {
-                    break;
+                    return;
                 }
 
                 length /= sizeof(short);
@@ -211,7 +211,7 @@ namespace FoxTunes
 
                 if (data.Position >= data.Capacity)
                 {
-                    break;
+                    return;
                 }
 
                 length /= sizeof(float);
