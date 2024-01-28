@@ -47,6 +47,8 @@ namespace FoxTunes
 
         public string Path { get; }
 
+        public object Source { get; set; }
+
         private byte _Attributes { get; set; }
 
         public byte Attributes

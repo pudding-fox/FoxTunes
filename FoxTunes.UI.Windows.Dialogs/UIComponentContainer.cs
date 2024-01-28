@@ -166,7 +166,7 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, "Clear");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
             }
         }
 
