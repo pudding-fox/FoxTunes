@@ -52,7 +52,9 @@ Various optional plugins are available;
   * Can rip CDs with the CD plugin.
   * Can up/down sample rate/depth with the Resampler plugin.
 * Javascript - Use JS for scriptable elements.
+* LibraryBrowser - An album art grid interface for the library. It can use lots of memory.
 * Logging - Use Log4Net logging back-end. Can be configured and disabled.
+* MetaDataEditor - A simple batch mode tag editor. Can embed artwork.
 * ParametricEqualizer - A ten band parametric equalizer.
 * Resampler - SOXR based high quality configurable resampler. Can perform up/down sampling.
 * SQLite - Use SQLite for database functions.
