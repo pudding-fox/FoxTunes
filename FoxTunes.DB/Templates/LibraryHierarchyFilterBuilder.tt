@@ -51,7 +51,17 @@ AND EXISTS
 					break;
 				}
 			}
-#>("MetaDataItems"."Name" = <#= this.Database.QueryFactory.Dialect.String(entry.Name) #> AND "MetaDataItems"."Value"<#
+			var numeric = default(int);
+			var isNumeric = int.TryParse(entry.Value, out numeric);
+#>("MetaDataItems"."Name" = <#= this.Database.QueryFactory.Dialect.String(entry.Name) #> AND <#
+			if (isNumeric)
+			{
+#>CAST("MetaDataItems"."Value" AS int)<#
+			}
+			else
+			{
+#>"MetaDataItems"."Value"<#
+			}
 			switch (entry.Operator)
 			{
 				default:
@@ -75,7 +85,16 @@ AND EXISTS
 					break;
 			}
 #>
-<#= this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.WILDCARD, "%")) #>
+<# 
+			if (isNumeric)
+			{
+#><#= numeric #><#
+			}
+			else
+			{
+#><#= this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.WILDCARD, "%"))  #><#
+			}
+#>
 )<#
 		}
 #>))<#		
