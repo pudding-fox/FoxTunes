@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Net;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -50,7 +50,6 @@ namespace FoxTunes
             var task = Task.Run(async () =>
 #endif
             {
-                await this.CreateBitmap().ConfigureAwait(false);
                 if (this.PlaybackManager.CurrentStream != null)
                 {
                     await this.Update(this.PlaybackManager.CurrentStream).ConfigureAwait(false);
@@ -72,7 +71,7 @@ namespace FoxTunes
             }
             else
             {
-                this.RefreshBitmap();
+                this.Dispatch(this.CreateData);
             }
         }
 
@@ -87,21 +86,10 @@ namespace FoxTunes
                 }
             }
 
-            this.GeneratorData = WaveFormGenerator.WaveFormGeneratorData.Empty;
-            this.RendererData = WaveFormRendererData.Empty;
-
-            if (stream == null)
-            {
-                await this.Clear().ConfigureAwait(false);
-                return;
-            }
-
             this.GeneratorData = this.Generator.Generate(stream);
             this.GeneratorData.Updated += this.OnUpdated;
 
-            await Windows.Invoke(this.CreateViewBox).ConfigureAwait(false);
-
-            this.Update();
+            await this.RefreshBitmap().ConfigureAwait(false);
         }
 
         protected virtual void OnUpdated(object sender, EventArgs e)
@@ -109,38 +97,20 @@ namespace FoxTunes
             this.Update();
         }
 
-        protected override async Task CreateBitmap()
+        protected override bool CreateData(int width, int height)
         {
-            await base.CreateBitmap().ConfigureAwait(false);
-            this.Update();
-        }
-
-        protected override void CreateViewBox()
-        {
-            if (this.GeneratorData == null)
+            var generatorData = this.GeneratorData;
+            if (generatorData == null)
             {
-                this.Viewbox = new Rect(0, 0, 1, 1);
+                return false;
             }
-            else
-            {
-                var bitmap = this.Bitmap;
-                if (bitmap == null)
-                {
-                    return;
-                }
-                this.RendererData = Create(this.GeneratorData, bitmap.PixelWidth, bitmap.PixelHeight);
-                this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), bitmap.PixelHeight);
-            }
-        }
-
-        protected virtual void RefreshBitmap()
-        {
-            if (this.RendererData != null)
-            {
-                this.RendererData.Position = 0;
-            }
-
-            this.Update();
+            this.RendererData = Create(
+                generatorData,
+                width,
+                height
+            );
+            this.Dispatch(this.Update);
+            return true;
         }
 
         public async Task Render(WaveFormRendererData data)
@@ -228,18 +198,22 @@ namespace FoxTunes
             }
         }
 
-        protected virtual double GetPixelWidth()
+        protected override int GetPixelWidth(double width)
         {
-            if (this.GeneratorData == null || this.RendererData == null)
+            var data = this.GeneratorData;
+            if (data != null)
             {
-                return 1;
+                var valuesPerElement = Convert.ToInt32(
+                    Math.Ceiling(
+                        Math.Max(
+                            (float)data.Capacity / width,
+                            1
+                        )
+                    )
+                );
+                width = data.Capacity / valuesPerElement;
             }
-            return this.GeneratorData.Capacity / this.RendererData.ValuesPerElement;
-        }
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new WaveFormRenderer();
+            return base.GetPixelWidth(width);
         }
 
         protected override void OnDisposing()
@@ -642,14 +616,7 @@ namespace FoxTunes
 
         public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height)
         {
-            var valuesPerElement = Convert.ToInt32(
-                Math.Ceiling(
-                    Math.Max(
-                        (float)generatorData.Capacity / width,
-                        1
-                    )
-                )
-            );
+            var valuesPerElement = generatorData.Capacity / width;
             return new WaveFormRendererData()
             {
                 Width = width,
@@ -685,8 +652,6 @@ namespace FoxTunes
             public float Peak;
 
             public float NormalizedPeak;
-
-            public static readonly WaveFormRendererData Empty = new WaveFormRendererData();
         }
 
         public struct Int32Pair

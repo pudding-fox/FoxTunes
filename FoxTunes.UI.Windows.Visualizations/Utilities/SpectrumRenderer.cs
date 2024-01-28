@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -80,52 +79,22 @@ namespace FoxTunes
             }
             else
             {
-                this.Debouncer.Exec(this.RefreshBitmap);
+                this.Debouncer.Exec(this.CreateData);
             }
         }
 
-        protected override void CreateViewBox()
+        protected override bool CreateData(int width, int height)
         {
-            var bitmap = this.Bitmap;
-            if (bitmap == null)
-            {
-                return;
-            }
             this.RendererData = Create(
                 this.Output,
-                bitmap.PixelWidth,
-                bitmap.PixelHeight,
+                width,
+                height,
                 SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.HighCut.Value
             );
-            if (this.RendererData == null)
-            {
-                return;
-            }
-            this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), bitmap.PixelHeight);
-        }
-
-        protected virtual Task RefreshBitmap()
-        {
-            return Windows.Invoke(() =>
-            {
-                var bitmap = this.Bitmap;
-                if (bitmap == null)
-                {
-                    return;
-                }
-                this.RendererData = Create(
-                    this.Output,
-                    bitmap.PixelWidth,
-                    bitmap.PixelHeight,
-                    SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
-                    VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                    this.ShowPeaks.Value,
-                    this.HighCut.Value
-                );
-            });
+            return true;
         }
 
         protected virtual async Task Render(SpectrumRendererData data)
@@ -233,19 +202,10 @@ namespace FoxTunes
             }
         }
 
-        protected virtual double GetPixelWidth()
+        protected override int GetPixelWidth(double width)
         {
-            if (this.RendererData == null)
-            {
-                return 1;
-            }
-            var step = this.RendererData.Width / this.RendererData.Count;
-            return this.RendererData.Count * step;
-        }
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new SpectrumRenderer();
+            var bars = SpectrumBehaviourConfiguration.GetBars(this.Bars.Value);
+            return base.GetPixelWidth(bars * (Convert.ToInt32(width) / bars));
         }
 
         protected override void OnDisposing()

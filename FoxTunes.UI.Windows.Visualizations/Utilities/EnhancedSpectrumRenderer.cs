@@ -2,11 +2,9 @@
 using System;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -89,50 +87,23 @@ namespace FoxTunes
             }
             else
             {
-                this.Debouncer.Exec(this.RefreshBitmap);
+                this.Debouncer.Exec(this.CreateData);
             }
         }
 
-        protected override void CreateViewBox()
+        protected override bool CreateData(int width, int height)
         {
-            var bitmap = this.Bitmap;
-            if (bitmap == null)
-            {
-                return;
-            }
             this.RendererData = Create(
                 this,
-                bitmap.PixelWidth,
-                bitmap.PixelHeight,
+                width,
+                height,
                 SpectrumBehaviourConfiguration.GetBands(this.Bands.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value
             );
-            this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), bitmap.PixelHeight);
-        }
-
-        protected virtual Task RefreshBitmap()
-        {
-            return Windows.Invoke(() =>
-            {
-                var bitmap = this.Bitmap;
-                if (bitmap == null)
-                {
-                    return;
-                }
-                this.RendererData = Create(
-                    this,
-                    bitmap.PixelWidth,
-                    bitmap.PixelHeight,
-                    SpectrumBehaviourConfiguration.GetBands(this.Bands.Value),
-                    VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                    this.ShowPeaks.Value,
-                    this.ShowRms.Value,
-                    this.ShowCrestFactor.Value
-                );
-            });
+            return true;
         }
 
         protected virtual async Task Render(SpectrumRendererData data)
@@ -272,19 +243,10 @@ namespace FoxTunes
             }
         }
 
-        protected virtual double GetPixelWidth()
+        protected override int GetPixelWidth(double width)
         {
-            var data = this.RendererData;
-            if (data == null)
-            {
-                return 1;
-            }
-            return data.Bands.Length * (data.Width / data.Bands.Length);
-        }
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new SpectrumRenderer();
+            var bands = SpectrumBehaviourConfiguration.GetBands(this.Bands.Value);
+            return base.GetPixelWidth(bands.Length * (Convert.ToInt32(width) / bands.Length));
         }
 
         protected override void OnDisposing()

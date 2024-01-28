@@ -14,7 +14,6 @@
              MinWidth="100"
              MinHeight="100">
     <UserControl.Resources>
-        <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
         <LocalViewModel:PeakMeter x:Key="ViewModel"></LocalViewModel:PeakMeter>
         <LocalWindows:TextAxisLabelProvider x:Key="Levels" Values="{Binding Levels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
         <LocalWindows:TextAxisLabelProvider x:Key="Channels" Values="{Binding Channels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
@@ -73,18 +72,7 @@
                 </LocalWindows:Axis.Style>
             </LocalWindows:Axis>
             <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="dB" Foreground="{DynamicResource TextBrush}"></TextBlock>
-            <Rectangle Grid.Column="1" Grid.Row="0">
-                <Rectangle.Resources>
-                    <LocalWindows:PeakRenderer x:Key="Renderer"
-                        Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
-                        Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
-                        Orientation="{Binding Orientation, Source={StaticResource ViewModel}}"
-                        Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:PeakMeter}}}"></LocalWindows:PeakRenderer>
-                </Rectangle.Resources>
-                <Rectangle.Fill>
-                    <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
-                </Rectangle.Fill>
-            </Rectangle>
+            <LocalWindows:PeakRenderer Grid.Column="1" Grid.Row="0" Orientation="{Binding Orientation, Source={StaticResource ViewModel}}"></LocalWindows:PeakRenderer>
         </Grid>
     </Windows:Visualization>
 </Windows:UIComponentBase>
