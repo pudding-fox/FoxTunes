@@ -132,7 +132,15 @@ namespace FoxTunes
 
         private static Lazy<string> _RelativeStoragePath = new Lazy<string>(() =>
         {
-            return FileSystemHelper.GetRelativePath(StoragePath, Environment.CurrentDirectory);
+            if (IsPortable)
+            {
+                var path = default(string);
+                if (FileSystemHelper.TryGetRelativePath(StoragePath, Environment.CurrentDirectory, out path))
+                {
+                    return path;
+                }
+            }
+            return StoragePath;
         });
 
         public static string RelativeStoragePath

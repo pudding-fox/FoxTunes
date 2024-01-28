@@ -144,6 +144,12 @@ namespace FoxTunes
             }
         }
 
+        public static bool TryGetRelativePath(string path1, string path2, out string path)
+        {
+            path = GetRelativePath(path1, path2);
+            return !string.IsNullOrEmpty(path);
+        }
+
         public static string GetRelativePath(string path1, string path2)
         {
             path1 = Path.GetFullPath(path1);
@@ -174,7 +180,8 @@ namespace FoxTunes
                 }
                 else if (!string.Equals(parts1[a], parts2[a], StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new NotImplementedException();
+                    //Paths cannot be relative, different locations.
+                    return null;
                 }
             }
 
