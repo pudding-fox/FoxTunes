@@ -142,6 +142,8 @@
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
+    <Compile Include="Tasks\StopOutputStreamTask.cs" />
+    <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
   </ItemGroup>

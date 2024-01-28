@@ -10,8 +10,8 @@ namespace FoxTunes.Interfaces
 
         event EventHandler CurrentStreamChanged;
 
-        void Load(string fileName, bool play);
+        void Load(string fileName, Action callBack = null);
 
-        void Unload();
+        void Unload(Action callBack = null);
     }
 }
