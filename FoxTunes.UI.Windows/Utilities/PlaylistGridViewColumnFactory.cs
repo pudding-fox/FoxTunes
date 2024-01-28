@@ -15,6 +15,8 @@ namespace FoxTunes
             }
         }
 
+        public static PlaylistColumnManager PlaylistColumnManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnManager>();
+
         public PlaylistGridViewColumnFactory(IPlaybackManager playbackManager, IScriptingRuntime scriptingRuntime)
         {
             this.PlaybackManager = playbackManager;
@@ -42,12 +44,24 @@ namespace FoxTunes
                 gridViewColumn = new GridViewColumn();
             }
             gridViewColumn.Header = column.Name;
-            gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding()
+            switch (column.Type)
             {
-                PlaybackManager = this.PlaybackManager,
-                ScriptingContext = this.ScriptingContext,
-                Script = column.Script
-            };
+                case PlaylistColumnType.Script:
+                    gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding()
+                    {
+                        PlaybackManager = this.PlaybackManager,
+                        ScriptingContext = this.ScriptingContext,
+                        Script = column.Script
+                    };
+                    break;
+                case PlaylistColumnType.Plugin:
+                    var provider = PlaylistColumnManager.GetProvider(column.Plugin);
+                    if (provider != null)
+                    {
+                        gridViewColumn.CellTemplate = provider.CellTemplate;
+                    }
+                    break;
+            }
             BindingHelper.Create(
                 gridViewColumn,
                 GridViewColumn.WidthProperty,

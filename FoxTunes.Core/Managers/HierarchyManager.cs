@@ -82,8 +82,13 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        public static void CreateDefaultData(IDatabase database, ICoreScripts scripts)
+        public void InitializeDatabase(IDatabaseComponent database)
         {
+            var scriptingRuntime = ComponentRegistry.Instance.GetComponent<IScriptingRuntime>();
+            if (scriptingRuntime == null)
+            {
+                return;
+            }
             using (var transaction = database.BeginTransaction())
             {
                 var set = database.Set<LibraryHierarchy>(transaction);
@@ -96,9 +101,9 @@ namespace FoxTunes
                     Enabled = true,
                     Levels = new ObservableCollection<LibraryHierarchyLevel>()
                     {
-                        new LibraryHierarchyLevel() { Sequence = 0, Script = scripts.Artist },
-                        new LibraryHierarchyLevel() { Sequence = 1, Script = scripts.Year_Album },
-                        new LibraryHierarchyLevel() { Sequence = 2, Script = scripts.Disk_Track_Title }
+                        new LibraryHierarchyLevel() { Sequence = 0, Script = scriptingRuntime.CoreScripts.Artist },
+                        new LibraryHierarchyLevel() { Sequence = 1, Script = scriptingRuntime.CoreScripts.Year_Album },
+                        new LibraryHierarchyLevel() { Sequence = 2, Script = scriptingRuntime.CoreScripts.Disk_Track_Title }
                     }
                 });
                 set.Add(new LibraryHierarchy()
@@ -109,9 +114,9 @@ namespace FoxTunes
                     Enabled = false,
                     Levels = new ObservableCollection<LibraryHierarchyLevel>()
                     {
-                        new LibraryHierarchyLevel() { Sequence = 0, Script = scripts.Genre },
-                        new LibraryHierarchyLevel() { Sequence = 1, Script = scripts.Year_Album },
-                        new LibraryHierarchyLevel() { Sequence = 2, Script = scripts.Disk_Track_Title }
+                        new LibraryHierarchyLevel() { Sequence = 0, Script = scriptingRuntime.CoreScripts.Genre },
+                        new LibraryHierarchyLevel() { Sequence = 1, Script = scriptingRuntime.CoreScripts.Year_Album },
+                        new LibraryHierarchyLevel() { Sequence = 2, Script = scriptingRuntime.CoreScripts.Disk_Track_Title }
                     }
                 });
                 set.Add(new LibraryHierarchy()

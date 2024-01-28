@@ -59,7 +59,7 @@ namespace FoxTunes
                 this.Core.Factories.Database.Initialize();
                 using (var database = this.Core.Factories.Database.Create())
                 {
-                    this.Core.CreateDefaultData(database);
+                    this.Core.InitializeDatabase(database);
                 }
             }
             this.Core.Initialize();

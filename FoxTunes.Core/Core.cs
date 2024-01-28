@@ -134,10 +134,19 @@ namespace FoxTunes
             });
         }
 
-        public void CreateDefaultData(IDatabase database)
+        public void InitializeDatabase(IDatabaseComponent database)
         {
-            PlaylistManager.CreateDefaultData(database, this.Components.ScriptingRuntime.CoreScripts);
-            HierarchyManager.CreateDefaultData(database, this.Components.ScriptingRuntime.CoreScripts);
+            ComponentRegistry.Instance.ForEach<IDatabaseInitializer>(component =>
+            {
+                try
+                {
+                    component.InitializeDatabase(database);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to initialize database {0}: {1}", component.GetType().Name, e.Message);
+                }
+            });
         }
 
         public bool IsDisposed { get; private set; }

@@ -228,7 +228,7 @@ namespace FoxTunes.ViewModel
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+                    this.HierarchyManager.InitializeDatabase(database);
 #if NET40
                     return TaskEx.FromResult(false);
 #else

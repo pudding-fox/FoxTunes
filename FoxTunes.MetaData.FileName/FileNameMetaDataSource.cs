@@ -130,7 +130,7 @@ namespace FoxTunes
             return result;
         }
 
-        public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems)
+        public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate)
         {
             throw new NotImplementedException();
         }

@@ -99,17 +99,16 @@ namespace FoxTunes {
         ///	[Type] INTEGER NOT NULL,
         ///    [Value] nvarchar(260));
         ///
+        ///CREATE TABLE [LibraryRoots] (
+        ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL,
+        ///	[DirectoryName] nvarchar(260) NOT NULL);
+        ///
         ///CREATE TABLE [LibraryItems] (
         ///	Id INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
         ///	DirectoryName nvarchar(260) NOT NULL, 
         ///	FileName nvarchar(260) NOT NULL, 
         ///	ImportDate varchar(50) NOT NULL,
-        ///	Favorite bit NOT NULL,
-        ///	Status INTEGER NOT NULL);
-        ///
-        ///CREATE TABLE [PlaylistItems](
-        ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
-        ///	[LibraryItem [rest of string was truncated]&quot;;.
+        ///	Favorite bit NOT NULL, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {

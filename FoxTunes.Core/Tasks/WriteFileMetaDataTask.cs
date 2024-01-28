@@ -27,10 +27,14 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
             var metaDataSource = this.MetaDataSourceFactory.Create();
-            await metaDataSource.SetMetaData(this.FileName, this.MetaDataItems).ConfigureAwait(false);
+            return metaDataSource.SetMetaData(
+                this.FileName,
+                this.MetaDataItems,
+                metaDataItem => true
+            );
         }
     }
 }
