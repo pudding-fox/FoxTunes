@@ -30,17 +30,14 @@ CREATE TABLE "LibraryHierarchyLevels" (
 	"LibraryHierarchy_Id" INTEGER NOT NULL,
 	"Sequence" INTEGER NOT NULL,
 	"Name" text NOT NULL,
-	"DisplayScript"	TEXT NOT NULL,
-	"SortScript"	TEXT
-);
+	"Script"	TEXT NOT NULL);
 
 CREATE TABLE [LibraryHierarchyItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
     [Parent_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]),
     [LibraryHierarchy_Id] bigint NOT NULL REFERENCES LibraryHierarchies([Id]),
     [LibraryHierarchyLevel_Id] bigint NOT NULL REFERENCES LibraryHierarchyLevels([Id]),
-    [DisplayValue] text NOT NULL, 
-    [SortValue] text, 
+    [Value] text NOT NULL, 
     [IsLeaf] bit NOT NULL);
 
 CREATE TABLE [PlaylistItem_MetaDataItem](
@@ -52,7 +49,7 @@ CREATE TABLE [PlaylistColumns] (
   [Id] INTEGER PRIMARY KEY NOT NULL, 
   [Sequence] INTEGER NOT NULL, 
   [Name] text NOT NULL, 
-  [DisplayScript] text NOT NULL,
+  [Script] text NOT NULL,
   [IsDynamic] INTEGER NOT NULL, 
   [Width] numeric(53,0) NULL);
 
@@ -111,8 +108,7 @@ CREATE TABLE "LibraryHierarchy"
 	"LibraryHierarchy_Id" INTEGER NOT NULL, 
 	"LibraryHierarchyLevel_Id" INTEGER NOT NULL, 
 	"LibraryItem_Id" INTEGER NOT NULL, 
-	"DisplayValue" text NOT NULL,
-	"SortValue" text NOT NULL,
+	"Value" text NOT NULL,
 	"IsLeaf" bit NOT NULL
 );
 
@@ -183,8 +179,7 @@ ON [LibraryHierarchy_LibraryHierarchyItem](
 
 CREATE INDEX [IDX_LibraryHierarchyItem_Values]
 ON [LibraryHierarchyItems](
-    [DisplayValue], 
-    [SortValue]);
+    [Value]);
 
 CREATE UNIQUE INDEX "IDX_LibraryHierarchyItem_LibraryItem" 
 ON "LibraryHierarchyItem_LibraryItem" (
@@ -215,8 +210,7 @@ ON "LibraryHierarchy"
 	"LibraryHierarchy_Id",
 	"LibraryHierarchyLevel_Id",
 	"LibraryItem_Id",
-	"DisplayValue",
-	"SortValue",
+	"Value",
 	"IsLeaf"
 );
 
@@ -226,18 +220,18 @@ ON "LibraryHierarchy"
 	"LibraryItem_Id"
 );
 
-INSERT INTO "PlaylistColumns" (Id,Sequence,Name,DisplayScript,IsDynamic,Width) VALUES (1,0,'Playing','playing != null && item.Id == playing.Id && item.FileName == playing.FileName ? "\u2022" : ""',1,NULL);
-INSERT INTO "PlaylistColumns" (Id,Sequence,Name,DisplayScript,IsDynamic,Width) VALUES (2,1,'Artist / album','(function(){ var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist || "No Artist"]; if(tag.album) { parts.push(tag.album); } return parts.join(" - "); })()',0,NULL);
-INSERT INTO "PlaylistColumns" (Id,Sequence,Name,DisplayScript,IsDynamic,Width) VALUES (3,2,'Track no','(function(){ var parts = []; if (tag.disccount != 1 && tag.disc) { parts.push(tag.disc); } if (tag.track) { parts.push(zeropad(tag.track, 2)); } return parts.join(" - "); })()',0,NULL);
-INSERT INTO "PlaylistColumns" (Id,Sequence,Name,DisplayScript,IsDynamic,Width) VALUES (4,3,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) { parts.push(tag.firstperformer); } if (parts.length) { return parts.join(" - "); } else { return filename(item.FileName); } })()',0,NULL);
-INSERT INTO "PlaylistColumns" (Id,Sequence,Name,DisplayScript,IsDynamic,Width) VALUES (5,4,'Duration','timestamp(property.duration)',0,NULL);
+INSERT INTO "PlaylistColumns" (Id,Sequence,Name,Script,IsDynamic,Width) VALUES (1,0,'Playing','playing != null && item.Id == playing.Id && item.FileName == playing.FileName ? "\u2022" : ""',1,NULL);
+INSERT INTO "PlaylistColumns" (Id,Sequence,Name,Script,IsDynamic,Width) VALUES (2,1,'Artist / album','(function(){ var parts = [tag.albumartist || tag.artist || "No Artist"]; if(tag.album) { parts.push(tag.album); } return parts.join(" - "); })()',0,NULL);
+INSERT INTO "PlaylistColumns" (Id,Sequence,Name,Script,IsDynamic,Width) VALUES (3,2,'Track no','(function(){ var parts = []; if (tag.disccount != 1 && tag.disc) { parts.push(tag.disc); } if (tag.track) { parts.push(zeropad(tag.track, 2)); } return parts.join(" - "); })()',0,NULL);
+INSERT INTO "PlaylistColumns" (Id,Sequence,Name,Script,IsDynamic,Width) VALUES (4,3,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.performer && tag.performer != (tag.albumartist || tag.artist)) { parts.push(tag.performer); } if (parts.length) { return parts.join(" - "); } else { return filename(item.FileName); } })()',0,NULL);
+INSERT INTO "PlaylistColumns" (Id,Sequence,Name,Script,IsDynamic,Width) VALUES (5,4,'Duration','timestamp(property.duration)',0,NULL);
 
 INSERT INTO "LibraryHierarchies" (Id,Sequence,Name) VALUES (1,0,'Artist/Album/Title');
 INSERT INTO "LibraryHierarchies" (Id,Sequence,Name) VALUES (2,1,'Genre/Album/Title');
 
-INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (1,1,0,'Artist','(function(){if(tag.__ft_variousartists) { return "Various Artists"; } return  tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist||"No Artist";})()',NULL);
-INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (2,1,1,'Year - Album','(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
-INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (3,1,2,'Disk - Track - Title','(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
-INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (4,2,0,'Genre','ucfirst(tag.firstgenre)||"No Genre"',NULL);
-INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (5,2,1,'Year - Album','(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
-INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (6,2,2,'Disk - Track - Title','(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
+INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,Script) VALUES (1,1,0,'Artist','(function(){if(tag.__ft_variousartists) { return "Various Artists"; } return  tag.albumartist||tag.artist||"No Artist";})()');
+INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,Script) VALUES (2,1,1,'Year - Album','(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()');
+INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,Script) VALUES (3,1,2,'Disk - Track - Title','(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()');
+INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,Script) VALUES (4,2,0,'Genre','ucfirst(tag.genre)||"No Genre"');
+INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,Script) VALUES (5,2,1,'Year - Album','(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()');
+INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,Script) VALUES (6,2,2,'Disk - Track - Title','(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()');

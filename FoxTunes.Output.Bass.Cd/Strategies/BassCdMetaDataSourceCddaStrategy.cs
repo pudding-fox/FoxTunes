@@ -10,9 +10,9 @@ namespace FoxTunes
         private static IDictionary<string, string> NAMES = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "TTITLE", CommonMetaData.Title },
-            { "DARTIST", CommonMetaData.FirstAlbumArtist },
+            { "DARTIST", CommonMetaData.AlbumArtist },
             { "DALBUM", CommonMetaData.Album },
-            { "DGENRE", CommonMetaData.FirstGenre },
+            { "DGENRE", CommonMetaData.Genre },
             { "DYEAR", CommonMetaData.Year }
         };
 

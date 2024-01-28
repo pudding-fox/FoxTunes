@@ -40,33 +40,33 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedItemChanged = delegate { };
 
-        private string _DisplayScript { get; set; }
+        private string _Script { get; set; }
 
-        public string DisplayScript
+        public string Script
         {
             get
             {
-                return this._DisplayScript;
+                return this._Script;
             }
         }
 
-        public Task SetDisplayScript(string value)
+        public Task SetScript(string value)
         {
-            this._DisplayScript = value;
-            return this.OnDisplayScriptChanged();
+            this._Script = value;
+            return this.OnScriptChanged();
         }
 
-        protected virtual async Task OnDisplayScriptChanged()
+        protected virtual async Task OnScriptChanged()
         {
             await this.Refresh();
-            if (this.DisplayScriptChanged != null)
+            if (this.ScriptChanged != null)
             {
-                this.DisplayScriptChanged(this, EventArgs.Empty);
+                this.ScriptChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("DisplayScript");
+            this.OnPropertyChanged("Script");
         }
 
-        public event EventHandler DisplayScriptChanged = delegate { };
+        public event EventHandler ScriptChanged = delegate { };
 
         public override void InitializeComponent(ICore core)
         {
@@ -77,7 +77,7 @@ namespace FoxTunes.ViewModel
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.PLAYLIST_SCRIPT_ELEMENT
-            ).ConnectValue<string>(async value => await this.SetDisplayScript(value));
+            ).ConnectValue<string>(async value => await this.SetScript(value));
             var task = this.Refresh();
         }
 
@@ -115,7 +115,7 @@ namespace FoxTunes.ViewModel
             {
                 return null;
             }
-            var playlistItemScriptRunner = new PlaylistItemScriptRunner(this.ScriptingContext, playlistItem, this.DisplayScript);
+            var playlistItemScriptRunner = new PlaylistItemScriptRunner(this.ScriptingContext, playlistItem, this.Script);
             playlistItemScriptRunner.Prepare();
             return playlistItemScriptRunner.Run();
         }

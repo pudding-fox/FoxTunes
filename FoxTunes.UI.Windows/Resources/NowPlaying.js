@@ -9,7 +9,7 @@
     if (tag.track) {
         parts.push(zeropad(tag.track, 2));
     }
-    var artist = tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist;
+    var artist = tag.albumartist || tag.artist;
     if (artist) {
         parts.push(artist);
     }
@@ -22,8 +22,8 @@
     else {
         parts.push(filename(item.FileName));
     }
-    if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) {
-        parts.push(tag.firstperformer);
+    if (tag.performer && tag.performer != (tag.albumartist || tag.artist)) {
+        parts.push(tag.performer);
     }
     return parts.join(" - ");
 })()

@@ -28,9 +28,7 @@ namespace FoxTunes
         [Column(Name = "LibraryHierarchy_Id")]
         public int LibraryHierarchyId { get; set; }
 
-        public string DisplayValue { get; set; }
-
-        public string SortValue { get; set; }
+        public string Value { get; set; }
 
         public bool IsLeaf { get; set; }
 

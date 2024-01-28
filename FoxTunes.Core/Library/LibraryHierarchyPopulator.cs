@@ -63,8 +63,7 @@ namespace FoxTunes
             await AsyncParallel.ForEach(reader, async record =>
             {
                 var context = this.GetOrAddContext();
-                var displayValue = this.ExecuteScript(record, "DisplayScript");
-                var sortValue = this.ExecuteScript(record, "SortScript");
+                var value = this.ExecuteScript(record, "Script");
 
 #if NET40
                 this.Semaphore.Wait();
@@ -73,7 +72,7 @@ namespace FoxTunes
 #endif
                 try
                 {
-                    await this.Writer.Write(record, displayValue, sortValue);
+                    await this.Writer.Write(record, value);
                 }
                 finally
                 {

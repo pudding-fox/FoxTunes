@@ -70,7 +70,7 @@ AS
             this.Write(@"
 )
 
-SELECT ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_Id"", ""LibraryHierarchyLevels"".""Id"" AS ""LibraryHierarchyLevel_Id"", ""HorizontalMetaData"".""Id"" AS ""LibraryItem_Id"", ""HorizontalMetaData"".""FileName"", ""LibraryHierarchyLevels"".""DisplayScript"", ""LibraryHierarchyLevels"".""SortScript""
+SELECT ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_Id"", ""LibraryHierarchyLevels"".""Id"" AS ""LibraryHierarchyLevel_Id"", ""HorizontalMetaData"".""Id"" AS ""LibraryItem_Id"", ""HorizontalMetaData"".""FileName"", ""LibraryHierarchyLevels"".""Script""
 ");
             
             #line 44 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"

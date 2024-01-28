@@ -16,13 +16,12 @@ namespace FoxTunes
 
         public IDatabaseCommand Command { get; private set; }
 
-        public Task Write(IDatabaseReaderRecord record, object displayValue, object sortValue)
+        public Task Write(IDatabaseReaderRecord record, object value)
         {
             this.Command.Parameters["libraryHierarchyId"] = record["LibraryHierarchy_Id"];
             this.Command.Parameters["libraryHierarchyLevelId"] = record["LibraryHierarchyLevel_Id"];
             this.Command.Parameters["libraryItemId"] = record["LibraryItem_Id"];
-            this.Command.Parameters["displayValue"] = displayValue;
-            this.Command.Parameters["sortValue"] = sortValue;
+            this.Command.Parameters["value"] = value;
             this.Command.Parameters["isLeaf"] = record["IsLeaf"];
             return this.Command.ExecuteNonQueryAsync();
         }
@@ -39,8 +38,7 @@ namespace FoxTunes
             table.CreateColumn(ColumnConfig.By("LibraryHierarchy_Id", Factories.Type.Create(TypeConfig.By(DbType.Int32))));
             table.CreateColumn(ColumnConfig.By("LibraryHierarchyLevel_Id", Factories.Type.Create(TypeConfig.By(DbType.Int32))));
             table.CreateColumn(ColumnConfig.By("LibraryItem_Id", Factories.Type.Create(TypeConfig.By(DbType.Int32))));
-            table.CreateColumn(ColumnConfig.By("DisplayValue", Factories.Type.Create(TypeConfig.By(DbType.String))));
-            table.CreateColumn(ColumnConfig.By("SortValue", Factories.Type.Create(TypeConfig.By(DbType.String))));
+            table.CreateColumn(ColumnConfig.By("Value", Factories.Type.Create(TypeConfig.By(DbType.String))));
             table.CreateColumn(ColumnConfig.By("IsLeaf", Factories.Type.Create(TypeConfig.By(DbType.Boolean))));
             var query = database.QueryFactory.Build();
             query.Add.SetTable(table);

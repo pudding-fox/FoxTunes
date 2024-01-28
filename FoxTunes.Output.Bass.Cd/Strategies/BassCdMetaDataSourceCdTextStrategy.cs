@@ -10,9 +10,9 @@ namespace FoxTunes
         private static IDictionary<string, string> NAMES = new Dictionary<string, string>()
         {
             { "TITLE", CommonMetaData.Title },
-            { "PERFORMER", CommonMetaData.FirstAlbumArtist },
-            { "COMPOSER", CommonMetaData.FirstComposer },
-            { "GENRE", CommonMetaData.FirstGenre }
+            { "PERFORMER", CommonMetaData.AlbumArtist },
+            { "COMPOSER", CommonMetaData.Composer },
+            { "GENRE", CommonMetaData.Genre }
         };
 
         public BassCdMetaDataSourceCdTextStrategy(int drive)

@@ -18,7 +18,7 @@ AS
 "AlbumArtist"
 AS
 (
-	SELECT "AlbumArtist"."Id", "AlbumArtist"."DirectoryName", "Album", CASE WHEN "FirstAlbumArtist" IS NOT NULL THEN "FirstAlbumArtist" ELSE "FirstArtist" END AS "Artist"
+	SELECT "AlbumArtist"."Id", "AlbumArtist"."DirectoryName", "Album", CASE WHEN "AlbumArtist" IS NOT NULL THEN "AlbumArtist" ELSE "Artist" END AS "Artist"
 	FROM
 	(
 		SELECT "LibraryItems".*,
@@ -30,13 +30,13 @@ AS
 		(
 			SELECT "TextValue"
 			FROM "MetaData"
-			WHERE "MetaData"."Id" = "LibraryItems"."Id" AND "MetaData"."Name" = 'FirstAlbumArtist'
-		) AS "FirstAlbumArtist",
+			WHERE "MetaData"."Id" = "LibraryItems"."Id" AND "MetaData"."Name" = 'AlbumArtist'
+		) AS "AlbumArtist",
 		(
 			SELECT "TextValue"
 			FROM "MetaData"
-			WHERE "MetaData"."Id" = "LibraryItems"."Id" AND "MetaData"."Name" = 'FirstArtist'
-		) AS "FirstArtist"
+			WHERE "MetaData"."Id" = "LibraryItems"."Id" AND "MetaData"."Name" = 'Artist'
+		) AS "Artist"
 		FROM "LibraryItems"
 		WHERE "Status" = @status
 	) AS "AlbumArtist"
