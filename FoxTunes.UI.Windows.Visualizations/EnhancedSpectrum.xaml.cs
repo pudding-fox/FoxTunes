@@ -163,8 +163,6 @@ namespace FoxTunes
                     this.Bands.Value = bands;
                 }
             }
-
-            this.SaveSettings();
 #if NET40
             return TaskEx.FromResult(false);
 #else

@@ -56,7 +56,6 @@ namespace FoxTunes
             {
                 case TOGGLE_GROUPING:
                     this.Grouping.Toggle();
-                    this.Configuration.Save();
                     break;
             }
             return Task.CompletedTask;

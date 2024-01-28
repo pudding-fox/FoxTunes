@@ -79,10 +79,6 @@ namespace FoxTunes
                 {
                     await this.Disable().ConfigureAwait(false);
                 }
-                if (this.IsInitialized)
-                {
-                    this.Configuration.Save();
-                }
             });
             this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
@@ -127,15 +123,12 @@ namespace FoxTunes
             {
                 case TOPMOST:
                     this.Topmost.Toggle();
-                    this.Configuration.Save();
                     break;
                 case SHOW_ARTWORK:
                     this.ShowArtwork.Toggle();
-                    this.Configuration.Save();
                     break;
                 case SHOW_PLAYLIST:
                     this.ShowPlaylist.Toggle();
-                    this.Configuration.Save();
                     break;
                 case QUIT:
                     return Windows.Shutdown();

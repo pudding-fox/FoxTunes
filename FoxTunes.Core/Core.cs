@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public static ICore Instance { get; private set; }
 
-        public static bool IsShuttingDown { get; set; }
+        public static bool IsShuttingDown { get; private set; }
 
         private Core()
         {
@@ -148,6 +148,17 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to initialize database {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
+        }
+
+        public void Unload()
+        {
+            IsShuttingDown = true;
+            this.SaveConfiguration();
+        }
+
+        protected virtual void SaveConfiguration()
+        {
+            this.Components.Configuration.Save();
         }
 
         public bool IsDisposed { get; private set; }

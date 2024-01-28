@@ -49,7 +49,6 @@ namespace FoxTunes
             if (string.Equals(component.Id, this.ShowCounters.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.ShowCounters.Toggle();
-                this.Configuration.Save();
             }
 #if NET40
             return TaskEx.FromResult(false);

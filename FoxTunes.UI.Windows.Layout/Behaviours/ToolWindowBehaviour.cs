@@ -54,8 +54,14 @@ namespace FoxTunes
 
         protected virtual async Task Load()
         {
-            //Whatever happens we're ready.
-            this.IsLoaded = true;
+            if (this.IsLoaded)
+            {
+                await this.Reset().ConfigureAwait(false);
+            }
+            else
+            {
+                this.IsLoaded = true;
+            }
             if (!string.IsNullOrEmpty(this.Element.Value))
             {
                 Logger.Write(this, LogLevel.Debug, "Loading config..");
@@ -215,7 +221,10 @@ namespace FoxTunes
             if (!configs.Any())
             {
                 Logger.Write(this, LogLevel.Debug, "No config to save.");
-                this.Element.Value = null;
+                if (!string.IsNullOrEmpty(this.Element.Value))
+                {
+                    this.Element.Value = null;
+                }
                 return;
             }
             try
@@ -257,6 +266,7 @@ namespace FoxTunes
             global::FoxTunes.Windows.Registrations.AddIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
             this.Core = core;
             this.Configuration = core.Components.Configuration;
+            this.Configuration.Loaded += this.OnLoaded;
             this.Configuration.Saving += this.OnSaving;
             this.Layout = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -266,7 +276,6 @@ namespace FoxTunes
                 ToolWindowBehaviourConfiguration.SECTION,
                 ToolWindowBehaviourConfiguration.ELEMENT
             );
-            this.Element.ValueChanged += this.OnValueChanged;
             if (this.Enabled)
             {
                 var task = this.Load();
@@ -323,14 +332,20 @@ namespace FoxTunes
             LayoutDesignerBehaviour.Instance.IsDesigning = global::FoxTunes.Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID);
         }
 
-        protected void OnValueChanged(object sender, EventArgs e)
+        protected virtual void OnLoaded(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(this.Element.Value))
+            if (this.Enabled)
             {
-                return;
+#if NET40
+                var task = TaskEx.Run(async () =>
+#else
+                var task = Task.Run(async () =>
+#endif
+                {
+                    await this.Load().ConfigureAwait(false);
+                    await this.UpdateVisiblity().ConfigureAwait(false);
+                });
             }
-            //Looks like the config was reset.
-            var task = this.Reset();
         }
 
         protected virtual void OnSaving(object sender, EventArgs e)
@@ -442,6 +457,8 @@ namespace FoxTunes
             {
                 foreach (var pair in this.Windows)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Closing window: {0}", pair.Value.Title);
+                    pair.Value.Closed -= this.OnClosed;
                     pair.Value.Close();
                 }
                 this.Windows.Clear();
@@ -479,6 +496,7 @@ namespace FoxTunes
             global::FoxTunes.Windows.Registrations.RemoveIsVisibleChanged(ToolWindowManagerWindow.ID, this.OnWindowIsVisibleChanged);
             if (this.Configuration != null)
             {
+                this.Configuration.Loaded -= this.OnLoaded;
                 this.Configuration.Saving -= this.OnSaving;
             }
         }

@@ -56,7 +56,6 @@ namespace FoxTunes
                 case PlaylistBehaviourConfiguration.ORDER_SHUFFLE_ALBUMS:
                 case PlaylistBehaviourConfiguration.ORDER_SHUFFLE_ARTISTS:
                     this.Order.Value = this.Order.GetOption(component.Id);
-                    this.Configuration.Save();
                     break;
             }
 #if NET40

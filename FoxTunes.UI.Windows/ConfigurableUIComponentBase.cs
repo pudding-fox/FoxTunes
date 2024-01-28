@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace FoxTunes
 {
-    public abstract class ConfigurableUIComponentBase : UIComponentBase, IConfigurableComponent, IInvocableComponent, IConfigurationTarget
+    public abstract class ConfigurableUIComponentBase : UIComponentBase, IConfigurableComponent, IInvocableComponent, IConfigurationTarget, IDisposable
     {
         public const string SETTINGS = "ZZZZ";
 
@@ -37,6 +37,7 @@ namespace FoxTunes
             {
                 this.ApplyConfiguration();
             }
+            this.Loaded -= this.OnLoaded;
         }
 
         protected virtual void ApplyConfiguration()
@@ -123,15 +124,17 @@ namespace FoxTunes
             }
         }
 
-        public virtual async Task InvokeAsync(IInvocationComponent component)
+        public virtual Task InvokeAsync(IInvocationComponent component)
         {
             if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
             {
-                if (await this.ShowSettings().ConfigureAwait(false))
-                {
-                    this.SaveSettings();
-                }
+                return this.ShowSettings();
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected abstract Task<bool> ShowSettings();
@@ -150,11 +153,45 @@ namespace FoxTunes
             );
         }
 
-        protected virtual void SaveSettings()
+        public abstract IEnumerable<ConfigurationSection> GetConfigurationSections();
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
         {
-            this.Configuration.Save();
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        public abstract IEnumerable<ConfigurationSection> GetConfigurationSections();
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Configuration is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        ~ConfigurableUIComponentBase()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
+        }
     }
 }

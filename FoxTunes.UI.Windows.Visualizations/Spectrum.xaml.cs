@@ -138,7 +138,6 @@ namespace FoxTunes
                     this.CheckSettings();
                 }
             }
-            this.SaveSettings();
 #if NET40
             return TaskEx.FromResult(false);
 #else
