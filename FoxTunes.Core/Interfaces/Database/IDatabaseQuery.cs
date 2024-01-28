@@ -9,6 +9,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IDatabaseQuery : IOrderedQueryable, IQueryable, IEnumerable, INotifyCollectionChanged
     {
+        void Detach();
+
         void Include(string path);
     }
 

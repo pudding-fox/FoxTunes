@@ -7,25 +7,10 @@ namespace FoxTunes.Managers
     {
         public ICore Core { get; private set; }
 
-        public ILibrary Library { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Library = core.Components.Library;
             base.InitializeComponent(core);
-        }
-
-        public Task AddHierarchy(LibraryHierarchy libraryHierarchy)
-        {
-            this.Library.LibraryHierarchySet.Add(libraryHierarchy);
-            return Task.CompletedTask;
-        }
-
-        public Task DeleteHierarchy(LibraryHierarchy libraryHierarchy)
-        {
-            this.Library.LibraryHierarchySet.Remove(libraryHierarchy);
-            return Task.CompletedTask;
         }
 
         public Task BuildHierarchies()

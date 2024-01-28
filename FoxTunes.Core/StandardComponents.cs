@@ -33,22 +33,6 @@ namespace FoxTunes
             }
         }
 
-        public IPlaylist Playlist
-        {
-            get
-            {
-                return ComponentRegistry.Instance.GetComponent<IPlaylist>();
-            }
-        }
-
-        public ILibrary Library
-        {
-            get
-            {
-                return ComponentRegistry.Instance.GetComponent<ILibrary>();
-            }
-        }
-
         public IOutput Output
         {
             get

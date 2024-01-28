@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
-    public class LibraryHierarchy : PersistableComponent
+    public class LibraryHierarchy : PersistableComponent, IEquatable<LibraryHierarchy>
     {
         public LibraryHierarchy()
         {
@@ -40,5 +40,50 @@ namespace FoxTunes
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
 
         public ObservableCollection<LibraryHierarchyItem> Items { get; set; }
+
+        public bool Equals(LibraryHierarchy other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return this.Id == other.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as LibraryHierarchy);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode();
+        }
+
+        public static bool operator ==(LibraryHierarchy a, LibraryHierarchy b)
+        {
+            if ((object)a == null && (object)b == null)
+            {
+                return true;
+            }
+            if ((object)a == null || (object)b == null)
+            {
+                return false;
+            }
+            if (object.ReferenceEquals((object)a, (object)b))
+            {
+                return true;
+            }
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(LibraryHierarchy a, LibraryHierarchy b)
+        {
+            return !(a == b);
+        }
     }
 }

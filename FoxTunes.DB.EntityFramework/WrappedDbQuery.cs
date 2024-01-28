@@ -66,6 +66,11 @@ namespace FoxTunes
             }
         }
 
+        public void Detach()
+        {
+            this.Query = this.Query.AsNoTracking();
+        }
+
         public void Include(string path)
         {
             this.Query = this.Query.Include(path);

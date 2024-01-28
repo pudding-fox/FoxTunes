@@ -8,7 +8,7 @@ namespace FoxTunes.Behaviours
     {
         const int ENQUEUE_COUNT = 3;
 
-        public IPlaylist Playlist { get; private set; }
+        public IDataManager DataManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -18,7 +18,7 @@ namespace FoxTunes.Behaviours
 
         public override void InitializeComponent(ICore core)
         {
-            this.Playlist = core.Components.Playlist;
+            this.DataManager = core.Managers.Data;
             this.PlaybackManager = core.Managers.Playback;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
@@ -39,7 +39,7 @@ namespace FoxTunes.Behaviours
         {
             var sequence = this.PlaybackManager.CurrentStream.PlaylistItem.Sequence;
             var query =
-                from playlistItem in this.Playlist.PlaylistItemQuery
+                from playlistItem in this.DataManager.ReadContext.Queries.PlaylistItem
                 orderby playlistItem.Sequence
                 where playlistItem.Sequence > sequence
                 select playlistItem;

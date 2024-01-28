@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.IO;
 
 namespace FoxTunes.Factories
 {
@@ -17,7 +18,7 @@ namespace FoxTunes.Factories
 
         public LibraryItem Create(string fileName)
         {
-            var item = new LibraryItem(fileName, this.MetaDataSourceFactory.Create(fileName));
+            var item = new LibraryItem(Path.GetDirectoryName(fileName), fileName, this.MetaDataSourceFactory.Create(fileName));
             item.InitializeComponent(this.Core);
             return item;
         }

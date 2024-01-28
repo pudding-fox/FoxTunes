@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public IEnumerable<LibraryItem> LibraryItems { get; private set; }
 
+        public IDataManager DataManager { get; private set; }
+
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
@@ -30,6 +32,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.DataManager = core.Managers.Data;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaylistItemFactory = core.Factories.PlaylistItem;
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -38,13 +41,16 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            this.ShiftItems(this.Sequence, this.LibraryItems.Count());
-            this.AddItems();
-            await this.SaveChanges();
+            using (var context = this.DataManager.CreateWriteContext())
+            {
+                this.ShiftItems(context, this.Sequence, this.LibraryItems.Count());
+                this.AddItems(context);
+                await this.SaveChanges(context);
+            }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
-        private void AddItems()
+        private void AddItems(IDatabaseContext context)
         {
             this.Name = "Processing library items";
             this.Position = 0;
@@ -59,7 +65,8 @@ namespace FoxTunes
             foreach (var playlistItem in query)
             {
                 Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.PlaylistItemSet.Add(playlistItem)));
+                context.Sets.PlaylistItem.Add(playlistItem);
+                this.ForegroundTaskRunner.Run(() => this.DataManager.ReadContext.Sets.PlaylistItem.Add(playlistItem));
                 if (position % interval == 0)
                 {
                     this.Description = Path.GetFileName(playlistItem.FileName);
@@ -68,14 +75,6 @@ namespace FoxTunes
                 position++;
             }
             this.Position = this.Count;
-        }
-
-        private Task SaveChanges()
-        {
-            this.Name = "Saving changes";
-            this.IsIndeterminate = true;
-            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
-            return this.Database.Interlocked(async () => await this.Database.SaveChangesAsync());
         }
     }
 }

@@ -41,9 +41,12 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             this.EnumerateFiles();
-            this.ShiftItems(this.Sequence, this.FileNames.Count());
-            this.AddFiles();
-            await this.SaveChanges();
+            using (var context = this.DataManager.CreateWriteContext())
+            {
+                this.ShiftItems(context, this.Sequence, this.FileNames.Count());
+                this.AddFiles(context);
+                await this.SaveChanges(context);
+            }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
@@ -73,7 +76,7 @@ namespace FoxTunes
             this.Position = this.Count;
         }
 
-        private void AddFiles()
+        private void AddFiles(IDatabaseContext context)
         {
             this.Name = "Processing files";
             this.Position = 0;
@@ -88,7 +91,8 @@ namespace FoxTunes
             foreach (var playlistItem in this.OrderBy(query))
             {
                 Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.PlaylistItemSet.Add(playlistItem)));
+                context.Sets.PlaylistItem.Add(playlistItem);
+                this.ForegroundTaskRunner.Run(() => this.DataManager.ReadContext.Sets.PlaylistItem.Add(playlistItem));
                 if (position % interval == 0)
                 {
                     this.Description = Path.GetFileName(playlistItem.FileName);
@@ -97,14 +101,6 @@ namespace FoxTunes
                 position++;
             }
             this.Position = this.Count;
-        }
-
-        private Task SaveChanges()
-        {
-            this.Name = "Saving changes";
-            this.IsIndeterminate = true;
-            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
-            return this.Database.Interlocked(async () => await this.Database.SaveChangesAsync());
         }
 
         private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)

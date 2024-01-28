@@ -15,11 +15,11 @@ namespace FoxTunes.ViewModel
             this._SelectedItem = new RenderableLibraryHierarchyItem();
         }
 
-        public IDatabase Database { get; private set; }
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
+        public IDataManager DataManager { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
-
-        public IDatabaseQuery<LibraryHierarchyItem> LibraryHierarchyItemQuery { get; private set; }
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 
@@ -43,7 +43,7 @@ namespace FoxTunes.ViewModel
                 this.SelectedHierarchyChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("SelectedHierarchy");
-            this.Refresh();
+            this.Refresh(false);
         }
 
         public event EventHandler SelectedHierarchyChanged = delegate { };
@@ -54,14 +54,14 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Database == null || this.SelectedHierarchy == null)
+                if (this.DataManager == null || this.SelectedHierarchy == null)
                 {
                     return null;
                 }
                 if (!this._Items.ContainsKey(this.SelectedHierarchy))
                 {
                     var libraryHierarchyItems = this.SelectedHierarchy.Items
-                        .Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database));
+                        .Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.DataManager.ReadContext));
                     this._Items[this.SelectedHierarchy] = new ObservableCollection<RenderableLibraryHierarchyItem>(libraryHierarchyItems);
                 }
                 return this._Items[this.SelectedHierarchy];
@@ -76,6 +76,8 @@ namespace FoxTunes.ViewModel
             }
             this.OnPropertyChanged("Items");
         }
+
+        public event EventHandler ItemsChanged = delegate { };
 
         private RenderableLibraryHierarchyItem _SelectedItem { get; set; }
 
@@ -106,22 +108,25 @@ namespace FoxTunes.ViewModel
         public void Reload()
         {
             this._Items.Clear();
-            this.Refresh();
+            this.Refresh(true);
         }
 
-        public void Refresh()
+        public void Refresh(bool deep)
         {
+            if (this.DataManager != null && this.SelectedHierarchy != null && deep)
+            {
+                this.SelectedHierarchy = this.DataManager.ReadContext.Sets.LibraryHierarchy.Find(this.SelectedHierarchy.Id);
+            }
             this.OnItemsChanged();
         }
 
-        public event EventHandler ItemsChanged = delegate { };
-
         protected override void OnCoreChanged()
         {
-            this.Database = this.Core.Components.Database;
+            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
+            this.DataManager = this.Core.Managers.Data;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Refresh();
+            this.Refresh(false);
             base.OnCoreChanged();
         }
 
@@ -130,7 +135,7 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    this.Reload();
+                    this.ForegroundTaskRunner.Run(this.Reload);
                     break;
             }
         }

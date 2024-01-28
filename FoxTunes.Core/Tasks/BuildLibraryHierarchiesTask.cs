@@ -1,13 +1,13 @@
-﻿using System;
-using FoxTunes.Interfaces;
-using System.Linq;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BuildLibraryHierarchiesTask : BackgroundTask
+    public class BuildLibraryHierarchiesTask : LibraryTaskBase
     {
         public const string ID = "B6AF297E-F334-481D-8D60-BD5BE5935BD9";
 
@@ -16,58 +16,51 @@ namespace FoxTunes
         {
         }
 
-        public ILibrary Library { get; private set; }
-
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
         public IScriptingContext ScriptingContext { get; private set; }
 
-        public IDatabase Database { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            this.Library = core.Components.Library;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
-            this.Database = core.Components.Database;
-            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
         protected override async Task OnRun()
         {
             this.Position = 0;
-            this.Count = this.Database.Interlocked(() => this.Library.LibraryItemQuery.Count() * this.Library.LibraryHierarchyQuery.Count());
-            foreach (var libraryHierarchy in this.Library.LibraryHierarchyQuery)
+            using (var context = this.DataManager.CreateWriteContext())
             {
-                Logger.Write(this, LogLevel.Debug, "Building library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);
-                this.Description = libraryHierarchy.Name;
-                this.ClearHierarchy(libraryHierarchy);
-                var libraryHierarchyItems = this.BuildHierarchy(libraryHierarchy);
-                foreach (var libraryHierarchyItem in libraryHierarchyItems)
+                this.Count = context.Queries.LibraryItem.Count() * context.Queries.LibraryHierarchy.Count();
+                foreach (var libraryHierarchy in context.Queries.LibraryHierarchy)
                 {
-                    this.Database.Interlocked(() => libraryHierarchy.Items.Add(libraryHierarchyItem));
+                    Logger.Write(this, LogLevel.Debug, "Building library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);
+                    this.Description = libraryHierarchy.Name;
+                    this.ClearHierarchy(libraryHierarchy);
+                    var libraryHierarchyItems = this.BuildHierarchy(libraryHierarchy, null, context.Queries.LibraryItem, 0);
+                    foreach (var libraryHierarchyItem in libraryHierarchyItems)
+                    {
+                        libraryHierarchy.Items.Add(libraryHierarchyItem);
+                    }
                 }
+                this.Position = this.Count;
+                await this.SaveChanges(context);
             }
-            this.Position = this.Count;
-            await this.SaveChanges();
             this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
 
         private void ClearHierarchy(LibraryHierarchy libraryHierarchy)
         {
             Logger.Write(this, LogLevel.Debug, "Clearing existing library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);
-            this.Database.Interlocked(() => libraryHierarchy.Items.Clear());
-        }
-
-        private IEnumerable<LibraryHierarchyItem> BuildHierarchy(LibraryHierarchy libraryHierarchy)
-        {
-            return this.BuildHierarchy(libraryHierarchy, null, this.Library.LibraryItemQuery, 0);
+            libraryHierarchy.Items.Clear();
         }
 
         private IEnumerable<LibraryHierarchyItem> BuildHierarchy(LibraryHierarchy libraryHierarchy, LibraryHierarchyItem parent, IEnumerable<LibraryItem> libraryItems, int level)
         {
+            if (libraryHierarchy.Levels.Count <= level)
+            {
+                return Enumerable.Empty<LibraryHierarchyItem>();
+            }
             var isLeaf = level >= libraryHierarchy.Levels.Count - 1;
             var libraryHierarchyLevel = libraryHierarchy.Levels[level];
             Logger.Write(this, LogLevel.Trace, "Building library hierarchy level: {0} => {1}", libraryHierarchyLevel.Id, libraryHierarchyLevel.DisplayScript);
@@ -127,12 +120,12 @@ namespace FoxTunes
             return query;
         }
 
-        private Task SaveChanges()
+        private Task SaveChanges(IDatabaseContext context)
         {
             this.Name = "Saving changes";
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
-            return this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(async () => await this.Database.SaveChangesAsync()));
+            return context.WithAutoDetectChanges(async () => await context.SaveChangesAsync());
         }
 
         private string ExecuteScript(LibraryItem libraryItem, string script)

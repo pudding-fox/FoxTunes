@@ -41,5 +41,7 @@ namespace FoxTunes
                 return null;
             }
         }
+
+        public static readonly MetaDataItem Empty = new MetaDataItem();
     }
 }

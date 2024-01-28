@@ -17,7 +17,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock>Library View Modes</TextBlock>
-        <TabControl Grid.Row="1" ItemsSource="{Binding Components.Library.LibraryHierarchyQuery}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name" Margin="0,7,0,0">
+        <TabControl Grid.Row="1" ItemsSource="{Binding DatabaseContext.Queries.LibraryHierarchy, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name" Margin="0,7,0,0">
             <TabControl.ContentTemplate>
                 <DataTemplate>
                     <Grid Margin="7">
@@ -50,7 +50,7 @@
             </StackPanel.Resources>
             <Button Command="{Binding NewCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
             <Button Command="{Binding DeleteCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
-            <Button Command="{Binding RebuildCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Rebuild</Button>
+            <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -13,11 +13,11 @@ namespace FoxTunes.ViewModel
 
         }
 
-        public RenderableLibraryHierarchyItem(LibraryHierarchyItem libraryHierarchyItem, IDatabase database)
+        public RenderableLibraryHierarchyItem(LibraryHierarchyItem libraryHierarchyItem, IDatabaseContext databaseContext)
             : this()
         {
             this.LibraryHierarchyItem = libraryHierarchyItem;
-            this.Database = database;
+            this.DatabaseContext = databaseContext;
             this.Id = libraryHierarchyItem.Id;
             this.DisplayValue = libraryHierarchyItem.DisplayValue;
             this.SortValue = libraryHierarchyItem.SortValue;
@@ -27,7 +27,7 @@ namespace FoxTunes.ViewModel
 
         public LibraryHierarchyItem LibraryHierarchyItem { get; private set; }
 
-        public IDatabase Database { get; private set; }
+        public IDatabaseContext DatabaseContext { get; private set; }
 
         private ObservableCollection<LibraryHierarchyItem> _Children { get; set; }
 
@@ -42,12 +42,12 @@ namespace FoxTunes.ViewModel
                     {
                         sequence = Enumerable.Empty<LibraryHierarchyItem>();
                     }
-                    else if (this.Database.CanQuery(this.LibraryHierarchyItem))
+                    else if (this.DatabaseContext.CanQuery(this.LibraryHierarchyItem))
                     {
-                        var query = this.Database
+                        var query = this.DatabaseContext
                             .GetMemberQuery<LibraryHierarchyItem, LibraryHierarchyItem>(this.LibraryHierarchyItem, _ => _.Children)
                             .ToArray(); //We have to switch to object query as the following projection is not supported.
-                        sequence = query.Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database));
+                        sequence = query.Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.DatabaseContext));
                     }
                     else
                     {
@@ -65,9 +65,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this._Items == null && this.Database != null && this.Database.CanQuery(this.LibraryHierarchyItem))
+                if (this._Items == null && this.DatabaseContext != null && this.DatabaseContext.CanQuery(this.LibraryHierarchyItem))
                 {
-                    var query = this.Database.GetMemberQuery<LibraryHierarchyItem, LibraryItem>(this.LibraryHierarchyItem, _ => _.Items);
+                    var query = this.DatabaseContext.GetMemberQuery<LibraryHierarchyItem, LibraryItem>(this.LibraryHierarchyItem, _ => _.Items);
                     query.Include("MetaDatas");
                     query.Include("Properties");
                     query.Include("Images");

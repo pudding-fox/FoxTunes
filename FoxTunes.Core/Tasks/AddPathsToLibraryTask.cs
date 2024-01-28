@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class AddPathsToLibraryTask : BackgroundTask
+    public class AddPathsToLibraryTask : LibraryTaskBase
     {
         public const string ID = "972222C8-8F6E-44CF-8EBE-DA4FCFD7CD80";
+
+        public const int SAVE_INTERVAL = 1000;
 
         public AddPathsToLibraryTask(IEnumerable<string> paths)
             : base(ID)
@@ -21,32 +23,26 @@ namespace FoxTunes
 
         public IEnumerable<string> FileNames { get; private set; }
 
-        public ILibrary Library { get; private set; }
-
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public ILibraryItemFactory LibraryItemFactory { get; private set; }
 
-        public IDatabase Database { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            this.Library = core.Components.Library;
             this.PlaybackManager = core.Managers.Playback;
             this.LibraryItemFactory = core.Factories.LibraryItem;
-            this.Database = core.Components.Database;
-            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
         protected override async Task OnRun()
         {
             this.EnumerateFiles();
-            this.SanitizeFiles();
-            this.AddFiles();
-            await this.SaveChanges();
+            using (var context = this.DataManager.CreateWriteContext())
+            {
+                this.SanitizeFiles(context);
+                await this.AddFiles(context);
+                await this.SaveChanges(context, true);
+            }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
@@ -76,7 +72,7 @@ namespace FoxTunes
             this.Position = this.Count;
         }
 
-        private void SanitizeFiles()
+        private void SanitizeFiles(IDatabaseContext context)
         {
             var fileNames = this.FileNames.ToList();
             this.Name = "Preparing file list";
@@ -88,7 +84,7 @@ namespace FoxTunes
             for (var a = 0; a < fileNames.Count;)
             {
                 var fileName = fileNames[a];
-                if (this.Database.Interlocked(() => this.Library.LibraryItemSet.Any(libraryItem => libraryItem.FileName == fileName)))
+                if (context.Queries.LibraryItem.Any(libraryItem => libraryItem.FileName == fileName))
                 {
                     Logger.Write(this, LogLevel.Debug, "File already exists in library: {0}", fileName);
                     fileNames.RemoveAt(a);
@@ -109,7 +105,7 @@ namespace FoxTunes
             this.Position = this.Count;
         }
 
-        private void AddFiles()
+        private async Task AddFiles(IDatabaseContext context)
         {
             this.Name = "Processing files";
             this.Position = 0;
@@ -124,23 +120,19 @@ namespace FoxTunes
             foreach (var libraryItem in query)
             {
                 Logger.Write(this, LogLevel.Debug, "Adding item to library: {0} => {1}", libraryItem.Id, libraryItem.FileName);
-                this.Database.Interlocked(() => this.Library.LibraryItemSet.Add(libraryItem));
+                context.Sets.LibraryItem.Add(libraryItem);
                 if (position % interval == 0)
                 {
                     this.Description = Path.GetFileName(libraryItem.FileName);
                     this.Position = position;
                 }
+                if (position > 0 && position % SAVE_INTERVAL == 0)
+                {
+                    await this.SaveChanges(context, false);
+                }
                 position++;
             }
             this.Position = this.Count;
-        }
-
-        private Task SaveChanges()
-        {
-            this.Name = "Saving changes";
-            this.IsIndeterminate = true;
-            Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
-            return this.Database.Interlocked(async () => await this.Database.SaveChangesAsync());
         }
     }
 }

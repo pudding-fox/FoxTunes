@@ -13,9 +13,10 @@ namespace FoxTunes
             this.Images = new ObservableCollection<ImageItem>();
         }
 
-        public PlaylistItem(int sequence, string fileName, IMetaDataSource metaData) : this()
+        public PlaylistItem(int sequence, string directoryName, string fileName, IMetaDataSource metaData) : this()
         {
             this.Sequence = sequence;
+            this.DirectoryName = directoryName;
             this.FileName = fileName;
             this.MetaDatas = metaData.MetaDatas;
             this.Properties = metaData.Properties;
@@ -47,6 +48,8 @@ namespace FoxTunes
         }
 
         public event EventHandler SequenceChanged = delegate { };
+
+        public string DirectoryName { get; set; }
 
         public string FileName { get; set; }
 

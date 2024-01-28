@@ -45,7 +45,15 @@ namespace FoxTunes
         {
             get
             {
-                return this.WaveSource.Position;
+                try
+                {
+                    return this.WaveSource.Position;
+                }
+                catch (NullReferenceException)
+                {
+                    //Disposed.
+                    return 0;
+                }
             }
             set
             {
@@ -57,7 +65,15 @@ namespace FoxTunes
         {
             get
             {
-                return this.WaveSource.Length;
+                try
+                {
+                    return this.WaveSource.Length;
+                }
+                catch (NullReferenceException)
+                {
+                    //Disposed.
+                    return 0;
+                }
             }
         }
 

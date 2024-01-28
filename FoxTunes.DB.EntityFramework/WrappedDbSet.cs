@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -21,6 +22,17 @@ namespace FoxTunes
         public DbContext DbContext { get; private set; }
 
         public DbSet<T> Set { get; private set; }
+
+        public void Load()
+        {
+            this.Set.Load();
+        }
+
+        public Task LoadAsync()
+        {
+            this.Load();
+            return Task.CompletedTask;
+        }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
@@ -56,6 +68,11 @@ namespace FoxTunes
             }
         }
 
+        public void Detach()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Include(string path)
         {
             throw new NotImplementedException();
@@ -78,6 +95,39 @@ namespace FoxTunes
             }
         }
 
+        public T Attach(T item)
+        {
+            return this.Set.Attach(item);
+        }
+
+        public IEnumerable<T> AttachRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                yield return this.Attach(item);
+            }
+        }
+
+        public T Detach(T item)
+        {
+            var entry = this.DbContext.Entry(item);
+            entry.State = EntityState.Detached;
+            return item;
+        }
+
+        public IEnumerable<T> DetachRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                yield return this.Detach(item);
+            }
+        }
+
+        public T Find(params object[] keyValues)
+        {
+            return this.Set.Find(keyValues);
+        }
+
         public T Add(T item)
         {
             return this.Set.Add(item);
@@ -90,7 +140,8 @@ namespace FoxTunes
 
         public T Update(T item)
         {
-            this.DbContext.Entry(item).State = EntityState.Modified;
+            var entry = this.DbContext.Entry(item);
+            entry.State = EntityState.Modified;
             return item;
         }
 
@@ -101,6 +152,14 @@ namespace FoxTunes
                 this.Update(item);
             }
             return items;
+        }
+
+        public T SetCurrentValues(T item, params object[] keyValues)
+        {
+            var currentItem = this.Find(keyValues);
+            var entry = this.DbContext.Entry(currentItem);
+            entry.CurrentValues.SetValues(item);
+            return item;
         }
 
         public T Remove(T item)
@@ -137,6 +196,11 @@ namespace FoxTunes
         public void Clear()
         {
             this.Set.Local.Clear();
+        }
+
+        public IEnumerable<T> Query(string sql, params object[] parameters)
+        {
+            return this.Set.SqlQuery(sql, parameters);
         }
 
         public ObservableCollection<T> Local

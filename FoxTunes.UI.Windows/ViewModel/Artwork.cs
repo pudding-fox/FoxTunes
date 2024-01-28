@@ -1,13 +1,7 @@
 ﻿using FoxTunes.Interfaces;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Data;
 using System;
-using System.Globalization;
 using System.Linq;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
@@ -17,7 +11,7 @@ namespace FoxTunes.ViewModel
         {
         }
 
-        public IDatabase Database { get; private set; }
+        public IDataManager DataManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -82,21 +76,21 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var playlistItem = this.PlaylistManager.CurrentItem;
-            if (playlistItem == null || !this.Database.CanQuery(playlistItem))
+            if (playlistItem == null)
             {
                 this.Image = null;
                 return;
             }
-            var query =
-                from imageItem in this.Database.GetMemberQuery<PlaylistItem, ImageItem>(playlistItem, _ => _.Images)
-                where imageItem.MetaDatas.Any(metaDataItem => metaDataItem.Name == CommonImageMetaData.Type && metaDataItem.TextValue == this.ImageType)
-                select imageItem;
-            this.Image = query.FirstOrDefault();
+            this.Image = playlistItem.Images.FirstOrDefault(
+                imageItem => imageItem.MetaDatas.Any(
+                    metaDataItem => metaDataItem.Name == "Type" && metaDataItem.TextValue == this.ImageType
+                )
+            );
         }
 
         protected override void OnCoreChanged()
         {
-            this.Database = this.Core.Components.Database;
+            this.DataManager = this.Core.Managers.Data;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaylistManager.CurrentItemChanged += (sender, e) => this.Refresh();
             base.OnCoreChanged();
