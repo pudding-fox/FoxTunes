@@ -1,4 +1,6 @@
-﻿namespace FoxTunes
+﻿using System;
+
+namespace FoxTunes
 {
     public class LibraryHierarchyLevel : PersistableComponent
     {
@@ -7,14 +9,56 @@
 
         }
 
-        public LibraryHierarchyLevel(string displayScript, string sortScript) : this()
+        private string _DisplayScript { get; set; }
+
+        public string DisplayScript
         {
-            this.DisplayScript = displayScript;
-            this.SortScript = sortScript;
+            get
+            {
+                return this._DisplayScript;
+            }
+            set
+            {
+                this._DisplayScript = value;
+                this.OnDisplayScriptChanged();
+            }
         }
 
-        public string DisplayScript { get; set; }
+        protected virtual void OnDisplayScriptChanged()
+        {
+            if (this.DisplayScriptChanged != null)
+            {
+                this.DisplayScriptChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("DisplayScript");
+        }
 
-        public string SortScript { get; set; }
+        public event EventHandler DisplayScriptChanged = delegate { };
+
+        private string _SortScript { get; set; }
+
+        public string SortScript
+        {
+            get
+            {
+                return this._SortScript;
+            }
+            set
+            {
+                this._SortScript = value;
+                this.OnSortScriptChanged();
+            }
+        }
+
+        protected virtual void OnSortScriptChanged()
+        {
+            if (this.SortScriptChanged != null)
+            {
+                this.SortScriptChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SortScript");
+        }
+
+        public event EventHandler SortScriptChanged = delegate { };
     }
 }

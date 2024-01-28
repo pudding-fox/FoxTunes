@@ -10,6 +10,10 @@ namespace FoxTunes.Interfaces
 
         Task BuildHierarchies();
 
+        Task AddHierarchy(LibraryHierarchy libraryHierarchy);
+
+        Task DeleteHierarchy(LibraryHierarchy libraryHierarchy);
+
         event EventHandler Updated;
     }
 }
