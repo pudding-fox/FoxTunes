@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -140,7 +139,7 @@ namespace FoxTunes
             "SplitterDistance",
             typeof(string),
             typeof(UIComponentVerticalSplitContainer),
-            new PropertyMetadata(new PropertyChangedCallback(OnSplitterDistanceChanged))
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnSplitterDistanceChanged))
         );
 
         public static string GetSplitterDistance(UIComponentVerticalSplitContainer source)
@@ -194,7 +193,7 @@ namespace FoxTunes
             "CollapseLeft",
             typeof(bool),
             typeof(UIComponentVerticalSplitContainer),
-            new PropertyMetadata(new PropertyChangedCallback(OnCollapseLeftChanged))
+            new FrameworkPropertyMetadata(false, new PropertyChangedCallback(OnCollapseLeftChanged))
         );
 
         public static bool GetCollapseLeft(UIComponentVerticalSplitContainer source)
@@ -221,7 +220,7 @@ namespace FoxTunes
             "CollapseRight",
             typeof(bool),
             typeof(UIComponentVerticalSplitContainer),
-            new PropertyMetadata(new PropertyChangedCallback(OnCollapseRightChanged))
+            new FrameworkPropertyMetadata(false, new PropertyChangedCallback(OnCollapseRightChanged))
         );
 
         public static bool GetCollapseRight(UIComponentVerticalSplitContainer source)
@@ -247,54 +246,11 @@ namespace FoxTunes
         public UIComponentVerticalSplitContainer()
         {
             this.InitializeComponent();
+            this.CreateBindings();
         }
 
-        public UIComponentContainer LeftContainer { get; private set; }
-
-        public UIComponentContainer RightContainer { get; private set; }
-
-        private void InitializeComponent()
+        new protected virtual void CreateBindings()
         {
-            this.LeftContainer = new UIComponentContainer();
-            this.RightContainer = new UIComponentContainer();
-
-            Grid.SetColumn(this.LeftContainer, 0);
-            Grid.SetColumn(this.RightContainer, 2);
-
-            this.LeftContainer.SetBinding(
-                FrameworkElement.DataContextProperty,
-                new Binding()
-                {
-                    Source = this,
-                    Path = new PropertyPath(nameof(this.DataContext))
-                }
-            );
-            this.LeftContainer.SetBinding(
-                UIComponentContainer.ComponentProperty,
-                new Binding()
-                {
-                    Source = this,
-                    Path = new PropertyPath(nameof(this.LeftComponent))
-                }
-            );
-
-            this.RightContainer.SetBinding(
-                FrameworkElement.DataContextProperty,
-                new Binding()
-                {
-                    Source = this,
-                    Path = new PropertyPath(nameof(this.DataContext))
-                }
-            );
-            this.RightContainer.SetBinding(
-                UIComponentContainer.ComponentProperty,
-                new Binding()
-                {
-                    Source = this,
-                    Path = new PropertyPath(nameof(this.RightComponent))
-                }
-            );
-
             this.SetBinding(
                 UIComponentVerticalSplitContainer.LeftEnabledProperty,
                 new Binding()
@@ -315,117 +271,34 @@ namespace FoxTunes
             );
         }
 
-        protected virtual void CreateLayout()
+        protected virtual void UpdateBindings()
         {
-            if (this.IsInDesignMode)
+            BindingOperations.ClearBinding(
+                this.LeftColumn,
+                ColumnDefinition.WidthProperty
+            );
+            BindingOperations.ClearBinding(
+                this.RightColumn,
+                ColumnDefinition.WidthProperty
+            );
+            if (this.CollapseLeft && !this.LeftEnabled && !this.IsInDesignMode)
             {
-                this.CreateSplitLayout();
-                this.IsComponentEnabled = true;
-                return;
+                this.LeftContainer.Visibility = Visibility.Collapsed;
+                this.LeftColumn.Width = new GridLength(0, GridUnitType.Pixel);
+                this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
             }
-            var showLeft = !this.CollapseLeft || this.LeftEnabled;
-            var showRight = !this.CollapseRight || this.RightEnabled;
-            if (showLeft && showRight)
+            else if (this.CollapseRight && !this.RightEnabled && !this.IsInDesignMode)
             {
-                this.CreateSplitLayout();
-                this.IsComponentEnabled = true;
-            }
-            else if (showLeft)
-            {
-                this.CreateLayout(this.LeftContainer);
-                this.IsComponentEnabled = true;
-            }
-            else if (showRight)
-            {
-                this.CreateLayout(this.RightContainer);
-                this.IsComponentEnabled = true;
+                this.RightContainer.Visibility = Visibility.Collapsed;
+                this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
+                this.RightColumn.Width = new GridLength(0, GridUnitType.Pixel);
             }
             else
             {
-                this.Content = null;
-                this.IsComponentEnabled = false;
-            }
-        }
-
-        protected virtual void CreateSplitLayout()
-        {
-            if (this.Content is Grid)
-            {
-                //Nothing to do.
-                return;
-            }
-
-            this.LeftContainer.Disconnect();
-            this.RightContainer.Disconnect();
-
-            var grid = new Grid();
-
-            var leftColumn = new ColumnDefinition();
-            var splitterColumn = new ColumnDefinition();
-            var rightColumn = new ColumnDefinition();
-
-            var splitter = new GridSplitter();
-
-            if (string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase))
-            {
-                leftColumn.SetBinding(
-                    ColumnDefinition.WidthProperty,
-                    new Binding()
-                    {
-                        Source = this,
-                        Path = new PropertyPath(nameof(this.SplitterDistance)),
-                        Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                        Mode = BindingMode.TwoWay
-                    }
-                );
-            }
-            else
-            {
-                rightColumn.SetBinding(
-                    ColumnDefinition.WidthProperty,
-                    new Binding()
-                    {
-                        Source = this,
-                        Path = new PropertyPath(nameof(this.SplitterDistance)),
-                        Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                        Mode = BindingMode.TwoWay
-                    }
-                );
-            }
-
-            splitterColumn.Width = new GridLength(0, GridUnitType.Auto);
-
-            Grid.SetColumn(splitter, 1);
-            splitter.Width = 4;
-            splitter.HorizontalAlignment = HorizontalAlignment.Center;
-            splitter.VerticalAlignment = VerticalAlignment.Stretch;
-
-            grid.ColumnDefinitions.Add(leftColumn);
-            grid.ColumnDefinitions.Add(splitterColumn);
-            grid.ColumnDefinitions.Add(rightColumn);
-
-            grid.Children.Add(this.LeftContainer);
-            grid.Children.Add(splitter);
-            grid.Children.Add(this.RightContainer);
-
-            this.Content = grid;
-        }
-
-        protected virtual void UpdateSplitterDirection()
-        {
-            if (this.Content is Grid grid)
-            {
-                var leftColumn = grid.ColumnDefinitions.FirstOrDefault();
-                var rightColumn = grid.ColumnDefinitions.LastOrDefault();
-                if (leftColumn == null || rightColumn == null || object.ReferenceEquals(leftColumn, rightColumn))
-                {
-                    return;
-                }
-                BindingOperations.ClearBinding(leftColumn, ColumnDefinition.WidthProperty);
-                BindingOperations.ClearBinding(rightColumn, ColumnDefinition.WidthProperty);
+                this.SplitterColumn.Width = new GridLength(4, GridUnitType.Pixel);
                 if (string.Equals(this.SplitterDirection, DirectionLeft, StringComparison.OrdinalIgnoreCase))
                 {
-                    leftColumn.SetBinding(
+                    this.LeftColumn.SetBinding(
                         ColumnDefinition.WidthProperty,
                         new Binding()
                         {
@@ -435,39 +308,30 @@ namespace FoxTunes
                             Mode = BindingMode.TwoWay
                         }
                     );
-                    rightColumn.Width = new GridLength(1, GridUnitType.Star);
+                    this.RightColumn.Width = new GridLength(1, GridUnitType.Star);
                 }
                 else
                 {
-                    leftColumn.Width = new GridLength(1, GridUnitType.Star);
-                    rightColumn.SetBinding(
-                       ColumnDefinition.WidthProperty,
-                       new Binding()
-                       {
-                           Source = this,
-                           Path = new PropertyPath(nameof(this.SplitterDistance)),
-                           Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
-                           Mode = BindingMode.TwoWay
-                       }
-                   );
+                    this.LeftColumn.Width = new GridLength(1, GridUnitType.Star);
+                    this.RightColumn.SetBinding(
+                        ColumnDefinition.WidthProperty,
+                        new Binding()
+                        {
+                            Source = this,
+                            Path = new PropertyPath(nameof(this.SplitterDistance)),
+                            Converter = new global::FoxTunes.ViewModel.GridLengthConverter(),
+                            Mode = BindingMode.TwoWay
+                        }
+                    );
                 }
+                this.LeftContainer.Visibility = Visibility.Visible;
+                this.RightContainer.Visibility = Visibility.Visible;
             }
-        }
-
-        protected virtual void CreateLayout(UIComponentContainer container)
-        {
-            if (object.ReferenceEquals(this.Content, container))
-            {
-                //Nothing to do.
-                return;
-            }
-            container.Disconnect();
-            this.Content = container;
         }
 
         protected override void OnIsInDesignModeChanged()
         {
-            this.CreateLayout();
+            this.UpdateBindings();
             base.OnIsInDesignModeChanged();
         }
 
@@ -477,7 +341,6 @@ namespace FoxTunes
             {
                 this.UpdateMetaData();
                 this.UpdateChildren();
-                this.CreateLayout();
             }
             base.OnComponentChanged();
         }
@@ -607,7 +470,7 @@ namespace FoxTunes
 
         protected virtual void OnLeftEnabledChanged()
         {
-            this.CreateLayout();
+            this.UpdateBindings();
             if (this.LeftEnabledChanged != null)
             {
                 this.LeftEnabledChanged(this, EventArgs.Empty);
@@ -631,7 +494,7 @@ namespace FoxTunes
 
         protected virtual void OnRightEnabledChanged()
         {
-            this.CreateLayout();
+            this.UpdateBindings();
             if (this.RightEnabledChanged != null)
             {
                 this.RightEnabledChanged(this, EventArgs.Empty);
@@ -692,7 +555,7 @@ namespace FoxTunes
                     this.SplitterDirection
                 );
             }
-            this.UpdateSplitterDirection();
+            this.UpdateBindings();
             if (this.SplitterDirectionChanged != null)
             {
                 this.SplitterDirectionChanged(this, EventArgs.Empty);
@@ -723,6 +586,7 @@ namespace FoxTunes
                     Convert.ToString(this.CollapseLeft)
                 );
             }
+            this.UpdateBindings();
             if (this.CollapseLeftChanged != null)
             {
                 this.CollapseLeftChanged(this, EventArgs.Empty);
@@ -753,6 +617,7 @@ namespace FoxTunes
                     Convert.ToString(this.CollapseRight)
                 );
             }
+            this.UpdateBindings();
             if (this.CollapseRightChanged != null)
             {
                 this.CollapseRightChanged(this, EventArgs.Empty);
