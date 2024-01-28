@@ -126,10 +126,6 @@ namespace FoxTunes
             {
                 return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Playing;
             }
-            protected set
-            {
-                throw new NotImplementedException();
-            }
         }
 
         public override bool IsPaused
@@ -138,10 +134,6 @@ namespace FoxTunes
             {
                 return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Paused;
             }
-            protected set
-            {
-                throw new NotImplementedException();
-            }
         }
 
         public override bool IsStopped
@@ -149,10 +141,6 @@ namespace FoxTunes
             get
             {
                 return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Stopped;
-            }
-            protected set
-            {
-                throw new NotImplementedException();
             }
         }
 
@@ -184,7 +172,7 @@ namespace FoxTunes
 
         public override void Pause()
         {
-            if (this.IsPaused)
+            if (!this.IsPlaying)
             {
                 return;
             }
