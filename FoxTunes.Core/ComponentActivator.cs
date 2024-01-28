@@ -6,6 +6,14 @@ namespace FoxTunes
 {
     public class ComponentActivator : IComponentActivator
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         private ComponentActivator()
         {
 
@@ -17,11 +25,20 @@ namespace FoxTunes
             {
                 type = AssemblyRegistry.Instance.GetExecutableType(type);
             }
-            if (type.GetConstructor(new Type[] { }) != null)
+            if (type.GetConstructor(new Type[] { }) == null)
             {
-                return (T)FastActivator.Instance.Activate(type);
+                Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to locate constructor for component {0}.", type.Name);
+                return default(T);
             }
-            throw new ComponentActivatorException(string.Format("Failed to locate constructor for component {0}.", type.Name));
+            if (FastActivator.Instance.Activate(type) is T component)
+            {
+                return component;
+            }
+            else
+            {
+                Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Component {0} is not of the expected type {1}.", type.Name, typeof(T).Name);
+                return default(T);
+            }
         }
 
         public static readonly IComponentActivator Instance = new ComponentActivator();

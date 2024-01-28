@@ -63,11 +63,20 @@ namespace FoxTunes
             var type = this.GetComponentType(this.Component);
             if (type == null || type == LayoutManager.PLACEHOLDER)
             {
-                //A plugin was uninstalled.
+                //The component is not available.
                 this.Content = null;
                 this.Visibility = Visibility.Collapsed;
+                return;
             }
-            this.Content = ComponentActivator.Instance.Activate<UIComponentBase>(type);
+            var component = ComponentActivator.Instance.Activate<UIComponentBase>(type);
+            if (component == null)
+            {
+                //The component could not be loaded.
+                this.Content = null;
+                this.Visibility = Visibility.Collapsed;
+                return;
+            }
+            this.Content = component;
             this.SetBinding(
                 UIElement.VisibilityProperty,
                 new Binding()
