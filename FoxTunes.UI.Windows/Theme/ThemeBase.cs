@@ -1,4 +1,6 @@
-﻿namespace FoxTunes
+﻿using System.IO;
+
+namespace FoxTunes
 {
     public abstract class ThemeBase : StandardComponent, ITheme
     {
@@ -15,7 +17,7 @@
 
         public string Description { get; private set; }
 
-        public abstract string ArtworkPlaceholder { get; }
+        public abstract Stream ArtworkPlaceholder { get; }
 
         public abstract void Enable();
 

@@ -12,14 +12,6 @@ namespace FoxTunes
     [Component("B889313D-4F21-4794-8D16-C2FAE6A7B305", ComponentSlots.UserInterface, priority: ComponentAttribute.PRIORITY_LOW)]
     public class WindowsUserInterface : UserInterface, IConfigurableComponent
     {
-        static WindowsUserInterface()
-        {
-            ResourceExtractor.Extract(typeof(WindowsUserInterface), new Dictionary<string, string>()
-            {
-                {  "FoxTunes.UI.Windows.Images.Fox.ico", string.Format("Images{0}Fox.ico", Path.DirectorySeparatorChar) }
-            });
-        }
-
         public static readonly Type[] References = new[]
         {
             typeof(global::System.Windows.Interactivity.Interaction)
