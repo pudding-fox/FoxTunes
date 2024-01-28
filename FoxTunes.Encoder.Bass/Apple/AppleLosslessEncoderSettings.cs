@@ -7,23 +7,23 @@ using System.IO;
 namespace FoxTunes
 {
     [BassEncoder(NAME)]
-    public class FlacEncoderSettings : BassEncoderSettings
+    public class AppleLosslessEncoderSettings : BassEncoderSettings
     {
-        public const string NAME = "FLAC";
+        public const string NAME = "Apple Lossless";
 
-        public FlacEncoderSettings()
+        public AppleLosslessEncoderSettings()
         {
             var directory = Path.GetDirectoryName(
-                typeof(FlacEncoderSettings).Assembly.Location
+                typeof(AppleLosslessEncoderSettings).Assembly.Location
             );
-            this.Executable = Path.Combine(directory, "Encoders\\flac.exe");
+            this.Executable = Path.Combine(directory, "Encoders\\refalac.exe");
         }
 
         public override string Extension
         {
             get
             {
-                return "flac";
+                return "m4a";
             }
         }
 
@@ -37,18 +37,12 @@ namespace FoxTunes
 
         public int Depth { get; private set; }
 
-        public int Compression { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             core.Components.Configuration.GetElement<SelectionConfigurationElement>(
-                FlacEncoderSettingsConfiguration.SECTION,
-                FlacEncoderSettingsConfiguration.DEPTH_ELEMENT
-            ).ConnectValue(option => this.Depth = FlacEncoderSettingsConfiguration.GetDepth(option));
-            core.Components.Configuration.GetElement<IntegerConfigurationElement>(
-                FlacEncoderSettingsConfiguration.SECTION,
-                FlacEncoderSettingsConfiguration.COMPRESSION_ELEMENT
-            ).ConnectValue(value => this.Compression = value);
+                AppleLosslessEncoderSettingsConfiguration.SECTION,
+                AppleLosslessEncoderSettingsConfiguration.DEPTH_ELEMENT
+            ).ConnectValue(option => this.Depth = AppleLosslessEncoderSettingsConfiguration.GetDepth(option));
             base.InitializeComponent(core);
         }
 
@@ -60,14 +54,18 @@ namespace FoxTunes
                 throw new NotImplementedException();
             }
             return string.Format(
-                "--no-seektable --force-raw-format --endian=little --sign=signed --sample-rate={0} --channels={1} --bps={2} --input-size={3} - --compression-level-{4} -o \"{5}\"",
+                "--alac --raw --raw-rate {0} --raw-channels {1} --raw-format {2} - --bits-per-sample {3} -o \"{4}\"",
                 channelInfo.Frequency,
                 channelInfo.Channels,
+                this.GetFormat(encoderItem, stream),
                 this.GetDepth(encoderItem, stream),
-                this.GetLength(encoderItem, stream),
-                this.Compression,
                 encoderItem.OutputFileName
             );
+        }
+
+        protected virtual string GetFormat(EncoderItem encoderItem, IBassStream stream)
+        {
+            return string.Format("S{0}L", this.GetDepth(encoderItem, stream));
         }
 
         public override int GetDepth(EncoderItem encoderItem, IBassStream stream)
@@ -78,17 +76,17 @@ namespace FoxTunes
                 Logger.Write(this.GetType(), LogLevel.Warn, "Requsted bit depth {0} is invalid, using minimum: 16 bit", depth);
                 return DEPTH_16;
             }
-            if (depth > DEPTH_24)
+            if (depth > DEPTH_32)
             {
-                Logger.Write(this.GetType(), LogLevel.Warn, "Requsted bit depth {0} is invalid, using maximum: 24 bit", depth);
-                return DEPTH_24;
+                Logger.Write(this.GetType(), LogLevel.Warn, "Requsted bit depth {0} is invalid, using maximum: 32 bit", depth);
+                return DEPTH_32;
             }
             return depth;
         }
 
         public override IEnumerable<ConfigurationElement> GetConfigurationElements()
         {
-            return FlacEncoderSettingsConfiguration.GetConfigurationElements();
+            return AppleLosslessEncoderSettingsConfiguration.GetConfigurationElements();
         }
     }
 }

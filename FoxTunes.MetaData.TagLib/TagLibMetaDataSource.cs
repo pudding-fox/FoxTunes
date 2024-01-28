@@ -255,7 +255,25 @@ namespace FoxTunes
                 this.Try(() => this.AddProperty(metaData, CommonProperties.AudioBitrate, properties.AudioBitrate.ToString()), this.ErrorHandler);
                 this.Try(() => this.AddProperty(metaData, CommonProperties.AudioChannels, properties.AudioChannels.ToString()), this.ErrorHandler);
                 this.Try(() => this.AddProperty(metaData, CommonProperties.AudioSampleRate, properties.AudioSampleRate.ToString()), this.ErrorHandler);
-                this.Try(() => this.AddProperty(metaData, CommonProperties.BitsPerSample, properties.BitsPerSample.ToString()), this.ErrorHandler);
+                this.Try(() =>
+                {
+                    if (properties.BitsPerSample != 0)
+                    {
+                        this.AddProperty(metaData, CommonProperties.BitsPerSample, properties.BitsPerSample.ToString());
+                    }
+                    else
+                    {
+                        //This is special case just for MPEG-4.
+                        foreach (var codec in properties.Codecs.OfType<global::TagLib.Mpeg4.IsoAudioSampleEntry>())
+                        {
+                            if (codec.AudioSampleSize != 0)
+                            {
+                                this.AddProperty(metaData, CommonProperties.BitsPerSample, codec.AudioSampleSize.ToString());
+                                break;
+                            }
+                        }
+                    }
+                }, this.ErrorHandler);
             }
             if (Categories.HasFlag(MetaDataCategory.MultiMedia))
             {

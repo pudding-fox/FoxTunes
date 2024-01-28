@@ -1,4 +1,5 @@
-﻿using ManagedBass;
+﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using System;
 using System.IO;
 
@@ -6,47 +7,63 @@ namespace FoxTunes
 {
     public class SoxEncoderSettings : BassEncoderSettings
     {
-        public static string Location
+        private SoxEncoderSettings()
+        {
+            var directory = Path.GetDirectoryName(
+                typeof(SoxEncoderSettings).Assembly.Location
+            );
+            this.Executable = Path.Combine(directory, "Encoders\\sox.exe");
+        }
+
+        public SoxEncoderSettings(IBassEncoderSettings settings) : this()
+        {
+            this.Settings = settings;
+        }
+
+        public IBassEncoderSettings Settings { get; }
+
+        public override string Extension
         {
             get
             {
-                return Path.GetDirectoryName(typeof(SoxEncoderSettings).Assembly.Location);
+                throw new NotImplementedException();
             }
         }
 
-        private SoxEncoderSettings()
+        public override IBassEncoderFormat Format
         {
-            this.Executable = Path.Combine(Location, "Encoders\\sox.exe");
-        }
-
-        public SoxEncoderSettings(int depth, BassFlags flags) : this()
-        {
-            this.Depth = depth;
-            this.Flags = flags;
-        }
-
-        public int Depth { get; private set; }
-
-        public BassFlags Flags { get; private set; }
-
-        public override string GetArguments(int rate, int channels, long length)
-        {
-            if (this.Flags.HasFlag(BassFlags.Float))
+            get
             {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override string GetArguments(EncoderItem encoderItem, IBassStream stream)
+        {
+            var channelInfo = default(ChannelInfo);
+            if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
+            {
+                throw new NotImplementedException();
+            }
+            var depth = this.Settings.GetDepth(encoderItem, stream);
+            if (channelInfo.Flags.HasFlag(BassFlags.Float))
+            {
+                Logger.Write(this.GetType(), LogLevel.Debug, "Resampling file \"{0}\" from 32 bit float to {1} bit integer.", encoderItem.InputFileName, depth);
                 return string.Format(
                     "-t raw -e floating-point --bits 32 -r {0} -c {1} - -t raw -e signed-integer --bits {2} -r {0} -c {1} -",
-                    rate,
-                    channels,
-                    this.Depth
+                    channelInfo.Frequency,
+                    channelInfo.Channels,
+                    depth
                 );
             }
             else
             {
+                Logger.Write(this.GetType(), LogLevel.Debug, "Resampling file \"{0}\" from 16 bit integer to {1} bit integer.", encoderItem.InputFileName, depth);
                 return string.Format(
                     "-t raw -e signed-integer --bits 16 -r {0} -c {1} - -t raw -e signed-integer --bits {2} -r {0} -c {1} -",
-                    rate,
-                    channels,
-                    this.Depth
+                    channelInfo.Frequency,
+                    channelInfo.Channels,
+                    depth
                 );
             }
         }

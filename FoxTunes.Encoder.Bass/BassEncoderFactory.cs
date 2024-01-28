@@ -1,30 +1,32 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Reflection;
-using System.Security.Policy;
 
 namespace FoxTunes
 {
     public class BassEncoderFactory : StandardComponent, IBassEncoderFactory
     {
-        public IBassEncoder CreateEncoder(int concurrency)
+        public IBassEncoder CreateEncoder()
         {
             var domain = this.CreateDomain();
-            var encoder = this.CreateEncoder(domain, concurrency);
+            var encoder = this.CreateEncoder(domain);
             return encoder;
         }
 
         protected virtual AppDomain CreateDomain()
         {
+            Logger.Write(this, LogLevel.Debug, "Creating app domain.");
             var name = string.Format("{0}_{1}", typeof(BassEncoderFactory), Guid.NewGuid().ToString("d"));
             var domain = AppDomain.CreateDomain(
                 name,
                 AppDomain.CurrentDomain.Evidence,
                 AppDomain.CurrentDomain.SetupInformation
             );
+            Logger.Write(this, LogLevel.Debug, "App domain created: {0}", name);
             return domain;
         }
 
-        protected virtual IBassEncoder CreateEncoder(AppDomain domain, int concurrency)
+        protected virtual IBassEncoder CreateEncoder(AppDomain domain)
         {
             var type = typeof(BassEncoder);
             var handle = domain.CreateInstance(
@@ -33,11 +35,13 @@ namespace FoxTunes
                 true,
                 BindingFlags.Default,
                 null,
-                new object[] { domain, concurrency },
+                new object[] { domain },
                 null,
                 null
             );
-            return (IBassEncoder)handle.Unwrap();
+            var encoder = (IBassEncoder)handle.Unwrap();
+            Logger.Write(this, LogLevel.Debug, "Created and unwrapped type \"{0}\" from app domain \"{1}\".", type.Name, domain.FriendlyName);
+            return encoder;
         }
     }
 }

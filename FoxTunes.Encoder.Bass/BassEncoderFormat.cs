@@ -1,17 +1,20 @@
-﻿using System;
-
-namespace FoxTunes
+﻿namespace FoxTunes
 {
-    public class BassEncoderFormat : MarshalByRefObject, IBassEncoderFormat
+    public class BassEncoderFormat : IBassEncoderFormat
     {
-        public const int DEFAULT_DEPTH = 16;
+        public BassEncoderFormat(int depth)
+        {
+            this.Depth = depth;
+        }
 
-        public int Depth
+        public bool AutoDepth
         {
             get
             {
-                return DEFAULT_DEPTH;
+                return this.Depth == 0;
             }
         }
+
+        public int Depth { get; private set; }
     }
 }
