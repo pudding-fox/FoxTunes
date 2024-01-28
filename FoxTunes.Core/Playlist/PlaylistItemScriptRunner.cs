@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -8,20 +7,11 @@ namespace FoxTunes
     public class PlaylistItemScriptRunner
     {
         public PlaylistItemScriptRunner(IScriptingContext scriptingContext, PlaylistItem playlistItem, string script)
-            : this(null, scriptingContext, playlistItem, script)
         {
-
-        }
-
-        public PlaylistItemScriptRunner(IPlaybackManager playbackManager, IScriptingContext scriptingContext, PlaylistItem playlistItem, string script)
-        {
-            this.PlaybackManager = playbackManager;
             this.ScriptingContext = scriptingContext;
             this.PlaylistItem = playlistItem;
             this.Script = script;
         }
-
-        public IPlaybackManager PlaybackManager { get; private set; }
 
         public IScriptingContext ScriptingContext { get; private set; }
 
@@ -59,16 +49,6 @@ namespace FoxTunes
                     }
                 }
             }
-            var playing = false;
-            if (this.PlaybackManager != null && this.PlaylistItem != null)
-            {
-                var currentStream = this.PlaybackManager.CurrentStream;
-                if (currentStream != null)
-                {
-                    playing = this.PlaylistItem.Id == currentStream.Id && string.Equals(this.PlaylistItem.FileName, currentStream.FileName, StringComparison.OrdinalIgnoreCase);
-                }
-            }
-            this.ScriptingContext.SetValue("playing", playing);
             this.ScriptingContext.SetValue("tag", collections[MetaDataItemType.Tag]);
             this.ScriptingContext.SetValue("property", collections[MetaDataItemType.Property]);
             if (this.PlaylistItem != null)

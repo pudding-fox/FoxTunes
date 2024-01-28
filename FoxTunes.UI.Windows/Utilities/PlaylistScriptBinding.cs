@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Globalization;
 
 namespace FoxTunes
@@ -10,32 +9,6 @@ namespace FoxTunes
         {
 
         }
-
-        private IPlaybackManager _PlaybackManager { get; set; }
-
-        public IPlaybackManager PlaybackManager
-        {
-            get
-            {
-                return this._PlaybackManager;
-            }
-            set
-            {
-                this._PlaybackManager = value;
-                this.OnPlaybackManagerChanged();
-            }
-        }
-
-        protected virtual void OnPlaybackManagerChanged()
-        {
-            if (this.PlaybackManagerChanged != null)
-            {
-                this.PlaybackManagerChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("PlaybackManager");
-        }
-
-        public event EventHandler PlaybackManagerChanged;
 
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -53,7 +26,7 @@ namespace FoxTunes
 
         private object ExecuteScript(PlaylistItem playlistItem, string script)
         {
-            var runner = new PlaylistItemScriptRunner(this.PlaybackManager, this.ScriptingContext, playlistItem, script);
+            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, playlistItem, script);
             runner.Prepare();
             return runner.Run();
         }

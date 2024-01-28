@@ -3,28 +3,16 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace FoxTunes.ViewModel
 {
     public class Playback : ViewModelBase
     {
-        private static readonly TimeSpan UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
-
-        public static readonly DispatcherTimer Timer;
-
-        static Playback()
-        {
-            Timer = new DispatcherTimer(DispatcherPriority.Background);
-            Timer.Interval = UPDATE_INTERVAL;
-            Timer.Start();
-        }
-
         public Playback(bool monitor)
         {
-            if (Timer != null && monitor)
+            if (monitor)
             {
-                Timer.Tick += this.OnTick;
+                PlaybackStateNotifier.Notify += this.OnNotify;
             }
         }
 
@@ -170,7 +158,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void OnTick(object sender, EventArgs e)
+        protected virtual void OnNotify(object sender, EventArgs e)
         {
             var isPlaying = default(bool);
             if (this.PlaybackManager != null)
@@ -202,10 +190,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (Timer != null)
-            {
-                Timer.Tick -= this.OnTick;
-            }
+            PlaybackStateNotifier.Notify -= this.OnNotify;
             base.OnDisposing();
         }
 

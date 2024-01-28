@@ -139,33 +139,7 @@ namespace FoxTunes
         }
 
         public event EventHandler PluginChanged;
-
-        private bool _IsDynamic { get; set; }
-
-        public bool IsDynamic
-        {
-            get
-            {
-                return this._IsDynamic;
-            }
-            set
-            {
-                this._IsDynamic = value;
-                this.OnIsDynamicChanged();
-            }
-        }
-
-        protected virtual void OnIsDynamicChanged()
-        {
-            if (this.IsDynamicChanged != null)
-            {
-                this.IsDynamicChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsDynamic");
-        }
-
-        public event EventHandler IsDynamicChanged;
-
+        
         private double? _Width { get; set; }
 
         public double? Width
