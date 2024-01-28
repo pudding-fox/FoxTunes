@@ -146,7 +146,6 @@ namespace FoxTunes
             {
                 playlistItem = this.PlaylistManager.CurrentItem;
             }
-            var exception = default(Exception);
             try
             {
                 await this.Output.Shutdown().ConfigureAwait(false);
@@ -154,26 +153,29 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                exception = e;
-            }
-            if (exception != null)
-            {
-                await this.OnError(exception).ConfigureAwait(false);
+                await this.OnError(e).ConfigureAwait(false);
                 return;
             }
             if (playlistItem != null)
             {
-                await this.PlaylistManager.Play(playlistItem).ConfigureAwait(false);
-                if (this.PlaybackManager.CurrentStream != null)
+                try
                 {
-                    if (position > 0)
+                    await this.PlaylistManager.Play(playlistItem).ConfigureAwait(false);
+                    if (this.PlaybackManager.CurrentStream != null)
                     {
-                        this.PlaybackManager.CurrentStream.Position = position;
+                        if (position > 0)
+                        {
+                            this.PlaybackManager.CurrentStream.Position = position;
+                        }
+                        if (paused)
+                        {
+                            await this.PlaybackManager.CurrentStream.Pause().ConfigureAwait(false);
+                        }
                     }
-                    if (paused)
-                    {
-                        await this.PlaybackManager.CurrentStream.Pause().ConfigureAwait(false);
-                    }
+                }
+                catch (Exception e)
+                {
+                    await this.OnError(e).ConfigureAwait(false);
                 }
             }
         }
