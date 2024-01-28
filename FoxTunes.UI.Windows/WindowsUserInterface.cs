@@ -19,14 +19,11 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public ILogEmitter LogEmitter { get; private set; }
-
         public IThemeLoader ThemeLoader { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.LogEmitter = core.Components.LogEmitter;
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<IThemeLoader>();
             base.InitializeComponent(core);
         }
@@ -35,7 +32,6 @@ namespace FoxTunes
         {
             this.Application = new Application();
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
-            this.Application.Exit += this.OnApplicationExit;
             this.ThemeLoader.Application = this.Application;
             this.Application.Run(new MainWindow() { DataContext = this.Core });
         }
@@ -43,11 +39,6 @@ namespace FoxTunes
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             Logger.Write(this, LogLevel.Fatal, e.Exception.Message, e);
-        }
-
-        protected virtual void OnApplicationExit(object sender, ExitEventArgs e)
-        {
-            this.LogEmitter.Enabled = false;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

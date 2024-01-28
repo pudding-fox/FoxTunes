@@ -71,9 +71,6 @@
     <Compile Include="LibraryViewMode.xaml.cs">
       <DependentUpon>LibraryViewMode.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Log.xaml.cs">
-      <DependentUpon>Log.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
@@ -120,7 +117,6 @@
     <Compile Include="ViewModel\LibraryBrowser.cs" />
     <Compile Include="ViewModel\LibraryTree.cs" />
     <Compile Include="ViewModel\LibraryHierarchySettings.cs" />
-    <Compile Include="ViewModel\Log.cs" />
     <Compile Include="ViewModel\Main.cs" />
     <Compile Include="Utilities\PlaylistScriptBinding.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
@@ -179,10 +175,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LibraryViewMode.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Log.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

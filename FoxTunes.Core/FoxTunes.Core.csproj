@@ -55,7 +55,6 @@
     <Compile Include="Interfaces\IFileData.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />
     <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
-    <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
     <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
