@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System;
 using FoxDb;
+using System.Data;
 
 namespace FoxTunes
 {
@@ -45,9 +46,16 @@ namespace FoxTunes
             this.CleanupMetaData(transaction);
         }
 
-        protected virtual void ShiftItems(ITransactionSource transaction)
+        protected virtual void ShiftItems(ITransactionSource transaction, QueryOperator @operator, int at, int by)
         {
-            Logger.Write(this, LogLevel.Debug, "Shifting playlist items at position {0} by offset {1}.", this.Sequence, this.Offset);
+            Logger.Write(
+                this,
+                LogLevel.Debug,
+                "Shifting playlist items at position {0} {1} by offset {2}.",
+                Enum.GetName(typeof(QueryOperator), @operator),
+                at,
+                by
+            );
             this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             var sequence = this.Database.Tables.PlaylistItem.Column("Sequence");
@@ -57,19 +65,19 @@ namespace FoxTunes
             {
                 expression.Left = expression.CreateColumn(sequence);
                 expression.Operator = expression.CreateOperator(QueryOperator.Add);
-                expression.Right = expression.CreateParameter("offset");
+                expression.Right = expression.CreateParameter("offset", DbType.Int32, ParameterDirection.Input);
             });
             query.Filter.AddColumn(status);
             query.Filter.AddColumn(sequence).With(expression =>
             {
-                expression.Operator = expression.CreateOperator(QueryOperator.GreaterOrEqual);
-                expression.Right = expression.CreateParameter("sequence");
+                expression.Operator = expression.CreateOperator(@operator);
+                expression.Right = expression.CreateParameter("sequence", DbType.Int32, ParameterDirection.Input);
             });
             this.Database.Execute(query, parameters =>
             {
                 parameters["status"] = PlaylistItemStatus.None;
-                parameters["sequence"] = this.Sequence;
-                parameters["offset"] = this.Offset;
+                parameters["sequence"] = at;
+                parameters["offset"] = by;
             }, transaction);
         }
 

@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -67,12 +68,9 @@ namespace FoxTunes
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
             query.Add.SetTable(this.Database.Tables.LibraryItem);
-            query.Output.AddParameters(new[]
-            {
-                "DirectoryName",
-                "FileName",
-                "Status"
-            });
+            query.Output.AddParameter("DirectoryName", DbType.String, ParameterDirection.Input);
+            query.Output.AddParameter("FileName", DbType.String, ParameterDirection.Input);
+            query.Output.AddParameter("Status", DbType.Byte, ParameterDirection.Input);
             query.Filter.Expressions.Add(
                 query.Filter.CreateUnary(
                     QueryOperator.Not,

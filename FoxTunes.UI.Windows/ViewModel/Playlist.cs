@@ -280,6 +280,10 @@ namespace FoxTunes.ViewModel
             {
                 effects = DragDropEffects.Copy;
             }
+            if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
+            {
+                effects = DragDropEffects.Copy;
+            }
             e.Effects = effects;
         }
 
@@ -302,6 +306,11 @@ namespace FoxTunes.ViewModel
             {
                 var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
                 return this.AddToPlaylist(libraryHierarchyNode);
+            }
+            if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
+            {
+                var playlistItems = e.Data.GetData<IEnumerable<PlaylistItem>>(true);
+                return this.AddToPlaylist(playlistItems);
             }
             return Task.CompletedTask;
         }
@@ -329,6 +338,19 @@ namespace FoxTunes.ViewModel
             else
             {
                 return this.PlaylistManager.Add(libraryHierarchyNode, false);
+            }
+        }
+
+        private Task AddToPlaylist(IEnumerable<PlaylistItem> playlistItems)
+        {
+            var sequence = default(int);
+            if (this.TryGetInsertSequence(out sequence))
+            {
+                return this.PlaylistManager.Move(sequence, playlistItems);
+            }
+            else
+            {
+                return this.PlaylistManager.Move(playlistItems);
             }
         }
 

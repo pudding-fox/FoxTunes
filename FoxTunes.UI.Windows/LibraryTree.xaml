@@ -32,14 +32,13 @@
         <TreeView x:Name="TreeView" Grid.Row="1" 
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
-                  Windows:TreeViewExtensions.RightButtonSelect="True">
+                  Windows:TreeViewExtensions.RightButtonSelect="True"
+                  Windows:TreeViewExtensions.DragSource="True"
+                  Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized">
             <TreeView.Resources>
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
-                    <EventSetter Event="Selected" Handler="TreeView_Selected"></EventSetter>
-                    <EventSetter Event="PreviewMouseDown" Handler="TreeViewItem_PreviewMouseDown"></EventSetter>
-                    <EventSetter Event="PreviewMouseMove" Handler="TreeViewItem_PreviewMouseMove"></EventSetter>
                 </Style>
             </TreeView.Resources>
             <Interactivity:Interaction.Triggers>

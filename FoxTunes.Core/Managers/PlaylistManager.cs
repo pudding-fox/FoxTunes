@@ -122,6 +122,22 @@ namespace FoxTunes.Managers
             return task.Run();
         }
 
+        public Task Move(IEnumerable<PlaylistItem> playlistItems)
+        {
+            Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");
+            var index = this.GetInsertIndex();
+            return this.Move(index, playlistItems);
+        }
+
+        public Task Move(int index, IEnumerable<PlaylistItem> playlistItems)
+        {
+            Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items at index: {0}", index);
+            var task = new MovePlaylistItemsTask(index, playlistItems);
+            task.InitializeComponent(this.Core);
+            this.OnBackgroundTask(task);
+            return task.Run();
+        }
+
         public Task Remove(IEnumerable<PlaylistItem> playlistItems)
         {
             var task = new RemoveItemsFromPlaylistTask(playlistItems);
