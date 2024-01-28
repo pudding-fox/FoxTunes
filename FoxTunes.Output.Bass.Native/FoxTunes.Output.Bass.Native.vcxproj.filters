@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="bass\bass.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="bass\bass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -26,11 +23,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="bass\bass.lib" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\bass.lib" />
+    <Library Include="lib\msvcrt.lib" />
   </ItemGroup>
 </Project>
