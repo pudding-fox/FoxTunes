@@ -60,7 +60,7 @@ namespace FoxTunes
         {
             get
             {
-                return BassUtils.GetMixerBufferLength();
+                return BassUtils.GetMixerBufferLength() + Bass.UpdatePeriod;
             }
         }
 

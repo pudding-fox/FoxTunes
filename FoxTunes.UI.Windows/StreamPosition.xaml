@@ -36,7 +36,7 @@
         <!-- Ensure the entire control responds to input. -->
         <Rectangle Grid.Column="0" Grid.ColumnSpan="3" Fill="Transparent"/>
         <TextBlock Grid.Column="0" Text="{Binding CurrentStream.PositionDescription, FallbackValue=00:00, Source={StaticResource ViewModel}}" Margin="0,0,4,0"/>
-        <Slider Grid.Column="1" VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, IsAsync=True, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <Slider Grid.Column="1" VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="PreviewMouseDown">
                     <ViewModel:InvokeParameterizedCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></ViewModel:InvokeParameterizedCommandAction>
