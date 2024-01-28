@@ -58,12 +58,20 @@ namespace FoxTunes
 
         public override object GetValue(string name)
         {
-            var result = this.Engine.GlobalObject.GetProperty(name);
-            if (result.IsUndefined)
+            return this.GetValue(this.Engine.GlobalObject.GetProperty(name));
+        }
+
+        protected virtual object GetValue(InternalHandle target)
+        {
+            if (target.IsString || target.IsStringObject)
             {
-                return null;
+                return target.AsString;
             }
-            return result.Value;
+            if (target.IsNumber || target.IsNumberObject)
+            {
+                return target.AsInt32;
+            }
+            return null;
         }
 
         [DebuggerNonUserCode]
@@ -71,12 +79,7 @@ namespace FoxTunes
         {
             try
             {
-                var result = this.Engine.Execute(script, throwExceptionOnError: true);
-                if (result.IsUndefined)
-                {
-                    return null;
-                }
-                return result.Value;
+                return this.GetValue(this.Engine.Execute(script, throwExceptionOnError: true));
             }
             catch (V8ExecutionErrorException e)
             {
