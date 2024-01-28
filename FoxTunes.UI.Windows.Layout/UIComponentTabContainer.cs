@@ -102,6 +102,31 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
+        protected virtual void RemoveComponent(int position)
+        {
+            this.TabControl.Items.RemoveAt(position);
+        }
+
+        protected virtual void SwapComponents(int position1, int position2)
+        {
+            var tab1 = this.TabControl.Items[position1];
+            var tab2 = this.TabControl.Items[position2];
+            if (position1 > position2)
+            {
+                this.TabControl.Items.RemoveAt(position2);
+                this.TabControl.Items.RemoveAt(position2);
+                this.TabControl.Items.Insert(position2, tab2);
+                this.TabControl.Items.Insert(position2, tab1);
+            }
+            else
+            {
+                this.TabControl.Items.RemoveAt(position1);
+                this.TabControl.Items.RemoveAt(position1);
+                this.TabControl.Items.Insert(position1, tab1);
+                this.TabControl.Items.Insert(position1, tab2);
+            }
+        }
+
         protected virtual void OnComponentChanged(object sender, EventArgs e)
         {
             var container = sender as UIComponentContainer;
@@ -181,8 +206,10 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                this.Configuration.Children.Add(new UIComponentConfiguration());
-                this.UpdateChildren();
+                var component = new UIComponentConfiguration();
+                this.Configuration.Children.Add(component);
+                this.AddComponent(component);
+                this.TabControl.SelectedIndex = this.TabControl.Items.Count - 1;
             });
         }
 
@@ -197,7 +224,11 @@ namespace FoxTunes
                         continue;
                     }
                     this.Configuration.Children.RemoveAt(a);
-                    this.UpdateChildren();
+                    this.RemoveComponent(a);
+                    if (this.Configuration.Children.Count == 0)
+                    {
+                        var task = this.Add();
+                    }
                     return;
                 }
                 //TODO: Component was not found.
@@ -219,7 +250,8 @@ namespace FoxTunes
                     {
                         this.Configuration.Children[a] = this.Configuration.Children[a - 1];
                         this.Configuration.Children[a - 1] = container.Configuration;
-                        this.UpdateChildren();
+                        this.SwapComponents(a, a - 1);
+                        this.TabControl.SelectedIndex = a - 1;
                     }
                     return;
                 }
@@ -242,7 +274,8 @@ namespace FoxTunes
                     {
                         this.Configuration.Children[a] = this.Configuration.Children[a + 1];
                         this.Configuration.Children[a + 1] = container.Configuration;
-                        this.UpdateChildren();
+                        this.SwapComponents(a, a + 1);
+                        this.TabControl.SelectedIndex = a + 1;
                     }
                     return;
                 }
@@ -268,7 +301,19 @@ namespace FoxTunes
                 {
                     container.Configuration.MetaData.TryRemove(Header);
                 }
-                this.UpdateChildren();
+                for (var a = 0; a < this.Configuration.Children.Count; a++)
+                {
+                    if (!object.ReferenceEquals(this.Configuration.Children[a], container.Configuration))
+                    {
+                        continue;
+                    }
+                    var tab = this.TabControl.Items[a] as TabItem;
+                    if (tab != null)
+                    {
+                        tab.Header = this.GetHeader(container);
+                    }
+                    break;
+                }
             });
         }
 
