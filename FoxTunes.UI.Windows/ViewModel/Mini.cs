@@ -16,21 +16,6 @@ namespace FoxTunes.ViewModel
 
         public IConfiguration Configuration { get; private set; }
 
-        public Icon Icon
-        {
-            get
-            {
-                using (var stream = typeof(Mini).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico"))
-                {
-                    if (stream == null)
-                    {
-                        return null;
-                    }
-                    return new Icon(stream);
-                }
-            }
-        }
-
         private BooleanConfigurationElement _ShowArtwork { get; set; }
 
         public BooleanConfigurationElement ShowArtwork
@@ -108,32 +93,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler DropCommitChanged;
-
-        private BooleanConfigurationElement _ShowNotifyIcon { get; set; }
-
-        public BooleanConfigurationElement ShowNotifyIcon
-        {
-            get
-            {
-                return this._ShowNotifyIcon;
-            }
-            set
-            {
-                this._ShowNotifyIcon = value;
-                this.OnShowNotifyIconChanged();
-            }
-        }
-
-        protected virtual void OnShowNotifyIconChanged()
-        {
-            if (this.ShowNotifyIconChanged != null)
-            {
-                this.ShowNotifyIconChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ShowNotifyIcon");
-        }
-
-        public event EventHandler ShowNotifyIconChanged;
 
         private DoubleConfigurationElement _ScalingFactor { get; set; }
 
@@ -332,10 +291,6 @@ namespace FoxTunes.ViewModel
               MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.DROP_COMMIT_ELEMENT
             );
-            this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
-              NotifyIconConfiguration.SECTION,
-              NotifyIconConfiguration.ENABLED_ELEMENT
-            );
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
@@ -345,27 +300,6 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.EXTEND_GLASS_ELEMENT
             );
             base.InitializeComponent(core);
-        }
-
-        public ICommand RestoreCommand
-        {
-            get
-            {
-                return new Command(this.Restore);
-            }
-        }
-
-        public void Restore()
-        {
-            if (Windows.IsMiniWindowCreated && Windows.ActiveWindow == Windows.MiniWindow)
-            {
-                Windows.ActiveWindow.Show();
-                if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
-                {
-                    Windows.ActiveWindow.WindowState = WindowState.Normal;
-                }
-                Windows.ActiveWindow.BringToFront();
-            }
         }
 
         protected override Freezable CreateInstanceCore()
