@@ -143,13 +143,20 @@ namespace FoxTunes.ViewModel
                 this._PlayCommandBinding = value;
                 this.AddCommandBinding(this.PlayCommandBinding, () =>
                 {
-                    if (this.PauseCommand.CanExecute(null))
+                    if (this.PlaybackManager.CurrentStream != null)
                     {
-                        this.PauseCommand.Execute(null);
+                        if (this.PlaybackManager.CurrentStream.IsPaused)
+                        {
+                            var task = this.PlaybackManager.CurrentStream.Resume();
+                        }
+                        else if (this.PlaybackManager.CurrentStream.IsPlaying)
+                        {
+                            var task = this.PlaybackManager.CurrentStream.Pause();
+                        }
                     }
-                    else if (this.PlayCommand.CanExecute(null))
+                    else
                     {
-                        this.PlayCommand.Execute(null);
+                        var task = this.PlaylistManager.Next();
                     }
                 });
             }
