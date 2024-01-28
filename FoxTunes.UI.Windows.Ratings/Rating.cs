@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [UIComponent("CAF4D8AD-80C3-4421-90C1-3E063FA9D5CB", "Rating")]
+    [UIComponent("CAF4D8AD-80C3-4421-90C1-3E063FA9D5CB", "Rating", role: UIComponentRole.Info)]
     public class Rating : RatingBase
     {
         public static IPlaybackManager PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();

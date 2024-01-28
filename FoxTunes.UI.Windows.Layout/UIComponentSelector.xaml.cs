@@ -1,18 +1,14 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace FoxTunes
 {
-    public class UIComponentSelector : ContentControl, IUIComponent, IValueConverter
+    public partial class UIComponentSelector : UserControl, IUIComponent
     {
-        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
-
         protected static ILogger Logger
         {
             get
@@ -53,27 +49,6 @@ namespace FoxTunes
             this.InitializeComponent();
         }
 
-        protected virtual void InitializeComponent()
-        {
-            var comboBox = new ComboBox();
-            if (LayoutManager.Instance != null)
-            {
-                comboBox.ItemsSource = LayoutManager.Instance.Components;
-            }
-            comboBox.DisplayMemberPath = "Name";
-            comboBox.SetBinding(
-                ComboBox.SelectedValueProperty,
-                new Binding()
-                {
-                    Source = this,
-                    Path = new PropertyPath("Component"),
-                    Converter = this
-                }
-            );
-
-            this.Content = comboBox;
-        }
-
         public UIComponentConfiguration Component
         {
             get
@@ -97,52 +72,9 @@ namespace FoxTunes
 
         public event EventHandler ComponentChanged;
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            if (value is UIComponent component)
-            {
-                return Factory.CreateConfiguration(component);
-            }
-            if (value is UIComponentConfiguration configuration)
-            {
-                return Factory.CreateComponent(configuration);
-            }
-            return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            if (value is UIComponent component)
-            {
-                return Factory.CreateConfiguration(component);
-            }
-            if (value is UIComponentConfiguration configuration)
-            {
-                return Factory.CreateComponent(configuration);
-            }
-            return value;
-        }
-
         public virtual void InitializeComponent(ICore core)
         {
             //Nothing to do.
-        }
-
-        protected virtual void Dispatch(Func<Task> function)
-        {
-#if NET40
-            var task = TaskEx.Run(function);
-#else
-            var task = Task.Run(function);
-#endif
         }
 
         protected virtual void OnPropertyChanging(string propertyName)

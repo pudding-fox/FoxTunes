@@ -25,6 +25,14 @@ namespace FoxTunes
     public enum UIComponentRole : byte
     {
         None,
-        LibraryView
+        Container,
+        Visualization,
+        Playback,
+        Info,
+        System,
+        Launcher,
+        Playlist,
+        Library,
+        DSP
     }
 }

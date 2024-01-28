@@ -12,7 +12,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for UIComponentVerticalSplitContainer.xaml
     /// </summary>
-    [UIComponent("18E98420-F039-4504-A116-3D0F26BEAAD5", "Vertical Split")]
+    [UIComponent("18E98420-F039-4504-A116-3D0F26BEAAD5", "Vertical Split", role: UIComponentRole.Container)]
     public partial class UIComponentVerticalSplitContainer : UIComponentPanel
     {
         const string FREEZE_LEFT = "AAAA";

@@ -5,7 +5,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for LibraryTree.xaml
     /// </summary>
-    [UIComponent(ID, "Library Tree")]
+    [UIComponent(ID, "Library Tree", role: UIComponentRole.Library)]
     public partial class LibraryTree : UIComponentBase
     {
         public const string ID = "86276AD4-3962-4659-A00F-95065CD92117";
