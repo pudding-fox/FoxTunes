@@ -122,9 +122,16 @@ namespace FoxTunes
             });
             if (cache)
             {
-                return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, () => this.Factory.StartNew(
-                    () => this.Store.GetOrAdd(new Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>(libraryHierarchyNode, mode), width, height, factory)
+                var key = new Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>(libraryHierarchyNode, mode);
+                var value = new Func<Task<ImageBrush>>(() => this.Factory.StartNew(
+                    () => this.Store.GetOrAdd(key, width, height, factory)
                 ));
+                var brush = default(ImageBrush);
+                if (this.Store.TryGetValue(key, width, height, out brush))
+                {
+                    return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, brush, value);
+                }
+                return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, value);
             }
             return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, () => this.Factory.StartNew(factory));
         }
