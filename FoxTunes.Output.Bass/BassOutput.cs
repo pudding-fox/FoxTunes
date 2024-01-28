@@ -372,7 +372,7 @@ namespace FoxTunes
 
         public override bool IsLoaded(string fileName)
         {
-            return this.IsStarted && BassOutputStreams.Contains(fileName);
+            return this.IsStarted && this.StreamFactory.HasActiveStream(fileName);
         }
 
         public override async Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate)
@@ -381,7 +381,8 @@ namespace FoxTunes
             {
                 await this.Start().ConfigureAwait(false);
             }
-            if (BassOutputStreams.Contains(playlistItem.FileName))
+            //TODO: Why do we do this? Multiple streams for the same file are valid.
+            if (this.StreamFactory.HasActiveStream(playlistItem.FileName))
             {
                 Logger.Write(this, LogLevel.Warn, "The stream is already loaded: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             }

@@ -124,7 +124,7 @@ namespace FoxTunes
                 if (immidiate)
                 {
                     Logger.Write(this, LogLevel.Debug, "Provider does not support multiple streams but immidiate playback was requested, releasing active streams.");
-                    if (BassOutputStreams.Clear())
+                    if (this.ReleaseActiveStreams())
                     {
                         Logger.Write(this, LogLevel.Debug, "Active streams were released, retrying.");
                         stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
@@ -146,6 +146,27 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
             return stream;
+        }
+
+        public bool HasActiveStream(string fileName)
+        {
+            return BassOutputStream.Active.Any(stream => string.Equals(stream.FileName, fileName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool ReleaseActiveStreams()
+        {
+            foreach (var stream in BassOutputStream.Active)
+            {
+                try
+                {
+                    stream.Dispose();
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
+            }
+            return !BassOutputStream.Active.Any();
         }
     }
 }
