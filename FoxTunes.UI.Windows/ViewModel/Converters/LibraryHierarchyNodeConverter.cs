@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using System.Windows.Documents;
 
 namespace FoxTunes.ViewModel
 {
@@ -17,7 +16,7 @@ namespace FoxTunes.ViewModel
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is LibraryHierarchyNode libraryHierarchyNode && libraryHierarchyNode.Id != 0)
+            if (value is LibraryHierarchyNode libraryHierarchyNode && !LibraryHierarchyNode.Empty.Equals(libraryHierarchyNode))
             {
                 return new AsyncResult<IFileData>(this.Convert(libraryHierarchyNode));
             }

@@ -176,42 +176,24 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void RefreshChildren(HierarchyDirection direction)
+        public void Refresh()
         {
-            if (direction.HasFlag(HierarchyDirection.Up) && this.Parent != null)
-            {
-                this.Parent.RefreshChildren(HierarchyDirection.Up);
-            }
-            if (this._Children.IsValueCreated)
-            {
-                this._Children.Reset();
-                this.OnChildrenChanged();
-            }
-            if (direction.HasFlag(HierarchyDirection.Down) && this._Children.IsValueCreated)
-            {
-                foreach (var libraryHierarchyNode in this._Children.Value)
-                {
-                    libraryHierarchyNode.RefreshChildren(HierarchyDirection.Down);
-                }
-            }
+            this.Refresh(HierarchyDirection.Both);
         }
 
-        public void RefreshItems(HierarchyDirection direction)
+        protected virtual void Refresh(HierarchyDirection direction)
         {
             if (direction.HasFlag(HierarchyDirection.Up) && this.Parent != null)
             {
-                this.Parent.RefreshItems(HierarchyDirection.Up);
+                this.Parent.Refresh(HierarchyDirection.Up);
             }
-            if (this._Items.IsValueCreated)
-            {
-                this._Items.Reset();
-                this.OnItemsChanged();
-            }
+            //TODO: What we really want to do is refresh all {Bindings} against this instance but there isn't always a Path, sometimes it's a Converter for the entire object.
+            this.OnPropertyChanged(string.Empty);
             if (direction.HasFlag(HierarchyDirection.Down) && this._Children.IsValueCreated)
             {
                 foreach (var libraryHierarchyNode in this._Children.Value)
                 {
-                    libraryHierarchyNode.RefreshItems(HierarchyDirection.Down);
+                    libraryHierarchyNode.Refresh(HierarchyDirection.Down);
                 }
             }
         }

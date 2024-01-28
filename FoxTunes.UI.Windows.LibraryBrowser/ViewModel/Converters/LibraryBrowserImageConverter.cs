@@ -10,11 +10,11 @@ namespace FoxTunes.ViewModel
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is LibraryHierarchyNode libraryHierarchyNode))
+            if (value is LibraryHierarchyNode libraryHierarchyNode)
             {
-                return value;
+                return Factory.Create(libraryHierarchyNode);
             }
-            return Factory.Create(libraryHierarchyNode);
+            return value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

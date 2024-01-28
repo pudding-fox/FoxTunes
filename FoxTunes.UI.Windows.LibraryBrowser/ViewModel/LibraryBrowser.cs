@@ -209,18 +209,30 @@ namespace FoxTunes.ViewModel
         {
             if (state != null)
             {
-                return this.Refresh(state.FileDatas, state.Names);
+                return this.Refresh(state.FileDatas, state.Names, state.UpdateType);
             }
             else
             {
-                return this.Refresh(Enumerable.Empty<IFileData>(), Enumerable.Empty<string>());
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
         }
 
         public bool IsRefreshing { get; private set; }
 
-        protected virtual Task Refresh(IEnumerable<IFileData> fileDatas, IEnumerable<string> names)
+        protected virtual Task Refresh(IEnumerable<IFileData> fileDatas, IEnumerable<string> names, MetaDataUpdateType updateType)
         {
+            if (updateType == MetaDataUpdateType.System)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             if (names != null && names.Any())
             {
                 if (!names.Contains(CommonImageTypes.FrontCover, StringComparer.OrdinalIgnoreCase))
@@ -234,7 +246,11 @@ namespace FoxTunes.ViewModel
             }
             if (fileDatas != null && fileDatas.Any())
             {
-
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
             return this.Refresh();
         }
