@@ -132,14 +132,14 @@ namespace FoxTunes
             {
                 playlistItem.MetaDatas.Add(new MetaDataItem(CommonMetaData.Track, MetaDataItemType.Tag)
                 {
-                    Value = Convert.ToString(index)
+                    Value = Convert.ToString(index + 1)
                 });
             }
             if (!hasTitle)
             {
                 playlistItem.MetaDatas.Add(new MetaDataItem(CommonMetaData.Title, MetaDataItemType.Tag)
                 {
-                    Value = entry.path.GetName()
+                    Value = entry.path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).LastOrDefault()
                 });
             }
         }

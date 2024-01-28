@@ -5,6 +5,7 @@ using ManagedBass;
 using ManagedBass.ZipStream;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace FoxTunes
 {
     [Component("5E1331EE-37F9-41BB-BD5E-82E9B4995B8A", null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IDisposable
+    public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IFileActionHandler, IDisposable
     {
         public const string OPEN_ARCHIVE = "FGGG";
 
@@ -113,6 +114,28 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public bool CanHandle(string path)
+        {
+            if (!this.Enabled)
+            {
+                return false;
+            }
+            if (!File.Exists(path) || !ArchiveUtils.Extensions.Contains(path.GetExtension(), true))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public async Task Handle(IEnumerable<string> paths)
+        {
+            var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+            foreach (var path in paths)
+            {
+                await this.OpenArchive(playlist, path).ConfigureAwait(false);
+            }
         }
 
         public Task OpenArchive()
