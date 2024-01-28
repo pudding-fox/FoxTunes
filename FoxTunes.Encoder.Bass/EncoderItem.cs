@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public string OutputFileName { get; set; }
 
+        public string Profile { get; private set; }
+
         public int Bitrate { get; private set; }
 
         public int Channels { get; private set; }
@@ -56,11 +58,12 @@ namespace FoxTunes
             }
         }
 
-        public static EncoderItem FromPlaylistItem(PlaylistItem playlistItem)
+        public static EncoderItem FromPlaylistItem(PlaylistItem playlistItem, string profile)
         {
             var encoderItem = new EncoderItem()
             {
-                InputFileName = playlistItem.FileName
+                InputFileName = playlistItem.FileName,
+                Profile = profile
             };
             if (playlistItem.MetaDatas != null)
             {
