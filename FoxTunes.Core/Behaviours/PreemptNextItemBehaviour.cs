@@ -19,12 +19,12 @@ namespace FoxTunes
             this.Output = core.Components.Output;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
-            this.PlaybackManager.Stopping += this.OnStopping;
+            this.PlaybackManager.Ending += this.OnEnding;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnStopping(object sender, AsyncEventArgs e)
+        protected virtual async void OnEnding(object sender, AsyncEventArgs e)
         {
             using (e.Defer())
             {
@@ -73,7 +73,7 @@ namespace FoxTunes
         {
             if (this.PlaybackManager != null)
             {
-                this.PlaybackManager.Stopping -= this.OnStopping;
+                this.PlaybackManager.Ending -= this.OnEnding;
             }
         }
 

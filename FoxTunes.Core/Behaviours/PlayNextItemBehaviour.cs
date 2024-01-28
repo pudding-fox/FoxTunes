@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -13,17 +12,13 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = core.Managers.Playback;
-            this.PlaybackManager.Stopped += this.OnStopped;
+            this.PlaybackManager.Ended += this.OnEnded;
             this.PlaylistManager = core.Managers.Playlist;
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnStopped(object sender, StoppedEventArgs e)
+        protected virtual async void OnEnded(object sender, AsyncEventArgs e)
         {
-            if (e.Manual)
-            {
-                return;
-            }
             Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
             using (e.Defer())
             {
@@ -53,7 +48,7 @@ namespace FoxTunes
         {
             if (this.PlaybackManager != null)
             {
-                this.PlaybackManager.Stopped -= this.OnStopped;
+                this.PlaybackManager.Ended -= this.OnEnded;
             }
         }
 

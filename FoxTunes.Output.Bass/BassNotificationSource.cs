@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class BassNotificationSource : BaseComponent
     {
-        const int STOPPING_THRESHOLD = 5;
+        const int ENDING_THRESHOLD = 5;
 
         public BassNotificationSource(BassOutputStream outputStream)
         {
@@ -20,20 +20,18 @@ namespace FoxTunes
         {
             get
             {
-                return this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, STOPPING_THRESHOLD);
+                return this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, ENDING_THRESHOLD);
             }
         }
 
         public override void InitializeComponent(ICore core)
         {
-            Logger.Write(this, LogLevel.Debug, "Creating \"Ending\" channel sync {0} seconds from the end for channel: {1}", STOPPING_THRESHOLD, this.OutputStream.ChannelHandle);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.Position,
                 this.EndingPosition,
                 this.OnEnding
             ));
-            Logger.Write(this, LogLevel.Debug, "Creating \"End\" channel sync for channel: {0}", this.OutputStream.ChannelHandle);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.End,
@@ -47,37 +45,42 @@ namespace FoxTunes
         {
             //Critical: Don't block in this call back, it glitches playback.
 #if NET40
-            var task = TaskEx.Run(new Action(this.Ending));
+            var task = TaskEx.Run(this.OnEnding);
 #else
-            var task = Task.Run(new Action(this.Ending));
+            var task = Task.Run(this.OnEnding);
 #endif
         }
 
-        public virtual void Ending()
+        public virtual Task OnEnding()
         {
-            Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ending\".", this.OutputStream.ChannelHandle);
-            var task = this.OnStopping();
+            if (this.Ending == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            var e = new AsyncEventArgs();
+            this.Ending(this, e);
+            return e.Complete();
         }
+
+        public event AsyncEventHandler Ending = delegate { };
 
         protected virtual void OnEnded(int Handle, int Channel, int Data, IntPtr User)
         {
             //Critical: Don't block in this call back, it glitches playback.
 #if NET40
-            var task = TaskEx.Run(new Action(this.Ended));
+            var task = TaskEx.Run(this.OnEnded);
 #else
-            var task = Task.Run(new Action(this.Ended));
+            var task = Task.Run(this.OnEnded);
 #endif
         }
 
-        public virtual void Ended()
+        public virtual Task OnEnded()
         {
-            Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ended\".", this.OutputStream.ChannelHandle);
-            var task = this.OnStopped();
-        }
-
-        protected virtual Task OnStopping()
-        {
-            if (this.Stopping == null)
+            if (this.Ended == null)
             {
 #if NET40
                 return TaskEx.FromResult(false);
@@ -86,27 +89,10 @@ namespace FoxTunes
 #endif
             }
             var e = new AsyncEventArgs();
-            this.Stopping(this, e);
+            this.Ended(this, e);
             return e.Complete();
         }
 
-        public event AsyncEventHandler Stopping = delegate { };
-
-        protected virtual Task OnStopped()
-        {
-            if (this.Stopped == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new AsyncEventArgs();
-            this.Stopped(this, e);
-            return e.Complete();
-        }
-
-        public event AsyncEventHandler Stopped = delegate { };
+        public event AsyncEventHandler Ended = delegate { };
     }
 }

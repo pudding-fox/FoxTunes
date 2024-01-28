@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Managers
@@ -104,11 +103,8 @@ namespace FoxTunes.Managers
         {
             if (this.CurrentStream != null)
             {
-                this.CurrentStream.IsPlayingChanged -= this.IsPlayingChanged;
-                this.CurrentStream.IsPausedChanged -= this.IsPausedChanged;
-                this.CurrentStream.IsStoppedChanged -= this.IsStoppedChanged;
-                this.CurrentStream.Stopping -= this.Stopping;
-                this.CurrentStream.Stopped -= this.Stopped;
+                this.CurrentStream.Ending -= this.Ending;
+                this.CurrentStream.Ended -= this.Ended;
             }
         }
 
@@ -116,11 +112,8 @@ namespace FoxTunes.Managers
         {
             if (this.CurrentStream != null)
             {
-                this.CurrentStream.IsPlayingChanged += this.IsPlayingChanged;
-                this.CurrentStream.IsPausedChanged += this.IsPausedChanged;
-                this.CurrentStream.IsStoppedChanged += this.IsStoppedChanged;
-                this.CurrentStream.Stopping += this.Stopping;
-                this.CurrentStream.Stopped += this.Stopped;
+                this.CurrentStream.Ending += this.Ending;
+                this.CurrentStream.Ended += this.Ended;
             }
             if (this.CurrentStreamChanged != null)
             {
@@ -133,15 +126,9 @@ namespace FoxTunes.Managers
 
         public event AsyncEventHandler CurrentStreamChanged = delegate { };
 
-        public event AsyncEventHandler IsPlayingChanged = delegate { };
+        public event AsyncEventHandler Ending = delegate { };
 
-        public event AsyncEventHandler IsPausedChanged = delegate { };
-
-        public event AsyncEventHandler IsStoppedChanged = delegate { };
-
-        public event AsyncEventHandler Stopping = delegate { };
-
-        public event StoppedEventHandler Stopped = delegate { };
+        public event AsyncEventHandler Ended = delegate { };
 
         public async Task Load(PlaylistItem playlistItem, bool immediate)
         {

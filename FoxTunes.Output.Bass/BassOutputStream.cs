@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -90,7 +89,7 @@ namespace FoxTunes
             if (position > this.NotificationSource.EndingPosition)
             {
                 Logger.Write(this, LogLevel.Debug, "Channel {0} was manually seeked past the \"Ending\" sync, raising it manually.", this.ChannelHandle);
-                this.NotificationSource.Ending();
+                this.NotificationSource.OnEnding();
             }
         }
 
@@ -121,27 +120,25 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.NotificationSource = new BassNotificationSource(this);
-            this.NotificationSource.Stopping += this.NotificationSource_Stopping;
-            this.NotificationSource.Stopped += this.NotificationSource_Stopped;
+            this.NotificationSource.Ending += this.OnEnding;
+            this.NotificationSource.Ended += this.OnEnded;
             this.NotificationSource.InitializeComponent(core);
             base.InitializeComponent(core);
         }
 
-        protected virtual async void NotificationSource_Stopping(object sender, AsyncEventArgs e)
+        protected virtual async void OnEnding(object sender, AsyncEventArgs e)
         {
             using (e.Defer())
             {
-                await this.EmitState();
-                await this.OnStopping();
+                await this.OnEnding();
             }
         }
 
-        protected virtual async void NotificationSource_Stopped(object sender, AsyncEventArgs e)
+        protected virtual async void OnEnded(object sender, AsyncEventArgs e)
         {
             using (e.Defer())
             {
-                await this.EmitState();
-                await this.OnStopped(false);
+                await this.OnEnded();
             }
         }
 
@@ -205,77 +202,72 @@ namespace FoxTunes
             }
         }
 
-        public override async Task Play()
+        public override Task Play()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            await this.Manager.WithPipelineExclusive(this, pipeline =>
+            return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {
                     pipeline.Play();
                 }
             });
-            await this.EmitState();
         }
 
-        public override async Task Pause()
+        public override Task Pause()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            await this.Manager.WithPipelineExclusive(this, pipeline =>
+            return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {
                     pipeline.Pause();
                 }
             });
-            await this.EmitState();
         }
 
-        public override async Task Resume()
+        public override Task Resume()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            await this.Manager.WithPipelineExclusive(this, pipeline =>
+            return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {
                     pipeline.Resume();
                 }
             });
-            await this.EmitState();
         }
 
-        public override async Task Stop()
+        public override Task Stop()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            await this.Manager.WithPipelineExclusive(this, pipeline =>
+            return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
                 if (pipeline != null)
                 {
                     pipeline.Stop();
                 }
             });
-            await this.EmitState();
-            await this.OnStopped(true);
         }
 
         protected override void OnDisposing()
         {
             if (this.NotificationSource != null)
             {
-                this.NotificationSource.Stopping -= this.NotificationSource_Stopping;
-                this.NotificationSource.Stopped -= this.NotificationSource_Stopped;
+                this.NotificationSource.Ending -= this.OnEnding;
+                this.NotificationSource.Ended -= this.OnEnded;
             }
             try
             {

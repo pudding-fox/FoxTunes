@@ -21,15 +21,9 @@ namespace FoxTunes.Interfaces
 
         bool IsPlaying { get; }
 
-        event AsyncEventHandler IsPlayingChanged;
-
         bool IsPaused { get; }
 
-        event AsyncEventHandler IsPausedChanged;
-
         bool IsStopped { get; }
-
-        event AsyncEventHandler IsStoppedChanged;
 
         Task Play();
 
@@ -39,9 +33,9 @@ namespace FoxTunes.Interfaces
 
         Task Stop();
 
-        event AsyncEventHandler Stopping;
+        event AsyncEventHandler Ending;
 
-        event StoppedEventHandler Stopped;
+        event AsyncEventHandler Ended;
 
         string Description { get; }
 
@@ -50,29 +44,5 @@ namespace FoxTunes.Interfaces
         Task EndSeek();
 
         bool IsDisposed { get; }
-    }
-
-    public delegate void PlayedEventHandler(object sender, PlayedEventArgs e);
-
-    public class PlayedEventArgs : EventArgs
-    {
-        public PlayedEventArgs(bool manual)
-        {
-            this.Manual = manual;
-        }
-
-        public bool Manual { get; private set; }
-    }
-
-    public delegate void StoppedEventHandler(object sender, StoppedEventArgs e);
-
-    public class StoppedEventArgs : AsyncEventArgs
-    {
-        public StoppedEventArgs(bool manual)
-        {
-            this.Manual = manual;
-        }
-
-        public bool Manual { get; private set; }
     }
 }
