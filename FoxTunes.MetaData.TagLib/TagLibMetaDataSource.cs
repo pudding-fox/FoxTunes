@@ -41,6 +41,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Lyrics { get; private set; }
 
+        public BooleanConfigurationElement ReplayGain { get; private set; }
+
         public BooleanConfigurationElement Popularimeter { get; private set; }
 
         public SelectionConfigurationElement Write { get; private set; }
@@ -78,6 +80,10 @@ namespace FoxTunes
             this.Lyrics = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_LYRICS_TAGS
+            );
+            this.ReplayGain = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_REPLAY_GAIN_TAGS
             );
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -268,6 +274,12 @@ namespace FoxTunes
             if (this.Lyrics.Value)
             {
                 (this).Try(() => this.AddTag(metaData, CommonMetaData.Lyrics, tag.Lyrics), this.ErrorHandler);
+            }
+
+            if (this.ReplayGain.Value)
+            {
+                (this).Try(() => this.AddTag(metaData, CommonMetaData.ReplayGainAlbumGain, tag.ReplayGainAlbumGain.ToString()), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, CommonMetaData.ReplayGainTrackGain, tag.ReplayGainTrackGain.ToString()), this.ErrorHandler);
             }
         }
 

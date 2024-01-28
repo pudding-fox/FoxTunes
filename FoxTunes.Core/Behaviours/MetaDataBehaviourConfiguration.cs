@@ -32,6 +32,8 @@ namespace FoxTunes
 
         public const string READ_LYRICS_TAGS = "IIII124F-FA35-4D35-B1A9-A2EF8E189A4F";
 
+        public const string READ_REPLAY_GAIN_TAGS = "IIJJF73C-4747-4961-9BFA-80639C31B9C7";
+
         public const string READ_POPULARIMETER_TAGS = "JJJJ6988-D3BF-434F-B326-3354D2922926";
 
         public const string THREADS_ELEMENT = "KKKK16BD-B4A7-4F9D-B4DA-F81E932F6DD9";
@@ -68,6 +70,8 @@ namespace FoxTunes
                     new BooleanConfigurationElement(READ_MUSICBRAINZ_TAGS, "MusicBrainz Attributes", path: "Advanced").WithValue(false))
                 .WithElement(
                     new BooleanConfigurationElement(READ_LYRICS_TAGS, "Lyrics").WithValue(releaseType == ReleaseType.Default))
+                .WithElement(
+                    new BooleanConfigurationElement(READ_REPLAY_GAIN_TAGS, "Replay Gain").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
                     new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, "Ratings/Play Counts").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(
