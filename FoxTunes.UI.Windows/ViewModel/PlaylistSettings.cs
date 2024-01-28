@@ -132,10 +132,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Cancel)
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                return new Command(this.Cancel);
             }
         }
 

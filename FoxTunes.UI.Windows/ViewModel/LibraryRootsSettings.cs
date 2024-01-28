@@ -64,11 +64,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var command = CommandFactory.Instance.CreateCommand(
+                return CommandFactory.Instance.CreateCommand(
                     new Func<Task>(this.Save)
                 );
-                command.Tag = CommandHints.DISMISS;
-                return command;
             }
         }
 
@@ -113,10 +111,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Cancel)
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                return new Command(this.Cancel);
             }
         }
 

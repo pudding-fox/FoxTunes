@@ -127,12 +127,10 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var command = new Command(
+                return new Command(
                     () => this.Configuration.Save(),
                     () => this.Configuration != null
                 );
-                command.Tag = CommandHints.DISMISS;
-                return command;
             }
         }
 

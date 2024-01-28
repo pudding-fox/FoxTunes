@@ -40,16 +40,13 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
             try
             {
                 this.Action();
-                this.OnPhase(CommandPhase.After, this.Tag, parameter);
             }
             catch (Exception e)
             {
                 Logger.Write(typeof(Command), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
-                this.OnPhase(CommandPhase.Error, this.Tag, parameter);
             }
             this.OnCanExecuteChanged();
         }
@@ -99,7 +96,6 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.OnPhase(CommandPhase.Before, this.Tag, parameter);
             try
             {
                 if (parameter is T)
@@ -110,19 +106,12 @@ namespace FoxTunes.ViewModel
                 {
                     this.Action(default(T));
                 }
-                this.OnPhase(CommandPhase.After, this.Tag, parameter);
             }
             catch (Exception e)
             {
                 Logger.Write(typeof(Command), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
-                this.OnPhase(CommandPhase.Error, this.Tag, parameter);
             }
             this.OnCanExecuteChanged();
         }
-    }
-
-    public static class CommandHints
-    {
-        public const string DISMISS = "CommandHints.Dismiss";
     }
 }
