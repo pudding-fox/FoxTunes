@@ -26,6 +26,8 @@ namespace FoxTunes
 
         const string LIB = "lib";
 
+        const string L10N_FR = "fr";
+
         public static Package Launcher = GetLauncher();
 
         public static Package Core = GetCore();
@@ -124,10 +126,10 @@ namespace FoxTunes
             var source = GetSource(target, package, element, flags);
             var destination = GetDestination(target, package, element, flags);
 
-            CopyFile(source, destination);
+            CopyFile(source, destination, flags);
         }
 
-        private static void CopyFile(string source, string destination)
+        private static void CopyFile(string source, string destination, ReleaseFlags flags)
         {
             var directoryName = Path.GetDirectoryName(destination);
             if (!Directory.Exists(directoryName))
@@ -137,8 +139,42 @@ namespace FoxTunes
             }
 
             Console.WriteLine("Creating file: {0}", destination);
-
             File.Copy(source, destination);
+
+            CopyResouces(source, destination, flags);
+        }
+
+        private static void CopyResouces(string source, string destination, ReleaseFlags flags)
+        {
+            if (flags.HasFlag(ReleaseFlags.L10N_FR))
+            {
+                CopyResouces(source, destination, L10N_FR, flags);
+            }
+        }
+
+        private static void CopyResouces(string source, string destination, string culture, ReleaseFlags flags)
+        {
+            var sourceDirectoryName = Path.Combine(Path.GetDirectoryName(source), culture);
+            if (!Directory.Exists(sourceDirectoryName))
+            {
+                return;
+            }
+            var fileNames = Directory.GetFiles(sourceDirectoryName, string.Format("{0}.resources.dll", Path.GetFileNameWithoutExtension(source)));
+            if (fileNames.Length == 0)
+            {
+                return;
+            }
+            var destinationDirectoryName = Path.Combine(Path.GetDirectoryName(destination), culture);
+            if (!Directory.Exists(destinationDirectoryName))
+            {
+                Console.WriteLine("Creating directory: {0}", destinationDirectoryName);
+                Directory.CreateDirectory(destinationDirectoryName);
+            }
+            foreach (var fileName in fileNames)
+            {
+                Console.WriteLine("Creating satellite: {0}", destination);
+                File.Copy(fileName, Path.Combine(destinationDirectoryName, Path.GetFileName(fileName)));
+            }
         }
 
         private static string GetSource(string target, Package package, PackageElement element, ReleaseFlags flags)
