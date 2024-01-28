@@ -382,7 +382,12 @@ namespace FoxTunes
 
         public static int IndexToFrequency(int index, int fftSize, int rate)
         {
-            return (int)Math.Floor((double)index * (double)rate / (double)fftSize);
+            var frequency = (int)Math.Floor((double)index * (double)rate / (double)fftSize);
+            if (frequency > rate / 2)
+            {
+                frequency = rate / 2;
+            }
+            return frequency;
         }
 
         public static int FrequencyToIndex(int frequency, int fftSize, int rate)
