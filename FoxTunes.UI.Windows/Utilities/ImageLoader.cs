@@ -12,8 +12,6 @@ namespace FoxTunes
 {
     public class ImageLoader : StandardComponent, IConfigurableComponent
     {
-        private static readonly string PREFIX = typeof(ImageLoader).Name;
-
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
 
         public IConfiguration Configuration { get; private set; }
@@ -35,14 +33,19 @@ namespace FoxTunes
             return ImageLoaderConfiguration.GetConfigurationSections();
         }
 
-        public ImageSource Load(string id, string fileName, int width, int height)
+        public ImageSource Load(string fileName)
+        {
+            return this.Load(null, null, fileName, 0, 0);
+        }
+
+        public ImageSource Load(string prefix, string id, string fileName, int width, int height)
         {
             try
             {
                 var decode = false;
                 if (width != 0 && height != 0 && this.HighQualityResizer.Value)
                 {
-                    fileName = this.Resize(id, fileName, width, height);
+                    fileName = this.Resize(prefix, id, fileName, width, height);
                 }
                 else
                 {
@@ -74,12 +77,17 @@ namespace FoxTunes
             }
         }
 
-        protected virtual string Resize(string id, string fileName, int width, int height)
+        public string Resize(string prefix, string id, string fileName, int width, int height)
         {
-            return this.Resize(id, () => Bitmap.FromFile(fileName), width, height);
+            return this.Resize(prefix, id, () => Bitmap.FromFile(fileName), width, height);
         }
 
-        public ImageSource Load(string id, Stream stream, int width, int height)
+        public ImageSource Load(Stream stream)
+        {
+            return this.Load(null, null, stream, 0, 0);
+        }
+
+        public ImageSource Load(string prefix, string id, Stream stream, int width, int height)
         {
             try
             {
@@ -87,7 +95,7 @@ namespace FoxTunes
                 var dispose = false;
                 if (width != 0 && height != 0 && this.HighQualityResizer.Value)
                 {
-                    stream = this.Resize(id, stream, width, height);
+                    stream = this.Resize(prefix, id, stream, width, height);
                     dispose = true;
                 }
                 else
@@ -124,22 +132,21 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Stream Resize(string id, Stream stream, int width, int height)
+        public Stream Resize(string prefix, string id, Stream stream, int width, int height)
         {
-            return File.OpenRead(this.Resize(id, () => Bitmap.FromStream(stream), width, height));
+            return File.OpenRead(this.Resize(prefix, id, () => Bitmap.FromStream(stream), width, height));
         }
 
-        protected virtual string Resize(string id, Func<Image> factory, int width, int height)
+        protected virtual string Resize(string prefix, string id, Func<Image> factory, int width, int height)
         {
             var fileName = default(string);
-            id = this.GetImageId(id, width, height);
-            if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+            if (FileMetaDataStore.Exists(prefix, id, out fileName))
             {
                 return fileName;
             }
             using (KeyLock.Lock(id))
             {
-                if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                if (FileMetaDataStore.Exists(prefix, id, out fileName))
                 {
                     return fileName;
                 }
@@ -156,7 +163,7 @@ namespace FoxTunes
                     {
                         image.Save(stream, ImageFormat.Png);
                         stream.Seek(0, SeekOrigin.Begin);
-                        return FileMetaDataStore.Write(PREFIX, id, stream);
+                        return FileMetaDataStore.Write(prefix, id, stream);
                     }
                 }
             }
@@ -168,18 +175,6 @@ namespace FoxTunes
             {
                 graphics.DrawImage(image, new Rectangle(0, 0, width, height));
             }
-        }
-
-        protected virtual string GetImageId(string id, int width, int height)
-        {
-            var hashCode = default(int);
-            unchecked
-            {
-                hashCode += id.GetHashCode();
-                hashCode += width.GetHashCode();
-                hashCode += height.GetHashCode();
-            }
-            return hashCode.ToString();
         }
     }
 }

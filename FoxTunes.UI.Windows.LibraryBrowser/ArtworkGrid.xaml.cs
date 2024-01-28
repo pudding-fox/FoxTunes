@@ -76,11 +76,7 @@ namespace FoxTunes
                 height = this.DecodePixelHeight;
                 libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
             });
-            if (!libraryHierarchyNode.IsMetaDatasLoaded)
-            {
-                await libraryHierarchyNode.LoadMetaDatasAsync();
-            }
-            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, width, height);
+            var source = await ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, width, height);
             await Windows.Invoke(() => this.Background = new ImageBrush(source)
             {
                 Stretch = Stretch.Uniform
