@@ -246,6 +246,10 @@ namespace FoxTunes
                         attribute.Section,
                         attribute.Element
                     );
+                    if (element == null)
+                    {
+                        continue;
+                    }
                     element.ConnectValue(value => component.IsComponentValid = this.IsComponentValid(type));
                 }
             }

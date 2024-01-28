@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FoxTunes.Interfaces;
+using System.Collections.Generic;
 using Windows.UI.Notifications;
 
 namespace FoxTunes
@@ -51,8 +52,9 @@ namespace FoxTunes
         {
             if (IsPlatformSupported)
             {
+                var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
                 yield return new ConfigurationSection(SECTION, "Windows 10")
-                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Notifications").WithValue(false))
+                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Notifications").WithValue(releaseType == ReleaseType.Default))
                     .WithElement(new BooleanConfigurationElement(POPUP_ELEMENT, "Popup").WithValue(false))
                     .WithElement(new BooleanConfigurationElement(LARGE_ARTWORK_ELEMENT, "Large Artwork").WithValue(false)
                 );

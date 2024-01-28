@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -31,8 +32,9 @@ namespace FoxTunes
         {
             if (IsPlatformSupported)
             {
+                var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
                 yield return new ConfigurationSection(SECTION, "Taskbar Buttons")
-                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false)
+                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(releaseType == ReleaseType.Default)
                 );
             }
         }
