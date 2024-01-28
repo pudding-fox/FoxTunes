@@ -14,5 +14,16 @@ namespace FoxTunes
         public abstract void Fatal(Exception exception);
 
         public abstract void Restart();
+
+        protected virtual void OnWindowCreated(IntPtr handle)
+        {
+            if (this.WindowCreated == null)
+            {
+                return;
+            }
+            this.WindowCreated(this, new UserInterfaceWindowCreatedEvent(handle));
+        }
+
+        public event UserInterfaceWindowCreatedEventHandler WindowCreated;
     }
 }

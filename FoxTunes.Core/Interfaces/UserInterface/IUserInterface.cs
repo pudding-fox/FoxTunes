@@ -13,5 +13,19 @@ namespace FoxTunes.Interfaces
         void Fatal(Exception exception);
 
         void Restart();
+
+        event UserInterfaceWindowCreatedEventHandler WindowCreated;
+    }
+
+    public delegate void UserInterfaceWindowCreatedEventHandler(object sender, UserInterfaceWindowCreatedEvent e);
+
+    public class UserInterfaceWindowCreatedEvent : EventArgs
+    {
+        public UserInterfaceWindowCreatedEvent(IntPtr handle)
+        {
+            this.Handle = handle;
+        }
+
+        public IntPtr Handle { get; private set; }
     }
 }

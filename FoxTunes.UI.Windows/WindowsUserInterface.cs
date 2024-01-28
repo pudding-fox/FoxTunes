@@ -29,6 +29,8 @@ namespace FoxTunes
                     await this.OnOpen(e.Sequence);
                 }
             };
+            Windows.MainWindowCreated += (sender, e) => this.OnWindowCreated(Windows.MainWindow.GetHandle());
+            Windows.MiniWindowCreated += (sender, e) => this.OnWindowCreated(Windows.MiniWindow.GetHandle());
         }
 
         private Application _Application { get; set; }
