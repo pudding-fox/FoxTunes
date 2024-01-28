@@ -104,7 +104,7 @@ namespace FoxTunes
                     {
                         if (pair.Key is PlaylistItem playlistItem)
                         {
-                            this.Warnings.Add(playlistItem, pair.Value);
+                            this.Warnings.GetOrAdd(playlistItem, _playlistItem => new List<string>()).AddRange(pair.Value);
                         }
                     }
                 }
