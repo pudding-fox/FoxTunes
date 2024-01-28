@@ -35,6 +35,7 @@ namespace FoxTunes
             this.LoadManagers();
             this.LoadFactories();
             this.LoadBehaviours();
+            this.LoadConfiguration();
             this.InitializeComponents();
         }
 
@@ -56,6 +57,22 @@ namespace FoxTunes
         protected virtual void LoadBehaviours()
         {
             ComponentRegistry.Instance.AddComponents(BehaviourLoader.Instance.Load());
+        }
+
+        protected virtual void LoadConfiguration()
+        {
+            ComponentRegistry.Instance.ForEach(component =>
+            {
+                if (!(component is IConfigurableComponent))
+                {
+                    return;
+                }
+                var sections = (component as IConfigurableComponent).GetConfigurationSections();
+                foreach (var section in sections)
+                {
+                    this.Components.Configuration.RegisterSection(section);
+                }
+            });
         }
 
         protected virtual void InitializeComponents()

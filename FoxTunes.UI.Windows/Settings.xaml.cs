@@ -1,13 +1,14 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace FoxTunes
 {
     /// <summary>
-    /// Interaction logic for StreamPosition.xaml
+    /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class StreamPosition : UserControl
+    public partial class Settings : UserControl
     {
-        public StreamPosition()
+        public Settings()
         {
             InitializeComponent();
         }

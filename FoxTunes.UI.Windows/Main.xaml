@@ -11,13 +11,15 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Windows:Playlist Grid.ColumnSpan="2"></Windows:Playlist>
+        <Windows:Playlist Grid.ColumnSpan="3"></Windows:Playlist>
         <Windows:Playback Grid.Row="1" ></Windows:Playback>
         <Windows:StreamPosition Grid.Column="1" Grid.Row="1"></Windows:StreamPosition>
+        <Windows:Settings Grid.Column="2" Grid.Row="1"></Windows:Settings>
     </Grid>
 </Window>
