@@ -1160,7 +1160,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style TargetType="{x:Type TabControl}">
         <Setter Property="Template">
             <Setter.Value>
@@ -1185,7 +1185,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style d:IsControlPart="True" TargetType="{x:Type TabItem}">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="Template">
@@ -1833,6 +1833,9 @@
                     </ControlTemplate.Resources>
                     <Border SnapsToDevicePixels="true" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" x:Name="border">
                         <Grid Margin="2,0,2,0">
+                            <!-- This empty textblock ensures that the item height is initially correct. -->
+                            <!-- This prevents re-measuring as the list data is "hydrated". -->
+                            <TextBlock/>
                             <Rectangle x:Name="Background" Opacity="0.25" Fill="{DynamicResource NormalBrush}" RadiusX="1" RadiusY="1"/>
                             <Rectangle x:Name="HoverRectangle" IsHitTestVisible="False" Opacity="0" Fill="{DynamicResource NormalBrush}" RadiusX="1" RadiusY="1"/>
                             <Rectangle x:Name="SelectedRectangle" IsHitTestVisible="False" Opacity="0" Fill="{DynamicResource SelectedBackgroundBrush}" RadiusX="1" RadiusY="1"/>
