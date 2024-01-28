@@ -24,16 +24,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async void PlaybackManager_CurrentStreamChanged(object sender, AsyncEventArgs e)
+        protected virtual async void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
         {
             if (this.PlaybackManager.CurrentStream == null)
             {
                 return;
             }
-            using (e.Defer())
-            {
-                await this.EnqueueItems();
-            }
+            await this.EnqueueItems();
         }
 
         private async Task EnqueueItems()

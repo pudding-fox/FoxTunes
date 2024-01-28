@@ -8,6 +8,10 @@ namespace FoxTunes.ViewModel
 {
     public class Artwork : ViewModelBase
     {
+        private static readonly ArtworkLocator ArtworkLocator = new ArtworkLocator();
+
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -45,19 +49,25 @@ namespace FoxTunes.ViewModel
                 this.Image = null;
                 return;
             }
+            var image = default(MetaDataItem);
             var playlistItem = this.PlaylistManager.CurrentItem;
-            if (playlistItem == null)
+            if (playlistItem != null)
             {
-                this.Image = null;
-                return;
+                image = playlistItem.MetaDatas.FirstOrDefault(
+                    metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == CommonImageTypes.FrontCover && File.Exists(metaDataItem.FileValue)
+                );
+                if (image == null)
+                {
+                    image = ArtworkLocator.Find(playlistItem.FileName, ArtworkType.FrontCover);
+                }
             }
-            this.Image = playlistItem.MetaDatas.FirstOrDefault(
-                metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == CommonImageTypes.FrontCover && File.Exists(metaDataItem.FileValue)
-            );
+            //TODO: Bad awaited Task.
+            this.ForegroundTaskRunner.Run(() => this.Image = image);
         }
 
         public override void InitializeComponent(ICore core)
         {
+            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaylistManager.CurrentItemChanged += (sender, e) => this.Refresh();
             this.Refresh();

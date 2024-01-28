@@ -76,14 +76,9 @@ namespace FoxTunes.Managers
                 Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
                 await this.Unload(this.CurrentStream);
             }
-            await this.ForegroundTaskRunner.Run(() =>
-            {
-                this._CurrentStream = stream;
-                return this.OnCurrentStreamChanged();
-            });
+            this._CurrentStream = stream;
+            await this.OnCurrentStreamChanged();
         }
-
-        public event EventHandler CurrentStreamChanging = delegate { };
 
         protected virtual async Task OnCurrentStreamChanged()
         {
