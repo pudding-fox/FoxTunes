@@ -47,10 +47,14 @@ namespace FoxTunes
                 var value = ComponentSlots.Lookup[key];
                 if (ComponentRegistry.Instance.GetComponents(value).Count() > 1)
                 {
-                    ComponentResolver.Instance.Add(value);
+                    if (ComponentResolver.Instance.Resolve(value))
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Multiple components are installed for slot \"{0}\", the conflict was resolved.", value);
+                        continue;
+                    }
                     if (core.Components.UserInterface != null)
                     {
-                        core.Components.UserInterface.Warn(string.Format("Multiple components are installed for slot \"{0}\".\nEdit {1} to resolve the conflict.", key, ComponentResolver.FILE_NAME.GetName()));
+                        core.Components.UserInterface.Warn(string.Format("Multiple components are installed for slot \"{0}\".\nEdit {1} to resolve the conflict.", value, ComponentResolver.FILE_NAME.GetName()));
                     }
                     success = false;
                 }

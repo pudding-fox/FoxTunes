@@ -21,9 +21,7 @@ namespace FoxTunes.Interfaces
 
         IEnumerable<T> GetComponents<T>();
 
-        void ReplaceComponents<T>(params T[] components) where T : IBaseComponent;
-
-        void ReplaceComponents<T>(IEnumerable<T> components) where T : IBaseComponent;
+        void RemoveComponent(IBaseComponent component);
 
         void ForEach(Action<IBaseComponent> action);
 

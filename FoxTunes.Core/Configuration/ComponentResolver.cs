@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
@@ -9,6 +10,14 @@ namespace FoxTunes
     public class ComponentResolver : IComponentResolver
     {
         public static readonly string FILE_NAME = GetFileName();
+
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
 
         private static string GetFileName()
         {
@@ -46,9 +55,11 @@ namespace FoxTunes
             return id;
         }
 
-        public void Add(string slot)
+        public bool Resolve(string slot)
         {
-            var components = ComponentRegistry.Instance.GetComponents(slot);
+            var components = ComponentRegistry.Instance.GetComponents(slot).ToArray();
+            var defaultComponent = default(IBaseComponent);
+            var result = true;
             foreach (var component in components)
             {
                 var attribute = component.GetType().GetCustomAttribute<ComponentAttribute>();
@@ -57,13 +68,36 @@ namespace FoxTunes
                     continue;
                 }
                 var name = attribute.Name;
-                var @default = attribute.Default;
+                var isDefault = attribute.Default;
                 if (string.IsNullOrEmpty(name))
                 {
                     name = component.GetType().FullName;
                 }
-                this.Add(slot, attribute.Id, name, @default);
+                this.Add(slot, attribute.Id, name, isDefault);
+                if (isDefault)
+                {
+                    if (defaultComponent != null)
+                    {
+                        Logger.Write(typeof(ComponentResolver), LogLevel.Error, "Multiple default components are installed for slot \"{0}\".", slot);
+                        result = false;
+                    }
+                    defaultComponent = component;
+                }
             }
+            if (result)
+            {
+                foreach (var component in components)
+                {
+                    if (object.ReferenceEquals(component, defaultComponent))
+                    {
+                        continue;
+                    }
+                    Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Unloading conflicting component \"{0}\" in slot {1}: It is not the default.", component.GetType().FullName, slot);
+                    ComponentRegistry.Instance.RemoveComponent(component);
+                }
+                return true;
+            }
+            return false;
         }
 
         private void Add(string slot, string id, string name, bool @default)
