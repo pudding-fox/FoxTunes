@@ -1,8 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -56,7 +56,10 @@ namespace FoxTunes
 
         public void Disable()
         {
-            this.Configuration.Saved -= this.OnSaved;
+            if (this.Configuration != null)
+            {
+                this.Configuration.Saved -= this.OnSaved;
+            }
             Logger.Write(this, LogLevel.Info, "Disabled.");
         }
 
