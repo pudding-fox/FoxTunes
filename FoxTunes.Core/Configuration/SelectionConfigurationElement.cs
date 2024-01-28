@@ -40,17 +40,23 @@ namespace FoxTunes
             }
             foreach (var option in options)
             {
+                if (option.IsDefault)
+                {
+                    if (value != null)
+                    {
+                        Logger.Write(typeof(SelectionConfigurationElement), LogLevel.Debug, "New default value \"{0}\" superseeds current value \"{1}\".", option.Id, value.Id);
+                    }
+                    value = option;
+                }
                 this.Options.Add(option);
             }
             if (value != null && this.Contains(value.Id))
             {
-                //The previous selection is valid, restore it.
                 this.Value = value;
             }
             else
             {
-                //Either no previous selection or it's invalid, select the first "default" option or just the first option if none are "default".
-                this.Value = this.Options.FirstOrDefault(option => option.IsDefault) ?? this.Options.FirstOrDefault();
+                this.Value = this.Options.FirstOrDefault();
             }
             return this;
         }
