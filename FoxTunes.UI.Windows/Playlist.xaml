@@ -45,7 +45,7 @@
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLIST}}"></Windows:Menu>
             </ListView.ContextMenu>
             <ListView.View>
-                <GridView AllowsColumnReorder="False" Windows:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}"></GridView>
+                <GridView Windows:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}"></GridView>
             </ListView.View>
         </ListView>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">

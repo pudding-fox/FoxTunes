@@ -10,6 +10,8 @@
 
         public const string PlaylistColumnsUpdated = "PlaylistColumnsUpdated";
 
+        public const string SettingsUpdated = "SettingsUpdated";
+
         public const string StreamLoaded = "StreamLoaded";
 
         public const string StreamFault = "StreamFault";

@@ -136,7 +136,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.PlayFromMemory;
+                return this.Pipeline == null || this.PlayFromMemory;
             }
         }
 

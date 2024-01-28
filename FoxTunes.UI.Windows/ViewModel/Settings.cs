@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -6,6 +7,8 @@ namespace FoxTunes.ViewModel
 {
     public class Settings : ViewModelBase
     {
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         private bool _SettingsVisible { get; set; }
 
         public bool SettingsVisible
@@ -23,6 +26,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnSettingsVisibleChanged()
         {
+            if (this.SettingsVisible)
+            {
+                this.SignalEmitter.Send(new Signal(this, CommonSignals.SettingsUpdated));
+            }
             if (this.SettingsVisibleChanged != null)
             {
                 this.SettingsVisibleChanged(this, EventArgs.Empty);
@@ -57,6 +64,12 @@ namespace FoxTunes.ViewModel
                     Tag = CommandHints.DISMISS
                 };
             }
+        }
+
+        protected override void OnCoreChanged()
+        {
+            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            base.OnCoreChanged();
         }
 
         protected override Freezable CreateInstanceCore()

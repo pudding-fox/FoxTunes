@@ -35,14 +35,23 @@ namespace FoxTunes.Utilities
             }
             gridViewColumn.Header = column.Name;
             gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding(this.PlaybackManager, this.ScriptingContext, column.DisplayScript);
-            BindingOperations.SetBinding(gridViewColumn, GridViewColumn.WidthProperty, new Binding("Width")
-            {
-                Source = column,
-                Converter = ColumnWidthConverter.Instance,
-                Mode = BindingMode.TwoWay
-            });
-            var descriptor = DependencyPropertyDescriptor.FromProperty(GridViewColumn.WidthProperty, typeof(GridViewColumn));
-            descriptor.AddValueChanged(gridViewColumn, (sender, e) => this.OnWidthChanged(column));
+            BindingHelper.Create(
+                gridViewColumn,
+                GridViewColumn.WidthProperty,
+                typeof(GridViewColumn),
+                column,
+                "Width",
+                ColumnWidthConverter.Instance,
+                (sender, e) => this.OnWidthChanged(column)
+            );
+            BindingHelper.Create(
+                gridViewColumn,
+                GridViewColumnExtensions.PositionProperty,
+                typeof(GridViewColumn),
+                column,
+                "Sequence",
+                (sender, e) => this.OnPositionChanged(column)
+            );
             return gridViewColumn;
         }
 
@@ -56,6 +65,17 @@ namespace FoxTunes.Utilities
         }
 
         public event EventHandler<PlaylistColumn> WidthChanged = delegate { };
+
+        protected virtual void OnPositionChanged(PlaylistColumn column)
+        {
+            if (this.PositionChanged == null)
+            {
+                return;
+            }
+            this.PositionChanged(this, column);
+        }
+
+        public event EventHandler<PlaylistColumn> PositionChanged = delegate { };
 
         public void Refresh(GridViewColumn column)
         {
