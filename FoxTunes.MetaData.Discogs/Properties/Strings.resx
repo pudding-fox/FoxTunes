@@ -117,8 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DiscogsBehaviour.LookupArtwork" xml:space="preserve">
-    <value>Lookup Artwork</value>
+  <data name="Discogs.CompilationArtist" xml:space="preserve">
+    <value>Various</value>
+  </data>
+  <data name="DiscogsBehaviour.FetchArtwork" xml:space="preserve">
+    <value>Fetch Artwork</value>
   </data>
   <data name="DiscogsBehaviourConfiguration.BaseUrl" xml:space="preserve">
     <value>Base Url</value>
@@ -135,18 +138,6 @@
   <data name="DiscogsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Discogs</value>
   </data>
-  <data name="LookupArtworkReport.Album" xml:space="preserve">
-    <value>Album</value>
-  </data>
-  <data name="LookupArtworkReport.Artist" xml:space="preserve">
-    <value>Artist</value>
-  </data>
-  <data name="LookupArtworkReport.Release" xml:space="preserve">
-    <value>Release</value>
-  </data>
-  <data name="LookupArtworkReport.Status" xml:space="preserve">
-    <value>Status</value>
-  </data>
   <data name="LookupArtworkTask.InsufficiantData" xml:space="preserve">
     <value>Artist and album data is required.</value>
   </data>
@@ -155,5 +146,20 @@
   </data>
   <data name="LookupArtworkTask.NotFound" xml:space="preserve">
     <value>No release or artwork found.</value>
+  </data>
+  <data name="ReleaseLookupReport.Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="ReleaseLookupReport.Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="ReleaseLookupReport.Release" xml:space="preserve">
+    <value>Release</value>
+  </data>
+  <data name="ReleaseLookupReport.Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ReleaseLookupReport.Title" xml:space="preserve">
+    <value>Release Lookup</value>
   </data>
 </root>

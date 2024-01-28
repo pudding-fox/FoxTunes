@@ -10,7 +10,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class DiscogsBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
     {
-        public const string LOOKUP_ARTWORK = "LLMM";
+        public const string FETCH_ARTWORK = "LLMM";
 
         public ICore Core { get; private set; }
 
@@ -46,11 +46,11 @@ namespace FoxTunes
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, LOOKUP_ARTWORK, Strings.DiscogsBehaviour_LookupArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, FETCH_ARTWORK, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
                     }
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOOKUP_ARTWORK, Strings.DiscogsBehaviour_LookupArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, FETCH_ARTWORK, Strings.DiscogsBehaviour_FetchArtwork, path: Strings.DiscogsBehaviourConfiguration_Section);
                     }
                 }
             }
@@ -60,8 +60,8 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case LOOKUP_ARTWORK:
-                    return this.LookupArtwork();
+                case FETCH_ARTWORK:
+                    return this.FetchArtwork();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -70,7 +70,7 @@ namespace FoxTunes
 #endif
         }
 
-        public Task LookupArtwork()
+        public Task FetchArtwork()
         {
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
@@ -93,13 +93,13 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.LookupArtwork(libraryItems);
+            return this.FetchArtwork(libraryItems);
         }
 
-        public async Task LookupArtwork(IFileData[] fileDatas)
+        public async Task FetchArtwork(IFileData[] fileDatas)
         {
-            var lookupItems = LookupArtworkItem.FromFileDatas(fileDatas).ToArray();
-            using (var task = new LookupArtworkTask(this, lookupItems))
+            var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
+            using (var task = new FetchArtworkTask(releaseLookups))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -124,9 +124,9 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        protected virtual void OnReport(LookupArtworkItem[] lookupItems)
+        protected virtual void OnReport(Discogs.ReleaseLookup[] releaseLookups)
         {
-            var report = new LookupArtworkReport(lookupItems);
+            var report = new ReleaseLookupReport(releaseLookups);
             report.InitializeComponent(this.Core);
             this.OnReport(report);
         }
@@ -142,136 +142,35 @@ namespace FoxTunes
 
         public event ReportEventHandler Report;
 
-        public class LookupArtworkTask : DiscogsTask
+        public class FetchArtworkTask : DiscogsLookupTask
         {
-            public LookupArtworkTask(DiscogsBehaviour behaviour, LookupArtworkItem[] lookupItems)
+            public static readonly string FRONT_COVER = Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover);
+
+            public FetchArtworkTask(Discogs.ReleaseLookup[] releaseLookups) : base(releaseLookups)
             {
-                this.Behaviour = behaviour;
-                this.LookupItems = lookupItems;
+
             }
 
-            public override bool Visible
+            protected override async Task<bool> OnLookupSuccess(Discogs.ReleaseLookup releaseLookup)
             {
-                get
+                var value = await this.ImportImage(
+                    releaseLookup,
+                    releaseLookup.Release.CoverUrl,
+                    releaseLookup.Release.ThumbUrl
+                ).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(value))
                 {
+                    this.UpdateMetaData(releaseLookup, FRONT_COVER, value, MetaDataItemType.Image);
                     return true;
-                }
-            }
-
-            public override bool Cancellable
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            public DiscogsBehaviour Behaviour { get; private set; }
-
-            public LookupArtworkItem[] LookupItems { get; private set; }
-
-            public ILibraryManager LibraryManager { get; private set; }
-
-            public IMetaDataManager MetaDataManager { get; private set; }
-
-            public IHierarchyManager HierarchyManager { get; private set; }
-
-            public override void InitializeComponent(ICore core)
-            {
-                this.LibraryManager = core.Managers.Library;
-                this.MetaDataManager = core.Managers.MetaData;
-                this.HierarchyManager = core.Managers.Hierarchy;
-                base.InitializeComponent(core);
-            }
-
-            protected override Task OnStarted()
-            {
-                this.Name = Strings.LookupArtworkTask_Name;
-                this.Position = 0;
-                this.Count = this.LookupItems.Length;
-                return base.OnStarted();
-            }
-
-            protected override async Task OnRun()
-            {
-                var position = 0;
-                foreach (var lookupItem in this.LookupItems)
-                {
-                    this.Description = string.Format("{0} - {1}", lookupItem.Artist, lookupItem.Album);
-                    this.Position = position;
-                    if (this.IsCancellationRequested)
-                    {
-                        lookupItem.Status = LookupArtworkItemStatus.Cancelled;
-                        continue;
-                    }
-                    if (string.IsNullOrEmpty(lookupItem.Artist) || string.IsNullOrEmpty(lookupItem.Album))
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Cannot fetch releases, search requires at least an artist and album tag.");
-                        lookupItem.AddError(Strings.LookupArtworkTask_InsufficiantData);
-                        lookupItem.Status = LookupArtworkItemStatus.Failed;
-                        continue;
-                    }
-                    try
-                    {
-                        lookupItem.Status = LookupArtworkItemStatus.Processing;
-                        var success = await this.Lookup(lookupItem).ConfigureAwait(false);
-                        if (success)
-                        {
-                            lookupItem.Status = LookupArtworkItemStatus.Complete;
-                        }
-                        else
-                        {
-                            lookupItem.AddError(Strings.LookupArtworkTask_NotFound);
-                            lookupItem.Status = LookupArtworkItemStatus.Failed;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Write(this, LogLevel.Error, "Failed to lookup artwork: {0}", e.Message);
-                        lookupItem.AddError(e.Message);
-                        lookupItem.Status = LookupArtworkItemStatus.Failed;
-                    }
-                    position++;
-                }
-            }
-
-            protected virtual async Task<bool> Lookup(LookupArtworkItem lookupItem)
-            {
-                Logger.Write(this, LogLevel.Debug, "Fetching releases for album: {0} - {1}", lookupItem.Artist, lookupItem.Album);
-                var releases = await this.Discogs.GetReleases(lookupItem.Artist, lookupItem.Album).ConfigureAwait(false);
-                Logger.Write(this, LogLevel.Debug, "Ranking releases for album: {0} - {1}", lookupItem.Artist, lookupItem.Album);
-                //Get the top release by title similarity, then by largest available image.
-                lookupItem.Release = releases
-                    .OrderByDescending(release => release.Similarity(lookupItem.Artist, lookupItem.Album))
-                    .ThenByDescending(release => release.CoverSize)
-                    .ThenByDescending(release => release.ThumbSize)
-                    .FirstOrDefault();
-                if (lookupItem.Release != null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Best match for album {0} - {1}: {2}", lookupItem.Artist, lookupItem.Album, lookupItem.Release.Url);
-                    var value = await this.ImportImage(
-                        lookupItem,
-                        lookupItem.Release.CoverUrl,
-                        lookupItem.Release.ThumbUrl
-                    ).ConfigureAwait(false);
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        this.UpdateMetaData(lookupItem, value);
-                        return true;
-                    }
-                    else
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Failed to download artwork for album {0} - {1}: Releases don't contain images or they count not be downloaded.", lookupItem.Artist, lookupItem.Album);
-                    }
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Warn, "No matches for album {0} - {1}.", lookupItem.Artist, lookupItem.Album);
+                    Logger.Write(this, LogLevel.Warn, "Failed to download artwork for album {0} - {1}: Releases don't contain images or they count not be downloaded.", releaseLookup.Artist, releaseLookup.Album);
+                    return false;
                 }
-                return false;
             }
 
-            protected virtual async Task<string> ImportImage(LookupArtworkItem lookupItem, params string[] urls)
+            protected virtual async Task<string> ImportImage(Discogs.ReleaseLookup releaseLookup, params string[] urls)
             {
                 var prefix = this.GetType().Name;
                 var result = default(string);
@@ -299,163 +198,28 @@ namespace FoxTunes
                         catch (Exception e)
                         {
                             Logger.Write(this, LogLevel.Error, "Failed to download data from url \"{0}\": {1}", url, e.Message);
-                            lookupItem.AddError(e.Message);
+                            releaseLookup.AddError(e.Message);
                         }
                     }
                 }
                 return null;
             }
 
-            protected virtual void UpdateMetaData(LookupArtworkItem lookupItem, string value)
-            {
-                var frontCover = Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover);
-                foreach (var fileData in lookupItem.FileDatas)
-                {
-                    lock (fileData.MetaDatas)
-                    {
-                        bool updated = false;
-                        foreach (var metaDataItem in fileData.MetaDatas)
-                        {
-                            if (string.Equals(metaDataItem.Name, frontCover, StringComparison.OrdinalIgnoreCase) && metaDataItem.Type == MetaDataItemType.Image)
-                            {
-                                metaDataItem.Value = value;
-                                updated = true;
-                                break;
-                            }
-                        }
-                        if (!updated)
-                        {
-                            fileData.MetaDatas.Add(new MetaDataItem(frontCover, MetaDataItemType.Image)
-                            {
-                                Value = value
-                            });
-                        }
-                    }
-                }
-            }
-
             protected override async Task OnCompleted()
             {
                 await base.OnCompleted().ConfigureAwait(false);
-                await this.SaveMetaData().ConfigureAwait(false);
-            }
-
-            protected virtual async Task SaveMetaData()
-            {
-                var frontCover = Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover);
-                var libraryItems = new List<LibraryItem>();
-                var playlistItems = new List<PlaylistItem>();
-                foreach (var lookupItem in this.LookupItems)
-                {
-                    if (lookupItem.Status != LookupArtworkItemStatus.Complete)
-                    {
-                        continue;
-                    }
-
-                    libraryItems.AddRange(lookupItem.FileDatas.OfType<LibraryItem>());
-                    playlistItems.AddRange(lookupItem.FileDatas.OfType<PlaylistItem>());
-                }
-                if (libraryItems.Any())
-                {
-                    await this.MetaDataManager.Save(libraryItems, true, false, frontCover).ConfigureAwait(false);
-                }
-                if (playlistItems.Any())
-                {
-                    await this.MetaDataManager.Save(playlistItems, true, false, frontCover).ConfigureAwait(false);
-                }
-                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
+                await this.SaveMetaData(FRONT_COVER).ConfigureAwait(false);
             }
         }
 
-        public class LookupArtworkItem
+        public class ReleaseLookupReport : BaseComponent, IReport
         {
-            const int ERROR_CAPACITY = 10;
-
-            private LookupArtworkItem()
+            public ReleaseLookupReport(IEnumerable<Discogs.ReleaseLookup> releaseLookups)
             {
-                this.Id = Guid.NewGuid();
-                this._Errors = new List<string>(ERROR_CAPACITY);
+                this.LookupItems = releaseLookups.ToDictionary(releaseLookup => Guid.NewGuid());
             }
 
-            public LookupArtworkItem(string artist, string album, IFileData[] fileDatas) : this()
-            {
-                this.Artist = artist;
-                this.Album = album;
-                this.FileDatas = fileDatas;
-            }
-
-            public Guid Id { get; private set; }
-
-            public string Artist { get; private set; }
-
-            public string Album { get; private set; }
-
-            public IFileData[] FileDatas { get; private set; }
-
-            public Discogs.Release Release { get; set; }
-
-            private IList<string> _Errors { get; set; }
-
-            public IEnumerable<string> Errors
-            {
-                get
-                {
-                    return this._Errors;
-                }
-            }
-
-            public LookupArtworkItemStatus Status { get; set; }
-
-            public void AddError(string error)
-            {
-                this._Errors.Add(error);
-                if (this._Errors.Count > ERROR_CAPACITY)
-                {
-                    this._Errors.RemoveAt(0);
-                }
-            }
-
-            public static IEnumerable<LookupArtworkItem> FromFileDatas(IEnumerable<IFileData> fileDatas)
-            {
-                return fileDatas.GroupBy(fileData =>
-                {
-                    var metaData = default(IDictionary<string, string>);
-                    lock (fileData.MetaDatas)
-                    {
-                        metaData = fileData.MetaDatas.ToDictionary(
-                            metaDataItem => metaDataItem.Name,
-                            metaDataItem => metaDataItem.Value,
-                            StringComparer.OrdinalIgnoreCase
-                        );
-                    }
-                    return new
-                    {
-                        Artist = metaData.GetValueOrDefault(CommonMetaData.Artist),
-                        Album = metaData.GetValueOrDefault(CommonMetaData.Album)
-                    };
-                }).Select(group => new LookupArtworkItem(group.Key.Artist, group.Key.Album, group.ToArray()));
-            }
-        }
-
-        public enum LookupArtworkItemStatus : byte
-        {
-            None,
-            Processing,
-            Complete,
-            Cancelled,
-            Failed
-        }
-
-        public class LookupArtworkReport : BaseComponent, IReport
-        {
-            public LookupArtworkReport(IEnumerable<LookupArtworkItem> lookupItems)
-            {
-                this.LookupItems = lookupItems.ToDictionary(lookupItem => Guid.NewGuid());
-            }
-
-            public Dictionary<Guid, LookupArtworkItem> LookupItems { get; private set; }
+            public Dictionary<Guid, Discogs.ReleaseLookup> LookupItems { get; private set; }
 
             public IUserInterface UserInterface { get; private set; }
 
@@ -469,7 +233,7 @@ namespace FoxTunes
             {
                 get
                 {
-                    return Strings.DiscogsBehaviour_LookupArtwork;
+                    return Strings.ReleaseLookupReport_Title;
                 }
             }
 
@@ -480,20 +244,20 @@ namespace FoxTunes
                     return string.Join(
                         Environment.NewLine,
                         this.LookupItems.Values.Select(
-                            lookupItem => this.GetDescription(lookupItem)
+                            releaseLookup => this.GetDescription(releaseLookup)
                         )
                     );
                 }
             }
 
-            protected virtual string GetDescription(LookupArtworkItem lookupItem)
+            protected virtual string GetDescription(Discogs.ReleaseLookup releaseLookup)
             {
                 var builder = new StringBuilder();
-                builder.AppendFormat("{0} - {1}", lookupItem.Artist, lookupItem.Album);
-                if (lookupItem.Status != LookupArtworkItemStatus.Complete && lookupItem.Errors.Any())
+                builder.AppendFormat("{0} - {1}", releaseLookup.Artist, releaseLookup.Album);
+                if (releaseLookup.Status != Discogs.ReleaseLookupStatus.Complete && releaseLookup.Errors.Any())
                 {
                     builder.AppendLine(" -> Error");
-                    foreach (var error in lookupItem.Errors)
+                    foreach (var error in releaseLookup.Errors)
                     {
                         builder.AppendLine('\t' + error);
                     }
@@ -511,10 +275,10 @@ namespace FoxTunes
                 {
                     return new[]
                     {
-                        Strings.LookupArtworkReport_Album,
-                        Strings.LookupArtworkReport_Artist,
-                        Strings.LookupArtworkReport_Status,
-                        Strings.LookupArtworkReport_Release
+                        Strings.ReleaseLookupReport_Album,
+                        Strings.ReleaseLookupReport_Artist,
+                        Strings.ReleaseLookupReport_Status,
+                        Strings.ReleaseLookupReport_Release
                     };
                 }
             }
@@ -533,12 +297,12 @@ namespace FoxTunes
                 {
                     return key =>
                     {
-                        var lookupItem = default(LookupArtworkItem);
-                        if (!this.LookupItems.TryGetValue(key, out lookupItem) || lookupItem.Release == null)
+                        var releaseLookup = default(Discogs.ReleaseLookup);
+                        if (!this.LookupItems.TryGetValue(key, out releaseLookup) || releaseLookup.Release == null)
                         {
                             return;
                         }
-                        var url = new Uri(new Uri("https://www.discogs.com"), lookupItem.Release.Url).ToString();
+                        var url = new Uri(new Uri("https://www.discogs.com"), releaseLookup.Release.Url).ToString();
                         this.UserInterface.OpenInShell(url);
                     };
                 }
@@ -546,30 +310,30 @@ namespace FoxTunes
 
             public class ReportRow : IReportRow
             {
-                public ReportRow(Guid id, LookupArtworkItem lookupItem)
+                public ReportRow(Guid id, Discogs.ReleaseLookup releaseLookup)
                 {
                     this.Id = id;
-                    this.LookupItem = lookupItem;
+                    this.ReleaseLookup = releaseLookup;
                 }
 
                 public Guid Id { get; private set; }
 
-                public LookupArtworkItem LookupItem { get; private set; }
+                public Discogs.ReleaseLookup ReleaseLookup { get; private set; }
 
                 public string[] Values
                 {
                     get
                     {
                         var url = default(string);
-                        if (this.LookupItem.Release != null)
+                        if (this.ReleaseLookup.Release != null)
                         {
-                            url = this.LookupItem.Release.Url;
+                            url = this.ReleaseLookup.Release.Url;
                         }
                         return new[]
                         {
-                            this.LookupItem.Artist,
-                            this.LookupItem.Album,
-                            Enum.GetName(typeof(LookupArtworkItemStatus), this.LookupItem.Status),
+                            this.ReleaseLookup.Artist,
+                            this.ReleaseLookup.Album,
+                            Enum.GetName(typeof(Discogs.ReleaseLookupStatus), this.ReleaseLookup.Status),
                             url
                         };
                     }

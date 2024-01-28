@@ -61,11 +61,20 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Lookup Artwork.
+        ///   Looks up a localized string similar to Various.
         /// </summary>
-        internal static string DiscogsBehaviour_LookupArtwork {
+        internal static string Discogs_CompilationArtist {
             get {
-                return ResourceManager.GetString("DiscogsBehaviour.LookupArtwork", resourceCulture);
+                return ResourceManager.GetString("Discogs.CompilationArtist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fetch Artwork.
+        /// </summary>
+        internal static string DiscogsBehaviour_FetchArtwork {
+            get {
+                return ResourceManager.GetString("DiscogsBehaviour.FetchArtwork", resourceCulture);
             }
         }
         
@@ -115,42 +124,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Album.
-        /// </summary>
-        internal static string LookupArtworkReport_Album {
-            get {
-                return ResourceManager.GetString("LookupArtworkReport.Album", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Artist.
-        /// </summary>
-        internal static string LookupArtworkReport_Artist {
-            get {
-                return ResourceManager.GetString("LookupArtworkReport.Artist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Release.
-        /// </summary>
-        internal static string LookupArtworkReport_Release {
-            get {
-                return ResourceManager.GetString("LookupArtworkReport.Release", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Status.
-        /// </summary>
-        internal static string LookupArtworkReport_Status {
-            get {
-                return ResourceManager.GetString("LookupArtworkReport.Status", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Artist and album data is required..
         /// </summary>
         internal static string LookupArtworkTask_InsufficiantData {
@@ -174,6 +147,51 @@ namespace FoxTunes {
         internal static string LookupArtworkTask_NotFound {
             get {
                 return ResourceManager.GetString("LookupArtworkTask.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Album.
+        /// </summary>
+        internal static string ReleaseLookupReport_Album {
+            get {
+                return ResourceManager.GetString("ReleaseLookupReport.Album", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Artist.
+        /// </summary>
+        internal static string ReleaseLookupReport_Artist {
+            get {
+                return ResourceManager.GetString("ReleaseLookupReport.Artist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Release.
+        /// </summary>
+        internal static string ReleaseLookupReport_Release {
+            get {
+                return ResourceManager.GetString("ReleaseLookupReport.Release", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        internal static string ReleaseLookupReport_Status {
+            get {
+                return ResourceManager.GetString("ReleaseLookupReport.Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Release Lookup.
+        /// </summary>
+        internal static string ReleaseLookupReport_Title {
+            get {
+                return ResourceManager.GetString("ReleaseLookupReport.Title", resourceCulture);
             }
         }
     }

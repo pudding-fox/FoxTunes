@@ -146,6 +146,104 @@ namespace FoxTunes
             }
         }
 
+        public class ReleaseLookup
+        {
+            const int ERROR_CAPACITY = 10;
+
+            private ReleaseLookup()
+            {
+                this.Id = Guid.NewGuid();
+                this._Errors = new List<string>(ERROR_CAPACITY);
+            }
+
+            public ReleaseLookup(string artist, string album, bool isCompilation, IFileData[] fileDatas) : this()
+            {
+                this.Artist = artist;
+                this.Album = album;
+                this.IsCompilation = isCompilation;
+                this.FileDatas = fileDatas;
+            }
+
+            public Guid Id { get; private set; }
+
+            public string Artist { get; private set; }
+
+            public string Album { get; private set; }
+
+            public bool IsCompilation { get; private set; }
+
+            public IFileData[] FileDatas { get; private set; }
+
+            public Discogs.Release Release { get; set; }
+
+            private IList<string> _Errors { get; set; }
+
+            public IEnumerable<string> Errors
+            {
+                get
+                {
+                    return this._Errors;
+                }
+            }
+
+            public ReleaseLookupStatus Status { get; set; }
+
+            public void AddError(string error)
+            {
+                this._Errors.Add(error);
+                if (this._Errors.Count > ERROR_CAPACITY)
+                {
+                    this._Errors.RemoveAt(0);
+                }
+            }
+
+            public static IEnumerable<ReleaseLookup> FromFileDatas(IEnumerable<IFileData> fileDatas)
+            {
+                return fileDatas.GroupBy(fileData =>
+                {
+                    var metaData = default(IDictionary<string, string>);
+                    lock (fileData.MetaDatas)
+                    {
+                        metaData = fileData.MetaDatas.ToDictionary(
+                            metaDataItem => metaDataItem.Name,
+                            metaDataItem => metaDataItem.Value,
+                            StringComparer.OrdinalIgnoreCase
+                        );
+                    }
+                    var artist = default(string);
+                    var album = metaData.GetValueOrDefault(CommonMetaData.Album);
+                    var isCompilation = string.Equals(
+                        metaData.GetValueOrDefault(CustomMetaData.VariousArtists),
+                        bool.TrueString,
+                        StringComparison.OrdinalIgnoreCase
+                    );
+                    if (isCompilation)
+                    {
+                        artist = Strings.Discogs_CompilationArtist;
+                    }
+                    else
+                    {
+                        artist = metaData.GetValueOrDefault(CommonMetaData.Artist);
+                    }
+                    return new
+                    {
+                        Artist = artist,
+                        Album = album,
+                        IsCompilation = isCompilation
+                    };
+                }).Select(group => new ReleaseLookup(group.Key.Artist, group.Key.Album, group.Key.IsCompilation, group.ToArray()));
+            }
+        }
+
+        public enum ReleaseLookupStatus : byte
+        {
+            None,
+            Processing,
+            Complete,
+            Cancelled,
+            Failed
+        }
+
         public class Release
         {
             private Release(IDictionary<string, object> data)
