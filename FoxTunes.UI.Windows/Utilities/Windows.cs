@@ -33,14 +33,15 @@ namespace FoxTunes
         {
             get
             {
-                foreach (var window in Registrations.WindowsByRole(UserInterfaceWindowRole.Main))
+                var windows = Registrations.WindowsByRole(UserInterfaceWindowRole.Main);
+                foreach (var window in windows)
                 {
                     if (window.IsVisible)
                     {
                         return window;
                     }
                 }
-                return null;
+                return windows.FirstOrDefault();
             }
         }
 

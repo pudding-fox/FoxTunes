@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -129,6 +130,9 @@ namespace FoxTunes
                 this.ListView.PreviewMouseDown += this.OnMouseDown;
                 this.ListView.PreviewMouseUp += this.OnMouseUp;
                 this.ListView.MouseMove += this.OnMouseMove;
+                this.ListView.PreviewTouchDown += this.OnTouchDown;
+                this.ListView.PreviewTouchUp += this.OnTouchUp;
+                this.ListView.TouchMove += this.OnTouchMove;
                 SetDraggingItems(this.ListView, new DraggingItemCollection(this.ListView));
             }
 
@@ -136,14 +140,9 @@ namespace FoxTunes
 
             public ListView ListView { get; private set; }
 
-            protected virtual bool ShouldInitializeDrag(object source, Point position)
+            protected virtual bool ShouldInitializeDrag(Point position)
             {
                 if (this.DragStartPosition.Equals(default(Point)))
-                {
-                    return false;
-                }
-                var dependencyObject = source as DependencyObject;
-                if (dependencyObject == null || dependencyObject.FindAncestor<ListViewItem>() == null)
                 {
                     return false;
                 }
@@ -168,26 +167,43 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var position = e.GetPosition(this.ListView);
-                this.DragStartPosition = position;
-                if (this.ListView.SelectedItems == null || this.ListView.SelectedItems.Count <= 1)
+                this.DragStartPosition = e.GetPosition(this.ListView);
+                this.PrepareDrag(e);
+            }
+
+            protected virtual void OnTouchDown(object sender, TouchEventArgs e)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
-                    //Don't need to use DraggingItemCollection for single selection.
                     return;
                 }
+                this.DragStartPosition = e.GetTouchPoint(this.ListView).Position;
+                this.PrepareDrag(e);
+            }
+
+            protected virtual void PrepareDrag(RoutedEventArgs e)
+            {
                 if (e.OriginalSource is FrameworkElement frameworkElement)
                 {
                     var listViewItem = frameworkElement.FindAncestor<ListViewItem>();
                     if (listViewItem != null && listViewItem.IsSelected)
                     {
-                        //We may be performing a multi select drag. 
-                        //Tag the selected items as they're about to be deselected.
                         GetDraggingItems(this.ListView).Update();
                     }
                 }
             }
 
             protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
+            {
+                this.EndDrag();
+            }
+
+            protected virtual void OnTouchUp(object sender, TouchEventArgs e)
+            {
+                this.EndDrag();
+            }
+
+            protected virtual void EndDrag()
             {
                 this.DragStartPosition = default(Point);
                 GetDraggingItems(this.ListView).Clear();
@@ -199,37 +215,44 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var selectedItems = default(IList);
+                var dependencyObject = e.OriginalSource as DependencyObject;
+                if (dependencyObject == null || dependencyObject.FindAncestor<ListViewItem>() == null)
+                {
+                    return;
+                }
+                this.TryInitializeDrag(e.GetPosition(this.ListView));
+            }
+
+            protected virtual void OnTouchMove(object sender, TouchEventArgs e)
+            {
+                var position = e.GetTouchPoint(this.ListView).Position;
+                var result = VisualTreeHelper.HitTest(this.ListView, position);
+                if (result != null && result.VisualHit is DependencyObject dependencyObject && dependencyObject.FindAncestor<ListBoxItem>() != null)
+                {
+                    this.TryInitializeDrag(position);
+                }
+            }
+
+            protected virtual bool TryInitializeDrag(Point position)
+            {
+                if (!this.ShouldInitializeDrag(position))
+                {
+                    return false;
+                }
                 var draggingItems = GetDraggingItems(this.ListView);
-                if (draggingItems != null && draggingItems.Count > 0)
+                if (draggingItems == null || draggingItems.Count == 0)
                 {
-                    selectedItems = draggingItems.Items;
+                    return false;
                 }
-                else
+                this.DragStartPosition = default(Point);
+                this.ListView.SelectedItems.Clear();
+                this.ListView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, draggingItems));
+                foreach (var selectedItem in draggingItems)
                 {
-                    selectedItems = GetSelectedItems(this.ListView);
+                    this.ListView.SelectedItems.Add(selectedItem);
                 }
-                if (selectedItems != null && selectedItems.Count > 0)
-                {
-                    var position = e.GetPosition(this.ListView);
-                    if (this.ShouldInitializeDrag(e.OriginalSource, position))
-                    {
-                        this.DragStartPosition = default(Point);
-                        if (selectedItems.Count > 1)
-                        {
-                            this.ListView.SelectedItems.Clear();
-                        }
-                        this.ListView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItems));
-                        if (selectedItems.Count > 1)
-                        {
-                            foreach (var selectedItem in selectedItems)
-                            {
-                                this.ListView.SelectedItems.Add(selectedItem);
-                            }
-                        }
-                        draggingItems.Clear();
-                    }
-                }
+                draggingItems.Clear();
+                return true;
             }
 
             protected override void OnDisposing()
@@ -239,13 +262,16 @@ namespace FoxTunes
                     this.ListView.PreviewMouseDown -= this.OnMouseDown;
                     this.ListView.PreviewMouseUp -= this.OnMouseUp;
                     this.ListView.MouseMove -= this.OnMouseMove;
+                    this.ListView.PreviewTouchDown -= this.OnTouchDown;
+                    this.ListView.PreviewTouchUp -= this.OnTouchUp;
+                    this.ListView.TouchMove -= this.OnTouchMove;
                     SetDraggingItems(this.ListView, null);
                 }
                 base.OnDisposing();
             }
         }
 
-        public class DraggingItemCollection
+        public class DraggingItemCollection : IEnumerable
         {
             private DraggingItemCollection()
             {
@@ -313,6 +339,11 @@ namespace FoxTunes
                 {
                     return this.Items.Count;
                 }
+            }
+
+            public IEnumerator GetEnumerator()
+            {
+                return this.Items.GetEnumerator();
             }
         }
     }
