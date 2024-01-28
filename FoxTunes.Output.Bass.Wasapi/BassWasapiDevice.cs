@@ -39,7 +39,7 @@ namespace FoxTunes
         {
             get
             {
-                return Info != null && Info.Device == BassWasapi.DefaultDevice;
+                return Info != null && Info.IsDefault;
             }
         }
 
@@ -112,7 +112,8 @@ namespace FoxTunes
                         deviceInfo.MixFrequency,
                         deviceInfo.MixChannels,
                         flags
-                    )
+                    ),
+                    device == BassWasapi.DefaultDevice
                 );
 
                 LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", BassWasapi.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
@@ -186,7 +187,7 @@ namespace FoxTunes
 
         public class BassWasapiDeviceInfo
         {
-            public BassWasapiDeviceInfo(int device, int rate, int inputs, int outputs, IDictionary<int, WasapiFormat> supportedFormats, WasapiFormat format)
+            public BassWasapiDeviceInfo(int device, int rate, int inputs, int outputs, IDictionary<int, WasapiFormat> supportedFormats, WasapiFormat format, bool isDefault)
             {
                 this.Device = device;
                 this.Rate = rate;
@@ -198,6 +199,7 @@ namespace FoxTunes
                 this.SupportedFormats = new ReadOnlyDictionary<int, WasapiFormat>(supportedFormats);
 #endif
                 this.Format = format;
+                this.IsDefault = isDefault;
             }
 
             public int Device { get; private set; }
@@ -223,6 +225,8 @@ namespace FoxTunes
 #endif
 
             public WasapiFormat Format { get; private set; }
+
+            public bool IsDefault { get; private set; }
 
             public int GetNearestRate(int rate)
             {
