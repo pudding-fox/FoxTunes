@@ -20,13 +20,12 @@ AS
 	FROM "PlaylistItems"
 		LEFT OUTER JOIN "PlaylistItem_MetaDataItem" 
 			ON "PlaylistItems"."Id" = "PlaylistItem_MetaDataItem"."PlaylistItem_Id"
-          LEFT JOIN "LibraryItem_MetaDataItem"
+		LEFT OUTER JOIN "LibraryItem_MetaDataItem"
                 ON "LibraryItem_MetaDataItem"."LibraryItem_Id" = "PlaylistItems"."LibraryItem_Id"
 		LEFT OUTER JOIN "MetaDataItems" 
 			ON "MetaDataItems"."Id" = "PlaylistItem_MetaDataItem"."MetaDataItem_Id"
                     OR "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
 	WHERE "PlaylistItems"."Status" = @status
-	ORDER BY "PlaylistItems"."Id"
 )
 ,
 "HorizontalMetaData"
