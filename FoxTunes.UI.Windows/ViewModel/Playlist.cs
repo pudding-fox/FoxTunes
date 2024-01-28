@@ -510,9 +510,19 @@ namespace FoxTunes.ViewModel
             await this.RefreshColumns().ConfigureAwait(false);
         }
 
+        protected override Task RefreshItems()
+        {
+            return Windows.Invoke(() =>
+            {
+                var selectedItems = this.SelectedItems;
+                this.OnItemsChanged();
+                this.SelectedItems = selectedItems;
+            });
+        }
+
         public virtual Task RefreshSelectedItems()
         {
-            return Windows.Invoke(() => this.OnSelectedItemsChanged());
+            return Windows.Invoke(new Action(this.OnSelectedItemsChanged));
         }
 
         public virtual async Task RefreshColumns()
