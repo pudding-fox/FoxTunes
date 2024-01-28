@@ -3,7 +3,7 @@ using System;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IBassStreamComponent : IDisposable
+    public interface IBassStreamComponent : IBaseComponent, IDisposable
     {
         string Name { get; }
 

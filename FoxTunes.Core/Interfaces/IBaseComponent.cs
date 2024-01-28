@@ -7,18 +7,18 @@ namespace FoxTunes.Interfaces
     {
         void InitializeComponent(ICore core);
 
-        event ComponentOutputErrorEventHandler Error;
+        event ComponentErrorEventHandler Error;
     }
 
-    public delegate Task ComponentOutputErrorEventHandler(object sender, ComponentOutputErrorEventArgs e);
+    public delegate Task ComponentErrorEventHandler(object sender, ComponentErrorEventArgs e);
 
-    public class ComponentOutputErrorEventArgs : EventArgs
+    public class ComponentErrorEventArgs : EventArgs
     {
-        public ComponentOutputErrorEventArgs(Exception exception) : this(exception.Message, exception)
+        public ComponentErrorEventArgs(Exception exception) : this(exception.Message, exception)
         {
         }
 
-        public ComponentOutputErrorEventArgs(string message, Exception exception)
+        public ComponentErrorEventArgs(string message, Exception exception)
         {
             this.Message = message;
             this.Exception = exception;

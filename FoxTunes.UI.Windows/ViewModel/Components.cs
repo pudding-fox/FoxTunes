@@ -33,7 +33,7 @@ namespace FoxTunes.ViewModel
             base.OnCoreChanged();
         }
 
-        protected virtual Task OnError(object sender, ComponentOutputErrorEventArgs e)
+        protected virtual Task OnError(object sender, ComponentErrorEventArgs e)
         {
             var component = sender as IBaseComponent;
             return this.Add(new ComponentError(component, component.GetType().Name, e.Exception));

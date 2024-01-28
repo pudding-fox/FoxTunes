@@ -348,11 +348,11 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task OnPipelineError(object sender, ComponentOutputErrorEventArgs e)
+        protected virtual Task OnPipelineError(object sender, ComponentErrorEventArgs e)
         {
             Logger.Write(this, LogLevel.Error, "Pipeline encountered an error, shutting it down: {0}", e.Message);
             this.Shutdown();
-            return Task.CompletedTask;
+            return this.OnError(e.Message, e.Exception);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
