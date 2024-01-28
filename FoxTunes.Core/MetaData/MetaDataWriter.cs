@@ -83,23 +83,27 @@ namespace FoxTunes
             return database.CreateCommand(query, DatabaseCommandFlags.NoCache, transaction);
         }
 
-        public class Cache
+        public class Cache : PredicatedCache<Cache.Key, int>
         {
             public static HashSet<string> NAMES = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 //Tags
                 CommonMetaData.Album,
                 CommonMetaData.Artist,
+                CommonMetaData.BeatsPerMinute,
                 CommonMetaData.Composer,
                 CommonMetaData.Conductor,
                 CommonMetaData.Disc,
                 CommonMetaData.DiscCount,
                 CommonMetaData.Genre,
+                CommonMetaData.InitialKey,
+                CommonMetaData.IsCompilation,
                 CommonMetaData.Performer,
-                CommonMetaData.Title,
                 CommonMetaData.Track,
                 CommonMetaData.TrackCount,
                 CommonMetaData.Year,
+                //Tags (internal)
+                CustomMetaData.VariousArtists,
                 //Properties
                 CommonProperties.AudioBitrate,
                 CommonProperties.AudioChannels,
@@ -107,23 +111,22 @@ namespace FoxTunes
                 CommonProperties.BitsPerSample,
                 //Images
                 CommonImageTypes.FrontCover
-        };
+            };
 
-            public Cache(int capacity)
+            public Cache(int capacity) : base(capacity)
             {
-                this.Store = new CappedDictionary<Key, int>(capacity);
-            }
 
-            public CappedDictionary<Key, int> Store { get; private set; }
+            }
 
             public int GetOrAdd(string name, MetaDataItemType type, string value, Func<int> factory)
             {
-                if (!NAMES.Contains(name))
-                {
-                    return default(int);
-                }
                 var key = new Key(name, type, value);
-                return this.Store.GetOrAdd(key, factory);
+                return this.GetOrAdd(key, factory);
+            }
+
+            protected override bool CanCache(Key key)
+            {
+                return NAMES.Contains(key.Name);
             }
 
             public class Key : IEquatable<Key>
