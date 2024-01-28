@@ -113,7 +113,7 @@ BOOL WINAPI draw_blended_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 wid
 				color = 0;
 			}
 			BYTE* pixel = topLeft + ((xposition * info->BytesPerPixel) + (yposition * info->Stride));
-			if (!blend_color(info->Palette, 0, pixel))
+			if (!blend_color(info->Palette, color, pixel))
 			{
 				return FALSE;
 			}

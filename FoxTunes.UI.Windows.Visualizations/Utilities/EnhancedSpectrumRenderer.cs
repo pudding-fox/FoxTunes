@@ -106,6 +106,15 @@ namespace FoxTunes
         protected virtual IDictionary<string, Color[]> GetColorPalettes(string value, bool showPeak, bool showRms, bool showCrest, Color[] colors)
         {
             var palettes = EnhancedSpectrumConfiguration.GetColorPalette(value, colors);
+            //Switch the default colors to the VALUE palette if one was provided.
+            colors = palettes.GetOrAdd(
+                EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE,
+                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE, showPeak, showRms, colors)
+            );
+            palettes.GetOrAdd(
+                EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, showPeak, showRms, colors)
+            );
             if (showPeak)
             {
                 palettes.GetOrAdd(
@@ -120,10 +129,6 @@ namespace FoxTunes
                     () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS, showPeak, showRms, colors)
                 );
             }
-            palettes.GetOrAdd(
-                EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE,
-                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE, showPeak, showRms, colors)
-            );
             if (showCrest)
             {
                 palettes.GetOrAdd(
@@ -131,10 +136,6 @@ namespace FoxTunes
                     () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST, showPeak, showRms, colors)
                 );
             }
-            palettes.GetOrAdd(
-                EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
-                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, showPeak, showRms, colors)
-            );
             return palettes;
         }
 
