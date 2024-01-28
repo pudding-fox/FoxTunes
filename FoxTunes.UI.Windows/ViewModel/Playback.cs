@@ -163,7 +163,7 @@ namespace FoxTunes.ViewModel
             var isPlaying = default(bool);
             if (this.PlaybackManager != null)
             {
-                var currentStream = PlaybackManager.CurrentStream;
+                var currentStream = this.PlaybackManager.CurrentStream;
                 if (currentStream != null)
                 {
                     isPlaying = currentStream.IsPlaying;
