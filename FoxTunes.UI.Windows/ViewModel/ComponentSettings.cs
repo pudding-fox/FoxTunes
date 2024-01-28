@@ -149,6 +149,11 @@ namespace FoxTunes.ViewModel
                 this.Sections.Clear();
                 foreach (var section in this.Configuration.Sections.OrderBy(section => section.Id))
                 {
+                    if (section.Flags.HasFlag(ConfigurationSectionFlags.System))
+                    {
+                        //System config should not be presented to the user.
+                        continue;
+                    }
                     if (!this.MatchesFilter(section, true))
                     {
                         continue;

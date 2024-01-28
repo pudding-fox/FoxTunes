@@ -68,6 +68,13 @@ namespace FoxTunes
             {
                 return;
             }
+            //The Enabled setting is for showing/hiding on the main window only.
+            //If we're hosted somewhere else then always enable.
+            else if (!this.IsHostedIn<MainWindow>())
+            {
+                this.Visibility = Visibility.Visible;
+                renderer.Start();
+            }
             else if (Enabled != null)
             {
                 Enabled.ConnectValue(value =>

@@ -13,6 +13,7 @@ namespace FoxTunes
         public ConfigurationSection()
         {
             this.Elements = new ObservableCollection<ConfigurationElement>();
+            this.Flags = ConfigurationSectionFlags.None;
         }
 
         public ConfigurationSection(string id, string name = null, string description = null)
@@ -34,6 +35,38 @@ namespace FoxTunes
         public ConfigurationSection WithElement(ConfigurationElement element)
         {
             this.Add(element);
+            return this;
+        }
+
+        private ConfigurationSectionFlags _Flags { get; set; }
+
+        public ConfigurationSectionFlags Flags
+        {
+            get
+            {
+                return this._Flags;
+            }
+            set
+            {
+                this._Flags = value;
+                this.OnFlagsChanged();
+            }
+        }
+
+        protected virtual void OnFlagsChanged()
+        {
+            if (this.FlagsChanged != null)
+            {
+                this.FlagsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Flags");
+        }
+
+        public event EventHandler FlagsChanged;
+
+        public ConfigurationSection WithFlags(ConfigurationSectionFlags flags)
+        {
+            this.Flags = flags;
             return this;
         }
 
@@ -119,5 +152,12 @@ namespace FoxTunes
         }
 
         #endregion
+    }
+
+    [Flags]
+    public enum ConfigurationSectionFlags : byte
+    {
+        None = 0,
+        System = 1
     }
 }
