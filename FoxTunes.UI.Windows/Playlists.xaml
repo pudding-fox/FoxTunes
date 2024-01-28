@@ -18,6 +18,15 @@
     </Windows:UIComponentBase.ContextMenu>
     <TabControl ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" DisplayMemberPath="Name">
         <Interactivity:Interaction.Triggers>
+            <Windows:FilteredEventTrigger EventName="DragEnter" SourceType="{x:Type TabPanel}">
+                <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragEnterCommand, Source={StaticResource ViewModel}}" />
+            </Windows:FilteredEventTrigger>
+            <Windows:FilteredEventTrigger EventName="DragOver" SourceType="{x:Type TabPanel}">
+                <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragOverCommand, Source={StaticResource ViewModel}}" />
+            </Windows:FilteredEventTrigger>
+            <Windows:FilteredEventTrigger EventName="Drop" SourceType="{x:Type TabPanel}">
+                <ViewModel:InvokeParameterizedCommandAction Command="{Binding DropCommand, Source={StaticResource ViewModel}}" />
+            </Windows:FilteredEventTrigger>
             <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabPanel}">
                 <Interactivity:InvokeCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
