@@ -116,6 +116,7 @@ namespace FoxTunes
             if (this.Component1 != null)
             {
                 this.Component1.IsComponentEnabledChanged -= this.OnIsComponentEnabledChanged;
+                this.Component1.IsComponentValidChanged -= this.OnIsComponentValidChanged;
                 this.Component1 = null;
             }
             if (this.HasControlType1)
@@ -123,6 +124,7 @@ namespace FoxTunes
                 this.Component1 = ComponentActivator.Instance.Activate<UIComponentBase>(this.ControlType1);
                 this.Component1.DataContext = this.DataContext;
                 this.Component1.IsComponentEnabledChanged += this.OnIsComponentEnabledChanged;
+                this.Component1.IsComponentValidChanged += this.OnIsComponentValidChanged;
             }
             this.RefreshLayout();
         }
@@ -141,7 +143,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Component1 != null && this.Component1.IsComponentEnabled;
+                return this.Component1 != null && this.Component1.IsComponentEnabled && this.Component1.IsComponentValid;
             }
         }
 
@@ -162,6 +164,7 @@ namespace FoxTunes
             if (this.Component2 != null)
             {
                 this.Component2.IsComponentEnabledChanged -= this.OnIsComponentEnabledChanged;
+                this.Component2.IsComponentValidChanged -= this.OnIsComponentValidChanged;
                 this.Component2 = null;
             }
             if (this.HasControlType2)
@@ -169,6 +172,7 @@ namespace FoxTunes
                 this.Component2 = ComponentActivator.Instance.Activate<UIComponentBase>(this.ControlType2);
                 this.Component2.DataContext = this.DataContext;
                 this.Component2.IsComponentEnabledChanged += this.OnIsComponentEnabledChanged;
+                this.Component2.IsComponentValidChanged += this.OnIsComponentValidChanged;
             }
             this.RefreshLayout();
         }
@@ -187,7 +191,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Component2 != null && this.Component2.IsComponentEnabled;
+                return this.Component2 != null && this.Component2.IsComponentEnabled && this.Component2.IsComponentValid;
             }
         }
 
@@ -284,6 +288,11 @@ namespace FoxTunes
         }
 
         protected virtual void OnIsComponentEnabledChanged(object sender, EventArgs e)
+        {
+            this.RefreshLayout();
+        }
+
+        protected virtual void OnIsComponentValidChanged(object sender, EventArgs e)
         {
             this.RefreshLayout();
         }

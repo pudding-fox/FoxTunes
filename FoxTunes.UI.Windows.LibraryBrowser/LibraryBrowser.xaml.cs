@@ -8,6 +8,7 @@ namespace FoxTunes
     /// Interaction logic for LibraryBrowser.xaml
     /// </summary>
     [UIComponent("FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3", UIComponentSlots.TOP_CENTER, "Library Browser")]
+    [UIComponentDependency(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)]
     public partial class LibraryBrowser : UIComponentBase
     {
         public static readonly ArtworkGridLoader ArtworkGridLoader = ComponentRegistry.Instance.GetComponent<ArtworkGridLoader>();

@@ -15,7 +15,7 @@ namespace FoxTunes
         {
             get
             {
-                return LayoutManager.Instance.IsComponentActive(typeof(global::FoxTunes.MetaDataEditor));
+                return LayoutManager.Instance.IsComponentActive(typeof(global::FoxTunes.MetaDataEditor)) && LayoutManager.Instance.IsComponentValid(typeof(global::FoxTunes.MetaDataEditor));
             }
         }
 

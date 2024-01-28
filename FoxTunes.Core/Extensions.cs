@@ -35,6 +35,39 @@ namespace FoxTunes
             return false;
         }
 
+        public static bool HasCustomAttributes<T>(this Type type, out IEnumerable<T> attributes) where T : Attribute
+        {
+            return type.HasCustomAttributes<T>(false, out attributes);
+        }
+
+        public static bool HasCustomAttributes<T>(this Type type, bool inherit, out IEnumerable<T> attributes) where T : Attribute
+        {
+            if (!type.Assembly.ReflectionOnly)
+            {
+                return (attributes = type.GetCustomAttributes<T>(inherit)).Any();
+            }
+            var sequence = type.GetCustomAttributesData();
+            var result = new List<T>();
+            foreach (var element in sequence)
+            {
+                if (!string.Equals(element.Constructor.DeclaringType.FullName, typeof(T).FullName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                result.Add(AssemblyRegistry.Instance.GetExecutableType(type).GetCustomAttribute<T>());
+            }
+            if (result.Any())
+            {
+                attributes = result;
+                return true;
+            }
+            else
+            {
+                attributes = Enumerable.Empty<T>();
+                return false;
+            }
+        }
+
         public static T GetCustomAttribute<T>(this Type type, bool inherit = false) where T : Attribute
         {
             return type.GetCustomAttributes<T>(inherit).FirstOrDefault();
