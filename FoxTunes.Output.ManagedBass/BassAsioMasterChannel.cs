@@ -45,30 +45,60 @@ namespace FoxTunes
 
         protected override void OnStartedStream()
         {
+            this.Setup();
+            if (this.Config.DsdDirect && this.Config.DsdRate > 0)
+            {
+                this.SetupDsd();
+            }
+            else
+            {
+                this.SetupPcm();
+            }
+            Logger.Write(this, LogLevel.Debug, "Enabled ASIO on master stream: {0}", this.ChannelHandle);
+            base.OnStartedStream();
+        }
+
+        protected virtual void Setup()
+        {
             BassUtils.OK(BassAsio.Init(this.Output.AsioDevice, AsioInitFlags.Thread));
-            BassUtils.OK(BASS_ASIO_ChannelEnableGaplessMaster(false, PRIMARY_CHANNEL, new IntPtr(this.ChannelHandle)));
+            BassUtils.OK(BASS_ASIO_ChannelEnableGaplessMaster(false, PRIMARY_CHANNEL, IntPtr.Zero));
             if (this.Config.Channels > BassAsio.Info.Outputs)
             {
                 Logger.Write(this, LogLevel.Warn, "Stream has {0} channels which is greater than {1} channels supported by the output.", this.Config.Channels, BassAsio.Info.Outputs);
+            }
+            if (this.Config.EffectiveRate > this.Output.Rate)
+            {
+                Logger.Write(this, LogLevel.Warn, "Stream has rate {0} which is greater than {1} configured for the device, resampling will occure.", this.Config.EffectiveRate, this.Output.Rate);
             }
             for (var a = 1; a < Math.Min(BassAsio.Info.Outputs, this.Config.Channels); a++)
             {
                 BassUtils.OK(BassAsio.ChannelJoin(false, a, PRIMARY_CHANNEL));
             }
-            if (this.Config.DsdDirect && this.Config.DsdRate > 0)
+        }
+
+        protected virtual void SetupDsd()
+        {
+            BassUtils.OK(BassAsio.SetDSD(true));
+            BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.DSDSampleFormat));
+            if (!BassAsio.CheckRate(this.Config.EffectiveRate))
             {
-                BassUtils.OK(BassAsio.SetDSD(true));
-                BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.DSDSampleFormat));
+                Logger.Write(this, LogLevel.Warn, "ASIO driver reports that DSD rate {0} is not supported and we can't currently resample DSD. Playback is likely to fail.", this.Config.EffectiveRate);
             }
-            else
+            BassAsio.Rate = this.Config.EffectiveRate;
+            Logger.Write(this, LogLevel.Debug, "Configured ASIO for DSD: {0}/{1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), this.DSDSampleFormat));
+        }
+
+        protected virtual void SetupPcm()
+        {
+            BassUtils.OK(BassAsio.SetDSD(false));
+            BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.SampleFormat));
+            BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, this.Config.EffectiveRate));
+            if (!BassAsio.CheckRate(Math.Min(this.Config.EffectiveRate, this.Output.Rate)))
             {
-                BassUtils.OK(BassAsio.SetDSD(false));
-                BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.SampleFormat));
-                BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, this.Config.GetActualRate()));
+                Logger.Write(this, LogLevel.Warn, "ASIO driver reports that PCM rate {0} is not supported. Playback is likely to fail.", Math.Min(this.Config.EffectiveRate, this.Output.Rate));
             }
-            BassAsio.Rate = this.Config.GetActualRate();
-            Logger.Write(this, LogLevel.Debug, "Enabled ASIO on master stream: {0}", this.ChannelHandle);
-            base.OnStartedStream();
+            BassAsio.Rate = Math.Min(this.Config.EffectiveRate, this.Output.Rate);
+            Logger.Write(this, LogLevel.Debug, "Configured ASIO for PCM: {0}/{1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), this.SampleFormat));
         }
 
         protected override void OnFreeingStream()

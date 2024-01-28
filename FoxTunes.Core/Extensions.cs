@@ -48,6 +48,15 @@ namespace FoxTunes
             }
         }
 
+        public static bool Contains(this IEnumerable<string> sequence, string value, bool ignoreCase)
+        {
+            if (!ignoreCase)
+            {
+                return sequence.Contains(value);
+            }
+            return sequence.Contains(value, StringComparer.OrdinalIgnoreCase);
+        }
+
         public static bool Contains(this string subject, string value, bool ignoreCase)
         {
             if (!ignoreCase)
