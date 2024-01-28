@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -40,6 +42,8 @@ namespace FoxTunes
 
         public const string CREST_ELEMENT = "DEEEFFB9-2014-4004-94F9-E566874317ED";
 
+        public const string COLOR_PALETTE_ELEMENT = "EEEE907A-5812-42CD-9844-89362C96C6AF";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
@@ -47,7 +51,8 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(false)
+                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, RMS_ELEMENT))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine).DependsOn(SECTION, RMS_ELEMENT, true)
             );
         }
 
@@ -469,6 +474,28 @@ namespace FoxTunes
                 case BANDS_160_OPTION:
                     return 320;
             }
+        }
+
+        public static string GetDefaultColorPalette()
+        {
+            var builder = new StringBuilder();
+            return builder.ToString();
+        }
+
+        public static Color[] GetColorPalette(string value, Color color)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                try
+                {
+                    return value.ToColorStops().ToGradient();
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
+            }
+            return new[] { color };
         }
 
         public static int GetFFTSize(SelectionConfigurationOption fftSize, SelectionConfigurationOption bands)
