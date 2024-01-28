@@ -35,7 +35,7 @@ namespace FoxTunes
         protected override Task OnRun()
         {
             this.Position = 0;
-            this.Count = this.Library.LibraryItemQuery.Count() * this.Library.LibraryHierarchyQuery.Count();
+            this.Count = this.Database.Interlocked(() => this.Library.LibraryItemQuery.Count() * this.Library.LibraryHierarchyQuery.Count());
             foreach (var libraryHierarchy in this.Library.LibraryHierarchyQuery)
             {
                 Logger.Write(this, LogLevel.Debug, "Building library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);

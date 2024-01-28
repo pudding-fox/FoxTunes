@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
@@ -13,16 +14,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}">
-            <ViewModel:Playlist.PlaylistColumns>
-                <ViewModel:PlaylistColumn Header="Playing" Script="playing != null &amp;&amp; item.Id == playing.Id ? &quot;\u2022&quot; : &quot;&quot;"/>
-                <ViewModel:PlaylistColumn Header="Artist / album" Script="(function(){var parts=[tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist];if(tag.album){parts.push(tag.album);}return parts.join(&quot; - &quot;);})()"/>
-                <ViewModel:PlaylistColumn Header="Track no" Script="(function(){var parts=[];if(tag.disccount != 1 &amp;&amp; tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}return parts.join(&quot; - &quot;);})()"/>
-                <ViewModel:PlaylistColumn Header="Title / track artist" Script="(function(){var parts=[];if(tag.title){parts.push(tag.title);}if(tag.firstperformer &amp;&amp; tag.firstperformer != (tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist)){parts.push(tag.firstperformer);}return parts.join(&quot; - &quot;);})()"/>
-                <ViewModel:PlaylistColumn Header="Duration" Script="timestamp(stat.duration)"/>
-            </ViewModel:Playlist.PlaylistColumns>
-        </ViewModel:Playlist>
-        <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Components.Playlist.Query}" IsLiveSortingRequested="True">
+        <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}"></ViewModel:Playlist>
+        <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Components.Playlist.PlaylistItemQuery}" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Sequence</System:String>
             </CollectionViewSource.LiveGroupingProperties>
@@ -54,7 +47,19 @@
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.View>
-                <GridView Extensions:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}" />
+                <GridView Extensions:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}">
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu>
+                                        <MenuItem Header="Settings" Command="{Binding SettingsCommand, Mode=OneWay, Source={StaticResource ViewModel}}"></MenuItem>
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
+                </GridView>
             </ListView.View>
         </ListView>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False">
@@ -62,12 +67,25 @@
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Components.Playlist.Query.Count, Mode=OneWay}" Value="0">
+                        <DataTrigger Binding="{Binding Components.Playlist.PlaylistItemQuery.Count, Mode=OneWay}" Value="0">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
         </TextBlock>
+        <Popup PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}" 
+              Placement="Center" 
+              AllowsTransparency="True" 
+              IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" 
+              StaysOpen="False">
+            <Border Background="{DynamicResource NormalBrush}" 
+                    BorderBrush="{DynamicResource NormalBorderBrush}" 
+                    BorderThickness="1" 
+                    CornerRadius="8,8,3,3" 
+                    Padding="10">
+                <Windows:PlaylistSettingsDialog></Windows:PlaylistSettingsDialog>
+            </Border>
+        </Popup>
     </Grid>
 </UserControl>

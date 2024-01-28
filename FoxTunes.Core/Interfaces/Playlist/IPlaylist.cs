@@ -2,8 +2,12 @@
 {
     public interface IPlaylist : IBaseComponent
     {
-        IDatabaseQuery<PlaylistItem> Query { get; }
+        IDatabaseSet<PlaylistItem> PlaylistItemSet { get; }
 
-        IDatabaseSet<PlaylistItem> Set { get; }
+        IDatabaseQuery<PlaylistItem> PlaylistItemQuery { get; }
+
+        IDatabaseSet<PlaylistColumn> PlaylistColumnSet { get; }
+
+        IDatabaseQuery<PlaylistColumn> PlaylistColumnQuery { get; }
     }
 }

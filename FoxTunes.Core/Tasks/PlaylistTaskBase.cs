@@ -24,7 +24,7 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Shifting playlist items from {0}", sequence);
             var query =
-                from playlistItem in this.Playlist.Query
+                from playlistItem in this.Playlist.PlaylistItemQuery
                 where playlistItem.Sequence >= sequence
                 orderby playlistItem.Sequence
                 select playlistItem;
@@ -32,7 +32,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Shifting playlist item: {0} => {1} => {2} => {3}", playlistItem.Id, playlistItem.FileName, playlistItem.Sequence, playlistItem.Sequence + offset);
                 playlistItem.Sequence = playlistItem.Sequence + offset;
-                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Update(playlistItem)));
+                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.PlaylistItemSet.Update(playlistItem)));
             }
         }
     }

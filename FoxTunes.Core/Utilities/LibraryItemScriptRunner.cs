@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace FoxTunes
 {
@@ -44,6 +45,7 @@ namespace FoxTunes
             this.ScriptingContext.SetValue("stat", properties);
         }
 
+        [DebuggerNonUserCode]
         public object Run()
         {
             const string RESULT = "__result";
@@ -51,9 +53,9 @@ namespace FoxTunes
             {
                 this.ScriptingContext.Run(string.Concat("var ", RESULT, " = ", this.Script, ";"));
             }
-            catch (Exception e)
+            catch (ScriptingException e)
             {
-                return e;
+                return e.Message;
             }
             return this.ScriptingContext.GetValue(RESULT);
         }

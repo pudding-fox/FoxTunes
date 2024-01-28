@@ -80,6 +80,9 @@
     <Compile Include="Playlist.xaml.cs">
       <DependentUpon>Playlist.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PlaylistSettingsDialog.xaml.cs">
+      <DependentUpon>PlaylistSettingsDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
@@ -99,16 +102,17 @@
     <Compile Include="ViewModel\Artwork.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
+    <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryHierarchies.cs" />
     <Compile Include="ViewModel\Log.cs" />
+    <Compile Include="ViewModel\PlaylistSettings.cs" />
     <Compile Include="ViewModel\RenderableLibraryHierarchyItem.cs" />
     <Compile Include="WindowsForegroundTaskRunner.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\Playback.cs" />
     <Compile Include="ViewModel\Playlist.cs" />
-    <Compile Include="ViewModel\PlaylistColumn.cs" />
     <Compile Include="ViewModel\Settings.cs" />
     <Compile Include="ViewModel\StreamPosition.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
@@ -162,6 +166,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Playlist.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PlaylistSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

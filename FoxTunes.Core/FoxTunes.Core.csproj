@@ -46,6 +46,7 @@
     <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
+    <Compile Include="Interfaces\Signal\ISignal.cs" />
     <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
     <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Library\LibraryHierarchy.cs" />
@@ -55,6 +56,12 @@
     <Compile Include="MetaData\CommonImageMetaData.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="MetaData\ImageItem.cs" />
+    <Compile Include="Playlist\PlaylistColumn.cs" />
+    <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
+    <Compile Include="Scripting\ScriptingException.cs" />
+    <Compile Include="Signal\CommonSignals.cs" />
+    <Compile Include="Signal\Signal.cs" />
+    <Compile Include="Signal\SignalEmitter.cs" />
     <Compile Include="Tasks\AddPathsToLibraryTask.cs" />
     <Compile Include="Tasks\BackgroundTask.cs" />
     <Compile Include="BaseBehaviour.cs" />
