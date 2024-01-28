@@ -253,6 +253,12 @@ TEMPO="
 FoxTunes.Output.Bass.Tempo.dll
 "
 
+ARCHIVE="
+FoxTunes.Output.Bass.Archive.dll
+ManagedBass.ZipStream.dll
+bass_zipstream.dll
+"
+
 MINIMAL="
 bass
 conf
@@ -263,6 +269,7 @@ wpf
 "
 
 BUNDLED="
+archive
 asio
 cd
 crossfade
@@ -314,6 +321,7 @@ do
 		mkdir -p "./release/$platform/$target/Main"
 		mkdir -p "./release/$platform/$target/Main/lib"
 		mkdir -p "./release/$platform/$target/Plugins"
+		mkdir -p "./release/$platform/$target/Plugins/archive"
 		mkdir -p "./release/$platform/$target/Plugins/asio"
 		mkdir -p "./release/$platform/$target/Plugins/bass"
 		mkdir -p "./release/$platform/$target/Plugins/bass/addon"
@@ -658,6 +666,14 @@ do
 		do
 				echo $file
 				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/tempo"
+		done
+		echo
+
+		echo "Creating plugin: archive"
+		for file in $ARCHIVE
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/archive"
 		done
 		echo
 
