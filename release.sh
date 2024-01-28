@@ -1,5 +1,10 @@
 #!/bin/sh
 
+PLATFORM="
+x86
+x64
+"
+
 TARGET="
 net40
 net461
@@ -72,6 +77,8 @@ FoxTunes.Scripting.JS.dll
 Noesis.Javascript.dll
 msvcp100.dll
 msvcr100.dll
+V8.Net.dll
+V8_Net_Proxy_x64.dll
 "
 
 WINDOWS="
@@ -119,11 +126,18 @@ bass_wasapi_handler.dll
 basswasapi.dll
 "
 
-SQLITE="
+SQLITE_X86="
 FoxDb.SQLite.dll
 FoxTunes.DB.SQLite.dll
 System.Data.SQLite.dll
 x86/SQLite.Interop.dll
+"
+
+SQLITE_X64="
+FoxDb.SQLite.dll
+FoxTunes.DB.SQLite.dll
+System.Data.SQLite.dll
+x64/SQLite.Interop.dll
 "
 
 SQLSERVER="
@@ -234,315 +248,336 @@ sleep 1
 
 rm -rf "./release"
 
-for target in $TARGET
+for platform in $PLATFORM
 do
-
-	mkdir -p "./release/$target/Main"
-	mkdir -p "./release/$target/Main/lib"
-	mkdir -p "./release/$target/Plugins"
-	mkdir -p "./release/$target/Plugins/asio"
-	mkdir -p "./release/$target/Plugins/bass"
-	mkdir -p "./release/$target/Plugins/bass/addon"
-	mkdir -p "./release/$target/Plugins/cd"
-	mkdir -p "./release/$target/Plugins/cue"
-	mkdir -p "./release/$target/Plugins/conf"
-	mkdir -p "./release/$target/Plugins/dsd"
-	mkdir -p "./release/$target/Plugins/dts"
-	mkdir -p "./release/$target/Plugins/encoder"
-	mkdir -p "./release/$target/Plugins/encoder/encoders"
-	mkdir -p "./release/$target/Plugins/eq"
-	mkdir -p "./release/$target/Plugins/js"
-	mkdir -p "./release/$target/Plugins/librarybrowser"
-	mkdir -p "./release/$target/Plugins/logger"
-	mkdir -p "./release/$target/Plugins/metadataeditor"
-	mkdir -p "./release/$target/Plugins/replaygain"
-	mkdir -p "./release/$target/Plugins/simplemetadata"
-	mkdir -p "./release/$target/Plugins/sox"
-	mkdir -p "./release/$target/Plugins/sqlite"
-	mkdir -p "./release/$target/Plugins/sqlserver"
-	mkdir -p "./release/$target/Plugins/taglibmetadata"
-	mkdir -p "./release/$target/Plugins/tools"
-	mkdir -p "./release/$target/Plugins/wasapi"
-	mkdir -p "./release/$target/Plugins/windows"
-	mkdir -p "./release/$target/Plugins/wpf"
-
-	echo "Creating plugins package.."
-	echo
-
-	echo "Creating plugin: windows"
-	for file in $WINDOWS
+	for target in $TARGET
 	do
-		if [ ! -f "./distribution/$target/$file" ]
-		then
-			echo "SKIPPING $file" 
-			continue
-		fi
-		echo $file
-		cp "./distribution/$target/$file" "./release/$target/Plugins/windows"
-	done
-	echo
 
-	echo "Creating plugin: asio"
-	for file in $ASIO
-	do
-		echo $file
-		cp "./distribution/$target/$file" "./release/$target/Plugins/asio"
-	done
-	echo
+		mkdir -p "./release/$platform/$target/Main"
+		mkdir -p "./release/$platform/$target/Main/lib"
+		mkdir -p "./release/$platform/$target/Plugins"
+		mkdir -p "./release/$platform/$target/Plugins/asio"
+		mkdir -p "./release/$platform/$target/Plugins/bass"
+		mkdir -p "./release/$platform/$target/Plugins/bass/addon"
+		mkdir -p "./release/$platform/$target/Plugins/cd"
+		mkdir -p "./release/$platform/$target/Plugins/cue"
+		mkdir -p "./release/$platform/$target/Plugins/conf"
+		mkdir -p "./release/$platform/$target/Plugins/dsd"
+		mkdir -p "./release/$platform/$target/Plugins/dts"
+		mkdir -p "./release/$platform/$target/Plugins/encoder"
+		mkdir -p "./release/$platform/$target/Plugins/encoder/encoders"
+		mkdir -p "./release/$platform/$target/Plugins/eq"
+		mkdir -p "./release/$platform/$target/Plugins/js"
+		mkdir -p "./release/$platform/$target/Plugins/librarybrowser"
+		mkdir -p "./release/$platform/$target/Plugins/logger"
+		mkdir -p "./release/$platform/$target/Plugins/metadataeditor"
+		mkdir -p "./release/$platform/$target/Plugins/replaygain"
+		mkdir -p "./release/$platform/$target/Plugins/simplemetadata"
+		mkdir -p "./release/$platform/$target/Plugins/sox"
+		mkdir -p "./release/$platform/$target/Plugins/sqlite"
+		mkdir -p "./release/$platform/$target/Plugins/sqlserver"
+		mkdir -p "./release/$platform/$target/Plugins/taglibmetadata"
+		mkdir -p "./release/$platform/$target/Plugins/tools"
+		mkdir -p "./release/$platform/$target/Plugins/wasapi"
+		mkdir -p "./release/$platform/$target/Plugins/windows"
+		mkdir -p "./release/$platform/$target/Plugins/wpf"
 
-	echo "Creating plugin: cd"
-	for file in $CD
-	do
-		echo $file
-		cp "./distribution/$target/$file" "./release/$target/Plugins/cd"
-	done
-	echo
+		echo "Creating plugins package.."
+		echo
 
-	echo "Creating plugin: dsd"
-	for file in $DSD
-	do
-		echo $file
-		cp "./distribution/$target/$file" "./release/$target/Plugins/dsd"
-	done
-	echo
-
-	echo "Creating plugin: dts"
-	for file in $DTS
-	do
-		echo $file
-		cp "./distribution/$target/$file" "./release/$target/Plugins/dts"
-	done
-	echo
-
-	echo "Creating plugin: sox"
-	for file in $SOX
-	do
-		echo $file
-		cp "./distribution/$target/$file" "./release/$target/Plugins/sox"
-	done
-	echo
-
-	echo "Creating plugin: wasapi"
-	for file in $WASAPI
-	do
-		echo $file
-		cp "./distribution/$target/$file" "./release/$target/Plugins/wasapi"
-	done
-	echo
-
-	echo "Creating plugin: sqlserver"
-	for file in $SQLSERVER
-	do
+		echo "Creating plugin: windows"
+		for file in $WINDOWS
+		do
+			if [ ! -f "./distribution/$platform/$target/$file" ]
+			then
+				echo "SKIPPING $file" 
+				continue
+			fi
 			echo $file
-			cp "./distribution/$target/$file" "./release/$target/Plugins/sqlserver"
-	done
-	echo
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/windows"
+		done
+		echo
 
-	echo "Creating plugin: simplemetadata"
-	for file in $SIMPLEMETADATA
-	do
+		echo "Creating plugin: asio"
+		for file in $ASIO
+		do
 			echo $file
-			cp "./distribution/$target/$file" "./release/$target/Plugins/simplemetadata"
-	done
-	echo
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/asio"
+		done
+		echo
 
-	echo "Creating plugin: librarybrowser"
-	for file in $LIBRARYBROWSER
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/librarybrowser"
-    done
-	echo
+		echo "Creating plugin: cd"
+		for file in $CD
+		do
+			echo $file
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/cd"
+		done
+		echo
 
-	echo "Creating plugin: metadataeditor"
-	for file in $METADATAEDITOR
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/metadataeditor"
-    done
-	echo
+		echo "Creating plugin: dsd"
+		for file in $DSD
+		do
+			echo $file
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/dsd"
+		done
+		echo
 
-	echo "Creating plugin: encoder"
-	for file in $ENCODER
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/encoder"
-    done
-	echo
+		echo "Creating plugin: dts"
+		for file in $DTS
+		do
+			echo $file
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/dts"
+		done
+		echo
 
-	echo "Installing encoders (bass)"
-	for file in $ENCODERS
-    do
-            echo $file
-            cp "./distribution/$target/Encoders/$file" "./release/$target/Plugins/encoder/encoders"
-    done
-	echo
+		echo "Creating plugin: sox"
+		for file in $SOX
+		do
+			echo $file
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/sox"
+		done
+		echo
 
-	echo "Creating plugin: eq"
-    for file in $EQ
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/eq"
-    done
-	echo
+		echo "Creating plugin: wasapi"
+		for file in $WASAPI
+		do
+			echo $file
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/wasapi"
+		done
+		echo
 
-	echo "Creating plugin: tools"
-	for file in $TOOLS
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/tools"
-    done
-	echo
+		echo "Creating plugin: sqlserver"
+		for file in $SQLSERVER
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/sqlserver"
+		done
+		echo
+
+		echo "Creating plugin: simplemetadata"
+		for file in $SIMPLEMETADATA
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/simplemetadata"
+		done
+		echo
+
+		echo "Creating plugin: librarybrowser"
+		for file in $LIBRARYBROWSER
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/librarybrowser"
+		done
+		echo
+
+		echo "Creating plugin: metadataeditor"
+		for file in $METADATAEDITOR
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/metadataeditor"
+		done
+		echo
+
+		echo "Creating plugin: encoder"
+		for file in $ENCODER
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/encoder"
+		done
+		echo
+
+		echo "Installing encoders (bass)"
+		for file in $ENCODERS
+		do
+				echo $file
+				cp "./distribution/$platform/$target/Encoders/$file" "./release/$platform/$target/Plugins/encoder/encoders"
+		done
+		echo
+
+		echo "Creating plugin: eq"
+		for file in $EQ
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/eq"
+		done
+		echo
+
+		echo "Creating plugin: tools"
+		for file in $TOOLS
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/tools"
+		done
+		echo
 	
-	echo "Creating plugin: js"
-	for file in $JS
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/js"
-    done
-	echo
+		echo "Creating plugin: js"
+		for file in $JS
+		do
+				if [ ! -f "./distribution/$platform/$target/$file" ]
+				then
+					echo "SKIPPING $file" 
+					continue
+				fi
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/js"
+		done
+		echo
 	
-	echo "Creating plugin: bass"
-	for file in $BASS
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/bass"
-    done
-	echo
+		echo "Creating plugin: bass"
+		for file in $BASS
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/bass"
+		done
+		echo
 	
-	echo "Installing addons (bass)"
-	for file in $ADDON
-	do
-		echo "$file"
-		cp "./distribution/$target/Addon/$file" "./release/$target/Plugins/bass/addon"
-	done
-	echo
+		echo "Installing addons (bass)"
+		for file in $ADDON
+		do
+			echo "$file"
+			cp "./distribution/$platform/$target/Addon/$file" "./release/$platform/$target/Plugins/bass/addon"
+		done
+		echo
 	
-	echo "Creating plugin: sqlite"
-	for file in $SQLITE
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/sqlite"
-    done
-	echo
-	
-	echo "Creating plugin: taglibmetadata"
-	for file in $TAGLIBMETADATA
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/taglibmetadata"
-    done
-	echo
-
-	echo "Creating plugin: logger"
-	for file in $LOG
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/logger"
-    done
-	echo
-
-	echo "Creating plugin: conf"
-	for file in $CONF
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/conf"
-    done
-	echo
-
-	echo "Creating plugin: wpf"
-	for file in $WPF
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/wpf"
-    done
-	echo
-
-	echo "Creating plugin: replaygain"
-	for file in $REPLAYGAIN
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/replaygain"
-    done
-	echo
-
-	echo "Creating plugin: cue"
-	for file in $CUE
-    do
-            echo $file
-            cp "./distribution/$target/$file" "./release/$target/Plugins/cue"
-    done
-	echo
-
-	cd "./release/$target/Plugins"
-
-	"../../../.7z/7za.exe" a "FoxTunes-$TAG-Plugins-$target.zip" "*.*" -r
-
-	mv "./FoxTunes-$TAG-Plugins-$target.zip" "../../"
-
-	cd ..
-	cd ..
-	cd ..
-	
-	echo "Creating main package.."
-
-	for file in $LAUNCHER
-	do
-		echo "$file"
-		cp "./distribution/$target/$file" "./release/$target/Main"
-	done
-
-	for file in $LIB
-	do
-		if [ ! -f "./distribution/$target/$file" ]
+		echo "Creating plugin: sqlite"
+		if [ $platform = "x86" ]
 		then
-			echo "SKIPPING $file" 
-			continue
+			SQLITE=$SQLITE_X86
+		elif [ $platform = "x64" ]
+		then
+			SQLITE=$SQLITE_X64
+		else
+			echo "Unsupported platform: ${platform}"
 		fi
-		echo "$file"
-		cp "./distribution/$target/$file" "./release/$target/Main/lib"
-	done
+		for file in $SQLITE
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/sqlite"
+		done
+		echo
 	
-	for minimal in $MINIMAL
-	do
-		echo "Installing plugin (Minimal): $minimal"
-		mkdir -p "./release/$target/Main/lib/$minimal"
-		cp -r "./release/$target/Plugins/$minimal/"* "./release/$target/Main/lib/$minimal"
+		echo "Creating plugin: taglibmetadata"
+		for file in $TAGLIBMETADATA
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/taglibmetadata"
+		done
+		echo
+
+		echo "Creating plugin: logger"
+		for file in $LOG
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/logger"
+		done
+		echo
+
+		echo "Creating plugin: conf"
+		for file in $CONF
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/conf"
+		done
+		echo
+
+		echo "Creating plugin: wpf"
+		for file in $WPF
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/wpf"
+		done
+		echo
+
+		echo "Creating plugin: replaygain"
+		for file in $REPLAYGAIN
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/replaygain"
+		done
+		echo
+
+		echo "Creating plugin: cue"
+		for file in $CUE
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/cue"
+		done
+		echo
+
+		cd "./release/$platform/$target/Plugins"
+
+		"../../../../.7z/7za.exe" a "FoxTunes-$TAG-Plugins-$target-$platform.zip" "*.*" -r
+
+		mv "./FoxTunes-$TAG-Plugins-$target-$platform.zip" "../../../"
+
+		cd ..
+		cd ..
+		cd ..
+		cd ..
+	
+		echo "Creating main package.."
+
+		for file in $LAUNCHER
+		do
+			echo "$file"
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Main"
+		done
+
+		for file in $LIB
+		do
+			if [ ! -f "./distribution/$platform/$target/$file" ]
+			then
+				echo "SKIPPING $file" 
+				continue
+			fi
+			echo "$file"
+			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Main/lib"
+		done
+	
+		for minimal in $MINIMAL
+		do
+			echo "Installing plugin (Minimal): $minimal"
+			mkdir -p "./release/$platform/$target/Main/lib/$minimal"
+			cp -r "./release/$platform/$target/Plugins/$minimal/"* "./release/$platform/$target/Main/lib/$minimal"
+		done
+
+		cd "./release/$platform/$target/Main"
+
+		echo "Setting the release type to minimal..";
+		sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Minimal"/' "FoxTunes.Launcher.exe.config"
+
+		"../../../../.7z/7za.exe" a "FoxTunes-$TAG-$target-$platform-Minimal.zip" "*.*" -r
+
+		mv "./FoxTunes-$TAG-$target-$platform-Minimal.zip" "../../../"
+
+		cd ..
+		cd ..
+		cd ..
+		cd ..
+
+		for bundled in $BUNDLED
+		do
+			echo "Installing plugin (Bundled): $bundled"
+			mkdir -p "./release/$platform/$target/Main/lib/$bundled"
+			cp -r "./release/$platform/$target/Plugins/$bundled/"* "./release/$platform/$target/Main/lib/$bundled"
+		done
+
+		cd "./release/$platform/$target/Main"
+
+		echo "Setting the release type to default..";
+		sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Default"/' "FoxTunes.Launcher.exe.config"
+
+		"../../../../.7z/7za.exe" a "FoxTunes-$TAG-$target-$platform.zip" "*.*" -r
+
+		mv "./FoxTunes-$TAG-$target-$platform.zip" "../../../"
+
+		cd ..
+		cd ..
+		cd ..
+		cd ..
+
 	done
-
-	cd "./release/$target/Main"
-
-	echo "Setting the release type to minimal..";
-	sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Minimal"/' "FoxTunes.Launcher.exe.config"
-
-	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target-Minimal.zip" "*.*" -r
-
-	mv "./FoxTunes-$TAG-$target-Minimal.zip" "../../"
-
-	cd ..
-	cd ..
-	cd ..
-
-	for bundled in $BUNDLED
-	do
-		echo "Installing plugin (Bundled): $bundled"
-		mkdir -p "./release/$target/Main/lib/$bundled"
-		cp -r "./release/$target/Plugins/$bundled/"* "./release/$target/Main/lib/$bundled"
-	done
-
-	cd "./release/$target/Main"
-
-	echo "Setting the release type to default..";
-	sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Default"/' "FoxTunes.Launcher.exe.config"
-
-	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target.zip" "*.*" -r
-
-	mv "./FoxTunes-$TAG-$target.zip" "../../"
-
-	cd ..
-	cd ..
-	cd ..
-
+	echo
 done
 echo
 
