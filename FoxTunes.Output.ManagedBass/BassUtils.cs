@@ -6,10 +6,10 @@ namespace FoxTunes
 {
     public static class BassUtils
     {
-        private static readonly string[] BUILT_IN_FORMATS = new[]
+        public static readonly HashSet<string> BUILT_IN_FORMATS = new HashSet<string>(new[]
         {
             "mp1", "mp2", "mp3", "ogg", "wav", "aif"
-        };
+        });
 
         public static IEnumerable<string> GetInputFormats()
         {
