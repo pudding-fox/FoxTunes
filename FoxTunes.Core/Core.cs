@@ -31,12 +31,20 @@ namespace FoxTunes
 
         public void Load()
         {
-            this.LoadComponents();
-            this.LoadManagers();
-            this.LoadFactories();
-            this.LoadBehaviours();
-            this.LoadConfiguration();
-            this.InitializeComponents();
+            try
+            {
+                this.LoadComponents();
+                this.LoadManagers();
+                this.LoadFactories();
+                this.LoadBehaviours();
+                this.LoadConfiguration();
+                this.InitializeComponents();
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Debug, "Failed to initialize the core, we will crash soon: {0}", e.Message);
+                throw;
+            }
         }
 
         protected virtual void LoadComponents()
