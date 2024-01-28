@@ -4,7 +4,7 @@
         parts.push(tag.disc);
     }
     if (tag.track) {
-        parts.push(zeropad(tag.track, 2));
+        parts.push(zeropad2(tag.track, tag.trackcount, 2));
     }
     return parts.join(" - ");
 })()

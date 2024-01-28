@@ -82,7 +82,7 @@ namespace FoxTunes {
         ///   Looks up a localized string similar to (function () {
         ///    var parts = [];
         ///    if (tag.track) {
-        ///        parts.push(zeropad(tag.track, 2));
+        ///        parts.push(zeropad2(tag.track, tag.trackcount, 2));
         ///    }
         ///    if (tag.title) {
         ///        parts.push(tag.title);

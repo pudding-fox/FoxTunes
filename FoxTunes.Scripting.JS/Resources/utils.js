@@ -40,6 +40,14 @@ function zeropad(value, width) {
     return value.length >= width ? value : new Array(width - value.length + 1).join("0") + value;
 }
 
+function zeropad2(value, max, width) {
+    if (max) {
+        max = max + "";
+        width = max.length;
+    }
+    return zeropad(value, width);
+}
+
 function ucfirst(value) {
     if (!value) {
         return value;
