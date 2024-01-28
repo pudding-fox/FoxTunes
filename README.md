@@ -1,8 +1,8 @@
 # FoxTunes
 A **portable, modular music player and converter** using the BASS framework for Windows XP/.../10/11.
 
-The main release is [FoxTunes-2.4.0-net462-x86.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.4.0/FoxTunes-2.4.0-net462-x86.zip) ([64 bit builds are available](https://github.com/Raimusoft/FoxTunes/releases)).  
-For additional plugins, download [FoxTunes-2.4.0-Plugins-net462-x86.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.4.0/FoxTunes-2.4.0-Plugins-net462-x86.zip) (extract and copy all files to the FoxTunes\lib directory).
+The main release is [FoxTunes-2.5.0-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.5.0/FoxTunes-2.5.0-net462.zip).  
+For additional plugins, download [FoxTunes-2.5.0-Plugins-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.5.0/FoxTunes-2.5.0-Plugins-net462.zip) (extract and copy required folders to the FoxTunes\lib directory).
 
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
@@ -60,7 +60,7 @@ A lot of settings are available depending on plugins installed.
 
 ## Windows XP support
 
-A Windows XP compatibile .NET 4.0 build is available, can be configured minimally.
+A Windows XP compatibile .NET 4.0 build can be created (raise an issue if you think this should be automated) by manually running the Nightly Build (Legacy) pipeline.
 It needs at least;
 * [KB2468871](https://www.microsoft.com/en-us/download/details.aspx?id=3556) - Portable class libraries patch.
   * Microsoft keep breaking the link. Google: NDP40-KB2468871
@@ -75,6 +75,8 @@ It needs at least;
 * **CROSSFADE** - A fading input transport: https://github.com/aidan-g/BASS_CROSSFADE
 * **CUE** - Play cue sheets: https://github.com/aidan-g/BASS_SUBSTREAM
   * Provides the "skip silence" feature which can trim silence from the start and end of media.
+* **Discogs** - Fetch meta data and images using the discogs API.
+  * Automatically fetch missing artwork.
 * **DirectSound** - Use standard windows audio session for output.
 * **DSD** - Required for DSD direct.
 * **DTS** - Play .dts multi channel format: https://github.com/aidan-g/BASS_DTS
@@ -83,12 +85,17 @@ It needs at least;
   * Can rip CDs with the CD plugin.
   * Can up/down sample rate/depth with the Resampler plugin.
 * **GAPLESS** - A "true" gapless input transport: https://github.com/aidan-g/BASS_GAPLESS
-* **Javascript** - Use JS for scriptable elements.
+* **noesis** - Use Noesis.Javascript for scriptable elements.
+* **v8net** - Use V8.Net for scriptable elements.
 * **Layout** - A flexible layout system with various panel types. 
-* **LibraryBrowser** - An album art grid interface for the library. It can use lots of memory.
-* **Logging** - Use Log4Net logging back-end. Can be configured and disabled.
+* **LibraryBrowser** - An album art grid interface for the library.
+* **Logging** - Use Log4Net logging back-end. Only used for debugging.
 * **Lyrics** - A simple lyrics viewer, editor and auto lookup via "Chart Lyrics" provider.
+* **Memory** - Play tracks from memory.
+  * Improves playback over a network or other slow storage.
 * **MetaDataEditor** - A simple batch mode tag editor. Can embed artwork.
+* **Minidisc** - Write physical minidiscs using a compatible netmd device.
+  * Uses the MD.Net library: https://github.com/aidan-g/MD.Net
 * **MOD** - Play various mod music formats.
 * **ParametricEqualizer** - A ten band parametric equalizer with EQ presets easily modifiable and addable (TEXT files).
 * **Ratings** - 1-5 based star rating system with several controls for viewing and editing.
@@ -97,7 +104,7 @@ It needs at least;
 * **Resampler** - SOXR based high quality configurable resampler. Can perform up/down sampling: https://github.com/aidan-g/BASS_SOX
 * **SimpleMetaData** - A meta data provider using the file path and regular expressions. Recommended for older systems.
 * **Snapping** - Enable winamp like window snapping.
-* **Spectrum** and **Enhanced Spectrum** - A simple/more advanced spectrum visualization.
+* **Spectrum** - Various visualizations.
 * **SQLite** - Use SQLite for database functions.
 * **SqlServer** - Use Microsoft SQL Server for database functions.
 * **Statistics** - Playback statistics like play count and last played date/time.
