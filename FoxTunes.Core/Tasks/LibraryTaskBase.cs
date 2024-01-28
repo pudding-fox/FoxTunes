@@ -97,9 +97,8 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task AddPaths(IEnumerable<string> paths, bool buildHierarchies)
+        protected virtual async Task AddPaths(IEnumerable<string> paths)
         {
-            var complete = true;
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
              {
                  await this.AddLibraryItems(paths, cancellationToken).ConfigureAwait(false);
@@ -117,7 +116,6 @@ namespace FoxTunes
                 //Reset cancellation as the next phases should finish quickly.
                 //Cancelling again will still work.
                 this.IsCancellationRequested = false;
-                complete = false;
             }
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
@@ -136,16 +134,10 @@ namespace FoxTunes
                 //Reset cancellation as the next phases should finish quickly.
                 //Cancelling again will still work.
                 this.IsCancellationRequested = false;
-                complete = false;
             }
-            if (buildHierarchies)
-            {
-                await this.BuildHierarchies(LibraryItemStatus.Import).ConfigureAwait(false);
-            }
-            if (complete)
-            {
-                await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None).ConfigureAwait(false);
-            }
+            await this.BuildHierarchies(LibraryItemStatus.Import).ConfigureAwait(false);
+            await RemoveCancelledLibraryItems(this.Database).ConfigureAwait(false);
+            await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None).ConfigureAwait(false);
         }
 
         protected virtual async Task AddLibraryItems(IEnumerable<string> paths, CancellationToken cancellationToken)
@@ -255,6 +247,14 @@ namespace FoxTunes
                     }
                 }, transaction).ConfigureAwait(false);
                 transaction.Commit();
+            }
+        }
+
+        public static async Task RemoveCancelledLibraryItems(IDatabaseComponent database)
+        {
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            {
+                await database.ExecuteAsync(database.Queries.RemoveCancelledLibraryItems).ConfigureAwait(false);
             }
         }
 
