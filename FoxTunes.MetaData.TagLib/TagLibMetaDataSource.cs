@@ -39,7 +39,7 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Popularimeter { get; private set; }
 
-        public BooleanConfigurationElement Write { get; private set; }
+        public SelectionConfigurationElement Write { get; private set; }
 
         public IArtworkProvider ArtworkProvider { get; private set; }
 
@@ -78,7 +78,7 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
             );
-            this.Write = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.WRITE_ELEMENT
             );
@@ -140,7 +140,7 @@ namespace FoxTunes
 
         public async Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaData, Func<MetaDataItem, bool> predicate)
         {
-            if (!this.Write.Value)
+            if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)
             {
                 Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", fileName);
                 return;
@@ -448,6 +448,11 @@ namespace FoxTunes
                     tag.Performers = new[] { metaDataItem.Value };
                     break;
                 case CommonMetaData.PlayCount:
+                    if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                    {
+                        PopularimeterManager.Write(this, metaDataItem, file);
+                    }
+                    break;
                 case CommonMetaData.Rating:
                     PopularimeterManager.Write(this, metaDataItem, file);
                     break;

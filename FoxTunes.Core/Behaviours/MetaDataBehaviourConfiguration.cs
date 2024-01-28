@@ -38,6 +38,12 @@ namespace FoxTunes
 
         public const string WRITE_ELEMENT = "LLLLEBD5-2675-42E4-8C9A-6E851DAA4D86";
 
+        public const string WRITE_NONE_OPTION = "AAAA73B6-7263-42A3-8304-9EAD8FB82197";
+
+        public const string WRITE_TAGS_OPTION = "BBBB6140-1201-4120-B2A9-E3BDBB582D47";
+
+        public const string WRITE_TAGS_AND_STATISTICS_OPTION = "CCCC75D8-4BCA-41E4-99A1-540F78B170EE";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
@@ -67,7 +73,7 @@ namespace FoxTunes
                 .WithElement(
                     new IntegerConfigurationElement(THREADS_ELEMENT, "Background Threads", path: "Advanced").WithValue(Environment.ProcessorCount).WithValidationRule(new IntegerValidationRule(1, 32)))
                 .WithElement(
-                    new BooleanConfigurationElement(WRITE_ELEMENT, "Write Changes", path: "Advanced").WithValue(true)
+                    new SelectionConfigurationElement(WRITE_ELEMENT, "Write Behaviour", path: "Advanced").WithOptions(GetWriteBehaviourOptions())
             );
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLE_ELEMENT).ConnectValue(value => UpdateConfiguration());
             StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, READ_EMBEDDED_IMAGES).ConnectValue(value => UpdateConfiguration());
@@ -162,6 +168,40 @@ namespace FoxTunes
             }
             return ImagePreference.Embedded;
         }
+
+        private static IEnumerable<SelectionConfigurationOption> GetWriteBehaviourOptions()
+        {
+            yield return new SelectionConfigurationOption(
+                WRITE_NONE_OPTION,
+                "None"
+            );
+            yield return new SelectionConfigurationOption(
+                WRITE_TAGS_OPTION,
+                "Tags"
+            ).Default();
+            yield return new SelectionConfigurationOption(
+                WRITE_TAGS_AND_STATISTICS_OPTION,
+                "Tags & Statistics"
+            );
+        }
+
+        public static WriteBehaviour GetWriteBehaviour(SelectionConfigurationOption value)
+        {
+            if (value != null)
+            {
+                switch (value.Id)
+                {
+                    case WRITE_NONE_OPTION:
+                        return WriteBehaviour.None;
+                    default:
+                    case WRITE_TAGS_OPTION:
+                        return WriteBehaviour.Tags;
+                    case WRITE_TAGS_AND_STATISTICS_OPTION:
+                        return WriteBehaviour.Tags | WriteBehaviour.Statistics;
+                }
+            }
+            return WriteBehaviour.Tags;
+        }
     }
 
     public enum ImagePreference : byte
@@ -169,5 +209,12 @@ namespace FoxTunes
         None,
         Embedded,
         Loose
+    }
+
+    public enum WriteBehaviour : byte
+    {
+        None,
+        Tags,
+        Statistics
     }
 }

@@ -50,14 +50,14 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement Write { get; private set; }
+        public SelectionConfigurationElement Write { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             this.Configuration = core.Components.Configuration;
-            this.Write = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.WRITE_ELEMENT
             );
@@ -109,7 +109,7 @@ namespace FoxTunes
                             await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
                         }
 
-                        if (!this.Write.Value)
+                        if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)
                         {
                             Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", playlistItem.FileName);
                             position++;
