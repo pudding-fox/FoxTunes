@@ -78,6 +78,32 @@ namespace FoxTunes
 
         public event EventHandler ExchangeHandlerChanged;
 
+        private Func<T, T> _CloneHandler { get; set; }
+
+        public Func<T, T> CloneHandler
+        {
+            get
+            {
+                return this._CloneHandler;
+            }
+            set
+            {
+                this._CloneHandler = value;
+                this.OnCloneHandlerChanged();
+            }
+        }
+
+        protected virtual void OnCloneHandlerChanged()
+        {
+            if (this.CloneHandlerChanged != null)
+            {
+                this.CloneHandlerChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CloneHandler");
+        }
+
+        public event EventHandler CloneHandlerChanged;
+
         private IEnumerable<T> _ItemsSource { get; set; }
 
         public IEnumerable<T> ItemsSource
@@ -292,6 +318,53 @@ namespace FoxTunes
             this.RefreshOrderedItemsSource();
         }
 
+        public ICommand CloneCommand
+        {
+            get
+            {
+                return new Command(this.Clone, () => this.CanClone);
+            }
+        }
+
+        protected virtual void OnCloneCommandChanged()
+        {
+            this.OnPropertyChanged("CloneCommand");
+        }
+
+        public bool CanClone
+        {
+            get
+            {
+                if (this.ExchangeHandler == null)
+                {
+                    return false;
+                }
+                if (this.SelectedValue == null)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        new public void Clone()
+        {
+            var collection = this.ItemsSource as ICollection<T>;
+            var item = this.CloneHandler(this.SelectedValue);
+            if (item == null)
+            {
+                //Operation cancelled.
+                return;
+            }
+            if (item is ISequenceableComponent sequenceable)
+            {
+                sequenceable.Sequence = this.ItemsSource.Count();
+            }
+            collection.Add(item);
+            this.Refresh();
+            this.SelectedValue = item;
+        }
+
         public void Refresh()
         {
             this.RefreshOrderedItemsSource();
@@ -346,6 +419,7 @@ namespace FoxTunes
             this.OnAddCommandChanged();
             this.OnRemoveCommandChanged();
             this.OnExchangeCommandChanged();
+            this.OnCloneCommandChanged();
         }
 
         public void Reset()

@@ -249,6 +249,9 @@
   <data name="LibrarySettingsDialog.Clear" xml:space="preserve">
     <value>Clear</value>
   </data>
+  <data name="LibrarySettingsDialog.Clone" xml:space="preserve">
+    <value>Clone</value>
+  </data>
   <data name="LibrarySettingsDialog.Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
@@ -257,6 +260,9 @@
   </data>
   <data name="LibrarySettingsDialog.GroupHeader" xml:space="preserve">
     <value>Views</value>
+  </data>
+  <data name="LibrarySettingsDialog.Levels" xml:space="preserve">
+    <value>Levels</value>
   </data>
   <data name="LibrarySettingsDialog.Name" xml:space="preserve">
     <value>Name</value>

@@ -94,11 +94,27 @@
             }
         }
 
+        public static string LibrarySettingsDialog_Levels
+        {
+            get
+            {
+                return Strings.LibrarySettingsDialog_Levels;
+            }
+        }
+
         public static string LibrarySettingsDialog_New
         {
             get
             {
                 return Strings.LibrarySettingsDialog_New;
+            }
+        }
+
+        public static string LibrarySettingsDialog_Clone
+        {
+            get
+            {
+                return Strings.LibrarySettingsDialog_Clone;
             }
         }
 
