@@ -17,8 +17,7 @@
         </Grid.Background>
         <Grid.Style>
             <Style TargetType="{x:Type Grid}">
-                <Setter Property="MinWidth" Value="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
-                <Setter Property="MinHeight" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
+                <Setter Property="Height" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding ImageSource, Source={StaticResource ViewModel}}" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed"/>

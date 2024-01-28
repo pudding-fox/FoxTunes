@@ -569,7 +569,7 @@ namespace FoxTunes
             using (var transaction = database.BeginTransaction())
             {
                 var set = database.Set<PlaylistColumn>(transaction);
-                set.ClearAsync();
+                set.Clear();
                 set.Add(new PlaylistColumn() { Name = "Playing", Sequence = 0, Script = scripts.Playing, IsDynamic = true });
                 set.Add(new PlaylistColumn() { Name = "Artist / album", Sequence = 1, Script = scripts.Artist_Album });
                 set.Add(new PlaylistColumn() { Name = "Track no", Sequence = 2, Script = scripts.Track });

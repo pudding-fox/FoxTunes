@@ -1,6 +1,7 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -11,13 +12,6 @@ namespace FoxTunes
     public class LibraryHierarchyNode : BaseComponent, ISelectable, IExpandable
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Image;
-
-        const int META_DATA_COUNT = 5;
-
-        public LibraryHierarchyNode()
-        {
-
-        }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
@@ -205,14 +199,20 @@ namespace FoxTunes
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    this.MetaDatas = new ObservableCollection<MetaDataItem>(
-                        MetaDataInfo.GetMetaData(
-                            database,
-                            this,
-                            META_DATA_TYPE,
-                            transaction
-                        ).Where(metaDataItem => File.Exists(metaDataItem.FileValue)).Take(META_DATA_COUNT)
-                    );
+                    using (var reader = MetaDataInfo.GetMetaData(database, this, META_DATA_TYPE, transaction))
+                    {
+                        var metaDatas = new List<MetaDataItem>();
+                        foreach (var record in reader)
+                        {
+                            metaDatas.Add(new MetaDataItem()
+                            {
+                                NumericValue = record.IsNull("NumericValue") ? default(int?) : record.Get<int>("NumericValue"),
+                                TextValue = record.Get<string>("TextValue"),
+                                FileValue = record.Get<string>("FileValue")
+                            });
+                        }
+                        this.MetaDatas = new ObservableCollection<MetaDataItem>(metaDatas);
+                    }
                 }
             }
         }

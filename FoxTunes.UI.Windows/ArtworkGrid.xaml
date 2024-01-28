@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="FoxTunes.ArtworkGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:LibraryHierarchyNode}, IsDesignTimeCreatable=False}">
+    <UserControl.Style>
+        <Style TargetType="{x:Type UserControl}">
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.Background>
+                                <ImageBrush ImageSource="{Binding ImageSource1, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                            </Grid.Background>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.Background>
+                                <ImageBrush ImageSource="{Binding ImageSource2, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                            </Grid.Background>
+                        </Grid>
+                        <Grid Grid.Column="0" Grid.Row="1">
+                            <Grid.Background>
+                                <ImageBrush ImageSource="{Binding ImageSource3, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                            </Grid.Background>
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="1">
+                            <Grid.Background>
+                                <ImageBrush ImageSource="{Binding ImageSource4, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                            </Grid.Background>
+                        </Grid>
+                    </Grid>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding MetaDatas.Count, Mode=OneWay}" Value="0">
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <Grid>
+                                <Grid.Background>
+                                    <ImageBrush ImageSource="{Binding ImageSource0, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                                </Grid.Background>
+                            </Grid>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding MetaDatas.Count, Mode=OneWay}" Value="1">
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <Grid>
+                                <Grid.Background>
+                                    <ImageBrush ImageSource="{Binding ImageSource1, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                                </Grid.Background>
+                            </Grid>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding MetaDatas.Count, Mode=OneWay}" Value="2">
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Grid.Background>
+                                        <ImageBrush ImageSource="{Binding ImageSource1, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}" Stretch="UniformToFill" AlignmentX="Left"/>
+                                    </Grid.Background>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Grid.Background>
+                                        <ImageBrush ImageSource="{Binding ImageSource2, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}" Stretch="UniformToFill" AlignmentX="Right"/>
+                                    </Grid.Background>
+                                </Grid>
+                            </Grid>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding MetaDatas.Count, Mode=OneWay}" Value="3">
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Grid.Background>
+                                        <ImageBrush ImageSource="{Binding ImageSource1, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                                    </Grid.Background>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Grid.Background>
+                                        <ImageBrush ImageSource="{Binding ImageSource2, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}"/>
+                                    </Grid.Background>
+                                </Grid>
+                                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                                    <Grid.Background>
+                                        <ImageBrush ImageSource="{Binding ImageSource3, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkGrid}}}" Stretch="UniformToFill" AlignmentY="Bottom"/>
+                                    </Grid.Background>
+                                </Grid>
+                            </Grid>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+</UserControl>

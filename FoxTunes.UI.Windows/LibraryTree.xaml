@@ -73,24 +73,7 @@
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner">
             <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>
-                    <ItemsControl ItemsSource="{Binding SelectedItem.MetaDatas, Source={StaticResource ViewModel}}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <Windows:DiagonalStackPanel XStep="25" YStep="15" Reverse="True"></Windows:DiagonalStackPanel>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{DynamicResource NormalBrush}" 
-                                  BorderBrush="{DynamicResource NormalBorderBrush}" 
-                                  BorderThickness="1" 
-                                  CornerRadius="5" 
-                                  Padding="5">
-                                    <Image Source="{Binding FileValue}" Width="100" Height="100" RenderOptions.BitmapScalingMode="Fant"></Image>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <Windows:ArtworkStack DataContext="{Binding SelectedItem, Source={StaticResource ViewModel}}"></Windows:ArtworkStack>
                 </DataTemplate>
             </Windows:MouseCursorAdorner.Template>
         </Windows:MouseCursorAdorner>

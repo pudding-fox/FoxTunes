@@ -24,9 +24,9 @@ namespace FoxTunes
             }
         }
 
-        public static IEnumerable<MetaDataItem> GetMetaData(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType, ITransactionSource transaction = null)
+        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType, ITransactionSource transaction = null)
         {
-            return database.ExecuteEnumerator<MetaDataItem>(database.Queries.GetLibraryHierarchyMetaDataItems, (parameters, phase) =>
+            return database.ExecuteReader(database.Queries.GetLibraryHierarchyMetaData, (parameters, phase) =>
             {
                 switch (phase)
                 {

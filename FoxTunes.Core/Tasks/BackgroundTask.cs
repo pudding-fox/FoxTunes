@@ -252,6 +252,7 @@ namespace FoxTunes
 
         protected virtual Task OnStarted()
         {
+            this.IsStarted = true;
             if (this.Started == null)
             {
 #if NET40
@@ -267,8 +268,11 @@ namespace FoxTunes
 
         public event AsyncEventHandler Started;
 
+        public bool IsStarted { get; private set; }
+
         protected virtual Task OnCompleted()
         {
+            this.IsCompleted = true;
             if (this.Completed == null)
             {
 #if NET40
@@ -283,6 +287,8 @@ namespace FoxTunes
         }
 
         public event AsyncEventHandler Completed;
+
+        public bool IsCompleted { get; private set; }
 
         private Exception _Exception { get; set; }
 
@@ -312,6 +318,7 @@ namespace FoxTunes
 
         protected virtual Task OnFaulted()
         {
+            this.IsFaulted = true;
             if (this.Faulted == null)
             {
 #if NET40
@@ -326,6 +333,8 @@ namespace FoxTunes
         }
 
         public event AsyncEventHandler Faulted;
+
+        public bool IsFaulted { get; private set; }
 
         public virtual void Cancel()
         {

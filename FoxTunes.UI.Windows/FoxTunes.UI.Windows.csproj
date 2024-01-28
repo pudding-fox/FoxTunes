@@ -77,6 +77,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <UpToDateCheckInput Remove="ArtworkGrid.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Images\Fox.ico">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -100,6 +104,21 @@
 
   <ItemGroup>
     <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ArtworkGrid.xaml.cs">
+      <DependentUpon>ArtworkGrid.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ArtworkGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Library.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
 
   <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
