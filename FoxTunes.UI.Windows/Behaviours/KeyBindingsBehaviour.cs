@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -9,6 +10,8 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class KeyBindingsBehaviour : StandardBehaviour, IDisposable, IConfigurableComponent
     {
+        public const string SEARCH = "5125ACDE-CC68-4DFE-82B0-F96A0ED303B6";
+
         public global::FoxTunes.ViewModel.Playback _Playback { get; private set; }
 
         public global::FoxTunes.ViewModel.Settings _Settings { get; private set; }
@@ -34,6 +37,19 @@ namespace FoxTunes
         public TextConfigurationElement Settings { get; private set; }
 
         public TextConfigurationElement MiniPlayer { get; private set; }
+
+        public TextConfigurationElement Search { get; private set; }
+
+        public ICommand SearchCommand
+        {
+            get
+            {
+                //TODO: This is a hack. The SearchBox control listens for this signal. Nothing else uses this pattern.
+                return CommandFactory.Instance.CreateCommand(
+                    () => this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, SEARCH))
+                );
+            }
+        }
 
         public override void InitializeComponent(ICore core)
         {
@@ -79,7 +95,11 @@ namespace FoxTunes
                 InputManagerConfiguration.SECTION,
                 KeyBindingsBehaviourConfiguration.MINI_PLAYER_ELEMENT
             );
-            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.MiniPlayer })
+            this.Search = this.Configuration.GetElement<TextConfigurationElement>(
+                InputManagerConfiguration.SECTION,
+                KeyBindingsBehaviourConfiguration.SEARCH_ELEMENT
+            );
+            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.MiniPlayer, this.Search })
             {
                 if (element == null)
                 {
@@ -145,6 +165,10 @@ namespace FoxTunes
             {
                 this.AddCommandBinding(window, this.MiniPlayer.Value, this._MiniPlayer.ToggleCommand);
             }
+            if (this.Search != null)
+            {
+                this.AddCommandBinding(window, this.Search.Value, this.SearchCommand);
+            }
         }
 
         protected virtual void AddCommandBinding(Window window, string keys, ICommand command)
@@ -206,7 +230,7 @@ namespace FoxTunes
         {
             Windows.MainWindowCreated -= this.OnWindowCreated;
             Windows.MiniWindowCreated -= this.OnWindowCreated;
-            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.MiniPlayer })
+            foreach (var element in new[] { this.Play, this.Previous, this.Next, this.Stop, this.Settings, this.MiniPlayer, this.Search })
             {
                 if (element == null)
                 {

@@ -1,5 +1,7 @@
-﻿using FoxTunes.ViewModel;
+﻿using FoxTunes.Interfaces;
+using FoxTunes.ViewModel;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,6 +15,8 @@ namespace FoxTunes
     public partial class SearchBox : UserControl
     {
         const int DEFAULT_INTERVAL = 1000;
+
+        public static readonly ISignalEmitter SignalEmitter = ComponentRegistry.Instance.GetComponent<ISignalEmitter>();
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
             "Text",
@@ -94,7 +98,7 @@ namespace FoxTunes
 
         public SearchBox()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private DispatcherTimer Timer { get; set; }
@@ -218,6 +222,39 @@ namespace FoxTunes
         protected virtual void OnCommit()
         {
             this.RaiseEvent(new RoutedEventArgs(CommitEvent));
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            SignalEmitter.Signal += this.OnSignal;
+        }
+
+        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            SignalEmitter.Signal -= this.OnSignal;
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            //TODO: This is a hack. The KeyBindingsBehaviour sends this signal. Nothing else uses this pattern.
+            if (this.IsVisible)
+            {
+                switch (signal.Name)
+                {
+                    case CommonSignals.PluginInvocation:
+                        switch (signal.State as string)
+                        {
+                            case KeyBindingsBehaviour.SEARCH:
+                                return Windows.Invoke(() => this.TextBox.Focus());
+                        }
+                        break;
+                }
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
     }
 }
