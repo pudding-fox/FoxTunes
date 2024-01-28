@@ -347,16 +347,16 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task SortItems(PlaylistColumn playlistColumn)
+        protected virtual Task SortItems(PlaylistColumn playlistColumn, bool descending)
         {
             switch (playlistColumn.Type)
             {
                 case PlaylistColumnType.Tag:
-                    return this.SortItemsByMetaData(MetaDataItemType.Tag, playlistColumn.Tag);
+                    return this.SortItemsByMetaData(MetaDataItemType.Tag, playlistColumn.Tag, descending);
                 case PlaylistColumnType.Property:
-                    return this.SortItemsByMetaData(MetaDataItemType.Property, playlistColumn.Property);
+                    return this.SortItemsByMetaData(MetaDataItemType.Property, playlistColumn.Property, descending);
                 case PlaylistColumnType.Script:
-                    return this.SortItemsByScript(playlistColumn.Script);
+                    return this.SortItemsByScript(playlistColumn.Script, descending);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -365,7 +365,7 @@ namespace FoxTunes
 #endif
         }
 
-        protected virtual Task SortItemsByMetaData(MetaDataItemType type, string value)
+        protected virtual Task SortItemsByMetaData(MetaDataItemType type, string value, bool descending)
         {
 #if NET40
             return TaskEx.FromResult(false);
@@ -374,18 +374,22 @@ namespace FoxTunes
 #endif
         }
 
-        protected virtual async Task SortItemsByScript(string script)
+        protected virtual async Task SortItemsByScript(string script, bool descending)
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var set = this.Database.Set<PlaylistItem>(transaction);
-                var playlistItems = set.ToList();
+                var playlistItems = set.ToArray();
                 using (var comparer = new PlaylistItemScriptComparer(script))
                 {
                     comparer.InitializeComponent(this.Core);
-                    playlistItems.Sort(comparer);
+                    Array.Sort(playlistItems, comparer);
+                    if (descending)
+                    {
+                        Array.Reverse(playlistItems);
+                    }
                 }
-                for (var a = 0; a < playlistItems.Count; a++)
+                for (var a = 0; a < playlistItems.Length; a++)
                 {
                     playlistItems[a].Sequence = a;
                 }
