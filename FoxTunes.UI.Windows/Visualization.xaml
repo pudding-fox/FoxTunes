@@ -31,6 +31,18 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
+                <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}" Text="{Binding FPS, Source={StaticResource ViewModel}, StringFormat='\{0\} FPS'}">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowFPS, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
             </Grid>
         </ControlTemplate>
