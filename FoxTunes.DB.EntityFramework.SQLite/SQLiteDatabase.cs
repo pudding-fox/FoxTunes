@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
@@ -47,11 +48,13 @@ namespace FoxTunes
                 var directoryName = Path.Combine(baseDirectoryName, assembly.DirectoryName);
                 if (!Directory.Exists(directoryName))
                 {
+                    Logger.Write(typeof(SQLiteDatabase), LogLevel.Debug, "Creating interop directory: {0}", directoryName);
                     Directory.CreateDirectory(directoryName);
                 }
                 var fileName = Path.Combine(directoryName, assembly.FileName);
                 if (!File.Exists(fileName))
                 {
+                    Logger.Write(typeof(SQLiteDatabase), LogLevel.Debug, "Writing interop assembly: {0}", fileName);
                     File.WriteAllBytes(fileName, assembly.Content);
                 }
             }
@@ -71,8 +74,10 @@ namespace FoxTunes
         {
             if (!File.Exists(DatabaseFileName))
             {
+                Logger.Write(this, LogLevel.Fatal, "Failed to locate the database: {0}", DatabaseFileName);
                 throw new FileNotFoundException("Failed to locate the database.", DatabaseFileName);
             }
+            Logger.Write(this, LogLevel.Debug, "Connecting to database: {0}", this.ConnectionString);
             return new SQLiteConnection(this.ConnectionString);
         }
     }

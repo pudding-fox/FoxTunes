@@ -31,6 +31,7 @@ namespace FoxTunes
 
         protected virtual DbModel CreateDbModel()
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database model.");
             var builder = this.CreateModelBuilder();
             this.MapPlaylistItem(builder);
             this.MapLibraryItem(builder);
@@ -45,6 +46,7 @@ namespace FoxTunes
 
         protected virtual void MapPlaylistItem(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(PlaylistItem).Name);
             builder.Entity<PlaylistItem>()
                 .HasMany(item => item.MetaDatas)
                 .WithMany()
@@ -67,6 +69,7 @@ namespace FoxTunes
 
         protected virtual void MapLibraryItem(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(LibraryItem).Name);
             builder.Entity<LibraryItem>()
                 .HasMany(item => item.MetaDatas)
                 .WithMany()
@@ -98,6 +101,7 @@ namespace FoxTunes
 
         protected virtual void MapLibraryHierarchy(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(LibraryHierarchy).Name);
             builder.Entity<LibraryHierarchy>()
                 .HasMany(item => item.Levels)
                .WithMany()
@@ -120,11 +124,13 @@ namespace FoxTunes
 
         protected virtual void MapLibraryHierarchyLevel(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(LibraryHierarchyLevel).Name);
             builder.Entity<LibraryHierarchyLevel>();
         }
 
         protected virtual void MapLibraryHierarchyItem(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(LibraryHierarchyItem).Name);
             //builder.Entity<LibraryHierarchyItem>()
             //    .HasOptional(item => item.Parent)
             //    .WithMany(item => item.Children);
@@ -141,23 +147,28 @@ namespace FoxTunes
 
         protected virtual void MapMetaDataItem(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(MetaDataItem).Name);
             builder.Entity<MetaDataItem>();
         }
 
         protected virtual void MapPropertyItem(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(PropertyItem).Name);
             builder.Entity<PropertyItem>();
         }
 
         protected virtual void MapStatisticItem(DbModelBuilder builder)
         {
+            Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(StatisticItem).Name);
             builder.Entity<StatisticItem>();
         }
 
         protected virtual DbContext CreateDbContext()
         {
             var model = this.CreateDbModel();
+            Logger.Write(this, LogLevel.Debug, "Compiling database model.");
             var compiled = model.Compile();
+            Logger.Write(this, LogLevel.Debug, "Creating database context.");
             return new InternalDbContext(this.Connection, compiled);
         }
 
@@ -167,6 +178,7 @@ namespace FoxTunes
             {
                 this.DbContext = this.CreateDbContext();
             }
+            Logger.Write(this, LogLevel.Debug, "Creating wrapped database set: {0}", typeof(T).Name);
             return new WrappedDbSet<T>(this.DbContext, this.DbContext.Set<T>());
         }
 
@@ -176,6 +188,7 @@ namespace FoxTunes
             {
                 this.DbContext = this.CreateDbContext();
             }
+            Logger.Write(this, LogLevel.Debug, "Creating wrapped database query: {0}", typeof(T).Name);
             return new WrappedDbQuery<T>(this.DbContext, this.DbContext.Set<T>());
         }
 
@@ -191,6 +204,7 @@ namespace FoxTunes
             {
                 throw new InvalidOperationException("Item is untracked, cannot query.");
             }
+            Logger.Write(this, LogLevel.Debug, "Creating wrapped database member query: {0} => {1}", typeof(T).Name, typeof(TMember).Name);
             var entry = this.DbContext.Entry(item);
             return new WrappedDbQuery<TMember>(
                 this.DbContext,
@@ -205,6 +219,7 @@ namespace FoxTunes
             {
                 throw new InvalidOperationException("Item is untracked, cannot query.");
             }
+            Logger.Write(this, LogLevel.Debug, "Creating wrapped database member collection query: {0} => {1}", typeof(T).Name, typeof(TMember).Name);
             var entry = this.DbContext.Entry(item);
             return new WrappedDbQuery<TMember>(
                 this.DbContext,
@@ -212,9 +227,10 @@ namespace FoxTunes
                 entry.Collection(member).Query()
             );
         }
-        
+
         public override void WithAutoDetectChanges(Action action)
         {
+            Logger.Write(this, LogLevel.Debug, "Begin executing action with auto detect changes enabled.");
             this.DbContext.Configuration.AutoDetectChangesEnabled = true;
             try
             {
@@ -222,12 +238,14 @@ namespace FoxTunes
             }
             finally
             {
+                Logger.Write(this, LogLevel.Debug, "End executing action with auto detect changes enabled.");
                 this.DbContext.Configuration.AutoDetectChangesEnabled = false;
             }
         }
 
         public override T WithAutoDetectChanges<T>(Func<T> func)
         {
+            Logger.Write(this, LogLevel.Debug, "Begin executing action with auto detect changes enabled.");
             this.DbContext.Configuration.AutoDetectChangesEnabled = true;
             try
             {
@@ -235,6 +253,7 @@ namespace FoxTunes
             }
             finally
             {
+                Logger.Write(this, LogLevel.Debug, "End executing action with auto detect changes enabled.");
                 this.DbContext.Configuration.AutoDetectChangesEnabled = false;
             }
         }
@@ -245,7 +264,9 @@ namespace FoxTunes
             {
                 return 0;
             }
-            return this.DbContext.SaveChanges();
+            var count= this.DbContext.SaveChanges();
+            Logger.Write(this, LogLevel.Debug, "Saved {0} changes to database.", count);
+            return count;
         }
 
         public override Task<int> SaveChangesAsync()

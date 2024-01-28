@@ -54,6 +54,7 @@ namespace FoxTunes
             var fileNames = new List<string>();
             foreach (var path in this.Paths)
             {
+                Logger.Write(this, LogLevel.Debug, "Enumerating files in path: {0}", path);
                 if (Directory.Exists(path))
                 {
                     this.Description = new DirectoryInfo(path).Name;
@@ -66,6 +67,7 @@ namespace FoxTunes
                 }
                 this.Position = this.Position + 1;
             }
+            Logger.Write(this, LogLevel.Debug, "Enumerated {0} files.", fileNames.Count);
             this.FileNames = fileNames;
             this.Position = this.Count;
         }
@@ -78,11 +80,13 @@ namespace FoxTunes
             this.Count = fileNames.Count;
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
+            Logger.Write(this, LogLevel.Debug, "Sanitizing files.");
             for (var a = 0; a < fileNames.Count; )
             {
                 var fileName = fileNames[a];
                 if (this.Database.Interlocked(() => this.Library.LibraryItemSet.Any(libraryItem => libraryItem.FileName == fileName)))
                 {
+                    Logger.Write(this, LogLevel.Debug, "File already exists in library: {0}", fileName);
                     fileNames.RemoveAt(a);
                 }
                 else
@@ -96,6 +100,7 @@ namespace FoxTunes
                 }
                 position++;
             }
+            Logger.Write(this, LogLevel.Debug, "Sanitized {0} files.", fileNames.Count);
             this.FileNames = fileNames;
             this.Position = this.Count;
         }
@@ -107,12 +112,14 @@ namespace FoxTunes
             this.Count = this.FileNames.Count();
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
+            Logger.Write(this, LogLevel.Debug, "Converting file names to library items.");
             var query =
                 from fileName in this.FileNames
                 where this.PlaybackManager.IsSupported(fileName)
                 select this.LibraryItemFactory.Create(fileName);
             foreach (var libraryItem in query)
             {
+                Logger.Write(this, LogLevel.Debug, "Adding item to library: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                 this.Database.Interlocked(() => this.Library.LibraryItemSet.Add(libraryItem));
                 if (position % interval == 0)
                 {
@@ -128,6 +135,7 @@ namespace FoxTunes
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
+            Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
             return this.Database.Interlocked(() => this.Database.SaveChangesAsync());
         }
     }

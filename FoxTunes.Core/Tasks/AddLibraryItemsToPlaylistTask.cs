@@ -44,17 +44,19 @@ namespace FoxTunes
 
         private void AddItems()
         {
-            this.Name = "Processing files";
+            this.Name = "Processing library items";
             this.Position = 0;
             this.Count = this.LibraryItems.Count();
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
+            Logger.Write(this, LogLevel.Debug, "Converting library items to playlist items.");
             var query =
                 from libraryItem in this.LibraryItems
                 where this.PlaybackManager.IsSupported(libraryItem.FileName)
                 select this.PlaylistItemFactory.Create(libraryItem);
             foreach (var playlistItem in query)
             {
+                Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Add(playlistItem)));
                 if (position % interval == 0)
                 {
@@ -70,6 +72,7 @@ namespace FoxTunes
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
+            Logger.Write(this, LogLevel.Debug, "Saving changes to playlist.");
             return this.Database.Interlocked(() => this.Database.SaveChangesAsync());
         }
     }
