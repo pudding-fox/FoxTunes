@@ -50,7 +50,11 @@ namespace FoxTunes
             {
                 var context = this.GetOrAddContext();
                 var values = this.ExecuteScript(record);
+#if NET40
+                this.Semaphore.Wait();
+#else
                 await this.Semaphore.WaitAsync();
+#endif
                 try
                 {
                     await this.Writer.Write(record, values);

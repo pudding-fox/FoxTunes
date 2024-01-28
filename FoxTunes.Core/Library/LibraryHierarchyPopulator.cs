@@ -66,7 +66,11 @@ namespace FoxTunes
                 var displayValue = this.ExecuteScript(record, "DisplayScript");
                 var sortValue = this.ExecuteScript(record, "SortScript");
 
+#if NET40
+                this.Semaphore.Wait();
+#else
                 await this.Semaphore.WaitAsync();
+#endif
                 try
                 {
                     await this.Writer.Write(record, displayValue, sortValue);
@@ -80,7 +84,11 @@ namespace FoxTunes
                 {
                     if (position % interval == 0)
                     {
+#if NET40
+                        this.Semaphore.Wait();
+#else
                         await this.Semaphore.WaitAsync();
+#endif
                         try
                         {
                             await this.SetDescription(new FileInfo(record["FileName"] as string).Name);

@@ -57,7 +57,11 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Trace, "Begin executing task: {0} with priority {1}.", this.Instance.Id, this.Priority);
             do
             {
+#if NET40
+                if (!this.Instance.Semaphore.Wait(this.Timeout))
+#else
                 if (!await this.Instance.Semaphore.WaitAsync(this.Timeout))
+#endif
                 {
                     Logger.Write(this, LogLevel.Trace, "Failed to acquire lock after {0}ms", this.Timeout);
                     if (object.ReferenceEquals(this, this.Instance.Instances.OrderBy(instance => instance.Priority).FirstOrDefault()))
@@ -142,11 +146,7 @@ namespace FoxTunes
         {
             private SingletonReentrantTaskContainer()
             {
-#if NET40
-                this.Semaphore = new AsyncSemaphore(1);
-#else
                 this.Semaphore = new SemaphoreSlim(1, 1);
-#endif
                 this.CancellationToken = new CancellationToken();
             }
 
@@ -156,11 +156,7 @@ namespace FoxTunes
                 this.Instances = new HashSet<SingletonReentrantTask>(new[] { instance });
             }
 
-#if NET40
-            public AsyncSemaphore Semaphore { get; private set; }
-#else
             public SemaphoreSlim Semaphore { get; private set; }
-#endif
 
             public CancellationToken CancellationToken { get; private set; }
 

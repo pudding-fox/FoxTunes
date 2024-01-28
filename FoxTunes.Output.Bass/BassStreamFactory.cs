@@ -15,19 +15,11 @@ namespace FoxTunes
 
         public BassStreamFactory()
         {
-#if NET40
-            this.Semaphore = new AsyncSemaphore(1);
-#else
             this.Semaphore = new SemaphoreSlim(1, 1);
-#endif
             this.Providers = new SortedList<byte, IBassStreamProvider>(new PriorityComparer());
         }
 
-#if NET40
-        public AsyncSemaphore Semaphore { get; private set; }
-#else
         public SemaphoreSlim Semaphore { get; private set; }
-#endif
 
         private SortedList<byte, IBassStreamProvider> Providers { get; set; }
 
@@ -59,7 +51,11 @@ namespace FoxTunes
         public async Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate)
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+#if NET40
+            this.Semaphore.Wait();
+#else
             await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 foreach (var provider in this.Providers.Values)

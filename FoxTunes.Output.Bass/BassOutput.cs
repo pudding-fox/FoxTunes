@@ -24,18 +24,10 @@ namespace FoxTunes
 
         public BassOutput()
         {
-#if NET40
-            this.Semaphore = new AsyncSemaphore(1);
-#else
             this.Semaphore = new SemaphoreSlim(1, 1);
-#endif
         }
 
-#if NET40
-        public AsyncSemaphore Semaphore { get; private set; }
-#else
         public SemaphoreSlim Semaphore { get; private set; }
-#endif
 
         public override string Name
         {
@@ -160,7 +152,11 @@ namespace FoxTunes
 
         protected virtual async Task Start(bool force)
         {
+#if NET40
+            if (!this.Semaphore.Wait(START_STOP_TIMEOUT))
+#else
             if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT))
+#endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already starting.", this.GetType().Name));
             }
@@ -211,7 +207,11 @@ namespace FoxTunes
 
         public override async Task Shutdown()
         {
+#if NET40
+            if (!this.Semaphore.Wait(START_STOP_TIMEOUT))
+#else
             if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT))
+#endif
             {
                 throw new InvalidOperationException(string.Format("{0} is already stopping.", this.GetType().Name));
             }

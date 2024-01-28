@@ -18,19 +18,11 @@ namespace FoxTunes
 
         public BassStreamProvider()
         {
-#if NET40
-            this.Semaphore = new AsyncSemaphore(1);
-#else
             this.Semaphore = new SemaphoreSlim(1, 1);
-#endif
             this.Streams = new ConcurrentDictionary<BassStreamProviderKey, byte[]>();
         }
 
-#if NET40
-        public AsyncSemaphore Semaphore { get; private set; }
-#else
         public SemaphoreSlim Semaphore { get; private set; }
-#endif
 
         public ConcurrentDictionary<BassStreamProviderKey, byte[]> Streams { get; private set; }
 
@@ -72,7 +64,11 @@ namespace FoxTunes
             {
                 flags |= BassFlags.Float;
             }
+#if NET40
+            this.Semaphore.Wait();
+#else
             await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 if (this.Output.PlayFromMemory)
