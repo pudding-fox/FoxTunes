@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace FoxTunes.Managers
 {
     public class PlaylistManager : StandardManager, IPlaylistManager
@@ -116,6 +117,24 @@ namespace FoxTunes.Managers
         {
             Logger.Write(this, LogLevel.Debug, "Inserting library node into playlist at index: {0}", index);
             var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode);
+            task.InitializeComponent(this.Core);
+            this.OnBackgroundTask(task);
+            return task.Run();
+        }
+
+        public Task Remove(IEnumerable<PlaylistItem> playlistItems)
+        {
+            var task = new RemoveItemsFromPlaylistTask(playlistItems);
+            task.InitializeComponent(this.Core);
+            this.OnBackgroundTask(task);
+            return task.Run();
+        }
+
+        public Task Crop(IEnumerable<PlaylistItem> playlistItems)
+        {
+            var task = new RemoveItemsFromPlaylistTask(
+                this.Database.Sets.PlaylistItem.Except(playlistItems)
+            );
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run();

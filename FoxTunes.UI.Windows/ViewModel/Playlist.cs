@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using FoxTunes.Utilities;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -204,17 +205,37 @@ namespace FoxTunes.ViewModel
                 case CommonSignals.PluginInvocation:
                     switch (Convert.ToString(signal.State))
                     {
-                        case PlaylistActionsBehaviour.LOCATE_PLAYLIST_ITEM:
-                            if (this.SelectedItems.Count > 0)
-                            {
-                                var item = this.SelectedItems[0] as PlaylistItem;
-                                Explorer.Select(item.FileName);
-                            }
+                        case PlaylistActionsBehaviour.REMOVE_PLAYLIST_ITEMS:
+                            this.RemovePlaylistItems();
+                            break;
+                        case PlaylistActionsBehaviour.CROP_PLAYLIST_ITEMS:
+                            this.CropPlaylistItems();
+                            break;
+                        case PlaylistActionsBehaviour.LOCATE_PLAYLIST_ITEMS:
+                            this.LocatePlaylistItems();
                             break;
                     }
                     break;
             }
             return Task.CompletedTask;
+        }
+
+        protected virtual void RemovePlaylistItems()
+        {
+            this.PlaylistManager.Remove(this.SelectedItems.OfType<PlaylistItem>());
+        }
+
+        protected virtual void CropPlaylistItems()
+        {
+            this.PlaylistManager.Crop(this.SelectedItems.OfType<PlaylistItem>());
+        }
+
+        protected virtual void LocatePlaylistItems()
+        {
+            foreach (var item in this.SelectedItems.OfType<PlaylistItem>())
+            {
+                Explorer.Select(item.FileName);
+            }
         }
 
         public ICommand PlaySelectedItemCommand

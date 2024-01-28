@@ -6,7 +6,11 @@ namespace FoxTunes
 {
     public class PlaylistActionsBehaviour : StandardBehaviour, IInvocableComponent
     {
-        public const string LOCATE_PLAYLIST_ITEM = "AAAA";
+        public const string REMOVE_PLAYLIST_ITEMS = "AAAA";
+
+        public const string CROP_PLAYLIST_ITEMS = "AAAB";
+
+        public const string LOCATE_PLAYLIST_ITEMS = "AAAC";
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -20,7 +24,9 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOCATE_PLAYLIST_ITEM, "Locate");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, REMOVE_PLAYLIST_ITEMS, "Remove");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CROP_PLAYLIST_ITEMS, "Crop");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOCATE_PLAYLIST_ITEMS, "Locate");
             }
         }
 
@@ -28,8 +34,10 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case LOCATE_PLAYLIST_ITEM:
-                    return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, LOCATE_PLAYLIST_ITEM));
+                case REMOVE_PLAYLIST_ITEMS:
+                case CROP_PLAYLIST_ITEMS:
+                case LOCATE_PLAYLIST_ITEMS:
+                    return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, component.Id));
             }
             return Task.CompletedTask;
         }
