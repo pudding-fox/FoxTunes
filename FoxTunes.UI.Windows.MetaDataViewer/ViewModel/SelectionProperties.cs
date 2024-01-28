@@ -65,6 +65,7 @@ namespace FoxTunes.ViewModel
 
         private static readonly IDictionary<string, ValueProvider> PROVIDERS = new Dictionary<string, ValueProvider>(StringComparer.OrdinalIgnoreCase)
         {
+            { CommonMetaData.IsCompilation, BooleanMetaDataValueProvider.Instance },
             { CountValueProvider.NAME, CountValueProvider.Instance },
             { CommonProperties.AudioBitrate, BitrateValueProvider.Instance },
             { CommonProperties.AudioSampleRate, SamplerateValueProvider.Instance },
@@ -591,6 +592,28 @@ namespace FoxTunes.ViewModel
             }
 
             new public static readonly ValueProvider Instance = new TextMetaDataValueProvider();
+        }
+
+        public class BooleanMetaDataValueProvider : MetaDataValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                var value = default(string);
+                if (metaData != null && metaData.TryGetValue(name, out value) && !string.IsNullOrEmpty(value))
+                {
+                    var boolean = default(bool);
+                    if (bool.TryParse(value, out boolean))
+                    {
+                        if (boolean)
+                        {
+                            return Strings.SelectionProperties_True;
+                        }
+                    }
+                }
+                return Strings.SelectionProperties_False;
+            }
+
+            new public static readonly ValueProvider Instance = new BooleanMetaDataValueProvider();
         }
 
         public class NumericMetaDataValueProvider : MetaDataValueProvider
