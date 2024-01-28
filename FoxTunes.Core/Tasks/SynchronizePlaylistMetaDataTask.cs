@@ -118,6 +118,10 @@ namespace FoxTunes
 
         protected virtual Task Schedule(PlaylistItem playlistItem)
         {
+            if (playlistItem.LibraryItem_Id.HasValue)
+            {
+                return LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Export);
+            }
             return PlaylistTaskBase.SetPlaylistItemStatus(this.Database, playlistItem.Id, PlaylistItemStatus.Export);
         }
 
