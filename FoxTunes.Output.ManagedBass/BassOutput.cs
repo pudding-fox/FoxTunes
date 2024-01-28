@@ -334,16 +334,26 @@ namespace FoxTunes
             return Task.FromResult<IOutputStream>(outputStream);
         }
 
-        private int CreateStream(PlaylistItem playlistItem)
+        public int CreateStream(PlaylistItem playlistItem)
         {
             Logger.Write(this, LogLevel.Debug, "Creating stream from file {0}", playlistItem.FileName);
             var channelHandle = default(int);
-            if (this.IsDsd(playlistItem) && this.Mode == BassOutputMode.ASIO && this.DsdDirect)
+            if (this.IsDsd(playlistItem) && this.DsdDirect && this.OutputChannel.CanPlayDSD)
             {
-                Logger.Write(this, LogLevel.Debug, "Creating DSD RAW stream from file {0}", playlistItem.FileName);
+                Logger.Write(this, LogLevel.Debug, "Creating DSD stream from file {0}", playlistItem.FileName);
                 channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
+                if (channelHandle != 0)
+                {
+                    var rate = BassUtils.GetChannelPcmRate(channelHandle);
+                    var channels = BassUtils.GetChannelCount(channelHandle);
+                    if (!this.OutputChannel.CheckFormat(rate, channels))
+                    {
+                        Logger.Write(this, LogLevel.Warn, "The output reported that DSD RAW with rate {0} and {1} channels could not be played, removing DSD RAW flag from channel: {2}", rate, channels, channelHandle);
+                        Bass.ChannelRemoveFlag(channelHandle, BassFlags.DSDRaw);
+                    }
+                }
             }
-            else
+            if (channelHandle == 0)
             {
                 channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, this.Flags);
             }
@@ -364,6 +374,12 @@ namespace FoxTunes
             }
             extension = extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
             return new[] { "dsd", "dsf" }.Contains(extension, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public void FreeStream(int channelHandle)
+        {
+            Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
+            Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
         }
 
         public override Task Preempt(IOutputStream stream)
