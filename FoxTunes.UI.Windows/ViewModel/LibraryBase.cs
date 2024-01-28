@@ -241,22 +241,23 @@ namespace FoxTunes.ViewModel
 
         public virtual Task Refresh()
         {
-            var task = new Func<Task>(async () =>
-            {
-                await this.RefreshItems().ConfigureAwait(false);
-                await Windows.Invoke(() =>
-                {
-                    this.OnSelectedItemChanged();
-                }).ConfigureAwait(false);
-            });
             if (this.IsInitialized && this.Items != null)
             {
-                return this.Debouncer.Exec(task);
+                return this.Debouncer.Exec(this.OnRefresh);
             }
             else
             {
-                return task();
+                return this.OnRefresh();
             }
+        }
+
+        protected virtual async Task OnRefresh()
+        {
+            await this.RefreshItems().ConfigureAwait(false);
+            await Windows.Invoke(() =>
+            {
+                this.OnSelectedItemChanged();
+            }).ConfigureAwait(false);
         }
 
         protected virtual async Task RefreshItems()
