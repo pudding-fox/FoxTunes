@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -114,9 +115,13 @@ namespace FoxTunes
             );
             this.ScalingFactor.ConnectValue<string>(value =>
             {
-                if (this.IsInitialized && Windows.IsMiniWindowCreated)
+                if (this.IsInitialized && Windows.IsMiniWindowCreated && Windows.MiniWindow.SizeToContent == SizeToContent.WidthAndHeight)
                 {
-                    this.UserInterface.Restart();
+                    //Auto size goes to shit when the scaling factor is changed.
+                    Windows.MiniWindow.SizeToContent = SizeToContent.Manual;
+                    Windows.MiniWindow.Width = 0;
+                    Windows.MiniWindow.Height = 0;
+                    Windows.MiniWindow.SizeToContent = SizeToContent.WidthAndHeight;
                 }
             });
             base.InitializeComponent(core);
