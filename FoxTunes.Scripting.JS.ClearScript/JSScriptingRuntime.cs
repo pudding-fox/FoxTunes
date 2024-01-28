@@ -4,7 +4,7 @@ using System;
 
 namespace FoxTunes
 {
-    [ComponentPreference(ComponentPreferenceAttribute.NORMAL)]
+    [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
     [PlatformDependency(Major = 6, Minor = 0)]
     [Component(ID, ComponentSlots.ScriptingRuntime)]
     public class JSScriptingRuntime : ScriptingRuntime

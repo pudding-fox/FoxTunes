@@ -4,7 +4,7 @@ using V8.Net;
 
 namespace FoxTunes
 {
-    [ComponentPreference(ComponentPreferenceAttribute.LOW)]
+    [ComponentPreference(ComponentPreferenceAttribute.NORMAL)]
     [Component(ID, ComponentSlots.ScriptingRuntime)]
     [PlatformDependency(Major = 6, Minor = 1)]
     public class JSScriptingRuntime : ScriptingRuntime
