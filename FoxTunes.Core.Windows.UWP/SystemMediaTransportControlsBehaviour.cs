@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using System.Timers;
 using Windows.Media;
@@ -251,11 +250,8 @@ namespace FoxTunes
                 using (var memoryStream = new MemoryStream())
                 {
                     await fileStream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                    var result = new InMemoryRandomAccessStream();
-#pragma warning disable ConfigureAwaitEnforcer
-                    await result.WriteAsync(memoryStream.ToArray().AsBuffer());
-#pragma warning restore ConfigureAwaitEnforcer
-                    return result;
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    return memoryStream.ToArray().ToRandomAccessStream();
                 }
             }
         }
