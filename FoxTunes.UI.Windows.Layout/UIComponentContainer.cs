@@ -12,7 +12,7 @@ using System.Windows.Shapes;
 
 namespace FoxTunes
 {
-    public class UIComponentContainer : DockPanel, IInvocableComponent, IUIComponent, IValueConverter
+    public class UIComponentContainer : DockPanel, IInvocableComponent, IUIComponent, IValueConverter, IConfigurationProvider
     {
         public const string CLEAR = "YYYY";
 
@@ -188,6 +188,10 @@ namespace FoxTunes
                 //If a plugin was uninstalled the control will be null.
                 return this.CreateSelector();
             }
+            else if (component is ConfigurableUIComponentBase configurable)
+            {
+                configurable.Configuration = this.GetConfiguration(configurable);
+            }
             this.Content = component;
             return control;
         }
@@ -278,6 +282,27 @@ namespace FoxTunes
         public Task Exit()
         {
             return Windows.Invoke(() => Behaviour.IsDesigning = false);
+        }
+
+        public IConfiguration GetConfiguration(IConfigurableComponent component)
+        {
+            var configuration = new UIComponentConfigurationProvider(this.Component);
+            configuration.InitializeComponent(Core.Instance);
+            Logger.Write(this, LogLevel.Debug, "Registering configuration for component {0}.", component.GetType().Name);
+            try
+            {
+                var sections = component.GetConfigurationSections();
+                foreach (var section in sections)
+                {
+                    configuration.WithSection(section);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to register configuration for component {0}: {1}", component.GetType().Name, e.Message);
+            }
+            configuration.Load();
+            return configuration;
         }
 
         protected virtual void Dispatch(Func<Task> function)
