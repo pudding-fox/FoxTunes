@@ -150,10 +150,20 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
                 return;
             }
+            var metaDataItems = default(IEnumerable<MetaDataItem>);
+            lock (metaData)
+            {
+                metaDataItems = metaData.Where(predicate).ToArray();
+                if (!metaDataItems.Any())
+                {
+                    //Nothing to update.
+                    return;
+                }
+            }
             var collect = default(bool);
             using (var file = this.Create(fileName))
             {
-                foreach (var metaDataItem in metaData.Where(predicate))
+                foreach (var metaDataItem in metaDataItems)
                 {
                     switch (metaDataItem.Type)
                     {

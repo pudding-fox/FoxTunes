@@ -114,15 +114,18 @@ namespace FoxTunes
 
         public string Find(PlaylistItem playlistItem, ArtworkType type)
         {
-            var result = playlistItem.MetaDatas.FirstOrDefault(
-                 metaDataItem =>
-                     metaDataItem.Type == MetaDataItemType.Image &&
-                     string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) &&
-                     File.Exists(metaDataItem.Value)
-             );
-            if (result != null)
+            lock (playlistItem.MetaDatas)
             {
-                return result.Value;
+                var result = playlistItem.MetaDatas.FirstOrDefault(
+                     metaDataItem =>
+                         metaDataItem.Type == MetaDataItemType.Image &&
+                         string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) &&
+                         File.Exists(metaDataItem.Value)
+                 );
+                if (result != null)
+                {
+                    return result.Value;
+                }
             }
             return this.Find(playlistItem.FileName, type);
         }

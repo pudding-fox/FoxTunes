@@ -182,11 +182,15 @@ namespace FoxTunes
                 updater.Type = MediaPlaybackType.Music;
                 if (playlistItem != null)
                 {
-                    var metaData = playlistItem.MetaDatas.ToDictionary(
-                        metaDataItem => metaDataItem.Name,
-                        metaDataItem => metaDataItem.Value,
-                        StringComparer.OrdinalIgnoreCase
-                    );
+                    var metaData = default(IDictionary<string, string>);
+                    lock (playlistItem.MetaDatas)
+                    {
+                        metaData = playlistItem.MetaDatas.ToDictionary(
+                            metaDataItem => metaDataItem.Name,
+                            metaDataItem => metaDataItem.Value,
+                            StringComparer.OrdinalIgnoreCase
+                        );
+                    }
                     this.Try(() => updater.MusicProperties.Title = metaData.GetValueOrDefault(CommonMetaData.Title) ?? string.Empty, this.ErrorHandler);
                     this.Try(() => updater.MusicProperties.Artist = metaData.GetValueOrDefault(CommonMetaData.Performer) ?? string.Empty, this.ErrorHandler);
                     this.Try(() => updater.MusicProperties.AlbumArtist = metaData.GetValueOrDefault(CommonMetaData.Artist) ?? string.Empty, this.ErrorHandler);

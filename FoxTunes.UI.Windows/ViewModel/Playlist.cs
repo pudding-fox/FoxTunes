@@ -231,7 +231,7 @@ namespace FoxTunes.ViewModel
             var task = this.Refresh();
         }
 
-        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40

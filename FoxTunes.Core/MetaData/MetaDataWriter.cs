@@ -29,9 +29,19 @@ namespace FoxTunes
 
         public IDatabaseCommand UpdateCommand { get; private set; }
 
-        public async Task Write(int itemId, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate)
+        public async Task Write(int itemId, IEnumerable<MetaDataItem> metaData, Func<MetaDataItem, bool> predicate)
         {
-            foreach (var metaDataItem in metaDataItems.Where(predicate))
+            var metaDataItems = default(IEnumerable<MetaDataItem>);
+            lock (metaData)
+            {
+                metaDataItems = metaData.Where(predicate).ToArray();
+                if (!metaDataItems.Any())
+                {
+                    //Nothing to update.
+                    return;
+                }
+            }
+            foreach (var metaDataItem in metaDataItems)
             {
                 await this.Write(itemId, metaDataItem).ConfigureAwait(false);
             }

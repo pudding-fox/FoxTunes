@@ -41,15 +41,18 @@ namespace FoxTunes
             var refreshPlaylist = default(bool);
             foreach (var libraryItem in libraryItems)
             {
-                var metaDataItem = libraryItem.MetaDatas.FirstOrDefault(
-                    _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
-                );
-                if (metaDataItem == null)
+                lock (libraryItem.MetaDatas)
                 {
-                    metaDataItem = new MetaDataItem(CommonMetaData.Rating, MetaDataItemType.Tag);
-                    libraryItem.MetaDatas.Add(metaDataItem);
+                    var metaDataItem = libraryItem.MetaDatas.FirstOrDefault(
+                        _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
+                    );
+                    if (metaDataItem == null)
+                    {
+                        metaDataItem = new MetaDataItem(CommonMetaData.Rating, MetaDataItemType.Tag);
+                        libraryItem.MetaDatas.Add(metaDataItem);
+                    }
+                    metaDataItem.Value = Convert.ToString(this.Rating);
                 }
-                metaDataItem.Value = Convert.ToString(this.Rating);
                 if (!refreshPlaylist)
                 {
                     refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);

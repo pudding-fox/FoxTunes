@@ -30,19 +30,22 @@ namespace FoxTunes
             {
                 if (this.LibraryItem.MetaDatas != null)
                 {
-                    foreach (var item in this.LibraryItem.MetaDatas)
+                    lock (this.LibraryItem.MetaDatas)
                     {
-                        if (!collections.ContainsKey(item.Type))
+                        foreach (var item in this.LibraryItem.MetaDatas)
                         {
-                            continue;
+                            if (!collections.ContainsKey(item.Type))
+                            {
+                                continue;
+                            }
+                            var key = item.Name.ToLower();
+                            if (collections[item.Type].ContainsKey(key))
+                            {
+                                //Not sure what to do. Doesn't happen often.
+                                continue;
+                            }
+                            collections[item.Type].Add(key, item.Value);
                         }
-                        var key = item.Name.ToLower();
-                        if (collections[item.Type].ContainsKey(key))
-                        {
-                            //Not sure what to do. Doesn't happen often.
-                            continue;
-                        }
-                        collections[item.Type].Add(key, item.Value);
                     }
                 }
             }

@@ -217,9 +217,12 @@ namespace FoxTunes.ViewModel
             }
             else
             {
-                this.MetaDataItem = this.FileData.MetaDatas.FirstOrDefault(
-                    metaDataItem => string.Equals(metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
-                );
+                lock (this.FileData.MetaDatas)
+                {
+                    this.MetaDataItem = this.FileData.MetaDatas.FirstOrDefault(
+                        metaDataItem => string.Equals(metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
+                    );
+                }
             }
             if (this.FileDataChanged != null)
             {

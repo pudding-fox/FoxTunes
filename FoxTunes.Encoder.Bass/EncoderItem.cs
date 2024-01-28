@@ -64,7 +64,15 @@ namespace FoxTunes
             };
             if (playlistItem.MetaDatas != null)
             {
-                var metaData = playlistItem.MetaDatas.ToDictionary(metaDataItem => metaDataItem.Name, metaDataItem => metaDataItem.Value, StringComparer.OrdinalIgnoreCase);
+                var metaData = default(IDictionary<string, string>);
+                lock (playlistItem.MetaDatas)
+                {
+                    metaData = playlistItem.MetaDatas.ToDictionary(
+                        metaDataItem => metaDataItem.Name,
+                        metaDataItem => metaDataItem.Value,
+                        StringComparer.OrdinalIgnoreCase
+                    );
+                }
                 encoderItem.Bitrate = Convert.ToInt32(metaData.GetValueOrDefault(CommonProperties.AudioBitrate));
                 encoderItem.Channels = Convert.ToInt32(metaData.GetValueOrDefault(CommonProperties.AudioChannels));
                 encoderItem.SampleRate = Convert.ToInt32(metaData.GetValueOrDefault(CommonProperties.AudioSampleRate));
