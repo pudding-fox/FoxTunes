@@ -6,6 +6,9 @@ using System.Collections.Generic;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    //TODO: bass_zipstream.dll does not work on XP.
+    //TODO: Unable to avoid linking to CxxFrameHandler3 which does not exist until a later version of msvcrt.dll
+    [PlatformDependency(Major = 6, Minor = 0)]
     public class BassArchiveStreamPasswordBehaviour : StandardBehaviour, IDisposable
     {
         public static readonly object SyncRoot = new object();
