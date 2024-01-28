@@ -31,7 +31,7 @@
                     <ItemsControl ItemsSource="{Binding Tags, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,0,5">
+                                <Grid Margin="0,0,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition></ColumnDefinition>
@@ -55,7 +55,7 @@
                     <ItemsControl ItemsSource="{Binding Properties, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,0,5">
+                                <Grid Margin="0,0,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition></ColumnDefinition>
@@ -79,7 +79,7 @@
                     <ItemsControl ItemsSource="{Binding ReplayGain, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,0,5">
+                                <Grid Margin="0,0,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition></ColumnDefinition>
@@ -103,7 +103,7 @@
                     <ItemsControl ItemsSource="{Binding FileSystem, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,0,5">
+                                <Grid Margin="0,0,5,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition></ColumnDefinition>
