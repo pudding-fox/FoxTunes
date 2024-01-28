@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -11,6 +12,15 @@ namespace FoxTunes
             {
                 return LogManager.Logger;
             }
+        }
+
+        protected virtual void Dispatch(Func<Task> function)
+        {
+#if NET40
+            var task = TaskEx.Run(function);
+#else
+            var task = Task.Run(function);
+#endif
         }
 
         public bool IsDisposed { get; private set; }

@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -73,6 +75,20 @@ namespace FoxTunes
 
             protected virtual void OnItemsSourceChanged(object sender, EventArgs e)
             {
+                if (this.TreeView.ItemsSource is INotifyCollectionChanged notifyCollectionChanged)
+                {
+                    notifyCollectionChanged.CollectionChanged += this.OnCollectionChanged;
+                }
+                this.ExpandAllIfRequired();
+            }
+
+            protected virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                this.ExpandAllIfRequired();
+            }
+
+            protected virtual void ExpandAllIfRequired()
+            {
                 if (string.IsNullOrEmpty(LibraryHierarchyBrowser.Filter))
                 {
                     return;
@@ -82,12 +98,12 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var task = this.ExpandAll(view.OfType<LibraryHierarchyNode>());
+                var stack = new Stack<LibraryHierarchyNode>(view.OfType<LibraryHierarchyNode>());
+                this.Dispatch(() => this.ExpandAll(stack));
             }
 
-            protected virtual async Task ExpandAll(IEnumerable<LibraryHierarchyNode> sequence)
+            protected virtual async Task ExpandAll(Stack<LibraryHierarchyNode> stack)
             {
-                var stack = new Stack<LibraryHierarchyNode>(sequence);
                 while (stack.Count > 0)
                 {
                     var node = stack.Pop();
