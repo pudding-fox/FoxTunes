@@ -49,4 +49,5 @@ WITH
 )
 
 SELECT [Id]
-FROM "LibraryHierarchyItems_Lookup";
+FROM "LibraryHierarchyItems_Lookup"
+WHERE NOT @isLeaf = 1
