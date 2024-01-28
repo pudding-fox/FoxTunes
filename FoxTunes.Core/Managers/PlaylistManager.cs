@@ -475,12 +475,12 @@ namespace FoxTunes
             {
                 var set = database.Set<PlaylistColumn>(transaction);
                 set.Clear();
-                set.Add(new PlaylistColumn() { Name = "Playing", Sequence = 0, Script = scripts.Playing, IsDynamic = true });
-                set.Add(new PlaylistColumn() { Name = "Artist / album", Sequence = 1, Script = scripts.Artist_Album });
-                set.Add(new PlaylistColumn() { Name = "Track no", Sequence = 2, Script = scripts.Track });
-                set.Add(new PlaylistColumn() { Name = "Title / track artist", Sequence = 3, Script = scripts.Title_Performer });
-                set.Add(new PlaylistColumn() { Name = "Duration", Sequence = 4, Script = scripts.Duration });
-                set.Add(new PlaylistColumn() { Name = "Codec", Sequence = 5, Script = scripts.Codec });
+                set.Add(new PlaylistColumn() { Name = "Playing", Sequence = 0, Script = scripts.Playing, IsDynamic = true, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Artist / album", Sequence = 1, Script = scripts.Artist_Album, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Track no", Sequence = 2, Script = scripts.Track, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Title / track artist", Sequence = 3, Script = scripts.Title_Performer, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Duration", Sequence = 4, Script = scripts.Duration, Enabled = true });
+                set.Add(new PlaylistColumn() { Name = "Codec", Sequence = 5, Script = scripts.Codec, Enabled = true });
                 transaction.Commit();
             }
         }

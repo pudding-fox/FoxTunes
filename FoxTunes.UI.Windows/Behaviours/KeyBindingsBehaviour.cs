@@ -239,9 +239,18 @@ namespace FoxTunes
                 element.ValueChanged -= this.OnValueChanged;
             }
             this.RemoveCommandBindings();
-            this._Playback.Dispose();
-            this._Settings.Dispose();
-            this._MiniPlayer.Dispose();
+            if (this._Playback != null)
+            {
+                this._Playback.Dispose();
+            }
+            if (this._Settings != null)
+            {
+                this._Settings.Dispose();
+            }
+            if (this._MiniPlayer != null)
+            {
+                this._MiniPlayer.Dispose();
+            }
         }
 
         ~KeyBindingsBehaviour()

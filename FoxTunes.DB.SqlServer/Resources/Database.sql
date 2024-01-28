@@ -56,7 +56,8 @@ CREATE TABLE [PlaylistColumns] (
   [Name] nvarchar(250) NOT NULL, 
   [Script] nvarchar(max) NOT NULL, 
   [IsDynamic] INTEGER NOT NULL, 
-  [Width] numeric(38,0) NULL);
+  [Width] numeric(38,0) NULL,
+  [Enabled] bit NOT NULL);
 
 CREATE TABLE [LibraryItem_MetaDataItem](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
