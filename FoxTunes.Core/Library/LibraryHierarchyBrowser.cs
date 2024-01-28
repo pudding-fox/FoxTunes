@@ -5,12 +5,16 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class LibraryHierarchyBrowser : StandardComponent, ILibraryHierarchyBrowser
     {
         public ICore Core { get; private set; }
+
+        public ILibraryManager LibraryManager { get; private set; }
 
         public ILibraryHierarchyCache LibraryHierarchyCache { get; private set; }
 
@@ -49,6 +53,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.LibraryManager = core.Managers.Library;
             this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
             this.DatabaseFactory = core.Factories.Database;
             base.InitializeComponent(core);
@@ -78,7 +83,12 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
         {
-            return this.LibraryHierarchyCache.GetNodes(libraryHierarchy, this.Filter, () => this.GetNodesCore(libraryHierarchy));
+            var nodes = this.LibraryHierarchyCache.GetNodes(libraryHierarchy, this.Filter, () => this.GetNodesCore(libraryHierarchy));
+            if (this.LibraryManager.SelectedItem != null)
+            {
+                var task = this.ApplySelection(nodes);
+            }
+            return nodes;
         }
 
         private IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchy libraryHierarchy)
@@ -149,6 +159,45 @@ namespace FoxTunes
             builder.Append(this.Filter.Replace(' ', '%'));
             builder.Append('%');
             return builder.ToString();
+        }
+
+        private async Task ApplySelection(IEnumerable<LibraryHierarchyNode> nodes)
+        {
+            var libraryHierarchyNode = this.LibraryManager.SelectedItem;
+            var stack = new Stack<LibraryHierarchyNode>(new[] { libraryHierarchyNode });
+            while (libraryHierarchyNode.Parent != null)
+            {
+                libraryHierarchyNode = libraryHierarchyNode.Parent;
+                stack.Push(libraryHierarchyNode);
+            }
+            while (stack.Count > 0)
+            {
+                var node = this.FindNode(nodes, stack.Pop().Value);
+                if (node == null)
+                {
+                    break;
+                }
+                libraryHierarchyNode = node;
+                if (libraryHierarchyNode.IsLeaf)
+                {
+                    break;
+                }
+                if (!node.IsExpanded)
+                {
+                    await node.LoadChildren();
+                    node.IsExpanded = true;
+                }
+                nodes = node.Children;
+            }
+            if (libraryHierarchyNode != null)
+            {
+                libraryHierarchyNode.IsSelected = true;
+            }
+        }
+
+        private LibraryHierarchyNode FindNode(IEnumerable<LibraryHierarchyNode> nodes, string value)
+        {
+            return nodes.FirstOrDefault(node => string.Equals(node.Value, value, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
