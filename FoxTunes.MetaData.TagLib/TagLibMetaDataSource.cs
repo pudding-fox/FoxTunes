@@ -88,20 +88,11 @@ namespace FoxTunes
 
         private void Add(string name, uint value)
         {
-            if (value == 0)
-            {
-                return;
-            }
             this.Items.Add(new MetaDataItem(name) { NumericValue = value });
         }
 
-
         private void Add(string name, string value)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return;
-            }
             this.Items.Add(new MetaDataItem(name) { TextValue = value });
         }
 

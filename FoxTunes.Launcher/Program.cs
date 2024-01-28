@@ -16,7 +16,8 @@ namespace FoxTunes.Launcher
             typeof(SQLiteDatabase),
             typeof(CSCoreOutput),
             typeof(TagLibMetaDataSource),
-            typeof(WindowsUserInterface)
+            typeof(WindowsUserInterface),
+            typeof(JSScriptingRuntime)
         };
 
         [STAThread]

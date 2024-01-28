@@ -11,5 +11,7 @@
         IPlaylist Playlist { get; }
 
         IOutput Output { get; }
+
+        IScriptingRuntime ScriptingRuntime { get; }
     }
 }

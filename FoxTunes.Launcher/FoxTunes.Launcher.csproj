@@ -97,6 +97,14 @@
       <Project>{c031b8f2-b799-4881-8140-de1d11a23fd8}</Project>
       <Name>FoxTunes.Output</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Scripting.JS\FoxTunes.Scripting.JS.csproj">
+      <Project>{0f6183db-5001-4d9a-bbd3-157356b62684}</Project>
+      <Name>FoxTunes.Scripting.JS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Scripting\FoxTunes.Scripting.csproj">
+      <Project>{50d995f1-ca54-42b6-bda5-4047e720716d}</Project>
+      <Name>FoxTunes.Scripting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FoxTunes.UI.Windows\FoxTunes.UI.Windows.csproj">
       <Project>{610985f5-26ae-42b5-9733-61ebbab36e0a}</Project>
       <Name>FoxTunes.UI.Windows</Name>
