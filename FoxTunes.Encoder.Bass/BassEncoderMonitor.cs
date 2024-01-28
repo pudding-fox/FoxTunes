@@ -63,7 +63,7 @@ namespace FoxTunes
                     this.UpdateStatus(encoderItem);
                     position += encoderItem.Progress;
                     count += EncoderItem.PROGRESS_COMPLETE;
-                    if (encoderItem.Status == EncoderItemStatus.Processing)
+                    if (encoderItem.Status == EncoderItemStatus.Processing && encoderItem.Progress != EncoderItem.PROGRESS_COMPLETE)
                     {
                         if (builder.Length > 0)
                         {

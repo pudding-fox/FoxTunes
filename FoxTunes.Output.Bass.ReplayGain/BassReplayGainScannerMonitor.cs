@@ -62,7 +62,7 @@ namespace FoxTunes
                     this.ScannerItems[scannerItem.Id] = scannerItem;
                     position += scannerItem.Progress;
                     count += ScannerItem.PROGRESS_COMPLETE;
-                    if (scannerItem.Status == ScannerItemStatus.Processing)
+                    if (scannerItem.Status == ScannerItemStatus.Processing && scannerItem.Progress != ScannerItem.PROGRESS_COMPLETE)
                     {
                         if (builder.Length > 0)
                         {
