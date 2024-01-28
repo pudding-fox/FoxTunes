@@ -63,20 +63,20 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to CREATE TABLE [MetaDataItems](
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
-        ///    [Name] nvarchar(250) NOT NULL, 
+        ///    [Name] nvarchar(4000) NOT NULL, 
         ///	[Type] INTEGER NOT NULL,
-        ///    [Value] nvarchar(260));
+        ///    [Value] nvarchar(4000));
         ///
         ///CREATE TABLE [LibraryRoots] (
         ///    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL,
-        ///	[DirectoryName] nvarchar(260) NOT NULL);
+        ///	[DirectoryName] nvarchar(4000) NOT NULL);
         ///
         ///CREATE TABLE [LibraryItems] (
         ///	Id INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
-        ///	DirectoryName nvarchar(260) NOT NULL, 
-        ///	FileName nvarchar(260) NOT NULL, 
+        ///	DirectoryName nvarchar(4000) NOT NULL, 
+        ///	FileName nvarchar(4000) NOT NULL, 
         ///	ImportDate varchar(50) NOT NULL,
-        ///	Status INTEGER NOT NUL [rest of string was truncated]&quot;;.
+        ///	Status INTEGER NO [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
