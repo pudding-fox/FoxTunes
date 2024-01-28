@@ -15,12 +15,12 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Context.Run(JSCoreScripts.Instance.Utils);
             this.Context.SetParameter("Publication", new Publication());
             this.Context.SetParameter("DateHelper", new DateHelper());
             this.Context.SetParameter("NumberHelper", new NumberHelper());
             //Note: Lower case to match tag, property etc.
             this.Context.SetParameter("strings", StringsHelper.Strings);
+            this.Context.Run(JSCoreScripts.Instance.Utils);
             base.InitializeComponent(core);
         }
 

@@ -1,6 +1,6 @@
 (function () {
     if (tag.__ft_variousartists) {
-        return "Various Artists";
+        return strings.general_variousartists;
     }
-    return tag.artist || "No Artist";
+    return tag.artist || strings.general_noartist;
 })()

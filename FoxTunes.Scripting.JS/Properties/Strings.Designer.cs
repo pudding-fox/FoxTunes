@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Album.
+        /// </summary>
+        internal static string General_NoAlbum {
+            get {
+                return ResourceManager.GetString("General.NoAlbum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Artist.
         /// </summary>
         internal static string General_NoArtist {
@@ -111,6 +120,15 @@ namespace FoxTunes {
         internal static string General_Unknown {
             get {
                 return ResourceManager.GetString("General.Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Various Artists.
+        /// </summary>
+        internal static string General_VariousArtists {
+            get {
+                return ResourceManager.GetString("General.VariousArtists", resourceCulture);
             }
         }
     }

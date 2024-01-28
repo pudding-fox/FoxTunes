@@ -7,5 +7,5 @@
         parts.push(tag.album);
         return parts.join(" - ");
     }
-    return "No Album";
+    return strings.general_noalbum;
 })()
