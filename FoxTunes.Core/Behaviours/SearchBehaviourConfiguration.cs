@@ -5,7 +5,7 @@ namespace FoxTunes
 {
     public static class SearchBehaviourConfiguration
     {
-        public const string SECTION = "FCD0E529-59BE-498D-B492-495D67BF1C3F";
+        public const string SECTION = "99797338-186F-4F4E-A6A1-C39546D2C047";
 
         public const string SEARCH_INTERVAL_ELEMENT = "AAAA9662-3EA7-427E-86A4-74ADFE44F097";
 
