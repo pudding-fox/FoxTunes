@@ -250,7 +250,7 @@ namespace FoxTunes.ViewModel
             foreach (var key in this.MetaDataItems.Keys)
             {
                 var metaDataItem = default(MetaDataItem);
-                if (!this.MetaDataItems.TryGetValue(key, out metaDataItem) || metaDataItem == null)
+                if (!this.MetaDataItems.TryGetValue(key, out metaDataItem) || metaDataItem == null || string.IsNullOrEmpty(metaDataItem.Value))
                 {
                     if (!this.HasValue)
                     {
