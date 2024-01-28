@@ -256,31 +256,28 @@ namespace FoxTunes.ViewModel
 
         public void SetValue()
         {
-            this._Value = null;
-            this._HasValue = false;
-            foreach (var key in this.MetaDataItems.Keys)
+            this.Value = Strings.MetaDataEntry_NoValue;
+            foreach (var metaDataItem in this.MetaDataItems.Values)
             {
-                var metaDataItem = default(MetaDataItem);
-                if (!this.MetaDataItems.TryGetValue(key, out metaDataItem) || metaDataItem == null || string.IsNullOrEmpty(metaDataItem.Value))
+                if (string.IsNullOrEmpty(metaDataItem.Value))
                 {
-                    if (!this.HasValue)
-                    {
-                        this.Value = Strings.MetaDataEntry_NoValue;
-                    }
-                    else
+                    if (this.HasValue)
                     {
                         this.Value = Strings.MetaDataEntry_MultipleValues;
                         break;
                     }
                 }
-                else if (!this.HasValue)
+                else
                 {
-                    this.Value = metaDataItem.Value;
-                }
-                else if (!string.Equals(this.Value, metaDataItem.Value))
-                {
-                    this.Value = Strings.MetaDataEntry_MultipleValues;
-                    break;
+                    if (this.HasValue && !string.Equals(this.Value, metaDataItem.Value))
+                    {
+                        this.Value = Strings.MetaDataEntry_MultipleValues;
+                        break;
+                    }
+                    else
+                    {
+                        this.Value = metaDataItem.Value;
+                    }
                 }
             }
             this.OriginalValue = this.Value;
@@ -301,28 +298,17 @@ namespace FoxTunes.ViewModel
 
         protected virtual void AddSource(IFileData source)
         {
-            var metaDataItem = default(MetaDataItem);
+            this.Sources.Add(source);
             lock (source.MetaDatas)
             {
-                metaDataItem = source.MetaDatas.FirstOrDefault(
-                    element => string.Equals(element.Name, this.Name, StringComparison.OrdinalIgnoreCase)
+                var metaDataItem = source.MetaDatas.FirstOrDefault(
+                    element => string.Equals(element.Name, this.Name, StringComparison.OrdinalIgnoreCase) && element.Type == this.Type
                 );
-                if (metaDataItem == null)
+                if (metaDataItem != null)
                 {
-                    metaDataItem = new MetaDataItem(this.Name, this.Type);
-                    source.MetaDatas.Add(metaDataItem);
+                    this.MetaDataItems.Add(source, metaDataItem);
                 }
             }
-            this.AddSource(
-                source,
-                metaDataItem
-            );
-        }
-
-        protected virtual void AddSource(IFileData source, MetaDataItem metaDataItem)
-        {
-            this.Sources.Add(source);
-            this.MetaDataItems.Add(source, metaDataItem);
         }
 
         public IEnumerable<IFileData> Save()
@@ -334,18 +320,18 @@ namespace FoxTunes.ViewModel
             var fileDatas = new List<IFileData>();
             foreach (var source in this.Sources)
             {
-                var metaDataItem = default(MetaDataItem);
-                if (!this.MetaDataItems.TryGetValue(source, out metaDataItem))
-                {
-                    metaDataItem = new MetaDataItem(this.Name, this.Type);
-                    lock (source.MetaDatas)
-                    {
-                        source.MetaDatas.Add(metaDataItem);
-                    }
-                    this.MetaDataItems.Add(source, metaDataItem);
-                }
                 if (this.HasValue)
                 {
+                    var metaDataItem = default(MetaDataItem);
+                    if (!this.MetaDataItems.TryGetValue(source, out metaDataItem))
+                    {
+                        metaDataItem = new MetaDataItem(this.Name, this.Type);
+                        lock (source.MetaDatas)
+                        {
+                            source.MetaDatas.Add(metaDataItem);
+                        }
+                        this.MetaDataItems.Add(source, metaDataItem);
+                    }
                     if (!string.Equals(metaDataItem.Value, this.Value))
                     {
                         metaDataItem.Value = this.Value;
@@ -354,10 +340,14 @@ namespace FoxTunes.ViewModel
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(metaDataItem.Value))
+                    var metaDataItem = default(MetaDataItem);
+                    if (this.MetaDataItems.TryGetValue(source, out metaDataItem))
                     {
-                        metaDataItem.Value = null;
-                        fileDatas.Add(source);
+                        if (!string.IsNullOrEmpty(metaDataItem.Value))
+                        {
+                            metaDataItem.Value = null;
+                            fileDatas.Add(source);
+                        }
                     }
                 }
             }
