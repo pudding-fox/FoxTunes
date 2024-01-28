@@ -34,7 +34,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override bool Advice(PlaylistItem playlistItem, out IBassStreamAdvice advice)
+        public override bool Advice(IBassStreamProvider provider, PlaylistItem playlistItem, out IBassStreamAdvice advice)
         {
             if (this.Behaviour == null || !this.Behaviour.Enabled)
             {
@@ -42,9 +42,17 @@ namespace FoxTunes
                 return false;
             }
 
+            if (provider.GetType() != typeof(BassStreamProvider))
+            {
+                Logger.Write(this, LogLevel.Warn, "Not attempting to calculate lead in/out for file \"{0}\": Provider \"{1}\" is not supported.", playlistItem.FileName, provider.GetType().Name);
+
+                advice = null;
+                return false;
+            }
+
             var leadIn = default(TimeSpan);
             var leadOut = default(TimeSpan);
-            if (!this.TryGetSilence(playlistItem, out leadIn, out leadOut))
+            if (!this.TryGetSilence(provider, playlistItem, out leadIn, out leadOut))
             {
                 advice = null;
                 return false;
@@ -54,13 +62,13 @@ namespace FoxTunes
             return true;
         }
 
-        protected virtual bool TryGetSilence(PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
+        protected virtual bool TryGetSilence(IBassStreamProvider provider, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
         {
             if (TryGetMetaData(this.Behaviour, playlistItem, out leadIn, out leadOut))
             {
                 return true;
             }
-            if (!this.TryCalculateSilence(playlistItem, out leadIn, out leadOut))
+            if (!this.TryCalculateSilence(provider, playlistItem, out leadIn, out leadOut))
             {
                 return false;
             }
@@ -114,7 +122,7 @@ namespace FoxTunes
             );
         }
 
-        protected virtual bool TryCalculateSilence(PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
+        protected virtual bool TryCalculateSilence(IBassStreamProvider provider, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in/out for file \"{0}\".", playlistItem.FileName);
 

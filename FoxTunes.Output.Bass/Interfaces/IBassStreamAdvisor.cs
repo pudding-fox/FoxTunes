@@ -4,6 +4,6 @@
     {
         byte Priority { get; }
 
-        bool Advice(PlaylistItem playlistItem, out IBassStreamAdvice Advice);
+        bool Advice(IBassStreamProvider provider, PlaylistItem playlistItem, out IBassStreamAdvice Advice);
     }
 }
