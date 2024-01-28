@@ -152,11 +152,13 @@ namespace FoxTunes.ViewModel
 
         public async Task Reset()
         {
+            var core = default(ICore);
+            await Windows.Invoke(() => core = this.Core);
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    this.Core.InitializeDatabase(database, DatabaseInitializeType.Playlist);
+                    core.InitializeDatabase(database, DatabaseInitializeType.Playlist);
 #if NET40
                     return TaskEx.FromResult(false);
 #else

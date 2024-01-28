@@ -501,7 +501,6 @@ namespace FoxTunes
             {
                 var set = database.Set<PlaylistColumn>(transaction);
                 set.Clear();
-                set.Add(new PlaylistColumn() { Name = "Playing", Type = PlaylistColumnType.Script, Sequence = 0, Script = scriptingRuntime.CoreScripts.Playing, IsDynamic = true, Enabled = true });
                 set.Add(new PlaylistColumn() { Name = "Artist / album", Type = PlaylistColumnType.Script, Sequence = 1, Script = scriptingRuntime.CoreScripts.Artist_Album, Enabled = true });
                 set.Add(new PlaylistColumn() { Name = "Track no", Type = PlaylistColumnType.Script, Sequence = 2, Script = scriptingRuntime.CoreScripts.Track, Enabled = true });
                 set.Add(new PlaylistColumn() { Name = "Title / track artist", Type = PlaylistColumnType.Script, Sequence = 3, Script = scriptingRuntime.CoreScripts.Title_Performer, Enabled = true });

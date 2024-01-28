@@ -11,14 +11,20 @@ namespace FoxTunes.ViewModel
     {
         private static readonly TimeSpan UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
 
+        public static readonly DispatcherTimer Timer;
+
+        static Playback()
+        {
+            Timer = new DispatcherTimer(DispatcherPriority.Background);
+            Timer.Interval = UPDATE_INTERVAL;
+            Timer.Start();
+        }
+
         public Playback(bool monitor)
         {
-            if (monitor)
+            if (Timer != null && monitor)
             {
-                this.Timer = new DispatcherTimer(DispatcherPriority.Background);
-                this.Timer.Interval = UPDATE_INTERVAL;
-                this.Timer.Tick += this.OnTick;
-                this.Timer.Start();
+                Timer.Tick += this.OnTick;
             }
         }
 
@@ -27,27 +33,24 @@ namespace FoxTunes.ViewModel
 
         }
 
-        public DispatcherTimer Timer { get; private set; }
-
         public IOutputStream OutputStream { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        private bool _IsPlaying { get; set; }
+
         public bool IsPlaying
         {
             get
             {
-                if (this.PlaybackManager == null)
-                {
-                    return false;
-                }
-                if (this.PlaybackManager.CurrentStream == null)
-                {
-                    return false;
-                }
-                return this.PlaybackManager.CurrentStream.IsPlaying;
+                return this._IsPlaying;
+            }
+            set
+            {
+                this._IsPlaying = value;
+                this.OnIsPlayingChanged();
             }
         }
 
@@ -61,6 +64,32 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler IsPlayingChanged;
+
+        public string Caption
+        {
+            get
+            {
+                if (this.IsPlaying)
+                {
+                    return ";";
+                }
+                else
+                {
+                    return "4";
+                }
+            }
+        }
+
+        protected virtual void OnCaptionChanged()
+        {
+            if (this.CaptionChanged != null)
+            {
+                this.CaptionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Caption");
+        }
+
+        public event EventHandler CaptionChanged;
 
         public ICommand PlayCommand
         {
@@ -85,11 +114,6 @@ namespace FoxTunes.ViewModel
                         {
                             return this.PlaybackManager.CurrentStream.Pause();
                         }
-#if NET40
-                        return TaskEx.FromResult(false);
-#else
-                        return Task.CompletedTask;
-#endif
                     }
                 );
             }
@@ -146,16 +170,27 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        private bool _isPlaying = default(bool);
-
         protected virtual void OnTick(object sender, EventArgs e)
         {
-            if (this.IsPlaying == this._isPlaying)
+            var isPlaying = default(bool);
+            if (this.PlaybackManager != null)
             {
-                return;
+                var currentStream = PlaybackManager.CurrentStream;
+                if (currentStream != null)
+                {
+                    isPlaying = currentStream.IsPlaying;
+                }
             }
-            this._isPlaying = this.IsPlaying;
-            this.OnIsPlayingChanged();
+            var refresh = default(bool);
+            if (this.IsPlaying != isPlaying)
+            {
+                this.IsPlaying = isPlaying;
+                refresh = true;
+            }
+            if (refresh)
+            {
+                this.OnCaptionChanged();
+            }
         }
 
         public override void InitializeComponent(ICore core)
@@ -167,9 +202,9 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.Timer != null)
+            if (Timer != null)
             {
-                this.Timer.Stop();
+                Timer.Tick -= this.OnTick;
             }
             base.OnDisposing();
         }
