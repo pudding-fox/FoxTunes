@@ -15,7 +15,7 @@ namespace FoxTunes.Factories
             base.InitializeComponent(core);
         }
 
-        public IPlaylistItem Create(string fileName)
+        public PlaylistItem Create(string fileName)
         {
             var item = new PlaylistItem(fileName, this.MetaDataSourceFactory.Create(fileName));
             item.InitializeComponent(this.Core);

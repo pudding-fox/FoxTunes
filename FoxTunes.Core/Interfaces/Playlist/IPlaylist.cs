@@ -4,9 +4,9 @@ namespace FoxTunes.Interfaces
 {
     public interface IPlaylist : IBaseComponent
     {
-        ObservableCollection<IPlaylistItem> Items { get; }
+        ObservableCollection<PlaylistItem> Items { get; }
 
-        IPlaylistItem SelectedItem { get; set; }
+        PlaylistItem SelectedItem { get; set; }
 
         event EventHandler SelectedItemChanging;
 

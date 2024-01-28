@@ -69,6 +69,7 @@
     <Compile Include="ComponentLoader.cs" />
     <Compile Include="Managers\PlaybackManager.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
+    <Compile Include="PersistableComponent.cs" />
     <Compile Include="Playlist\Playlist.cs" />
     <Compile Include="Playlist\PlaylistItem.cs" />
     <Compile Include="Factories\PlaylistItemFactory.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="Interfaces\IComponentActivator.cs" />
     <Compile Include="Interfaces\Output\IOutputStream.cs" />
     <Compile Include="Interfaces\Playlist\IPlaylist.cs" />
-    <Compile Include="Interfaces\Playlist\IPlaylistItem.cs" />
     <Compile Include="Interfaces\IStandardComponent.cs" />
     <Compile Include="Interfaces\UserInterface\IUserInterface.cs" />
     <Compile Include="StandardFactories.cs" />

@@ -76,7 +76,7 @@ namespace FoxTunes.Managers
             this.Playlist.SelectedItem = this.Playlist.Items[index];
         }
 
-        public IEnumerable<IPlaylistItem> Items
+        public IEnumerable<PlaylistItem> Items
         {
             get
             {

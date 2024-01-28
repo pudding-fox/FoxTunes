@@ -18,6 +18,7 @@ namespace FoxTunes
         protected virtual DbModel CreateDbModel()
         {
             var builder = this.CreateModelBuilder();
+            builder.Entity<PlaylistItem>();
             return builder.Build(this.Connection);
         }
 
@@ -44,6 +45,15 @@ namespace FoxTunes
                 this.DbContext = this.CreateDbContext();
             }
             return new WrappedDbSet<T>(this.DbContext.Set<T>());
+        }
+
+        public override int SaveChanges()
+        {
+            if (this.DbContext == null)
+            {
+                return 0;
+            }
+            return this.DbContext.SaveChanges();
         }
     }
 }

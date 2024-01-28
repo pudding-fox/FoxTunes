@@ -70,7 +70,7 @@ namespace FoxTunes
         {
             if (!File.Exists(DatabaseFileName))
             {
-                SQLiteConnection.CreateFile(DatabaseFileName);
+                File.WriteAllBytes(DatabaseFileName, Resources.Database);
             }
             return new SQLiteConnection(this.ConnectionString);
         }

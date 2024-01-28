@@ -61,6 +61,7 @@ namespace FoxTunes
                         this.Core.Managers.Playlist.AddFile(path);
                     }
                 }
+                this.Core.Components.Database.SaveChanges();
             }
         }
     }

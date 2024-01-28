@@ -13,11 +13,11 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
-        public ObservableCollection<IPlaylistItem> Items { get; private set; }
+        public ObservableCollection<PlaylistItem> Items { get; private set; }
 
-        private IPlaylistItem _SelectedItem { get; set; }
+        private PlaylistItem _SelectedItem { get; set; }
 
-        public IPlaylistItem SelectedItem
+        public PlaylistItem SelectedItem
         {
             get
             {
@@ -56,7 +56,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Components.Database;
-            this.Items = this.Database.GetSet<IPlaylistItem>().AsObservable();
+            this.Items = this.Database.GetSet<PlaylistItem>().AsObservable();
             base.InitializeComponent(core);
         }
     }
