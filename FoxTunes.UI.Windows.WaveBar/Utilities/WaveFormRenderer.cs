@@ -569,10 +569,10 @@ namespace FoxTunes
                 return;
             }
 
-            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, rendererData.Channels, rendererData.Capacity);
+            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, rendererData.WaveElements.Length);
             if (rendererData.PowerElements != null)
             {
-                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, rendererData.Channels, rendererData.Capacity);
+                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, rendererData.PowerElements.Length);
             }
         }
 

@@ -61,20 +61,6 @@ BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, INT32 count
 	return result;
 }
 
-BOOL WINAPI draw_rectangles2(RenderInfo* info, Int32Rect* rectangles, INT32 dimentions, INT32 count) {
-	BOOL result = TRUE;
-	for (INT32 dimention = 0; dimention < dimentions; dimention++)
-	{
-		INT32 offset = count * dimention;
-		for (INT32 position = 0; position < count; position++)
-		{
-			Int32Rect rectangle = rectangles[offset + position];
-			result &= draw_rectangle(info, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-		}
-	}
-	return result;
-}
-
 BOOL WINAPI draw_flat_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
 

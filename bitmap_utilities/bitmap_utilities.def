@@ -4,7 +4,6 @@ EXPORTS
 create_palette
 destroy_palette
 draw_rectangles
-draw_rectangles2
 draw_rectangle
 draw_lines
 draw_line
