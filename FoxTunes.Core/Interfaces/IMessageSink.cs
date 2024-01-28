@@ -17,5 +17,7 @@ namespace FoxTunes.Interfaces
         event EventHandler MouseMove;
 
         event EventHandler MouseDoubleClick;
+
+        event EventHandler TaskBarCreated;
     }
 }

@@ -67,6 +67,16 @@ namespace FoxTunes
 
         public event EventHandler MouseDoubleClick;
 
+        protected virtual void OnTaskBarCreated()
+        {
+            if (this.TaskBarCreated != null)
+            {
+                this.TaskBarCreated(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler TaskBarCreated;
+
         public bool IsDisposed { get; private set; }
 
         public void Dispose()
