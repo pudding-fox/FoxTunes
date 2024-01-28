@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassEncoderFactory : StandardComponent, IBassEncoderFactory
     {
         public string Location

@@ -25,6 +25,14 @@ namespace FoxTunes
 
         public IBassStream Stream { get; private set; }
 
+        public IBassStreamProvider Provider
+        {
+            get
+            {
+                return this.Stream.Provider;
+            }
+        }
+
         public int ChannelHandle
         {
             get

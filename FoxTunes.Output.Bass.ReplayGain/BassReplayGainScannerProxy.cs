@@ -44,7 +44,18 @@ namespace FoxTunes
             this.TerminateCallback.Disable();
             if (this.Process.ExitCode != 0)
             {
-                throw new InvalidOperationException("Process does not indicate success.");
+                if (this.ScannerItems != null)
+                {
+                    foreach (var scannerItem in this.ScannerItems)
+                    {
+                        if (scannerItem.Status != ScannerItemStatus.None)
+                        {
+                            continue;
+                        }
+                        scannerItem.Status = ScannerItemStatus.Failed;
+                    }
+                }
+                throw new InvalidOperationException(string.Format("Process does not indicate success: Code = {0}", this.Process.ExitCode));
             }
         }
 

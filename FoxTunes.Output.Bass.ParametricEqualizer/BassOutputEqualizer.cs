@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassOutputEqualizer : BassOutputEffect, IOutputEqualizer, IStandardComponent, IDisposable
     {
         public override bool Enabled

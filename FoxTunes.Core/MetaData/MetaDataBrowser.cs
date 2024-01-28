@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class MetaDataBrowser : StandardComponent, IMetaDataBrowser
     {
         public IMetaDataCache MetaDataCache { get; private set; }

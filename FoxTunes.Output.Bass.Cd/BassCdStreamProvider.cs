@@ -8,6 +8,8 @@ namespace FoxTunes
 {
     public class BassCdStreamProvider : BassStreamProvider
     {
+        public static readonly object SyncRoot = new object();
+
         public override BassStreamProviderFlags Flags
         {
             get
@@ -34,7 +36,7 @@ namespace FoxTunes
             var drive = default(int);
             var id = default(string);
             var track = default(int);
-            return BassCdUtils.ParseUrl(playlistItem.FileName, out drive, out id, out track);
+            return CdUtils.ParseUrl(playlistItem.FileName, out drive, out id, out track);
         }
 
         public override IBassStream CreateBasicStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
@@ -43,23 +45,26 @@ namespace FoxTunes
             var id = default(string);
             var track = default(int);
             var fileName = this.GetFileName(playlistItem, advice);
-            if (!BassCdUtils.ParseUrl(fileName, out drive, out id, out track))
+            if (!CdUtils.ParseUrl(fileName, out drive, out id, out track))
             {
                 //This shouldn't happen as CanCreateStream would have returned false.
                 return BassStream.Empty;
             }
             this.AssertDiscId(drive, id);
             var channelHandle = default(int);
-            if (this.GetCurrentStream(drive, track, out channelHandle))
+            lock (SyncRoot)
             {
-                return this.CreateBasicStream(channelHandle, advice);
+                if (this.GetCurrentStream(drive, track, out channelHandle))
+                {
+                    return this.CreateBasicStream(channelHandle, advice);
+                }
+                if (BassCd.FreeOld)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
+                    BassCd.FreeOld = false;
+                }
+                channelHandle = BassCd.CreateStream(drive, track, flags);
             }
-            if (BassCd.FreeOld)
-            {
-                Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
-                BassCd.FreeOld = false;
-            }
-            channelHandle = BassCd.CreateStream(drive, track, flags);
             return this.CreateBasicStream(channelHandle, advice);
         }
 
@@ -69,33 +74,40 @@ namespace FoxTunes
             var id = default(string);
             var track = default(int);
             var fileName = this.GetFileName(playlistItem, advice);
-            if (!BassCdUtils.ParseUrl(fileName, out drive, out id, out track))
+            if (!CdUtils.ParseUrl(fileName, out drive, out id, out track))
             {
                 //This shouldn't happen as CanCreateStream would have returned false.
                 return BassStream.Empty;
             }
             this.AssertDiscId(drive, id);
             var channelHandle = default(int);
-            if (this.GetCurrentStream(drive, track, out channelHandle))
+            lock (SyncRoot)
             {
-                return this.CreateInteractiveStream(channelHandle, advice);
+                if (this.GetCurrentStream(drive, track, out channelHandle))
+                {
+                    return this.CreateInteractiveStream(channelHandle, advice);
+                }
+                if (this.Output != null && this.Output.PlayFromMemory)
+                {
+                    Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+                }
+                if (BassCd.FreeOld)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
+                    BassCd.FreeOld = false;
+                }
+                channelHandle = BassCd.CreateStream(drive, track, flags);
             }
-            if (this.Output != null && this.Output.PlayFromMemory)
-            {
-                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
-            }
-            if (BassCd.FreeOld)
-            {
-                Logger.Write(this, LogLevel.Debug, "Updating config: BASS_CONFIG_CD_FREEOLD = FALSE");
-                BassCd.FreeOld = false;
-            }
-            channelHandle = BassCd.CreateStream(drive, track, flags);
             return this.CreateInteractiveStream(channelHandle, advice);
         }
 
         protected virtual void AssertDiscId(int drive, string expected)
         {
-            var actual = BassCd.GetID(drive, CDID.CDPlayer);
+            var actual = default(string);
+            lock (SyncRoot)
+            {
+                actual = BassCd.GetID(drive, CDID.CDPlayer);
+            }
             if (string.Equals(expected, actual, StringComparison.OrdinalIgnoreCase))
             {
                 return;

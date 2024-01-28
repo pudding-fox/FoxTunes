@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class FileAssociations : StandardComponent, IFileAssociations
     {
         public string Id

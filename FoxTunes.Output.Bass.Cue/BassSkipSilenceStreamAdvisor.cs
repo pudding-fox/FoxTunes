@@ -106,6 +106,15 @@ namespace FoxTunes
 
         protected virtual bool TryCalculateSilence(IBassStreamProvider provider, PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, out TimeSpan leadIn, out TimeSpan leadOut)
         {
+            if (provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
+            {
+                Logger.Write(this, LogLevel.Debug, "Cannot calculate lead in/out for file \"{0}\": The provider does not support this action.", playlistItem.FileName);
+
+                leadIn = default(TimeSpan);
+                leadOut = default(TimeSpan);
+                return false;
+            }
+
             Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in/out for file \"{0}\".", playlistItem.FileName);
 
             var stream = provider.CreateBasicStream(playlistItem, advice, BassFlags.Decode | BassFlags.Byte);
