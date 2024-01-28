@@ -9,16 +9,6 @@ namespace FoxTunes.Launcher
             AssemblyResolver.Instance.Enable();
         }
 
-        private static readonly Type[] References = new[]
-        {
-            typeof(Configuration),
-            typeof(SQLiteDatabase),
-            typeof(CSCoreOutput),
-            typeof(TagLibMetaDataSource),
-            typeof(WindowsUserInterface),
-            typeof(JSScriptingRuntime)
-        };
-
         [STAThread]
         public static void Main(string[] args)
         {
