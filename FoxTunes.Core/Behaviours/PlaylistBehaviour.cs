@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class PlaylistBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string SHUFFLE = "AAAA";

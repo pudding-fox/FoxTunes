@@ -5,10 +5,14 @@ using System.Windows;
 
 namespace FoxTunes
 {
+    [Component(ID, ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class SystemTheme : ThemeBase
     {
+        public const string ID = "3E9EFE8C-5245-4F8B-97D1-EB47CC70E373";
+
         public SystemTheme()
-            : base("D4EBB53F-BF59-4D61-99E1-D6D52926AE3F", "System")
+            : base(ID, "System")
         {
 
         }
@@ -35,13 +39,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            if (!(core.Flags.HasFlag(CoreFlags.Headless)))
+            this.ResourceDictionary = new ResourceDictionary()
             {
-                this.ResourceDictionary = new ResourceDictionary()
-                {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
-                };
-            }
+                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
+            };
             base.InitializeComponent(core);
         }
     }

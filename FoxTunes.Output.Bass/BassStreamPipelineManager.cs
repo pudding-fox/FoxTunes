@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassStreamPipelineManager : StandardComponent, IBassStreamPipelineManager
     {
         const int SYNCHRONIZE_PIPELINE_TIMEOUT = 1000;

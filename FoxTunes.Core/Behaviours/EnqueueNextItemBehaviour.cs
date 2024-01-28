@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class EnqueueNextItemBehaviour : StandardBehaviour, IDisposable
     {
         public IPlaylistManager PlaylistManager { get; private set; }

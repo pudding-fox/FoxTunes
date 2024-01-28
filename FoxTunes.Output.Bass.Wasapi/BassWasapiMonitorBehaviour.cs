@@ -4,6 +4,7 @@ using System;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassWasapiMonitorBehaviour : BassDeviceMonitorBehaviour
     {
         public IConfiguration Configuration { get; private set; }

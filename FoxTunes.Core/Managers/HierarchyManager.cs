@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class HierarchyManager : StandardManager, IHierarchyManager
     {
         public HierarchyManagerState State

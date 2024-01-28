@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [Component("C051C82C-3391-4DDC-B856-C4BDEA86ADDC", null, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";

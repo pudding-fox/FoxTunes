@@ -2,6 +2,7 @@
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class AsyncCollectionLoaderBehaviour : StandardBehaviour
     {
         public override void InitializeComponent(ICore core)

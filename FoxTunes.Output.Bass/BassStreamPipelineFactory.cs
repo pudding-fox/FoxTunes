@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassStreamPipelineFactory : StandardComponent, IBassStreamPipelineFactory
     {
         protected virtual void OnQueryingPipeline(QueryingPipelineEventArgs e)

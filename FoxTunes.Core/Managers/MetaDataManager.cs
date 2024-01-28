@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class MetaDataManager : StandardManager, IMetaDataManager
     {
         public ICore Core { get; private set; }

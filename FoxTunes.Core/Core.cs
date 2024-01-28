@@ -6,16 +6,25 @@ namespace FoxTunes
 {
     public class Core : BaseComponent, ICore
     {
-        public Core(CoreFlags flags)
+        private Core()
         {
-            this.Flags = flags;
             ComponentRegistry.Instance.Clear();
             ComponentResolver.Slots.Clear();
-            if (this.Flags.HasFlag(CoreFlags.Headless))
+        }
+
+        public Core(ICoreSetup setup) : this()
+        {
+            this.Setup = setup;
+            foreach (var slot in ComponentSlots.All)
             {
-                ComponentResolver.Slots.Add(ComponentSlots.UserInterface, ComponentSlots.Blocked);
+                if (!this.Setup.HasSlot(slot))
+                {
+                    ComponentResolver.Slots.Add(slot, ComponentSlots.Blocked);
+                }
             }
         }
+
+        public ICoreSetup Setup { get; private set; }
 
         public IStandardComponents Components
         {
@@ -40,8 +49,6 @@ namespace FoxTunes
                 return StandardFactories.Instance;
             }
         }
-
-        public CoreFlags Flags { get; private set; }
 
         public void Load()
         {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class WindowsInputManager : InputManager, IStandardManager
     {
         const int WH_KEYBOARD_LL = 13;

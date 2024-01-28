@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class PlaybackManager : StandardManager, IPlaybackManager
     {
         public ICore Core { get; private set; }

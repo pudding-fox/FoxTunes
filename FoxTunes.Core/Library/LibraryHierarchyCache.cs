@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class LibraryHierarchyCache : StandardComponent, ILibraryHierarchyCache
     {
         public Lazy<IList<LibraryHierarchy>> Hierarchies { get; private set; }

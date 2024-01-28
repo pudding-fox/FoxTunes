@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public class TestCore : Core
     {
-        public TestCore() : base(CoreFlags.Headless)
+        public TestCore() : base(GetSetup())
         {
 
         }
@@ -13,6 +13,13 @@ namespace FoxTunes
         {
             this.Components.Configuration.Reset();
             base.LoadConfiguration();
+        }
+
+        public static ICoreSetup GetSetup()
+        {
+            var setup = new CoreSetup();
+            setup.Disable(ComponentSlots.UserInterface);
+            return setup;
         }
     }
 }

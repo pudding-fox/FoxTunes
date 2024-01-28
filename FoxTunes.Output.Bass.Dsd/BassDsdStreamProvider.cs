@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    //This component does not technically require an output but we don't want to present anything else with DSD data.
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdStreamProvider : BassStreamProvider
     {
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
@@ -71,7 +73,7 @@ namespace FoxTunes
             try
             {
                 var channelHandle = default(int);
-                if (this.Output.PlayFromMemory)
+                if (this.Output != null && this.Output.PlayFromMemory)
                 {
                     channelHandle = BassDsdInMemoryHandler.CreateStream(playlistItem.FileName, 0, 0, flags);
                     if (channelHandle == 0)

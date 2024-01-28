@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [Component("0D6ACE7E-EAD3-4081-8D7F-95F26944C36D", ComponentSlots.Signaling)]
     public class SignalEmitter : StandardComponent, ISignalEmitter
     {
         public Task Send(ISignal signal)

@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ImageLoader : StandardComponent, IConfigurableComponent
     {
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
