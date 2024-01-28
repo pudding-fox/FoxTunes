@@ -381,24 +381,24 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    return this.AddToPlaylist(playlist, paths);
+                    return PlaylistActionsBehaviour.Instance.Add(playlist, paths, false);
                 }
                 if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
                 {
                     var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
-                    return this.AddToPlaylist(playlist, libraryHierarchyNode);
+                    return PlaylistActionsBehaviour.Instance.Add(playlist, libraryHierarchyNode, false);
                 }
                 if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>())
                 {
                     var playlistItems = e.Data
                         .GetData<IEnumerable<PlaylistItem>>()
                         .OrderBy(playlistItem => playlistItem.Sequence);
-                    return this.AddToPlaylist(playlist, playlistItems);
+                    return PlaylistActionsBehaviour.Instance.Add(playlist, playlistItems, false);
                 }
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
                     var paths = ShellIDListHelper.GetData(e.Data);
-                    return this.AddToPlaylist(playlist, paths);
+                    return PlaylistActionsBehaviour.Instance.Add(playlist, paths, false);
                 }
             }
             catch (Exception exception)
@@ -410,21 +410,6 @@ namespace FoxTunes.ViewModel
 #else
             return Task.CompletedTask;
 #endif
-        }
-
-        public Task AddToPlaylist(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode)
-        {
-            return this.PlaylistManager.Add(playlist, libraryHierarchyNode, false);
-        }
-
-        public Task AddToPlaylist(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
-        {
-            return this.PlaylistManager.Add(playlist, playlistItems, false);
-        }
-
-        public Task AddToPlaylist(Playlist playlist, IEnumerable<string> paths)
-        {
-            return this.PlaylistManager.Add(playlist, paths, false);
         }
 
         protected override Freezable CreateInstanceCore()

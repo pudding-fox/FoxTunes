@@ -14,13 +14,21 @@ namespace FoxTunes
 
         public const string LOCATE_PLAYLIST_ITEMS = "AAAC";
 
+        public PlaylistActionsBehaviour()
+        {
+            Instance = this;
+        }
+
         public IPlaylistManager PlaylistManager { get; private set; }
+
+        public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
 
         public IFileSystemBrowser FileSystemBrowser { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = core.Managers.Playlist;
+            this.FileActionHandlerManager = core.Managers.FileActionHandler;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
             base.InitializeComponent(core);
         }
@@ -64,17 +72,40 @@ namespace FoxTunes
 #endif
         }
 
-        protected virtual Task RemovePlaylistItems()
+        public async Task Add(Playlist playlist, IEnumerable<string> paths, bool clear)
+        {
+            if (clear)
+            {
+                await this.PlaylistManager.Clear(playlist).ConfigureAwait(false);
+            }
+            if (this.PlaylistManager.SelectedPlaylist != playlist)
+            {
+                this.PlaylistManager.SelectedPlaylist = playlist;
+            }
+            await this.FileActionHandlerManager.RunPaths(paths, FileActionType.Playlist).ConfigureAwait(false);
+        }
+
+        public Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode, bool clear)
+        {
+            return this.PlaylistManager.Add(playlist, libraryHierarchyNode, clear);
+        }
+
+        public Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems, bool clear)
+        {
+            return this.PlaylistManager.Add(playlist, playlistItems, clear);
+        }
+
+        public Task RemovePlaylistItems()
         {
             return this.PlaylistManager.Remove(this.PlaylistManager.SelectedPlaylist, this.PlaylistManager.SelectedItems);
         }
 
-        protected virtual Task CropPlaylistItems()
+        public Task CropPlaylistItems()
         {
             return this.PlaylistManager.Crop(this.PlaylistManager.SelectedPlaylist, this.PlaylistManager.SelectedItems);
         }
 
-        protected virtual Task LocatePlaylistItems()
+        public Task LocatePlaylistItems()
         {
             foreach (var item in this.PlaylistManager.SelectedItems)
             {
@@ -86,5 +117,7 @@ namespace FoxTunes
             return Task.CompletedTask;
 #endif
         }
+
+        public static PlaylistActionsBehaviour Instance { get; private set; }
     }
 }
