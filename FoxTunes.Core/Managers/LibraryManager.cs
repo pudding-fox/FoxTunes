@@ -209,9 +209,19 @@ namespace FoxTunes
             }
         }
 
-        public async Task Set(LibraryItemStatus status)
+        public async Task SetStatus(LibraryItemStatus status)
         {
             using (var task = new UpdateLibraryTask(status))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task SetStatus(IEnumerable<LibraryItem> items, LibraryItemStatus status)
+        {
+            using (var task = new UpdateLibraryTask(items, status))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);

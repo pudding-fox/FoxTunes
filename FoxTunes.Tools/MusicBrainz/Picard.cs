@@ -107,7 +107,7 @@ namespace FoxTunes
             await this.MetaDataManager.Rescan(libraryItems).ConfigureAwait(false);
             await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-            await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+            await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
         }
 
         protected virtual async Task OpenPlaylist()
@@ -127,11 +127,14 @@ namespace FoxTunes
             }
             await this.Open(playlistItems).ConfigureAwait(false);
             await this.MetaDataManager.Rescan(playlistItems).ConfigureAwait(false);
-            if (playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
+            var libraryItems = playlistItems
+                .Where(playlistItem => playlistItem.LibraryItem_Id.HasValue)
+                .Select(playlistItem => new LibraryItem() { Id = playlistItem.LibraryItem_Id.Value });
+            if (libraryItems.Any())
             {
                 await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
                 await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+                await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
             }
         }
 

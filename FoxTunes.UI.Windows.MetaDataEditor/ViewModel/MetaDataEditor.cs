@@ -367,17 +367,11 @@ namespace FoxTunes.ViewModel
             {
                 if (libraryItems.Any())
                 {
-                    await this.MetaDataManager.Save(libraryItems, true, true, names.ToArray()).ConfigureAwait(false);
+                    await this.SaveLibrary(libraryItems, names).ConfigureAwait(false);
                 }
                 if (playlistItems.Any())
                 {
-                    await this.MetaDataManager.Save(playlistItems, true, true, names.ToArray()).ConfigureAwait(false);
-                }
-                if (libraryItems.Any() || playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
-                {
-                    await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-                    await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                    await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+                    await this.SavePlaylist(playlistItems, names).ConfigureAwait(false);
                 }
             }
             finally
@@ -385,6 +379,19 @@ namespace FoxTunes.ViewModel
                 await Windows.Invoke(() => this.IsSaving = false).ConfigureAwait(false);
             }
             await this.Cancel().ConfigureAwait(false);
+        }
+
+        protected virtual async Task SaveLibrary(IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names)
+        {
+            await this.MetaDataManager.Save(libraryItems, true, true, names.ToArray()).ConfigureAwait(false);
+            await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
+            await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+            await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
+        }
+
+        protected virtual Task SavePlaylist(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
+        {
+            return this.MetaDataManager.Save(playlistItems, true, true, names.ToArray());
         }
 
         public ICommand CancelCommand

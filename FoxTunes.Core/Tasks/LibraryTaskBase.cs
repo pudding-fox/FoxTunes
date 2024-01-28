@@ -250,6 +250,37 @@ namespace FoxTunes
             }
         }
 
+        public static IEnumerable<string> UpdateLibraryCache(ILibraryCache libraryCache, IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names)
+        {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var libraryItem in libraryItems)
+            {
+                var cachedLibraryItem = default(LibraryItem);
+                if (libraryCache.TryGetItem(libraryItem.Id, out cachedLibraryItem))
+                {
+                    if (!object.ReferenceEquals(libraryItem, cachedLibraryItem))
+                    {
+                        result.AddRange(MetaDataItem.Update(libraryItem, cachedLibraryItem, names));
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static IEnumerable<string> UpdatePlaylistCache(IPlaylistCache playlistCache, IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names)
+        {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var libraryItem in libraryItems)
+            {
+                var playlistItems = default(IEnumerable<PlaylistItem>);
+                if (playlistCache.TryGetItemsByLibraryId(libraryItem.Id, out playlistItems))
+                {
+                    result.AddRange(MetaDataItem.Update(libraryItem, playlistItems, names));
+                }
+            }
+            return result;
+        }
+
         public static async Task RemoveCancelledLibraryItems(IDatabaseComponent database)
         {
             using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))

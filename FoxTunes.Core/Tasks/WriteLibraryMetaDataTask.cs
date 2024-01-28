@@ -1,5 +1,7 @@
-﻿using FoxDb.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -75,9 +77,9 @@ namespace FoxTunes
             }
             await base.OnStarted().ConfigureAwait(false);
             //We don't need a lock for this so not waiting for OnRun().
-            this.UpdateLibraryCache();
-            this.UpdatePlaylistCache();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            names.AddRange(LibraryTaskBase.UpdateLibraryCache(this.LibraryCache, this.LibraryItems, this.Names));
+            names.AddRange(LibraryTaskBase.UpdatePlaylistCache(this.PlaylistCache, this.LibraryItems, this.Names));
         }
 
         protected override async Task OnRun()
@@ -117,31 +119,10 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdateLibraryCache()
+        protected override async Task OnCompleted()
         {
-            foreach (var libraryItem in this.LibraryItems)
-            {
-                var cachedLibraryItem = default(LibraryItem);
-                if (this.LibraryCache.TryGetItem(libraryItem.Id, out cachedLibraryItem))
-                {
-                    if (!object.ReferenceEquals(libraryItem, cachedLibraryItem))
-                    {
-                        MetaDataItem.Update(libraryItem, cachedLibraryItem);
-                    }
-                }
-            }
-        }
-
-        protected virtual void UpdatePlaylistCache()
-        {
-            foreach (var libraryItem in this.LibraryItems)
-            {
-                var playlistItems = default(IEnumerable<PlaylistItem>);
-                if (this.PlaylistCache.TryGetItemsByLibraryId(libraryItem.Id, out playlistItems))
-                {
-                    MetaDataItem.Update(libraryItem, playlistItems);
-                }
-            }
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 
         private async Task WriteLibraryMetaData(LibraryItem libraryItem)

@@ -100,49 +100,75 @@ namespace FoxTunes
             }
         }
 
-        public static void Update(IFileData source, IFileData destination)
+        public static IEnumerable<string> Update(IFileData source, IFileData destination, IEnumerable<string> names)
         {
-            Update(source, new[] { destination });
+            return Update(source.MetaDatas, new[] { destination.MetaDatas }, names);
         }
 
-        public static void Update(IFileData source, IEnumerable<IFileData> destinations)
+        public static IEnumerable<string> Update(IFileData source, IEnumerable<IFileData> destinations, IEnumerable<string> names)
         {
-            lock (source.MetaDatas)
+            return Update(source.MetaDatas, destinations.Select(destination => destination.MetaDatas), names);
+        }
+
+        public static IEnumerable<string> Update(IEnumerable<MetaDataItem> source, ICollection<MetaDataItem> destination, IEnumerable<string> names)
+        {
+            return Update(source, new[] { destination }, names);
+        }
+
+        public static IEnumerable<string> Update(IEnumerable<MetaDataItem> source, IEnumerable<ICollection<MetaDataItem>> destinations, IEnumerable<string> names)
+        {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            lock (source)
             {
-                var sourceMetaData = source.MetaDatas.ToDictionary(
+                var sourceMetaData = source.ToDictionary(
                     metaDataItem => metaDataItem.Name,
                     StringComparer.OrdinalIgnoreCase
                 );
                 foreach (var destination in destinations)
                 {
-                    lock (destination.MetaDatas)
+                    lock (destination)
                     {
-                        var destinationMetaData = destination.MetaDatas.ToDictionary(
+                        var destinationMetaData = destination.ToDictionary(
                             metaDataItem => metaDataItem.Name,
                             StringComparer.OrdinalIgnoreCase
                         );
-                        foreach (var sourceMetaDataItem in source.MetaDatas)
+                        foreach (var sourceMetaDataItem in source)
                         {
+                            if (names != null && names.Any() && !names.Contains(sourceMetaDataItem.Name, true))
+                            {
+                                continue;
+                            }
                             var destinationMetaDataItem = default(MetaDataItem);
                             if (destinationMetaData.TryGetValue(sourceMetaDataItem.Name, out destinationMetaDataItem))
                             {
-                                destinationMetaDataItem.Value = sourceMetaDataItem.Value;
+                                if (!string.Equals(destinationMetaDataItem.Value, sourceMetaDataItem.Value))
+                                {
+                                    destinationMetaDataItem.Value = sourceMetaDataItem.Value;
+                                    result.Add(destinationMetaDataItem.Name);
+                                }
                             }
                             else
                             {
-                                destination.MetaDatas.Add(sourceMetaDataItem);
+                                destination.Add(sourceMetaDataItem);
+                                result.Add(sourceMetaDataItem.Name);
                             }
                         }
                         foreach (var pair in destinationMetaData)
                         {
+                            if (names != null && names.Any() && !names.Contains(pair.Value.Name, true))
+                            {
+                                continue;
+                            }
                             if (!sourceMetaData.ContainsKey(pair.Key))
                             {
                                 pair.Value.Value = string.Empty;
+                                result.Add(pair.Value.Name);
                             }
                         }
                     }
                 }
             }
+            return result;
         }
 
         public static readonly MetaDataItem Empty = new MetaDataItem();

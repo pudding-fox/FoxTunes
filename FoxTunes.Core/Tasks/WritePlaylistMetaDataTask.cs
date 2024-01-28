@@ -1,5 +1,7 @@
-﻿using FoxDb.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -76,9 +78,9 @@ namespace FoxTunes
             }
             await base.OnStarted().ConfigureAwait(false);
             //We don't need a lock for this so not waiting for OnRun().
-            this.UpdateLibraryCache();
-            this.UpdatePlaylistCache();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            names.AddRange(PlaylistTaskBase.UpdateLibraryCache(this.LibraryCache, this.PlaylistItems, this.Names));
+            names.AddRange(PlaylistTaskBase.UpdatePlaylistCache(this.PlaylistCache, this.PlaylistItems, this.Names));
         }
 
         protected override async Task OnRun()
@@ -125,35 +127,10 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdateLibraryCache()
+        protected override async Task OnCompleted()
         {
-            foreach (var playlistItem in this.PlaylistItems)
-            {
-                if (!playlistItem.LibraryItem_Id.HasValue)
-                {
-                    continue;
-                }
-                var libraryItem = default(LibraryItem);
-                if (this.LibraryCache.TryGetItem(playlistItem.LibraryItem_Id.Value, out libraryItem))
-                {
-                    MetaDataItem.Update(playlistItem, libraryItem);
-                }
-            }
-        }
-
-        protected virtual void UpdatePlaylistCache()
-        {
-            foreach (var playlistItem in this.PlaylistItems)
-            {
-                var cachedPlaylistItem = default(PlaylistItem);
-                if (this.PlaylistCache.TryGetItemById(playlistItem.Id, out cachedPlaylistItem))
-                {
-                    if (!object.ReferenceEquals(playlistItem, cachedPlaylistItem))
-                    {
-                        MetaDataItem.Update(playlistItem, cachedPlaylistItem);
-                    }
-                }
-            }
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 
         private async Task WritePlaylistMetaData(PlaylistItem playlistItem)

@@ -1,8 +1,8 @@
-﻿using FoxDb.Interfaces;
+﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,10 +42,19 @@ namespace FoxTunes
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
+        public IPlaylistCache PlaylistCache { get; private set; }
+
+        public ILibraryCache LibraryCache { get; private set; }
+
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            this.PlaylistCache = core.Components.PlaylistCache;
+            this.LibraryCache = core.Components.LibraryCache;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
@@ -74,9 +83,8 @@ namespace FoxTunes
                         continue;
                     }
 
-                    libraryItem.MetaDatas = new ObservableCollection<MetaDataItem>(
-                        await metaDataSource.GetMetaData(libraryItem.FileName).ConfigureAwait(false)
-                    );
+                    var metaDatas = await metaDataSource.GetMetaData(libraryItem.FileName).ConfigureAwait(false);
+                    MetaDataItem.Update(metaDatas, libraryItem.MetaDatas, null);
 
                     await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
                     await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
@@ -87,6 +95,16 @@ namespace FoxTunes
             {
                 await task.Run().ConfigureAwait(false);
             }
+        }
+
+        protected override async Task OnCompleted()
+        {
+            await base.OnCompleted().ConfigureAwait(false);
+            //We don't need a lock for this so not performing in OnRun().
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            names.AddRange(LibraryTaskBase.UpdateLibraryCache(this.LibraryCache, this.LibraryItems, null));
+            names.AddRange(LibraryTaskBase.UpdatePlaylistCache(this.PlaylistCache, this.LibraryItems, null));
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, names)).ConfigureAwait(false);
         }
 
         private async Task WriteLibraryMetaData(LibraryItem libraryItem)
