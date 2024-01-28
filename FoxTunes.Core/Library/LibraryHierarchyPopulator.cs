@@ -56,6 +56,13 @@ namespace FoxTunes
         public async Task Populate(LibraryItemStatus? status, CancellationToken cancellationToken)
         {
             var libraryHierarchies = this.GetHierarchies(this.Transaction);
+
+            if (libraryHierarchies.Length == 0)
+            {
+                Logger.Write(this, LogLevel.Warn, "No library hierarchies are defined (or enabled).");
+                return;
+            }
+
             var libraryHierarchyLevels = this.GetLevels(libraryHierarchies);
             var libraryItems = this.GetItems(status, this.Transaction);
 
