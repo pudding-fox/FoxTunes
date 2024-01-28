@@ -14,6 +14,7 @@ typedef struct Int32Color
 #define COLOR_FROM_X 1
 #define COLOR_FROM_Y 2
 #define ALPHA_BLENDING 4
+#define HAS_TRANSPARENCY 8
 
 typedef struct ColorPalette
 {
