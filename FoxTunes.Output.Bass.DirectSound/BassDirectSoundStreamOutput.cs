@@ -11,8 +11,7 @@ namespace FoxTunes
         {
             this.Behaviour = behaviour;
             this.Rate = behaviour.Output.Rate;
-            this.Depth = stream.Depth;
-            this.Channels = stream.Channels;
+            this.Channels = BassDirectSoundDevice.Info.Outputs;
             this.Flags = BassFlags.Default;
             if (this.Behaviour.Output.Float)
             {
@@ -31,8 +30,6 @@ namespace FoxTunes
         }
 
         public override int Rate { get; protected set; }
-
-        public override int Depth { get; protected set; }
 
         public override int Channels { get; protected set; }
 
@@ -64,6 +61,10 @@ namespace FoxTunes
             {
                 return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Playing;
             }
+            protected set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public override bool IsPaused
@@ -72,6 +73,10 @@ namespace FoxTunes
             {
                 return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Paused;
             }
+            protected set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public override bool IsStopped
@@ -79,6 +84,10 @@ namespace FoxTunes
             get
             {
                 return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Stopped;
+            }
+            protected set
+            {
+                throw new NotImplementedException();
             }
         }
 

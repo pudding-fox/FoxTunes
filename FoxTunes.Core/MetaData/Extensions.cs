@@ -8,6 +8,10 @@ namespace FoxTunes
     {
         public static T GetMetaDataValue<T>(this IEnumerable<MetaDataItem> sequence, MetaDataItemType type, string name)
         {
+            if (sequence == null)
+            {
+                return default(T);
+            }
             var match = sequence.FirstOrDefault(element => element.Type == type && string.Equals(element.Name, name, StringComparison.OrdinalIgnoreCase));
             if (match == null)
             {

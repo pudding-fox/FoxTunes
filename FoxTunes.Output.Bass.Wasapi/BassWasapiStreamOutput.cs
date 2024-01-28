@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using ManagedBass.Mix;
 using ManagedBass.Wasapi;
 using System;
 using System.Linq;
@@ -26,33 +27,10 @@ namespace FoxTunes
             : this()
         {
             this.Behaviour = behaviour;
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
-            {
-                this.Rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
-                this.Flags |= BassFlags.DSDRaw;
-            }
-            else
-            {
-                if (behaviour.Output.Rate == stream.Rate)
-                {
-                    this.Rate = stream.Rate;
-                }
-                else if (!behaviour.Output.EnforceRate && BassWasapiDevice.Info.SupportedRates.Contains(stream.Rate))
-                {
-                    this.Rate = stream.Rate;
-                }
-                else
-                {
-                    Logger.Write(this, LogLevel.Debug, "The requested output rate is either enforced or the device does not support the stream's rate: {0} => {1}", stream.Rate, behaviour.Output.Rate);
-                    this.Rate = behaviour.Output.Rate;
-                }
-                if (behaviour.Output.Float)
-                {
-                    this.Flags |= BassFlags.Float;
-                }
-            }
-            this.Depth = stream.Depth;
-            this.Channels = stream.Channels;
+            this.Rate = behaviour.Output.Rate;
+            this.Channels = BassWasapiDevice.Info.Outputs;
+            //WASAPI requires BASS_SAMPLE_FLOAT so don't bother respecting the output's Float setting.
+            this.Flags = BassFlags.Decode | BassFlags.Float;
         }
 
         public BassWasapiStreamOutputBehaviour Behaviour { get; private set; }
@@ -67,8 +45,6 @@ namespace FoxTunes
 
         public override int Rate { get; protected set; }
 
-        public override int Depth { get; protected set; }
-
         public override int Channels { get; protected set; }
 
         public override BassFlags Flags { get; protected set; }
@@ -82,56 +58,16 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            if (previous.Channels > BassWasapiDevice.Info.Outputs)
+            Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
+            this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
+            if (this.ChannelHandle == 0)
             {
-                //TODO: We should down mix.
-                Logger.Write(this, LogLevel.Error, "Cannot play stream with more channels than device outputs.");
-                throw new NotImplementedException(string.Format("The stream contains {0} channels which is greater than {1} output channels provided by the device.", this.Channels, BassWasapiDevice.Info.Outputs));
+                BassUtils.Throw();
             }
-            if (!this.CheckFormat(this.Rate, previous.Channels))
-            {
-                Logger.Write(this, LogLevel.Error, "Cannot play stream with unsupported rate.");
-                throw new NotImplementedException(string.Format("The stream has a rate of {0} which is not supported by the device.", this.Rate));
-            }
-            if (this.Rate != previous.Rate)
-            {
-                Logger.Write(this, LogLevel.Error, "Cannot play stream with different rate to device.");
-                throw new NotImplementedException(string.Format("Cannot play stream with rate {0} not equal to device rate {1}, you must configure resampling.", previous.Rate, this.Rate));
-            }
-            if (!BassUtils.GetChannelFloat(previous.ChannelHandle))
-            {
-                Logger.Write(this, LogLevel.Error, "Cannot play non float stream.");
-                throw new NotImplementedException("Cannot play non 32 bit float stream, you must configure depth.");
-            }
-            var exception = default(Exception);
-            for (var a = 1; a <= CONNECT_ATTEMPTS; a++)
-            {
-                Logger.Write(this, LogLevel.Debug, "Configuring WASAPI, attempt: {0}", a);
-                try
-                {
-                    if (BassUtils.OK(this.ConfigureWASAPI(previous)))
-                    {
-                        return;
-                    }
-                }
-                catch (Exception e)
-                {
-                    exception = e;
-                    Logger.Write(this, LogLevel.Warn, "Failed to configure WASAPI: {0}", e.Message);
-                    if (BassWasapiDevice.IsInitialized)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Re-initializing WASAPI, have you just switched from DSD to PCM?");
-                        BassWasapiDevice.Free();
-                        BassWasapiDevice.Init();
-                    }
-                }
-                Thread.Sleep(CONNECT_ATTEMPT_INTERVAL);
-            }
-            if (exception != null)
-            {
-                throw exception;
-            }
-            throw new NotImplementedException();
+            Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
+            BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default));
+            BassWasapiDevice.Init(this.Rate, this.Channels);
+            BassUtils.OK(BassWasapiHandler.StreamSet(this.ChannelHandle));
         }
 
         protected virtual bool StartWASAPI()
@@ -163,7 +99,7 @@ namespace FoxTunes
             return false;
         }
 
-        protected virtual bool StopWASAPI(bool reset = true)
+        protected virtual bool StopWASAPI(bool reset)
         {
             if (!BassWasapi.IsStarted)
             {
@@ -175,43 +111,29 @@ namespace FoxTunes
             return true;
         }
 
-        protected virtual bool ConfigureWASAPI(IBassStreamComponent previous)
-        {
-            Logger.Write(this, LogLevel.Debug, "Configuring WASAPI.");
-
-            if (!this.CheckFormat(previous.Rate, previous.Channels))
-            {
-                throw new NotImplementedException();
-            }
-
-            BassWasapiDevice.Init(previous.Rate, previous.Channels);
-
-            BassUtils.OK(BassWasapiHandler.StreamSet(previous.ChannelHandle));
-
-            return true;
-        }
-
         public override bool IsPlaying
         {
             get
             {
                 return BassWasapi.IsStarted;
             }
-        }
-
-        public override bool IsPaused
-        {
-            get
+            protected set
             {
-                return false;
+                throw new NotImplementedException();
             }
         }
+
+        public override bool IsPaused { get; protected set; }
 
         public override bool IsStopped
         {
             get
             {
                 return !BassWasapi.IsStarted;
+            }
+            protected set
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -233,6 +155,7 @@ namespace FoxTunes
             try
             {
                 BassUtils.OK(this.StartWASAPI());
+                this.IsPaused = false;
             }
             catch (Exception e)
             {
@@ -242,12 +165,25 @@ namespace FoxTunes
 
         public override void Pause()
         {
-            throw new NotImplementedException();
+            if (this.IsStopped)
+            {
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Pausing WASAPI.");
+            try
+            {
+                BassUtils.OK(this.StopWASAPI(false));
+                this.IsPaused = true;
+            }
+            catch (Exception e)
+            {
+                this.OnError(e);
+            }
         }
 
         public override void Resume()
         {
-            throw new NotImplementedException();
+            this.Play();
         }
 
         public override void Stop()
@@ -259,7 +195,8 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Stopping WASAPI.");
             try
             {
-                BassUtils.OK(this.StopWASAPI());
+                BassUtils.OK(this.StopWASAPI(true));
+                this.IsPaused = false;
             }
             catch (Exception e)
             {
@@ -271,7 +208,7 @@ namespace FoxTunes
         {
             if (BassWasapi.IsStarted)
             {
-                BassUtils.OK(this.StopWASAPI());
+                BassUtils.OK(this.StopWASAPI(true));
             }
         }
     }

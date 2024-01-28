@@ -56,6 +56,10 @@
       <Project>{a638a91c-bd8e-4475-a5fb-e4fcff7ba61d}</Project>
       <Name>FoxTunes.Output.Bass.Resampler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.Output.Bass.Wasapi\FoxTunes.Output.Bass.Wasapi.csproj">
+      <Project>{e334ba97-5450-4960-84da-b7c5e09589e4}</Project>
+      <Name>FoxTunes.Output.Bass.Wasapi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FoxTunes.Output.ManagedBass\FoxTunes.Output.Bass.csproj">
       <Project>{676f7dd1-bf13-4317-819f-9b5d85df18b5}</Project>
       <Name>FoxTunes.Output.Bass</Name>

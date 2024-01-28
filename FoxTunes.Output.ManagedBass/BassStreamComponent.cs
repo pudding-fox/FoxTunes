@@ -8,8 +8,6 @@ namespace FoxTunes
     {
         public abstract int Rate { get; protected set; }
 
-        public abstract int Depth { get; protected set; }
-
         public abstract int Channels { get; protected set; }
 
         public abstract BassFlags Flags { get; protected set; }

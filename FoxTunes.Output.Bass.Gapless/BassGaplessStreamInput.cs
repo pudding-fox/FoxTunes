@@ -12,7 +12,6 @@ namespace FoxTunes
         {
             this.Behaviour = behaviour;
             this.Rate = stream.Rate;
-            this.Depth = stream.Depth;
             this.Channels = stream.Channels;
             this.Flags = BassFlags.Decode;
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
@@ -28,8 +27,6 @@ namespace FoxTunes
         public BassGaplessStreamInputBehaviour Behaviour { get; private set; }
 
         public override int Rate { get; protected set; }
-
-        public override int Depth { get; protected set; }
 
         public override int Channels { get; protected set; }
 
@@ -120,6 +117,7 @@ namespace FoxTunes
         {
             if (this.ChannelHandle != 0)
             {
+                this.Reset();
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
                 BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
             }

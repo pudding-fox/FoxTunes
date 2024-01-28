@@ -34,6 +34,10 @@
     <Reference Include="ManagedBass, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedBass.1.0.0\lib\net45\ManagedBass.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.Mix, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.Mix.2.1.0\lib\netstandard1.4\ManagedBass.Mix.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ManagedBass.Wasapi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedBass.Wasapi.2.0.0\lib\netstandard1.4\ManagedBass.Wasapi.dll</HintPath>
     </Reference>

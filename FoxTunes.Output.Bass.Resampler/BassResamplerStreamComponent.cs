@@ -21,7 +21,6 @@ namespace FoxTunes
             }
             this.Behaviour = behaviour;
             this.Rate = behaviour.Output.Rate;
-            this.Depth = stream.Depth;
             this.Channels = stream.Channels;
             this.Flags = BassFlags.Decode;
             if (this.Behaviour.Output.Float)
@@ -33,8 +32,6 @@ namespace FoxTunes
         public BassResamplerStreamComponentBehaviour Behaviour { get; private set; }
 
         public override int Rate { get; protected set; }
-
-        public override int Depth { get; protected set; }
 
         public override int Channels { get; protected set; }
 

@@ -45,8 +45,6 @@ namespace FoxTunes
 
         public abstract int Rate { get; }
 
-        public abstract int Depth { get; }
-
         public abstract int Channels { get; }
 
         public abstract bool IsPlaying { get; }
@@ -178,7 +176,7 @@ namespace FoxTunes
         {
             get
             {
-                return string.Format("Length = {0},  Rate {1}, Channels = {3}", this.Length, this.Rate, this.Channels);
+                return string.Format("Length = {0},  Rate {1}, Channels = {2}", this.Length, this.Rate, this.Channels);
             }
         }
 

@@ -88,14 +88,6 @@ namespace FoxTunes
             }
         }
 
-        public override int Depth
-        {
-            get
-            {
-                return this.PlaylistItem.MetaDatas.GetMetaDataValue<int>(MetaDataItemType.Property, CommonProperties.BitsPerSample);
-            }
-        }
-
         public override int Channels
         {
             get
