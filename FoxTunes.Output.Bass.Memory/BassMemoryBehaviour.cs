@@ -25,8 +25,6 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public IBassOutput Output { get; private set; }
-
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -45,14 +43,12 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                var task = this.Output.Shutdown();
             }
         }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Output = core.Components.Output as IBassOutput;
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             this.Configuration = core.Components.Configuration;

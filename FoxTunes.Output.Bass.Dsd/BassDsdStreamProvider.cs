@@ -10,8 +10,6 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    //This component does not technically require an output but we don't want to present anything else with DSD data.
-    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdStreamProvider : BassStreamProvider
     {
         public BassDsdBehaviour Behaviour { get; private set; }
@@ -31,17 +29,20 @@ namespace FoxTunes
             {
                 return false;
             }
-            var query = this.BassStreamPipelineFactory.QueryPipeline();
-            if ((query.OutputCapabilities & BassCapability.DSD_RAW) != BassCapability.DSD_RAW)
-            {
-                return false;
-            }
             return true;
         }
 
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, bool immidiate, BassFlags flags)
         {
-            var channelHandle = this.CreateDsdRawStream(playlistItem, advice, flags);
+            var channelHandle = default(int);
+            if (this.IsDsdRawSupported())
+            {
+                channelHandle = this.CreateDsdRawStream(playlistItem, advice, flags);
+            }
+            else
+            {
+                channelHandle = this.CreateDsdStream(playlistItem, advice, flags);
+            }
             if (channelHandle == 0)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
@@ -49,11 +50,35 @@ namespace FoxTunes
             return this.CreateBasicStream(channelHandle, advice, flags | BassFlags.DSDRaw);
         }
 
+        protected virtual int CreateDsdStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        {
+            var fileName = this.GetFileName(playlistItem, advice);
+            var channelHandle = default(int);
+            if (this.Behaviour != null && this.Behaviour.Memory)
+            {
+                Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
+                channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, BassFlags.Decode);
+                if (channelHandle != 0)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                }
+            }
+            if (channelHandle == 0)
+            {
+                channelHandle = BassDsd.CreateStream(fileName, 0, 0, BassFlags.Decode);
+            }
+            return channelHandle;
+        }
+
         protected virtual int CreateDsdRawStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             var fileName = this.GetFileName(playlistItem, advice);
             var channelHandle = default(int);
-            if (this.Behaviour.Memory)
+            if (this.Behaviour != null && this.Behaviour.Memory)
             {
                 Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
                 channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
@@ -82,8 +107,26 @@ namespace FoxTunes
             return channelHandle;
         }
 
+        protected virtual bool IsDsdRawSupported()
+        {
+            if (this.BassStreamPipelineFactory == null)
+            {
+                return false;
+            }
+            var query = this.BassStreamPipelineFactory.QueryPipeline();
+            if ((query.OutputCapabilities & BassCapability.DSD_RAW) != BassCapability.DSD_RAW)
+            {
+                return false;
+            }
+            return true;
+        }
+
         protected virtual bool IsFormatSupported(int channelHandle)
         {
+            if (this.BassStreamPipelineFactory == null)
+            {
+                return false;
+            }
             var query = this.BassStreamPipelineFactory.QueryPipeline();
             var channels = BassUtils.GetChannelCount(channelHandle);
             var rate = BassUtils.GetChannelDsdRate(channelHandle);

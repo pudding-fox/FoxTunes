@@ -3,7 +3,6 @@ using ManagedBass;
 using ManagedBass.ReplayGain;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,21 +12,7 @@ namespace FoxTunes
     {
         const string GROUP_NONE = "None";
 
-        public static string Location
-        {
-            get
-            {
-                return Path.GetDirectoryName(typeof(BassReplayGainScanner).Assembly.Location);
-            }
-        }
-
-        private BassReplayGainScanner()
-        {
-            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
-            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_replay_gain.dll"));
-        }
-
-        public BassReplayGainScanner(IEnumerable<ScannerItem> scannerItems) : this()
+        public BassReplayGainScanner(IEnumerable<ScannerItem> scannerItems)
         {
             this.ScannerItems = scannerItems;
         }
@@ -146,6 +131,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Warn, "Scanning file \"{0}\" failed: The format is likely not supported.", scannerItem.FileName);
                 scannerItem.AddError("The format is likely not supported.");
+                scannerItem.AddError("Only stereo files of common sample rates are supported.");
                 scannerItem.Status = ScannerItemStatus.Failed;
             }
         }

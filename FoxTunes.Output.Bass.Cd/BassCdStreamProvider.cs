@@ -29,14 +29,6 @@ namespace FoxTunes
             }
         }
 
-        public BassCdBehaviour Behaviour { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassCdBehaviour>();
-            base.InitializeComponent(core);
-        }
-
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
             var drive = default(int);
