@@ -22,22 +22,22 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Playlist")
+            yield return new ConfigurationSection(SECTION, Strings.PlaylistBehaviourConfiguration_Section)
                 .WithElement(
-                    new SelectionConfigurationElement(ORDER_ELEMENT, "Order").WithOptions(GetOrderOptions()))
+                    new SelectionConfigurationElement(ORDER_ELEMENT, Strings.PlaylistBehaviourConfiguration_Order).WithOptions(GetOrderOptions()))
                 .WithElement(
-                    new TextConfigurationElement(PRE_SORT_ORDER_ELEMENT, "Pre Sorting", path: "Advanced").WithValue(Resources.PlaylistSequence).WithFlags(ConfigurationElementFlags.MultiLine))
+                    new TextConfigurationElement(PRE_SORT_ORDER_ELEMENT, Strings.PlaylistBehaviourConfiguration_PreSort, path: Strings.General_Advanced).WithValue(Resources.PlaylistSequence).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(
-                    new BooleanConfigurationElement(QUEUE_ELEMENT, "Queuing").WithValue(false)
+                    new BooleanConfigurationElement(QUEUE_ELEMENT, Strings.PlaylistBehaviourConfiguration_Queue).WithValue(false)
             );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetOrderOptions()
         {
-            yield return new SelectionConfigurationOption(ORDER_DEFAULT_OPTION, "Default");
-            yield return new SelectionConfigurationOption(ORDER_SHUFFLE_TRACKS, "Shuffle (Tracks)");
-            yield return new SelectionConfigurationOption(ORDER_SHUFFLE_ALBUMS, "Shuffle (Albums)");
-            yield return new SelectionConfigurationOption(ORDER_SHUFFLE_ARTISTS, "Shuffle (Artists)");
+            yield return new SelectionConfigurationOption(ORDER_DEFAULT_OPTION, Strings.PlaylistBehaviourConfiguration_Order_Default);
+            yield return new SelectionConfigurationOption(ORDER_SHUFFLE_TRACKS, Strings.PlaylistBehaviourConfiguration_Order_ShuffleTracks);
+            yield return new SelectionConfigurationOption(ORDER_SHUFFLE_ALBUMS, Strings.PlaylistBehaviourConfiguration_Order_ShuffleAlbums);
+            yield return new SelectionConfigurationOption(ORDER_SHUFFLE_ARTISTS, Strings.PlaylistBehaviourConfiguration_Order_ShuffleArtists);
         }
     }
 }

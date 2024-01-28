@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Queue Size.
+        /// </summary>
+        internal static string EnqueueNextItemBehaviourConfiguration_Count {
+            get {
+                return ResourceManager.GetString("EnqueueNextItemBehaviourConfiguration.Count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
@@ -331,11 +340,119 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close To Tray.
+        /// </summary>
+        internal static string NotifyIconConfiguration_Close {
+            get {
+                return ResourceManager.GetString("NotifyIconConfiguration.Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string NotifyIconConfiguration_Enabled {
+            get {
+                return ResourceManager.GetString("NotifyIconConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimize To Tray.
+        /// </summary>
+        internal static string NotifyIconConfiguration_Minimize {
+            get {
+                return ResourceManager.GetString("NotifyIconConfiguration.Minimize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tray Icon.
+        /// </summary>
+        internal static string NotifyIconConfiguration_Section {
+            get {
+                return ResourceManager.GetString("NotifyIconConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Playback.
         /// </summary>
         internal static string PlaybackBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("PlaybackBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order.
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_Order {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.Order", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_Order_Default {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.Order.Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shuffle (Albums).
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_Order_ShuffleAlbums {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.Order.ShuffleAlbums", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shuffle (Artists).
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_Order_ShuffleArtists {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.Order.ShuffleArtists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shuffle (Tracks).
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_Order_ShuffleTracks {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.Order.ShuffleTracks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pre Sorting.
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_PreSort {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.PreSort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Queuing.
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_Queue {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.Queue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlist.
+        /// </summary>
+        internal static string PlaylistBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("PlaylistBehaviourConfiguration.Section", resourceCulture);
             }
         }
         

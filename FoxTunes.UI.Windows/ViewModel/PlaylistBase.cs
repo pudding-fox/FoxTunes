@@ -246,7 +246,7 @@ namespace FoxTunes.ViewModel
                 }
                 await this.RefreshStatus().ConfigureAwait(false);
             });
-            if (this.IsInitialized)
+            if (this.IsInitialized && this.Items != null)
             {
                 return this.Debouncer.Exec(task);
             }

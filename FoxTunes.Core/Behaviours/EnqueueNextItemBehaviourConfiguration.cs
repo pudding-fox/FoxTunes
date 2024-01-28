@@ -10,10 +10,9 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION)
                 .WithElement(
-                    new IntegerConfigurationElement(COUNT, "Queue Size").WithValue(1).WithValidationRule(new IntegerValidationRule(1, 16))
+                    new IntegerConfigurationElement(COUNT, Strings.EnqueueNextItemBehaviourConfiguration_Count).WithValue(1).WithValidationRule(new IntegerValidationRule(1, 16))
             );
         }
     }
