@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public class PlaylistActionsBehaviour : StandardBehaviour, IInvocableComponent
     {
-        public const string LOCATE_PLAYLIST_ITEM = "0ECC7DA5-EC67-4EB2-B435-FFF44D9DCF55";
+        public const string LOCATE_PLAYLIST_ITEM = "AAAA";
 
         public ISignalEmitter SignalEmitter { get; private set; }
 

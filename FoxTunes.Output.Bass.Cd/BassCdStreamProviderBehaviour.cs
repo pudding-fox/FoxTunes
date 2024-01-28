@@ -11,7 +11,7 @@ namespace FoxTunes
 {
     public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent
     {
-        public const string ID = "707A7BC8-96A2-4166-80C0-2A652EAA9D49";
+        public const string OPEN_CD = "FFFF";
 
         public ICore Core { get; private set; }
 
@@ -107,7 +107,7 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ID, "Open CD");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_CD, "Open CD");
             }
         }
 
@@ -115,7 +115,7 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case ID:
+                case OPEN_CD:
                     return this.OpenCd();
             }
             return Task.CompletedTask;

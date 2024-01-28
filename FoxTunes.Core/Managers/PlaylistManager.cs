@@ -10,7 +10,7 @@ namespace FoxTunes.Managers
 {
     public class PlaylistManager : StandardManager, IPlaylistManager
     {
-        public const string CLEAR_PLAYLIST = "F452E482-2DF8-42F3-8D7D-4B3C7F40A708";
+        public const string CLEAR_PLAYLIST = "ZZZZ";
 
         private volatile bool IsNavigating = false;
 
@@ -343,7 +343,7 @@ namespace FoxTunes.Managers
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Clear");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
             }
         }
 

@@ -6,12 +6,15 @@ namespace FoxTunes
     {
         public const string CATEGORY_PLAYLIST = "42BC8F63-202C-4F77-8383-04A54FFFDCD5";
 
-        public InvocationComponent(string category, string id, string name = null, string description = null)
+        public const byte ATTRIBUTE_SEPARATOR = 1;
+
+        public InvocationComponent(string category, string id, string name = null, string description = null, byte attributes = 0)
         {
             this.Category = category;
             this.Id = id;
             this.Name = name;
             this.Description = description;
+            this.Attributes = attributes;
         }
 
         public string Category { get; private set; }
@@ -21,5 +24,7 @@ namespace FoxTunes
         public string Name { get; private set; }
 
         public string Description { get; private set; }
+
+        public byte Attributes { get; private set; }
     }
 }
