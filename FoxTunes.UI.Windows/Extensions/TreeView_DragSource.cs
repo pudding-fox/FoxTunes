@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -105,20 +106,18 @@ namespace FoxTunes
                 this.TreeView.PreviewMouseDown += this.OnMouseDown;
                 this.TreeView.PreviewMouseUp += this.OnMouseUp;
                 this.TreeView.MouseMove += this.OnMouseMove;
+                this.TreeView.PreviewTouchDown += this.OnTouchDown;
+                this.TreeView.PreviewTouchUp += this.OnTouchUp;
+                this.TreeView.TouchMove += this.OnTouchMove;
             }
 
             public Point DragStartPosition { get; private set; }
 
             public TreeView TreeView { get; private set; }
 
-            protected virtual bool ShouldInitializeDrag(object source, Point position)
+            protected virtual bool ShouldInitializeDrag(Point position)
             {
                 if (this.DragStartPosition.Equals(default(Point)))
-                {
-                    return false;
-                }
-                var dependencyObject = source as DependencyObject;
-                if (dependencyObject == null || dependencyObject.FindAncestor<TreeViewItem>() == null)
                 {
                     return false;
                 }
@@ -142,7 +141,17 @@ namespace FoxTunes
                 this.DragStartPosition = e.GetPosition(this.TreeView);
             }
 
+            protected virtual void OnTouchDown(object sender, TouchEventArgs e)
+            {
+                this.DragStartPosition = e.GetTouchPoint(this.TreeView).Position;
+            }
+
             protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
+            {
+                this.DragStartPosition = default(Point);
+            }
+
+            protected virtual void OnTouchUp(object sender, TouchEventArgs e)
             {
                 this.DragStartPosition = default(Point);
             }
@@ -153,17 +162,51 @@ namespace FoxTunes
                 {
                     return;
                 }
+                var dependencyObject = e.OriginalSource as DependencyObject;
+                if (dependencyObject != null && dependencyObject.FindAncestor<TreeViewItem>() != null)
+                {
+                    this.TryInitializeDrag(e.GetPosition(this.TreeView));
+                }
+            }
+
+            protected virtual void OnTouchMove(object sender, TouchEventArgs e)
+            {
+                var position = e.GetTouchPoint(this.TreeView).Position;
+                var result = VisualTreeHelper.HitTest(this.TreeView, position);
+                if (result != null && result.VisualHit is DependencyObject dependencyObject && dependencyObject.FindAncestor<TreeViewItem>() != null)
+                {
+                    this.TryInitializeDrag(position);
+                }
+            }
+
+            protected virtual bool TryInitializeDrag(Point position)
+            {
                 var selectedItem = GetSelectedItem(this.TreeView);
                 if (selectedItem == null)
                 {
-                    return;
+                    return false;
                 }
-                var position = e.GetPosition(this.TreeView);
-                if (this.ShouldInitializeDrag(e.OriginalSource, position))
+                if (this.ShouldInitializeDrag(position))
                 {
                     this.DragStartPosition = default(Point);
                     this.TreeView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
+                    return true;
                 }
+                return false;
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.TreeView != null)
+                {
+                    this.TreeView.PreviewMouseDown -= this.OnMouseDown;
+                    this.TreeView.PreviewMouseUp -= this.OnMouseUp;
+                    this.TreeView.MouseMove -= this.OnMouseMove;
+                    this.TreeView.PreviewTouchDown -= this.OnTouchDown;
+                    this.TreeView.PreviewTouchUp -= this.OnTouchUp;
+                    this.TreeView.TouchMove -= this.OnTouchMove;
+                }
+                base.OnDisposing();
             }
         }
     }
