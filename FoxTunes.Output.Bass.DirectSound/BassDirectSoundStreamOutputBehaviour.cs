@@ -31,8 +31,7 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -48,8 +47,7 @@ namespace FoxTunes
             {
                 this._DirectSoundDevice = value;
                 Logger.Write(this, LogLevel.Debug, "Direct Sound Device = {0}", this.DirectSoundDevice);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
+                var task = this.Output.Shutdown();
             }
         }
 
@@ -82,7 +80,8 @@ namespace FoxTunes
             }
             this.IsInitialized = true;
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 1));
-            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.GetBufferLength()));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.MixerBufferLength, this.Output.MixerBufferLength));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.SRCQuality, this.Output.ResamplingQuality));
             BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Output.Rate));
             Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
@@ -116,13 +115,6 @@ namespace FoxTunes
                 return;
             }
             BassDirectSoundDevice.Free();
-        }
-
-
-        protected virtual int GetBufferLength()
-        {
-            var updatePeriod = Bass.GetConfig(global::ManagedBass.Configuration.UpdatePeriod);
-            return updatePeriod + this.Output.BufferLength;
         }
 
         protected virtual void OnQueryingPipeline(object sender, QueryingPipelineEventArgs e)

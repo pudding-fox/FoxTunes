@@ -49,16 +49,17 @@ namespace FoxTunes
                     if (pipeline != null)
                     {
                         builder.AppendLine();
-                        builder.AppendLine(string.Format("Input = {0}", pipeline.Input.Description));
+                        builder.AppendLine(string.Format("{0}: {1}ms", Strings.BassOutput_Latency, pipeline.BufferLength));
+                        builder.AppendLine(string.Format("{0}: {1}", Strings.BassOutput_Input, pipeline.Input.Description));
                         foreach (var component in pipeline.Components)
                         {
                             if (!component.IsActive)
                             {
                                 continue;
                             }
-                            builder.AppendLine(string.Format("Component = {0}", component.Description));
+                            builder.AppendLine(string.Format("{0}: {1}", Strings.BassOutput_Component, component.Description));
                         }
-                        builder.Append(string.Format("Output = {0}", pipeline.Output.Description));
+                        builder.Append(string.Format("{0}: {1}", Strings.BassOutput_Output, pipeline.Output.Description));
                     }
                 });
                 return builder.ToString();
@@ -89,8 +90,7 @@ namespace FoxTunes
             {
                 this._Rate = value;
                 Logger.Write(this, LogLevel.Debug, "Rate = {0}", this.Rate);
-                //TODO: Bad .Wait().
-                this.Shutdown().Wait();
+                var task = this.Shutdown();
             }
         }
 
@@ -106,8 +106,7 @@ namespace FoxTunes
             {
                 this._EnforceRate = value;
                 Logger.Write(this, LogLevel.Debug, "Enforce Rate = {0}", this.EnforceRate);
-                //TODO: Bad .Wait().
-                this.Shutdown().Wait();
+                var task = this.Shutdown();
             }
         }
 
@@ -123,8 +122,7 @@ namespace FoxTunes
             {
                 this._Float = value;
                 Logger.Write(this, LogLevel.Debug, "Float = {0}", this.Float);
-                //TODO: Bad .Wait().
-                this.Shutdown().Wait();
+                var task = this.Shutdown();
             }
         }
 
@@ -140,8 +138,23 @@ namespace FoxTunes
             {
                 this._BufferLength = value;
                 Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
-                //TODO: Bad .Wait().
-                this.Shutdown().Wait();
+                var task = this.Shutdown();
+            }
+        }
+
+        private int _MixerBufferLength { get; set; }
+
+        public int MixerBufferLength
+        {
+            get
+            {
+                return this._MixerBufferLength;
+            }
+            set
+            {
+                this._MixerBufferLength = value;
+                Logger.Write(this, LogLevel.Debug, "MixerBufferLength = {0}", this.MixerBufferLength);
+                var task = this.Shutdown();
             }
         }
 
@@ -157,8 +170,7 @@ namespace FoxTunes
             {
                 this._ResamplingQuality = value;
                 Logger.Write(this, LogLevel.Debug, "ResamplingQuality = {0}", this.ResamplingQuality);
-                //TODO: Bad .Wait().
-                this.Shutdown().Wait();
+                var task = this.Shutdown();
             }
         }
 
@@ -319,6 +331,10 @@ namespace FoxTunes
             ).ConnectValue(value => this.BufferLength = value);
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.MIXER_BUFFER_LENGTH_ELEMENT
+            ).ConnectValue(value => this.MixerBufferLength = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.RESAMPLE_QUALITY_ELEMENT
             ).ConnectValue(value => this.ResamplingQuality = value);
             this.PluginLoader = ComponentRegistry.Instance.GetComponent<IBassPluginLoader>();
@@ -413,7 +429,7 @@ namespace FoxTunes
                     {
                         if (pipeline.Input.CheckFormat(outputStream))
                         {
-                            if (pipeline.Input.Add(outputStream))
+                            if (pipeline.Input.Add(outputStream, this.OnStreamAdded))
                             {
                                 Logger.Write(this, LogLevel.Debug, "Pre-empted playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
                                 return true;
@@ -442,6 +458,11 @@ namespace FoxTunes
 #endif
         }
 
+        protected virtual void OnStreamAdded(BassOutputStream stream)
+        {
+            //Nothing to do.
+        }
+
         public override async Task Unload(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
@@ -452,16 +473,25 @@ namespace FoxTunes
                 {
                     if (pipeline != null)
                     {
-                        if (!pipeline.Input.Remove(outputStream, this.Unload))
+                        var resume = false;
+                        if (!outputStream.IsEnded && pipeline.Input.Contains(outputStream))
+                        {
+                            if (!pipeline.Input.PreserveBuffer)
+                            {
+                                Logger.Write(this, LogLevel.Debug, "Track was manually skipped, clearing the playback buffer.");
+                                pipeline.Pause();
+                                pipeline.ClearBuffer();
+                                resume = true;
+                            }
+                        }
+                        if (!pipeline.Input.Remove(outputStream, this.OnStreamRemoved))
                         {
                             //Probably not in the queue.
                             this.Unload(outputStream);
                         }
-                        if (!outputStream.IsEnded && !pipeline.Input.PreserveBuffer)
+                        if (resume)
                         {
-                            Logger.Write(this, LogLevel.Debug, "Track was manually skipped, clearing the playback buffer.");
-                            pipeline.Pause();
-                            pipeline.ClearBuffer();
+                            pipeline.Resume();
                         }
                     }
                 }).ConfigureAwait(false);
@@ -471,6 +501,11 @@ namespace FoxTunes
                 //TODO: Is this possible? 
                 this.Unload(outputStream);
             }
+        }
+
+        protected virtual void OnStreamRemoved(BassOutputStream outputStream)
+        {
+            this.Unload(outputStream);
         }
 
         protected virtual void Unload(BassOutputStream outputStream)

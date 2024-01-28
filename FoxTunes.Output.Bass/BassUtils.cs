@@ -101,6 +101,16 @@ namespace FoxTunes
             OK(Bass.ChannelGetInfo(channelHandle, out channelInfo));
             return channelInfo.Flags;
         }
+
+        public static int GetMixerBufferLength()
+        {
+            var bufferLength = Bass.GetConfig(Configuration.MixerBufferLength);
+            if (bufferLength <= 5)
+            {
+                bufferLength *= Bass.PlaybackBufferLength;
+            }
+            return bufferLength;
+        }
     }
 
     public class BassException : Exception

@@ -19,19 +19,19 @@ namespace FoxTunes
 
         public BassFlags Flags { get; protected set; }
 
-        public virtual long BufferLength
+        public virtual int BufferLength
         {
             get
             {
                 return 0;
             }
-            protected set
-            {
-                throw new NotImplementedException();
-            }
         }
 
         public abstract bool IsActive { get; }
+
+        public virtual bool IsStarting { get; set; }
+
+        public virtual bool IsStopping { get; set; }
 
         public virtual bool GetFormat(out int rate, out int channels, out BassFlags flags)
         {

@@ -8,8 +8,6 @@
 
         bool IsStopped { get; }
 
-        int Latency { get; }
-
         bool CheckFormat(int rate, int channels);
 
         bool CanGetData { get; }

@@ -23,7 +23,7 @@ namespace FoxTunes
         {
             get
             {
-                return "Direct Sound";
+                return Strings.DirectSound;
             }
         }
 
@@ -55,6 +55,14 @@ namespace FoxTunes
         public BassDirectSoundStreamOutputBehaviour Behaviour { get; private set; }
 
         public override int ChannelHandle { get; protected set; }
+
+        public override int BufferLength
+        {
+            get
+            {
+                return BassUtils.GetMixerBufferLength();
+            }
+        }
 
         protected override IEnumerable<int> GetMixerChannelHandles()
         {
@@ -120,6 +128,13 @@ namespace FoxTunes
             flags = flags & ~BassFlags.Decode;
         }
 
+        public override void ClearBuffer()
+        {
+            Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
+            Bass.ChannelSetPosition(this.ChannelHandle, 0);
+            base.ClearBuffer();
+        }
+
         public override bool IsPlaying
         {
             get
@@ -141,14 +156,6 @@ namespace FoxTunes
             get
             {
                 return Bass.ChannelIsActive(this.ChannelHandle) == PlaybackState.Stopped;
-            }
-        }
-
-        public override int Latency
-        {
-            get
-            {
-                return 0;
             }
         }
 

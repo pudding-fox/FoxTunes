@@ -9,11 +9,11 @@ namespace FoxTunes.Interfaces
 
         T WithPipeline<T>(Func<IBassStreamPipeline, T> func);
 
-        Task WithPipelineExclusive(Action<IBassStreamPipeline> action);
+        Task<bool> WithPipelineExclusive(Action<IBassStreamPipeline> action, int timeout = BassStreamPipelineManager.SYNCHRONIZE_PIPELINE_TIMEOUT);
 
-        Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func);
+        Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func, int timeout = BassStreamPipelineManager.SYNCHRONIZE_PIPELINE_TIMEOUT);
 
-        Task WithPipelineExclusive(BassOutputStream stream, Action<IBassStreamPipeline> action);
+        Task<bool> WithPipelineExclusive(BassOutputStream stream, Action<IBassStreamPipeline> action, int timeout = BassStreamPipelineManager.SYNCHRONIZE_PIPELINE_TIMEOUT);
 
         Task FreePipeline();
 

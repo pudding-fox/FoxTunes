@@ -12,6 +12,8 @@ namespace FoxTunes.Interfaces
 
         int BufferLength { get; }
 
+        int MixerBufferLength { get; }
+
         int ResamplingQuality { get; }
 
         event EventHandler Init;

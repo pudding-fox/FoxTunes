@@ -24,7 +24,7 @@ namespace FoxTunes
         {
             get
             {
-                return "WASAPI";
+                return Strings.WASAPI;
             }
         }
 
@@ -56,6 +56,19 @@ namespace FoxTunes
         public BassWasapiStreamOutputBehaviour Behaviour { get; private set; }
 
         public override int ChannelHandle { get; protected set; }
+
+        public override int BufferLength
+        {
+            get
+            {
+                var bufferLength = Convert.ToInt32(Bass.ChannelBytes2Seconds(this.ChannelHandle, BassWasapi.Info.BufferLength) / 1000);
+                foreach (var channelHandle in this.MixerChannelHandles)
+                {
+                    bufferLength += BassUtils.GetMixerBufferLength();
+                }
+                return bufferLength;
+            }
+        }
 
         protected override IEnumerable<int> GetMixerChannelHandles()
         {
@@ -191,6 +204,16 @@ namespace FoxTunes
             return false;
         }
 
+        public override void ClearBuffer()
+        {
+            foreach (var channelHandle in this.MixerChannelHandles)
+            {
+                Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
+                Bass.ChannelSetPosition(channelHandle, 0);
+            }
+            base.ClearBuffer();
+        }
+
         public override bool IsPlaying
         {
             get
@@ -214,14 +237,6 @@ namespace FoxTunes
             get
             {
                 return !BassWasapi.IsStarted;
-            }
-        }
-
-        public override int Latency
-        {
-            get
-            {
-                return 0;
             }
         }
 

@@ -29,7 +29,7 @@ namespace FoxTunes
 
         public PlaylistItem PlaylistItem { get; private set; }
 
-        public abstract long Position { get; set; }
+        public abstract long Position { get; }
 
         public abstract long Length { get; }
 
@@ -55,6 +55,8 @@ namespace FoxTunes
 
         public abstract Task Stop();
 
+        public abstract Task Seek(long position);
+
         public abstract event EventHandler Ending;
 
         public abstract event EventHandler Ended;
@@ -69,12 +71,12 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Stop();
+            return this.Pause();
         }
 
         public virtual Task EndSeek()
         {
-            if (!this.IsStopped)
+            if (!this.IsPaused)
             {
 #if NET40
                 return TaskEx.FromResult(false);
@@ -82,7 +84,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Play();
+            return this.Resume();
         }
 
         public abstract TimeSpan GetDuration(long position);

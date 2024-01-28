@@ -52,12 +52,9 @@ namespace FoxTunes.ViewModel
                 if (this.IsSeeking)
                 {
                     this._Position = value;
+                    return;
                 }
-                else
-                {
-                    this.InnerOutputStream.Position = value;
-                }
-                this.OnPositionChanged();
+                var task = this.Seek(value);
             }
         }
 
@@ -190,20 +187,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler IsSeekingChanged;
 
-        public Task BeginSeek()
+        public async Task BeginSeek()
         {
-            var position = this.Position;
+            await this.InnerOutputStream.BeginSeek().ConfigureAwait(false);
+            this._Position = this.Position;
             this.IsSeeking = true;
-            this.Position = position;
-            return this.InnerOutputStream.BeginSeek();
         }
 
-        public Task EndSeek()
+        public async Task EndSeek()
         {
-            var position = this.Position;
+            if (!this.IsSeeking)
+            {
+                return;
+            }
+            await this.InnerOutputStream.Seek(this.Position).ConfigureAwait(false);
+            await this.InnerOutputStream.EndSeek().ConfigureAwait(false);
             this.IsSeeking = false;
-            this.Position = position;
-            return this.InnerOutputStream.EndSeek();
+        }
+
+        public async Task Seek(long position)
+        {
+            this._Position = position;
+            this.IsSeeking = true;
+            await this.InnerOutputStream.BeginSeek().ConfigureAwait(false);
+            await this.InnerOutputStream.Seek(position).ConfigureAwait(false);
+            await this.InnerOutputStream.EndSeek().ConfigureAwait(false);
+            this.IsSeeking = false;
         }
 
         protected override void OnDisposing()

@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public const string BUFFER_LENGTH_ELEMENT = "PPPP3629-1AE5-451F-A545-8B864FEAD038";
 
+        public const string MIXER_BUFFER_LENGTH_ELEMENT = "PPPQ18BB-0485-4472-880D-3AB2ADFB1E42";
+
         public const string VOLUME_ENABLED_ELEMENT = "PPQQE42E-E530-4995-B3AC-CF6B2D9FE95B";
 
         public const string VOLUME_ELEMENT = "QQQQ1AF3-507A-426A-AE65-F118D1E71F2D";
@@ -41,6 +43,7 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT, Strings.BassOutputConfiguration_Output))
                 .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, Strings.BassOutputConfiguration_EnforceRate, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, Strings.BassOutputConfiguration_BufferLength, path: Strings.General_Advanced).WithValue(500).WithValidationRule(new IntegerValidationRule(10, 5000)))
+                .WithElement(new IntegerConfigurationElement(MIXER_BUFFER_LENGTH_ELEMENT, Strings.BassOutputConfiguration_MixerBufferLength, path: Strings.General_Advanced).WithValue(2).WithValidationRule(new IntegerValidationRule(1, 5)))
                 .WithElement(new BooleanConfigurationElement(VOLUME_ENABLED_ELEMENT, Strings.BassOutputConfiguration_Volume, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, Strings.BassOutputConfiguration_VolumeLevel, path: Strings.General_Advanced).WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(RESAMPLE_QUALITY_ELEMENT, Strings.BassOutputConfiguration_ResampleQuality, path: Strings.General_Advanced).WithValue(2).WithValidationRule(new IntegerValidationRule(1, 10)))

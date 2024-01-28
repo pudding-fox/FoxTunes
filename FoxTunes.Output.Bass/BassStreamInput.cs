@@ -81,7 +81,7 @@ namespace FoxTunes
 
         public abstract int Position(BassOutputStream stream);
 
-        public abstract bool Add(BassOutputStream stream);
+        public abstract bool Add(BassOutputStream stream, Action<BassOutputStream> callBack);
 
         public abstract bool Remove(BassOutputStream stream, Action<BassOutputStream> callBack);
 

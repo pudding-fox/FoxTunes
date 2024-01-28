@@ -198,7 +198,6 @@ namespace FoxTunes
             {
                 return;
             }
-            await this.SetCurrentStream(null).ConfigureAwait(false);
             await this.Output.Shutdown().ConfigureAwait(false);
         }
 

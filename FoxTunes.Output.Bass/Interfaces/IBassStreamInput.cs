@@ -15,7 +15,7 @@ namespace FoxTunes.Interfaces
 
         bool Contains(BassOutputStream stream);
 
-        bool Add(BassOutputStream stream);
+        bool Add(BassOutputStream stream, Action<BassOutputStream> callBack);
 
         bool Remove(BassOutputStream stream, Action<BassOutputStream> callBack);
 

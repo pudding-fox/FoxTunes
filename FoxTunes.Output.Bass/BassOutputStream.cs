@@ -83,50 +83,20 @@ namespace FoxTunes
         {
             get
             {
-                return this.GetPosition();
-            }
-            set
-            {
-                this.SetPosition(value);
-            }
-        }
-
-        protected virtual long GetPosition()
-        {
-            var position = this.Stream.Position;
-            this.Manager.WithPipeline(pipeline =>
-            {
-                if (pipeline != null)
+                var position = this.Stream.Position;
+                this.Manager.WithPipeline(pipeline =>
                 {
-                    var buffer = pipeline.BufferLength;
-                    if (buffer > 0)
+                    if (pipeline != null)
                     {
-                        position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, buffer);
+                        var bufferLength = (float)pipeline.BufferLength / 1000;
+                        if (bufferLength > 0)
+                        {
+                            position -= Bass.ChannelSeconds2Bytes(this.ChannelHandle, bufferLength);
+                        }
                     }
-                }
-            });
-            return Math.Max(position, 0);
-        }
-
-        protected virtual void SetPosition(long position)
-        {
-            this.Manager.WithPipeline(pipeline =>
-            {
-                if (pipeline != null)
-                {
-                    var buffer = pipeline.BufferLength;
-                    if (buffer > 0)
-                    {
-                        pipeline.Pause();
-                        pipeline.ClearBuffer();
-                    }
-                }
-            });
-            if (position >= this.Length)
-            {
-                position = this.Length - 1;
+                });
+                return Math.Max(position, 0);
             }
-            this.Stream.Position = position;
         }
 
         public override long Length
@@ -244,6 +214,10 @@ namespace FoxTunes
         {
             return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
+                if (this.IsPlaying)
+                {
+                    return;
+                }
                 if (pipeline != null)
                 {
                     pipeline.Play();
@@ -255,6 +229,10 @@ namespace FoxTunes
         {
             return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
+                if (!this.IsPlaying)
+                {
+                    return;
+                }
                 if (pipeline != null)
                 {
                     pipeline.Pause();
@@ -266,6 +244,10 @@ namespace FoxTunes
         {
             return this.Manager.WithPipelineExclusive(this, pipeline =>
             {
+                if (!this.IsPaused)
+                {
+                    return;
+                }
                 if (pipeline != null)
                 {
                     pipeline.Resume();
@@ -280,6 +262,45 @@ namespace FoxTunes
                 if (pipeline != null)
                 {
                     pipeline.Stop();
+                }
+            });
+        }
+
+        public override Task Seek(long position)
+        {
+            return this.Manager.WithPipelineExclusive(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    var bufferLength = pipeline.BufferLength;
+                    if (position >= this.Length)
+                    {
+                        //BASS cannot seek to the end of a stream.
+                        //We should follow this with a second call to BASS_ChannelSetPosition with the BASS_POS_DECODETO flag set.
+                        position = this.Length - 1;
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Seeking to position {0}", position);
+                    if (this.IsPlaying)
+                    {
+                        if (bufferLength > 0)
+                        {
+                            pipeline.Pause();
+                            pipeline.ClearBuffer();
+                        }
+                        this.Stream.Position = position;
+                        if (bufferLength > 0)
+                        {
+                            pipeline.Resume();
+                        }
+                    }
+                    else
+                    {
+                        if (bufferLength > 0)
+                        {
+                            pipeline.ClearBuffer();
+                        }
+                        this.Stream.Position = position;
+                    }
                 }
             });
         }
