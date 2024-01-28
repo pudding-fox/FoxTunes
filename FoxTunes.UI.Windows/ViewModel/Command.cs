@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes.ViewModel
 {
@@ -45,9 +46,10 @@ namespace FoxTunes.ViewModel
                 this.Action();
                 this.OnPhase(CommandPhase.After, this.Tag, parameter);
             }
-            catch
+            catch (Exception e)
             {
-                //TODO: Logging.
+                Logger.Write(typeof(Command), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                this.OnPhase(CommandPhase.Error, this.Tag, parameter);
             }
             this.OnCanExecuteChanged();
         }
@@ -110,9 +112,10 @@ namespace FoxTunes.ViewModel
                 }
                 this.OnPhase(CommandPhase.After, this.Tag, parameter);
             }
-            catch
+            catch (Exception e)
             {
-                //TODO: Logging.
+                Logger.Write(typeof(Command), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                this.OnPhase(CommandPhase.Error, this.Tag, parameter);
             }
             this.OnCanExecuteChanged();
         }

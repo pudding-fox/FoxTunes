@@ -83,6 +83,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SettingsVisibleChanged;
 
+        private bool _IsSaving { get; set; }
+
+        public bool IsSaving
+        {
+            get
+            {
+                return this._IsSaving;
+            }
+            set
+            {
+                this._IsSaving = value;
+                this.OnIsSavingChanged();
+            }
+        }
+
+        protected virtual void OnIsSavingChanged()
+        {
+            if (this.IsSavingChanged != null)
+            {
+                this.IsSavingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsSaving");
+        }
+
+        public event EventHandler IsSavingChanged;
+
         public ICommand SaveCommand
         {
             get
@@ -100,6 +126,7 @@ namespace FoxTunes.ViewModel
             var exception = default(Exception);
             try
             {
+                await Windows.Invoke(() => this.IsSaving = true);
                 using (var database = this.DatabaseFactory.Create())
                 {
                     using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
@@ -123,6 +150,10 @@ namespace FoxTunes.ViewModel
             {
                 exception = e;
             }
+            finally
+            {
+                await Windows.Invoke(() => this.IsSaving = false);
+            }
             await this.OnError("Save", exception);
             throw exception;
         }
@@ -141,8 +172,16 @@ namespace FoxTunes.ViewModel
 
         public async Task Rebuild()
         {
-            await this.HierarchyManager.Clear(null);
-            await this.HierarchyManager.Build(null);
+            await Windows.Invoke(() => this.IsSaving = true);
+            try
+            {
+                await this.HierarchyManager.Clear(null);
+                await this.HierarchyManager.Build(null);
+            }
+            finally
+            {
+                await Windows.Invoke(() => this.IsSaving = false);
+            }
         }
 
         public ICommand RescanCommand
@@ -157,9 +196,17 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public Task Rescan()
+        public async Task Rescan()
         {
-            return this.LibraryManager.Rescan();
+            await Windows.Invoke(() => this.IsSaving = true);
+            try
+            {
+                await this.LibraryManager.Rescan();
+            }
+            finally
+            {
+                await Windows.Invoke(() => this.IsSaving = false);
+            }
         }
 
         public ICommand ClearCommand
@@ -176,8 +223,16 @@ namespace FoxTunes.ViewModel
 
         public async Task Clear()
         {
-            await this.HierarchyManager.Clear(null);
-            await this.LibraryManager.Clear(null);
+            await Windows.Invoke(() => this.IsSaving = true);
+            try
+            {
+                await this.HierarchyManager.Clear(null);
+                await this.LibraryManager.Clear(null);
+            }
+            finally
+            {
+                await Windows.Invoke(() => this.IsSaving = false);
+            }
         }
 
         public ICommand CancelCommand
@@ -206,23 +261,30 @@ namespace FoxTunes.ViewModel
 
         public async Task Reset()
         {
-            await this.Clear();
-            using (var database = this.DatabaseFactory.Create())
+            await Windows.Invoke(() => this.IsSaving = true);
+            try
             {
-                using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
+                    {
+                        global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
 #if NET40
-                    return TaskEx.FromResult(false);
+                        return TaskEx.FromResult(false);
 #else
-                    return Task.CompletedTask;
+                        return Task.CompletedTask;
 #endif
-                }))
-                {
-                    await task.Run();
+                    }))
+                    {
+                        await task.Run();
+                    }
                 }
+                await this.Refresh();
             }
-            await this.Refresh();
+            finally
+            {
+                await Windows.Invoke(() => this.IsSaving = false);
+            }
         }
 
         public override void InitializeComponent(ICore core)

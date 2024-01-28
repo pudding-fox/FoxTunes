@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace FoxTunes.ViewModel
@@ -37,13 +38,21 @@ namespace FoxTunes.ViewModel
             }
             this.OnPhase(CommandPhase.Before, this.Tag, parameter);
 #if NET40
-            var task = TaskEx.Run(() =>
+            var task = TaskEx.Run(async () =>
 #else
-            var task = Task.Run(() =>
+            var task = Task.Run(async () =>
 #endif
             {
-                this.Func();
-                this.OnPhase(CommandPhase.After, this.Tag, parameter);
+                try
+                {
+                    await this.Func();
+                    this.OnPhase(CommandPhase.After, this.Tag, parameter);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                    this.OnPhase(CommandPhase.Error, this.Tag, parameter);
+                }
                 return Windows.Invoke(() => this.OnCanExecuteChanged());
             });
         }
@@ -90,20 +99,28 @@ namespace FoxTunes.ViewModel
             }
             this.OnPhase(CommandPhase.Before, this.Tag, parameter);
 #if NET40
-            var task = TaskEx.Run(() =>
+            var task = TaskEx.Run(async () =>
 #else
-            var task = Task.Run(() =>
+            var task = Task.Run(async () =>
 #endif
             {
-                if (parameter is T)
+                try
                 {
-                    this.Func((T)parameter);
+                    if (parameter is T)
+                    {
+                        await this.Func((T)parameter);
+                    }
+                    else
+                    {
+                        await this.Func(default(T));
+                    }
+                    this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 }
-                else
+                catch (Exception e)
                 {
-                    this.Func(default(T));
+                    Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                    this.OnPhase(CommandPhase.Error, this.Tag, parameter);
                 }
-                this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 return Windows.Invoke(() => this.OnCanExecuteChanged());
             });
         }

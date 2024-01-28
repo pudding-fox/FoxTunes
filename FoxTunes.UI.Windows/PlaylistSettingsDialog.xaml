@@ -85,12 +85,24 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
-            <Button Width="60" Height="30" Margin="0,7,0,0" Command="{Binding ResetCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Reset</Button>
-        </StackPanel>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
-            <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
-        </StackPanel>
+        <Grid Grid.Row="1" >
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Setter Property="IsEnabled" Value="True"></Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSaving, Source={StaticResource ViewModel}}" Value="True">
+                            <Setter Property="IsEnabled" Value="False"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Width="60" Height="30" Margin="0,7,0,0" Command="{Binding ResetCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Reset</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
+                <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
