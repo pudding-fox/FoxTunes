@@ -3,13 +3,16 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Layout;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FoxTunes
 {
     [Component("3DC2C04A-CE99-4416-BC27-068E8AC02F56", ComponentSlots.Logger, priority: ComponentAttribute.PRIORITY_HIGH)]
-    public class Log4NetLogger : StandardComponent, ILogger
+    public class Log4NetLogger : StandardComponent, ILogger, IConfigurableComponent
     {
+        public IConfiguration Configuration { get; private set; }
+
         public bool IsDebugEnabled(IBaseComponent component)
         {
             return this.IsDebugEnabled(component.GetType());
@@ -103,9 +106,39 @@ namespace FoxTunes
             }
         }
 
+        public override void InitializeComponent(ICore core)
+        {
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                Log4NetLoggerConfiguration.SECTION,
+                Log4NetLoggerConfiguration.DEFAULT_APPENDER_ELEMENT
+            ).ConnectValue<bool>(value =>
+            {
+                if (value)
+                {
+                    EnableFileAppender();
+                }
+                else
+                {
+                    DisableFileAppender();
+                }
+            });
+            base.InitializeComponent(core);
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return Log4NetLoggerConfiguration.GetConfigurationSections();
+        }
+
         public static void EnableFileAppender()
         {
             BasicConfigurator.Configure(GetFileAppender());
+        }
+
+        public static void DisableFileAppender()
+        {
+            BasicConfigurator.Configure();
         }
 
         private static IAppender GetFileAppender()

@@ -110,7 +110,10 @@ namespace FoxTunes.ViewModel
                 {
                     if (this.ShowPlaceholder && this.ThemeLoader.Theme != null)
                     {
-                        this.ImageSource = this.LoadImage(this.ThemeLoader.Theme.ArtworkPlaceholder);
+                        using (var stream = this.ThemeLoader.Theme.ArtworkPlaceholder)
+                        {
+                            this.ImageSource = this.LoadImage(stream);
+                        }
                     }
                     else
                     {

@@ -21,7 +21,6 @@ namespace FoxTunes.Launcher
                     client.Send(Environment.CommandLine).Wait();
                     return;
                 }
-                Log4NetLogger.EnableFileAppender();
                 using (var core = new Core())
                 {
                     try

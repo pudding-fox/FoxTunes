@@ -42,7 +42,8 @@ namespace FoxTunes
             }
             set
             {
-                this.Values.Add(this.ThreadLocal.Value = value);
+                this.ThreadLocal.Value = value;
+                this.Values.Add(value);
             }
         }
 

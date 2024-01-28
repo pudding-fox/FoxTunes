@@ -15,6 +15,58 @@ namespace FoxTunes.ViewModel
 
         public IConfiguration Configuration { get; private set; }
 
+        private TextConfigurationElement _MarqueeInterval { get; set; }
+
+        public TextConfigurationElement MarqueeInterval
+        {
+            get
+            {
+                return this._MarqueeInterval;
+            }
+            set
+            {
+                this._MarqueeInterval = value;
+                this.OnMarqueeIntervalChanged();
+            }
+        }
+
+        protected virtual void OnMarqueeIntervalChanged()
+        {
+            if (this.MarqueeIntervalChanged != null)
+            {
+                this.MarqueeIntervalChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MarqueeInterval");
+        }
+
+        public event EventHandler MarqueeIntervalChanged = delegate { };
+
+        private TextConfigurationElement _MarqueeStep { get; set; }
+
+        public TextConfigurationElement MarqueeStep
+        {
+            get
+            {
+                return this._MarqueeStep;
+            }
+            set
+            {
+                this._MarqueeStep = value;
+                this.OnMarqueeStepChanged();
+            }
+        }
+
+        protected virtual void OnMarqueeStepChanged()
+        {
+            if (this.MarqueeStepChanged != null)
+            {
+                this.MarqueeStepChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MarqueeStep");
+        }
+
+        public event EventHandler MarqueeStepChanged = delegate { };
+
         private PlaylistItem _CurrentItem { get; set; }
 
         public PlaylistItem CurrentItem
@@ -133,6 +185,14 @@ namespace FoxTunes.ViewModel
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
             ).ConnectValue<string>(async value => await this.SetDisplayScript(value));
+            this.MarqueeInterval = this.Configuration.GetElement<TextConfigurationElement>(
+              WindowsUserInterfaceConfiguration.SECTION,
+              WindowsUserInterfaceConfiguration.MARQUEE_INTERVAL_ELEMENT
+            );
+            this.MarqueeStep = this.Configuration.GetElement<TextConfigurationElement>(
+              WindowsUserInterfaceConfiguration.SECTION,
+              WindowsUserInterfaceConfiguration.MARQUEE_STEP_ELEMENT
+            );
             var task = this.Refresh();
             base.InitializeComponent(core);
         }
