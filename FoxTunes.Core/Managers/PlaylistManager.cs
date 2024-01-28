@@ -684,7 +684,7 @@ namespace FoxTunes
             {
                 return;
             }
-            using (var transaction = database.BeginTransaction())
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
             {
                 {
                     var set = database.Set<Playlist>(transaction);

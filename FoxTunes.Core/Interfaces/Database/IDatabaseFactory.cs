@@ -6,11 +6,18 @@ namespace FoxTunes.Interfaces
     {
         DatabaseFactoryFlags Flags { get; }
 
-        bool Test();
+        DatabaseTestResult Test();
 
         void Initialize();
 
         IDatabaseComponent Create();
+    }
+
+    public enum DatabaseTestResult : byte
+    {
+        OK = 0,
+        Missing = 1,
+        Mismatch = 2
     }
 
     [Flags]

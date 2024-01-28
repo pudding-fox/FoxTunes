@@ -43,17 +43,28 @@ namespace FoxTunes.Launcher
                         {
                             throw new InvalidOperationException("One or more required components were not loaded.");
                         }
-                        if (!core.Factories.Database.Test())
+                        var test = core.Factories.Database.Test();
+                        if (test != DatabaseTestResult.OK)
                         {
-                            if (core.Factories.Database.Flags.HasFlag(DatabaseFactoryFlags.ConfirmCreate))
+                            if (test == DatabaseTestResult.Missing)
                             {
-                                if (!core.Components.UserInterface.Confirm("The database was not found, initialize it?."))
+                                if (core.Factories.Database.Flags.HasFlag(DatabaseFactoryFlags.ConfirmCreate))
+                                {
+                                    if (!core.Components.UserInterface.Confirm("The database was not found, initialize it?."))
+                                    {
+                                        throw new OperationCanceledException("Database initialization was cancelled.");
+                                    }
+                                }
+                            }
+                            else if (test == DatabaseTestResult.Mismatch)
+                            {
+                                if (!core.Components.UserInterface.Confirm("The database is incompatible, delete it?."))
                                 {
                                     throw new OperationCanceledException("Database initialization was cancelled.");
                                 }
                             }
                             core.Factories.Database.Initialize();
-                            if (!core.Factories.Database.Test())
+                            if (core.Factories.Database.Test() != DatabaseTestResult.OK)
                             {
                                 throw new InvalidOperationException("Failed to initialize the database.");
                             }

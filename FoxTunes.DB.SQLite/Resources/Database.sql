@@ -1,3 +1,6 @@
+CREATE TABLE [Main](
+	[Checksum] text COLLATE NOCASE);
+
 CREATE TABLE [MetaDataItems](
 	[Id] INTEGER PRIMARY KEY NOT NULL, 
 	[Name] text NOT NULL COLLATE NOCASE, 
