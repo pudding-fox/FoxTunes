@@ -75,24 +75,7 @@ namespace FoxTunes
         public virtual IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             var fileName = this.GetFileName(playlistItem, advice);
-            var channelHandle = default(int);
-            if (this.Output != null && this.Output.PlayFromMemory)
-            {
-                //Synchronize as BassInMemoryHandler will create a shared buffer for the file.
-                using (KeyLock.Lock(fileName))
-                {
-                    channelHandle = BassInMemoryHandler.CreateStream(fileName, 0, 0, flags);
-                }
-                if (channelHandle == 0)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", fileName);
-                    channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
-                }
-            }
-            else
-            {
-                channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
-            }
+            var channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 

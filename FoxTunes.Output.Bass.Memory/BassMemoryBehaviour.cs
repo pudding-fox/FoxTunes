@@ -1,12 +1,12 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass.Sox;
+using ManagedBass.Memory;
 using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassResamplerStreamComponentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassMemoryBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public ICore Core { get; private set; }
 
@@ -44,7 +44,7 @@ namespace FoxTunes
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
-                BassResamplerStreamComponentConfiguration.ENABLED_ELEMENT
+                BassMemoryBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
@@ -60,9 +60,9 @@ namespace FoxTunes
             {
                 return;
             }
-            BassUtils.OK(BassSox.Init());
+            BassMemory.Init();
+            Logger.Write(this, LogLevel.Debug, "BASS MEMORY Initialized.");
             this.IsInitialized = true;
-            Logger.Write(this, LogLevel.Debug, "BASS SOX Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -71,8 +71,8 @@ namespace FoxTunes
             {
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Releasing BASS SOX.");
-            BassSox.Free();
+            Logger.Write(this, LogLevel.Debug, "Releasing BASS MEMORY.");
+            BassMemory.Free();
             this.IsInitialized = false;
         }
 
@@ -82,18 +82,18 @@ namespace FoxTunes
             {
                 return;
             }
-            if (!BassResamplerStreamComponent.ShouldCreate(this, e.Stream, e.Query))
+            if (!BassMemoryStreamComponent.ShouldCreate(this, e.Stream, e.Query))
             {
                 return;
             }
-            var component = new BassResamplerStreamComponent(this, e.Stream, e.Query);
+            var component = new BassMemoryStreamComponent(this, e.Stream, e.Query);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            return BassResamplerStreamComponentConfiguration.GetConfigurationSections();
+            return BassMemoryBehaviourConfiguration.GetConfigurationSections();
         }
 
         public bool IsDisposed { get; private set; }
@@ -127,7 +127,7 @@ namespace FoxTunes
             }
         }
 
-        ~BassResamplerStreamComponentBehaviour()
+        ~BassMemoryBehaviour()
         {
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try

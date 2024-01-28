@@ -123,11 +123,5 @@ source/.vs/
 #libs
 lib/x86/bass_asio_handler.*
 lib/x86/bass_wasapi_handler.*
-lib/x86/bass_inmemory_handler.*
-lib/x86/bass_inmemory_handler_dsd.*
-lib/x86/bass_substream_handler.*
 lib/x64/bass_asio_handler.*
 lib/x64/bass_wasapi_handler.*
-lib/x64/bass_inmemory_handler.*
-lib/x64/bass_inmemory_handler_dsd.*
-lib/x64/bass_substream_handler.*

@@ -28,20 +28,20 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+  	<None Include="..\lib\x86\bassdsd.dll" Link="Addon\bassdsd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	</None>
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+  	<None Include="..\lib\x64\bassdsd.dll" Link="Addon\bassdsd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	</None>
+  </ItemGroup>
+
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Platform)' == 'x86'">
-    <None Include="..\lib\x86\bass_inmemory_handler_dsd.dll" Link="bass_inmemory_handler_dsd.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Platform)' == 'x64'">
-    <None Include="..\lib\x64\bass_inmemory_handler_dsd.dll" Link="bass_inmemory_handler_dsd.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

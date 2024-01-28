@@ -5,6 +5,7 @@ using ManagedBass;
 using ManagedBass.Dsd;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace FoxTunes
@@ -13,11 +14,25 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdStreamProvider : BassStreamProvider
     {
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassDsdStreamProvider).Assembly.Location);
+            }
+        }
+
         public static readonly string[] EXTENSIONS = new[]
         {
             "dsd",
             "dsf"
         };
+
+        public BassDsdStreamProvider()
+        {
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddExtensions(EXTENSIONS);
+        }
 
         public BassDsdStreamProviderBehaviour Behaviour { get; private set; }
 
@@ -53,20 +68,7 @@ namespace FoxTunes
         {
             flags |= BassFlags.DSDRaw;
             var fileName = this.GetFileName(playlistItem, advice);
-            var channelHandle = default(int);
-            if (this.Output != null && this.Output.PlayFromMemory)
-            {
-                channelHandle = BassDsdInMemoryHandler.CreateStream(fileName, 0, 0, flags);
-                if (channelHandle == 0)
-                {
-                    Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", fileName);
-                    channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
-                }
-            }
-            else
-            {
-                channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
-            }
+            var channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
             if (channelHandle != 0 && !this.IsFormatSupported(playlistItem, channelHandle))
             {
                 this.FreeStream(playlistItem, channelHandle);

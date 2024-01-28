@@ -17,7 +17,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override void Advise(IBassStreamProvider provider, PlaylistItem playlistItem, IList<IBassStreamAdvice> advice)
+        public override void Advise(IBassStreamProvider provider, PlaylistItem playlistItem, IList<IBassStreamAdvice> advice, BassStreamUsageType type)
         {
             if (this.Behaviour == null || !this.Behaviour.Enabled)
             {

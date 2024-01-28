@@ -171,23 +171,5 @@ namespace FoxTunes.Output.Bass.Tests
             Assert.AreEqual(outputStreams[0].Length, outputStreams[0].Position);
             Assert.IsTrue(outputStreams[1].Position > 0);
         }
-
-        [Test]
-        public async Task CanPlayFromMemory()
-        {
-            this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                BassOutputConfiguration.PLAY_FROM_RAM_ELEMENT
-            ).Value = true;
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[4], false).ConfigureAwait(false);
-            await outputStream.Play().ConfigureAwait(false);
-#if NET40
-            await TaskEx.Delay(1000).ConfigureAwait(false);
-#else
-            await Task.Delay(1000).ConfigureAwait(false);
-#endif
-            Assert.IsTrue(outputStream.Position > 0);
-            outputStream.Dispose();
-        }
     }
 }

@@ -55,12 +55,7 @@ namespace FoxTunes
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
             var fileName = this.GetFileName(playlistItem, advice);
-            var channelHandle = default(int);
-            if (this.Output != null && this.Output.PlayFromMemory)
-            {
-                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
-            }
-            channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
+            var channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 

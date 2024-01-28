@@ -17,6 +17,6 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public abstract void Advise(IBassStreamProvider provider, PlaylistItem playlistItem, IList<IBassStreamAdvice> advice);
+        public abstract void Advise(IBassStreamProvider provider, PlaylistItem playlistItem, IList<IBassStreamAdvice> advice, BassStreamUsageType type);
     }
 }

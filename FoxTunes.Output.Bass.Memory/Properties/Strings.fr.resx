@@ -117,40 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BassOutputConfiguration.BufferLength" xml:space="preserve">
-    <value>Buffer Length</value>
-  </data>
-  <data name="BassOutputConfiguration.Depth" xml:space="preserve">
-    <value>Depth</value>
-  </data>
-  <data name="BassOutputConfiguration.DeviceMonitor" xml:space="preserve">
-    <value>Monitor Device Settings</value>
-  </data>
-  <data name="BassOutputConfiguration.EnforceRate" xml:space="preserve">
-    <value>Enforce Rate</value>
-  </data>
-  <data name="BassOutputConfiguration.Input" xml:space="preserve">
-    <value>Input</value>
-  </data>
-  <data name="BassOutputConfiguration.Output" xml:space="preserve">
-    <value>Output</value>
-  </data>
-  <data name="BassOutputConfiguration.Rate" xml:space="preserve">
-    <value>Rate</value>
-  </data>
-  <data name="BassOutputConfiguration.ResampleQuality" xml:space="preserve">
-    <value>Resampling Quality</value>
-  </data>
-  <data name="BassOutputConfiguration.Section" xml:space="preserve">
-    <value>Output</value>
-  </data>
-  <data name="BassOutputConfiguration.Volume" xml:space="preserve">
-    <value>Software Volume Level</value>
-  </data>
-  <data name="BassOutputConfiguration.VolumeLevel" xml:space="preserve">
-    <value>Software Volume Level</value>
-  </data>
-  <data name="General.Advanced" xml:space="preserve">
-    <value>Advanced</value>
-  </data>
 </root>
