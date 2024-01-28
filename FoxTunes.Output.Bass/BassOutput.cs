@@ -11,6 +11,10 @@ namespace FoxTunes
     [Component("E0318CB1-57A0-4DC3-AA8D-F6E100F86190", ComponentSlots.Output)]
     public class BassOutput : Output, IBassOutput
     {
+        public const int DEPTH_16 = 16;
+
+        public const int DEPTH_32 = 32;
+
         const int START_STOP_TIMEOUT = 10000;
 
         const int START_ATTEMPTS = 5;
@@ -515,7 +519,7 @@ namespace FoxTunes
 
         public override float[] GetBuffer(int fftSize)
         {
-            var length = default(uint);
+            var length = default(int);
             switch (fftSize)
             {
                 case BassFFT.FFT256:
@@ -530,20 +534,65 @@ namespace FoxTunes
                 case BassFFT.FFT2048:
                     length = BassFFT.FFT2048_SIZE;
                     break;
+                case BassFFT.FFT4096:
+                    length = BassFFT.FFT4096_SIZE;
+                    break;
+                case BassFFT.FFT8192:
+                    length = BassFFT.FFT8192_SIZE;
+                    break;
+                case BassFFT.FFT16384:
+                    length = BassFFT.FFT16384_SIZE;
+                    break;
+                case BassFFT.FFT32768:
+                    length = BassFFT.FFT32768_SIZE;
+                    break;
                 default:
                     throw new NotImplementedException();
             }
             return new float[length];
         }
 
-        public override int GetData(float[] buffer, int fftSize, bool interleaved)
+        public override int GetData(float[] buffer, int fftSize)
         {
             var result = default(int);
             this.PipelineManager.WithPipeline(pipeline =>
             {
                 if (pipeline != null)
                 {
-                    result = pipeline.Output.GetData(buffer, fftSize, interleaved);
+                    result = pipeline.Output.GetData(buffer, fftSize);
+                }
+            });
+            return result;
+        }
+
+        public override int GetRate()
+        {
+            var result = default(int);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    result = pipeline.Output.Rate;
+                }
+            });
+            return result;
+        }
+
+        public override int GetDepth()
+        {
+            var result = default(int);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    if (pipeline.Output.Flags.HasFlag(BassFlags.Float))
+                    {
+                        result = DEPTH_32;
+                    }
+                    else
+                    {
+                        result = DEPTH_16;
+                    }
                 }
             });
             return result;

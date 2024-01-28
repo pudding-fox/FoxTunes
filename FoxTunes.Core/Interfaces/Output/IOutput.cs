@@ -40,7 +40,11 @@ namespace FoxTunes.Interfaces
 
         float[] GetBuffer(int fftSize);
 
-        int GetData(float[] buffer, int fftSize, bool interleaved);
+        int GetData(float[] buffer, int fftSize);
+
+        int GetRate();
+
+        int GetDepth();
     }
 
     public delegate void OutputStreamEventHandler(object sender, OutputStreamEventArgs e);

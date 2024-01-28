@@ -134,7 +134,7 @@ namespace FoxTunes
 
         private static readonly object ChannelDataSyncRoot = new object();
 
-        public virtual int GetData(float[] buffer, int fftSize, bool interleaved)
+        public virtual int GetData(float[] buffer, int fftSize)
         {
             var length = default(uint);
             switch (fftSize)
@@ -151,12 +151,20 @@ namespace FoxTunes
                 case BassFFT.FFT2048:
                     length = BassFFT.FFT2048_MASK;
                     break;
+                case BassFFT.FFT4096:
+                    length = BassFFT.FFT4096_MASK;
+                    break;
+                case BassFFT.FFT8192:
+                    length = BassFFT.FFT8192_MASK;
+                    break;
+                case BassFFT.FFT16384:
+                    length = BassFFT.FFT16384_MASK;
+                    break;
+                case BassFFT.FFT32768:
+                    length = BassFFT.FFT32768_MASK;
+                    break;
                 default:
                     throw new NotImplementedException();
-            }
-            if (interleaved)
-            {
-                length |= BassFFT.FFT_INDIVIDUAL_MASK;
             }
             foreach (var channelHandle in this.GetMixerChannelHandles())
             {
