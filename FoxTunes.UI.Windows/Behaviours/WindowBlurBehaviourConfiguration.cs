@@ -2,7 +2,7 @@
 
 namespace FoxTunes
 {
-    public static class WindowCoverArtAccentBehaviourConfiguration
+    public static class WindowBlurBehaviourConfiguration
     {
         public const string SECTION = WindowsUserInterfaceConfiguration.SECTION;
 
@@ -18,7 +18,7 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetProviders()
         {
-            yield return new SelectionConfigurationOption(WindowCoverArtAccentBehaviour.ID, Strings.WindowCoverArtAccentBehaviour_Name);
+            yield return new SelectionConfigurationOption(WindowBlurBehaviour.ID, Strings.WindowBlurBehaviour_Name).Default();
         }
     }
 }

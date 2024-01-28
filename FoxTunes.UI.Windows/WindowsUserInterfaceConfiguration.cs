@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public const string TRANSPARENCY = "NNNN0D57-6E03-4718-ACA3-AD8199F5AC75";
 
+        public const string TRANSPARENCY_PROVIDER = "NNMME002-E835-443B-9C30-6E6530215B13";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)
@@ -45,7 +47,9 @@ namespace FoxTunes
                 .WithElement(
                     new IntegerConfigurationElement(TIMER_FREQUENCY, Strings.WindowsUserInterfaceConfiguration_TimerFrequency, path: Strings.General_Advanced).WithValue(DEFAULT_TIMER_FREQUENCY).WithValidationRule(new IntegerValidationRule(MIN_TIMER_FREQUENCY, MAX_TIMER_FREQUENCY)))
                 .WithElement(
-                    new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency)
+                    new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency))
+                .WithElement(
+                    new SelectionConfigurationElement(TRANSPARENCY_PROVIDER, Strings.WindowsUserInterfaceConfiguration_TransparencyProvider).DependsOn(SECTION, TRANSPARENCY)
             );
         }
 

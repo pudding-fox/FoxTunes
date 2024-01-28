@@ -1510,6 +1510,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Acrylic.
+        /// </summary>
+        internal static string WindowAcrylicBlurBehaviour_Name {
+            get {
+                return ResourceManager.GetString("WindowAcrylicBlurBehaviour.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aero.
+        /// </summary>
+        internal static string WindowBlurBehaviour_Name {
+            get {
+                return ResourceManager.GetString("WindowBlurBehaviour.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cover Art.
+        /// </summary>
+        internal static string WindowCoverArtAccentBehaviour_Name {
+            get {
+                return ResourceManager.GetString("WindowCoverArtAccentBehaviour.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Restart required to enable/disable transparency..
         /// </summary>
         internal static string WindowExtensions_TransparencyWarning {
@@ -1524,15 +1551,6 @@ namespace FoxTunes {
         internal static string WindowsUserInterfaceConfiguration_AccentColor {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.AccentColor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cover Art Accent.
-        /// </summary>
-        internal static string WindowsUserInterfaceConfiguration_ArtworkAccent {
-            get {
-                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.ArtworkAccent", resourceCulture);
             }
         }
         
@@ -1614,6 +1632,15 @@ namespace FoxTunes {
         internal static string WindowsUserInterfaceConfiguration_Transparency {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Transparency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transparency Provider.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_TransparencyProvider {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.TransparencyProvider", resourceCulture);
             }
         }
     }

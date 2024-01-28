@@ -12,8 +12,18 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     //Requires Windows 11 22H2.
     [PlatformDependency(Major = 6, Minor = 2, Build = 22621)]
-    public class WindowCoverArtAccentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class WindowCoverArtAccentBehaviour : WindowBlurProvider
     {
+        public const string ID = "CCCCD95E-98F0-4055-95EF-CC0393E8F1A7";
+
+        public override string Id
+        {
+            get
+            {
+                return ID;
+            }
+        }
+
         public WindowCoverArtAccentBehaviour()
         {
             this.AccentColors = new Dictionary<IntPtr, Color>();
@@ -29,35 +39,14 @@ namespace FoxTunes
 
         public ImageResizer ImageResizer { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
-        public BooleanConfigurationElement ArtworkAccent { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            WindowBase.ActiveChanged += this.OnActiveChanged;
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.LibraryBrowser = core.Components.LibraryBrowser;
             this.ArtworkProvider = core.Components.ArtworkProvider;
             this.ImageResizer = ComponentRegistry.Instance.GetComponent<ImageResizer>();
-            this.Configuration = core.Components.Configuration;
-            this.ArtworkAccent = this.Configuration.GetElement<BooleanConfigurationElement>(
-                WindowCoverArtAccentBehaviourConfiguration.SECTION,
-                WindowCoverArtAccentBehaviourConfiguration.ARTWORK_ACCENT
-            );
-            this.ArtworkAccent.ValueChanged += this.OnValueChanged;
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnActiveChanged(object sender, EventArgs e)
-        {
-            this.Dispatch(this.Refresh);
-        }
-
-        protected virtual void OnValueChanged(object sender, EventArgs e)
-        {
-            this.Dispatch(this.Refresh);
         }
 
         private void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -66,12 +55,8 @@ namespace FoxTunes
             this.Dispatch(this.Refresh);
         }
 
-        protected virtual async Task Refresh()
+        protected override async void OnRefresh()
         {
-            if (!this.ArtworkAccent.Value)
-            {
-                return;
-            }
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream == null)
             {
@@ -143,49 +128,18 @@ namespace FoxTunes
             return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
-        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        public override IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return WindowCoverArtAccentBehaviourConfiguration.GetConfigurationSections();
         }
 
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
+        protected override void OnDisposing()
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            WindowBase.ActiveChanged -= this.OnActiveChanged;
             if (this.PlaybackManager != null)
             {
                 this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
             }
-        }
-
-        ~WindowCoverArtAccentBehaviour()
-        {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
+            base.OnDisposing();
         }
     }
 }

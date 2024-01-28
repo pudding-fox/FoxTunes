@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -8,74 +7,29 @@ namespace FoxTunes
     //TODO: SetWindowCompositionAttribute is undocumented.
     //TODO: Assuming Windows 8.
     [PlatformDependency(Major = 6, Minor = 2)]
-    public class WindowBlurBehaviour : StandardBehaviour, IDisposable
+    public class WindowBlurBehaviour : WindowBlurProvider
     {
-        public IConfiguration Configuration { get; private set; }
+        public const string ID = "AAAA8904-827D-449F-A69C-EA57C17852BC";
 
-        public BooleanConfigurationElement Transparency { get; private set; }
-
-        public override void InitializeComponent(ICore core)
+        public override string Id
         {
-            WindowBase.ActiveChanged += this.OnActiveChanged;
-            this.Configuration = core.Components.Configuration;
-            this.Transparency = this.Configuration.GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.TRANSPARENCY
-            );
-            base.InitializeComponent(core);
-        }
-
-        protected virtual void OnActiveChanged(object sender, EventArgs e)
-        {
-            this.Refresh();
-        }
-
-        protected virtual void Refresh()
-        {
-            if (!this.Transparency.Value)
+            get
             {
-                return;
+                return ID;
             }
+        }
+
+        protected override void OnRefresh()
+        {
             foreach (var window in WindowBase.Active)
             {
                 WindowExtensions.EnableBlur(window.Handle);
             }
         }
 
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
+        public override IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            WindowBase.ActiveChanged -= this.OnActiveChanged;
-        }
-
-        ~WindowBlurBehaviour()
-        {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
+            return WindowBlurBehaviourConfiguration.GetConfigurationSections();
         }
     }
 }

@@ -600,14 +600,20 @@
   <data name="Volume.Name" xml:space="preserve">
     <value>Volume</value>
   </data>
+  <data name="WindowAcrylicBlurBehaviour.Name" xml:space="preserve">
+    <value>Acrylic</value>
+  </data>
+  <data name="WindowBlurBehaviour.Name" xml:space="preserve">
+    <value>Aero</value>
+  </data>
+  <data name="WindowCoverArtAccentBehaviour.Name" xml:space="preserve">
+    <value>Cover Art</value>
+  </data>
   <data name="WindowExtensions.TransparencyWarning" xml:space="preserve">
     <value>Restart required to enable/disable transparency.</value>
   </data>
   <data name="WindowsUserInterfaceConfiguration.AccentColor" xml:space="preserve">
     <value>Accent Color</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.ArtworkAccent" xml:space="preserve">
-    <value>Cover Art Accent</value>
   </data>
   <data name="WindowsUserInterfaceConfiguration.Counters" xml:space="preserve">
     <value>Show Counters</value>
@@ -635,5 +641,8 @@
   </data>
   <data name="WindowsUserInterfaceConfiguration.Transparency" xml:space="preserve">
     <value>Transparency</value>
+  </data>
+  <data name="WindowsUserInterfaceConfiguration.TransparencyProvider" xml:space="preserve">
+    <value>Transparency Provider</value>
   </data>
 </root>
