@@ -7,6 +7,28 @@ namespace FoxTunes
 {
     public static partial class Extensions
     {
+        public static T GetValueOrDefault<T>(this IFileData fileData, string name, MetaDataItemType type, T value = default(T))
+        {
+            var text = fileData.GetValueOrDefault(name, type);
+            if (string.IsNullOrEmpty(text))
+            {
+                return value;
+            }
+            return (T)Convert.ChangeType(text, typeof(T));
+        }
+
+        public static string GetValueOrDefault(this IFileData fileData, string name, MetaDataItemType type, string value = null)
+        {
+            foreach (var metaDataItem in fileData.MetaDatas)
+            {
+                if (string.Equals(metaDataItem.Name, name, StringComparison.OrdinalIgnoreCase) && metaDataItem.Type == type)
+                {
+                    return metaDataItem.Value;
+                }
+            }
+            return value;
+        }
+
         public static MetaDataItem GetOrAdd(this IFileData fileData, string name, MetaDataItemType type, string value = null)
         {
             foreach (var metaDataItem in fileData.MetaDatas)

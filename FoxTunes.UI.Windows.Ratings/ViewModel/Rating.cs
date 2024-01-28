@@ -204,24 +204,14 @@ namespace FoxTunes.ViewModel
             {
                 return 0;
             }
-            var metaDataItem = default(MetaDataItem);
             if (this.FileData != null)
             {
                 lock (this.FileData.MetaDatas)
                 {
-                    metaDataItem = this.FileData.GetOrAdd(CommonStatistics.Rating, MetaDataItemType.Tag);
+                    return this.FileData.GetValueOrDefault<byte>(CommonStatistics.Rating, MetaDataItemType.Tag, default(byte));
                 }
             }
-            if (metaDataItem == null)
-            {
-                return 0;
-            }
-            var value = default(byte);
-            if (!byte.TryParse(metaDataItem.Value, out value))
-            {
-                return 0;
-            }
-            return value;
+            return 0;
         }
 
         protected virtual void SetValue(byte value)
