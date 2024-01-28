@@ -97,7 +97,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duration (ms).
+        ///   Looks up a localized string similar to Duration.
         /// </summary>
         internal static string EnhancedSpectrumConfiguration_Duration {
             get {

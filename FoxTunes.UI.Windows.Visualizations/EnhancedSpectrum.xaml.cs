@@ -110,7 +110,7 @@ namespace FoxTunes
                     this.Rms.Name,
                     attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
-                if (this.Rms.Value)
+                if (this.Crest.IsVisible)
                 {
                     yield return new InvocationComponent(
                         CATEGORY,
