@@ -21,7 +21,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return "Loading...";
+                return Strings.LibraryBase_Loading;
             }
         }
 
@@ -29,7 +29,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return "Updating...";
+                return Strings.LibraryBase_Updating;
             }
         }
 
@@ -37,7 +37,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return Strings.LibraryBase_Add;
+                return Strings.LibraryBase_Empty;
             }
         }
 

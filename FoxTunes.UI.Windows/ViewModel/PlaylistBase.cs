@@ -19,7 +19,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return "Loading...";
+                return Strings.PlaylistBase_Loading;
             }
         }
 
@@ -27,7 +27,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return "Updating...";
+                return Strings.PlaylistBase_Updating;
             }
         }
 
@@ -35,7 +35,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return "Add to playlist by dropping files here.";
+                return Strings.PlaylistBase_Empty;
             }
         }
 

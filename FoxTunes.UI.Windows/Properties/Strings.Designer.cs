@@ -261,9 +261,27 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Add to collection by dropping files here..
         /// </summary>
-        internal static string LibraryBase_Add {
+        internal static string LibraryBase_Empty {
             get {
-                return ResourceManager.GetString("LibraryBase.Add", resourceCulture);
+                return ResourceManager.GetString("LibraryBase.Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading....
+        /// </summary>
+        internal static string LibraryBase_Loading {
+            get {
+                return ResourceManager.GetString("LibraryBase.Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating....
+        /// </summary>
+        internal static string LibraryBase_Updating {
+            get {
+                return ResourceManager.GetString("LibraryBase.Updating", resourceCulture);
             }
         }
         
@@ -336,6 +354,33 @@ namespace FoxTunes {
         internal static string Playback_Name {
             get {
                 return ResourceManager.GetString("Playback.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add to playlist by dropping files here..
+        /// </summary>
+        internal static string PlaylistBase_Empty {
+            get {
+                return ResourceManager.GetString("PlaylistBase.Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading....
+        /// </summary>
+        internal static string PlaylistBase_Loading {
+            get {
+                return ResourceManager.GetString("PlaylistBase.Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating....
+        /// </summary>
+        internal static string PlaylistBase_Updating {
+            get {
+                return ResourceManager.GetString("PlaylistBase.Updating", resourceCulture);
             }
         }
         

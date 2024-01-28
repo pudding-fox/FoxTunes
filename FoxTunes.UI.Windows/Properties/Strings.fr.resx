@@ -183,7 +183,7 @@
   <data name="KeyBindingsBehaviourConfiguration.ToggleMiniPlayer" xml:space="preserve">
     <value>Mini lecteur</value>
   </data>
-  <data name="LibraryBase.Add" xml:space="preserve">
+  <data name="LibraryBase.Empty" xml:space="preserve">
     <value>Ajouter des fichiers à la collection en les déposant ici</value>
   </data>
   <data name="LibrarySearch.Name" xml:space="preserve">
