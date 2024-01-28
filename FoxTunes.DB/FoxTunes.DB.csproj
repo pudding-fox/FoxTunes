@@ -39,6 +39,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\LibraryHierarchyFilterBuilder.tt">
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>LibraryHierarchyFilterBuilder.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
+    <Compile Update="Templates\LibraryHierarchyFilterBuilder.cs">
+      <DependentUpon>LibraryHierarchyFilterBuilder.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 

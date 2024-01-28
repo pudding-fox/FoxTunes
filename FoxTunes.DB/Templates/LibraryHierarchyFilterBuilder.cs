@@ -20,9 +20,9 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryHierarchyNodes.tt"
+    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class GetLibraryHierarchyNodes : GetLibraryHierarchyNodesBase
+    public partial class LibraryHierarchyFilterBuilder : LibraryHierarchyFilterBuilderBase
     {
 #line hidden
         /// <summary>
@@ -30,20 +30,193 @@ namespace FoxTunes.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"
-SELECT ""LibraryHierarchyItems"".""Id"", ""LibraryHierarchy_Id"", ""Value"", ""IsLeaf""
-FROM ""LibraryHierarchyItems""
-WHERE ""LibraryHierarchy_Id"" = @libraryHierarchyId
-	AND ((@libraryHierarchyItemId IS NULL AND ""LibraryHierarchyItems"".""Parent_Id"" IS NULL) 
-		OR ""LibraryHierarchyItems"".""Parent_Id"" = @libraryHierarchyItemId)
-");
+            this.Write("\r\n");
             
-            #line 14 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetLibraryHierarchyNodes.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(new LibraryHierarchyFilterBuilder(this.Database, this.Filter).TransformText()));
+            #line 9 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+if (this.Filter != null)
+{
+
             
             #line default
             #line hidden
-            this.Write("\r\nORDER BY \"Value\"");
+            this.Write(@"AND EXISTS
+	(
+		SELECT *
+		FROM ""LibraryHierarchyItem_LibraryItem""
+			INNER JOIN ""LibraryItem_MetaDataItem"" 
+				ON ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
+			INNER JOIN ""MetaDataItems""
+				ON ""LibraryItem_MetaDataItem"".""MetaDataItem_Id"" = ""MetaDataItems"".""Id""
+			WHERE ""LibraryHierarchyItem_LibraryItem"".""LibraryHierarchyItem_Id"" = ""LibraryHierarchyItems"".""Id""
+");
+            
+            #line 22 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+	foreach (var group in this.Filter.Groups)
+	{
+
+            
+            #line default
+            #line hidden
+            this.Write("\t AND (");
+            
+            #line 25 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+		var first = true;
+		foreach (var entry in group.Entries)
+		{
+			if (first)
+			{
+				first = false;
+			}
+			else
+			{
+				switch (group.Operator)
+				{
+					default:
+					case	FilterParserGroupOperator.And:
+
+            
+            #line default
+            #line hidden
+            this.Write(" AND ");
+            
+            #line 39 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+					break;
+					case FilterParserGroupOperator.Or:
+
+            
+            #line default
+            #line hidden
+            this.Write(" OR ");
+            
+            #line 42 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+					break;
+				}
+			}
+
+            
+            #line default
+            #line hidden
+            this.Write("(\"MetaDataItems\".\"Name\" = ");
+            
+            #line 46 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(entry.Name)));
+            
+            #line default
+            #line hidden
+            this.Write(") AND \"MetaDataItems\".\"Value\"");
+            
+            #line 46 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+			switch (entry.Operator)
+			{
+				default:
+				case FilterParserEntryOperator.Equal:
+
+            
+            #line default
+            #line hidden
+            this.Write(" = ");
+            
+            #line 51 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+					break;
+				case FilterParserEntryOperator.Greater:
+
+            
+            #line default
+            #line hidden
+            this.Write(" > ");
+            
+            #line 54 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+					
+					break;
+				case FilterParserEntryOperator.GreaterEqual:
+
+            
+            #line default
+            #line hidden
+            this.Write(" >= ");
+            
+            #line 57 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+					
+					break;
+				case FilterParserEntryOperator.Less:
+
+            
+            #line default
+            #line hidden
+            this.Write(" < ");
+            
+            #line 60 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+					
+					break;
+				case FilterParserEntryOperator.LessEqual:
+
+            
+            #line default
+            #line hidden
+            this.Write(" <= ");
+            
+            #line 63 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+					
+					break;
+				case FilterParserEntryOperator.Match:
+
+            
+            #line default
+            #line hidden
+            this.Write(" LIKE ");
+            
+            #line 66 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+					
+					break;
+			}
+
+            
+            #line default
+            #line hidden
+            
+            #line 69 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(
+	entry.Value.Replace(
+		FilterParserResultEntry.WILDCARD,
+		"%"
+	)
+)));
+            
+            #line default
+            #line hidden
+            
+            #line 74 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+
+		}
+
+            
+            #line default
+            #line hidden
+            this.Write(")");
+            
+            #line 76 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+		
+	}
+
+            
+            #line default
+            #line hidden
+            this.Write("\t)\r\n");
+            
+            #line 80 "C:\Source\FoxTunes\FoxTunes.DB\Templates\LibraryHierarchyFilterBuilder.tt"
+		
+}
+
+            
+            #line default
+            #line hidden
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -55,7 +228,7 @@ WHERE ""LibraryHierarchy_Id"" = @libraryHierarchyId
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class GetLibraryHierarchyNodesBase
+    public class LibraryHierarchyFilterBuilderBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
