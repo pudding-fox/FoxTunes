@@ -25,13 +25,18 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public IntegerConfigurationElement Threads { get; private set; }
+
+        public IntegerConfigurationElement Interval { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.THREADS_ELEMENT
-            ).ConnectValue(value =>
+            this.Threads = this.Configuration.GetElement<IntegerConfigurationElement>(
+                ImageLoaderConfiguration.SECTION,
+                ImageLoaderConfiguration.THREADS
+            );
+            this.Threads.ConnectValue(value =>
             {
                 this.ForegroundFactory = new TaskFactory(new TaskScheduler(new ParallelOptions()
                 {
@@ -42,6 +47,10 @@ namespace FoxTunes
                     MaxDegreeOfParallelism = 1
                 }));
             });
+            this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                ImageLoaderConfiguration.SECTION,
+                ImageLoaderConfiguration.INTERVAL
+            );
             base.InitializeComponent(core);
         }
 
@@ -53,7 +62,7 @@ namespace FoxTunes
             {
                 queue.Add(artworkGrid);
             }
-            return factory.StartNew(() =>
+            return factory.StartNew(async () =>
             {
                 lock (SyncRoot)
                 {
@@ -66,6 +75,15 @@ namespace FoxTunes
 #endif
                     }
                     queue.Remove(artworkGrid);
+                }
+                //If we're in the low priority queue then sleep a little so other (more important) threads can work.
+                if (priority == ArtworkGridLoaderPriority.Low && this.Interval.Value > 0)
+                {
+#if NET40
+                    await TaskEx.Delay(this.Interval.Value).ConfigureAwait(false);
+#else
+                    await Task.Delay(this.Interval.Value).ConfigureAwait(false);
+#endif
                 }
                 return artworkGrid.Refresh();
             });
