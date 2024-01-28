@@ -39,12 +39,12 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Border>
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Drop files anywhere." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding StatusMessage, Mode=OneWay, Source={StaticResource ViewModel}}" IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Managers.Playlist.CanNavigate, Mode=OneWay}" Value="False">
+                        <DataTrigger Binding="{Binding HasStatusMessage, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>

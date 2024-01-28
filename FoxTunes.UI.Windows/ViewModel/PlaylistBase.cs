@@ -43,7 +43,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged;
 
-        public string StatusMessage
+        public virtual string StatusMessage
         {
             get
             {
@@ -77,7 +77,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler StatusMessageChanged;
 
-        public bool HasStatusMessage
+        public virtual bool HasStatusMessage
         {
             get
             {
