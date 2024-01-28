@@ -4,7 +4,6 @@ using ManagedBass.DirectX8;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace FoxTunes
 {
