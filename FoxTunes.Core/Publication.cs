@@ -17,6 +17,14 @@ namespace FoxTunes
 
         public static readonly string HomePage = "https://github.com/Raimusoft/FoxTunes";
 
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(Publication).Assembly.Location);
+            }
+        }
+
         private static string GetVersion()
         {
             var version = typeof(Publication).Assembly.GetName().Version;
@@ -38,7 +46,7 @@ namespace FoxTunes
                 //Grab some informations.
                 var identity = WindowsIdentity.GetCurrent();
                 var principal = new WindowsPrincipal(identity);
-                var directoryInfo = new DirectoryInfo(ComponentScanner.Instance.Location);
+                var directoryInfo = new DirectoryInfo(Location);
                 var directorySecurity = directoryInfo.GetAccessControl();
                 var authorizationRules = directorySecurity.GetAccessRules(true, true, typeof(NTAccount));
                 for (var a = 0; a < authorizationRules.Count; a++)
@@ -95,7 +103,7 @@ namespace FoxTunes
             if (IsPortable)
             {
                 //If we're portable we store data with the application.
-                return ComponentScanner.Instance.Location;
+                return Location;
             }
             else
             {
@@ -151,7 +159,8 @@ namespace FoxTunes
 
     public enum ReleaseType : byte
     {
-        Default = 0,
-        Minimal = 1
+        None = 0,
+        Default = 1,
+        Minimal = 2
     }
 }

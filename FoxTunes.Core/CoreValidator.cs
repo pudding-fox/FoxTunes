@@ -16,11 +16,6 @@ namespace FoxTunes
 
         public bool Validate(ICore core)
         {
-            return this.ValidateInterfaces(core) && this.ValidateSlots(core);
-        }
-
-        protected virtual bool ValidateInterfaces(ICore core)
-        {
             var success = true;
             var types = typeof(ICore).Assembly
                 .GetExportedTypes()
@@ -32,29 +27,6 @@ namespace FoxTunes
                     if (core.Components.UserInterface != null)
                     {
                         core.Components.UserInterface.Warn(string.Format("Component missing or invalid for interface \"{0}\".", type.FullName));
-                    }
-                    success = false;
-                }
-            }
-            return success;
-        }
-
-        protected virtual bool ValidateSlots(ICore core)
-        {
-            var success = true;
-            foreach (var key in ComponentSlots.Lookup.Keys)
-            {
-                var value = ComponentSlots.Lookup[key];
-                if (ComponentRegistry.Instance.GetComponents(value).Count() > 1)
-                {
-                    if (ComponentResolver.Instance.Resolve(value))
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Multiple components are installed for slot \"{0}\", the conflict was resolved.", value);
-                        continue;
-                    }
-                    if (core.Components.UserInterface != null)
-                    {
-                        core.Components.UserInterface.Warn(string.Format("Multiple components are installed for slot \"{0}\".\nEdit {1} to resolve the conflict.", value, ComponentResolver.FILE_NAME.GetName()));
                     }
                     success = false;
                 }
