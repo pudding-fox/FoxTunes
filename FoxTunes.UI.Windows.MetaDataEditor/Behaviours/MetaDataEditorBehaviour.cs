@@ -11,6 +11,14 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public bool Enabled
+        {
+            get
+            {
+                return LayoutManager.Instance.IsComponentActive(typeof(global::FoxTunes.MetaDataEditor));
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -21,7 +29,10 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
+                if (this.Enabled)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
+                }
             }
         }
 
