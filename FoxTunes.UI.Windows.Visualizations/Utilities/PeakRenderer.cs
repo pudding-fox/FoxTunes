@@ -114,7 +114,7 @@ namespace FoxTunes
                 this,
                 width,
                 height,
-                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color),
+                PeakMeterBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors),
                 this.Orientation
             );
             return true;
@@ -144,7 +144,7 @@ namespace FoxTunes
                 }
                 if (data.RmsElements != null)
                 {
-                    var colors = this.Color.ToPair(SHADE);
+                    var colors = data.Colors[0].ToPair(SHADE);
                     valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
                     rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[1]));
                 }

@@ -51,9 +51,9 @@ namespace FoxTunes
             };
             var actual = new ColorStop[]
             {
-                new ColorStop(0, Colors.Black),
-                new ColorStop(5, Colors.Green),
-                new ColorStop(10, Colors.White)
+                new ColorStop(0, global::System.Windows.Media.Colors.Black),
+                new ColorStop(5, global::System.Windows.Media.Colors.Green),
+                new ColorStop(10, global::System.Windows.Media.Colors.White)
             }.ToGradient();
             Assert.IsTrue(Enumerable.SequenceEqual(expected, actual));
         }

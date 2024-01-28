@@ -14,11 +14,12 @@ namespace FoxTunes
             this.ResourceDictionaries = new Dictionary<ConfigurationElement, Lazy<ResourceDictionary>>();
         }
 
-        protected ThemeBase(string id, string name = null, string description = null) : this()
+        protected ThemeBase(string id, string name, string description, IEnumerable<IColorPalette> colorPalettes) : this()
         {
             this.Id = id;
             this.Name = name;
             this.Description = description;
+            this.ColorPalettes = colorPalettes;
         }
 
         public Lazy<ResourceDictionary> ResourceDictionary { get; private set; }
@@ -38,6 +39,8 @@ namespace FoxTunes
         public abstract ResourceDictionary GetResourceDictionary();
 
         public abstract Stream GetArtworkPlaceholder();
+
+        public IEnumerable<IColorPalette> ColorPalettes { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -136,6 +139,28 @@ namespace FoxTunes
                     Application.Current.Resources.MergedDictionaries.Remove(resourceDictionary.Value);
                 }
             }
+        }
+
+        public class ColorPalette : BaseComponent, IColorPalette
+        {
+            public ColorPalette(string id, ColorPaletteRole role, string name, string description, string value)
+            {
+                this.Id = id;
+                this.Role = role;
+                this.Name = name;
+                this.Description = description;
+                this.Value = value;
+            }
+
+            public string Id { get; private set; }
+
+            public ColorPaletteRole Role { get; private set; }
+
+            public string Name { get; private set; }
+
+            public string Description { get; private set; }
+
+            public string Value { get; private set; }
         }
     }
 }

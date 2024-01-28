@@ -127,7 +127,7 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public static Color[] GetColorPalette(string value, Color color)
+        public static Color[] GetColorPalette(string value, Color[] colors)
         {
             if (!string.IsNullOrEmpty(value))
             {
@@ -140,7 +140,7 @@ namespace FoxTunes
                     //Nothing can be done.
                 }
             }
-            return new[] { color };
+            return colors;
         }
     }
 }

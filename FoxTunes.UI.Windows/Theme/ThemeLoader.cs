@@ -66,5 +66,23 @@ namespace FoxTunes
                 var theme = this.Theme;
             });
         }
+
+        public ThemeLoader ConnectTheme(Action<ITheme> action)
+        {
+            var handler = new EventHandler((sender, e) =>
+            {
+                try
+                {
+                    action(this.Theme);
+                }
+                catch
+                {
+                    //TODO: Warn.
+                }
+            });
+            handler(this, EventArgs.Empty);
+            this.ThemeChanged += handler;
+            return this;
+        }
     }
 }

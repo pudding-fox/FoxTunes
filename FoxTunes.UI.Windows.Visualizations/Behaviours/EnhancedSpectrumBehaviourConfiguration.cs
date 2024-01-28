@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Media;
 
@@ -482,7 +479,7 @@ namespace FoxTunes
             return builder.ToString();
         }
 
-        public static Color[] GetColorPalette(string value, Color color)
+        public static Color[] GetColorPalette(string value, Color[] colors)
         {
             if (!string.IsNullOrEmpty(value))
             {
@@ -495,7 +492,7 @@ namespace FoxTunes
                     //Nothing can be done.
                 }
             }
-            return new[] { color };
+            return colors;
         }
 
         public static int GetFFTSize(SelectionConfigurationOption fftSize, SelectionConfigurationOption bands)

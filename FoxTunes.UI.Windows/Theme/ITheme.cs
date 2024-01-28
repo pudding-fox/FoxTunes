@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FoxTunes
@@ -14,6 +15,8 @@ namespace FoxTunes
         int CornerRadius { get; }
 
         Stream GetArtworkPlaceholder();
+
+        IEnumerable<IColorPalette> ColorPalettes { get; }
 
         void Enable();
 
