@@ -67,10 +67,6 @@ namespace FoxTunes
         {
             var completionSource = default(TaskCompletionSource<bool>);
             this.Tasks.TryRemove(task, out completionSource);
-            if (this.Tasks.Count == 0)
-            {
-                this.Timer.Stop();
-            }
             if (completionSource != null)
             {
                 completionSource.TrySetResult(false);

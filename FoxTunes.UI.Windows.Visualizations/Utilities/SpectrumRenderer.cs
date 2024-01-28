@@ -76,11 +76,11 @@ namespace FoxTunes
             if (object.ReferenceEquals(sender, this.Bars))
             {
                 //Changing bars requires full refresh.
-                var task = this.CreateBitmap();
+                this.Debouncer.Exec(this.CreateBitmap);
             }
             else
             {
-                var task = this.RefreshBitmap();
+                this.Debouncer.Exec(this.RefreshBitmap);
             }
         }
 

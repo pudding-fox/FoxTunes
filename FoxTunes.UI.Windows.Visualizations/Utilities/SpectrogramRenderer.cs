@@ -59,7 +59,7 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            var task = this.RefreshBitmap();
+            this.Debouncer.Exec(this.RefreshBitmap);
         }
 
         protected override void CreateViewBox()
@@ -102,15 +102,6 @@ namespace FoxTunes
                     this.Smoothing.Value
                 );
             });
-        }
-
-        protected override WriteableBitmap CreateBitmap(Size size)
-        {
-            if (this.Bitmap != null)
-            {
-                return this.Bitmap.Resize(size);
-            }
-            return base.CreateBitmap(size);
         }
 
         protected virtual async Task Render(SpectrogramRendererData data)

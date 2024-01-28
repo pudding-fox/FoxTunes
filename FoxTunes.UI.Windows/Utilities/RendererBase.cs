@@ -14,6 +14,10 @@ namespace FoxTunes
 {
     public abstract class RendererBase : Freezable, IBaseComponent, INotifyPropertyChanged, IDisposable
     {
+        public const double DPIX = 96;
+
+        public const double DPIY = 96;
+
         public const int DB_MIN = -90;
 
         public const int DB_MAX = 0;
@@ -169,7 +173,7 @@ namespace FoxTunes
 
         const int TIMEOUT = 100;
 
-        public RendererBase(bool initialize = true)
+        protected RendererBase(bool initialize = true)
         {
             this.Debouncer = new AsyncDebouncer(TIMEOUT);
             if (initialize && Core.Instance != null)
@@ -325,7 +329,7 @@ namespace FoxTunes
 
         protected virtual void OnScalingFactorChanged(object sender, EventArgs e)
         {
-            var task = this.CreateBitmap();
+            this.Debouncer.Exec(this.CreateBitmap);
         }
 
         protected virtual Task CreateBitmap()
@@ -344,9 +348,7 @@ namespace FoxTunes
                     width * this.ScalingFactor.Value,
                     height * this.ScalingFactor.Value
                 );
-
                 this.Bitmap = this.CreateBitmap(size);
-
                 this.CreateViewBox();
             });
         }
@@ -356,8 +358,8 @@ namespace FoxTunes
             return new WriteableBitmap(
                 Convert.ToInt32(size.Width),
                 Convert.ToInt32(size.Height),
-                96,
-                96,
+                DPIX,
+                DPIY,
                 PixelFormats.Pbgra32,
                 null
             );
