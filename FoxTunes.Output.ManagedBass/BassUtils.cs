@@ -57,8 +57,13 @@ namespace FoxTunes
         {
             if (Bass.LastError != Errors.OK)
             {
-                throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
+                throw new BassException(Bass.LastError);
             }
+        }
+
+        public static bool GetChannelFloat(int channelHandle)
+        {
+            return GetChannelFlags(channelHandle).HasFlag(BassFlags.Float);
         }
 
         public static bool GetChannelDsdRaw(int channelHandle)
@@ -89,5 +94,20 @@ namespace FoxTunes
             OK(Bass.ChannelGetInfo(channelHandle, out channelInfo));
             return channelInfo.Flags;
         }
+    }
+
+    public class BassException : Exception
+    {
+        public BassException(Errors error) : this(Enum.GetName(typeof(Errors), error), error)
+        {
+
+        }
+
+        public BassException(string message, Errors error) : base(message)
+        {
+            this.Error = error;
+        }
+
+        public Errors Error { get; private set; }
     }
 }

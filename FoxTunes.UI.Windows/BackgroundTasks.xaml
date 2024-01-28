@@ -10,95 +10,47 @@
     <UserControl.Resources>
         <ViewModel:BackgroundTasks x:Key="ViewModel" Core="{Binding}"></ViewModel:BackgroundTasks>
     </UserControl.Resources>
-    <Grid>
-        <Border Background="{DynamicResource NormalBrush}" 
+    <Border Background="{DynamicResource NormalBrush}" 
                     BorderBrush="{DynamicResource NormalBorderBrush}" 
                     BorderThickness="1" 
                     CornerRadius="8,8,0,0" 
                     Padding="10">
-            <Border.Style>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Visibility" Value="Visible"></Setter>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={StaticResource ViewModel}, Path=RunningTasks.Count}" Value="0">
-                            <Setter Property="Visibility" Value="Collapsed"></Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <ItemsControl ItemsSource="{Binding Source={StaticResource ViewModel}, Path=RunningTasks}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="{Binding Name, Mode=OneWay}"></TextBlock>
-                            <TextBlock Grid.Row="1" Text="{Binding Description, Mode=OneWay}"></TextBlock>
-                            <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}">
-                                <ProgressBar.Style>
-                                    <Style TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">
-                                        <Setter Property="IsIndeterminate" Value="False"></Setter>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Count, Mode=OneWay}" Value="0">
-                                                <Setter Property="IsIndeterminate" Value="True"></Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ProgressBar.Style>
-                            </ProgressBar>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Border>
-        <Popup PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}" 
-               Placement="Center" 
-               AllowsTransparency="True" 
-               StaysOpen="True">
-            <Popup.Style>
-                <Style TargetType="{x:Type Popup}">
-                    <Setter Property="IsOpen" Value="True"></Setter>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={StaticResource ViewModel}, Path=FaultedTasks.Count}" Value="0">
-                            <Setter Property="IsOpen" Value="False"></Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Popup.Style>
-            <Border Background="{DynamicResource NormalBrush}" 
-                    BorderBrush="{DynamicResource NormalBorderBrush}" 
-                    BorderThickness="1" 
-                    CornerRadius="8,8,3,3" 
-                    Padding="10">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <TextBlock>Error</TextBlock>
-                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource ViewModel}, Path=FaultedTasks}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <GroupBox Header="{Binding Name, Mode=OneWay}" Padding="0,7,0,0">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <TextBlock Text="{Binding Description, Mode=OneWay}"></TextBlock>
-                                        <TextBlock Grid.Row="1" Text="{Binding Exception.Message, Mode=OneWay}" Foreground="Red"></TextBlock>
-                                    </Grid>
-                                </GroupBox>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <Button Grid.Row="2" Command="{Binding Source={StaticResource ViewModel}, Path=ClearFaultedTasksCommand}" HorizontalAlignment="Right" Height="30" Width="60" Margin="0,7,0,0">Dismiss</Button>
-                </Grid>
-            </Border>
-        </Popup>
-    </Grid>
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="Visibility" Value="Visible"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={StaticResource ViewModel}, Path=RunningTasks.Count}" Value="0">
+                        <Setter Property="Visibility" Value="Collapsed"></Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <ItemsControl ItemsSource="{Binding Source={StaticResource ViewModel}, Path=RunningTasks}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Name, Mode=OneWay}"></TextBlock>
+                        <TextBlock Grid.Row="1" Text="{Binding Description, Mode=OneWay}"></TextBlock>
+                        <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}">
+                            <ProgressBar.Style>
+                                <Style TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">
+                                    <Setter Property="IsIndeterminate" Value="False"></Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Count, Mode=OneWay}" Value="0">
+                                            <Setter Property="IsIndeterminate" Value="True"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ProgressBar.Style>
+                        </ProgressBar>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Border>
 </UserControl>

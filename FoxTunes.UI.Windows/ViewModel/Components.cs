@@ -3,6 +3,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -21,13 +22,46 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
-            ComponentRegistry.Instance.ForEach(component => component.Error += this.OnError);
+            ComponentRegistry.Instance.ForEach(component =>
+            {
+                component.Error += this.OnError;
+                if (component is IBackgroundTaskSource)
+                {
+                    (component as IBackgroundTaskSource).BackgroundTask += this.OnBackgroundTask;
+                }
+            });
             base.OnCoreChanged();
         }
 
         protected virtual Task OnError(object sender, ComponentOutputErrorEventArgs e)
         {
-            return this.ForegroundTaskRunner.RunAsync(() => this.Errors.Add(new ComponentError(sender as IBaseComponent, e.Message, e.Exception)));
+            var component = sender as IBaseComponent;
+            return this.Add(new ComponentError(component, component.GetType().Name, e.Exception));
+        }
+
+        protected virtual void OnBackgroundTask(object sender, BackgroundTaskEventArgs e)
+        {
+            e.BackgroundTask.Faulted += this.OnFaulted;
+        }
+
+        protected virtual void OnFaulted(object sender, EventArgs e)
+        {
+            var backgroundTask = sender as IBackgroundTask;
+            this.Add(new ComponentError(backgroundTask, backgroundTask.Name, backgroundTask.Exception));
+        }
+
+        public Task Add(ComponentError error)
+        {
+            return this.ForegroundTaskRunner.RunAsync(() =>
+            {
+                if (this.Errors.Contains(error))
+                {
+                    return;
+                }
+                this.Errors.Add(error);
+                //WPF glitch; ItemsControl in a Popup displays duplicate items.
+                CollectionViewSource.GetDefaultView(this.Errors).Refresh();
+            });
         }
 
         public ICommand ClearErrorsCommand
@@ -44,7 +78,7 @@ namespace FoxTunes.ViewModel
         }
     }
 
-    public class ComponentError
+    public class ComponentError : IEquatable<ComponentError>
     {
         public ComponentError(IBaseComponent component, string message, Exception exception)
         {
@@ -66,5 +100,53 @@ namespace FoxTunes.ViewModel
         public string Message { get; private set; }
 
         public Exception Exception { get; private set; }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            if (!string.IsNullOrEmpty(this.Message))
+            {
+                hashCode += this.Message.GetHashCode();
+            }
+            if (this.Exception != null && !string.IsNullOrEmpty(this.Exception.Message))
+            {
+                hashCode += this.Exception.Message.GetHashCode();
+            }
+            return hashCode;
+        }
+
+        public override bool Equals(object other)
+        {
+            if (other is ComponentError)
+            {
+                return this.Equals(other as ComponentError);
+            }
+            return base.Equals(other);
+        }
+
+        public bool Equals(ComponentError other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            if (!string.Equals(this.Message, other.Message, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            if (this.Exception != null && other.Exception == null)
+            {
+                return false;
+            }
+            if (this.Exception == null && other.Exception != null)
+            {
+                return false;
+            }
+            if (!string.Equals(this.Exception.Message, other.Exception.Message, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

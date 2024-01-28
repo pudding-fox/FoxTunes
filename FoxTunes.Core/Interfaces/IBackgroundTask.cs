@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IBackgroundTask : IReportsProgress
+    public interface IBackgroundTask : IBaseComponent, IReportsProgress
     {
         string Id { get; }
 

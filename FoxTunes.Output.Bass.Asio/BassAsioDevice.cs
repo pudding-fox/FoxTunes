@@ -68,12 +68,17 @@ namespace FoxTunes
                 Convert.ToInt32(BassAsio.Rate),
                 BassAsio.Info.Inputs,
                 BassAsio.Info.Outputs,
-                //TODO: I'm not sure if we should be setting DSD mode before querying DSD rates.
-                RATES.Where(rate => BassAsio.CheckRate(rate)).ToArray(),
+                GetSupportedRates(),
                 info.Format
             );
             LogManager.Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Name => {1}, Inputs => {2}, Outputs = {3}, Rate = {4}, Format = {5}", Device, Info.Name, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(AsioSampleFormat), Info.Format));
             LogManager.Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Rates => {1}", Device, string.Join(", ", Info.SupportedRates));
+        }
+
+        private static IEnumerable<int> GetSupportedRates()
+        {
+            //TODO: I'm not sure if we should be setting DSD mode before querying DSD rates.
+            return RATES.Where(rate => BassAsio.CheckRate(rate)).ToArray();
         }
 
         public static void Free()
@@ -83,8 +88,8 @@ namespace FoxTunes
                 return;
             }
             LogManager.Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Releasing BASS ASIO.");
-            BassAsioUtils.OK(BassAsio.Free());
-            BassAsioUtils.OK(BassAsioHandler.Free());
+            BassAsio.Free();
+            BassAsioHandler.Free();
             IsInitialized = false;
         }
 
@@ -92,6 +97,10 @@ namespace FoxTunes
         {
             get
             {
+                if (!Devices.ContainsKey(Device))
+                {
+                    return null;
+                }
                 return Devices[Device];
             }
         }

@@ -34,11 +34,11 @@ namespace FoxTunes
         {
             if (Bass.LastError != Errors.OK)
             {
-                throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
+                throw new BassException(Bass.LastError);
             }
             if (BassAsio.LastError != Errors.OK)
             {
-                throw new ApplicationException(Enum.GetName(typeof(Errors), BassAsio.LastError));
+                throw new BassException(BassAsio.LastError);
             }
         }
     }

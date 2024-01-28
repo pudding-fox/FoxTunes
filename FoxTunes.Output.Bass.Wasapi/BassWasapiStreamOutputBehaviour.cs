@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassAsioStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent
+    public class BassWasapiStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent
     {
         public IBassOutput Output { get; private set; }
 
@@ -32,18 +32,18 @@ namespace FoxTunes
             }
         }
 
-        private int _AsioDevice { get; set; }
+        private int _WasapiDevice { get; set; }
 
-        public int AsioDevice
+        public int WasapiDevice
         {
             get
             {
-                return this._AsioDevice;
+                return this._WasapiDevice;
             }
             set
             {
-                this._AsioDevice = value;
-                Logger.Write(this, LogLevel.Debug, "ASIO Device = {0}", this.AsioDevice);
+                this._WasapiDevice = value;
+                Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
                 this.Output.Shutdown();
             }
         }
@@ -64,6 +64,38 @@ namespace FoxTunes
             }
         }
 
+        private bool _Exclusive { get; set; }
+
+        public bool Exclusive
+        {
+            get
+            {
+                return this._Exclusive;
+            }
+            private set
+            {
+                this._Exclusive = value;
+                Logger.Write(this, LogLevel.Debug, "Exclusive = {0}", this.Exclusive);
+                this.Output.Shutdown();
+            }
+        }
+
+        private bool _EventDriven { get; set; }
+
+        public bool EventDriven
+        {
+            get
+            {
+                return this._EventDriven;
+            }
+            private set
+            {
+                this._EventDriven = value;
+                Logger.Write(this, LogLevel.Debug, "EventDriven = {0}", this.EventDriven);
+                this.Output.Shutdown();
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
@@ -73,15 +105,23 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.MODE_ELEMENT
-            ).ConnectValue<string>(value => this.Enabled = string.Equals(value, BassAsioStreamOutputConfiguration.MODE_ASIO_OPTION, StringComparison.OrdinalIgnoreCase));
+            ).ConnectValue<string>(value => this.Enabled = string.Equals(value, BassWasapiStreamOutputConfiguration.MODE_WASAPI_OPTION, StringComparison.OrdinalIgnoreCase));
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
-                BassAsioStreamOutputConfiguration.ELEMENT_ASIO_DEVICE
-            ).ConnectValue<string>(value => this.AsioDevice = BassAsioStreamOutputConfiguration.GetAsioDevice(value));
+                BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_DEVICE
+            ).ConnectValue<string>(value => this.WasapiDevice = BassWasapiStreamOutputConfiguration.GetWasapiDevice(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
-                BassAsioStreamOutputConfiguration.DSD_RAW_ELEMENT
+                BassWasapiStreamOutputConfiguration.DSD_RAW_ELEMENT
             ).ConnectValue<bool>(value => this.DsdDirect = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_EXCLUSIVE
+            ).ConnectValue<bool>(value => this.Exclusive = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_EVENT
+            ).ConnectValue<bool>(value => this.EventDriven = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
             this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
@@ -94,20 +134,20 @@ namespace FoxTunes
             {
                 return;
             }
-            BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
-            BassAsioUtils.OK(Bass.Init(Bass.NoSoundDevice));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
+            BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
         protected virtual void OnInitDevice()
         {
-            if (BassAsioDevice.IsInitialized)
+            if (BassWasapiDevice.IsInitialized)
             {
                 return;
             }
-            BassAsioDevice.Init(this.AsioDevice);
-            if (!BassAsioDevice.Info.SupportedRates.Contains(this.Output.Rate))
+            BassWasapiDevice.Init(this.WasapiDevice, this.Exclusive, this.EventDriven);
+            if (!BassWasapiDevice.Info.SupportedRates.Contains(this.Output.Rate))
             {
                 Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device.", this.Output.Rate);
                 throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device.", this.Output.Rate));
@@ -128,11 +168,11 @@ namespace FoxTunes
 
         protected virtual void OnFreeDevice()
         {
-            if (!BassAsioDevice.IsInitialized)
+            if (!BassWasapiDevice.IsInitialized)
             {
                 return;
             }
-            BassAsioDevice.Free();
+            BassWasapiDevice.Free();
         }
 
         protected virtual void OnQueryingPipeline(object sender, QueryingPipelineEventArgs e)
@@ -146,8 +186,8 @@ namespace FoxTunes
             {
                 e.OutputCapabilities |= BassCapability.DSD_RAW;
             }
-            e.OutputRates = BassAsioDevice.Info.SupportedRates;
-            e.OutputChannels = BassAsioDevice.Info.Outputs;
+            e.OutputRates = BassWasapiDevice.Info.SupportedRates;
+            e.OutputChannels = BassWasapiDevice.Info.Outputs;
         }
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
@@ -157,12 +197,12 @@ namespace FoxTunes
                 return;
             }
             this.OnInitDevice();
-            e.Output = new BassAsioStreamOutput(this, e.Stream);
+            e.Output = new BassWasapiStreamOutput(this, e.Stream);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            return BassAsioStreamOutputConfiguration.GetConfigurationSections();
+            return BassWasapiStreamOutputConfiguration.GetConfigurationSections();
         }
     }
 }

@@ -60,6 +60,10 @@ namespace FoxTunes
         {
             get
             {
+                if (!Devices.ContainsKey(Device))
+                {
+                    return null;
+                }
                 return Devices[Device];
             }
         }
