@@ -49,6 +49,10 @@ namespace FoxTunes
         {
             var fileName = this.GetFileName(playlistItem, advice);
             var channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
+            if (channelHandle == 0)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create MOD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+            }
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
@@ -56,6 +60,10 @@ namespace FoxTunes
         {
             var fileName = this.GetFileName(playlistItem, advice);
             var channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
+            if (channelHandle == 0)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to create MOD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+            }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 

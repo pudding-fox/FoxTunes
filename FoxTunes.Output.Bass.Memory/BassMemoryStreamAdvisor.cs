@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassMemoryStreamAdvisor : BassStreamAdvisor
     {
         public BassMemoryBehaviour Behaviour { get; private set; }
@@ -15,7 +16,11 @@ namespace FoxTunes
 
         public override void Advise(IBassStreamProvider provider, PlaylistItem playlistItem, IList<IBassStreamAdvice> advice, BassStreamUsageType type)
         {
-            if (this.Behaviour == null || !this.Behaviour.Enabled)
+            if (!this.Behaviour.Enabled)
+            {
+                return;
+            }
+            if (typeof(BassMemoryStreamProvider).IsAssignableFrom(provider.GetType()))
             {
                 return;
             }

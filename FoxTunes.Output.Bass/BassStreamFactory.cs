@@ -49,74 +49,82 @@ namespace FoxTunes
         {
             flags |= BassFlags.Decode;
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for file \"{0}\".", playlistItem.FileName);
-            var provider = this.GetProviders(playlistItem).FirstOrDefault();
-            if (provider == null)
+            var providers = this.GetProviders(playlistItem);
+            if (!providers.Any())
             {
                 Logger.Write(this, LogLevel.Warn, "No provider was found for file \"{0}\".", playlistItem.FileName);
                 return BassStream.Empty;
             }
-            Logger.Write(this, LogLevel.Debug, "Using bass stream provider \"{0}\".", provider.GetType().Name);
-            var advice = this.GetAdvice(provider, playlistItem, BassStreamUsageType.Basic).ToArray();
-            var stream = provider.CreateBasicStream(playlistItem, advice, flags);
-            if (stream.ChannelHandle != 0)
+            foreach (var provider in providers)
             {
-                Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
-                return stream;
+                Logger.Write(this, LogLevel.Debug, "Using bass stream provider \"{0}\".", provider.GetType().Name);
+                var advice = this.GetAdvice(provider, playlistItem, BassStreamUsageType.Basic).ToArray();
+                var stream = provider.CreateBasicStream(playlistItem, advice, flags);
+                if (stream.ChannelHandle != 0)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
+                    return stream;
+                }
+                if (stream.Errors == Errors.Already && provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Provider does not support multiple streams.");
+                    return stream;
+                }
+                Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
             }
-            if (stream.Errors == Errors.Already && provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
-            {
-                Logger.Write(this, LogLevel.Debug, "Provider does not support multiple streams.");
-                return stream;
-            }
-            Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
-            return stream;
+            Logger.Write(this, LogLevel.Warn, "All providers failed for file \"{0}\".", playlistItem.FileName);
+            return BassStream.Empty;
         }
 
         public IBassStream CreateInteractiveStream(PlaylistItem playlistItem, bool immidiate, BassFlags flags)
         {
             flags |= BassFlags.Decode;
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for file \"{0}\".", playlistItem.FileName);
-            var provider = this.GetProviders(playlistItem).FirstOrDefault();
-            if (provider == null)
+            var providers = this.GetProviders(playlistItem);
+            if (!providers.Any())
             {
                 Logger.Write(this, LogLevel.Warn, "No provider was found for file \"{0}\".", playlistItem.FileName);
                 return BassStream.Empty;
             }
-            Logger.Write(this, LogLevel.Debug, "Using bass stream provider \"{0}\".", provider.GetType().Name);
-            var advice = this.GetAdvice(provider, playlistItem, BassStreamUsageType.Interactive).ToArray();
-            var stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
-            if (stream.ChannelHandle != 0)
+            foreach (var provider in providers)
             {
-                Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
-                return stream;
-            }
-            if (stream.Errors == Errors.Already && provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
-            {
-                if (immidiate)
+                Logger.Write(this, LogLevel.Debug, "Using bass stream provider \"{0}\".", provider.GetType().Name);
+                var advice = this.GetAdvice(provider, playlistItem, BassStreamUsageType.Interactive).ToArray();
+                var stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
+                if (stream.ChannelHandle != 0)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Provider does not support multiple streams but immidiate playback was requested, releasing active streams.");
-                    if (this.ReleaseActiveStreams())
+                    Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
+                    return stream;
+                }
+                if (stream.Errors == Errors.Already && provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
+                {
+                    if (immidiate)
                     {
-                        Logger.Write(this, LogLevel.Debug, "Active streams were released, retrying.");
-                        stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
-                        if (stream.ChannelHandle != 0)
+                        Logger.Write(this, LogLevel.Debug, "Provider does not support multiple streams but immidiate playback was requested, releasing active streams.");
+                        if (this.ReleaseActiveStreams())
                         {
-                            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
-                            return stream;
+                            Logger.Write(this, LogLevel.Debug, "Active streams were released, retrying.");
+                            stream = provider.CreateInteractiveStream(playlistItem, advice, flags);
+                            if (stream.ChannelHandle != 0)
+                            {
+                                Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
+                                return stream;
+                            }
+                        }
+                        else
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Failed to release active streams.");
                         }
                     }
                     else
                     {
-                        Logger.Write(this, LogLevel.Debug, "Failed to release active streams.");
+                        return stream;
                     }
                 }
-                else
-                {
-                    return stream;
-                }
+                Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
             }
-            Logger.Write(this, LogLevel.Debug, "Failed to create stream from file {0}: {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
-            return stream;
+            Logger.Write(this, LogLevel.Warn, "All providers failed for file \"{0}\".", playlistItem.FileName);
+            return BassStream.Empty;
         }
 
         public bool HasActiveStream(string fileName)

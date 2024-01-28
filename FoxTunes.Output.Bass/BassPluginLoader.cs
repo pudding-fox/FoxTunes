@@ -120,19 +120,29 @@ namespace FoxTunes
             }
             foreach (var path in PATHS)
             {
-                if (!Directory.Exists(path))
-                {
-                    continue;
-                }
-                foreach (var fileName in Directory.EnumerateFiles(path, FILE_NAME_MASK))
+                if (File.Exists(path))
                 {
                     try
                     {
-                        this.Load(fileName);
+                        this.Load(path);
                     }
                     catch (Exception e)
                     {
                         Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", path, e.Message);
+                    }
+                }
+                else if (Directory.Exists(path))
+                {
+                    foreach (var fileName in Directory.EnumerateFiles(path, FILE_NAME_MASK))
+                    {
+                        try
+                        {
+                            this.Load(fileName);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
+                        }
                     }
                 }
             }
