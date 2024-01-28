@@ -161,7 +161,30 @@ namespace FoxTunes
 
         public abstract void InitializeComponent();
 
-        public abstract void Update(ConfigurationElement element);
+        public virtual void Update(ConfigurationElement element)
+        {
+            if (string.IsNullOrEmpty(this.Name) && !string.IsNullOrEmpty(element.Name))
+            {
+                this.Name = element.Name;
+            }
+            if (string.IsNullOrEmpty(this.Description) && !string.IsNullOrEmpty(element.Description))
+            {
+                this.Description = element.Description;
+            }
+            if (string.IsNullOrEmpty(this.Path) && !string.IsNullOrEmpty(element.Path))
+            {
+                this.Path = element.Path;
+            }
+            if (this.ValidationRules.Count == 0 && element.ValidationRules.Count > 0)
+            {
+                this.ValidationRules.AddRange(element.ValidationRules);
+            }
+            this.Flags |= element.Flags;
+            if (this.Dependencies.Count == 0 && element.Dependencies.Count > 0)
+            {
+                this.Dependencies.AddRange(element.Dependencies);
+            }
+        }
 
         public ConfigurationElement Hide()
         {
@@ -297,6 +320,7 @@ namespace FoxTunes
             {
                 this.Update(element as ConfigurationElement<T>);
             }
+            base.Update(element);
         }
 
         protected virtual void Update(ConfigurationElement<T> element)
