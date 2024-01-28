@@ -156,20 +156,20 @@ namespace FoxTunes
         {
             var flags = default(int);
             var palettes = WaveFormStreamPositionConfiguration.GetColorPalette(value, colors);
+            var background = palettes.GetOrAdd(
+                WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => DefaultColors.GetBackground()
+            );
             //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
                 WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE,
-                () => GetDefaultColors(WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE, showRms, colors)
-            );
-            palettes.GetOrAdd(
-                WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
-                () => GetDefaultColors(WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND, showRms, colors)
+                () => DefaultColors.GetValue(colors)
             );
             if (showRms)
             {
                 palettes.GetOrAdd(
                     WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS,
-                    () => GetDefaultColors(WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS, showRms, colors)
+                    () => DefaultColors.GetRms(colors)
                 );
             }
             return palettes.ToDictionary(
@@ -183,7 +183,7 @@ namespace FoxTunes
                         flags |= BitmapHelper.COLOR_FROM_Y;
                         if (new[] { WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE, WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS }.Contains(pair.Key, StringComparer.OrdinalIgnoreCase))
                         {
-                            colors = colors.MirrorGradient(true);
+                            colors = colors.MirrorGradient(false);
                             switch (mode)
                             {
                                 case WaveFormRendererMode.Seperate:
@@ -196,26 +196,6 @@ namespace FoxTunes
                 },
                 StringComparer.OrdinalIgnoreCase
             );
-        }
-
-        private static Color[] GetDefaultColors(string name, bool showRms, Color[] colors)
-        {
-            var color = colors.FirstOrDefault();
-            switch (name)
-            {
-                case WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS:
-                    const byte SHADE = 30;
-                    var contrast = Color.FromRgb(SHADE, SHADE, SHADE);
-                    return colors.Shade(contrast);
-                case WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE:
-                    return colors;
-                case WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Black
-                    };
-            }
-            throw new NotImplementedException();
         }
 
         protected override WriteableBitmap CreateBitmap(int width, int height)
@@ -767,6 +747,39 @@ namespace FoxTunes
                 }
             }
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WaveFormRenderInfo
+        {
+            public BitmapHelper.RenderInfo Rms;
+
+            public BitmapHelper.RenderInfo Value;
+
+            public BitmapHelper.RenderInfo Background;
+        }
+
+        public static class DefaultColors
+        {
+            public static Color[] GetBackground()
+            {
+                return new[]
+                {
+                    global::System.Windows.Media.Colors.Black
+                };
+            }
+
+            public static Color[] GetRms(Color[] colors)
+            {
+                const byte SHADE = 30;
+                var contrast = Color.FromRgb(SHADE, SHADE, SHADE);
+                return colors.Shade(contrast);
+            }
+
+            public static Color[] GetValue(Color[] colors)
+            {
+                return colors;
+            }
+        }
     }
 
     public enum WaveFormRendererMode : byte
@@ -774,15 +787,5 @@ namespace FoxTunes
         None,
         Mono,
         Seperate
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct WaveFormRenderInfo
-    {
-        public BitmapHelper.RenderInfo Rms;
-
-        public BitmapHelper.RenderInfo Value;
-
-        public BitmapHelper.RenderInfo Background;
     }
 }
