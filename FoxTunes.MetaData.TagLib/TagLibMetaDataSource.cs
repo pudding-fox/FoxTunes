@@ -12,11 +12,9 @@ namespace FoxTunes
 {
     public class TagLibMetaDataSource : BaseComponent, IMetaDataSource
     {
-        const int TIMEOUT = 1000;
-
         public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
 
-        public static readonly KeyLock<string> KeyLock = new KeyLock<string>();
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         //10MB
         public static int MAX_TAG_SIZE = 10240000;

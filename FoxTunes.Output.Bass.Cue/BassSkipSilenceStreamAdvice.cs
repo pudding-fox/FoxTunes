@@ -4,34 +4,38 @@ using System;
 
 namespace FoxTunes
 {
-    public class BassCueStreamAdvice : BassStreamAdvice
+    public class BassSkipSilenceStreamAdvice : BassStreamAdvice
     {
-        static BassCueStreamAdvice()
+        public BassSkipSilenceStreamAdvice(string fileName, TimeSpan leadIn, TimeSpan leadOut) : base(fileName)
         {
-            BassSubstreamHandler.Init();
+            this.LeadIn = leadIn;
+            this.LeadOut = leadOut;
         }
 
-        public BassCueStreamAdvice(string fileName, string offset, string length) : base(fileName)
-        {
-            this.Offset = CueSheetIndex.ToTimeSpan(offset);
-            this.Length = CueSheetIndex.ToTimeSpan(length);
-        }
+        public TimeSpan LeadIn { get; private set; }
 
-        public TimeSpan Offset { get; private set; }
-
-        public TimeSpan Length { get; private set; }
+        public TimeSpan LeadOut { get; private set; }
 
         public override bool Wrap(IBassStreamProvider provider, int channelHandle, out IBassStream stream)
         {
             var offset = default(long);
             var length = default(long);
-            if (this.Offset != TimeSpan.Zero)
+            if (this.LeadIn != TimeSpan.Zero)
             {
-                offset = Bass.ChannelSeconds2Bytes(channelHandle, this.Offset.TotalSeconds);
+                offset = Bass.ChannelSeconds2Bytes(
+                    channelHandle,
+                    this.LeadIn.TotalSeconds
+                );
             }
-            if (this.Length != TimeSpan.Zero)
+            if (this.LeadOut != TimeSpan.Zero)
             {
-                length = Bass.ChannelSeconds2Bytes(channelHandle, this.Length.TotalSeconds);
+                length = Bass.ChannelGetLength(
+                    channelHandle,
+                    PositionFlags.Bytes
+                ) - Bass.ChannelSeconds2Bytes(
+                    channelHandle,
+                    this.LeadOut.TotalSeconds
+                );
             }
             if (offset != 0 || length != 0)
             {

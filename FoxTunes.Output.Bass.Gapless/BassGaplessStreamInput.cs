@@ -157,7 +157,7 @@ namespace FoxTunes
             {
                 this.Reset();
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
-                BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
+                Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
         }
     }

@@ -162,7 +162,7 @@ namespace FoxTunes
             finally
             {
                 Logger.Write(this, LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
-                Bass.StreamFree(stream.ChannelHandle);
+                Bass.StreamFree(stream.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
             if (this.CancellationToken.IsCancellationRequested)
             {

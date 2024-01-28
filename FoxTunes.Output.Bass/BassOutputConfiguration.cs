@@ -37,22 +37,8 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory", path: "Advanced").WithValue(false))
                 .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Advanced").WithValue(500).WithValidationRule(new IntegerValidationRule(10, 5000)))
                 .WithElement(new BooleanConfigurationElement(VOLUME_ENABLED_ELEMENT, "Software Volume Control", path: "Advanced").WithValue(false))
-                .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, "Software Volume Level", path: "Advanced").WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01))
+                .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, "Software Volume Level", path: "Advanced").WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT)
             );
-            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                SECTION,
-                VOLUME_ENABLED_ELEMENT
-            ).ConnectValue(value =>
-            {
-                if (value)
-                {
-                    ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement(SECTION, VOLUME_ELEMENT).Show();
-                }
-                else
-                {
-                    ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement(SECTION, VOLUME_ELEMENT).Hide();
-                }
-            });
         }
 
         public static IEnumerable<SelectionConfigurationOption> GetRateOptions()

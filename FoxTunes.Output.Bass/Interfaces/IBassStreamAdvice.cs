@@ -6,10 +6,6 @@ namespace FoxTunes.Interfaces
     {
         string FileName { get; }
 
-        TimeSpan Offset { get; }
-
-        TimeSpan Length { get; }
-
         bool Wrap(IBassStreamProvider provider, int channelHandle, out IBassStream stream);
     }
 }

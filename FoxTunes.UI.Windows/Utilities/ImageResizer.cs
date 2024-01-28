@@ -13,7 +13,7 @@ namespace FoxTunes
     {
         private static readonly string PREFIX = typeof(ImageResizer).Name;
 
-        private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
+        private static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public ISignalEmitter SignalEmitter { get; private set; }
 

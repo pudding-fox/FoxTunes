@@ -345,7 +345,7 @@ namespace FoxTunes
             if (this.ChannelHandle != 0)
             {
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);
-                BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
+                BassUtils.OK(Bass.StreamFree(this.ChannelHandle)); //Not checking result code as it contains an error if the application is shutting down.
             }
             this.Stop();
             BassAsioDevice.Free();
