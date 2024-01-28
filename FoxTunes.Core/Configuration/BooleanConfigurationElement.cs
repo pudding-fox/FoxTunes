@@ -5,8 +5,8 @@ namespace FoxTunes
     [Serializable]
     public class BooleanConfigurationElement : ConfigurationElement
     {
-        public BooleanConfigurationElement(string id, string name = null, string description = null)
-            : base(id, name, description)
+        public BooleanConfigurationElement(string id, string name = null, string description = null, string path = null)
+            : base(id, name, description, path)
         {
         }
 

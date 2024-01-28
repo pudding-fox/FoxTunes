@@ -206,6 +206,15 @@ namespace FoxTunes
             return sequence;
         }
 
+        public static IEnumerable<T> RemoveRange<T>(this IList<T> list, IEnumerable<T> sequence)
+        {
+            foreach (var element in sequence)
+            {
+                list.Remove(element);
+            }
+            return sequence;
+        }
+
         public static bool TryRemove<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary, TKey key)
         {
             var value = default(TValue);

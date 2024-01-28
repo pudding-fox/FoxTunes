@@ -39,7 +39,7 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "Output")
-                .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, "Rate")
+                .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, "Rate", path: "Advanced")
                     .WithOption(new SelectionConfigurationOption(RATE_044100_OPTION, "44100"), true)
                     .WithOption(new SelectionConfigurationOption(RATE_048000_OPTION, "48000"))
                     .WithOption(new SelectionConfigurationOption(RATE_088200_OPTION, "88200"))
@@ -48,11 +48,11 @@ namespace FoxTunes
                     .WithOption(new SelectionConfigurationOption(RATE_192000_OPTION, "192000"))
                     .WithOption(new SelectionConfigurationOption(RATE_352800_OPTION, "352800"))
                     .WithOption(new SelectionConfigurationOption(RATE_384000_OPTION, "384000")))
-                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth")
+                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: "Advanced")
                     .WithOption(new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit"), true)
                     .WithOption(new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point")))
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode"))
-                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate").WithValue(false))
+                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate", path: "Advanced").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory").WithValue(false)
             );
         }

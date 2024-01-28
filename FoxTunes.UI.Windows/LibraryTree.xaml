@@ -45,6 +45,8 @@
                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                     <Setter Property="Background" Value="Transparent" />
                     <Setter Property="Padding" Value="1,0,0,0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
+                    <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
                     <Setter Property="Template" Value="{DynamicResource TreeViewItemTemplate}"></Setter>
                 </Style>
             </TreeView.Resources>

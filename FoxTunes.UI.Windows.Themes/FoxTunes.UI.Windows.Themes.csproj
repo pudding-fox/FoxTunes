@@ -43,6 +43,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\System_TreeViewItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Themes\System.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

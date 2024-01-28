@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace FoxTunes
@@ -8,13 +9,20 @@ namespace FoxTunes
         public SystemTheme()
             : base("D4EBB53F-BF59-4D61-99E1-D6D52926AE3F", "System")
         {
-            this.ResourceDictionary = new ResourceDictionary()
+            this.ResourceDictionaries = new[]
             {
-                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
+                new ResourceDictionary()
+                {
+                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary()
+                {
+                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/System_TreeViewItem.xaml", UriKind.Relative)
+                }
             };
         }
 
-        public ResourceDictionary ResourceDictionary { get; private set; }
+        public IEnumerable<ResourceDictionary> ResourceDictionaries { get; private set; }
 
         public override string ArtworkPlaceholder
         {
@@ -26,12 +34,12 @@ namespace FoxTunes
 
         public override void Enable()
         {
-            Application.Current.Resources.MergedDictionaries.Add(this.ResourceDictionary);
+            Application.Current.Resources.MergedDictionaries.AddRange(this.ResourceDictionaries);
         }
 
         public override void Disable()
         {
-            Application.Current.Resources.MergedDictionaries.Remove(this.ResourceDictionary);
+            Application.Current.Resources.MergedDictionaries.RemoveRange(this.ResourceDictionaries);
         }
     }
 }

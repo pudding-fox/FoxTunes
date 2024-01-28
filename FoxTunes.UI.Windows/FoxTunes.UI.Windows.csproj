@@ -193,6 +193,7 @@
     <Compile Include="ViewModel\PlaylistBase.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
     <Compile Include="Utilities\ScriptBinding.cs" />
+    <Compile Include="ViewModel\Settings.cs" />
     <Compile Include="ViewModel\Titlebar.cs" />
     <Compile Include="ViewModel\ValidationRule.cs" />
     <Compile Include="ViewModel\Wrapper.cs" />
@@ -200,7 +201,6 @@
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\Playback.cs" />
     <Compile Include="ViewModel\Playlist.cs" />
-    <Compile Include="ViewModel\Settings.cs" />
     <Compile Include="ViewModel\StreamPosition.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="WindowsUserInterface.cs" />

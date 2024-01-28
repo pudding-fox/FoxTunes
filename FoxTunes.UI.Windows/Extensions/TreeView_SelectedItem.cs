@@ -40,7 +40,13 @@ namespace FoxTunes
             {
                 return;
             }
-            //TODO: Set TreeView.SelectedItem = e.NewValue.
+            //TODO: Why doesn't this work?
+            //var treeViewItem = treeView.ItemContainerGenerator.ContainerFromItem(e.NewValue) as TreeViewItem;
+            //if (treeViewItem == null)
+            //{
+            //    return;
+            //}
+            //treeViewItem.IsSelected = true;
         }
 
         private class SelectedItemBehaviour
