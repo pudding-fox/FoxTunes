@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IForegroundTaskRunner : IBaseComponent
+    public interface IForegroundTaskRunner : IStandardComponent
     {
         [Obsolete]
         Task Run(Action action);

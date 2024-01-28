@@ -16,6 +16,10 @@ namespace FoxTunes.Launcher
             using (var core = new Core())
             {
                 core.Load();
+                if (!CoreValidator.Instance.Validate(core))
+                {
+                    throw new InvalidOperationException("One or more required components were not loaded.");
+                }
                 core.Components.UserInterface.Show();
             }
         }
