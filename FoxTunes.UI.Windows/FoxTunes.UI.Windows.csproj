@@ -79,6 +79,7 @@
 
   <ItemGroup>
     <Page Remove="Resources\PlaybackState.xaml" />
+    <Page Remove="Resources\TabContent.xaml" />
     <Page Remove="Resources\WindowBase.xaml" />
   </ItemGroup>
 

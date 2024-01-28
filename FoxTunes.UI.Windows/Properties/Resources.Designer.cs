@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -63,7 +63,10 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to (function () {
         ///    var parts = [];
-        ///    if (tag.artist) {
+        ///    if (tag.__ft_variousartists) {
+        ///        parts.push(&quot;Various Artists&quot;);
+        ///    }
+        ///    else if (tag.artist) {
         ///        parts.push(tag.artist);
         ///    }
         ///    if (tag.year) {
@@ -154,6 +157,22 @@ namespace FoxTunes {
         internal static string Playlist {
             get {
                 return ResourceManager.GetString("Playlist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;DataTemplate 
+        ///    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        ///    xmlns:Core=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.Core&quot; 
+        ///    xmlns:Windows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows&quot;
+        ///    xmlns:ViewModel=&quot;clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows&quot;&gt;
+        ///    &lt;Border Windows:TabControlExtensions.InternalTabControl=&quot;{Binding RelativeSource={RelativeSource AncestorType=TabControl}}&quot;/&gt;
+        ///&lt;/DataTemp [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TabContent {
+            get {
+                return ResourceManager.GetString("TabContent", resourceCulture);
             }
         }
         

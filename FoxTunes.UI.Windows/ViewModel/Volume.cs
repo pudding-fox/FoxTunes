@@ -103,8 +103,7 @@ namespace FoxTunes.ViewModel
                 this.Effects.Volume.EnabledChanged += this.OnEnabledChanged;
                 this.Effects.Volume.ValueChanged += this.OnValueChanged;
             }
-            //TODO: Bad .Wait().
-            this.Refresh().Wait();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 

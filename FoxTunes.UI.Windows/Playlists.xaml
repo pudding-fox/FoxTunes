@@ -38,9 +38,7 @@
         </Interactivity:Interaction.Triggers>
         <Windows:TabControlExtensions.Template>
             <DataTemplate DataType="{x:Type Core:Playlist}">
-                <Grid>
-                    <Windows:TabPlaylist Playlist="{Binding}"></Windows:TabPlaylist>
-                </Grid>
+                <Windows:TabPlaylist Playlist="{Binding}"></Windows:TabPlaylist>
             </DataTemplate>
         </Windows:TabControlExtensions.Template>
     </TabControl>
