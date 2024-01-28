@@ -2,11 +2,38 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes.ViewModel
 {
     public class PeakMeter : ViewModelBase
     {
+        private Orientation _Orientation { get; set; }
+
+        public Orientation Orientation
+        {
+            get
+            {
+                return this._Orientation;
+            }
+            private set
+            {
+                this._Orientation = value;
+                this.OnOrientationChanged();
+            }
+        }
+
+        protected virtual void OnOrientationChanged()
+        {
+            if (this.OrientationChanged != null)
+            {
+                this.OrientationChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Orientation");
+        }
+
+        public event EventHandler OrientationChanged;
+
         public StringCollection Levels
         {
             get
@@ -48,6 +75,10 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
+            core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                PeakMeterBehaviourConfiguration.SECTION,
+                PeakMeterBehaviourConfiguration.ORIENTATION
+            ).ConnectValue(value => this.Orientation = PeakMeterBehaviourConfiguration.GetOrientation(value));
             //TODO: Use actual channel count.
             this.Channels = new StringCollection(new[]
             {

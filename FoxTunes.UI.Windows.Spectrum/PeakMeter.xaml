@@ -12,14 +12,17 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
              Foreground="{DynamicResource TextBrush}"
              SnapsToDevicePixels="True"
-             MinWidth="180"
-             MinHeight="90">
+             MinWidth="100"
+             MinHeight="100">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
         <LocalViewModel:PeakMeter x:Key="ViewModel" Core="{Binding}"></LocalViewModel:PeakMeter>
         <LocalWindows:TextAxisLabelProvider x:Key="Levels" Values="{Binding Levels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
         <LocalWindows:TextAxisLabelProvider x:Key="Channels" Values="{Binding Channels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
     </UserControl.Resources>
+    <UserControl.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:PeakMeterBehaviour.CATEGORY}}"></Windows:Menu>
+    </UserControl.ContextMenu>
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -30,7 +33,42 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="32"></RowDefinition>
             </Grid.RowDefinitions>
-            <LocalWindows:Axis Grid.Column="0" Grid.Row="0" Orientation="Vertical" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Channels}"></LocalWindows:Axis>
+            <LocalWindows:Axis Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Channels}">
+                <LocalWindows:Axis.Style>
+                    <Style TargetType="{x:Type LocalWindows:Axis}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Horizontal">
+                                <Setter Property="Grid.Column" Value="0"></Setter>
+                                <Setter Property="Grid.Row" Value="0"></Setter>
+                                <Setter Property="Orientation" Value="Vertical"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Vertical">
+                                <Setter Property="Grid.Column" Value="1"></Setter>
+                                <Setter Property="Grid.Row" Value="1"></Setter>
+                                <Setter Property="Orientation" Value="Horizontal"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </LocalWindows:Axis.Style>
+            </LocalWindows:Axis>
+            <LocalWindows:Axis Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Levels}">
+                <LocalWindows:Axis.Style>
+                    <Style TargetType="{x:Type LocalWindows:Axis}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Horizontal">
+                                <Setter Property="Grid.Column" Value="1"></Setter>
+                                <Setter Property="Grid.Row" Value="1"></Setter>
+                                <Setter Property="Orientation" Value="Horizontal"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Vertical">
+                                <Setter Property="Grid.Column" Value="0"></Setter>
+                                <Setter Property="Grid.Row" Value="0"></Setter>
+                                <Setter Property="Orientation" Value="Vertical"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </LocalWindows:Axis.Style>
+            </LocalWindows:Axis>
             <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="dB" Foreground="{DynamicResource TextBrush}"></TextBlock>
             <Rectangle Grid.Column="1" Grid.Row="0">
                 <Rectangle.Resources>
@@ -38,14 +76,13 @@
                         Core="{Binding}"                                  
                         Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
                         Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
-                        Orientation="Horizontal"
+                        Orientation="{Binding Orientation, Source={StaticResource ViewModel}}"
                         Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:PeakMeter}}}"></LocalWindows:PeakRenderer>
                 </Rectangle.Resources>
                 <Rectangle.Fill>
                     <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
                 </Rectangle.Fill>
             </Rectangle>
-            <LocalWindows:Axis Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Levels}"></LocalWindows:Axis>
         </Grid>
         <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
