@@ -13,13 +13,14 @@ namespace FoxTunes
     {
         public readonly object SyncRoot = new object();
 
-        private PlaylistSequencePopulator()
+        private PlaylistSequencePopulator(bool reportProgress)
+            : base(reportProgress)
         {
             this.Command = new ThreadLocal<PlaylistSequencePopulatorCommand>(true);
         }
 
-        public PlaylistSequencePopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction)
-            : this()
+        public PlaylistSequencePopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, bool reportProgress)
+            : this(reportProgress)
         {
             this.Database = database;
             this.DatabaseContext = databaseContext;
@@ -44,37 +45,54 @@ namespace FoxTunes
 
         public void Populate(EnumerableDataReader reader)
         {
-            this.Name = "Populating library hierarchies";
-            this.Position = 0;
-            this.Count = (
-                this.DatabaseContext.GetQuery<LibraryHierarchyLevel>().Detach().Count() * this.DatabaseContext.GetQuery<LibraryItem>().Detach().Count()
-            );
+            if (this.ReportProgress)
+            {
+                this.Name = "Populating library hierarchies";
+                this.Position = 0;
+                this.Count = (
+                    this.DatabaseContext.GetQuery<LibraryHierarchyLevel>().Detach().Count() * this.DatabaseContext.GetQuery<LibraryItem>().Detach().Count()
+                );
+            }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
+
             Parallel.ForEach(reader, this.ParallelOptions, record =>
             {
                 var command = this.GetOrAddCommand();
                 var values = this.ExecuteScript(command.ScriptingContext, record);
 
                 command.Parameters["playlistItemId"] = record["PlaylistItem_Id"];
-                for (var a = 0; a < values.Length; a++)
+
+                for (var a = 0; a < 9; a++)
                 {
-                    command.Parameters[string.Format("value{0}", a + 1)] = values[a];
+                    var value = default(object);
+                    if (a < values.Length)
+                    {
+                        value = values[a];
+                    }
+                    else
+                    {
+                        value = DBNull.Value;
+                    }
+                    command.Parameters[string.Format("value{0}", a + 1)] = value;
                 }
+
                 command.Command.ExecuteNonQuery();
 
-                if (position % interval == 0)
+                if (this.ReportProgress)
                 {
-                    lock (this.SyncRoot)
+                    if (position % interval == 0)
                     {
-                        var fileName = record["FileName"] as string;
-                        this.Description = new FileInfo(fileName).Name;
-                        this.Position = position;
+                        lock (this.SyncRoot)
+                        {
+                            var fileName = record["FileName"] as string;
+                            this.Description = new FileInfo(fileName).Name;
+                            this.Position = position;
+                        }
                     }
+                    Interlocked.Increment(ref position);
                 }
-
-                Interlocked.Increment(ref position);
             });
         }
 
@@ -133,7 +151,7 @@ namespace FoxTunes
                 var parameters = default(IDbParameterCollection);
                 this.Command = databaseContext.Connection.CreateCommand(
                     database.CoreSQL.AddPlaylistSequenceRecord,
-                    new[] { "playlistItemId", "value1", "value2", "value3", "value4", "value5" },
+                    new[] { "playlistItemId", "value1", "value2", "value3", "value4", "value5", "value6", "value7", "value8", "value9", "value10" },
                     out parameters
                 );
                 this.Command.Transaction = transaction;

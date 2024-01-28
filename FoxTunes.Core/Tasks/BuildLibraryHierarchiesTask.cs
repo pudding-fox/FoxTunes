@@ -64,7 +64,7 @@ namespace FoxTunes
 
         private void AddHiearchies(IDatabaseContext databaseContext, IDbTransaction transaction, EnumerableDataReader reader)
         {
-            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, databaseContext, transaction))
+            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, databaseContext, transaction, true))
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
                 libraryHierarchyPopulator.NameChanged += (sender, e) => this.Name = libraryHierarchyPopulator.Name;

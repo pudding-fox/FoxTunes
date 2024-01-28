@@ -12,7 +12,12 @@ CREATE TEMPORARY TABLE "PlaylistSort"
 	"Value2" text NULL,
 	"Value3" text NULL,
 	"Value4" text NULL,
-	"Value5" text NULL
+	"Value5" text NULL,
+	"Value6" text NULL,
+	"Value7" text NULL,
+	"Value8" text NULL,
+	"Value9" text NULL,
+	"Value10" text NULL
 );
 
 WITH "VerticalMetaData"
@@ -71,7 +76,7 @@ CREATE TEMPORARY TABLE "PlaylistSequence"
 INSERT INTO "PlaylistSequence" ("PlaylistItem_Id")
 SELECT "PlaylistItem_Id"
 FROM "PlaylistSort"
-ORDER BY "Value1", "Value2", "Value3", "Value4", "Value5";
+ORDER BY "Value1", "Value2", "Value3", "Value4", "Value5", "Value6", "Value7", "Value8", "Value9", "Value10";
 
 UPDATE "PlaylistItems"
 SET "Sequence" = "Sequence" +

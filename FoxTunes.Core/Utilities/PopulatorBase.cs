@@ -6,6 +6,13 @@ namespace FoxTunes
 {
     public abstract class PopulatorBase : BaseComponent, IReportsProgress, IDisposable
     {
+        public PopulatorBase(bool reportProgress)
+        {
+            this.ReportProgress = reportProgress;
+        }
+
+        public bool ReportProgress { get; private set; }
+
         private string _Name { get; set; }
 
         public string Name
