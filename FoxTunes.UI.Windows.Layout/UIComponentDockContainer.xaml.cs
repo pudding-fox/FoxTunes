@@ -232,8 +232,18 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, DOCK_TOP, "Dock Top");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, DOCK_BOTTOM, "Dock Bottom");
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    DOCK_TOP,
+                    "Dock Top",
+                    attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Top), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    DOCK_BOTTOM,
+                    "Dock Bottom",
+                    attributes: string.Equals(this.DockLocation, Enum.GetName(typeof(Dock), Dock.Bottom), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
             }
         }
 
