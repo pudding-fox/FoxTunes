@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Mpeg4;
 using NUnit.Framework;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +11,11 @@ namespace FoxTunes.MetaData.TagLib.Tests
     [TestFixture]
     public class TagLibFileFactoryTests : TestBase
     {
+        public string FileName { get; private set; }
+
         public override void SetUp()
         {
+            this.FileName = Path.Combine(TestInfo.CurrentDirectory, "Audio", "F.m4a");
             ComponentResolver.Slots[ComponentSlots.MetaData] = "679D9459-BBCE-4D95-BB65-DD20C335719C";
             base.SetUp();
         }
@@ -22,18 +26,13 @@ namespace FoxTunes.MetaData.TagLib.Tests
             base.TearDown();
         }
 
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\1.m4a", "1")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\2.m4a", "2")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\3.m4a", "3")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\4.m4a", "4")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\5.m4a", "5")]
-        public async Task CanReadXtraBox(string fileName, string rating)
+        public async Task CanReadXtraBox(string rating)
         {
             //Turn on READ_WINDOWS_MEDIA_TAGS.
             var fileFactory = ComponentRegistry.Instance.GetComponent<TagLibFileFactory>();
             fileFactory.WindowsMedia.Value = true;
             var metaDataSource = this.Core.Factories.MetaDataSource.Create();
-            var metaData = await metaDataSource.GetMetaData(fileName).ConfigureAwait(false);
+            var metaData = await metaDataSource.GetMetaData(this.FileName).ConfigureAwait(false);
             foreach (var metaDataItem in metaData)
             {
                 if (string.Equals(metaDataItem.Name, CommonStatistics.Rating, StringComparison.OrdinalIgnoreCase))
@@ -45,12 +44,12 @@ namespace FoxTunes.MetaData.TagLib.Tests
             Assert.Fail("No rating was returned.");
         }
 
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\6.m4a", "1")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\6.m4a", "2")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\6.m4a", "3")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\6.m4a", "4")]
-        [TestCase(@"C:\Users\AidanG\Desktop\Test\6.m4a", "5")]
-        public async Task CanReadAndWriteXtraBox(string fileName, string rating)
+        [TestCase("1")]
+        [TestCase("2")]
+        [TestCase("3")]
+        [TestCase("4")]
+        [TestCase("5")]
+        public async Task CanReadAndWriteXtraBox(string rating)
         {
             //Turn on READ_WINDOWS_MEDIA_TAGS.
             var fileFactory = ComponentRegistry.Instance.GetComponent<TagLibFileFactory>();
@@ -63,8 +62,8 @@ namespace FoxTunes.MetaData.TagLib.Tests
                     Value = rating
                 }
             };
-            await metaDataSource.SetMetaData(fileName, metaData, null).ConfigureAwait(false);
-            await this.CanReadXtraBox(fileName, rating).ConfigureAwait(false);
+            await metaDataSource.SetMetaData(this.FileName, metaData, null).ConfigureAwait(false);
+            await this.CanReadXtraBox(rating).ConfigureAwait(false);
         }
 
         [Test]
