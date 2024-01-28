@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Forms;
 
 namespace FoxTunes.ViewModel
 {
@@ -110,6 +111,56 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HeightChanged;
 
+        public static readonly DependencyProperty ShowPlaceholderProperty = DependencyProperty.Register(
+            "ShowPlaceholder",
+            typeof(bool),
+            typeof(ArtworkImageConverter),
+            new PropertyMetadata(true, new PropertyChangedCallback(OnShowPlaceholderChanged))
+        );
+
+        public static bool GetShowPlaceholder(ViewModelBase source)
+        {
+            return global::System.Convert.ToBoolean(source.GetValue(ShowPlaceholderProperty));
+        }
+
+        public static void SetShowPlaceholder(ViewModelBase source, bool value)
+        {
+            source.SetValue(ShowPlaceholderProperty, value);
+        }
+
+        public static void OnShowPlaceholderChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var artworkImageConverter = sender as ArtworkImageConverter;
+            if (artworkImageConverter == null)
+            {
+                return;
+            }
+            artworkImageConverter.OnShowPlaceholderChanged();
+        }
+
+        public bool ShowPlaceholder
+        {
+            get
+            {
+                return global::System.Convert.ToBoolean(this.GetValue(ShowPlaceholderProperty));
+            }
+            set
+            {
+                this.SetValue(ShowPlaceholderProperty, value);
+            }
+        }
+
+        protected virtual void OnShowPlaceholderChanged()
+        {
+            if (this.ShowPlaceholderChanged != null)
+            {
+                this.ShowPlaceholderChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowPlaceholder");
+        }
+
+        public event EventHandler ShowPlaceholderChanged;
+
         public ArtworkBrushFactory ArtworkBrushFactory { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -133,6 +184,10 @@ namespace FoxTunes.ViewModel
             if (value is string)
             {
                 fileName = (string)value;
+                if (!this.ShowPlaceholder && !FileSystemHelper.IsLocalPath(fileName))
+                {
+                    return null;
+                }
             }
             else if (value is IFileData)
             {

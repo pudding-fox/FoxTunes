@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -137,17 +136,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ValueChanged;
 
-        public void SetValue(string value)
-        {
-            this.Value = value;
-            switch (this.Type)
-            {
-                case MetaDataItemType.Image:
-                    this.RefreshImageSource();
-                    break;
-            }
-        }
-
         public bool HasChanges
         {
             get
@@ -166,32 +154,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler HasChangesChanged;
-
-        private ImageSource _ImageSource { get; set; }
-
-        public ImageSource ImageSource
-        {
-            get
-            {
-                return this._ImageSource;
-            }
-            set
-            {
-                this._ImageSource = value;
-                this.OnImageSourceChanged();
-            }
-        }
-
-        protected virtual void OnImageSourceChanged()
-        {
-            if (this.ImageSourceChanged != null)
-            {
-                this.ImageSourceChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ImageSource");
-        }
-
-        public event EventHandler ImageSourceChanged;
 
         private bool _HasValue { get; set; }
 
@@ -273,39 +235,7 @@ namespace FoxTunes.ViewModel
                 }
             }
             this.OriginalValue = this.Value;
-            switch (this.Type)
-            {
-                case MetaDataItemType.Image:
-                    this.RefreshImageSource();
-                    break;
-            }
             base.InitializeComponent(core);
-        }
-
-        protected virtual void RefreshImageSource()
-        {
-            if (!this.HasValue || this.HasMultipleValues)
-            {
-                //TODO: The <No Value>/<Multiple Values> text is hard to read when we use the placeholder image.
-                //this.ImageSource = ImageLoader.Load(
-                //    ThemeLoader.Theme.Id,
-                //    () => ThemeLoader.Theme.ArtworkPlaceholder,
-                //    true
-                //);
-                this.ImageSource = null;
-            }
-            else
-            {
-                if (File.Exists(this.Value))
-                {
-                    this.ImageSource = ImageLoader.Load(
-                        this.Value,
-                        0,
-                        0,
-                        true
-                    );
-                }
-            }
         }
 
         public IEnumerable<IFileData> GetSources()
@@ -425,7 +355,7 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            this.SetValue(result.Paths.FirstOrDefault());
+            this.Value = result.Paths.FirstOrDefault();
         }
 
         public ICommand DragEnterCommand
@@ -494,7 +424,7 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    this.SetValue(paths.FirstOrDefault());
+                    this.Value = paths.FirstOrDefault();
                 }
 #if VISTA
                 if (ShellIDListHelper.GetDataPresent(e.Data))
@@ -534,12 +464,6 @@ namespace FoxTunes.ViewModel
         public void Clear()
         {
             this.Value = NoValue;
-            switch (this.Type)
-            {
-                case MetaDataItemType.Image:
-                    this.RefreshImageSource();
-                    break;
-            }
         }
 
         protected override Freezable CreateInstanceCore()

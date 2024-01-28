@@ -115,7 +115,11 @@ namespace FoxTunes
         {
             try
             {
-                var uri = new Uri(fileName);
+                var uri = default(Uri);
+                if (!Uri.TryCreate(fileName, UriKind.Absolute, out uri))
+                {
+                    return false;
+                }
                 if (string.Equals(uri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
                 {
                     //Normal path.
