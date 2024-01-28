@@ -5,16 +5,6 @@ namespace FoxTunes
 {
     public class BassEncoderSettingsFactory : StandardComponent
     {
-        public static IEnumerable<IBassEncoderSettings> Profiles
-        {
-            get
-            {
-                yield return new AppleLosslessEncoderSettings();
-                yield return new FlacEncoderSettings();
-                yield return new WavPackEncoderSettings();
-            }
-        }
-
         public ICore Core { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
