@@ -1,5 +1,5 @@
 ﻿using FoxTunes.Interfaces;
-using Noesis.Javascript;
+using FoxTunes.Proxies;
 using System;
 using System.Diagnostics;
 
@@ -50,14 +50,7 @@ namespace FoxTunes
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
-            try
-            {
-                return this.Context.Run(script);
-            }
-            catch (JavascriptException e)
-            {
-                throw new ScriptingException(e.Line, e.StartColumn, e.EndColumn, e.Message);
-            }
+            return this.Context.Run(script);
         }
 
         protected override void OnDisposing()

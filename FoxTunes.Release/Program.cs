@@ -472,7 +472,8 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.Scripting.JS.Noesis.dll",
-                        "Noesis.Javascript.dll",
+                        "x86/Noesis.Javascript.dll",
+                        "x64/Noesis.Javascript.dll",
                         "x86/msvcp100.dll",
                         "x86/msvcr100.dll",
                         "x64/msvcp100.dll",
