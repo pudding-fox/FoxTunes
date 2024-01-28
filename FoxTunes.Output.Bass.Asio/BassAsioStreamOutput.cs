@@ -318,6 +318,10 @@ namespace FoxTunes
         {
             if (!BassAsioDevice.CanControlVolume)
             {
+                if (volume != 1)
+                {
+                    this.ErrorEmitter.Send(this, Strings.BassAsioStreamOutput_VolumeUnsupported);
+                }
                 return;
             }
             BassAsioDevice.Volume = volume;
