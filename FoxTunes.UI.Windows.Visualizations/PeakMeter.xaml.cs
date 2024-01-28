@@ -95,12 +95,9 @@ namespace FoxTunes
         {
             get
             {
-                if (this.ColorPalette.IsVisible)
+                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
                 {
-                    foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
-                    {
-                        yield return component;
-                    }
+                    yield return component;
                 }
                 yield return new InvocationComponent(
                     CATEGORY,

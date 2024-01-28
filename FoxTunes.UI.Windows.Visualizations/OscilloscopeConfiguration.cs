@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -10,9 +13,6 @@ namespace FoxTunes
         public const string MODE_ELEMENT = "AAAAD149-F777-46CB-92C0-F479CEE72A91";
 
         public const string MODE_MONO_OPTION = "AAAA5CBA-52E7-47AB-98B6-AE2A937A4971";
-
-        //TODO: This was never implemented.
-        public const string MODE_STEREO_OPTION = "BBBB73E1-D8A5-42C4-809A-853A278E0170";
 
         public const string MODE_SEPERATE_OPTION = "CCCCD496-E88A-4B42-8A89-75FFB9A1CD49";
 
@@ -31,6 +31,12 @@ namespace FoxTunes
         public const int DURATION_MAX = 2000;
 
         public const int DURATION_DEFAULT = 400;
+
+        public const string COLOR_PALETTE_THEME = "THEME";
+
+        public const string COLOR_PALETTE_VALUE = "VALUE";
+
+        public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -67,6 +73,14 @@ namespace FoxTunes
         public static TimeSpan GetDuration(int value)
         {
             return TimeSpan.FromMilliseconds(value);
+        }
+
+        public static IDictionary<string, Color[]> GetColorPalette(Color[] colors)
+        {
+            return new Dictionary<string, Color[]>(StringComparer.OrdinalIgnoreCase)
+            {
+                { COLOR_PALETTE_THEME, colors }
+            };
         }
     }
 }

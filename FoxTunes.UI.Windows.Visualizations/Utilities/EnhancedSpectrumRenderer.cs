@@ -154,14 +154,7 @@ namespace FoxTunes
                     {
                         flags |= BitmapHelper.COLOR_FROM_Y;
                     }
-                    if (showPeak || showRms)
-                    {
-                        if (!string.Equals(pair.Key, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
-                        {
-                            flags |= BitmapHelper.ALPHA_BLENDING;
-                        }
-                    }
-                    return BitmapHelper.GetOrCreatePalette(flags, pair.Value);
+                    return BitmapHelper.CreatePalette(flags, pair.Value);
                 },
                 StringComparer.OrdinalIgnoreCase
             );

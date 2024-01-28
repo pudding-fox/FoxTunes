@@ -1,10 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -182,14 +180,7 @@ namespace FoxTunes
                             }
                         }
                     }
-                    if (showPeak || showRms)
-                    {
-                        if (!string.Equals(pair.Key, PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
-                        {
-                            flags |= BitmapHelper.ALPHA_BLENDING;
-                        }
-                    }
-                    return BitmapHelper.GetOrCreatePalette(flags, pair.Value);
+                    return BitmapHelper.CreatePalette(flags, pair.Value);
                 },
                 StringComparer.OrdinalIgnoreCase
             );

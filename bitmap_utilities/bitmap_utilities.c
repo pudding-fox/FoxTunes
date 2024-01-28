@@ -22,7 +22,7 @@ ColorPalette* WINAPI create_palette(Int32Color* colors, INT32 count, INT32 flags
 		if (colors[a].Alpha == 0xff) {
 			continue;
 		}
-		flags |= HAS_TRANSPARENCY;
+		flags |= ALPHA_BLENDING;
 		break;
 	}
 	palette->Count = count;
@@ -313,9 +313,7 @@ BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT3
 		return FALSE;
 	}
 
-	//Only do blending if required.
-	INT32 mask = ALPHA_BLENDING | HAS_TRANSPARENCY;
-	if ((info->Palette->Flags & mask) == mask)
+	if ((info->Palette->Flags & ALPHA_BLENDING) == ALPHA_BLENDING)
 	{
 		if (info->Palette->Count == 1)
 		{
