@@ -64,7 +64,7 @@ namespace FoxTunes
                 var metaDataSource = this.MetaDataSourceFactory.Create();
                 foreach (var libraryItem in this.LibraryItems)
                 {
-                    await this.SetDescription(new FileInfo(libraryItem.FileName).Name).ConfigureAwait(false);
+                    await this.SetDescription(Path.GetFileName(libraryItem.FileName)).ConfigureAwait(false);
                     await this.SetPosition(position).ConfigureAwait(false);
 
                     if (!File.Exists(libraryItem.FileName))

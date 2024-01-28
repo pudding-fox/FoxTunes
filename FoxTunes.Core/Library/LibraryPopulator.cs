@@ -109,7 +109,7 @@ namespace FoxTunes
                 await this.SetName(string.Format("Populating library: {0} items/s", this.CountMetric.Average(position))).ConfigureAwait(false);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(new FileInfo(this.Current).Name).ConfigureAwait(false);
+                    await this.SetDescription(Path.GetFileName(this.Current)).ConfigureAwait(false);
                 }
             }
             base.OnElapsed(sender, e);

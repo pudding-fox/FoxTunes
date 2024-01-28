@@ -113,7 +113,7 @@ namespace FoxTunes
         {
             if (this.Current != null)
             {
-                await this.SetDescription(new FileInfo(this.Current).Name).ConfigureAwait(false);
+                await this.SetDescription(Path.GetFileName(this.Current)).ConfigureAwait(false);
             }
             base.OnElapsed(sender, e);
         }

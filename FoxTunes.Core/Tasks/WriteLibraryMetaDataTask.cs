@@ -49,11 +49,20 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement Write { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             this.SignalEmitter = core.Components.SignalEmitter;
+            this.Configuration = core.Components.Configuration;
+            this.Write = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.WRITE_ELEMENT
+            );
             base.InitializeComponent(core);
         }
 
@@ -78,19 +87,46 @@ namespace FoxTunes
                         break;
                     }
 
-                    await this.SetDescription(new FileInfo(libraryItem.FileName).Name).ConfigureAwait(false);
+                    await this.SetDescription(Path.GetFileName(libraryItem.FileName)).ConfigureAwait(false);
                     await this.SetPosition(position).ConfigureAwait(false);
-
-                    if (!File.Exists(libraryItem.FileName))
-                    {
-                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName);
-                        this.Errors.Add(libraryItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName)));
-                        position++;
-                        continue;
-                    }
 
                     try
                     {
+                        foreach (var metaDataItem in libraryItem.MetaDatas.ToArray())
+                        {
+                            if (!string.IsNullOrEmpty(metaDataItem.Value))
+                            {
+                                continue;
+                            }
+                            libraryItem.MetaDatas.Remove(metaDataItem);
+                        }
+
+                        await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
+                        await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
+
+                        if (!this.Write.Value)
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", libraryItem.FileName);
+                            position++;
+                            continue;
+                        }
+
+                        if (!FileSystemHelper.IsLocalFile(libraryItem.FileName))
+                        {
+                            Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", libraryItem.FileName);
+                            this.Errors.Add(libraryItem, new FileNotFoundException(string.Format("File \"{0}\" is not a local file: Cannot update.", libraryItem.FileName)));
+                            position++;
+                            continue;
+                        }
+
+                        if (!File.Exists(libraryItem.FileName))
+                        {
+                            Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName);
+                            this.Errors.Add(libraryItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName)));
+                            position++;
+                            continue;
+                        }
+
                         await metaDataSource.SetMetaData(
                             libraryItem.FileName,
                             libraryItem.MetaDatas,
@@ -103,18 +139,6 @@ namespace FoxTunes
                         position++;
                         continue;
                     }
-
-                    foreach (var metaDataItem in libraryItem.MetaDatas.ToArray())
-                    {
-                        if (!string.IsNullOrEmpty(metaDataItem.Value))
-                        {
-                            continue;
-                        }
-                        libraryItem.MetaDatas.Remove(metaDataItem);
-                    }
-
-                    await this.WriteLibraryMetaData(libraryItem).ConfigureAwait(false);
-                    await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import).ConfigureAwait(false);
 
                     position++;
                 }

@@ -209,7 +209,7 @@ namespace FoxTunes
                 await this.SetName(string.Format("Populating library hierarchies: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(new FileInfo(this.Current).Name).ConfigureAwait(false);
+                    await this.SetDescription(Path.GetFileName(this.Current)).ConfigureAwait(false);
                 }
                 await this.SetPosition(position).ConfigureAwait(false);
             }

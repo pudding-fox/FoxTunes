@@ -144,7 +144,7 @@ namespace FoxTunes
                 await this.SetName(string.Format("Updating library: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(new FileInfo(this.Current.FileName).Name).ConfigureAwait(false);
+                    await this.SetDescription(Path.GetFileName(this.Current.FileName)).ConfigureAwait(false);
                 }
                 await this.SetPosition(this.position).ConfigureAwait(false);
             }
