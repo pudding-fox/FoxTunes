@@ -76,6 +76,7 @@ namespace FoxTunes
                 this.ListBox.PreviewMouseUp += this.OnMouseUp;
                 this.ListBox.MouseMove += this.OnMouseMove;
                 this.ListBox.DragOver += this.OnDragOver;
+                this.ListBox.GiveFeedback += this.OnGiveFeedback;
             }
 
             public Point DragStartPosition { get; private set; }
@@ -171,6 +172,16 @@ namespace FoxTunes
                 e.Effects = DragDropEffects.Move;
             }
 
+            protected virtual void OnGiveFeedback(object sender, GiveFeedbackEventArgs e)
+            {
+                if (!this.DragInitialized)
+                {
+                    return;
+                }
+                Mouse.SetCursor(Cursors.Hand);
+                e.Handled = true;
+            }
+
             protected virtual object GetDataContext(MouseEventArgs e)
             {
                 var position = e.GetPosition(this.ListBox);
@@ -191,6 +202,19 @@ namespace FoxTunes
                     return element.DataContext;
                 }
                 return null;
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.ListBox != null)
+                {
+                    this.ListBox.PreviewMouseDown -= this.OnMouseDown;
+                    this.ListBox.PreviewMouseUp -= this.OnMouseUp;
+                    this.ListBox.MouseMove -= this.OnMouseMove;
+                    this.ListBox.DragOver -= this.OnDragOver;
+                    this.ListBox.GiveFeedback -= this.OnGiveFeedback;
+                }
+                base.OnDisposing();
             }
         }
     }
