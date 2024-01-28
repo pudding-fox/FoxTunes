@@ -10,7 +10,21 @@
     <UserControl.Resources>
         <ViewModel:BackgroundTasks x:Key="ViewModel" Core="{Binding}"></ViewModel:BackgroundTasks>
     </UserControl.Resources>
-    <Grid>
+    <Border Background="{DynamicResource NormalBrush}" 
+                    BorderBrush="{DynamicResource NormalBorderBrush}" 
+                    BorderThickness="1" 
+                    CornerRadius="8,8,0,0" 
+                    Padding="10">
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="Visibility" Value="Visible"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={StaticResource ViewModel}, Path=Items.Count}" Value="0">
+                        <Setter Property="Visibility" Value="Collapsed"></Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
         <ItemsControl ItemsSource="{Binding Source={StaticResource ViewModel}, Path=Items}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -38,5 +52,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </Grid>
+    </Border>
 </UserControl>
