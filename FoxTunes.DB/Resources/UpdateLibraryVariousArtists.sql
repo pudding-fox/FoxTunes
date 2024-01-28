@@ -18,8 +18,10 @@ AS
 "AlbumArtist"
 AS
 (
-	SELECT 
-		"LibraryItems".*, 
+	SELECT "AlbumArtist"."Id", "AlbumArtist"."DirectoryName", "Album", CASE WHEN "FirstAlbumArtist" IS NOT NULL THEN "FirstAlbumArtist" ELSE "FirstArtist" END AS "Artist"
+	FROM
+	(
+		SELECT "LibraryItems".*,
 		(
 			SELECT "TextValue"
 			FROM "MetaData"
@@ -28,10 +30,16 @@ AS
 		(
 			SELECT "TextValue"
 			FROM "MetaData"
+			WHERE "MetaData"."Id" = "LibraryItems"."Id" AND "MetaData"."Name" = 'FirstAlbumArtist'
+		) AS "FirstAlbumArtist",
+		(
+			SELECT "TextValue"
+			FROM "MetaData"
 			WHERE "MetaData"."Id" = "LibraryItems"."Id" AND "MetaData"."Name" = 'FirstArtist'
 		) AS "FirstArtist"
-	FROM "LibraryItems"
-	WHERE "Status" = @status
+		FROM "LibraryItems"
+		WHERE "Status" = @status
+	) AS "AlbumArtist"
 ),
 
 "VariousArtists" AS
@@ -39,7 +47,7 @@ AS
 	SELECT "DirectoryName", "Album"
 	FROM "AlbumArtist"
 	GROUP BY "DirectoryName", "Album"
-	HAVING COUNT(DISTINCT "FirstArtist") > 1
+	HAVING COUNT(DISTINCT "Artist") > 1
 ),
 
 "VA_MetaDataItem" AS
@@ -52,8 +60,8 @@ AS
 INSERT INTO "LibraryItem_MetaDataItem" ("LibraryItem_Id", "MetaDataItem_Id")
 SELECT "AlbumArtist"."Id", (SELECT "Id" FROM "VA_MetaDataItem")
 FROM "AlbumArtist"
-JOIN "VariousArtists" ON "AlbumArtist".DirectoryName = "VariousArtists".DirectoryName 
-	AND "AlbumArtist".Album = "VariousArtists".Album 
+JOIN "VariousArtists" ON "AlbumArtist"."DirectoryName" = "VariousArtists"."DirectoryName"
+	AND "AlbumArtist"."Album" = "VariousArtists"."Album"
 WHERE NOT EXISTS(
 	SELECT * 
 	FROM "LibraryItem_MetaDataItem"
