@@ -8,13 +8,16 @@ namespace FoxTunes
 
         public const string AUTO_SCROLL = "AAAA70DD-84E9-48D5-B174-E0A0FC498698";
 
-        public const string AUTO_SCROLL_EASING = "BBBBCC1E-B4A8-41A9-A611-47F06EFFF24B";
+        public const string AUTO_LOOKUP = "BBBB3698-E26A-4D6C-9BBF-E845B0F9D150";
+
+        public const string EDITOR = "CCCCF394-0C2A-4BC3-ADA3-9E89F8C897D9";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "Lyrics")
                 .WithElement(new BooleanConfigurationElement(AUTO_SCROLL, "Auto Scroll").WithValue(true).DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(AUTO_SCROLL_EASING, "Auto Scroll Easing").WithValue(false).DependsOn(SECTION, AUTO_SCROLL)
+                .WithElement(new BooleanConfigurationElement(AUTO_LOOKUP, "Auto Lookup").WithValue(false).DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT))
+                .WithElement(new TextConfigurationElement(EDITOR, "Editor").WithValue("notepad.exe").DependsOn(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)
             );
         }
     }

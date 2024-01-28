@@ -19,19 +19,47 @@
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:LyricsBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <GroupBox Header="Lyrics">
-        <ScrollViewer 
-                HorizontalScrollBarVisibility="Disabled" 
-                VerticalScrollBarVisibility="Auto" 
-                Padding="5" 
-                LocalWindows:ScrollViewerExtensions.AutoScroll="{Binding AutoScroll, Source={StaticResource ViewModel}}"
-                LocalWindows:ScrollViewerExtensions.AutoScrollEasing="{Binding AutoScrollEasing, Source={StaticResource ViewModel}}"
-                LocalWindows:ScrollViewerExtensions.VerticalValue="{Binding Position, Source={StaticResource ViewModel}}"
-                LocalWindows:ScrollViewerExtensions.VerticalMax="{Binding Length, Source={StaticResource ViewModel}}">
-            <TextBlock VerticalAlignment="Top" TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextBrush}">
-                <Run Text="{x:Static LocalViewModel:Lyrics.PADDING}"></Run>
-                <Run Text="{Binding Data, Source={StaticResource ViewModel}}"></Run>
-                <Run Text="{x:Static LocalViewModel:Lyrics.PADDING}"></Run>
-            </TextBlock>
-        </ScrollViewer>
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="{x:Type ContentControl}">
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <ScrollViewer 
+                                HorizontalScrollBarVisibility="Disabled" 
+                                VerticalScrollBarVisibility="Auto" 
+                                Padding="5">
+                                <TextBlock 
+                                    VerticalAlignment="Top" 
+                                    TextAlignment="Center" 
+                                    TextWrapping="Wrap" 
+                                    Foreground="{DynamicResource TextBrush}" 
+                                    Text="{Binding Data, Source={StaticResource ViewModel}}"/>
+                            </ScrollViewer>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding AutoScroll, Source={StaticResource ViewModel}}" Value="True">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <ScrollViewer 
+                                        HorizontalScrollBarVisibility="Disabled" 
+                                        VerticalScrollBarVisibility="Auto" 
+                                        Padding="5" 
+                                        LocalWindows:ScrollViewerExtensions.AutoScroll="True"
+                                        LocalWindows:ScrollViewerExtensions.VerticalValue="{Binding Position, Source={StaticResource ViewModel}}"
+                                        LocalWindows:ScrollViewerExtensions.VerticalMax="{Binding Length, Source={StaticResource ViewModel}}">
+                                        <TextBlock VerticalAlignment="Top" TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextBrush}">
+                                        <Run Text="{x:Static LocalViewModel:Lyrics.PADDING}"></Run>
+                                        <Run Text="{Binding Data, Source={StaticResource ViewModel}}"></Run>
+                                        <Run Text="{x:Static LocalViewModel:Lyrics.PADDING}"></Run>
+                                        </TextBlock>
+                                    </ScrollViewer>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
     </GroupBox>
 </Windows:UIComponentBase>

@@ -52,28 +52,6 @@ namespace FoxTunes
             }
         }
 
-        public static readonly DependencyProperty AutoScrollEasingProperty = DependencyProperty.RegisterAttached(
-            "AutoScrollEasing",
-            typeof(bool),
-            typeof(ScrollViewerExtensions),
-            new FrameworkPropertyMetadata(false, new PropertyChangedCallback(OnAutoScrollEasingPropertyChanged))
-        );
-
-        public static bool GetAutoScrollEasing(ScrollViewer source)
-        {
-            return (bool)source.GetValue(AutoScrollEasingProperty);
-        }
-
-        public static void SetAutoScrollEasing(ScrollViewer source, bool value)
-        {
-            source.SetValue(AutoScrollEasingProperty, value);
-        }
-
-        private static void OnAutoScrollEasingPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            //Nothing to do.
-        }
-
         public static readonly DependencyProperty VerticalValueProperty = DependencyProperty.RegisterAttached(
             "VerticalValue",
             typeof(double),
@@ -136,22 +114,12 @@ namespace FoxTunes
                     //Content is not scrollable.
                     return;
                 }
-                var verticalOffset = Math.Round(height * this.GetFactor(GetVerticalValue(this.ScrollViewer) / GetVerticalMax(ScrollViewer)), 1);
+                var verticalOffset = Math.Round(height * (GetVerticalValue(this.ScrollViewer) / GetVerticalMax(ScrollViewer)), 1);
                 if (verticalOffset == this.ScrollViewer.VerticalOffset)
                 {
                     return;
                 }
                 this.ScrollViewer.ScrollToVerticalOffset(verticalOffset);
-            }
-
-            protected virtual double GetFactor(double value)
-            {
-                if (!GetAutoScrollEasing(this.ScrollViewer))
-                {
-                    return value;
-                }
-                //easeInOutCubic
-                return value < 0.5 ? 4 * value * value * value : 1 - Math.Pow(-2 * value + 2, 3) / 2;
             }
 
             protected override void OnDisposing()

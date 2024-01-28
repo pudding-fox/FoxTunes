@@ -74,32 +74,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler AutoScrollChanged;
 
-        private bool _AutoScrollEasing { get; set; }
-
-        public bool AutoScrollEasing
-        {
-            get
-            {
-                return this._AutoScrollEasing;
-            }
-            set
-            {
-                this._AutoScrollEasing = value;
-                this.OnAutoScrollEasingChanged();
-            }
-        }
-
-        protected virtual void OnAutoScrollEasingChanged()
-        {
-            if (this.AutoScrollEasingChanged != null)
-            {
-                this.AutoScrollEasingChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("AutoScrollEasing");
-        }
-
-        public event EventHandler AutoScrollEasingChanged;
-
         private string _Data { get; set; }
 
         public string Data
@@ -222,10 +196,6 @@ namespace FoxTunes.ViewModel
                 LyricsBehaviourConfiguration.SECTION,
                 LyricsBehaviourConfiguration.AUTO_SCROLL
             ).ConnectValue(value => this.AutoScroll = value);
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                LyricsBehaviourConfiguration.SECTION,
-                LyricsBehaviourConfiguration.AUTO_SCROLL_EASING
-            ).ConnectValue(value => this.AutoScrollEasing = value);
             base.InitializeComponent(core);
         }
 
