@@ -58,6 +58,11 @@ namespace FoxTunes
             return Task.FromResult<IOutputStream>(outputStream);
         }
 
+        public override Task Preempt(IOutputStream stream)
+        {
+            return Task.CompletedTask;
+        }
+
         public override Task Unload(IOutputStream stream)
         {
             Logger.Write(this, LogLevel.Debug, "Unloading output stream for playlist item: {0} => {1}", stream.Id, stream.FileName);

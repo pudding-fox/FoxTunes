@@ -9,9 +9,9 @@ using System.Windows.Input;
 namespace FoxTunes
 {
     /// <summary>
-    /// Interaction logic for Library.xaml
+    /// Interaction logic for LibraryTree.xaml
     /// </summary>
-    public partial class Library : UserControl
+    public partial class LibraryTree : UserControl
     {
         private LibraryHierarchyNode SelectedNode { get; set; }
 
@@ -19,7 +19,7 @@ namespace FoxTunes
 
         private bool DragInitialized { get; set; }
 
-        public Library()
+        public LibraryTree()
         {
             InitializeComponent();
         }

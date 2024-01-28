@@ -183,7 +183,10 @@ namespace FoxTunes
 
         public void LoadChildren()
         {
-            this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
+            if (this.LibraryHierarchyBrowser != null)
+            {
+                this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
+            }
             this.IsLoaded = true;
         }
 
