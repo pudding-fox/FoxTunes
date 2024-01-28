@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -71,13 +72,19 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
+            this.Configuration.Loaded += this.OnLoaded;
             this.Configuration.Saving += this.OnSaving;
             this.Main = this.Configuration.GetElement<TextConfigurationElement>(
                 UIComponentLayoutProviderConfiguration.SECTION,
                 UIComponentLayoutProviderConfiguration.MAIN_LAYOUT
             );
-            this.Main.ConnectValue(value => this.MainComponent = this.LoadComponent(value));
+            var task = this.Load();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnLoaded(object sender, EventArgs e)
+        {
+            var task = this.Load();
         }
 
         protected virtual void OnSaving(object sender, EventArgs e)
@@ -85,23 +92,27 @@ namespace FoxTunes
             this.Save();
         }
 
-        protected virtual UIComponentConfiguration LoadComponent(string value)
+        protected virtual Task Load()
         {
-            if (!string.IsNullOrEmpty(value))
+            return Windows.Invoke(() =>
             {
+                if (string.IsNullOrEmpty(this.Main.Value))
+                {
+                    this.MainComponent = null;
+                    return;
+                }
                 try
                 {
-                    using (var stream = new MemoryStream(Encoding.Default.GetBytes(value)))
+                    using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Main.Value)))
                     {
-                        return Serializer.LoadComponent(stream);
+                        this.MainComponent = Serializer.LoadComponent(stream);
                     }
                 }
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to load component: {0}", e.Message);
                 }
-            }
-            return null;
+            });
         }
 
         public override UIComponentBase Load(UILayoutTemplate template)
