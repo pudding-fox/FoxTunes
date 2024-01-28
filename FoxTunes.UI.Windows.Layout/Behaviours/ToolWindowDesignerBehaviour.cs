@@ -27,6 +27,7 @@ namespace FoxTunes
             ToolWindowBehaviour.ToolWindowManagerWindowCreated += this.OnToolWindowManagerWindowCreated;
             ToolWindowBehaviour.ToolWindowManagerWindowClosed += this.OnToolWindowManagerWindowClosed;
             this.Behaviour = ComponentRegistry.Instance.GetComponent<ToolWindowBehaviour>();
+            this.Behaviour.Loaded += this.OnLoaded;
             base.InitializeComponent(core);
         }
 
@@ -38,6 +39,14 @@ namespace FoxTunes
         protected virtual void OnToolWindowManagerWindowClosed(object sender, EventArgs e)
         {
             this.HideDesignerOverlay();
+        }
+
+        protected virtual void OnLoaded(object sender, ToolWindowConfigurationEventArgs e)
+        {
+            if (ToolWindowBehaviour.IsToolWindowManagerWindowCreated)
+            {
+                var task = Windows.Invoke(() => this.ShowDesignerOverlay(e.Configuration, e.Window));
+            }
         }
 
         protected virtual void ShowDesignerOverlay()

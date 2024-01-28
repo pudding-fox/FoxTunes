@@ -46,6 +46,19 @@ namespace FoxTunes
             }
         }
 
+        public static void Save(Stream stream, UIComponentConfiguration config)
+        {
+            using (var writer = new XmlTextWriter(stream, Encoding.Default))
+            {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartDocument();
+                writer.WriteStartElement(Publication.Product);
+                SaveComponent(writer, config);
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+        }
+
         private static void SaveComponent(XmlTextWriter writer, UIComponentConfiguration config)
         {
             writer.WriteStartElement(nameof(UIComponentConfiguration));
@@ -76,7 +89,7 @@ namespace FoxTunes
             writer.WriteEndElement();
         }
 
-        public static IEnumerable<ToolWindowConfiguration> Load(Stream stream)
+        public static IEnumerable<ToolWindowConfiguration> LoadWindows(Stream stream)
         {
             using (var reader = new XmlTextReader(stream))
             {
@@ -117,6 +130,22 @@ namespace FoxTunes
                     reader.ReadEndElement();
                 }
             }
+        }
+
+        public static UIComponentConfiguration LoadComponent(Stream stream)
+        {
+            var component = default(UIComponentConfiguration);
+            using (var reader = new XmlTextReader(stream))
+            {
+                reader.WhitespaceHandling = WhitespaceHandling.Significant;
+                reader.ReadStartElement(Publication.Product);
+                component = LoadComponent(reader);
+                if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, Publication.Product))
+                {
+                    reader.ReadEndElement();
+                }
+            }
+            return component;
         }
 
         private static UIComponentConfiguration LoadComponent(XmlReader reader)
