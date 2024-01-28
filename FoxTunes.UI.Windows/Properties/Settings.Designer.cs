@@ -12,7 +12,7 @@ namespace FoxTunes.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -104,6 +104,30 @@ namespace FoxTunes.Properties {
             }
             set {
                 this["EqualizerWindowBounds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,0,0,0")]
+        public global::System.Windows.Rect PlaylistManagerWindowBounds {
+            get {
+                return ((global::System.Windows.Rect)(this["PlaylistManagerWindowBounds"]));
+            }
+            set {
+                this["PlaylistManagerWindowBounds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,0,0,0")]
+        public global::System.Windows.Rect ReportWindowBounds {
+            get {
+                return ((global::System.Windows.Rect)(this["ReportWindowBounds"]));
+            }
+            set {
+                this["ReportWindowBounds"] = value;
             }
         }
     }

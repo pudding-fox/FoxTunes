@@ -34,13 +34,14 @@
   <ItemGroup>
     <EmbeddedResource Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
-      <CustomToolNamespace>FoxTunes</CustomToolNamespace>
+      <CustomToolNamespace>FoxTunes.Properties</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
   
@@ -74,11 +75,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <UpToDateCheckInput Remove="Resources\PlaybackState.xaml" />
-    <UpToDateCheckInput Remove="Resources\Rating.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Images\Fox.ico">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -106,15 +102,9 @@
 
   <ItemGroup>
     <None Update="Properties\Settings.settings">
-      <CustomToolNamespace>FoxTunes.Properties</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <None Update="Resources\PlaybackState.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
-    <None Update="Resources\Rating.xaml">
-      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>FoxTunes.Properties</CustomToolNamespace>
     </None>
   </ItemGroup>
 
