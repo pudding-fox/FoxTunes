@@ -6,19 +6,19 @@ namespace FoxTunes
 {
     public class ErrorEmitter : StandardComponent, IErrorEmitter
     {
-        public Task Send(string message)
+        public Task Send(IBaseComponent source, string message)
         {
-            return this.Send(new Exception(message));
+            return this.Send(source, new Exception(message));
         }
 
-        public Task Send(Exception exception)
+        public Task Send(IBaseComponent source, Exception exception)
         {
-            return this.Send(exception.Message, exception);
+            return this.OnError(this, new ComponentErrorEventArgs(source, exception));
         }
 
-        public Task Send(string message, Exception exception)
+        public Task Send(IBaseComponent source, string message, Exception exception)
         {
-            return this.OnError(this, new ComponentErrorEventArgs(message, exception));
+            return this.OnError(this, new ComponentErrorEventArgs(source, message, exception));
         }
 
         protected virtual Task OnError(object sender, ComponentErrorEventArgs e)

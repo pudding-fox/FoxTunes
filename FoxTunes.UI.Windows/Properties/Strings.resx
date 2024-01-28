@@ -210,6 +210,9 @@
   <data name="LibraryBase.Loading" xml:space="preserve">
     <value>Loading...</value>
   </data>
+  <data name="LibraryBase.UnvirtualizedTooLarge" xml:space="preserve">
+    <value>The library view contains {0} items which exceeds {1} items allowed without virtualization. Please enable the "Virtualizing Lists" setting.</value>
+  </data>
   <data name="LibraryBase.Updating" xml:space="preserve">
     <value>Updating...</value>
   </data>
@@ -359,6 +362,9 @@
   </data>
   <data name="PlaylistBase.Loading" xml:space="preserve">
     <value>Loading...</value>
+  </data>
+  <data name="PlaylistBase.UnvirtualizedTooLarge" xml:space="preserve">
+    <value>The playlist contains {0} items which exceeds {1} items allowed without virtualization. Please enable the "Virtualizing Lists" setting.</value>
   </data>
   <data name="PlaylistBase.Updating" xml:space="preserve">
     <value>Updating...</value>

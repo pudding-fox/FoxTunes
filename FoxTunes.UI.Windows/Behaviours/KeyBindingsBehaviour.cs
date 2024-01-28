@@ -74,7 +74,7 @@ namespace FoxTunes
             }
             else
             {
-                this.ErrorEmitter.Send(string.Format("Failed to register input hook {0}", keys));
+                this.ErrorEmitter.Send(this, string.Format("Failed to register input hook {0}", keys));
             }
         }
 
@@ -90,7 +90,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                this.ErrorEmitter.Send(string.Format("Failed to register input hook {0}: {1}", id, e.Message));
+                this.ErrorEmitter.Send(this, string.Format("Failed to register input hook {0}: {1}", id, e.Message));
             }
         }
 

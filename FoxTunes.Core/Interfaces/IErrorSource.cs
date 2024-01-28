@@ -12,15 +12,18 @@ namespace FoxTunes.Interfaces
 
     public class ComponentErrorEventArgs : EventArgs
     {
-        public ComponentErrorEventArgs(Exception exception) : this(exception.Message, exception)
+        public ComponentErrorEventArgs(IBaseComponent source, Exception exception) : this(source, exception.Message, exception)
         {
         }
 
-        public ComponentErrorEventArgs(string message, Exception exception)
+        public ComponentErrorEventArgs(IBaseComponent source, string message, Exception exception)
         {
+            this.Source = source;
             this.Message = message;
             this.Exception = exception;
         }
+
+        public IBaseComponent Source { get; private set; }
 
         public string Message { get; private set; }
 

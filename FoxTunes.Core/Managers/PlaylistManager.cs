@@ -450,7 +450,7 @@ namespace FoxTunes
             {
                 exception = e;
             }
-            await this.ErrorEmitter.Send(exception).ConfigureAwait(false);
+            await this.ErrorEmitter.Send(this, exception).ConfigureAwait(false);
         }
 
         public Task Play(Playlist playlist, int sequence)

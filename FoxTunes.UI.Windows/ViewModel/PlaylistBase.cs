@@ -54,7 +54,11 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
+
+        public const int MAX_UNVIRTUALIZED_ITEMS = 1000;
 
         private bool _IsVirtualizing { get; set; }
 
@@ -225,6 +229,7 @@ namespace FoxTunes.ViewModel
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -280,6 +285,11 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var items = this.PlaylistBrowser.GetItems(playlist);
+            if (!this.IsVirtualizing && items.Length > MAX_UNVIRTUALIZED_ITEMS)
+            {
+                await this.ErrorEmitter.Send(this, string.Format(Strings.PlaylistBase_UnvirtualizedTooLarge, items.Length, MAX_UNVIRTUALIZED_ITEMS));
+                items = items.Take(MAX_UNVIRTUALIZED_ITEMS).ToArray();
+            }
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);

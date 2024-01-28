@@ -177,7 +177,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                await this.ErrorEmitter.Send(e).ConfigureAwait(false);
+                await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
                 return;
             }
             if (playlistItem != null)
@@ -199,7 +199,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    await this.ErrorEmitter.Send(e).ConfigureAwait(false);
+                    await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
                 }
             }
         }

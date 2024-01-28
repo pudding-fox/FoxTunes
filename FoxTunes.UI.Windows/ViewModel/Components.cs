@@ -58,24 +58,24 @@ namespace FoxTunes.ViewModel
 
         protected virtual async Task OnError(object sender, ComponentErrorEventArgs e)
         {
-            var component = sender as IBaseComponent;
             if (e.Exception is AggregateException aggregateException)
             {
                 if (aggregateException.InnerExceptions.Count == 1)
                 {
-                    await this.Add(new ComponentError(component, aggregateException.InnerExceptions[0].Message, aggregateException.InnerExceptions[0])).ConfigureAwait(false);
+                    var innerException = aggregateException.InnerExceptions[0];
+                    await this.Add(new ComponentError(e.Source, innerException.Message, innerException)).ConfigureAwait(false);
                 }
                 else
                 {
                     foreach (var innerException in aggregateException.InnerExceptions)
                     {
-                        await this.Add(new ComponentError(component, innerException.Message, innerException)).ConfigureAwait(false);
+                        await this.Add(new ComponentError(e.Source, innerException.Message, innerException)).ConfigureAwait(false);
                     }
                 }
             }
             else
             {
-                await this.Add(new ComponentError(component, e.Message, e.Exception)).ConfigureAwait(false);
+                await this.Add(new ComponentError(e.Source, e.Message, e.Exception)).ConfigureAwait(false);
             }
         }
 

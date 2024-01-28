@@ -107,7 +107,7 @@ namespace FoxTunes.ViewModel
             {
                 exception = e;
             }
-            await this.ErrorEmitter.Send("Save", exception).ConfigureAwait(false);
+            await this.ErrorEmitter.Send(this, "Save", exception).ConfigureAwait(false);
             throw exception;
         }
 
