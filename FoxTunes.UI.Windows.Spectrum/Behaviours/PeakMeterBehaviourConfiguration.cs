@@ -15,15 +15,15 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Peak Meter")
-                .WithElement(new SelectionConfigurationElement(ORIENTATION, "Orientation").WithOptions(GetOrientationOptions())
+            yield return new ConfigurationSection(SECTION, Strings.PeakMeterBehaviourConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(ORIENTATION, Strings.PeakMeterBehaviourConfiguration_Orientation).WithOptions(GetOrientationOptions())
             );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetOrientationOptions()
         {
-            yield return new SelectionConfigurationOption(ORIENTATION_HORIZONTAL, "Horizontal");
-            yield return new SelectionConfigurationOption(ORIENTATION_VERTICAL, "Vertical");
+            yield return new SelectionConfigurationOption(ORIENTATION_HORIZONTAL, Strings.PeakMeterBehaviourConfiguration_Orientation_Horizontal);
+            yield return new SelectionConfigurationOption(ORIENTATION_VERTICAL, Strings.PeakMeterBehaviourConfiguration_Orientation_Vertical);
         }
 
         public static Orientation GetOrientation(SelectionConfigurationOption option)
