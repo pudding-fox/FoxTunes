@@ -50,69 +50,6 @@ namespace FoxTunes.ViewModel
 
         private IConfiguration Configuration { get; set; }
 
-        private LibraryHierarchyCollection _Hierarchies { get; set; }
-
-        public LibraryHierarchyCollection Hierarchies
-        {
-            get
-            {
-                return this._Hierarchies;
-            }
-            set
-            {
-                this._Hierarchies = value;
-                this.OnHierarchiesChanged();
-            }
-        }
-
-        protected virtual void OnHierarchiesChanged()
-        {
-            if (this.HierarchiesChanged != null)
-            {
-                this.HierarchiesChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Hierarchies");
-        }
-
-        public event EventHandler HierarchiesChanged;
-
-        public LibraryHierarchy SelectedHierarchy
-        {
-            get
-            {
-                if (this.LibraryManager == null)
-                {
-                    return LibraryHierarchy.Empty;
-                }
-                return this.LibraryManager.SelectedHierarchy;
-            }
-            set
-            {
-                if (this.LibraryManager == null || value == null)
-                {
-                    return;
-                }
-                this.IsNavigating = true;
-                try
-                {
-                    this.LibraryManager.SelectedHierarchy = value;
-                }
-                finally
-                {
-                    this.IsNavigating = false;
-                }
-            }
-        }
-
-        protected virtual void OnSelectedHierarchyChanged()
-        {
-            if (this.SelectedHierarchyChanged != null)
-            {
-                this.SelectedHierarchyChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SelectedHierarchy");
-        }
-
         private LibraryHierarchyNodeCollection _Items { get; set; }
 
         public virtual LibraryHierarchyNodeCollection Items
@@ -177,84 +114,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler SelectedItemChanged;
-
-        private bool _IsPrimaryView { get; set; }
-
-        public bool IsPrimaryView
-        {
-            get
-            {
-                return this._IsPrimaryView;
-            }
-            set
-            {
-                this._IsPrimaryView = value;
-                this.OnIsPrimaryViewChanged();
-            }
-        }
-
-        protected virtual void OnIsPrimaryViewChanged()
-        {
-            if (this.IsPrimaryViewChanged != null)
-            {
-                this.IsPrimaryViewChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsPrimaryView");
-        }
-
-        public event EventHandler IsPrimaryViewChanged;
-
-        private int _SearchInterval { get; set; }
-
-        public virtual int SearchInterval
-        {
-            get
-            {
-                return this._SearchInterval;
-            }
-            set
-            {
-                this._SearchInterval = value;
-                this.OnSearchIntervalChanged();
-            }
-        }
-
-        protected virtual void OnSearchIntervalChanged()
-        {
-            if (this.SearchIntervalChanged != null)
-            {
-                this.SearchIntervalChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SearchInterval");
-        }
-
-        public event EventHandler SearchIntervalChanged;
-
-        private SearchCommitBehaviour _SearchCommitBehaviour { get; set; }
-
-        public virtual SearchCommitBehaviour SearchCommitBehaviour
-        {
-            get
-            {
-                return this._SearchCommitBehaviour;
-            }
-            set
-            {
-                this._SearchCommitBehaviour = value;
-                this.OnSearchCommitBehaviourChanged();
-            }
-        }
-
-        protected virtual void OnSearchCommitBehaviourChanged()
-        {
-            if (this.SearchCommitBehaviourChanged != null)
-            {
-                this.SearchCommitBehaviourChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SearchCommitBehaviour");
-        }
-
-        public event EventHandler SearchCommitBehaviourChanged;
 
         private bool _ShowCursorAdorners { get; set; }
 
@@ -367,7 +226,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual async Task RefreshItems()
         {
-            var items = this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy);
+            var items = this.LibraryHierarchyBrowser.GetNodes(this.LibraryManager.SelectedHierarchy);
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
@@ -379,27 +238,9 @@ namespace FoxTunes.ViewModel
             await this.RefreshStatus().ConfigureAwait(false);
         }
 
-        protected virtual Task RefreshHierarchies()
+        public virtual Task Reload()
         {
-            var hierarchies = this.LibraryHierarchyBrowser.GetHierarchies();
-            if (this.Hierarchies == null)
-            {
-                return Windows.Invoke(() => this.Hierarchies = new LibraryHierarchyCollection(hierarchies));
-            }
-            else
-            {
-                return Windows.Invoke(this.Hierarchies.Reset(hierarchies));
-            }
-        }
-
-        public virtual async Task Reload()
-        {
-            await this.RefreshHierarchies().ConfigureAwait(false);
-            await Windows.Invoke(() =>
-            {
-                this.OnSelectedHierarchyChanged();
-            }).ConfigureAwait(false);
-            await this.Refresh().ConfigureAwait(false);
+            return this.Refresh();
         }
 
         public override void InitializeComponent(ICore core)
@@ -416,24 +257,12 @@ namespace FoxTunes.ViewModel
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
             this.Configuration = this.Core.Components.Configuration;
-            this.Configuration.GetElement<SelectionConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.PRIMARY_LIBRARY_VIEW
-            ).ConnectValue(option => this.IsPrimaryView = WindowsUserInterfaceConfiguration.GetIsPrimaryView(option, this.UIComponent));
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-                SearchBehaviourConfiguration.SECTION,
-                SearchBehaviourConfiguration.SEARCH_INTERVAL_ELEMENT
-            ).ConnectValue(value => this.SearchInterval = value);
-            this.Configuration.GetElement<SelectionConfigurationElement>(
-                SearchBehaviourConfiguration.SECTION,
-                SearchBehaviourConfiguration.SEARCH_COMMIT_ELEMENT
-            ).ConnectValue(option => this.SearchCommitBehaviour = SearchBehaviourConfiguration.GetCommitBehaviour(option));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.SHOW_CURSOR_ADORNERS
             ).ConnectValue(value => this.ShowCursorAdorners = value);
             //TODO: Bad .Wait().
-            this.Reload().Wait();
+            this.Refresh().Wait();
             this.RefreshStatus().Wait();
             base.InitializeComponent(core);
         }
@@ -453,9 +282,8 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.RefreshStatus);
         }
 
-        protected virtual async void OnSelectedHierarchyChanged(object sender, EventArgs e)
+        protected virtual void OnSelectedHierarchyChanged(object sender, EventArgs e)
         {
-            await Windows.Invoke(new Action(this.OnSelectedHierarchyChanged)).ConfigureAwait(false);
             this.Dispatch(this.Refresh);
         }
 
@@ -469,7 +297,7 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    return this.Reload();
+                    return this.Refresh();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -587,35 +415,6 @@ namespace FoxTunes.ViewModel
 #else
             return Task.CompletedTask;
 #endif
-        }
-
-        public event EventHandler SelectedHierarchyChanged;
-
-        public ICommand SearchCommitCommand
-        {
-            get
-            {
-                return CommandFactory.Instance.CreateCommand(this.SearchCommit);
-            }
-        }
-
-        public Task SearchCommit()
-        {
-            var clear = default(bool);
-            switch (this.SearchCommitBehaviour)
-            {
-                case SearchCommitBehaviour.Replace:
-                    clear = true;
-                    break;
-                case SearchCommitBehaviour.Append:
-                    clear = false;
-                    break;
-            }
-            return this.PlaylistManager.Add(
-                this.PlaylistManager.SelectedPlaylist,
-                this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy),
-                clear
-            );
         }
 
         protected override void Dispose(bool disposing)

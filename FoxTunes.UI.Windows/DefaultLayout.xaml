@@ -14,7 +14,7 @@
         <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
     </Windows:UIComponentBase.Resources>
     <DockPanel>
-        <Grid DockPanel.Dock="Bottom">
+        <Grid DockPanel.Dock="Bottom" Margin="0,2,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
@@ -31,7 +31,7 @@
                                 <DataTrigger Binding="{Binding ShowSpectrum.Value, Source={StaticResource ViewModel}}" Value="True">
                                     <Setter Property="Content">
                                         <Setter.Value>
-                                            <Windows:Spectrum ></Windows:Spectrum>
+                                            <Windows:Spectrum></Windows:Spectrum>
                                         </Setter.Value>
                                     </Setter>
                                 </DataTrigger>
@@ -54,7 +54,26 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Windows:LibraryTree Grid.Column="0"></Windows:LibraryTree>
+            <DockPanel Grid.Column="0">
+                <ContentControl DockPanel.Dock="Top">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}">
+                            <Setter Property="Content" Value="{x:Null}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowLibrarySelector, Source={StaticResource ViewModel}}" Value="True">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Windows:LibrarySelector></Windows:LibrarySelector>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+                <Windows:LibrarySearch DockPanel.Dock="Bottom"></Windows:LibrarySearch>
+                <Windows:LibraryTree></Windows:LibraryTree>
+            </DockPanel>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4"></GridSplitter>
             <Windows:DefaultPlaylist Grid.Column="2"></Windows:DefaultPlaylist>
             <Windows:BackgroundTasks Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Windows:BackgroundTasks>
