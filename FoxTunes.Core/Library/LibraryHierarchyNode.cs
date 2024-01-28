@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -176,8 +177,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public void Refresh()
+        public void Refresh(IEnumerable<string> names)
         {
+            if (names != null && !names.Contains(CommonImageTypes.FrontCover, StringComparer.OrdinalIgnoreCase))
+            {
+                //Only refresh if the artwork has changed.
+                return;
+            }
             this.Refresh(HierarchyDirection.Both);
         }
 

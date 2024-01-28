@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class MonitoringAsyncResult<T> : ViewModelBase, IAsyncResult<T> where T : class
+    public class MonitoringAsyncResult<T> : Wrapper<T>, IWeakEventListener where T : class
     {
         private MonitoringAsyncResult()
         {
@@ -16,80 +16,46 @@ namespace FoxTunes.ViewModel
         public MonitoringAsyncResult(IObservable source, Func<Task<T>> factory) : this()
         {
             this.Source = source;
-            this.Source.PropertyChanged += this.OnSourceChanged;
+            PropertyChangedEventManager.AddListener(source, this, string.Empty);
             this.Factory = factory;
             this.Dispatch(this.Run);
         }
 
-        public MonitoringAsyncResult(IObservable source, T value, Func<Task<T>> factory) : this()
+        public MonitoringAsyncResult(IObservable source, T value, Func<Task<T>> factory, bool refresh) : this()
         {
             this.Source = source;
-            this.Source.PropertyChanged += this.OnSourceChanged;
+            PropertyChangedEventManager.AddListener(source, this, string.Empty);
             this.Value = value;
             this.Factory = factory;
-            this.Dispatch(this.Run);
+            if (refresh)
+            {
+                this.Dispatch(this.Run);
+            }
         }
 
         public IObservable Source { get; private set; }
 
         public Func<Task<T>> Factory { get; private set; }
 
-        protected virtual void OnSourceChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.PropertyName))
-            {
-                return;
-            }
-            this.Dispatch(this.Run);
-        }
-
-        private T _Value { get; set; }
-
-        public T Value
-        {
-            get
-            {
-                return this._Value;
-            }
-            set
-            {
-                if (object.ReferenceEquals(this.Value, value))
-                {
-                    return;
-                }
-                this._Value = value;
-                this.OnValueChanged();
-            }
-        }
-
-        protected virtual void OnValueChanged()
-        {
-            if (this.ValueChanged != null)
-            {
-                this.ValueChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Value");
-        }
-
-        public event EventHandler ValueChanged;
-
         public async Task Run()
         {
             var task = this.Factory();
             var value = await task.ConfigureAwait(false);
-            if (value == null)
+            await Windows.Invoke(() => this.Value = value).ConfigureAwait(false);
+        }
+
+        public bool ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
+        {
+            if (e is PropertyChangedEventArgs propertyChangedEventArgs && string.IsNullOrEmpty(propertyChangedEventArgs.PropertyName))
             {
-                return;
+                this.Dispatch(this.Run);
             }
-            this.Value = value;
+            return true;
         }
 
         protected override void OnDisposing()
         {
-            if (this.Source != null)
-            {
-                this.Source.PropertyChanged -= this.OnSourceChanged;
-            }
+            PropertyChangedEventManager.RemoveListener(this.Source, this, string.Empty);
             base.OnDisposing();
         }
 
