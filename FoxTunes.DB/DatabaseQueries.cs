@@ -171,7 +171,18 @@ namespace FoxTunes
             }
         }
 
-        public abstract IDatabaseQuery GetLibraryHierarchyNodesWithFilter { get; }
+        public IDatabaseQuery GetLibraryHierarchyNodesWithFilter
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.GetLibraryHierarchyNodesWithFilter,
+                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("filter", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
 
         public IDatabaseQuery UpdatePlaylistVariousArtists
         {

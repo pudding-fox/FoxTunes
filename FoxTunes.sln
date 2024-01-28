@@ -69,11 +69,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Core.Windows", "Fo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.MetaData.FileName", "FoxTunes.MetaData.FileName\FoxTunes.MetaData.FileName.csproj", "{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows.LibraryBrowser", "FoxTunes.UI.Windows.LibraryBrowser\FoxTunes.UI.Windows.LibraryBrowser.csproj", "{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.LibraryBrowser", "FoxTunes.UI.Windows.LibraryBrowser\FoxTunes.UI.Windows.LibraryBrowser.csproj", "{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows.MetaDataEditor", "FoxTunes.UI.Windows.MetaDataEditor\FoxTunes.UI.Windows.MetaDataEditor.csproj", "{B02498D9-D348-44B4-96B7-AFB02B542DB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.MetaDataEditor", "FoxTunes.UI.Windows.MetaDataEditor\FoxTunes.UI.Windows.MetaDataEditor.csproj", "{B02498D9-D348-44B4-96B7-AFB02B542DB1}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -333,5 +336,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9293982D-B2F3-4C86-A307-057EE1CFA115}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

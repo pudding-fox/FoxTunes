@@ -118,7 +118,7 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.LibraryManager == null)
+                if (this.LibraryManager == null || value == null)
                 {
                     return;
                 }
