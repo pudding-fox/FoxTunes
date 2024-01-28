@@ -55,6 +55,8 @@ namespace FoxTunes.ViewModel
 
         public ILibraryManager LibraryManager { get; private set; }
 
+        public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
+
         private IConfiguration Configuration { get; set; }
 
         private LibraryHierarchyNodeCollection _Items { get; set; }
@@ -279,6 +281,7 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
+            this.FileActionHandlerManager = this.Core.Managers.FileActionHandler;
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -417,7 +420,7 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    return this.LibraryManager.Add(paths);
+                    return this.FileActionHandlerManager.RunPaths(paths, FileActionType.Library);
                 }
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {

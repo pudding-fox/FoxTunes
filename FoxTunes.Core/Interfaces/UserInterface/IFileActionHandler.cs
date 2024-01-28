@@ -12,8 +12,8 @@ namespace FoxTunes.Interfaces
 
     public enum FileActionType : byte
     {
-        None,
-        Playlist,
-        Library
+        None = 0,
+        Playlist = 1,
+        Library = 2
     }
 }

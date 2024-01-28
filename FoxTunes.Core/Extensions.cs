@@ -159,6 +159,20 @@ namespace FoxTunes
             return extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
         }
 
+        public static string UCFirst(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+            var words = value.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            for (var a = 0; a < words.Length; a++)
+            {
+                words[a] = char.ToUpper(words[a][0]) + words[a].Substring(1);
+            }
+            return string.Join(" ", words);
+        }
+
         public static IEnumerable<string> GetLines(this string sequence)
         {
             if (string.IsNullOrEmpty(sequence))

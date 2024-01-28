@@ -51,10 +51,10 @@ namespace FoxTunes
 
         public IEnumerable<string> Paths { get; private set; }
 
-        protected override async Task OnStarted()
+        protected override Task OnStarted()
         {
             this.Name = "Getting file list";
-            await base.OnStarted().ConfigureAwait(false);
+            return base.OnStarted();
         }
 
         protected override async Task OnRun()

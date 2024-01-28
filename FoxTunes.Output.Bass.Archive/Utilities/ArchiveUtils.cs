@@ -122,6 +122,15 @@ namespace FoxTunes
             return false;
         }
 
+        public static string CreateUrl(string fileName)
+        {
+            return string.Format(
+                "{0}://{1}",
+                SCHEME,
+                fileName.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            );
+        }
+
         public static string CreateUrl(string fileName, string entryName)
         {
             return string.Format(
