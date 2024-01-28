@@ -1,13 +1,15 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace FoxTunes
 {
     [UIComponent("67A0F63C-DC86-4B4E-91E1-290B71822853", role: UIComponentRole.Container)]
-    public class UIComponentTabContainer : UIComponentPanel
+    public class UIComponentTabContainer : UIComponentPanel, IDisposable
     {
         const string ADD = "AAAA";
 
@@ -283,6 +285,52 @@ namespace FoxTunes
                 return container.Configuration.Component.Name;
             }
             return Strings.UIComponentTabContainer_NewTab;
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.TabControl != null)
+            {
+                foreach (var tabItem in this.TabControl.Items.Cast<TabItem>())
+                {
+                    if (object.ReferenceEquals(this.TabControl.SelectedItem, tabItem))
+                    {
+                        continue;
+                    }
+                    UIDisposer.Dispose(tabItem, UIDisposerFlags.All);
+                }
+            }
+        }
+
+        ~UIComponentTabContainer()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }
