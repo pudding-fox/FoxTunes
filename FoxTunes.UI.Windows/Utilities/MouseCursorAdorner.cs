@@ -41,7 +41,10 @@ namespace FoxTunes
 
         public MouseCursorAdorner()
         {
-            ThemeLoader.ThemeChanged += this.OnThemeChanged;
+            if (ThemeLoader != null)
+            {
+                ThemeLoader.ThemeChanged += this.OnThemeChanged;
+            }
             this.DataContextChanged += this.OnDataContextChanged;
         }
 
