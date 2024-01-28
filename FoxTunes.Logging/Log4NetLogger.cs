@@ -151,7 +151,7 @@ namespace FoxTunes
                 AppendToFile = false,
                 LockingModel = new FileAppender.MinimalLock(),
                 Layout = layout,
-                File = Path.Combine(ComponentScanner.Instance.Location, "Log.txt")
+                File = Path.Combine(ComponentScanner.Instance.Location, LoggingBehaviour.FILE_NAME)
             };
             appender.ActivateOptions();
             return appender;

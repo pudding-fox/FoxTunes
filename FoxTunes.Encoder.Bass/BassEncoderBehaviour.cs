@@ -124,6 +124,7 @@ namespace FoxTunes
                 this.Behaviour = behaviour;
                 this.PlaylistItems = playlistItems;
                 this.EncoderItems = playlistItems
+                    .OrderBy(playlistItem => playlistItem.FileName)
                     .Select(playlistItem => EncoderItem.FromPlaylistItem(playlistItem))
                     .ToArray();
             }
@@ -154,15 +155,6 @@ namespace FoxTunes
 
             protected override async Task OnRun()
             {
-                await this.Encode();
-                if (this.Behaviour.CopyTags.Value)
-                {
-                    await this.CopyTags();
-                }
-            }
-
-            protected virtual async Task Encode()
-            {
                 Logger.Write(this, LogLevel.Debug, "Creating encoder.");
                 var encoder = EncoderFactory.CreateEncoder();
                 try
@@ -170,9 +162,17 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Starting encoder.");
                     using (var monitor = new BassEncoderMonitor(encoder, this.Visible, this.CancellationToken))
                     {
-                        await this.WithSubTask(monitor,
-                            async () => await monitor.Encode(this.EncoderItems)
-                        );
+                        monitor.StatusChanged += this.OnStatusChanged;
+                        try
+                        {
+                            await this.WithSubTask(monitor,
+                                async () => await monitor.Encode(this.EncoderItems)
+                            );
+                        }
+                        finally
+                        {
+                            monitor.StatusChanged -= this.OnStatusChanged;
+                        }
                     }
                 }
                 finally
@@ -182,35 +182,36 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Encoder completed successfully.");
             }
 
-            protected virtual async Task CopyTags()
+            protected virtual void OnStatusChanged(object sender, BassEncoderMonitorEventArgs e)
             {
-                Logger.Write(this, LogLevel.Debug, "Copying tags.");
-                foreach (var playlistItem in this.PlaylistItems)
+                if (e.EncoderItem.Status == EncoderItemStatus.Complete)
                 {
-                    var encoderItem = this.GetEncoderItem(playlistItem);
-                    if (encoderItem.Status != EncoderItemStatus.Complete)
+                    var task = this.CopyTags(e.EncoderItem);
+                }
+            }
+
+            protected virtual async Task CopyTags(EncoderItem encoderItem)
+            {
+                try
+                {
+                    Logger.Write(this, LogLevel.Debug, "Copying tags from \"{0}\" to \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
+                    var playlistItem = this.GetPlaylistItem(encoderItem);
+                    using (var task = new WriteFileMetaDataTask(encoderItem.OutputFileName, playlistItem.MetaDatas))
                     {
-                        Logger.Write(this, LogLevel.Warn, "Not tagging file \"{0}\" status does not indicate success.", encoderItem.OutputFileName);
-                        continue;
+                        task.InitializeComponent(this.Core);
+                        await task.Run();
                     }
-                    await this.CopyTags(playlistItem, encoderItem);
                 }
-                Logger.Write(this, LogLevel.Debug, "Successfully copied tags.");
-            }
-
-            protected virtual async Task CopyTags(PlaylistItem playlistItem, EncoderItem encoderItem)
-            {
-                Logger.Write(this, LogLevel.Debug, "Copying tags from \"{0}\" to \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
-                using (var task = new WriteFileMetaDataTask(encoderItem.OutputFileName, playlistItem.MetaDatas))
+                catch (Exception e)
                 {
-                    task.InitializeComponent(this.Core);
-                    await task.Run();
+                    Logger.Write(this, LogLevel.Warn, "Failed to copy tags from \"{0}\" to \"{1}\": {2}", encoderItem.InputFileName, encoderItem.OutputFileName, e.Message);
+                    await this.OnError(e);
                 }
             }
 
-            protected virtual EncoderItem GetEncoderItem(PlaylistItem playlistItem)
+            protected virtual PlaylistItem GetPlaylistItem(EncoderItem encoderItem)
             {
-                return this.EncoderItems.FirstOrDefault(encoderItem => string.Equals(encoderItem.InputFileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase));
+                return this.PlaylistItems.FirstOrDefault(playlistItem => string.Equals(playlistItem.FileName, encoderItem.InputFileName, StringComparison.OrdinalIgnoreCase));
             }
 
             protected virtual void Unload(AppDomain domain)

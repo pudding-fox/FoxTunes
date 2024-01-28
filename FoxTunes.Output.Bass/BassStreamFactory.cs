@@ -48,6 +48,11 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Registered bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
         }
 
+        public IEnumerable<IBassStreamProvider> GetProviders(PlaylistItem playlistItem)
+        {
+            return this.Providers.Values.Where(provider => provider.CanCreateStream(playlistItem));
+        }
+
         public async Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate)
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
@@ -58,12 +63,8 @@ namespace FoxTunes
 #endif
             try
             {
-                foreach (var provider in this.Providers.Values)
+                foreach (var provider in this.GetProviders(playlistItem))
                 {
-                    if (!provider.CanCreateStream(playlistItem))
-                    {
-                        continue;
-                    }
                     Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
                     for (var attempt = 0; attempt < CREATE_ATTEMPTS; attempt++)
                     {
@@ -117,9 +118,8 @@ namespace FoxTunes
                     }
                     else
                     {
-                        BassUtils.Throw();
+                        return BassStream.Error(Bass.LastError);
                     }
-                    Thread.Sleep(CREATE_ATTEMPT_INTERVAL);
                 }
             }
             finally

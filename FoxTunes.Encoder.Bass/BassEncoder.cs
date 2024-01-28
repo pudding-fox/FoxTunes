@@ -1,9 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +21,11 @@ namespace FoxTunes
 
         static BassEncoder()
         {
+            LoggingBehaviour.FILE_NAME = string.Format(
+                "Log_{0}_{1}.txt",
+                typeof(BassEncoder).Name,
+                DateTime.UtcNow.ToFileTime()
+            );
             AssemblyResolver.Instance.Enable();
         }
 
@@ -84,7 +89,7 @@ namespace FoxTunes
                     return;
                 }
                 encoderItem.OutputFileName = settings.GetOutput(encoderItem.InputFileName);
-                if (File.Exists(encoderItem.OutputFileName))
+                if (!this.CheckPaths(encoderItem.InputFileName, encoderItem.OutputFileName))
                 {
                     Logger.Write(this.GetType(), LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" already exists.", encoderItem.InputFileName, encoderItem.OutputFileName);
                     encoderItem.Status = EncoderItemStatus.Failed;
@@ -122,7 +127,6 @@ namespace FoxTunes
 
         protected virtual void Encode(ICore core, EncoderItem encoderItem, IBassEncoderSettings settings)
         {
-            var streamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             var flags = BassFlags.Decode;
             if (this.ShouldDecodeFloat(encoderItem, settings))
             {
@@ -133,18 +137,11 @@ namespace FoxTunes
             {
                 Logger.Write(this.GetType(), LogLevel.Debug, "Decoding file \"{0}\" in standaed quality mode (16 bit integer).", encoderItem.InputFileName);
             }
-            //TODO: Bad .Result
-            var stream = streamFactory.CreateStream(
-                new PlaylistItem()
-                {
-                    FileName = encoderItem.InputFileName
-                },
-                false,
-                flags
-            ).Result;
-            if (stream == null || stream.ChannelHandle == 0)
+            var stream = this.CreateStream(encoderItem.InputFileName, flags);
+            if (stream.IsEmpty)
             {
-                throw new InvalidOperationException(string.Format("Failed to create decoder stream for file \"{0}\".", encoderItem.InputFileName));
+                Logger.Write(this.GetType(), LogLevel.Debug, "Failed to create stream for file \"{0}\": Unknown error.", encoderItem.InputFileName);
+                return;
             }
             Logger.Write(this.GetType(), LogLevel.Debug, "Created stream for file \"{0}\": {1}", encoderItem.InputFileName, stream.ChannelHandle);
             try
@@ -307,6 +304,51 @@ namespace FoxTunes
             this.CancellationToken.Cancel();
         }
 
+        protected virtual bool CheckPaths(string inputFileName, string outputFileName)
+        {
+            if (!string.IsNullOrEmpty(Path.GetPathRoot(inputFileName)) && !File.Exists(inputFileName))
+            {
+                //TODO: Bad .Result
+                if (!NetworkDrive.IsRemotePath(inputFileName) || !NetworkDrive.ConnectRemotePath(inputFileName).Result)
+                {
+                    throw new FileNotFoundException(string.Format("File not found: {0}", inputFileName), inputFileName);
+                }
+            }
+            return !File.Exists(outputFileName);
+        }
+
+        protected virtual IBassStream CreateStream(string fileName, BassFlags flags)
+        {
+            const int INTERVAL = 5000;
+            var streamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
+            var playlistItem = new PlaylistItem()
+            {
+                FileName = fileName
+            };
+        retry:
+            if (this.CancellationToken.IsCancellationRequested)
+            {
+                return BassStream.Empty;
+            }
+            //TODO: Bad .Result
+            var stream = streamFactory.CreateStream(
+                playlistItem,
+                false,
+                flags
+            ).Result;
+            if (stream.IsEmpty)
+            {
+                if (stream.Errors == Errors.Already)
+                {
+                    Logger.Write(this.GetType(), LogLevel.Trace, "Failed to create decoder stream for file \"{0}\": Device is already in use.", fileName);
+                    Thread.Sleep(INTERVAL);
+                    goto retry;
+                }
+                throw new InvalidOperationException(string.Format("Failed to create decoder stream for file \"{0}\".", fileName));
+            }
+            return stream;
+        }
+
         protected virtual Process CreateResamplerProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
         {
             Logger.Write(this.GetType(), LogLevel.Debug, "Creating resampler process for file \"{0}\".", encoderItem.InputFileName);
@@ -412,6 +454,13 @@ namespace FoxTunes
                 }
             }
             return true;
+        }
+
+        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.Infrastructure)]
+        public override object InitializeLifetimeService()
+        {
+            //Disable the 5 minute lease default.
+            return null;
         }
     }
 }

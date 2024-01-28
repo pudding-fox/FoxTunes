@@ -6,6 +6,7 @@ using ManagedBass.Cd;
 using ManagedBass.Gapless.Cd;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -118,7 +119,6 @@ namespace FoxTunes
             }
             BassUtils.OK(BassGaplessCd.Init());
             BassUtils.OK(BassGaplessCd.Enable(this.CdDrive, flags));
-            BassCd.FreeOld = false;
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS CD Initialized.");
         }
@@ -261,9 +261,13 @@ namespace FoxTunes
 
             public IPlaylistManager PlaylistManager { get; private set; }
 
+            public IMetaDataSource MetaDataSource { get; private set; }
+
             public override void InitializeComponent(ICore core)
             {
                 this.PlaylistManager = core.Managers.Playlist;
+                this.MetaDataSource = new BassCdMetaDataSource(this.GetStrategy());
+                this.MetaDataSource.InitializeComponent(this.Core);
                 base.InitializeComponent(core);
             }
 
@@ -322,6 +326,7 @@ namespace FoxTunes
                                 continue;
                             }
                             var fileName = BassCdStreamProvider.CreateUrl(this.Drive, id, a);
+                            fileName += string.Format("/{0}", await this.GetFileName(fileName, a));
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                             var playlistItem = new PlaylistItem()
                             {
@@ -346,15 +351,12 @@ namespace FoxTunes
                         .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), transaction))
                         .Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
                     var info = default(CDInfo);
-                    var strategy = this.GetStrategy();
-                    var metaDataSource = new BassCdMetaDataSource(strategy);
                     BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
                     using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, transaction))
                     {
                         foreach (var playlistItem in query)
                         {
-                            metaDataSource.InitializeComponent(this.Core);
-                            var metaData = await metaDataSource.GetMetaData(playlistItem.FileName);
+                            var metaData = await this.MetaDataSource.GetMetaData(playlistItem.FileName);
                             foreach (var metaDataItem in metaData)
                             {
                                 await writer.Write(playlistItem.Id, metaDataItem);
@@ -383,6 +385,38 @@ namespace FoxTunes
                     }
                 }
                 return new BassCdMetaDataSourceStrategy(this.Drive);
+            }
+
+            private async Task<string> GetFileName(string fileName, int track)
+            {
+                var metaDatas = await this.MetaDataSource.GetMetaData(fileName);
+                var metaData = metaDatas.ToDictionary(
+                    metaDataItem => metaDataItem.Name,
+                    metaDataItem => metaDataItem.Value,
+                    StringComparer.OrdinalIgnoreCase
+                );
+                var title = metaData.GetValueOrDefault(CommonMetaData.Title) ?? string.Empty;
+                if (!string.IsNullOrEmpty(title))
+                {
+                    var sanitize = new Func<string, string>(value =>
+                    {
+                        const char PLACEHOLDER = '_';
+                        var characters = Enumerable.Concat(
+                            Path.GetInvalidPathChars(),
+                            Path.GetInvalidFileNameChars()
+                        );
+                        foreach (var character in characters)
+                        {
+                            value = value.Replace(character, PLACEHOLDER);
+                        }
+                        return value;
+                    });
+                    return string.Format("{0:00} - {1}.cda", track + 1, sanitize(title));
+                }
+                else
+                {
+                    return string.Format("Track {0}.cda", track + 1);
+                }
             }
         }
     }

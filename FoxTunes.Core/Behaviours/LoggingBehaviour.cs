@@ -7,6 +7,8 @@ namespace FoxTunes
 {
     public class LoggingBehaviour : StandardBehaviour, IConfigurableComponent
     {
+        public static string FILE_NAME = "Log.txt";
+
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)

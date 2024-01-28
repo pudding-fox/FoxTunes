@@ -1,4 +1,6 @@
-﻿namespace FoxTunes.Interfaces
+﻿using ManagedBass;
+
+namespace FoxTunes.Interfaces
 {
     public interface IBassStream
     {
@@ -7,5 +9,7 @@
         int ChannelHandle { get; }
 
         bool IsEmpty { get; }
+
+        Errors Errors { get; }
     }
 }
