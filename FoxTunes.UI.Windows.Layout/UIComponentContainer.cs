@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -62,8 +63,32 @@ namespace FoxTunes
                 {
                     newComponent.MetaData.TryAdd(pair.Key, pair.Value);
                 }
+                componentContainer.RaiseEvent(new RoutedPropertyChangedEventArgs<UIComponentConfiguration>(
+                    oldComponent,
+                    newComponent,
+                    ConfigurationChangedEvent
+                ));
             }
             componentContainer.OnConfigurationChanged();
+        }
+
+        public static readonly RoutedEvent ConfigurationChangedEvent = EventManager.RegisterRoutedEvent(
+            "ConfigurationChanged",
+            RoutingStrategy.Bubble,
+            typeof(RoutedPropertyChangedEventHandler<UIComponentConfiguration>),
+            typeof(UIComponentContainer)
+        );
+
+        public event RoutedPropertyChangedEventHandler<UIComponentConfiguration> ConfigurationChanged
+        {
+            add
+            {
+                AddHandler(ConfigurationChangedEvent, value);
+            }
+            remove
+            {
+                RemoveHandler(ConfigurationChangedEvent, value);
+            }
         }
 
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
@@ -116,13 +141,8 @@ namespace FoxTunes
 
         protected virtual void OnConfigurationChanged()
         {
-            if (this.ConfigurationChanged != null)
-            {
-                this.ConfigurationChanged(this, EventArgs.Empty);
-            }
+            //Nothing to do.
         }
-
-        public event EventHandler ConfigurationChanged;
 
         public UIComponentBase Content
         {
