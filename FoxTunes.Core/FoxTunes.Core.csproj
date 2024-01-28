@@ -70,6 +70,7 @@
     <Compile Include="Managers\PlaybackManager.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
     <Compile Include="MetaData\MetaDataItem.cs" />
+    <Compile Include="MetaData\PropertyItem.cs" />
     <Compile Include="PersistableComponent.cs" />
     <Compile Include="Playlist\Playlist.cs" />
     <Compile Include="Playlist\PlaylistItem.cs" />

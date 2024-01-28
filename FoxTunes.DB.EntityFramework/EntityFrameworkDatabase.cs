@@ -19,13 +19,22 @@ namespace FoxTunes
         {
             var builder = this.CreateModelBuilder();
             builder.Entity<PlaylistItem>()
-                .HasMany(item => item.MetaData)
+                .HasMany(item => item.MetaDatas)
                 .WithMany()
                 .Map(config =>
                 {
                     config.MapLeftKey("PlaylistItem_Id");
                     config.MapRightKey("MetaDataItem_Id");
                     config.ToTable("PlaylistItem_MetaDataItem");
+                });
+            builder.Entity<PlaylistItem>()
+                .HasMany(item => item.Properties)
+                .WithMany()
+                .Map(config =>
+                {
+                    config.MapLeftKey("PlaylistItem_Id");
+                    config.MapRightKey("PropertyItem_Id");
+                    config.ToTable("PlaylistItem_PropertyItem");
                 });
             builder.Entity<MetaDataItem>();
             return builder.Build(this.Connection);

@@ -1,5 +1,5 @@
-﻿using Noesis.Javascript;
-using System;
+﻿using FoxTunes.Interfaces;
+using Noesis.Javascript;
 
 namespace FoxTunes
 {
@@ -11,6 +11,12 @@ namespace FoxTunes
         }
 
         public JavascriptContext Context { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Context.Run(Resources.utils);
+            base.InitializeComponent(core);
+        }
 
         public override void SetValue(string name, object value)
         {
