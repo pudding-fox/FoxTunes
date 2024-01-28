@@ -38,11 +38,10 @@ namespace FoxTunes
                 var dependencies = default(IEnumerable<PlatformDependencyAttribute>);
                 if (type.HasCustomAttributes<PlatformDependencyAttribute>(out dependencies))
                 {
-                    var major = Environment.OSVersion.Version.Major;
-                    var minor = Environment.OSVersion.Version.Minor;
                     foreach (var dependency in dependencies)
                     {
-                        if (major < dependency.Major || minor < dependency.Minor)
+                        var version = new Version(dependency.Major, dependency.Minor);
+                        if (Environment.OSVersion.Version < version)
                         {
                             Logger.Write(this, LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);
                             return false;
