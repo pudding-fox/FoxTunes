@@ -73,6 +73,10 @@ namespace FoxTunes
                     this.IsStarted = false;
                 }
             }
+            if (PlaybackStateNotifier.IsPlaying)
+            {
+                var task = this.Clear();
+            }
         }
 
         protected abstract void OnElapsed(object sender, ElapsedEventArgs e);
