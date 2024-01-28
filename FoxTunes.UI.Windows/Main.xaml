@@ -6,6 +6,7 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Properties="clr-namespace:FoxTunes.Properties"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
@@ -46,7 +47,7 @@
                 <ColumnDefinition>
                     <ColumnDefinition.Style>
                         <Style TargetType="{x:Type ColumnDefinition}">
-                            <Setter Property="Width" Value=".35*"></Setter>
+                            <Setter Property="Width" Value="{Binding ColumnWidth_FC87DEC38708, Source={x:Static Properties:Settings.Default}, Mode=TwoWay}"></Setter>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ShowLibrary.Value, Source={StaticResource ViewModel}}" Value="False">
                                     <Setter Property="Width" Value="0"></Setter>
@@ -55,6 +56,7 @@
                         </Style>
                     </ColumnDefinition.Style>
                 </ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -63,7 +65,8 @@
             </Grid.RowDefinitions>
             <Windows:LibraryTree Style="{StaticResource LibraryTreeStyle}"></Windows:LibraryTree>
             <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}"></Windows:Artwork>
-            <Windows:Playlist Grid.Column="1" Grid.RowSpan="2"></Windows:Playlist>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></GridSplitter>
+            <Windows:Playlist Grid.Column="2" Grid.RowSpan="2"></Windows:Playlist>
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalAlignment="Bottom">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width=".35*"></ColumnDefinition>
