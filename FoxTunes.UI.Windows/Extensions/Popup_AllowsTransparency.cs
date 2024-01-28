@@ -1,7 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Interop;
-using System.Xaml.Schema;
 
 namespace FoxTunes
 {
@@ -52,14 +52,15 @@ namespace FoxTunes
             public AllowsTransparencyBehaviour(global::System.Windows.Controls.Primitives.Popup popup)
             {
                 this.Popup = popup;
-                this.Popup.Loaded += this.OnLoaded;
+                this.Popup.Opened += this.OnOpened;
             }
+
 
             public global::System.Windows.Controls.Primitives.Popup Popup { get; private set; }
 
-            protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+            protected virtual void OnOpened(object sender, EventArgs e)
             {
-                var source = (HwndSource)HwndSource.FromVisual(this.Popup);
+                var source = (HwndSource)HwndSource.FromVisual(this.Popup.Child);
                 WindowExtensions.EnableBlur(source.Handle);
             }
         }
