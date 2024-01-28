@@ -161,7 +161,15 @@ do
 		cp "./distribution/$target/$file" "./release/$target/Main"
 	done
 
-	tar -zcvf "./release/$target/FoxTunes-$TAG-$TARGET.tar.gz" -C "./release/$target/Main" . --xform='s!^\./!!'
+	cd "./release/$target/Main"
+
+	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target.zip" "*.*" -r
+
+	cp "./FoxTunes-$TAG-$target.zip" "../../"
+
+	cd ..
+	cd ..
+	cd ..
 
 	echo "Creating plugins package.."
 
@@ -219,7 +227,15 @@ do
 			cp "./distribution/$target/$file" "./release/$target/Plugins/metadata"
 	done
 
-	tar -zcvf "./release/$target/FoxTunes-$TAG-Plugins-$TARGET.tar.gz" -C "./release/$target/Plugins" . --xform='s!^\./!!'
+	cd "./release/$target/Plugins"
+
+	"../../../.7z/7za.exe" a "FoxTunes-$TAG-Plugins-$target.zip" "*.*" -r
+
+	cp "./FoxTunes-$TAG-Plugins-$target.zip" "../../"
+
+	cd ..
+	cd ..
+	cd ..
 done
 
 echo "All done."
