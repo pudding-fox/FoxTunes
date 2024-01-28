@@ -52,32 +52,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowNotifyIconChanged;
 
-        private BooleanConfigurationElement _ShowSpectrum { get; set; }
-
-        public BooleanConfigurationElement ShowSpectrum
-        {
-            get
-            {
-                return this._ShowSpectrum;
-            }
-            set
-            {
-                this._ShowSpectrum = value;
-                this.OnShowSpectrumChanged();
-            }
-        }
-
-        protected virtual void OnShowSpectrumChanged()
-        {
-            if (this.ShowSpectrumChanged != null)
-            {
-                this.ShowSpectrumChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ShowSpectrum");
-        }
-
-        public event EventHandler ShowSpectrumChanged;
-
         private DoubleConfigurationElement _ScalingFactor { get; set; }
 
         public DoubleConfigurationElement ScalingFactor
@@ -140,10 +114,6 @@ namespace FoxTunes.ViewModel
             this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
               NotifyIconConfiguration.SECTION,
               NotifyIconConfiguration.ENABLED_ELEMENT
-            );
-            this.ShowSpectrum = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.ENABLED_ELEMENT
             );
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
