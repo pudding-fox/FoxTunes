@@ -1,5 +1,4 @@
 ﻿using CSCore;
-using CSCore.Ffmpeg;
 using CSCore.SoundOut;
 using CSCore.Streams;
 
@@ -9,9 +8,11 @@ namespace FoxTunes
     {
         const int UPDATE_INTERVAL = 100;
 
-        public CSCoreOutputStream(string fileName)
+        public CSCoreOutputStream(string fileName, IWaveSource waveSource, ISoundOut soundOut)
             : base(fileName)
         {
+            this.WaveSource = waveSource;
+            this.SoundOut = soundOut;
             this.InitializeComponent();
         }
 
@@ -87,12 +88,10 @@ namespace FoxTunes
 
         private void InitializeComponent()
         {
-            this.WaveSource = new FfmpegDecoder(this.FileName); //CodecFactory.Instance.GetCodec(this.FileName);
             this.SampleSource = this.WaveSource.ToSampleSource();
             this.NotificationSource = new NotificationSource(this.SampleSource);
             this.NotificationSource.Interval = UPDATE_INTERVAL;
             this.NotificationSource.BlockRead += this.NotificationSource_BlockRead;
-            this.SoundOut = new DirectSoundOut();
             this.SoundOut.Stopped += this.SoundOut_Stopped;
         }
 
