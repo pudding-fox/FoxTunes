@@ -344,29 +344,7 @@ namespace FoxTunes
                 return;
             }
 
-            if (data.Elements != null)
-            {
-                switch (data.Mode)
-                {
-                    default:
-                    case OscilloscopeRendererMode.Mono:
-                        RenderMono(info, data.Elements, data.Width);
-                        break;
-                    case OscilloscopeRendererMode.Seperate:
-                        RenderSeperate(info, data.Elements, data.Channels, data.Width);
-                        break;
-                }
-            }
-        }
-
-        private static void RenderMono(BitmapHelper.RenderInfo info, Int32Point[,] elements, int width)
-        {
-            BitmapHelper.DrawLines(ref info, elements, 1, width);
-        }
-
-        private static void RenderSeperate(BitmapHelper.RenderInfo info, Int32Point[,] elements, int channels, int width)
-        {
-            BitmapHelper.DrawLines(ref info, elements, channels, width);
+            BitmapHelper.DrawLines(ref info, data.Elements, data.Elements.GetLength(0), data.Elements.GetLength(1));
         }
 
         private static void UpdateValues(OscilloscopeRendererData data)

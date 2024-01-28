@@ -161,6 +161,19 @@ BOOL WINAPI draw_line(RenderInfo* info, INT32 x1, INT32 y1, INT32 x2, INT32 y2)
 	return TRUE;
 }
 
+BOOL WINAPI  draw_dots(RenderInfo* info, Int32Pixel* pixels, size_t count) {
+	BOOL result = TRUE;
+	for (size_t position = 0; position < count; position++) {
+		Int32Pixel pixel = pixels[position];
+		info->Blue = pixel.Blue;
+		info->Green = pixel.Green;
+		info->Red = pixel.Red;
+		info->Alpha = pixel.Alpha;
+		result &= draw_dot(info, pixel.X, pixel.Y);
+	}
+	return result;
+}
+
 BOOL WINAPI  draw_dot(RenderInfo* info, INT32 x, INT32 y)
 {
 	//Check arguments are valid.
