@@ -6,6 +6,12 @@ namespace FoxTunes
 {
     public abstract class BassStreamOutput : BaseComponent, IBassStreamOutput
     {
+        public const uint FFT256 = 0x80000000;
+
+        public const uint FFT512 = 0x80000001;
+
+        public const uint FFT1024 = 0x80000002;
+
         public abstract string Name { get; }
 
         public abstract string Description { get; }
@@ -61,6 +67,8 @@ namespace FoxTunes
         public abstract void Resume();
 
         public abstract void Stop();
+
+        public abstract int GetData(float[] buffer);
 
         public bool IsDisposed { get; private set; }
 

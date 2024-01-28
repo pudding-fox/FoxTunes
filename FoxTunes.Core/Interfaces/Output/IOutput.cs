@@ -28,5 +28,7 @@ namespace FoxTunes.Interfaces
         Task Unload(IOutputStream stream);
 
         Task Shutdown();
+
+        int GetData(float[] buffer);
     }
 }

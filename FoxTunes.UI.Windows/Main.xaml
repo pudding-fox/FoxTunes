@@ -17,7 +17,10 @@
     <DockPanel Background="{DynamicResource NormalBrush}">
         <Windows:Titlebar DockPanel.Dock="Top"></Windows:Titlebar>
         <DockPanel DockPanel.Dock="Bottom" Margin="2,0,2,2">
-            <Windows:Playback></Windows:Playback>
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                <Windows:Playback></Windows:Playback>
+                <Windows:Spectrum Width="140" Margin="2,0,2,0"></Windows:Spectrum>
+            </StackPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Windows:MiniPlayer Margin="0,0,2,0"></Windows:MiniPlayer>
                 <Windows:Settings ></Windows:Settings>

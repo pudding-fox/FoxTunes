@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -55,5 +54,7 @@ namespace FoxTunes
         public abstract Task Unload(IOutputStream stream);
 
         public abstract Task Shutdown();
+
+        public abstract int GetData(float[] buffer);
     }
 }
