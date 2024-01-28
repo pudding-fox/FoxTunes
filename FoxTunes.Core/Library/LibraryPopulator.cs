@@ -48,8 +48,8 @@ namespace FoxTunes
                             {
                                 return;
                             }
-                            await this.AddLibraryItem(writer, fileName);
-                            if (this.ReportProgress)
+                            var success = await this.AddLibraryItem(writer, fileName);
+                            if (success && this.ReportProgress)
                             {
                                 this.Current = fileName;
                             }
@@ -57,22 +57,22 @@ namespace FoxTunes
                     }
                     else if (File.Exists(path))
                     {
-                        await this.AddLibraryItem(writer, path);
+                        var success = await this.AddLibraryItem(writer, path);
+                        if (success && this.ReportProgress)
+                        {
+                            this.Current = path;
+                        }
                     }
                 }
             }
         }
 
-        protected virtual Task AddLibraryItem(LibraryWriter writer, string fileName)
+        protected virtual async Task<bool> AddLibraryItem(LibraryWriter writer, string fileName)
         {
             if (!this.PlaybackManager.IsSupported(fileName))
             {
                 Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return false;
             }
             Logger.Write(this, LogLevel.Trace, "Adding file to library: {0}", fileName);
             var libraryItem = new LibraryItem()
@@ -82,7 +82,8 @@ namespace FoxTunes
                 Status = LibraryItemStatus.Import
             };
             libraryItem.SetImportDate(DateTime.UtcNow);
-            return writer.Write(libraryItem);
+            await writer.Write(libraryItem);
+            return true;
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)

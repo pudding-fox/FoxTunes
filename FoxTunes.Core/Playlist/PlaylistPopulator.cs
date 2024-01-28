@@ -56,8 +56,8 @@ namespace FoxTunes
                                 return;
                             }
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
-                            await this.AddPlaylistItem(writer, fileName);
-                            if (this.ReportProgress)
+                            var success = await this.AddPlaylistItem(writer, fileName);
+                            if (success && this.ReportProgress)
                             {
                                 this.Current = fileName;
                             }
@@ -66,18 +66,22 @@ namespace FoxTunes
                     else if (File.Exists(path))
                     {
                         Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", path);
-                        await this.AddPlaylistItem(writer, path);
+                        var success = await this.AddPlaylistItem(writer, path);
+                        if (success && this.ReportProgress)
+                        {
+                            this.Current = path;
+                        }
                     }
                 }
             }
         }
 
-        protected virtual async Task AddPlaylistItem(PlaylistWriter writer, string fileName)
+        protected virtual async Task<bool> AddPlaylistItem(PlaylistWriter writer, string fileName)
         {
             if (!this.PlaybackManager.IsSupported(fileName))
             {
                 Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
-                return;
+                return false;
             }
             Logger.Write(this, LogLevel.Trace, "Adding file to playlist: {0}", fileName);
             var playlistItem = new PlaylistItem()
@@ -88,6 +92,7 @@ namespace FoxTunes
             };
             await writer.Write(playlistItem);
             this.Offset++;
+            return true;
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)

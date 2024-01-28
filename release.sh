@@ -44,8 +44,6 @@ System.IO.dll
 System.Runtime.dll
 System.Threading.Tasks.dll
 System.Windows.Interactivity.dll
-msvcp100.dll
-msvcr100.dll
 "
 
 BASS="
@@ -64,6 +62,8 @@ bassmix.dll
 JS="
 FoxTunes.Scripting.JS.dll
 Noesis.Javascript.dll
+msvcp100.dll
+msvcr100.dll
 "
 
 WINDOWS="
