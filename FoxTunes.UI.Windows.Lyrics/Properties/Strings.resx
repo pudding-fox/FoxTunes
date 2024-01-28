@@ -135,9 +135,6 @@
   <data name="LyricsBehaviourConfiguration.AutoScroll" xml:space="preserve">
     <value>Auto Scroll</value>
   </data>
-  <data name="LyricsBehaviourConfiguration.Editor" xml:space="preserve">
-    <value>Editor</value>
-  </data>
   <data name="LyricsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Lyrics</value>
   </data>

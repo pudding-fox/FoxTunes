@@ -115,15 +115,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Editor.
-        /// </summary>
-        internal static string LyricsBehaviourConfiguration_Editor {
-            get {
-                return ResourceManager.GetString("LyricsBehaviourConfiguration.Editor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Lyrics.
         /// </summary>
         internal static string LyricsBehaviourConfiguration_Section {

@@ -38,8 +38,6 @@ namespace FoxTunes
 
         public SelectionConfigurationElement AutoLookupProvider { get; private set; }
 
-        public TextConfigurationElement Editor { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = core.Managers.Playback;
@@ -73,10 +71,6 @@ namespace FoxTunes
             this.AutoLookupProvider = this.Configuration.GetElement<SelectionConfigurationElement>(
                 LyricsBehaviourConfiguration.SECTION,
                 LyricsBehaviourConfiguration.AUTO_LOOKUP_PROVIDER
-            );
-            this.Editor = this.Configuration.GetElement<TextConfigurationElement>(
-                LyricsBehaviourConfiguration.SECTION,
-                LyricsBehaviourConfiguration.EDITOR
             );
             base.InitializeComponent(core);
         }
@@ -178,7 +172,10 @@ namespace FoxTunes
                     element => string.Equals(element.Name, CommonMetaData.Lyrics, StringComparison.OrdinalIgnoreCase)
                 );
             }
-            var fileName = Path.GetTempFileName();
+            var fileName = Path.Combine(
+                Path.GetTempPath(),
+                string.Format("Lyrics-{0}.txt", DateTime.Now.ToFileTimeUtc())
+            );
             Logger.Write(this, LogLevel.Debug, "Editing lyrics for file \"{0}\": \"{1}\"", playlistItem.FileName, fileName);
             if (metaDataItem != null)
             {
@@ -188,30 +185,42 @@ namespace FoxTunes
             {
                 File.WriteAllText(fileName, string.Empty);
             }
-            var args = string.Format("\"{0}\"", fileName);
-            Logger.Write(this, LogLevel.Debug, "Using editor: \"{0}\"", this.Editor.Value);
-            var process = Process.Start(this.Editor.Value, args);
-            await process.WaitForExitAsync().ConfigureAwait(false);
-            if (process.ExitCode != 0)
+            try
             {
-                Logger.Write(this, LogLevel.Warn, "Process does not indicate success: Code = {0}", process.ExitCode);
-                return;
-            }
-            if (metaDataItem == null)
-            {
-                metaDataItem = new MetaDataItem(CommonMetaData.Lyrics, MetaDataItemType.Tag);
-                lock (playlistItem.MetaDatas)
+                var process = Process.Start(fileName);
+                await process.WaitForExitAsync().ConfigureAwait(false);
+                if (process.ExitCode != 0)
                 {
-                    playlistItem.MetaDatas.Add(metaDataItem);
+                    Logger.Write(this, LogLevel.Warn, "Process does not indicate success: Code = {0}", process.ExitCode);
+                    return;
+                }
+                if (metaDataItem == null)
+                {
+                    metaDataItem = new MetaDataItem(CommonMetaData.Lyrics, MetaDataItemType.Tag);
+                    lock (playlistItem.MetaDatas)
+                    {
+                        playlistItem.MetaDatas.Add(metaDataItem);
+                    }
+                }
+                metaDataItem.Value = File.ReadAllText(fileName);
+                await this.MetaDataManager.Save(
+                    new[] { playlistItem },
+                    true,
+                    false,
+                    CommonMetaData.Lyrics
+                ).ConfigureAwait(false);
+            }
+            finally
+            {
+                try
+                {
+                    File.Delete(fileName);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to delete temp file \"{0}\":", fileName, e.Message);
                 }
             }
-            metaDataItem.Value = File.ReadAllText(fileName);
-            await this.MetaDataManager.Save(
-                new[] { playlistItem },
-                true,
-                false,
-                CommonMetaData.Lyrics
-            ).ConfigureAwait(false);
         }
 
         public Task Lookup()
