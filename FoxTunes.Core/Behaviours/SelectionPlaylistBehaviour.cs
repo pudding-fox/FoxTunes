@@ -35,7 +35,7 @@ namespace FoxTunes
         public override async Task Refresh(Playlist playlist, bool force)
         {
             var libraryHierarchyNode = this.LibraryManager.SelectedItem;
-            if (libraryHierarchyNode != null && !LibraryHierarchyNode.Empty.Equals(libraryHierarchyNode))
+            if (libraryHierarchyNode != null)
             {
                 playlist.Name = libraryHierarchyNode.Value;
                 await this.Update(playlist).ConfigureAwait(false);

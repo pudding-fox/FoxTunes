@@ -34,7 +34,7 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <Grid>
-        <ItemsControl Name="ItemsControl" Grid.Row="0" ItemsSource="{Binding Frames, Source={StaticResource ViewModel}, IsAsync=True}" >
+        <ItemsControl Name="ItemsControl" Grid.Row="0" ItemsSource="{Binding Frames, Source={StaticResource ViewModel}}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid></Grid>
@@ -46,7 +46,7 @@
                         Name="ListBox"
                         Margin="0,2,0,2" 
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                        ItemsSource="{Binding Items, IsAsync=True}" 
+                        ItemsSource="{Binding AllItems}" 
                         SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}"
                         IsVisibleChanged="OnIsVisibleChanged"
                         SelectionChanged="OnSelectionChanged"

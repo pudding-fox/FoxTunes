@@ -3,10 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -46,6 +45,14 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFramesChanged()
         {
+            if (this.Frames != null)
+            {
+                this.SelectedFrame = this.Frames.LastOrDefault();
+            }
+            else
+            {
+                this.SelectedFrame = null;
+            }
             if (this.FramesChanged != null)
             {
                 this.FramesChanged(this, EventArgs.Empty);
@@ -54,6 +61,37 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler FramesChanged;
+
+        private LibraryBrowserFrame _SelectedFrame { get; set; }
+
+        public LibraryBrowserFrame SelectedFrame
+        {
+            get
+            {
+                return this._SelectedFrame;
+            }
+            set
+            {
+                if (object.ReferenceEquals(this._SelectedFrame, value))
+                {
+                    return;
+                }
+                this._SelectedFrame = value;
+                this.OnSelectedFrameChanged();
+            }
+        }
+
+        protected virtual void OnSelectedFrameChanged()
+        {
+            this.IsPlaceholderSelected = false;
+            if (this.SelectedFrameChanged != null)
+            {
+                this.SelectedFrameChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedFrame");
+        }
+
+        public event EventHandler SelectedFrameChanged;
 
         private int _GridTileSize { get; set; }
 
@@ -126,7 +164,7 @@ namespace FoxTunes.ViewModel
         {
             if (this.IsInitialized)
             {
-                this.Debouncer.Exec(this.Reload);
+                this.Debouncer.Exec(this.Refresh);
             }
             if (this.ImageModeChanged != null)
             {
@@ -208,20 +246,15 @@ namespace FoxTunes.ViewModel
             }
             if (fileDatas != null && fileDatas.Any())
             {
-                return this.Refresh(fileDatas);
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
             return this.Refresh();
         }
 
-        protected virtual Task Refresh(IEnumerable<IFileData> fileDatas)
-        {
-            //Updates for specific items are handled by LibraryHierarchyBrowser.
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
-        }
 
         protected override async Task OnRefresh()
         {
@@ -232,21 +265,34 @@ namespace FoxTunes.ViewModel
             })).ConfigureAwait(false);
         }
 
-        public override async Task Reload()
+        public bool IsPlaceholderSelected { get; private set; }
+
+        public override LibraryHierarchyNode SelectedItem
         {
-            await base.Reload().ConfigureAwait(false);
-            await Windows.Invoke(() => this.Synchronize(new List<LibraryBrowserFrame>()
+            get
             {
-                new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-            })).ConfigureAwait(false);
+                if (this.IsPlaceholderSelected)
+                {
+                    return LibraryHierarchyNode.Empty;
+                }
+                return base.SelectedItem;
+            }
+            set
+            {
+                if (LibraryHierarchyNode.Empty.Equals(value))
+                {
+                    this.IsPlaceholderSelected = true;
+                    return;
+                }
+                this.IsPlaceholderSelected = false;
+                base.SelectedItem = value;
+            }
         }
 
         protected override void OnSelectedItemChanged(object sender, EventArgs e)
         {
-            if (!this.IsNavigating)
-            {
-                this.Synchronize();
-            }
+            this.IsPlaceholderSelected = false;
+            this.Synchronize();
             base.OnSelectedItemChanged(sender, e);
         }
 
@@ -270,7 +316,7 @@ namespace FoxTunes.ViewModel
                 this.AddToPlaylistCommand.Execute(false);
                 return;
             }
-            if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
+            if (this.IsPlaceholderSelected)
             {
                 this.Up();
             }
@@ -282,10 +328,16 @@ namespace FoxTunes.ViewModel
 
         private void Up()
         {
-            this.Up(this.Frames, true);
+            var frame = this.Frames.LastOrDefault();
+            this.Up(this.Frames);
+            this.SelectedFrame = this.Frames.LastOrDefault();
+            if (frame != null && !object.ReferenceEquals(this.SelectedItem, frame.ItemsSource))
+            {
+                this.SelectedItem = frame.ItemsSource;
+            }
         }
 
-        private void Up(IList<LibraryBrowserFrame> frames, bool updateSelection)
+        private void Up(IList<LibraryBrowserFrame> frames)
         {
             if (frames.Count <= 1)
             {
@@ -297,23 +349,33 @@ namespace FoxTunes.ViewModel
                 return;
             }
             frames.Remove(frame);
-            if (updateSelection && object.ReferenceEquals(this.Frames, frames))
-            {
-                this.SelectedItem = frame.ItemsSource;
-            }
         }
 
         private void Down()
         {
-            this.Down(this.SelectedItem, true);
+            var libraryHierarchyNode = this.SelectedItem;
+            if (libraryHierarchyNode == null)
+            {
+                return;
+            }
+            this.Down(libraryHierarchyNode);
+            this.SelectedFrame = this.Frames.LastOrDefault();
+            if (this.SelectedFrame != null)
+            {
+                libraryHierarchyNode = this.SelectedFrame.Items.FirstOrDefault();
+                if (!object.ReferenceEquals(this.SelectedItem, libraryHierarchyNode))
+                {
+                    this.SelectedItem = libraryHierarchyNode;
+                }
+            }
         }
 
-        private void Down(LibraryHierarchyNode libraryHierarchyNode, bool updateSelection)
+        private void Down(LibraryHierarchyNode libraryHierarchyNode)
         {
-            this.Down(libraryHierarchyNode, this.Frames, updateSelection);
+            this.Down(libraryHierarchyNode, this.Frames);
         }
 
-        private void Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames, bool updateSelection)
+        private void Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames)
         {
             var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode);
             if (!libraryHierarchyNodes.Any())
@@ -322,16 +384,9 @@ namespace FoxTunes.ViewModel
             }
             var frame = new LibraryBrowserFrame(
                 libraryHierarchyNode,
-                new[]
-                {
-                    LibraryHierarchyNode.Empty
-                }.Concat(libraryHierarchyNodes)
+                libraryHierarchyNodes
             );
             frames.Add(frame);
-            if (updateSelection && object.ReferenceEquals(this.Frames, frames))
-            {
-                this.SelectedItem = libraryHierarchyNodes.FirstOrDefault();
-            }
         }
 
         private void Synchronize()
@@ -341,7 +396,7 @@ namespace FoxTunes.ViewModel
 
         private void Synchronize(IList<LibraryBrowserFrame> frames)
         {
-            if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
+            if (this.SelectedItem == null)
             {
                 if (!object.ReferenceEquals(this.Frames, frames))
                 {
@@ -357,33 +412,76 @@ namespace FoxTunes.ViewModel
                 libraryHierarchyNode = libraryHierarchyNode.Parent;
             }
             path.Insert(0, LibraryHierarchyNode.Empty);
+            this.Synchronize(frames, path);
+        }
+
+        private void Synchronize(IList<LibraryBrowserFrame> frames, IList<LibraryHierarchyNode> path)
+        {
+            if (this.IsSynchronized(frames, path))
+            {
+                return;
+            }
             for (var a = 0; a < path.Count; a++)
             {
-                libraryHierarchyNode = path[a];
+                var libraryHierarchyNode = path[a];
                 if (frames.Count > a)
                 {
-                    while (frames[a].ItemsSource != libraryHierarchyNode)
+                    while (!object.ReferenceEquals(frames[a].ItemsSource, libraryHierarchyNode))
                     {
                         while (frames.Count > a)
                         {
-                            this.Up(frames, false);
+                            this.Up(frames);
                         }
-                        this.Down(libraryHierarchyNode, frames, false);
+                        this.Down(libraryHierarchyNode, frames);
                     }
                 }
                 else
                 {
-                    this.Down(libraryHierarchyNode, frames, false);
+                    this.Down(libraryHierarchyNode, frames);
                 }
             }
             while (frames.Count > path.Count)
             {
-                this.Up(frames, false);
+                this.Up(frames);
             }
             if (!object.ReferenceEquals(this.Frames, frames))
             {
                 this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames);
             }
+            this.SelectedFrame = this.Frames.LastOrDefault();
+        }
+
+        private bool IsSynchronized(IList<LibraryBrowserFrame> frames, IList<LibraryHierarchyNode> path)
+        {
+            if (!object.ReferenceEquals(this.Frames, frames))
+            {
+                return false;
+            }
+            if (frames.Count != path.Count)
+            {
+                return false;
+            }
+            for (var a = 0; a < path.Count; a++)
+            {
+                var frame = frames[a];
+                var libraryHierarchyNode = path[a];
+                if (!object.ReferenceEquals(frames[a].ItemsSource, libraryHierarchyNode))
+                {
+                    return false;
+                }
+                if (a > 0)
+                {
+                    //TODO: Can't quickly validate items, an extra item exists.
+                }
+                else
+                {
+                    if (!object.ReferenceEquals(frames[a].Items, this.Items))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         protected override Freezable CreateInstanceCore()

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
@@ -10,10 +10,20 @@ namespace FoxTunes.ViewModel
 
         }
 
-        public LibraryBrowserFrame(LibraryHierarchyNode itemsSource, IEnumerable<LibraryHierarchyNode> items) : this()
+        public LibraryBrowserFrame(LibraryHierarchyNode itemsSource, LibraryHierarchyNode[] items) : this()
         {
             this.ItemsSource = itemsSource;
             this.Items = items;
+            if (LibraryHierarchyNode.Empty.Equals(itemsSource))
+            {
+                this.AllItems = this.Items;
+            }
+            else
+            {
+                this.AllItems = new LibraryHierarchyNode[this.Items.Length + 1];
+                this.AllItems[0] = LibraryHierarchyNode.Empty;
+                Array.Copy(this.Items, 0, this.AllItems, 1, this.Items.Length);
+            }
             if (this.CanFreeze)
             {
                 this.Freeze();
@@ -22,7 +32,9 @@ namespace FoxTunes.ViewModel
 
         public LibraryHierarchyNode ItemsSource { get; private set; }
 
-        public IEnumerable<LibraryHierarchyNode> Items { get; private set; }
+        public LibraryHierarchyNode[] Items { get; private set; }
+
+        public LibraryHierarchyNode[] AllItems { get; private set; }
 
         protected override Freezable CreateInstanceCore()
         {

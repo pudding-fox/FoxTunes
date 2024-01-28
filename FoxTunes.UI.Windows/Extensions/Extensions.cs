@@ -316,14 +316,17 @@ namespace FoxTunes
             }
             if (double.IsNaN(item.ActualHeight) || item.ActualHeight == 0)
             {
-                var wrapper = default(RoutedEventHandler);
-                wrapper = (sender, e) =>
+                if (callback != null)
                 {
-                    callback(sender, e);
-                    item.Loaded -= wrapper;
-                };
-                item.Loaded += wrapper;
-                return false;
+                    var wrapper = default(RoutedEventHandler);
+                    wrapper = (sender, e) =>
+                    {
+                        callback(sender, e);
+                        item.Loaded -= wrapper;
+                    };
+                    item.Loaded += wrapper;
+                    return false;
+                }
             }
             scrollViewer.ScrollToVerticalOffset(offset * item.ActualHeight);
             return true;

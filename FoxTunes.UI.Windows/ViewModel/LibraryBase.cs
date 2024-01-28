@@ -41,8 +41,6 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public bool IsNavigating { get; private set; }
-
         public AsyncDebouncer Debouncer { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
@@ -119,9 +117,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
+                if (this.LibraryManager == null)
                 {
-                    return LibraryHierarchyNode.Empty;
+                    return null;
                 }
                 return this.LibraryManager.SelectedItem;
             }
@@ -131,15 +129,7 @@ namespace FoxTunes.ViewModel
                 {
                     return;
                 }
-                this.IsNavigating = true;
-                try
-                {
-                    this.LibraryManager.SelectedItem = value;
-                }
-                finally
-                {
-                    this.IsNavigating = false;
-                }
+                this.LibraryManager.SelectedItem = value;
             }
         }
 
@@ -270,11 +260,6 @@ namespace FoxTunes.ViewModel
             var items = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
             await Windows.Invoke(() => this.Items = items).ConfigureAwait(false);
             await this.RefreshStatus().ConfigureAwait(false);
-        }
-
-        public virtual Task Reload()
-        {
-            return this.Refresh();
         }
 
         protected override void InitializeComponent(ICore core)
