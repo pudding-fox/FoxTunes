@@ -47,7 +47,7 @@ namespace FoxTunes.Interfaces
 
         event AsyncEventHandler CurrentItemChanged;
 
-        ObservableCollection<PlaylistItem> SelectedItems { get; set; }
+        PlaylistItem[] SelectedItems { get; set; }
 
         event EventHandler SelectedItemsChanged;
 

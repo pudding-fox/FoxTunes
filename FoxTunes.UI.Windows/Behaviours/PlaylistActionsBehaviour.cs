@@ -18,6 +18,14 @@ namespace FoxTunes
 
         public const string SET_RATING = "AAAD";
 
+#if NET40
+        //ListView grouping is too slow under net40 due to lack of virtualization.
+#else
+        public const string TOGGLE_GROUPING = "MMMM";
+#endif
+
+        public const string TOGGLE_FOLLOW_LIBRARY = "NNNN";
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IMetaDataBrowser MetaDataBrowser { get; private set; }
@@ -25,6 +33,14 @@ namespace FoxTunes
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Popularimeter { get; private set; }
+
+#if NET40
+        //ListView grouping is too slow under net40 due to lack of virtualization.
+#else
+        public BooleanConfigurationElement Grouping { get; private set; }
+#endif
+
+        public BooleanConfigurationElement FollowLibrary { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -34,6 +50,18 @@ namespace FoxTunes
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
+            );
+#if NET40
+            //ListView grouping is too slow under net40 due to lack of virtualization.
+#else
+            this.Grouping = this.Configuration.GetElement<BooleanConfigurationElement>(
+                PlaylistBehaviourConfiguration.SECTION,
+                PlaylistGroupingBehaviourConfiguration.GROUP_ENABLED_ELEMENT
+            );
+#endif
+            this.FollowLibrary = this.Configuration.GetElement<BooleanConfigurationElement>(
+                PlaylistBehaviourConfiguration.SECTION,
+                PlaylistTracksLibraryBehaviourConfiguration.ENABLED_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -70,6 +98,24 @@ namespace FoxTunes
                     }
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOCATE_PLAYLIST_ITEMS, "Locate");
                 }
+#if NET40
+                //ListView grouping is too slow under net40 due to lack of virtualization.
+#else
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_PLAYLIST, 
+                    TOGGLE_GROUPING, 
+                    "Grouping", 
+                    path: "Playlist",
+                    attributes: this.Grouping.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+#endif
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_PLAYLIST, 
+                        TOGGLE_FOLLOW_LIBRARY, 
+                        "Follow Library", 
+                        path: "Playlist", 
+                        attributes: this.FollowLibrary.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
             }
         }
 
@@ -85,6 +131,18 @@ namespace FoxTunes
                     return this.LocatePlaylistItems();
                 case SET_RATING:
                     return this.SetRating(component.Name);
+#if NET40
+                //ListView grouping is too slow under net40 due to lack of virtualization.
+#else
+                case TOGGLE_GROUPING:
+                    this.Grouping.Toggle();
+                    this.Configuration.Save();
+                    break;
+#endif
+                case TOGGLE_FOLLOW_LIBRARY:
+                    this.FollowLibrary.Toggle();
+                    this.Configuration.Save();
+                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);

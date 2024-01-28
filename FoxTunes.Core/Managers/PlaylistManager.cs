@@ -16,7 +16,7 @@ namespace FoxTunes
 
         public PlaylistManager()
         {
-            this.SelectedItems = new ObservableCollection<PlaylistItem>();
+            this.SelectedItems = new PlaylistItem[] { };
         }
 
         private volatile bool IsNavigating = false;
@@ -401,9 +401,9 @@ namespace FoxTunes
 
         public event AsyncEventHandler CurrentItemChanged;
 
-        private ObservableCollection<PlaylistItem> _SelectedItems { get; set; }
+        private PlaylistItem[] _SelectedItems { get; set; }
 
-        public ObservableCollection<PlaylistItem> SelectedItems
+        public PlaylistItem[] SelectedItems
         {
             get
             {
