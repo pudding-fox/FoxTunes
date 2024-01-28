@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -49,10 +50,13 @@ namespace FoxTunes
             {
                 try
                 {
-                    var configs = Serializer.LoadValue<ToolWindowConfiguration[]>(this.Element.Value);
-                    foreach (var config in configs)
+                    using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Element.Value)))
                     {
-                        await this.Load(config).ConfigureAwait(false);
+                        var configs = Serializer.Load(stream);
+                        foreach (var config in configs)
+                        {
+                            await this.Load(config).ConfigureAwait(false);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -136,7 +140,11 @@ namespace FoxTunes
             }
             try
             {
-                this.Element.Value = Serializer.SaveValue(this.Windows.Keys.ToArray());
+                using (var stream = new MemoryStream())
+                {
+                    Serializer.Save(stream, this.Windows.Keys);
+                    this.Element.Value = Encoding.Default.GetString(stream.ToArray());
+                }
                 this.Configuration.Save();
             }
             catch (Exception e)
@@ -388,8 +396,15 @@ namespace FoxTunes
     {
         public ToolWindowConfiguration()
         {
-
+            this.Id = Guid.NewGuid().ToString("d");
         }
+
+        public ToolWindowConfiguration(string id)
+        {
+            this.Id = id;
+        }
+
+        public string Id { get; private set; }
 
         private string _Title { get; set; }
 

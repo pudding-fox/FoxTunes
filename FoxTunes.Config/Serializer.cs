@@ -22,6 +22,7 @@ namespace FoxTunes
             using (var writer = new XmlTextWriter(stream, Encoding.Default))
             {
                 writer.Formatting = Formatting.Indented;
+                writer.WriteStartDocument();
                 writer.WriteStartElement(Publication.Product);
                 foreach (var section in sections)
                 {
@@ -46,6 +47,7 @@ namespace FoxTunes
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
+                writer.WriteEndDocument();
             }
         }
 
@@ -53,29 +55,39 @@ namespace FoxTunes
         {
             using (var reader = new XmlTextReader(stream))
             {
+                reader.WhitespaceHandling = WhitespaceHandling.Significant;
                 reader.ReadStartElement(Publication.Product);
-                while (reader.IsStartElement())
+                while (reader.IsStartElement(nameof(ConfigurationSection)))
                 {
                     var id = reader.GetAttribute(nameof(ConfigurationSection.Id));
                     Logger.Write(typeof(Serializer), LogLevel.Trace, "Loading configuration section: \"{0}\".", id);
                     reader.ReadStartElement(nameof(ConfigurationSection));
                     yield return new KeyValuePair<string, IEnumerable<KeyValuePair<string, string>>>(id, Load(reader));
+                    if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, nameof(ConfigurationSection)))
+                    {
+                        reader.ReadEndElement();
+                    }
+                }
+                if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, Publication.Product))
+                {
                     reader.ReadEndElement();
                 }
-                reader.ReadEndElement();
             }
         }
 
         private static IEnumerable<KeyValuePair<string, string>> Load(XmlReader reader)
         {
-            while (reader.IsStartElement())
+            while (reader.IsStartElement(nameof(ConfigurationElement)))
             {
                 var id = reader.GetAttribute(nameof(ConfigurationElement.Id));
                 Logger.Write(typeof(Serializer), LogLevel.Trace, "Loading configuration element: \"{0}\".", id);
                 reader.ReadStartElement(nameof(ConfigurationElement));
                 yield return new KeyValuePair<string, string>(id, reader.Value);
                 reader.Read(); //Done with <![CDATA[
-                reader.ReadEndElement();
+                if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, nameof(ConfigurationElement)))
+                {
+                    reader.ReadEndElement();
+                }
             }
         }
     }
