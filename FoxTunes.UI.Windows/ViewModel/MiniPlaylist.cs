@@ -84,7 +84,7 @@ namespace FoxTunes.ViewModel
         {
             using (e.Defer())
             {
-                await this.Refresh().ConfigureAwait(false);
+                await this.RefreshSelectedItem().ConfigureAwait(false);
             }
         }
 

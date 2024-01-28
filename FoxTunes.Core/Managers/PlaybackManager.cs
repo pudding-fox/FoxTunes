@@ -174,6 +174,10 @@ namespace FoxTunes
 
         public async Task Stop()
         {
+            if (!this.Output.IsStarted)
+            {
+                return;
+            }
             await this.SetCurrentStream(null).ConfigureAwait(false);
             await this.Output.Shutdown().ConfigureAwait(false);
         }
