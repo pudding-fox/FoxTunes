@@ -375,6 +375,11 @@ namespace FoxTunes
             return 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
         }
 
+        protected static float FromDecibel(int value)
+        {
+            return Math.Min(Math.Max((float)value / Math.Abs(DB_MIN), 0.0f), 1.0f);
+        }
+
         public static int IndexToFrequency(int index, int fftSize, int rate)
         {
             return (int)Math.Floor((double)index * (double)rate / (double)fftSize);

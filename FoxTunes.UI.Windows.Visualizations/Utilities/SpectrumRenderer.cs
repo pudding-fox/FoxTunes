@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -21,6 +22,8 @@ namespace FoxTunes
         public TextConfigurationElement ColorPalette { get; private set; }
 
         public IntegerConfigurationElement CutOff { get; private set; }
+
+        public IntegerConfigurationElement PreAmp { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
@@ -47,6 +50,10 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.CUT_OFF_ELEMENT
             );
+            this.PreAmp = this.Configuration.GetElement<IntegerConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.PRE_AMP_ELEMENT
+            );
             this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
@@ -55,6 +62,7 @@ namespace FoxTunes
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ColorPalette.ValueChanged += this.OnValueChanged;
             this.CutOff.ValueChanged += this.OnValueChanged;
+            this.PreAmp.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
         }
@@ -82,7 +90,8 @@ namespace FoxTunes
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color),
-                this.CutOff.Value
+                this.CutOff.Value,
+                1.0f + FromDecibel(this.PreAmp.Value)
             );
             return true;
         }
@@ -216,6 +225,10 @@ namespace FoxTunes
             {
                 this.CutOff.ValueChanged -= this.OnValueChanged;
             }
+            if (this.PreAmp != null)
+            {
+                this.PreAmp.ValueChanged -= this.OnValueChanged;
+            }
             if (this.FFTSize != null)
             {
                 this.FFTSize.ValueChanged -= this.OnValueChanged;
@@ -299,9 +312,17 @@ namespace FoxTunes
                     values[a] = ToDecibelFixed(value);
                 }
             }
+
+            if (data.PreAmp > 0)
+            {
+                for (var a = 0; a < data.Count; a++)
+                {
+                    values[a] = Math.Min(values[a] * data.PreAmp, 1.0f);
+                }
+            }
         }
 
-        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff)
+        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff, float preAmp)
         {
             if (count > width)
             {
@@ -320,6 +341,7 @@ namespace FoxTunes
                 Values = new float[count],
                 Colors = colors,
                 CutOff = cutOff,
+                PreAmp = preAmp,
                 Elements = new Int32Rect[count]
             };
             if (showPeaks)
@@ -363,6 +385,8 @@ namespace FoxTunes
             public Color[] Colors;
 
             public int CutOff;
+
+            public float PreAmp;
 
             public Int32Rect[] Elements;
 

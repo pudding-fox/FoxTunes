@@ -464,5 +464,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("SpectrumBehaviourConfiguration.Peaks", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pre Amp (dB).
+        /// </summary>
+        internal static string SpectrumBehaviourConfiguration_PreAmp {
+            get {
+                return ResourceManager.GetString("SpectrumBehaviourConfiguration.PreAmp", resourceCulture);
+            }
+        }
     }
 }

@@ -46,6 +46,14 @@ namespace FoxTunes
 
         public const int DEFAULT_CUT_OFF = 10;
 
+        public const string PRE_AMP_ELEMENT = "HHHH2DBD-8CA9-4F41-9F61-1BC5F5D79545";
+
+        public const int MIN_PRE_AMP = 0;
+
+        public const int MAX_PRE_AMP = 20;
+
+        public const int DEFAULT_PRE_AMP = 0;
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
@@ -53,7 +61,8 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumBehaviourConfiguration_ColorPalette, path: Strings.SpectrumBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(CUT_OFF_ELEMENT, Strings.SpectrumBehaviourConfiguration_MaxFrequency, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_CUT_OFF).WithValidationRule(new IntegerValidationRule(MIN_CUT_OFF, MAX_CUT_OFF))
+                .WithElement(new IntegerConfigurationElement(CUT_OFF_ELEMENT, Strings.SpectrumBehaviourConfiguration_MaxFrequency, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_CUT_OFF).WithValidationRule(new IntegerValidationRule(MIN_CUT_OFF, MAX_CUT_OFF)))
+                .WithElement(new IntegerConfigurationElement(PRE_AMP_ELEMENT, Strings.SpectrumBehaviourConfiguration_PreAmp, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_PRE_AMP).WithValidationRule(new IntegerValidationRule(MIN_PRE_AMP, MAX_PRE_AMP))
             );
         }
 
