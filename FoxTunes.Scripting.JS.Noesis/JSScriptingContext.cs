@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using Noesis.Javascript;
+using System;
 using System.Diagnostics;
 
 namespace FoxTunes
@@ -26,17 +27,29 @@ namespace FoxTunes
 
         public override void SetValue(string name, object value)
         {
+            if (this.IsDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
             this.Context.SetParameter(name, value);
         }
 
         public override object GetValue(string name)
         {
+            if (this.IsDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
             return this.Context.GetParameter(name);
         }
 
         [DebuggerNonUserCode]
         public override object Run(string script)
         {
+            if (this.IsDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
             try
             {
                 return this.Context.Run(script);

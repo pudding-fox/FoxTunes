@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,6 +44,10 @@ namespace FoxTunes
 
         public override void SetValue(string name, object value)
         {
+            if (this.IsDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
             this.SetValue(this.Engine.GlobalObject, name, value);
         }
 
@@ -70,6 +75,10 @@ namespace FoxTunes
 
         public override object GetValue(string name)
         {
+            if (this.IsDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
             return this.GetValue(this.Engine.GlobalObject.GetProperty(name));
         }
 
@@ -85,6 +94,10 @@ namespace FoxTunes
         [DebuggerNonUserCode]
         public override object Run(string script)
         {
+            if (this.IsDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
             try
             {
                 var handle = this.Compile(script);
