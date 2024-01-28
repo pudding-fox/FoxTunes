@@ -37,7 +37,6 @@
                     <Setter Property="FontSize" Value="10"></Setter>
                     <Setter Property="FontFamily" Value="Webdings"></Setter>
                     <!-- System -->
-                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
                     <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />

@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" 
              Foreground="{DynamicResource TextBrush}"
-             MinWidth="80"
+             MinWidth="160"
              MinHeight="30">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
