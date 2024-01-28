@@ -42,7 +42,7 @@
             </TreeView.Resources>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding DisplayValue, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding Value, Mode=OneWay}"/>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

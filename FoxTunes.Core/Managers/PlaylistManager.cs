@@ -54,15 +54,15 @@ namespace FoxTunes.Managers
             return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
-        public Task Add(IEnumerable<LibraryItem> libraryItems)
+        public Task Add(LibraryHierarchyNode libraryHierarchyNode)
         {
             var index = this.GetInsertIndex();
-            return this.Insert(index, libraryItems);
+            return this.Insert(index, libraryHierarchyNode);
         }
 
-        public Task Insert(int index, IEnumerable<LibraryItem> libraryItems)
+        public Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode)
         {
-            var task = new AddLibraryItemsToPlaylistTask(index, libraryItems);
+            var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run().ContinueWith(_ => this.OnUpdated());

@@ -109,6 +109,23 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public ICommand UpdateCommand
+        {
+            get
+            {
+                return new Command(this.Update);
+            }
+        }
+
+        public void Update()
+        {
+            if (this.SelectedHierarchy.Id == 0)
+            {
+                return;
+            }
+            this.DatabaseContext.Sets.LibraryHierarchy.Update(this.SelectedHierarchy);
+        }
+
         public ICommand SaveCommand
         {
             get
@@ -129,7 +146,7 @@ namespace FoxTunes.ViewModel
             {
                 this.DatabaseContext.Dispose();
             }
-            
+
         }
 
         protected override void OnCoreChanged()

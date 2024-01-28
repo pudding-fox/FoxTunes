@@ -1,32 +1,28 @@
-﻿using System.Collections.ObjectModel;
-
-namespace FoxTunes
+﻿namespace FoxTunes
 {
     public class LibraryHierarchyItem : PersistableComponent
     {
         public LibraryHierarchyItem()
         {
-            this.Children = new ObservableCollection<LibraryHierarchyItem>();
-            this.Items = new ObservableCollection<LibraryItem>();
+
         }
 
         public LibraryHierarchyItem(string displayValue, string sortValue, bool isLeaf) : this()
         {
             this.DisplayValue = displayValue;
             this.SortValue = sortValue;
-            this.IsLeaf = isLeaf;
         }
+
+        public LibraryHierarchyItem Parent { get; set; }
+
+        public LibraryHierarchy LibraryHierarchy { get; set; }
+
+        public LibraryHierarchyLevel LibraryHierarchyLevel { get; set; }
+
+        public LibraryItem LibraryItem { get; private set; }
 
         public string DisplayValue { get; set; }
 
         public string SortValue { get; set; }
-
-        public LibraryHierarchyItem Parent { get; set; }
-
-        public virtual ObservableCollection<LibraryHierarchyItem> Children { get; set; }
-
-        public virtual ObservableCollection<LibraryItem> Items { get; set; }
-
-        public bool IsLeaf { get; set; }
     }
 }

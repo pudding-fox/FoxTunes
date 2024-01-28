@@ -41,11 +41,6 @@
   <ItemGroup>
     <Compile Include="AssemblyRegistry.cs" />
     <Compile Include="AssemblyResolver.cs" />
-    <Compile Include="Behaviours\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
@@ -56,6 +51,7 @@
     <Compile Include="Interfaces\IReportsProgress.cs" />
     <Compile Include="Interfaces\IRootDataQueries.cs" />
     <Compile Include="Interfaces\IRootDataSets.cs" />
+    <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
     <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
     <Compile Include="Interfaces\Managers\IDataManager.cs" />
@@ -65,8 +61,10 @@
     <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
     <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Library\LibraryHierarchy.cs" />
+    <Compile Include="Library\LibraryHierarchyBrowser.cs" />
     <Compile Include="Library\LibraryHierarchyItem.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
+    <Compile Include="Library\LibraryHierarchyNode.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\HierarchyManager.cs" />
@@ -163,63 +161,90 @@
     <Compile Include="StandardManager.cs" />
     <Compile Include="StandardManagers.cs" />
     <Compile Include="Statistic\StatisticItem.cs" />
-    <Compile Include="Tasks\AddLibraryItemsToPlaylistTask.cs" />
+    <Compile Include="Tasks\AddLibraryHierarchyNodeToPlaylistTask.cs" />
     <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\LibraryTaskBase.cs" />
-    <Compile Include="Tasks\MetaDataPopulator.cs" />
+    <Compile Include="Utilities\MetaDataPopulator.cs" />
     <Compile Include="Tasks\PlaylistTaskBase.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
-    <Compile Include="Tasks\Resources.Designer.cs">
+    <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\SQL.cs" />
+    <Compile Include="Utilities\Templates\LibraryHierarchyViewBuilder.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LibraryHierarchyViewBuilder.tt</DependentUpon>
+    </Compile>
     <Compile Include="Tasks\StopOutputStreamTask.cs" />
+    <Compile Include="Utilities\Templates\LibraryHierarchyViewBuilder_Logic.cs" />
+    <Compile Include="Utilities\Templates\PivotViewBuilder.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PivotViewBuilder.tt</DependentUpon>
+    </Compile>
     <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
+    <Compile Include="Utilities\Templates\PivotViewBuilder_Logic.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Behaviours\Resources.resx">
+    <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Tasks\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Behaviours\Resources\VariousArtists.sql" />
+    <None Include="Resources\VariousArtists.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tasks\Resources\AddLibraryItem.sql" />
-    <None Include="Tasks\Resources\ClearPlaylist.sql" />
+    <None Include="Resources\AddLibraryItem.sql" />
+    <None Include="Resources\ClearPlaylist.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tasks\Resources\AddMetaDataItems.sql" />
+    <None Include="Resources\AddMetaDataItems.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tasks\Resources\AddImageItems.sql" />
-    <None Include="Tasks\Resources\AddPropertyItems.sql" />
+    <None Include="Resources\AddImageItems.sql" />
+    <None Include="Resources\AddPropertyItems.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tasks\Resources\CopyMetaDataItems.sql" />
-    <None Include="Tasks\Resources\SetLibraryItemStatus.sql" />
+    <None Include="Resources\CopyMetaDataItems.sql" />
+    <None Include="Resources\SetLibraryItemStatus.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tasks\Resources\ShiftPlaylistItems.sql" />
+    <None Include="Resources\ShiftPlaylistItems.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tasks\Resources\AddPlaylistItem.sql" />
+    <None Include="Resources\AddPlaylistItem.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tasks\Resources\SetPlaylistItemStatus.sql" />
+    <None Include="Resources\SetPlaylistItemStatus.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GetLibraryHierarchyLibraryItems.sql" />
+    <None Include="Resources\GetLibraryHierarchyNodes.sql" />
+    <None Include="Resources\GetLibraryHierarchyRootNodes.sql" />
+    <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
+    <Content Include="Utilities\Templates\LibraryHierarchyViewBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>LibraryHierarchyViewBuilder.cs</LastGenOutput>
+    </Content>
+    <Content Include="Utilities\Templates\PivotViewBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PivotViewBuilder.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

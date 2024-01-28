@@ -31,7 +31,7 @@ namespace FoxTunes
             {
                 effects = DragDropEffects.Copy;
             }
-            if (e.Data.GetDataPresent(typeof(ObservableCollection<LibraryItem>)))
+            if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
             {
                 effects = DragDropEffects.Copy;
             }
@@ -46,10 +46,10 @@ namespace FoxTunes
                 var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
                 this.AddToPlaylist(paths);
             }
-            if (e.Data.GetDataPresent(typeof(ObservableCollection<LibraryItem>)))
+            if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
             {
-                var items = e.Data.GetData(typeof(ObservableCollection<LibraryItem>)) as ObservableCollection<LibraryItem>;
-                this.AddToPlaylist(items);
+                var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
+                this.AddToPlaylist(libraryHierarchyNode);
             }
             base.OnDrop(e);
         }
@@ -67,16 +67,16 @@ namespace FoxTunes
             }
         }
 
-        private void AddToPlaylist(IEnumerable<LibraryItem> libraryItems)
+        private void AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)
         {
             var sequence = default(int);
             if (this.TryGetInsertSequence(out sequence))
             {
-                this.Core.Managers.Playlist.Insert(sequence, libraryItems);
+                this.Core.Managers.Playlist.Insert(sequence, libraryHierarchyNode);
             }
             else
             {
-                this.Core.Managers.Playlist.Add(libraryItems);
+                this.Core.Managers.Playlist.Add(libraryHierarchyNode);
             }
         }
 

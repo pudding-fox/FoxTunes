@@ -23,5 +23,7 @@
         ILogEmitter LogEmitter { get; }
 
         ISignalEmitter SignalEmitter { get; }
+
+        ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; }
     }
 }

@@ -1,38 +1,24 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.Tasks;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace FoxTunes
 {
-    public class AddLibraryItemsToPlaylistTask : PlaylistTaskBase
+    public class AddLibraryHierarchyNodeToPlaylistTask : PlaylistTaskBase
     {
         public const string ID = "4E0DD392-1138-4DA8-84C2-69B27D1E34EA";
 
-        public AddLibraryItemsToPlaylistTask(int sequence, IEnumerable<LibraryItem> libraryItems) :
-            base(ID)
+        public AddLibraryHierarchyNodeToPlaylistTask(int sequence, LibraryHierarchyNode libraryHierarchyNode) : base(ID)
         {
             this.Sequence = sequence;
-            this.LibraryItems = libraryItems;
-        }
-
-        public override bool Visible
-        {
-            get
-            {
-                return true;
-            }
+            this.LibraryHierarchyNode = libraryHierarchyNode;
         }
 
         public int Sequence { get; private set; }
 
         public int Offset { get; private set; }
 
-        public IEnumerable<LibraryItem> LibraryItems { get; private set; }
+        public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -64,45 +50,21 @@ namespace FoxTunes
 
         private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
-            this.Name = "Processing library items";
-            this.Position = 0;
-            this.Count = this.LibraryItems.Count();
-            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
-            Logger.Write(this, LogLevel.Debug, "Converting library items to playlist items.");
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(Resources.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
+            using (var command = databaseContext.Connection.CreateCommand(Resources.AddLibraryHierarchyNodeToPlaylist, new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "displayValue", "sequence", "status" }, out parameters))
             {
                 command.Transaction = transaction;
-                var position = 0;
-                var addPlaylistItem = new Action<string>(fileName =>
-                {
-                    if (!this.PlaybackManager.IsSupported(fileName))
-                    {
-                        return;
-                    }
-                    parameters["sequence"] = this.Sequence + position++;
-                    parameters["directoryName"] = Path.GetDirectoryName(fileName);
-                    parameters["fileName"] = fileName;
-                    parameters["status"] = PlaylistItemStatus.Import;
-                    command.ExecuteNonQuery();
-                });
-                foreach (var libraryItem in this.LibraryItems)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", libraryItem.Id, libraryItem.FileName);
-                    addPlaylistItem(libraryItem.FileName);
-                    if (position % interval == 0)
-                    {
-                        this.Description = Path.GetFileName(libraryItem.FileName);
-                        this.Position = position;
-                    }
-                }
-                this.Offset = position;
+                parameters["libraryHierarchyId"] = this.LibraryHierarchyNode.LibraryHierarchyId;
+                parameters["libraryHierarchyLevelId"] = this.LibraryHierarchyNode.LibraryHierarchyLevelId;
+                parameters["displayValue"] = this.LibraryHierarchyNode.Value;
+                parameters["sequence"] = this.Sequence;
+                parameters["status"] = PlaylistItemStatus.Import;
+                this.Offset = command.ExecuteNonQuery();
             }
         }
 
         private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
-            this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.CopyMetaDataItems, new[] { "status" }, out parameters))
             {

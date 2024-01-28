@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -88,13 +87,13 @@ namespace FoxTunes
                     {
                         foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
                         {
-                            Logger.Write(this, LogLevel.Debug, "Adding file to library: {0} => {1}", fileName);
+                            Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", fileName);
                             addLibraryItem(fileName);
                         }
                     }
                     else if (File.Exists(path))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Adding file to library: {0} => {1}", path);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", path);
                         addLibraryItem(path);
                     }
                 }

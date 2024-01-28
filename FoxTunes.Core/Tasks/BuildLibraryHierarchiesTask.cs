@@ -1,7 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using FoxTunes.Utilities.Templates;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,137 +21,31 @@ namespace FoxTunes
             }
         }
 
-        public IScriptingRuntime ScriptingRuntime { get; private set; }
-
-        public IScriptingContext ScriptingContext { get; private set; }
-
-        public override void InitializeComponent(ICore core)
+        protected override Task OnRun()
         {
-            this.ScriptingRuntime = core.Components.ScriptingRuntime;
-            base.InitializeComponent(core);
-        }
-
-        protected override async Task OnRun()
-        {
-            this.Position = 0;
-            using (var context = this.DataManager.CreateWriteContext())
+            this.Name = "Building hierarchies";
+            this.Description = "This could take a while, the UI may freeze :(";
+            this.IsIndeterminate = true;
+            using (var databaseContext = this.DataManager.CreateWriteContext())
             {
-                this.Count = context.Queries.LibraryItem.Count() * context.Queries.LibraryHierarchy.Count();
-                foreach (var libraryHierarchy in context.Queries.LibraryHierarchy)
+                using (var transaction = databaseContext.Connection.BeginTransaction())
                 {
-                    Logger.Write(this, LogLevel.Debug, "Building library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);
-                    this.Description = libraryHierarchy.Name;
-                    this.ClearHierarchy(libraryHierarchy);
-                    var libraryHierarchyItems = this.BuildHierarchy(libraryHierarchy, null, context.Queries.LibraryItem, 0);
-                    foreach (var libraryHierarchyItem in libraryHierarchyItems)
+                    var query =
+                        from metaDataItem in databaseContext.GetQuery<MetaDataItem>().Detach()
+                        group metaDataItem by metaDataItem.Name into name
+                        select name.Key;
+                    var metaDataViewBuilder = new LibraryHierarchyViewBuilder(query);
+                    var view = metaDataViewBuilder.TransformText();
+                    using (var command = databaseContext.Connection.CreateCommand(view))
                     {
-                        libraryHierarchy.Items.Add(libraryHierarchyItem);
+                        command.Transaction = transaction;
+                        command.ExecuteNonQuery();
                     }
+                    transaction.Commit();
                 }
-                this.Position = this.Count;
-                await this.SaveChanges(context);
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
-        }
-
-        private void ClearHierarchy(LibraryHierarchy libraryHierarchy)
-        {
-            Logger.Write(this, LogLevel.Debug, "Clearing existing library hierarchy: {0} => {1}", libraryHierarchy.Id, libraryHierarchy.Name);
-            libraryHierarchy.Items.Clear();
-        }
-
-        private IEnumerable<LibraryHierarchyItem> BuildHierarchy(LibraryHierarchy libraryHierarchy, LibraryHierarchyItem parent, IEnumerable<LibraryItem> libraryItems, int level)
-        {
-            if (libraryHierarchy.Levels.Count <= level)
-            {
-                return Enumerable.Empty<LibraryHierarchyItem>();
-            }
-            var isLeaf = level >= libraryHierarchy.Levels.Count - 1;
-            var libraryHierarchyLevel = libraryHierarchy.Levels[level];
-            Logger.Write(this, LogLevel.Trace, "Building library hierarchy level: {0} => {1}", libraryHierarchyLevel.Id, libraryHierarchyLevel.DisplayScript);
-            var query = default(IEnumerable<LibraryHierarchyItem>);
-            if (!isLeaf)
-            {
-                query =
-                    from libraryItem in libraryItems
-                    group libraryItem by new
-                    {
-                        Display = this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript),
-                        Sort = this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript),
-                    } into hierarchy
-                    select new LibraryHierarchyItem(hierarchy.Key.Display, hierarchy.Key.Sort, isLeaf)
-                    {
-                        Parent = parent,
-                        Items = new ObservableCollection<LibraryItem>(hierarchy)
-                    };
-            }
-            else
-            {
-                query =
-                    from libraryItem in libraryItems
-                    select new LibraryHierarchyItem(
-                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript),
-                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript),
-                        isLeaf
-                    )
-                    {
-                        Parent = parent,
-                        Items = new ObservableCollection<LibraryItem>(new[] { libraryItem })
-                    };
-            }
-            var libraryHierarchyItems = this.OrderBy(query).ToList();
-            if (!isLeaf)
-            {
-                foreach (var libraryHierarchyItem in libraryHierarchyItems)
-                {
-                    libraryHierarchyItem.Children = new ObservableCollection<LibraryHierarchyItem>(
-                        this.BuildHierarchy(libraryHierarchy, libraryHierarchyItem, libraryHierarchyItem.Items, level + 1)
-                    );
-                }
-            }
-            else
-            {
-                this.Position = this.Position + libraryHierarchyItems.Count;
-            }
-            return libraryHierarchyItems;
-        }
-
-        private IEnumerable<LibraryHierarchyItem> OrderBy(IEnumerable<LibraryHierarchyItem> libraryHierarchyItems)
-        {
-            var query =
-                from libraryHierarchyItem in libraryHierarchyItems
-                orderby libraryHierarchyItem.SortValue, libraryHierarchyItem.DisplayValue
-                select libraryHierarchyItem;
-            return query;
-        }
-
-        private Task SaveChanges(IDatabaseContext context)
-        {
-            this.Name = "Saving changes";
-            this.IsIndeterminate = true;
-            Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
-            return context.WithAutoDetectChanges(async () => await context.SaveChangesAsync());
-        }
-
-        private string ExecuteScript(LibraryItem libraryItem, string script)
-        {
-            if (string.IsNullOrEmpty(script))
-            {
-                return string.Empty;
-            }
-            this.EnsureScriptingContext();
-            var runner = new LibraryItemScriptRunner(this.ScriptingContext, libraryItem, script);
-            runner.Prepare();
-            return Convert.ToString(runner.Run());
-        }
-
-        private void EnsureScriptingContext()
-        {
-            if (this.ScriptingContext != null)
-            {
-                return;
-            }
-            this.ScriptingContext = this.ScriptingRuntime.CreateContext();
+            return Task.CompletedTask;
         }
     }
 }

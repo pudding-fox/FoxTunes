@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.Tasks;
 using System.Data;
 
 namespace FoxTunes

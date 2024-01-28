@@ -162,18 +162,12 @@ namespace FoxTunes
         protected virtual void MapLibraryHierarchyItem(DbModelBuilder builder)
         {
             Logger.Write(this, LogLevel.Debug, "Creating database mapping: {0}", typeof(LibraryHierarchyItem).Name);
-            //builder.Entity<LibraryHierarchyItem>()
-            //    .HasOptional(item => item.Parent)
-            //    .WithMany(item => item.Children);
             builder.Entity<LibraryHierarchyItem>()
-                .HasMany(item => item.Items)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("LibraryItem_Id");
-                    config.MapRightKey("LibraryHierarchyItem_Id");
-                    config.ToTable("LibraryItem_LibraryHierarchyItem");
-                });
+                .HasOptional(item => item.LibraryHierarchy);
+            builder.Entity<LibraryHierarchyItem>()
+                .HasOptional(item => item.LibraryHierarchyLevel);
+            builder.Entity<LibraryHierarchyItem>()
+                 .HasOptional(item => item.LibraryItem);
         }
 
         protected virtual void MapMetaDataItem(DbModelBuilder builder)
