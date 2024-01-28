@@ -155,23 +155,26 @@ namespace FoxTunes
             }
 
             var parts1 = path1.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            var parts2 = path1.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var parts2 = path2.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
             var builder = new StringBuilder();
+            builder.Append(".");
 
-            for (var a = 0, b = Math.Max(parts1.Length, parts2.Length); a < b; a++)
+            for (int a = 0, b = Math.Max(parts1.Length, parts2.Length); a < b; a++)
             {
-                if (a > parts1.Length)
+                if (a >= parts1.Length)
                 {
-
+                    builder.Append(Path.DirectorySeparatorChar);
+                    builder.Append(parts2[a]);
                 }
-                else if (a > parts2.Length)
+                else if (a >= parts2.Length)
                 {
-
+                    builder.Append(Path.DirectorySeparatorChar);
+                    builder.Append(parts1[a]);
                 }
-                if (!string.Equals(parts1[a], parts2[a], StringComparison.OrdinalIgnoreCase))
+                else if (!string.Equals(parts1[a], parts2[a], StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new InvalidOperationException("Expected path1 to be inside path2.");
+                    throw new NotImplementedException();
                 }
             }
 
