@@ -12,10 +12,13 @@ namespace FoxTunes
 {
     public class WrappedDbSet : IPersistableSet
     {
-        public WrappedDbSet(DbSet set)
+        public WrappedDbSet(DbContext dbContext, DbSet set)
         {
+            this.DbContext = dbContext;
             this.Set = set;
         }
+
+        public DbContext DbContext { get; private set; }
 
         public DbSet Set { get; private set; }
 
@@ -60,12 +63,38 @@ namespace FoxTunes
         {
             return ((IListSource)this.Set).GetList();
         }
+
+        public void LoadReference(string property)
+        {
+            foreach (var item in this.Set)
+            {
+                var reference = this.DbContext.Entry(item).Reference(property);
+                if (reference.IsLoaded)
+                {
+                    continue;
+                }
+                reference.Load();
+            }
+        }
+
+        public void LoadCollection(string property)
+        {
+            foreach (var item in this.Set)
+            {
+                var collection = this.DbContext.Entry(item).Collection(property);
+                if (collection.IsLoaded)
+                {
+                    continue;
+                }
+                collection.Load();
+            }
+        }
     }
 
     public class WrappedDbSet<T> : WrappedDbSet, IPersistableSet<T> where T : class
     {
-        public WrappedDbSet(DbSet<T> set)
-            : base(set)
+        public WrappedDbSet(DbContext dbContext, DbSet<T> set)
+            : base(dbContext, set)
         {
             this.Set = set;
         }
@@ -111,6 +140,32 @@ namespace FoxTunes
             get
             {
                 return ((IQueryable)this.Set).Provider;
+            }
+        }
+
+        public void LoadReference<TProperty>(Expression<Func<T, TProperty>> property) where TProperty : class
+        {
+            foreach (var item in this.Set)
+            {
+                var reference = this.DbContext.Entry(item).Reference(property);
+                if (reference.IsLoaded)
+                {
+                    continue;
+                }
+                reference.Load();
+            }
+        }
+
+        public void LoadCollection<TElement>(Expression<Func<T, ICollection<TElement>>> property) where TElement : class
+        {
+            foreach (var item in this.Set)
+            {
+                var collection = this.DbContext.Entry(item).Collection(property);
+                if (collection.IsLoaded)
+                {
+                    continue;
+                }
+                collection.Load();
             }
         }
 

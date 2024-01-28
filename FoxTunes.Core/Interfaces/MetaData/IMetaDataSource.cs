@@ -1,7 +1,9 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System.Collections.ObjectModel;
+
+namespace FoxTunes.Interfaces
 {
     public interface IMetaDataSource : IBaseComponent
     {
-        IMetaDataItems Items { get; }
+        ObservableCollection<MetaDataItem> Items { get; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -13,11 +15,19 @@ namespace FoxTunes
         public PlaylistItem(string fileName, IMetaDataSource metaData)
         {
             this.FileName = fileName;
-            this.MetaData = metaData;
+            this.MetaData = metaData.Items;
         }
 
         public string FileName { get; set; }
 
-        public IMetaDataSource MetaData { get; private set; }
+        public ObservableCollection<MetaDataItem> MetaData { get; private set; }
+
+        public MetaDataItem this[string name]
+        {
+            get
+            {
+                return this.MetaData.FirstOrDefault(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 }
