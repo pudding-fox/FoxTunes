@@ -237,6 +237,10 @@ STATISTICS="
 FoxTunes.Statistics.dll
 "
 
+LAYOUT="
+FoxTunes.UI.Windows.Layout.dll
+"
+
 MINIMAL="
 bass
 conf
@@ -255,6 +259,7 @@ dsd
 dts
 encoder
 eq
+layout
 librarybrowser
 logger
 metadataeditor
@@ -308,6 +313,7 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/encoder/encoders"
 		mkdir -p "./release/$platform/$target/Plugins/eq"
 		mkdir -p "./release/$platform/$target/Plugins/js"
+		mkdir -p "./release/$platform/$target/Plugins/layout"
 		mkdir -p "./release/$platform/$target/Plugins/librarybrowser"
 		mkdir -p "./release/$platform/$target/Plugins/logger"
 		mkdir -p "./release/$platform/$target/Plugins/metadataeditor"
@@ -600,6 +606,14 @@ do
 
 		echo "Creating plugin: statistics"
 		for file in $STATISTICS
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/statistics"
+		done
+		echo
+
+		echo "Creating plugin: layout"
+		for file in $LAYOUT
 		do
 				echo $file
 				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/statistics"
