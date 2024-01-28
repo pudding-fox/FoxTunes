@@ -66,7 +66,15 @@ namespace FoxTunes
         {
             if (offset != 0)
             {
-                throw new NotImplementedException();
+                //I don't really understand why but taglib occasionally calls this routing with a non zero offset.
+                //Repeating the same operation does not yield the same behaviour.
+                //bass_zipstream doesn't support offsets so here we are.
+                //This is slow but we don't end up here often.
+                //Weh.
+                var temp = new byte[count];
+                var result = ArchiveEntry.ReadEntry(this.Entry, temp, count);
+                Array.Copy(temp, 0, buffer, offset, result);
+                return result;
             }
             return ArchiveEntry.ReadEntry(this.Entry, buffer, count);
         }
