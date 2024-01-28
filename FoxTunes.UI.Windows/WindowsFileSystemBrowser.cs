@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -30,10 +31,14 @@ namespace FoxTunes
                  var dialog = new OpenFileDialog()
                  {
                      Title = options.Title,
-                     InitialDirectory = options.InitialDirectory,
                      Filter = GetFilter(options.Filters),
                      Multiselect = options.Flags.HasFlag(BrowseFlags.Multiselect),
                  };
+                 if (File.Exists(options.Path))
+                 {
+                     dialog.InitialDirectory = Path.GetDirectoryName(options.Path);
+                     dialog.FileName = options.Path;
+                 }
                  var window = this.GetActiveWindow();
                  var success = dialog.ShowDialog(window);
                  return new BrowseResult(dialog.FileNames, success.GetValueOrDefault());
@@ -48,7 +53,10 @@ namespace FoxTunes
                 using (var dialog = new global::System.Windows.Forms.FolderBrowserDialog())
                 {
                     dialog.Description = options.Title;
-                    dialog.SelectedPath = options.InitialDirectory;
+                    if (Directory.Exists(options.Path))
+                    {
+                        dialog.SelectedPath = options.Path;
+                    }
                     var window = this.GetActiveWindow();
                     var success = default(bool);
                     switch (dialog.ShowDialog(new Win32Window(window.GetHandle())))

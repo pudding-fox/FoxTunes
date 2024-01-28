@@ -29,6 +29,10 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetLibraryHierarchyNodesWithFilter { get; }
 
+        IDatabaseQuery GetLibraryItems { get; }
+
+        IDatabaseQuery GetLibraryItemsWithFilter { get; }
+
         IDatabaseQuery GetOrAddMetaDataItem { get; }
 
         IDatabaseQuery MovePlaylistItem { get; }

@@ -1,5 +1,4 @@
-﻿using FoxDb.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
@@ -15,5 +14,7 @@ namespace FoxTunes.Interfaces
         IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy);
 
         IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode);
+
+        IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode);
     }
 }

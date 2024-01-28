@@ -166,6 +166,48 @@ namespace FoxTunes
             }
         }
 
+        public IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                var query = default(IDatabaseQuery);
+                if (string.IsNullOrEmpty(this.Filter))
+                {
+                    query = database.Queries.GetLibraryItems;
+                }
+                else
+                {
+                    query = database.Queries.GetLibraryItemsWithFilter;
+                }
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var items = database.ExecuteEnumerator<LibraryItem>(query, (parameters, phase) =>
+                    {
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
+                                parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
+                                if (parameters.Contains("filter"))
+                                {
+                                    parameters["filter"] = this.GetFilter();
+                                }
+                                if (this.ShowFavorites.Value)
+                                {
+                                    parameters["favorite"] = true;
+                                }
+                                break;
+                        }
+                    }, transaction);
+                    foreach (var item in items)
+                    {
+                        item.InitializeComponent(this.Core);
+                        yield return item;
+                    }
+                }
+            }
+        }
+
         private string GetFilter()
         {
             if (string.IsNullOrEmpty(this.Filter))

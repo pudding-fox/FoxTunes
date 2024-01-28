@@ -10,17 +10,17 @@ namespace FoxTunes.Interfaces
 
     public class BrowseOptions
     {
-        public BrowseOptions(string title, string initialDirectory, IEnumerable<BrowseFilter> filters, BrowseFlags flags)
+        public BrowseOptions(string title, string path, IEnumerable<BrowseFilter> filters, BrowseFlags flags)
         {
             this.Title = title;
-            this.InitialDirectory = initialDirectory;
+            this.Path = path;
             this.Filters = filters;
             this.Flags = flags;
         }
 
         public string Title { get; private set; }
 
-        public string InitialDirectory { get; private set; }
+        public string Path { get; private set; }
 
         public IEnumerable<BrowseFilter> Filters { get; private set; }
 
@@ -46,7 +46,7 @@ namespace FoxTunes.Interfaces
         None = 0,
         File = 1,
         Folder = 2,
-        Multiselect =4
+        Multiselect = 4
     }
 
     public class BrowseResult
