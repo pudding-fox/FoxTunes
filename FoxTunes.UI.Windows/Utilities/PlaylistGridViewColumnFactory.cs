@@ -10,6 +10,38 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class PlaylistGridViewColumnFactory : StandardComponent, IDisposable
     {
+        static PlaylistGridViewColumnFactory()
+        {
+            AutoSizing = new List<PlaylistColumn>();
+        }
+
+        public static IList<PlaylistColumn> AutoSizing { get; private set; }
+
+        public static bool IsAutoSizing(GridViewColumn gridViewColumn)
+        {
+            if (gridViewColumn is PlaylistGridViewColumn playlistGridViewColumn)
+            {
+                return AutoSizing.Contains(playlistGridViewColumn.PlaylistColumn);
+            }
+            return false;
+        }
+
+        public static void BeginAutoSize(GridViewColumn gridViewColumn)
+        {
+            if (gridViewColumn is PlaylistGridViewColumn playlistGridViewColumn)
+            {
+                AutoSizing.Add(playlistGridViewColumn.PlaylistColumn);
+            }
+        }
+
+        public static void EndAutoSize(GridViewColumn gridViewColumn)
+        {
+            if (gridViewColumn is PlaylistGridViewColumn playlistGridViewColumn)
+            {
+                AutoSizing.Remove(playlistGridViewColumn.PlaylistColumn);
+            }
+        }
+
         public PlaylistColumnProviderManager PlaylistColumnProviderManager { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
@@ -69,7 +101,7 @@ namespace FoxTunes
                 ColumnWidthConverter.Instance,
                 (sender, e) =>
                 {
-                    if (ListViewExtensions.GetIsAutoSizing(gridViewColumn))
+                    if (IsAutoSizing(gridViewColumn))
                     {
                         //Don't raise events while auto sizing is in progress.
                         return;

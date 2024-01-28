@@ -51,23 +51,6 @@ namespace FoxTunes
             }
         }
 
-        public static readonly DependencyProperty IsAutoSizingProperty = DependencyProperty.RegisterAttached(
-            "IsAutoSizing",
-            typeof(bool),
-            typeof(ListViewExtensions),
-            new PropertyMetadata(false)
-        );
-
-        public static bool GetIsAutoSizing(GridViewColumn source)
-        {
-            return (bool)source.GetValue(IsAutoSizingProperty);
-        }
-
-        public static void SetIsAutoSizing(GridViewColumn source, bool value)
-        {
-            source.SetValue(IsAutoSizingProperty, value);
-        }
-
         private class AutoSizeColumnsBehaviour : UIBehaviour
         {
             public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(500);
@@ -171,10 +154,10 @@ namespace FoxTunes
                 }
                 if (width > gridViewColumn.ActualWidth)
                 {
-                    SetIsAutoSizing(gridViewColumn, true);
+                    PlaylistGridViewColumnFactory.BeginAutoSize(gridViewColumn);
                     gridViewColumn.Width = gridViewColumn.ActualWidth;
                     gridViewColumn.Width = double.NaN;
-                    SetIsAutoSizing(gridViewColumn, false);
+                    PlaylistGridViewColumnFactory.EndAutoSize(gridViewColumn);
                 }
             }
 
