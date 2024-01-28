@@ -19,7 +19,7 @@ namespace FoxTunes
         public BassResamplerStreamComponentBehaviour()
         {
             BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", BassLoader.DIRECTORY_NAME_ADDON));
-            BassLoader.AddPath(Path.Combine(Loader.FolderName, Environment.Is64BitProcess ? "x64" : "x86", "bass_sox.dll"));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bass_sox.dll"));
         }
 
         public ICore Core { get; private set; }
