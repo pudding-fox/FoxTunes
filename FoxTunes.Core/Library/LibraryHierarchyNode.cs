@@ -264,6 +264,11 @@ namespace FoxTunes
             }
         }
 
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as LibraryHierarchyNode);
+        }
+
         public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();
     }
 }

@@ -20,6 +20,10 @@ namespace FoxTunes
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement ShowFavorites { get; private set; }
+
         private string _Filter { get; set; }
 
         public string Filter
@@ -56,6 +60,11 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
             this.DatabaseFactory = core.Factories.Database;
+            this.Configuration = core.Components.Configuration;
+            this.ShowFavorites = this.Configuration.GetElement<BooleanConfigurationElement>(
+                LibraryFavoritesBehaviourConfiguration.SECTION,
+                LibraryFavoritesBehaviourConfiguration.SHOW_FAVORITES_ELEMENT
+            );
             base.InitializeComponent(core);
         }
 
@@ -86,7 +95,8 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
         {
-            var nodes = this.LibraryHierarchyCache.GetNodes(libraryHierarchy, this.Filter, () => this.GetNodesCore(libraryHierarchy));
+            var key = new LibraryHierarchyCacheKey(libraryHierarchy, this.Filter, this.ShowFavorites.Value);
+            var nodes = this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchy));
             if (this.LibraryManager.SelectedItem != null)
             {
                 this.ApplySelection(nodes);
@@ -101,7 +111,8 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
-            return this.LibraryHierarchyCache.GetNodes(libraryHierarchyNode, this.Filter, () => this.GetNodesCore(libraryHierarchyNode));
+            var key = new LibraryHierarchyCacheKey(libraryHierarchyNode, this.Filter, this.ShowFavorites.Value);
+            return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchyNode));
         }
 
         private IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchyNode libraryHierarchyNode)
@@ -138,6 +149,10 @@ namespace FoxTunes
                                 if (parameters.Contains("filter"))
                                 {
                                     parameters["filter"] = this.GetFilter();
+                                }
+                                if (this.ShowFavorites.Value)
+                                {
+                                    parameters["favorite"] = true;
                                 }
                                 break;
                         }

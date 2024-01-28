@@ -22,12 +22,13 @@ namespace FoxTunes
 
         public const byte ATTRIBUTE_SELECTED = 2;
 
-        public InvocationComponent(string category, string id, string name = null, string description = null, byte attributes = 0)
+        public InvocationComponent(string category, string id, string name = null, string description = null, string path = null, byte attributes = 0)
         {
             this.Category = category;
             this.Id = id;
             this.Name = name;
             this.Description = description;
+            this.Path = path;
             this.Attributes = attributes;
         }
 
@@ -38,6 +39,8 @@ namespace FoxTunes
         public string Name { get; private set; }
 
         public string Description { get; private set; }
+
+        public string Path { get; private set; }
 
         public byte Attributes { get; private set; }
     }

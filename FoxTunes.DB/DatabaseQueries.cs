@@ -103,6 +103,17 @@ namespace FoxTunes
             }
         }
 
+        public IDatabaseQuery GetIsFavorite
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.GetIsFavorite,
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
+
         public abstract IDatabaseQuery GetLibraryHierarchyMetaData { get; }
 
         public IDatabaseQuery GetLibraryHierarchyNodes
@@ -112,7 +123,8 @@ namespace FoxTunes
                 return this.Database.QueryFactory.Create(
                     Resources.GetLibraryHierarchyNodes,
                     new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("favorite", DbType.Boolean, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -125,7 +137,8 @@ namespace FoxTunes
                     Resources.GetLibraryHierarchyNodesWithFilter,
                     new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("filter", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                    new DatabaseQueryParameter("filter", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("favorite", DbType.Boolean, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }
@@ -189,6 +202,18 @@ namespace FoxTunes
         }
 
         public abstract IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
+
+        public IDatabaseQuery SetIsFavorite
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.SetIsFavorite,
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("isFavorite", DbType.Boolean, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
 
         public IDatabaseQuery UpdateLibraryHierarchyNode
         {

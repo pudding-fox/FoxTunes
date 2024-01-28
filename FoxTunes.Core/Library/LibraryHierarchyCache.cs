@@ -3,15 +3,24 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class LibraryHierarchyCache : StandardComponent, ILibraryHierarchyCache
     {
+        public IEnumerable<LibraryHierarchyCacheKey> Keys
+        {
+            get
+            {
+                return this.Nodes.Keys.ToArray();
+            }
+        }
+
         public Lazy<IList<LibraryHierarchy>> Hierarchies { get; private set; }
 
-        public ConcurrentDictionary<Key, Lazy<IList<LibraryHierarchyNode>>> Nodes { get; private set; }
+        public ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<IList<LibraryHierarchyNode>>> Nodes { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -32,7 +41,15 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    this.Reset();
+                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
+                        this.Reset();
+                    }
+                    else
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Hierarchies were updated but soft flag was specified, ignoring.");
+                    }
                     break;
             }
 #if NET40
@@ -51,19 +68,7 @@ namespace FoxTunes
             return this.Hierarchies.Value;
         }
 
-        public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy, string filter, Func<IEnumerable<LibraryHierarchyNode>> factory)
-        {
-            var key = new Key(libraryHierarchy, filter);
-            return this.GetNodes(key, factory);
-        }
-
-        public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode, string filter, Func<IEnumerable<LibraryHierarchyNode>> factory)
-        {
-            var key = new Key(libraryHierarchyNode, filter);
-            return this.GetNodes(key, factory);
-        }
-
-        public IEnumerable<LibraryHierarchyNode> GetNodes(Key key, Func<IEnumerable<LibraryHierarchyNode>> factory)
+        public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory)
         {
             return this.Nodes.GetOrAdd(key, _key => new Lazy<IList<LibraryHierarchyNode>>(() => new List<LibraryHierarchyNode>(factory()))).Value;
         }
@@ -71,101 +76,13 @@ namespace FoxTunes
         public void Reset()
         {
             this.Hierarchies = null;
-            this.Nodes = new ConcurrentDictionary<Key, Lazy<IList<LibraryHierarchyNode>>>();
+            this.Nodes = new ConcurrentDictionary<LibraryHierarchyCacheKey, Lazy<IList<LibraryHierarchyNode>>>();
         }
 
-        public class Key : IEquatable<Key>
+        public void Evict(LibraryHierarchyCacheKey key)
         {
-            public Key(LibraryHierarchy libraryHierarchy, string filter)
-            {
-                this.LibraryHierarchy = libraryHierarchy;
-                this.Filter = filter;
-            }
-
-            public Key(LibraryHierarchyNode libraryHierarchyNode, string filter)
-            {
-                this.LibraryHierarchyNode = libraryHierarchyNode;
-                this.Filter = filter;
-            }
-
-            public LibraryHierarchy LibraryHierarchy { get; private set; }
-
-            public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
-
-            public string Filter { get; private set; }
-
-            public virtual bool Equals(Key other)
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-                if (object.ReferenceEquals(this, other))
-                {
-                    return true;
-                }
-                if (!object.Equals(this.LibraryHierarchy, other.LibraryHierarchy))
-                {
-                    return false;
-                }
-                if (!object.Equals(this.LibraryHierarchyNode, other.LibraryHierarchyNode))
-                {
-                    return false;
-                }
-                if (!string.Equals(this.Filter, other.Filter, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-                return true;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return this.Equals(obj as Key);
-            }
-
-            public override int GetHashCode()
-            {
-                var hashCode = default(int);
-                unchecked
-                {
-                    if (this.LibraryHierarchy != null)
-                    {
-                        hashCode += this.LibraryHierarchy.GetHashCode();
-                    }
-                    if (this.LibraryHierarchyNode != null)
-                    {
-                        hashCode += this.LibraryHierarchyNode.GetHashCode();
-                    }
-                    if (!string.IsNullOrEmpty(this.Filter))
-                    {
-                        hashCode += this.Filter.GetHashCode();
-                    }
-                }
-                return hashCode;
-            }
-
-            public static bool operator ==(Key a, Key b)
-            {
-                if ((object)a == null && (object)b == null)
-                {
-                    return true;
-                }
-                if ((object)a == null || (object)b == null)
-                {
-                    return false;
-                }
-                if (object.ReferenceEquals((object)a, (object)b))
-                {
-                    return true;
-                }
-                return a.Equals(b);
-            }
-
-            public static bool operator !=(Key a, Key b)
-            {
-                return !(a == b);
-            }
+            Logger.Write(this, LogLevel.Debug, "Evicting cache entry: {0}", key);
+            this.Nodes.TryRemove(key);
         }
     }
 }

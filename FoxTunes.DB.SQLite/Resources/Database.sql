@@ -9,6 +9,7 @@ CREATE TABLE [LibraryItems] (
 	[DirectoryName] text NOT NULL COLLATE NOCASE, 
 	[FileName] text NOT NULL COLLATE NOCASE, 
 	[ImportDate] text NOT NULL,
+	[Favorite] bit NOT NULL,
 	[Status] INTEGER NOT NULL);
 
 CREATE TABLE [PlaylistItems](

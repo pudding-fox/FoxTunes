@@ -1,10 +1,16 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
     public abstract class PersistableComponent : BaseComponent, IPersistableComponent
     {
         public int Id { get; set; }
+
+        public override string ToString()
+        {
+            return Convert.ToString(this.Id);
+        }
 
         public virtual bool Equals(IPersistableComponent other)
         {
