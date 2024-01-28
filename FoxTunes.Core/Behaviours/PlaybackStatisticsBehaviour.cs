@@ -1,18 +1,28 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Output)]
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class PlaybackStatisticsBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        const int TIMEOUT = 1;
+
+        const int DELAY = 10000;
+
         public PlaybackStatisticsBehaviour()
         {
             this.Queue = new Queue<PlaylistItem>();
+            this.Semaphore = new SemaphoreSlim(1, 1);
         }
 
         public Queue<PlaylistItem> Queue { get; private set; }
+
+        public SemaphoreSlim Semaphore { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -93,14 +103,14 @@ namespace FoxTunes
                 //If we're shutting down we need to block while we write our data.
                 using (e.Defer())
                 {
-                    await this.Dequeue().ConfigureAwait(false);
+                    await this.Dequeue(false).ConfigureAwait(false);
                     return;
                 }
             }
 #if NET40
-            var task = TaskEx.Run(() => this.Dequeue());
+            var task = TaskEx.Run(() => this.Dequeue(true));
 #else
-            var task = Task.Run(() => this.Dequeue());
+            var task = Task.Run(() => this.Dequeue(true));
 #endif
         }
 
@@ -116,7 +126,7 @@ namespace FoxTunes
 
         protected virtual Task Enqueue(IOutputStream currentStream)
         {
-            if (currentStream != null)
+            if (currentStream != null && currentStream.PlaylistItem != null)
             {
                 if (!MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
                 {
@@ -129,7 +139,7 @@ namespace FoxTunes
                 {
                     //Only try to write if there's more than one item in the queue.
                     //Otherwise nothing can be written (as the track is being played).
-                    return this.Dequeue();
+                    return this.Dequeue(true);
                 }
             }
 #if NET40
@@ -139,28 +149,53 @@ namespace FoxTunes
 #endif
         }
 
-        protected virtual async Task Dequeue()
+        protected virtual async Task Dequeue(bool delay)
         {
-            var count = this.Queue.Count;
-            while (count-- > 0)
+#if NET40
+            if (!this.Semaphore.Wait(TIMEOUT))
+#else
+            if (!await this.Semaphore.WaitAsync(TIMEOUT).ConfigureAwait(false))
+#endif
             {
-                var playlistItem = this.Queue.Dequeue();
-                if (this.Output.IsStarted)
+                //TODO: Warn.
+                return;
+            }
+            try
+            {
+                if (delay)
                 {
-                    if (this.OutputStreamQueue.IsQueued(playlistItem))
-                    {
-                        //File is likely in use, enqueued. Push it to the back.
-                        this.Queue.Enqueue(playlistItem);
-                        continue;
-                    }
-                    if (this.PlaybackManager.CurrentStream != null && string.Equals(this.PlaybackManager.CurrentStream.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        //File is likely in use, being played. Push it to the back.
-                        this.Queue.Enqueue(playlistItem);
-                        continue;
-                    }
+                    //Wait a moment for the playback queue to settle.
+#if NET40
+                    await TaskEx.Delay(DELAY).ConfigureAwait(false);
+#else
+                    await Task.Delay(DELAY).ConfigureAwait(false);
+#endif
                 }
-                await this.IncrementPlayCount(playlistItem).ConfigureAwait(false);
+                var count = this.Queue.Count;
+                while (count-- > 0)
+                {
+                    var playlistItem = this.Queue.Dequeue();
+                    if (this.Output.IsStarted)
+                    {
+                        if (this.OutputStreamQueue.IsQueued(playlistItem))
+                        {
+                            //File is likely in use, enqueued. Push it to the back.
+                            this.Queue.Enqueue(playlistItem);
+                            continue;
+                        }
+                        if (this.PlaybackManager.CurrentStream != null && string.Equals(this.PlaybackManager.CurrentStream.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            //File is likely in use, being played. Push it to the back.
+                            this.Queue.Enqueue(playlistItem);
+                            continue;
+                        }
+                    }
+                    await this.IncrementPlayCount(playlistItem).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                this.Semaphore.Release();
             }
         }
 
