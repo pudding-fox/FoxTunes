@@ -12,6 +12,8 @@ namespace FoxTunes
     {
         public const string COMMAND_BEHAVIOUR_DISMISS = "ButtonExtensions.Dismiss";
 
+        public const string COMMAND_BEHAVIOUR_ACCEPT = "ButtonExtensions.Accept";
+
         private static readonly IErrorEmitter ErrorEmitter = ComponentRegistry.Instance.GetComponent<IErrorEmitter>();
 
         private static readonly ConditionalWeakTable<Button, CommandBehaviour> CommandBehaviours = new ConditionalWeakTable<Button, CommandBehaviour>();

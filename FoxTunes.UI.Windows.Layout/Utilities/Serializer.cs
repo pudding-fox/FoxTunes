@@ -61,6 +61,24 @@ namespace FoxTunes
             }
         }
 
+        public static string SaveComponent(UIComponentConfiguration config)
+        {
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new XmlTextWriter(stream, Encoding.Default))
+                {
+                    writer.Formatting = Formatting.Indented;
+                    SaveComponent(writer, config);
+                    writer.Flush();
+                    stream.Seek(0, SeekOrigin.Begin);
+                    using (var reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+            }
+        }
+
         private static void SaveComponent(XmlTextWriter writer, UIComponentConfiguration config)
         {
             writer.WriteStartElement(nameof(UIComponentConfiguration));
@@ -124,6 +142,26 @@ namespace FoxTunes
                 if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, Publication.Product))
                 {
                     reader.ReadEndElement();
+                }
+            }
+        }
+
+        public static UIComponentConfiguration LoadComponent(string value)
+        {
+            using (var stream = new MemoryStream(Encoding.Default.GetBytes(value)))
+            {
+                using (var reader = new XmlTextReader(stream))
+                {
+                    if (reader.IsStartElement(Publication.Product))
+                    {
+                        reader.ReadStartElement(Publication.Product);
+                    }
+                    var component = LoadComponent(reader);
+                    if (reader.NodeType == XmlNodeType.EndElement && string.Equals(reader.Name, Publication.Product))
+                    {
+                        reader.ReadEndElement();
+                    }
+                    return component;
                 }
             }
         }
