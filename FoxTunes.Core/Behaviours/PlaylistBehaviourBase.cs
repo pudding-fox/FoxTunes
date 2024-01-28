@@ -9,14 +9,7 @@ namespace FoxTunes
 {
     public abstract class PlaylistBehaviourBase : StandardBehaviour
     {
-        public PlaylistBehaviourBase()
-        {
-            this.Playlists = new List<Playlist>();
-        }
-
         public abstract Func<Playlist, bool> Predicate { get; }
-
-        public IList<Playlist> Playlists { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -33,8 +26,12 @@ namespace FoxTunes
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
+        }
+
+        protected virtual IEnumerable<Playlist> GetPlaylists()
+        {
+            return this.PlaylistBrowser.GetPlaylists().Where(this.Predicate);
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
@@ -42,7 +39,15 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    this.Dispatch(this.Refresh);
+                    var playlists = signal.State as IEnumerable<Playlist>;
+                    if (playlists != null && playlists.Any())
+                    {
+
+                    }
+                    else
+                    {
+                        this.Dispatch(this.Refresh);
+                    }
                     break;
             }
 #if NET40
@@ -52,23 +57,11 @@ namespace FoxTunes
 #endif
         }
 
-        protected virtual void Refresh()
+        protected virtual async Task Refresh()
         {
-            var playlists = this.PlaylistBrowser.GetPlaylists().Where(this.Predicate).ToArray();
-            for (var a = this.Playlists.Count - 1; a >= 0; a--)
+            foreach (var playlist in this.GetPlaylists())
             {
-                if (!playlists.Contains(this.Playlists[a]))
-                {
-                    this.Playlists.RemoveAt(a);
-                }
-            }
-            foreach (var playlist in playlists)
-            {
-                if (!this.Playlists.Contains(playlist))
-                {
-                    this.Playlists.Add(playlist);
-                    var task = this.Refresh(playlist);
-                }
+                await this.Refresh(playlist).ConfigureAwait(false);
             }
         }
 

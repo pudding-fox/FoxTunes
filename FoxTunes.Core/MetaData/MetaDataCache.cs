@@ -59,15 +59,8 @@ namespace FoxTunes
                     }
                     break;
                 case CommonSignals.HierarchiesUpdated:
-                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
-                        this.Reset();
-                    }
-                    else
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Hierarchies were updated but soft flag was specified, ignoring.");
-                    }
+                    Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
+                    this.Reset();
                     break;
             }
 #if NET40

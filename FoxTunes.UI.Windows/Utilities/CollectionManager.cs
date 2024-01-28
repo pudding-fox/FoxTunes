@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace FoxTunes
 {
-    public class CollectionManager<T> : Freezable, INotifyPropertyChanged
+    public class CollectionManager<T> : Freezable, INotifyPropertyChanged where T : class
     {
         private Func<T> _ItemFactory { get; set; }
 
@@ -74,11 +74,11 @@ namespace FoxTunes
             set
             {
                 this._ItemsSource = value;
-                this.OnItemsSourceChanged(true);
+                this.OnItemsSourceChanged();
             }
         }
 
-        protected virtual void OnItemsSourceChanged(bool resetSelection)
+        protected virtual void OnItemsSourceChanged()
         {
             if (this._ItemsSource != null && typeof(ISequenceableComponent).IsAssignableFrom(typeof(T)))
             {
@@ -91,20 +91,18 @@ namespace FoxTunes
             {
                 this.OrderedItemsSource = this._ItemsSource;
             }
-            if (resetSelection)
+            if (this.SelectedValue is IPersistableComponent persistable)
             {
-                if (this.OrderedItemsSource != null)
+                if (this._ItemsSource != null && typeof(IPersistableComponent).IsAssignableFrom(typeof(T)))
                 {
-                    this.SelectedValue = this.OrderedItemsSource.FirstOrDefault();
+                    this.SelectedValue = this._ItemsSource
+                        .OfType<IPersistableComponent>()
+                        .FirstOrDefault(element => element.Id == persistable.Id) as T;
                 }
-                else if (this.ItemsSource != null)
-                {
-                    this.SelectedValue = this.ItemsSource.FirstOrDefault();
-                }
-                else
-                {
-                    this.SelectedValue = default(T);
-                }
+            }
+            if (this.SelectedValue == default(T))
+            {
+                this.SelectedValue = (this.OrderedItemsSource ?? this.ItemsSource).FirstOrDefault();
             }
             if (this.ItemsSourceChanged != null)
             {
@@ -228,8 +226,12 @@ namespace FoxTunes
             }
             else
             {
+                var sequence = 0;
+                foreach (var element in collection.OfType<ISequenceableComponent>())
+                {
+                    element.Sequence = sequence++;
+                }
                 this.Refresh();
-                this.SelectedValue = default(T);
             }
         }
 
@@ -266,7 +268,7 @@ namespace FoxTunes
 
         public void Refresh()
         {
-            this.OnItemsSourceChanged(false);
+            this.OnItemsSourceChanged();
         }
 
         protected virtual void OnPropertyChanged(string propertyName)

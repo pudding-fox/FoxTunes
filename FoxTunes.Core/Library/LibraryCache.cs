@@ -31,10 +31,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.LibraryUpdated:
-                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
-                    {
-                        this.Reset();
-                    }
+                    this.Reset();
                     break;
             }
 #if NET40

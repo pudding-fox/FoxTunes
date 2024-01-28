@@ -125,10 +125,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
-                    {
-                        this.Refresh();
-                    }
+                    this.Refresh();
                     break;
             }
 #if NET40
