@@ -9,8 +9,8 @@ namespace FoxTunes.Interfaces
 
         Task Rescan(IEnumerable<PlaylistItem> playlistItems);
 
-        Task Save(IEnumerable<LibraryItem> libraryItems, params string[] names);
+        Task Save(IEnumerable<LibraryItem> libraryItems, bool write, params string[] names);
 
-        Task Save(IEnumerable<PlaylistItem> playlistItems, params string[] names);
+        Task Save(IEnumerable<PlaylistItem> playlistItems, bool write, params string[] names);
     }
 }

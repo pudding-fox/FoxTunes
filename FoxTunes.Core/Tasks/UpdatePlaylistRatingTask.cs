@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -43,7 +42,7 @@ namespace FoxTunes
             }
             //Send a soft playlist update so the list refreshes, this makes the task seem more responsive.
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
-            await this.MetaDataManager.Save(this.PlaylistItems, CommonMetaData.Rating).ConfigureAwait(false);
+            await this.MetaDataManager.Save(this.PlaylistItems, true, CommonMetaData.Rating).ConfigureAwait(false);
         }
     }
 }

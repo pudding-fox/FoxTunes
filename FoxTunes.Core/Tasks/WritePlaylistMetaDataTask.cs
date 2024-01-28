@@ -14,11 +14,12 @@ namespace FoxTunes
 
         public const string ID = "8DB1257E-5854-4F8F-BAE3-D59A45DEE998";
 
-        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names)
+        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names, bool writeToFiles)
             : base(ID)
         {
             this.PlaylistItems = playlistItems;
             this.Names = names;
+            this.WriteToFiles = writeToFiles;
             this.Errors = new Dictionary<PlaylistItem, Exception>();
         }
 
@@ -26,7 +27,7 @@ namespace FoxTunes
         {
             get
             {
-                return true;
+                return this.PlaylistItems.Count() > 1;
             }
         }
 
@@ -41,6 +42,8 @@ namespace FoxTunes
         public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
 
         public IEnumerable<string> Names { get; private set; }
+
+        public bool WriteToFiles { get; private set; }
 
         public IDictionary<PlaylistItem, Exception> Errors { get; private set; }
 
@@ -66,9 +69,12 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Saving meta data").ConfigureAwait(false);
-            await this.SetPosition(0).ConfigureAwait(false);
-            await this.SetCount(this.PlaylistItems.Count()).ConfigureAwait(false);
+            if (this.Visible)
+            {
+                await this.SetName("Saving meta data").ConfigureAwait(false);
+                await this.SetPosition(0).ConfigureAwait(false);
+                await this.SetCount(this.PlaylistItems.Count()).ConfigureAwait(false);
+            }
             await base.OnStarted().ConfigureAwait(false);
         }
 
@@ -85,8 +91,11 @@ namespace FoxTunes
                         break;
                     }
 
-                    await this.SetDescription(Path.GetFileName(playlistItem.FileName)).ConfigureAwait(false);
-                    await this.SetPosition(position).ConfigureAwait(false);
+                    if (this.Visible)
+                    {
+                        await this.SetDescription(Path.GetFileName(playlistItem.FileName)).ConfigureAwait(false);
+                        await this.SetPosition(position).ConfigureAwait(false);
+                    }
 
                     try
                     {
@@ -107,6 +116,13 @@ namespace FoxTunes
                         {
                             await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
                             await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
+                        }
+
+                        if (!this.WriteToFiles)
+                        {
+                            //Task was configured not to write to files.
+                            position++;
+                            continue;
                         }
 
                         if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)

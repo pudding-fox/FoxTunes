@@ -301,7 +301,7 @@ namespace FoxTunes.ViewModel
             var refreshPlaylist = default(bool);
             if (libraryItems.Any())
             {
-                await this.MetaDataManager.Save(libraryItems).ConfigureAwait(false);
+                await this.MetaDataManager.Save(libraryItems, true).ConfigureAwait(false);
                 foreach (var libraryItem in libraryItems)
                 {
                     refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);
@@ -314,7 +314,7 @@ namespace FoxTunes.ViewModel
             var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             if (playlistItems.Any())
             {
-                await this.MetaDataManager.Save(playlistItems).ConfigureAwait(false);
+                await this.MetaDataManager.Save(playlistItems, true).ConfigureAwait(false);
                 refreshPlaylist = true;
             }
             if (refreshPlaylist)
