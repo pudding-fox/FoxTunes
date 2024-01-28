@@ -11,6 +11,7 @@ namespace FoxTunes
 
         private BassStream()
         {
+            this.Syncs = new int[] { };
             this.Errors = Errors.OK;
         }
 
@@ -25,6 +26,8 @@ namespace FoxTunes
 
         public int ChannelHandle { get; private set; }
 
+        public int[] Syncs { get; private set; }
+
         public long Length { get; private set; }
 
         public virtual long Position
@@ -32,7 +35,7 @@ namespace FoxTunes
             get
             {
                 return this.Provider.GetPosition(this.ChannelHandle);
-                
+
             }
             set
             {
@@ -61,18 +64,21 @@ namespace FoxTunes
 
         public virtual void RegisterSyncHandlers()
         {
-            BassUtils.OK(Bass.ChannelSetSync(
-                this.ChannelHandle,
-                SyncFlags.Position,
-                this.Length - Bass.ChannelSeconds2Bytes(this.ChannelHandle, ENDING_THRESHOLD),
-                this.OnEnding
-            ));
-            BassUtils.OK(Bass.ChannelSetSync(
-                this.ChannelHandle,
-                SyncFlags.End,
-                0,
-                this.OnEnded
-            ));
+            this.Syncs = new int[]
+            {
+                 BassUtils.OK(Bass.ChannelSetSync(
+                    this.ChannelHandle,
+                    SyncFlags.Position,
+                    this.Length - Bass.ChannelSeconds2Bytes(this.ChannelHandle, ENDING_THRESHOLD),
+                    this.OnEnding
+                )),
+                BassUtils.OK(Bass.ChannelSetSync(
+                    this.ChannelHandle,
+                    SyncFlags.End,
+                    0,
+                    this.OnEnded
+                ))
+            };
         }
 
         protected virtual void OnEnding(int Handle, int Channel, int Data, IntPtr User)

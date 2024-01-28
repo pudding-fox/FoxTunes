@@ -13,7 +13,7 @@ namespace FoxTunes
 
         public const string DSD_RAW_ELEMENT = "BBBB043A-8A30-42A0-B2CB-3DE379636DD6";
 
-        public const string MODE_ASIO_OPTION = "CCCC87DA-EE55-467A-B2F5-61480F2F12F6";
+        public const string OUTPUT_ASIO_OPTION = "CCCC87DA-EE55-467A-B2F5-61480F2F12F6";
 
         public const string MIXER_ELEMENT = "CCDDCD1A-32F6-44B0-81E5-C9CEF0652E69";
 
@@ -22,8 +22,8 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
-                .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
-                    .WithOptions(new[] { new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO") }))
+                .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.OUTPUT_ELEMENT, "Mode")
+                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_ASIO_OPTION, "ASIO") }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device", path: "ASIO")
                     .WithOptions(GetASIODevices()))
                 .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct", path: "ASIO").WithValue(false))

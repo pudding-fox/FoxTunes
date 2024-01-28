@@ -270,6 +270,13 @@ namespace FoxTunes
             {
                 if (this.Stream != null)
                 {
+                    if (this.Stream.Syncs != null)
+                    {
+                        foreach (var sync in this.Stream.Syncs)
+                        {
+                            Bass.ChannelRemoveSync(this.ChannelHandle, sync);
+                        }
+                    }
                     this.Stream.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
                 }
             }

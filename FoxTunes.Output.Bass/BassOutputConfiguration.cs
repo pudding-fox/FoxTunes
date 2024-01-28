@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -17,7 +18,9 @@ namespace FoxTunes
 
         public const string DEPTH_32_OPTION = "MMMM73F2-2E08-4F2B-B94E-DAA945D96497";
 
-        public const string MODE_ELEMENT = "NNNN6B39-2F8A-4667-9C03-9742FF2D1EA7";
+        public const string INPUT_ELEMENT = "MMNN52A1-79E9-43AA-BC17-C9DB335AFC9C";
+
+        public const string OUTPUT_ELEMENT = "NNNN6B39-2F8A-4667-9C03-9742FF2D1EA7";
 
         public const string PLAY_FROM_RAM_ELEMENT = "OOOOBED1-7965-47A3-9798-E46124386A8D";
 
@@ -32,7 +35,8 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, "Rate", path: "Advanced").WithOptions(GetRateOptions()))
                 .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: "Advanced").WithOptions(GetDepthOptions()))
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode"))
+                .WithElement(new SelectionConfigurationElement(INPUT_ELEMENT, "Input"))
+                .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT, "Output"))
                 .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate", path: "Advanced").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory", path: "Advanced").WithValue(false))
                 .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Advanced").WithValue(500).WithValidationRule(new IntegerValidationRule(10, 5000)))

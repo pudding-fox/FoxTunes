@@ -1,22 +1,22 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using ManagedBass.Gapless;
-using System.Collections.Generic;
+using ManagedBass.Crossfade;
+using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public class BassGaplessStreamInput : BassStreamInput
+    public class BassCrossfadeStreamInput : BassStreamInput
     {
-        public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour, BassOutputStream stream)
+        public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour, BassOutputStream stream)
         {
             this.Behaviour = behaviour;
             this.Channels = stream.Channels;
             this.Flags = BassFlags.Decode;
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
-                this.Rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
-                this.Flags |= BassFlags.DSDRaw;
+                throw new InvalidOperationException("Cannot apply effects to DSD streams.");
             }
             else
             {
@@ -28,11 +28,12 @@ namespace FoxTunes
             }
         }
 
+
         public override string Name
         {
             get
             {
-                return "Gapless";
+                return "Crossfade";
             }
         }
 
@@ -50,7 +51,7 @@ namespace FoxTunes
             }
         }
 
-        public BassGaplessStreamInputBehaviour Behaviour { get; private set; }
+        public BassCrossfadeStreamInputBehaviour Behaviour { get; private set; }
 
         public override int Rate { get; protected set; }
 
@@ -65,15 +66,15 @@ namespace FoxTunes
             get
             {
                 var count = default(int);
-                return BassGapless.GetChannels(out count);
+                return BassCrossfade.GetChannels(out count);
             }
         }
 
         public override void Connect(IBassStreamComponent previous)
         {
-            BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
-            Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", this.Rate, this.Channels);
-            this.ChannelHandle = BassGapless.StreamCreate(this.Rate, this.Channels, this.Flags);
+            //BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
+            Logger.Write(this, LogLevel.Debug, "Creating BASS CROSSFADE stream with rate {0} and {1} channels.", this.Rate, this.Channels);
+            this.ChannelHandle = BassCrossfade.StreamCreate(this.Rate, this.Channels, this.Flags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
@@ -105,7 +106,7 @@ namespace FoxTunes
         public override int Position(int channelHandle)
         {
             var count = default(int);
-            var channelHandles = BassGapless.GetChannels(out count);
+            var channelHandles = BassCrossfade.GetChannels(out count);
             return channelHandles.IndexOf(channelHandle);
         }
 
@@ -117,7 +118,7 @@ namespace FoxTunes
                 return false;
             }
             Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", channelHandle);
-            BassUtils.OK(BassGapless.ChannelEnqueue(channelHandle));
+            BassUtils.OK(BassCrossfade.ChannelEnqueue(channelHandle));
             return true;
         }
 
@@ -129,7 +130,7 @@ namespace FoxTunes
                 return false;
             }
             Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
-            BassUtils.OK(BassGapless.ChannelRemove(channelHandle));
+            BassUtils.OK(BassCrossfade.ChannelRemove(channelHandle));
             return true;
         }
 
@@ -148,7 +149,7 @@ namespace FoxTunes
             if (this.ChannelHandle != 0)
             {
                 this.Reset();
-                Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS CROSSFADE stream: {0}", this.ChannelHandle);
                 Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
         }

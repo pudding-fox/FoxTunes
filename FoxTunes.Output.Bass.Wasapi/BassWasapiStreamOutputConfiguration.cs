@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public const string ELEMENT_WASAPI_DEVICE = "AAAA9BD4-C90C-46A8-A486-2EBAE7152051";
 
-        public const string MODE_WASAPI_OPTION = "BBBB737C-0B07-4842-A59A-03679E1716F3";
+        public const string OUTPUT_WASAPI_OPTION = "BBBB737C-0B07-4842-A59A-03679E1716F3";
 
         public const string ELEMENT_WASAPI_EXCLUSIVE = "CCCC20A2-3A5B-4F64-A574-89561114AAF4";
 
@@ -26,8 +26,8 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
-                .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
-                    .WithOptions(new[] { new SelectionConfigurationOption(MODE_WASAPI_OPTION, "WASAPI") }))
+                .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.OUTPUT_ELEMENT, "Mode")
+                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_WASAPI_OPTION, "WASAPI") }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_WASAPI_DEVICE, "Device", path: "WASAPI")
                     .WithOptions(GetWASAPIDevices()))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EXCLUSIVE, "Exclusive", path: "WASAPI").WithValue(true))

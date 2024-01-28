@@ -8,6 +8,11 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent
     {
+        static BassDsdStreamProviderBehaviour()
+        {
+            BassPluginLoader.Instance.Load();
+        }
+
         public int Rate
         {
             get

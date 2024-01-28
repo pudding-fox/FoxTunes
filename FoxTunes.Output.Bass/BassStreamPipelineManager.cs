@@ -8,7 +8,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassStreamPipelineManager : StandardComponent, IBassStreamPipelineManager
     {
-        const int SYNCHRONIZE_PIPELINE_TIMEOUT = 1000;
+        const int SYNCHRONIZE_PIPELINE_TIMEOUT = 10000;
 
         public BassStreamPipelineManager()
         {
