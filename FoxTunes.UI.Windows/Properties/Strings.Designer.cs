@@ -718,6 +718,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Items Selected.
+        /// </summary>
+        internal static string MetaDataName_SelectionCount {
+            get {
+                return ResourceManager.GetString("MetaDataName.SelectionCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string MetaDataProvidersSettingsDialog_Cancel {
