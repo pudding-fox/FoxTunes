@@ -49,6 +49,7 @@ namespace FoxTunes
                 {
                     data.Data = new float[1, data.Samples32.Length];
                 }
+                data.OnAllocated();
             }
             switch (data.Format)
             {

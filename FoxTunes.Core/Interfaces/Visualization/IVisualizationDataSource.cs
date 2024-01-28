@@ -20,6 +20,11 @@ namespace FoxTunes.Interfaces
         public bool Initialized;
 
         public VisualizationDataFlags Flags;
+
+        public virtual void OnAllocated()
+        {
+            //Nothing to do.
+        }
     }
 
     [Flags]
