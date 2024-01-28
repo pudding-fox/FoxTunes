@@ -23,6 +23,8 @@ namespace FoxTunes
 
         public const string TRACE_OPTION = "FFFF9D19-17DE-40FC-A8DB-C2D5407F12BD";
 
+        public const string OPEN_ELEMENT = "CCCC7035-7960-472E-A6E8-58F6AA0918F1";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
 #if DEBUG
@@ -30,30 +32,40 @@ namespace FoxTunes
 #else
             var enabled = false;
 #endif
-            yield return new ConfigurationSection(SECTION, "Logging")
-                .WithElement(
-                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled (Log.txt)").WithValue(enabled)
-                )
-                .WithElement(
-                    new SelectionConfigurationElement(LEVEL_ELEMENT, "Level").WithOptions(GetLevelOptions()).DependsOn(SECTION, ENABLED_ELEMENT)
-                );
+            yield return new ConfigurationSection(SECTION, Strings.LoggingBehaviourConfiguration_Section)
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.LoggingBehaviourConfiguration_Enabled)
+                    .WithValue(enabled))
+                .WithElement(new SelectionConfigurationElement(LEVEL_ELEMENT, Strings.LoggingBehaviourConfiguration_Level)
+                    .WithOptions(GetLevelOptions())
+                    .DependsOn(SECTION, ENABLED_ELEMENT))
+                .WithElement(new CommandConfigurationElement(OPEN_ELEMENT, Strings.LoggingBehaviourConfiguration_Open)
+                    .WithHandler(() =>
+                    {
+                        var userInterface = ComponentRegistry.Instance.GetComponent<IUserInterface>();
+                        if (userInterface == null)
+                        {
+                            return;
+                        }
+                        userInterface.OpenInShell(LogManager.FileName);
+                    })
+                    .DependsOn(SECTION, ENABLED_ELEMENT));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetLevelOptions()
         {
-            yield return new SelectionConfigurationOption(FATAL_OPTION, "Fatal");
+            yield return new SelectionConfigurationOption(FATAL_OPTION, Strings.LoggingBehaviourConfiguration_Level_Fatal);
 #if DEBUG
-            yield return new SelectionConfigurationOption(ERROR_OPTION, "Error");
+            yield return new SelectionConfigurationOption(ERROR_OPTION, Strings.LoggingBehaviourConfiguration_Level_Error);
 #else
-            yield return new SelectionConfigurationOption(ERROR_OPTION, "Error").Default();
+            yield return new SelectionConfigurationOption(ERROR_OPTION, Strings.LoggingBehaviourConfiguration_Level_Error).Default();
 #endif
-            yield return new SelectionConfigurationOption(WARN_OPTION, "Warn");
-            yield return new SelectionConfigurationOption(INFO_OPTION, "Info");
-            yield return new SelectionConfigurationOption(DEBUG_OPTION, "Debug");
+            yield return new SelectionConfigurationOption(WARN_OPTION, Strings.LoggingBehaviourConfiguration_Level_Warn);
+            yield return new SelectionConfigurationOption(INFO_OPTION, Strings.LoggingBehaviourConfiguration_Level_Info);
+            yield return new SelectionConfigurationOption(DEBUG_OPTION, Strings.LoggingBehaviourConfiguration_Level_Debug);
 #if DEBUG
-            yield return new SelectionConfigurationOption(TRACE_OPTION, "Trace").Default();
+            yield return new SelectionConfigurationOption(TRACE_OPTION, Strings.LoggingBehaviourConfiguration_Level_Trace).Default();
 #else
-            yield return new SelectionConfigurationOption(TRACE_OPTION, "Trace");
+            yield return new SelectionConfigurationOption(TRACE_OPTION, Strings.LoggingBehaviourConfiguration_Level_Trace);
 #endif
         }
 

@@ -12,5 +12,12 @@ namespace FoxTunes.Integration
 
             Process.Start(EXPLORER, args);
         }
+
+        public static void Open(string fileName)
+        {
+            var args = string.Format("\"{0}\"", fileName);
+
+            Process.Start(EXPLORER, args);
+        }
     }
 }

@@ -21,6 +21,10 @@ namespace FoxTunes
 
         public abstract string Prompt(string message);
 
+        public abstract void SelectInShell(string fileName);
+
+        public abstract void OpenInShell(string fileName);
+
         public abstract void Restart();
 
         protected virtual void OnWindowCreated(IUserInterfaceWindow window)

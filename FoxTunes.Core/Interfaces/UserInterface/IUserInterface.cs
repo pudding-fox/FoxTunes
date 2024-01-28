@@ -20,6 +20,10 @@ namespace FoxTunes.Interfaces
 
         string Prompt(string message);
 
+        void SelectInShell(string fileName);
+
+        void OpenInShell(string fileName);
+
         void Restart();
 
         event UserInterfaceWindowEventHandler WindowCreated;
