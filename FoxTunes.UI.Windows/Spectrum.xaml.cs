@@ -16,7 +16,11 @@ namespace FoxTunes
 
         public static readonly BooleanConfigurationElement Enabled;
 
-        public static readonly SelectionConfigurationElement Bars;
+        public static readonly SelectionConfigurationElement BarCount;
+
+        public static readonly BooleanConfigurationElement ShowPeaks;
+
+        public static readonly IntegerConfigurationElement UpdateInterval;
 
         static Spectrum()
         {
@@ -26,12 +30,20 @@ namespace FoxTunes
                 return;
             }
             Enabled = configuration.GetElement<BooleanConfigurationElement>(
-                    SpectrumBehaviourConfiguration.SECTION,
-                    SpectrumBehaviourConfiguration.ENABLED_ELEMENT
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.ENABLED_ELEMENT
             );
-            Bars = configuration.GetElement<SelectionConfigurationElement>(
-                    SpectrumBehaviourConfiguration.SECTION,
-                    SpectrumBehaviourConfiguration.BARS_ELEMENT
+            BarCount = configuration.GetElement<SelectionConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.BARS_ELEMENT
+            );
+            ShowPeaks = configuration.GetElement<BooleanConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.PEAKS_ELEMENT
+            );
+            UpdateInterval = configuration.GetElement<IntegerConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.INTERVAL_ELEMENT
             );
         }
 
@@ -96,14 +108,27 @@ namespace FoxTunes
 
             public Renderer()
             {
-                if (Bars != null)
+                if (BarCount != null)
                 {
-                    Bars.ConnectValue(value =>
+                    BarCount.ConnectValue(value =>
                         this.Configure(
                             SpectrumBehaviourConfiguration.GetBars(value),
                             SpectrumBehaviourConfiguration.GetWidth(value)
                         )
                     );
+                }
+                if (UpdateInterval != null)
+                {
+                    UpdateInterval.ConnectValue(value =>
+                    {
+                        lock (SyncRoot)
+                        {
+                            if (this.Timer != null)
+                            {
+                                this.Timer.Interval = value;
+                            }
+                        }
+                    });
                 }
             }
 
@@ -116,7 +141,14 @@ namespace FoxTunes
                     if (this.Timer == null)
                     {
                         this.Timer = new Timer();
-                        this.Timer.Interval = UPDATE_INTERVAL;
+                        if (UpdateInterval != null)
+                        {
+                            this.Timer.Interval = UpdateInterval.Value;
+                        }
+                        else
+                        {
+                            this.Timer.Interval = UPDATE_INTERVAL;
+                        }
                         this.Timer.AutoReset = false;
                         this.Timer.Elapsed += this.OnElapsed;
                         this.Timer.Start();
@@ -147,6 +179,7 @@ namespace FoxTunes
 
             protected override void OnRender(DrawingContext drawingContext)
             {
+                bool showPeaks = ShowPeaks.Value;
                 base.OnRender(drawingContext);
                 if (this.HasData)
                 {
@@ -164,18 +197,18 @@ namespace FoxTunes
                                 this.Elements[a, 3]
                             )
                         );
-                        if (this.Elements[a, 1] > this.Peaks[a, 1])
+                        if (showPeaks && this.Elements[a, 1] > this.Peaks[a, 1])
                         {
                             drawingContext.DrawRectangle(
-                            brush,
-                            pen,
-                            new Rect(
-                                this.Peaks[a, 0],
-                                this.Peaks[a, 1],
-                                this.Peaks[a, 2],
-                                this.Peaks[a, 3]
-                            )
-                        );
+                                brush,
+                                pen,
+                                new Rect(
+                                    this.Peaks[a, 0],
+                                    this.Peaks[a, 1],
+                                    this.Peaks[a, 2],
+                                    this.Peaks[a, 3]
+                                )
+                            );
                         }
                     }
                 }
