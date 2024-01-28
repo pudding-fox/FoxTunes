@@ -1,5 +1,4 @@
-﻿#pragma warning disable 612, 618
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -29,10 +28,15 @@ namespace FoxTunes
             return base.OnStarted();
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            await this.AddPaths(this.Paths);
+            return this.AddPaths(this.Paths);
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+            await base.OnCompleted();
         }
     }
 }

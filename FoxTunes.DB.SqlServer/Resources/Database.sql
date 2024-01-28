@@ -89,8 +89,9 @@ CREATE TABLE PlaylistSort
 
 CREATE TABLE PlaylistSequence
 (
-	"Id" INTEGER PRIMARY KEY NOT NULL,
-	"PlaylistItem_Id" INTEGER NOT NULL
+	"Id" INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	"PlaylistItem_Id" INTEGER NOT NULL,
+	"Sequence" INTEGER NULL
 );
 
 CREATE TABLE "LibraryHierarchyLevelLeaf"

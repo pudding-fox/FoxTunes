@@ -34,7 +34,12 @@ namespace FoxTunes
             await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
             await this.SequenceItems();
             await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted();
         }
 
         private async Task AddPlaylistItems()

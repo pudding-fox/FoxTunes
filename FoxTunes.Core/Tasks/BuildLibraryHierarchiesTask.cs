@@ -25,10 +25,15 @@ namespace FoxTunes
             return base.OnStarted();
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            await this.BuildHierarchies();
+            return this.BuildHierarchies();
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+            await base.OnCompleted();
         }
     }
 }

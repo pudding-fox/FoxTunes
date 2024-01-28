@@ -10,10 +10,15 @@ namespace FoxTunes
 
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            await this.RemoveItems(PlaylistItemStatus.None);
+            return this.RemoveItems(PlaylistItemStatus.None);
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted();
         }
     }
 }

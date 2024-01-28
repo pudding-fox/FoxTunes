@@ -46,7 +46,13 @@ namespace FoxTunes
                 await this.RemoveItems(PlaylistItemStatus.None);
             }
             await this.AddPaths(this.Paths);
+
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted();
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿#pragma warning disable 612, 618
-using FoxTunes.Interfaces;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -27,11 +25,15 @@ namespace FoxTunes
             return base.OnStarted();
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            Logger.Write(this, LogLevel.Debug, "Clearing library.");
-            await this.RemoveItems(LibraryItemStatus.None);
+            return this.RemoveItems(LibraryItemStatus.None);
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
+            await base.OnCompleted();
         }
     }
 }

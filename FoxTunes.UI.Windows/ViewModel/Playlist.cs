@@ -130,31 +130,31 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler InsertActiveChanged = delegate { };
 
-        private int _InsertIndex { get; set; }
+        private PlaylistItem _InsertItem { get; set; }
 
-        public int InsertIndex
+        public PlaylistItem InsertItem
         {
             get
             {
-                return this._InsertIndex;
+                return this._InsertItem;
             }
             set
             {
-                this._InsertIndex = value;
-                this.OnInsertIndexChanged();
+                this._InsertItem = value;
+                this.OnInsertItemChanged();
             }
         }
 
-        protected virtual void OnInsertIndexChanged()
+        protected virtual void OnInsertItemChanged()
         {
-            if (this.InsertIndexChanged != null)
+            if (this.InsertItemChanged != null)
             {
-                this.InsertIndexChanged(this, EventArgs.Empty);
+                this.InsertItemChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("InsertIndex");
+            this.OnPropertyChanged("InsertItem");
         }
 
-        public event EventHandler InsertIndexChanged = delegate { };
+        public event EventHandler InsertItemChanged = delegate { };
 
         private int _InsertOffset { get; set; }
 
@@ -367,7 +367,9 @@ namespace FoxTunes.ViewModel
                 }
                 if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
                 {
-                    var playlistItems = e.Data.GetData<IEnumerable<PlaylistItem>>(true);
+                    var playlistItems = e.Data
+                        .GetData<IEnumerable<PlaylistItem>>(true)
+                        .OrderBy(playlistItem => playlistItem.Sequence);
                     return this.AddToPlaylist(playlistItems);
                 }
             }
@@ -409,6 +411,14 @@ namespace FoxTunes.ViewModel
             var sequence = default(int);
             if (this.TryGetInsertSequence(out sequence))
             {
+                //TODO: This was really confusing, there is some disconnection between what the UI suggests will happen (where the items will be moved to) and what happens.
+                //TODO: I don't really understand it but if the current sequence is less than the target sequence (moving down the list) then we have to decrement the target sequence.
+                //TODO: The unit tests don't have this problem for some reason.
+                var playlistItem = playlistItems.FirstOrDefault();
+                if (playlistItem != null && playlistItem.Sequence < sequence)
+                {
+                    sequence--;
+                }
                 return this.PlaylistManager.Move(sequence, playlistItems);
             }
             else
@@ -419,12 +429,12 @@ namespace FoxTunes.ViewModel
 
         protected virtual bool TryGetInsertSequence(out int sequence)
         {
-            if (!this.InsertActive)
+            if (!this.InsertActive || this.InsertItem == null)
             {
                 sequence = 0;
                 return false;
             }
-            sequence = this.InsertIndex + this.InsertOffset;
+            sequence = this.InsertItem.Sequence + this.InsertOffset;
             return true;
         }
 

@@ -89,7 +89,12 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             }
+        }
+
+        protected override async Task OnCompleted()
+        {
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
+            await base.OnCompleted();
         }
     }
 }
