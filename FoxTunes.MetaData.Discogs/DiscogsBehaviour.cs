@@ -139,11 +139,14 @@ namespace FoxTunes
         public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchTags(IEnumerable<IFileData> fileDatas, MetaDataUpdateType updateType)
         {
             var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
-            using (var task = new DiscogsFetchTagsTask(releaseLookups, updateType))
+            if (releaseLookups.Any())
             {
-                task.InitializeComponent(this.Core);
-                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
+                using (var task = new DiscogsFetchTagsTask(releaseLookups, updateType))
+                {
+                    task.InitializeComponent(this.Core);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                }
             }
             return releaseLookups;
         }
@@ -197,11 +200,14 @@ namespace FoxTunes
         public async Task<IEnumerable<Discogs.ReleaseLookup>> FetchArtwork(IEnumerable<IFileData> fileDatas, MetaDataUpdateType updateType)
         {
             var releaseLookups = Discogs.ReleaseLookup.FromFileDatas(fileDatas).ToArray();
-            using (var task = new DiscogsFetchArtworkTask(releaseLookups, updateType))
+            if (releaseLookups.Any())
             {
-                task.InitializeComponent(this.Core);
-                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
+                using (var task = new DiscogsFetchArtworkTask(releaseLookups, updateType))
+                {
+                    task.InitializeComponent(this.Core);
+                    await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
+                    await task.Run().ConfigureAwait(false);
+                }
             }
             return releaseLookups;
         }
