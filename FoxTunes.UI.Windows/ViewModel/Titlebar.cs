@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -48,6 +49,17 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnWindowChanged()
         {
+            if (this.Window != null)
+            {
+                DependencyPropertyDescriptor.FromProperty(
+                    Window.TitleProperty,
+                    typeof(Window)
+                ).AddValueChanged(this.Window, (sender, e) => this.OnTitleChanged());
+                DependencyPropertyDescriptor.FromProperty(
+                    Window.WindowStateProperty,
+                    typeof(Window)
+                ).AddValueChanged(this.Window, (sender, e) => this.OnWindowStateChanged());
+            }
             this.OnTitleChanged();
             this.OnWindowStateChanged();
             if (this.WindowChanged != null)
