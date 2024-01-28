@@ -1,14 +1,14 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Linq;
 
 namespace FoxTunes.ViewModel
 {
     public class NowPlaying : ViewModelBase
     {
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public IPlaybackManager PlaybackManager { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
@@ -177,8 +177,8 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
+            this.PlaybackManager = this.Core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
             this.Configuration = this.Core.Components.Configuration;
@@ -214,22 +214,31 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.Refresh().ConfigureAwait(false);
-            }
+            var task = this.Refresh();
         }
 
         protected virtual Task Refresh()
         {
-            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, this.PlaylistManager.CurrentItem, this.Script);
+            var outputStream = this.PlaybackManager.CurrentStream;
+            var runner = new PlaylistItemScriptRunner(
+                this.ScriptingContext,
+                outputStream != null ? outputStream.PlaylistItem : null,
+                this.Script
+            );
             runner.Prepare();
             var value = runner.Run();
             return Windows.Invoke(() =>
             {
-                this.CurrentItem = this.PlaylistManager.CurrentItem;
+                if (outputStream != null)
+                {
+                    this.CurrentItem = outputStream.PlaylistItem;
+                }
+                else
+                {
+                    this.CurrentItem = null;
+                }
                 this.Value = value;
             });
         }
@@ -242,9 +251,9 @@ namespace FoxTunes.ViewModel
         protected override void OnDisposing()
         {
             global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
-            if (this.PlaylistManager != null)
+            if (this.PlaybackManager != null)
             {
-                this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
             }
             if (this.ScriptingContext != null)
             {
