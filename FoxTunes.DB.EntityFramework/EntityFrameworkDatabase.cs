@@ -101,22 +101,22 @@ namespace FoxTunes
             return new InternalDbContext(this.Connection, compiled);
         }
 
-        public override IPersistableSet GetSet(Type type)
-        {
-            if (this.DbContext == null)
-            {
-                this.DbContext = this.CreateDbContext();
-            }
-            return new WrappedDbSet(this.DbContext, this.DbContext.Set(type));
-        }
-
-        public override IPersistableSet<T> GetSet<T>()
+        public override IDatabaseSet<T> GetSet<T>()
         {
             if (this.DbContext == null)
             {
                 this.DbContext = this.CreateDbContext();
             }
             return new WrappedDbSet<T>(this.DbContext, this.DbContext.Set<T>());
+        }
+
+        public override IDatabaseQuery<T> GetQuery<T>()
+        {
+            if (this.DbContext == null)
+            {
+                this.DbContext = this.CreateDbContext();
+            }
+            return new WrappedDbQuery<T>(this.DbContext, this.DbContext.Set<T>());
         }
 
         public override int SaveChanges()

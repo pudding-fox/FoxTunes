@@ -22,10 +22,10 @@
         </ViewModel:Playlist>
     </UserControl.Resources>
     <Grid>
-        <ListView ItemsSource="{Binding Components.Playlist.Items}" Extensions:ListViewExtensions.SelectedItems="{Binding Source={StaticResource ViewModel}, Path=SelectedItems}">
+        <ListView ItemsSource="{Binding Components.Playlist.Query}" Extensions:ListViewExtensions.SelectedItems="{Binding Source={StaticResource ViewModel}, Path=SelectedItems}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseDoubleClick">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=PlaySelectedItemCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>
+                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=PlaySelectedItemCommand}"></Interactivity:InvokeCommandAction>
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
             <ListView.ContextMenu>

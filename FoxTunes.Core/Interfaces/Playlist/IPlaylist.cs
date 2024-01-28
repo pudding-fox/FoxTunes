@@ -1,11 +1,9 @@
-﻿using System.Collections.ObjectModel;
-
-namespace FoxTunes.Interfaces
+﻿namespace FoxTunes.Interfaces
 {
     public interface IPlaylist : IBaseComponent
     {
-        IPersistableSet<PlaylistItem> Set { get; }
+        IDatabaseQuery<PlaylistItem> Query { get; }
 
-        ObservableCollection<PlaylistItem> Items { get; }
+        IDatabaseSet<PlaylistItem> Set { get; }
     }
 }

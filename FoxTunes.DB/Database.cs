@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Data;
 using System.Data.Common;
 
 namespace FoxTunes
@@ -9,9 +8,9 @@ namespace FoxTunes
     {
         protected virtual DbConnection Connection { get; set; }
 
-        public abstract IPersistableSet GetSet(Type type);
+        public abstract IDatabaseSet<T> GetSet<T>() where T : class;
 
-        public abstract IPersistableSet<T> GetSet<T>() where T : class;
+        public abstract IDatabaseQuery<T> GetQuery<T>() where T : class;
 
         public abstract int SaveChanges();
 

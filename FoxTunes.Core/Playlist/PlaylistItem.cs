@@ -7,10 +7,11 @@ namespace FoxTunes
     {
         public PlaylistItem()
         {
-
+            this.MetaDatas = new ObservableCollection<MetaDataItem>();
+            this.Properties = new ObservableCollection<PropertyItem>();
         }
 
-        public PlaylistItem(string fileName, IMetaDataSource metaData)
+        public PlaylistItem(string fileName, IMetaDataSource metaData) : this()
         {
             this.FileName = fileName;
             this.MetaDatas = metaData.MetaDatas;

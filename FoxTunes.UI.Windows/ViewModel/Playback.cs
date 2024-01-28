@@ -7,18 +7,19 @@ namespace FoxTunes.ViewModel
 {
     public class Playback : ViewModelBase
     {
-        protected override Freezable CreateInstanceCore()
-        {
-            return new Playback();
-        }
+        public IPlaylist Playlist { get; private set; }
+
+        public IPlaylistManager PlaylistManager { get; private set; }
+
+        public IPlaybackManager PlaybackManager { get; private set; }
 
         public ICommand PlayCommand
         {
             get
             {
-                return new Command<IPlaybackManager>(
-                    playback => playback.CurrentStream.Play(),
-                    playback => playback != null && playback.CurrentStream != null && playback.CurrentStream.IsStopped
+                return new Command(
+                    () => this.PlaybackManager.CurrentStream.Play(),
+                    () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsStopped
                 );
             }
         }
@@ -27,18 +28,18 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IPlaybackManager>(playback =>
+                return new Command(() =>
                     {
-                        if (playback.CurrentStream.IsPaused)
+                        if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
-                            playback.CurrentStream.Resume();
+                            this.PlaybackManager.CurrentStream.Resume();
                         }
-                        else if (playback.CurrentStream.IsPlaying)
+                        else if (this.PlaybackManager.CurrentStream.IsPlaying)
                         {
-                            playback.CurrentStream.Pause();
+                            this.PlaybackManager.CurrentStream.Pause();
                         }
                     },
-                    playback => playback != null && playback.CurrentStream != null
+                    () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null
                 );
             }
         }
@@ -47,9 +48,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IPlaybackManager>(
-                    playback => playback.CurrentStream.Stop(),
-                    playback => playback != null && playback.CurrentStream != null && playback.CurrentStream.IsPlaying
+                return new Command(
+                    () => this.PlaybackManager.CurrentStream.Stop(),
+                    () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsPlaying
                 );
             }
         }
@@ -58,9 +59,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IPlaylistManager>(
-                    playlist => playlist.Previous(),
-                    playlist => playlist != null && playlist.Items.Any()
+                return new Command(
+                    () => this.PlaylistManager.Previous(),
+                    () => this.PlaylistManager != null && this.Playlist.Query.Any()
                 );
             }
         }
@@ -69,11 +70,24 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IPlaylistManager>(
-                    playlist => playlist.Next(),
-                    playlist => playlist != null && playlist.Items.Any()
+                return new Command(
+                    () => this.PlaylistManager.Next(),
+                    () => this.PlaylistManager != null && this.Playlist != null && this.Playlist.Query.Any()
                 );
             }
+        }
+
+        protected override void OnCoreChanged()
+        {
+            this.Playlist = this.Core.Components.Playlist;
+            this.PlaylistManager = this.Core.Managers.Playlist;
+            this.PlaybackManager = this.Core.Managers.Playback;
+            base.OnCoreChanged();
+        }
+
+        protected override Freezable CreateInstanceCore()
+        {
+            return new Playback();
         }
     }
 }

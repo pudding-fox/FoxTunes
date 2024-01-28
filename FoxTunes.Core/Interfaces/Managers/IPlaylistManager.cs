@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
@@ -9,6 +9,8 @@ namespace FoxTunes.Interfaces
 
         void Add(IEnumerable<LibraryItem> libraryItems);
 
+        event EventHandler Updated;
+
         void Next();
 
         void Previous();
@@ -17,6 +19,6 @@ namespace FoxTunes.Interfaces
 
         PlaylistItem CurrentItem { get; }
 
-        ObservableCollection<PlaylistItem> Items { get; }
+        event EventHandler CurrentItemChanged;
     }
 }

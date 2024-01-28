@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
@@ -13,23 +12,18 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
-        public IPersistableSet<LibraryItem> Set { get; private set; }
+        public IDatabaseSet<LibraryItem> Set { get; private set; }
 
-        public ObservableCollection<LibraryItem> Items
-        {
-            get
-            {
-                return this.Set.AsObservable();
-            }
-        }
+        public IDatabaseQuery<LibraryItem> Query { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Components.Database;
             this.Set = this.Database.GetSet<LibraryItem>();
-            this.Set.LoadCollection(item => item.MetaDatas);
-            this.Set.LoadCollection(item => item.Properties);
-            this.Set.LoadCollection(item => item.Statistics);
+            this.Query = this.Database.GetQuery<LibraryItem>();
+            this.Query.Include("MetaDatas");
+            this.Query.Include("Properties");
+            this.Query.Include("Statistics");
             base.InitializeComponent(core);
         }
     }

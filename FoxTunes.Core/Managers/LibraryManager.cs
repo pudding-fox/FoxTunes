@@ -1,6 +1,6 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 
 namespace FoxTunes.Managers
@@ -37,6 +37,7 @@ namespace FoxTunes.Managers
                     this.AddFile(path);
                 }
             }
+            this.OnUpdated();
         }
 
         protected virtual void AddDirectory(string directoryName)
@@ -54,20 +55,23 @@ namespace FoxTunes.Managers
             {
                 return;
             }
-            this.Items.Add(this.LibraryItemFactory.Create(fileName));
+            this.Library.Set.Add(this.LibraryItemFactory.Create(fileName));
         }
+
+        protected virtual void OnUpdated()
+        {
+            if (this.Updated == null)
+            {
+                return;
+            }
+            this.Updated(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Updated = delegate { };
 
         public void Clear()
         {
-            this.Library.Items.Clear();
-        }
-
-        public ObservableCollection<LibraryItem> Items
-        {
-            get
-            {
-                return this.Library.Items;
-            }
+            this.Library.Set.Clear();
         }
     }
 }
