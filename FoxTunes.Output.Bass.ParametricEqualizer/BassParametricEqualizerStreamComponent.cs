@@ -185,8 +185,8 @@ namespace FoxTunes
         public static string GetDescription(IOutputEqualizerBand band)
         {
             return string.Format(
-                "{0}/{1}dB",
-                band.Value > 0 ? "+" + band.Value.ToString() : band.Value.ToString(),
+                "{0}/{1}",
+                (band.Value > 0 ? "+" + band.Value.ToString() : band.Value.ToString()) + "dB",
                 band.Center < 1000 ? band.Center.ToString() + "Hz" : band.Center.ToString() + "kHz"
             );
         }
