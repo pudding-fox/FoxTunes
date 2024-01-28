@@ -261,6 +261,10 @@ namespace FoxTunes
 
         protected virtual void OnColor1Changed()
         {
+            if (this.IsInitialized)
+            {
+                var task = this.CreateBitmap();
+            }
             if (this.Color1Changed != null)
             {
                 this.Color1Changed(this, EventArgs.Empty);
@@ -284,6 +288,10 @@ namespace FoxTunes
 
         protected virtual void OnColor2Changed()
         {
+            if (this.IsInitialized)
+            {
+                var task = this.CreateBitmap();
+            }
             if (this.Color2Changed != null)
             {
                 this.Color2Changed(this, EventArgs.Empty);

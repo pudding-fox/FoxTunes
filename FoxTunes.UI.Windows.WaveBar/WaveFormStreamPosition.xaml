@@ -59,25 +59,24 @@
                                 </Style>
                             </ControlTemplate.Resources>
                             <Grid>
-                                <Grid>
-                                    <Track Name="PART_Track" Value="{TemplateBinding Value}">
-                                        <Track.Thumb>
-                                            <Thumb Width="0">
-                                                <Thumb.Template>
-                                                    <ControlTemplate TargetType="{x:Type Thumb}">
+                                <Track Name="PART_Track" Value="{TemplateBinding Value}">
+                                    <Track.Thumb>
+                                        <Thumb Width="0">
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="{x:Type Thumb}">
 
-                                                    </ControlTemplate>
-                                                </Thumb.Template>
-                                            </Thumb>
-                                        </Track.Thumb>
-                                        <Track.DecreaseRepeatButton>
-                                            <RepeatButton Background="{TemplateBinding Background}" Command="Slider.DecreaseLarge"/>
-                                        </Track.DecreaseRepeatButton>
-                                        <Track.IncreaseRepeatButton>
-                                            <RepeatButton Background="Transparent" Command="Slider.IncreaseLarge"/>
-                                        </Track.IncreaseRepeatButton>
-                                    </Track>
-                                </Grid>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Background="{TemplateBinding Background}" Command="Slider.DecreaseLarge"/>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Background="Transparent" Command="Slider.IncreaseLarge"/>
+                                    </Track.IncreaseRepeatButton>
+                                </Track>
+                                <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>
