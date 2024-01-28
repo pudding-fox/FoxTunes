@@ -225,7 +225,7 @@ namespace FoxTunes
 <toast>
     <visual>
         <binding template=""ToastGeneric"">" +
-(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>" + SecurityElement.Escape(Path.GetFileNameWithoutExtension(outputStream.FileName)) + "/text>") +
+(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>" + SecurityElement.Escape(Path.GetFileNameWithoutExtension(outputStream.FileName)) + "</text>") +
 (!string.IsNullOrEmpty(album) ? "<text>" + SecurityElement.Escape(album) + "</text>" : string.Empty) +
 (!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
         </binding>
