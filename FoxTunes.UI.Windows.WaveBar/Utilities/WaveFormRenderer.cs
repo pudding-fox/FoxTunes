@@ -204,24 +204,9 @@ namespace FoxTunes
             switch (name)
             {
                 case WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS:
-                    if (colors.Length > 1)
-                    {
-                        return colors.WithAlpha(-50);
-                    }
-                    else
-                    {
-                        const byte SHADE = 30;
-                        var contrast = new Color()
-                        {
-                            R = SHADE,
-                            G = SHADE,
-                            B = SHADE
-                        };
-                        return new[]
-                        {
-                            color.Shade(contrast)
-                        };
-                    }
+                    const byte SHADE = 30;
+                    var contrast = Color.FromRgb(SHADE, SHADE, SHADE);
+                    return colors.Shade(contrast);
                 case WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE:
                     return colors;
                 case WaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND:

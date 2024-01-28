@@ -70,8 +70,9 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to #00000000
-        ///100:#FF9BDDFB.
+        ///   Looks up a localized string similar to #FF9BDDFB
+        ///700:#FF9BDDFB
+        ///1000:#009BDDFB.
         /// </summary>
         internal static string Transparent_Blue {
             get {
@@ -80,8 +81,9 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to #00000000
-        ///100:#FFFFFFFF.
+        ///   Looks up a localized string similar to #FFFFFFFF
+        ///700:#FFFFFFFF
+        ///1000:#00FFFFFF.
         /// </summary>
         internal static string Transparent_White {
             get {
