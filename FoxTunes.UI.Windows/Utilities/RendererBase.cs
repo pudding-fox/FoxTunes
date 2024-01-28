@@ -498,6 +498,10 @@ namespace FoxTunes
 
         protected static void UpdateElementsFast(float[] values, Int32Rect[] elements, int width, int height, Orientation orientation)
         {
+            if (values.Length == 0)
+            {
+                return;
+            }
             if (orientation == Orientation.Horizontal)
             {
                 var step = height / values.Length;
@@ -540,6 +544,10 @@ namespace FoxTunes
 
         protected static void UpdateElementsSmooth(float[] values, Int32Rect[] elements, int width, int height, int smoothing, Orientation orientation)
         {
+            if (values.Length == 0)
+            {
+                return;
+            }
             if (orientation == Orientation.Horizontal)
             {
                 var step = height / values.Length;
@@ -624,7 +632,7 @@ namespace FoxTunes
             }
         }
 
-        protected static void UpdatePeaks(Int32Rect[] elements, Int32Rect[] peaks, int[] holds, int width, int height, int interval, int duration, Orientation orientation)
+        protected static void UpdateElementsSmooth(Int32Rect[] elements, Int32Rect[] peaks, int[] holds, int width, int height, int interval, int duration, Orientation orientation)
         {
             if (orientation == Orientation.Horizontal)
             {

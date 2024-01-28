@@ -10,7 +10,9 @@ namespace FoxTunes
 {
     public class SpectrumRenderer : VisualizationBase
     {
-        const int SCALE_FACTOR = 4;
+        public const int DB_MIN = -90;
+
+        public const int DB_MAX = 0;
 
         public SpectrumRendererData RendererData { get; private set; }
 
@@ -27,8 +29,6 @@ namespace FoxTunes
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
-
-        public IntegerConfigurationElement Amplitude { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -65,10 +65,6 @@ namespace FoxTunes
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
-            this.Amplitude = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.AMPLITUDE_ELEMENT
-            );
             this.ScalingFactor.ValueChanged += this.OnValueChanged;
             this.Bars.ValueChanged += this.OnValueChanged;
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
@@ -77,7 +73,6 @@ namespace FoxTunes
             this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
-            this.Amplitude.ValueChanged += this.OnValueChanged;
 #if NET40
             var task = TaskEx.Run(async () =>
 #else
@@ -113,7 +108,6 @@ namespace FoxTunes
                 this.Bitmap.PixelHeight,
                 SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                 SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                this.Amplitude.Value,
                 this.ShowPeaks.Value,
                 this.HighCut.Value
             );
@@ -130,7 +124,6 @@ namespace FoxTunes
                     this.Bitmap.PixelHeight,
                     SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                     SpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                    this.Amplitude.Value,
                     this.ShowPeaks.Value,
                     this.HighCut.Value
                 );
@@ -201,7 +194,7 @@ namespace FoxTunes
                             this.UpdateInterval * 100
                         )
                     );
-                    UpdatePeaks(data.Elements, data.Peaks, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
+                    UpdateElementsSmooth(data.Elements, data.Peaks, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
                 }
 
                 data.LastUpdated = DateTime.UtcNow;
@@ -272,10 +265,6 @@ namespace FoxTunes
             {
                 this.FFTSize.ValueChanged -= this.OnValueChanged;
             }
-            if (this.Amplitude != null)
-            {
-                this.Amplitude.ValueChanged -= this.OnValueChanged;
-            }
         }
 
         private static void Render(BitmapHelper.RenderInfo info, SpectrumRendererData rendererData)
@@ -320,13 +309,13 @@ namespace FoxTunes
             {
                 for (int a = 0, b = 0; a < data.FFTRange && b < values.Length; a += data.SamplesPerElement, b++)
                 {
-                    var value = 0.0f;
+                    var value = default(float);
                     for (var c = 0; c < data.SamplesPerElement; c++)
                     {
-                        var boost = (float)(1.0f + a * data.Amplitude);
-                        value += (float)(Math.Sqrt(samples[a + c] * boost) * SCALE_FACTOR);
+                        value = Math.Max(samples[a + c], value);
                     }
-                    values[b] = Math.Min(Math.Max(value / data.SamplesPerElement, 0), 1);
+                    var dB = Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
+                    values[b] = 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
                 }
             }
             else
@@ -334,14 +323,14 @@ namespace FoxTunes
                 //Not enough samples to fill the values, do the best we can.
                 for (int a = 0; a < data.Count; a++)
                 {
-                    var boost = (float)(1.0f + a * data.Amplitude);
-                    var value = (float)(Math.Sqrt(samples[a] * boost) * SCALE_FACTOR);
-                    data.Values[a] = Math.Min(Math.Max(value, 0), 1);
+                    var value = samples[a];
+                    var dB = Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
+                    values[a] = 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
                 }
             }
         }
 
-        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, int amplitude, bool showPeaks, bool highCut)
+        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, bool highCut)
         {
             var data = new SpectrumRendererData()
             {
@@ -350,7 +339,6 @@ namespace FoxTunes
                 Height = height,
                 Count = count,
                 FFTSize = fftSize,
-                Amplitude = (float)amplitude / 500,
                 Samples = output.GetBuffer(fftSize),
                 Values = new float[count],
                 Elements = new Int32Rect[count]
@@ -380,8 +368,6 @@ namespace FoxTunes
             public int FFTSize;
 
             public int FFTRange;
-
-            public float Amplitude;
 
             public float[] Samples;
 

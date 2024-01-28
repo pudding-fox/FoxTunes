@@ -220,7 +220,7 @@ namespace FoxTunes
                                 this.UpdateInterval * 100
                             )
                         );
-                        UpdatePeaks(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
+                        UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
                     }
                 }
 
