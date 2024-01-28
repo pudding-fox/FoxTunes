@@ -40,6 +40,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\GetPlaylistMetaData.tt">
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>GetPlaylistMetaData.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
+    <Compile Update="Templates\GetPlaylistMetaData.cs">
+      <DependentUpon>GetPlaylistMetaData.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Templates\GetLibraryItems.tt">
       <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
       <LastGenOutput>GetLibraryItems.cs</LastGenOutput>

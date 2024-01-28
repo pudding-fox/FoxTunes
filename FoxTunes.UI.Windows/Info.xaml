@@ -33,7 +33,7 @@
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <Windows:Artwork Grid.Column="0" Grid.Row="0"></Windows:Artwork>
-            <Windows:Rating Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" Height="20" FileData="{Binding FileData, Source={StaticResource ViewModel}}" Visibility="{Binding ShowRating, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
+            <Windows:Rating Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" Height="20" FileData="{Binding FileData, Source={StaticResource ViewModel}}" Visibility="{Binding ShowRating, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}" Margin="0,4,0,0">
                 <Interactivity:Interaction.Triggers>
                     <Interactivity:EventTrigger EventName="ValueChanged">
                         <ViewModel:InvokeParameterizedCommandAction Command="{Binding UpdateRatingCommand, Source={StaticResource ViewModel}}" />

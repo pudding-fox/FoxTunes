@@ -1,7 +1,5 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
-using System.Linq;
-using System.Text;
 
 namespace FoxTunes.Templates
 {
