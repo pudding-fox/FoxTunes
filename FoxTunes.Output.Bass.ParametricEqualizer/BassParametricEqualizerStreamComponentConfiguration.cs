@@ -6,6 +6,8 @@ namespace FoxTunes
     {
         public const string ENABLED = "AAAAF34F-A090-4AEE-BD65-128561960C92";
 
+        public const string BANDWIDTH = "AAAB688D-9CA0-41B3-8E11-AC252DF03BE4";
+
         public const string BAND_32 = "BBBBC109-B99A-49C1-909D-16A862EFF344";
 
         public const string BAND_64 = "CCCCDD9E-7430-4123-B7CA-FDDD7680EF2C";
@@ -43,13 +45,22 @@ namespace FoxTunes
             var section = new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(
                     new BooleanConfigurationElement(ENABLED, "Enabled", path: "Parametric Equalizer")
-                    .WithValue(false)
-                );
+                        .WithValue(false))
+                .WithElement(
+                    new IntegerConfigurationElement(BANDWIDTH, "Bandwidth", path: "Parametric Equalizer")
+                        .WithValue(18)
+                        .WithValidationRule(
+                            new IntegerValidationRule(
+                                BassParametricEqualizerStreamComponent.MIN_BANDWIDTH,
+                                BassParametricEqualizerStreamComponent.MAX_BANDWIDTH
+                            )
+                        )
+                    );
 
             foreach (var band in Bands)
             {
                 section.WithElement(
-                    new IntegerConfigurationElement(band.Key, GetBandName(band.Value), path: "Parametric Equalizer")
+                    new IntegerConfigurationElement(band.Key, BassParametricEqualizerStreamComponent.Band.GetBandName(band.Value), path: "Parametric Equalizer")
                         .WithValue(0)
                         .WithValidationRule(
                             new IntegerValidationRule(
@@ -86,18 +97,6 @@ namespace FoxTunes
             yield return new SelectionConfigurationOption(PRESET_ROCK, "Rock");
         }
 
-        private static string GetBandName(int value)
-        {
-            if (value < 1000)
-            {
-                return string.Format("{0}Hz", value);
-            }
-            else
-            {
-                return string.Format("{0}kHz", value / 1000);
-            }
-        }
-
         private static void UpdateConfiguration(bool enabled)
         {
             foreach (var band in Bands)
@@ -118,6 +117,16 @@ namespace FoxTunes
                 {
                     element.Hide();
                 }
+            }
+            if (enabled)
+            {
+                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BANDWIDTH).Show();
+                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, PRESET).Show();
+            }
+            else
+            {
+                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BANDWIDTH).Hide();
+                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, PRESET).Hide();
             }
         }
 
