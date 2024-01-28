@@ -132,6 +132,15 @@ namespace FoxTunes.ViewModel
 
         public Task SearchCommit()
         {
+            var libraryHierarchy = this.LibraryManager.SelectedHierarchy;
+            if (libraryHierarchy == null || LibraryHierarchy.Empty.Equals(libraryHierarchy))
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             var clear = default(bool);
             switch (this.SearchCommitBehaviour)
             {
@@ -144,7 +153,7 @@ namespace FoxTunes.ViewModel
             }
             return this.PlaylistManager.Add(
                 this.PlaylistManager.SelectedPlaylist,
-                this.LibraryHierarchyBrowser.GetNodes(this.LibraryManager.SelectedHierarchy),
+                this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy),
                 clear
             );
         }
