@@ -12,7 +12,7 @@
         <ViewModel:StreamPosition x:Key="ViewModel"></ViewModel:StreamPosition>
     </UserControl.Resources>
     <Grid>
-        <Slider VerticalAlignment="Center" Value="{Binding Managers.Playback.CurrentStream.Position}" Maximum="{Binding Managers.Playback.CurrentStream.Length}">
+        <Slider VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding Managers.Playback.CurrentStream.Position}" Maximum="{Binding Managers.Playback.CurrentStream.Length}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="PreviewMouseDown">
                     <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>
