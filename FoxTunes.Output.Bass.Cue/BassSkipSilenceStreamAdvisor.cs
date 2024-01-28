@@ -118,7 +118,7 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in/out for file \"{0}\".", playlistItem.FileName);
 
-            var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode | BassFlags.Byte);
+            var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode | BassFlags.Byte | BassFlags.Prescan);
             if (channelHandle == 0)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), Bass.LastError));
@@ -178,13 +178,14 @@ namespace FoxTunes
                 channelHandle,
                 WINDOW
             );
-            BassUtils.OK(
-                Bass.ChannelSetPosition(
-                    channelHandle,
-                    0,
-                    PositionFlags.Bytes
-                )
-            );
+            var position = 0;
+            if (!this.TrySetPosition(channelHandle, position))
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", channelHandle);
+
+                //Track won't synchronize. MOD files seem to have this problem.                
+                return -1;
+            }
             do
             {
                 var levels = new float[1];
@@ -195,7 +196,7 @@ namespace FoxTunes
                     break;
                 }
                 var dB = levels[0] > 0 ? 20 * Math.Log10(levels[0]) : -1000;
-                if (dB > threshold)
+                if (dB >= threshold)
                 {
                     //TODO: Sometimes this value is less than zero so clamp it.
                     //TODO: Some problem with BASS/ManagedBass, if you have exactly N bytes available call Bass.ChannelGetLevel with Length = Bass.ChannelBytesToSeconds(N) sometimes results in Errors.Ended.
@@ -226,16 +227,17 @@ namespace FoxTunes
                 channelHandle,
                 WINDOW
             );
-            BassUtils.OK(
-                Bass.ChannelSetPosition(
-                    channelHandle,
-                    Bass.ChannelGetLength(
-                        channelHandle,
-                        PositionFlags.Bytes
-                    ) - (length * 2),
-                    PositionFlags.Bytes
-                )
-            );
+            var position = Bass.ChannelGetLength(
+                channelHandle,
+                PositionFlags.Bytes
+            ) - (length * 2);
+            if (!this.TrySetPosition(channelHandle, position))
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", channelHandle);
+
+                //Track won't synchronize. MOD files seem to have this problem.
+                return -1;
+            }
             do
             {
                 var levels = new float[1];
@@ -246,7 +248,7 @@ namespace FoxTunes
                     break;
                 }
                 var dB = levels[0] > 0 ? 20 * Math.Log10(levels[0]) : -1000;
-                if (dB > threshold)
+                if (dB >= threshold)
                 {
                     //TODO: Sometimes this value is less than zero so clamp it.
                     //TODO: Some problem with BASS/ManagedBass, if you have exactly N bytes available call Bass.ChannelGetLevel with Length = Bass.ChannelBytesToSeconds(N) sometimes results in Errors.Ended.
@@ -278,6 +280,18 @@ namespace FoxTunes
             } while (true);
             //Track was silent?
             return -1;
+        }
+
+        protected virtual bool TrySetPosition(int channelHandle, long position)
+        {
+            BassUtils.OK(
+                Bass.ChannelSetPosition(
+                    channelHandle,
+                    position,
+                    PositionFlags.Bytes
+                )
+            );
+            return Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes) == position;
         }
 
         public static bool TryGetMetaData(BassSkipSilenceStreamAdvisorBehaviour behaviour, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
