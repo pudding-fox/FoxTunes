@@ -99,7 +99,7 @@ namespace FoxTunes
             await metaDataSource.SetMetaData(
                 libraryItem.FileName,
                 libraryItem.MetaDatas,
-                metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
+                metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, StringComparer.OrdinalIgnoreCase)
             ).ConfigureAwait(false);
 
             await this.Deschedule(libraryItem).ConfigureAwait(false);

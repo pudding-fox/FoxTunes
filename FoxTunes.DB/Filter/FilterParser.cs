@@ -57,7 +57,7 @@ namespace FoxTunes
             {
                 foreach (var entry in group.Entries)
                 {
-                    if (names.Contains(entry.Name, true))
+                    if (names.Contains(entry.Name, StringComparer.OrdinalIgnoreCase))
                     {
                         return true;
                     }

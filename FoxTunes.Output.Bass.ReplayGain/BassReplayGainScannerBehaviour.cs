@@ -255,7 +255,7 @@ namespace FoxTunes
                 {
                     foreach (var metaDataItem in libraryItem.MetaDatas)
                     {
-                        if (!names.Contains(metaDataItem.Name, true))
+                        if (!names.Contains(metaDataItem.Name, StringComparer.OrdinalIgnoreCase))
                         {
                             continue;
                         }
@@ -288,7 +288,7 @@ namespace FoxTunes
                 {
                     foreach (var metaDataItem in playlistItem.MetaDatas)
                     {
-                        if (!names.Contains(metaDataItem.Name, true))
+                        if (!names.Contains(metaDataItem.Name, StringComparer.OrdinalIgnoreCase))
                         {
                             continue;
                         }

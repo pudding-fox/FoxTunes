@@ -1,5 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace FoxTunes
             builder.Update.SetTable(this.Table);
             if (columns != null && columns.Any())
             {
-                builder.Update.AddColumns(this.Table.UpdatableColumns.Where(column => columns.Contains(column.ColumnName, true)));
+                builder.Update.AddColumns(this.Table.UpdatableColumns.Where(column => columns.Contains(column.ColumnName, StringComparer.OrdinalIgnoreCase)));
             }
             else
             {
