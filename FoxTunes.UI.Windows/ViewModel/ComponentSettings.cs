@@ -159,7 +159,10 @@ namespace FoxTunes.ViewModel
                     {
                         continue;
                     }
-                    var page = new ComponentSettingsPage(section.Name, section.Elements);
+                    var elements = section.Elements.Where(
+                        element => this.MatchesFilter(element)
+                    );
+                    var page = new ComponentSettingsPage(section.Name, elements);
                     page.InitializeComponent(this.Core);
                     this.Pages.Add(page);
                 }
