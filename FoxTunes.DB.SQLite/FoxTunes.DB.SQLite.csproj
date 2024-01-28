@@ -76,7 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FoxDb.SQLite" Version="0.2.0"></PackageReference>
+    <PackageReference Include="FoxDb.SQLite" Version="0.3.0"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 
