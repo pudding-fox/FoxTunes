@@ -3,7 +3,6 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -77,6 +76,15 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScriptChanged;
 
+        protected override Task<Playlist> GetPlaylist()
+        {
+#if NET40
+            return TaskEx.FromResult(this.PlaylistManager.CurrentPlaylist);
+#else
+            return Task.FromResult(this.PlaylistManager.CurrentPlaylist);
+#endif
+        }
+
         public override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
@@ -87,11 +95,6 @@ namespace FoxTunes.ViewModel
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.PLAYLIST_SCRIPT_ELEMENT
             ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
-        }
-
-        protected override Task RefreshItems()
-        {
-            return this.RefreshItems(this.PlaylistManager.CurrentPlaylist);
         }
 
         protected virtual void OnCurrentItemChanged(object sender, EventArgs e)

@@ -13,11 +13,14 @@
     <Windows:UIComponentBase.Resources>
         <ViewModel:Playlists x:Key="ViewModel" Core="{Binding}"></ViewModel:Playlists>
     </Windows:UIComponentBase.Resources>
+    <Windows:UIComponentBase.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLISTS}}"></Windows:Menu>
+    </Windows:UIComponentBase.ContextMenu>
     <TabControl ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" DisplayMemberPath="Name">
         <Interactivity:Interaction.Triggers>
-            <Interactivity:EventTrigger EventName="MouseDoubleClick">
-                <ViewModel:InvokeParameterizedCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
-            </Interactivity:EventTrigger>
+            <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabControl}">
+                <Interactivity:InvokeCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
+            </Windows:FilteredEventTrigger>
         </Interactivity:Interaction.Triggers>
         <TabControl.ContentTemplate>
             <DataTemplate DataType="{x:Type Core:Playlist}">

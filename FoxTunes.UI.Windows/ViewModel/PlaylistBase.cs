@@ -1,7 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Media.TextFormatting;
 
 namespace FoxTunes.ViewModel
 {
@@ -143,6 +145,8 @@ namespace FoxTunes.ViewModel
             });
         }
 
+        protected abstract Task<Playlist> GetPlaylist();
+
         public override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
@@ -164,18 +168,26 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.RefreshStatus);
         }
 
-        protected virtual Task OnSignal(object sender, ISignal signal)
+        protected virtual async Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    return this.RefreshItems();
+                    var playlists = signal.State as IEnumerable<Playlist>;
+                    if (playlists != null)
+                    {
+                        var playlist = await this.GetPlaylist().ConfigureAwait(false);
+                        if (playlists.Contains(playlist))
+                        {
+                            await this.RefreshItems().ConfigureAwait(false);
+                        }
+                    }
+                    else
+                    {
+                        await this.RefreshItems().ConfigureAwait(false);
+                    }
+                    break;
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
@@ -183,7 +195,15 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.RefreshStatus);
         }
 
-        protected abstract Task RefreshItems();
+        protected virtual async Task RefreshItems()
+        {
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
+            if (playlist == null)
+            {
+                return;
+            }
+            await this.RefreshItems(playlist).ConfigureAwait(false);
+        }
 
         protected virtual async Task RefreshItems(Playlist playlist)
         {

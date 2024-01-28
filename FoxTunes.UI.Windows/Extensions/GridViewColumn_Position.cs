@@ -90,7 +90,7 @@ namespace FoxTunes
 
             protected virtual void UpdateTarget()
             {
-                if (!GetPosition(this.GridViewColumn).HasValue)
+                if (this.GridView == null || !GetPosition(this.GridViewColumn).HasValue)
                 {
                     return;
                 }

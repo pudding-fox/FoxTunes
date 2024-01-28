@@ -65,7 +65,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler PlaylistChanged;
 
-        public async Task<Playlist> GetPlaylist()
+        protected override async Task<Playlist> GetPlaylist()
         {
             var playlist = default(Playlist);
             await Windows.Invoke(() => playlist = this.Playlist).ConfigureAwait(false);
@@ -264,12 +264,6 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.Refresh);
         }
 
-        protected override async Task RefreshItems()
-        {
-            var playlist = await this.GetPlaylist().ConfigureAwait(false);
-            await this.RefreshItems(playlist).ConfigureAwait(false);
-        }
-
         protected virtual void OnColumnChanged(object sender, PlaylistColumn e)
         {
             if (this.DatabaseFactory != null)
@@ -292,7 +286,19 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    await this.ResizeColumns().ConfigureAwait(false);
+                    var playlists = signal.State as IEnumerable<Playlist>;
+                    if (playlists != null)
+                    {
+                        var playlist = await this.GetPlaylist().ConfigureAwait(false);
+                        if (playlists.Contains(playlist))
+                        {
+                            await this.ResizeColumns().ConfigureAwait(false);
+                        }
+                    }
+                    else
+                    {
+                        await this.ResizeColumns().ConfigureAwait(false);
+                    }
                     break;
                 case CommonSignals.PlaylistColumnsUpdated:
                     await this.ReloadColumns().ConfigureAwait(false);
