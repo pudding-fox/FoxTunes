@@ -37,17 +37,13 @@ namespace FoxTunes
             renderer.OnOrientationChanged();
         }
 
-        public IConfiguration Configuration { get; private set; }
-
         public PeakRendererData RendererData { get; private set; }
 
         public BooleanConfigurationElement ShowPeaks { get; private set; }
 
-        public BooleanConfigurationElement ShowRms { get; private set; }
-
-        public BooleanConfigurationElement Smooth { get; private set; }
-
         public IntegerConfigurationElement HoldInterval { get; private set; }
+
+        public BooleanConfigurationElement ShowRms { get; private set; }
 
         public Orientation Orientation
         {
@@ -79,32 +75,21 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Configuration = core.Components.Configuration;
+            base.InitializeComponent(core);
             this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                 PeakMeterBehaviourConfiguration.SECTION,
                 PeakMeterBehaviourConfiguration.PEAKS
              );
-            this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                PeakMeterBehaviourConfiguration.SECTION,
-                PeakMeterBehaviourConfiguration.RMS
-            );
-            this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
-            );
             this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
                PeakMeterBehaviourConfiguration.SECTION,
                PeakMeterBehaviourConfiguration.HOLD
             );
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
-            ).ConnectValue(value => this.UpdateInterval = value);
+            this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
+                PeakMeterBehaviourConfiguration.SECTION,
+                PeakMeterBehaviourConfiguration.RMS
+            );
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.ShowRms.ValueChanged += this.OnValueChanged;
-            this.Smooth.ValueChanged += this.OnValueChanged;
-            this.HoldInterval.ValueChanged += this.OnValueChanged;
-            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 
@@ -208,7 +193,7 @@ namespace FoxTunes
                     return;
                 }
                 UpdateValues(data);
-                if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
+                if (!data.LastUpdated.Equals(default(DateTime)))
                 {
                     UpdateElementsSmooth(data);
                 }
@@ -262,14 +247,6 @@ namespace FoxTunes
             if (this.ShowRms != null)
             {
                 this.ShowRms.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.Smooth != null)
-            {
-                this.Smooth.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.HoldInterval != null)
-            {
-                this.HoldInterval.ValueChanged -= this.OnValueChanged;
             }
             base.OnDisposing();
         }

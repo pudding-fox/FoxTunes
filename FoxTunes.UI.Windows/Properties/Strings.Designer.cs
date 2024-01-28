@@ -1312,47 +1312,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Quality.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_Quality {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to High.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_Quality_High {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality.High", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Low.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_Quality_Low {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Quality.Low", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Visualizations.
         /// </summary>
         internal static string VisualizationBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("VisualizationBehaviourConfiguration.Section", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Smooth.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_Smooth {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Smooth", resourceCulture);
             }
         }
         

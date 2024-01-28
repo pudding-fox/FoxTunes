@@ -534,20 +534,8 @@
   <data name="VisualizationBehaviourConfiguration.Interval" xml:space="preserve">
     <value>Update Interval</value>
   </data>
-  <data name="VisualizationBehaviourConfiguration.Quality" xml:space="preserve">
-    <value>Quality</value>
-  </data>
-  <data name="VisualizationBehaviourConfiguration.Quality.High" xml:space="preserve">
-    <value>High</value>
-  </data>
-  <data name="VisualizationBehaviourConfiguration.Quality.Low" xml:space="preserve">
-    <value>Low</value>
-  </data>
   <data name="VisualizationBehaviourConfiguration.Section" xml:space="preserve">
     <value>Visualizations</value>
-  </data>
-  <data name="VisualizationBehaviourConfiguration.Smooth" xml:space="preserve">
-    <value>Smooth</value>
   </data>
   <data name="Volume.Name" xml:space="preserve">
     <value>Volume</value>

@@ -126,20 +126,20 @@
   <data name="EnhancedSpectrumBehaviourConfiguration.Crest" xml:space="preserve">
     <value>Show Crest Factor</value>
   </data>
+  <data name="EnhancedSpectrumBehaviourConfiguration.Hold" xml:space="preserve">
+    <value>Hold Duration</value>
+  </data>
   <data name="EnhancedSpectrumBehaviourConfiguration.Path" xml:space="preserve">
     <value>Spectrum</value>
+  </data>
+  <data name="EnhancedSpectrumBehaviourConfiguration.Peaks" xml:space="preserve">
+    <value>Show Peaks</value>
   </data>
   <data name="EnhancedSpectrumBehaviourConfiguration.Rms" xml:space="preserve">
     <value>Show RMS</value>
   </data>
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
-  </data>
-  <data name="General.Bands" xml:space="preserve">
-    <value>Bands</value>
-  </data>
-  <data name="General.Bars" xml:space="preserve">
-    <value>Bars</value>
   </data>
   <data name="Oscilloscope.Name" xml:space="preserve">
     <value>Oscilloscope</value>

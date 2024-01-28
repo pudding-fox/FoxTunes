@@ -1,18 +1,9 @@
-﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public static class EnhancedSpectrumBehaviourConfiguration
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
         public const string BANDS_ELEMENT = "AABBF573-83D3-498E-BEF8-F1DB5A329B9D";
@@ -25,6 +16,16 @@ namespace FoxTunes
 
         public const string BANDS_31_OPTION = "DDDD0A9D-0512-4F9F-903D-9AC33A9C6CFD";
 
+        public const string PEAKS_ELEMENT = "BBBBDCF0-8B24-4321-B7BE-74DADE59D4FA";
+
+        public const string HOLD_ELEMENT = "CCCCA25C-F8FA-4C37-82E8-2C5F297D2ED3";
+
+        public const int MIN_HOLD = 500;
+
+        public const int MAX_HOLD = 5000;
+
+        public const int DEFAULT_HOLD = 1000;
+
         public const string RMS_ELEMENT = "DDDEE2B6A-188E-4FF4-A277-37D140D49C45";
 
         public const string CREST_ELEMENT = "DEEEFFB9-2014-4004-94F9-E566874317ED";
@@ -33,34 +34,11 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Bands, path: Strings.EnhancedSpectrumBehaviourConfiguration_Path).WithOptions(GetBandsOptions()))
-                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumBehaviourConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(false)
             );
-            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
-                SECTION,
-                VisualizationBehaviourConfiguration.QUALITY_ELEMENT
-            ).ConnectValue(option => UpdateConfiguration(option));
-        }
-
-        private static void UpdateConfiguration(SelectionConfigurationOption option)
-        {
-            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
-            var rms = configuration.GetElement<BooleanConfigurationElement>(
-                SECTION,
-                RMS_ELEMENT
-            );
-            switch (option.Id)
-            {
-                default:
-                case VisualizationBehaviourConfiguration.QUALITY_HIGH_OPTION:
-                    Logger.Write(typeof(EnhancedSpectrumBehaviourConfiguration), LogLevel.Debug, "Using high quality profile.");
-                    rms.Value = true;
-                    break;
-                case VisualizationBehaviourConfiguration.QUALITY_LOW_OPTION:
-                    Logger.Write(typeof(EnhancedSpectrumBehaviourConfiguration), LogLevel.Debug, "Using low quality profile.");
-                    rms.Value = false;
-                    break;
-            }
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetBandsOptions()

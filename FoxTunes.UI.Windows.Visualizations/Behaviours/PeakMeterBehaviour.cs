@@ -46,7 +46,7 @@ namespace FoxTunes
                     CATEGORY,
                     this.Peaks.Id,
                     this.Peaks.Name,
-                    attributes: (byte)((this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                    attributes: this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     CATEGORY,

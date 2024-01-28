@@ -123,12 +123,6 @@
   <data name="General.Advanced" xml:space="preserve">
     <value>Avancé</value>
   </data>
-  <data name="General.Bands" xml:space="preserve">
-    <value>Bandes</value>
-  </data>
-  <data name="General.Bars" xml:space="preserve">
-    <value>Barres</value>
-  </data>
   <data name="Oscilloscope.Name" xml:space="preserve">
     <value>Oscilloscope</value>
   </data>

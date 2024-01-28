@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Bands { get; private set; }
 
+        public BooleanConfigurationElement Peaks { get; private set; }
+
         public BooleanConfigurationElement Rms { get; private set; }
 
         public BooleanConfigurationElement Crest { get; private set; }
@@ -25,6 +27,10 @@ namespace FoxTunes
             this.Bands = this.Configuration.GetElement<SelectionConfigurationElement>(
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
                 EnhancedSpectrumBehaviourConfiguration.BANDS_ELEMENT
+            );
+            this.Peaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.PEAKS_ELEMENT
             );
             this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
                 EnhancedSpectrumBehaviourConfiguration.SECTION,
@@ -54,15 +60,22 @@ namespace FoxTunes
                     yield return new InvocationComponent(
                         CATEGORY,
                         option.Id,
-                        string.Format("{0} {1}", option.Name, Strings.General_Bands),
+                        string.Format("{0} {1}", option.Name, this.Bands.Name),
+                        path: this.Bands.Name,
                         attributes: this.Bands.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
                 yield return new InvocationComponent(
                     CATEGORY,
+                    this.Peaks.Id,
+                    this.Peaks.Name,
+                    attributes: this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
                     this.Rms.Id,
                     this.Rms.Name,
-                    attributes: (byte)((this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                    attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     CATEGORY,
@@ -75,7 +88,11 @@ namespace FoxTunes
 
         public Task InvokeAsync(IInvocationComponent component)
         {
-            if (string.Equals(component.Id, this.Rms.Id, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(component.Id, this.Peaks.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Peaks.Toggle();
+            }
+            else if (string.Equals(component.Id, this.Rms.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.Rms.Toggle();
             }

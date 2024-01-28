@@ -8,19 +8,15 @@ namespace FoxTunes
 {
     public class OscilloscopeRenderer : VisualizationBase
     {
-        public IConfiguration Configuration { get; private set; }
-
         public OscilloscopeRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Mode { get; private set; }
 
         public IntegerConfigurationElement Duration { get; private set; }
 
-        public BooleanConfigurationElement Smooth { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            this.Configuration = core.Components.Configuration;
+            base.InitializeComponent(core);
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 OscilloscopeBehaviourConfiguration.SECTION,
                 OscilloscopeBehaviourConfiguration.MODE_ELEMENT
@@ -29,18 +25,8 @@ namespace FoxTunes
                 OscilloscopeBehaviourConfiguration.SECTION,
                 OscilloscopeBehaviourConfiguration.DURATION_ELEMENT
             );
-            this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
-            );
-            this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
-            ).ConnectValue(value => this.UpdateInterval = value);
             this.Mode.ValueChanged += this.OnValueChanged;
             this.Duration.ValueChanged += this.OnValueChanged;
-            this.Smooth.ValueChanged += this.OnValueChanged;
-            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 
@@ -138,7 +124,7 @@ namespace FoxTunes
                 {
                     default:
                     case OscilloscopeRendererMode.Mono:
-                        if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
+                        if (!data.LastUpdated.Equals(default(DateTime)))
                         {
                             UpdateElementsSmoothMono(data.Values, data.Peaks, data.Elements, data.Width, data.Height);
                         }
@@ -148,7 +134,7 @@ namespace FoxTunes
                         }
                         break;
                     case OscilloscopeRendererMode.Seperate:
-                        if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
+                        if (!data.LastUpdated.Equals(default(DateTime)))
                         {
                             UpdateElementsSmoothSeperate(data.Values, data.Peaks, data.Elements, data.Width, data.Height, data.Channels);
                         }
@@ -322,10 +308,6 @@ namespace FoxTunes
             if (this.Duration != null)
             {
                 this.Duration.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.Smooth != null)
-            {
-                this.Smooth.ValueChanged -= this.OnValueChanged;
             }
             base.OnDisposing();
         }
