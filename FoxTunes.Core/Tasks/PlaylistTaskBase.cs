@@ -442,7 +442,10 @@ namespace FoxTunes
                     }, transaction).ConfigureAwait(false);
                     playlistItem.Status = status;
                 }
-                transaction.Commit();
+                if (transaction.HasTransaction)
+                {
+                    transaction.Commit();
+                }
             }
         }
 

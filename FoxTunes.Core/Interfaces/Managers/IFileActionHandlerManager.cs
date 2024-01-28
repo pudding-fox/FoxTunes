@@ -8,5 +8,7 @@ namespace FoxTunes.Interfaces
         void RunCommand(string command);
 
         Task RunPaths(IEnumerable<string> paths, FileActionType type);
+
+        Task RunPaths(IEnumerable<string> paths, int index, FileActionType type);
     }
 }

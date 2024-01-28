@@ -77,6 +77,24 @@ namespace FoxTunes
 
         public virtual async Task RunPaths(IEnumerable<string> paths, FileActionType type)
         {
+            var handlers = this.GetHandlers(paths, type);
+            foreach (var pair in handlers)
+            {
+                await pair.Key.Handle(pair.Value, type).ConfigureAwait(false);
+            }
+        }
+
+        public virtual async Task RunPaths(IEnumerable<string> paths, int index, FileActionType type)
+        {
+            var handlers = this.GetHandlers(paths, type);
+            foreach (var pair in handlers)
+            {
+                await pair.Key.Handle(pair.Value, index, type).ConfigureAwait(false);
+            }
+        }
+
+        protected virtual IDictionary<IFileActionHandler, IList<string>> GetHandlers(IEnumerable<string> paths, FileActionType type)
+        {
             var handlers = new Dictionary<IFileActionHandler, IList<string>>();
             foreach (var path in paths)
             {
@@ -89,10 +107,7 @@ namespace FoxTunes
                     handlers.GetOrAdd(handler, key => new List<string>()).Add(path);
                 }
             }
-            foreach (var pair in handlers)
-            {
-                await pair.Key.Handle(pair.Value, type).ConfigureAwait(false);
-            }
+            return handlers;
         }
 
         protected override void OnDisposing()

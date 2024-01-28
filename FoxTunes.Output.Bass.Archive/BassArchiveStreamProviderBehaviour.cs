@@ -217,6 +217,21 @@ namespace FoxTunes
 #endif
         }
 
+        public Task Handle(IEnumerable<string> paths, int index, FileActionType type)
+        {
+            switch (type)
+            {
+                case FileActionType.Playlist:
+                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    return this.AddArchivesToPlaylist(playlist, index, paths);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
         public Task OpenArchive()
         {
             var options = new BrowseOptions(
@@ -250,9 +265,14 @@ namespace FoxTunes
             }
         }
 
-        public async Task AddArchivesToPlaylist(Playlist playlist, IEnumerable<string> paths)
+        public Task AddArchivesToPlaylist(Playlist playlist, IEnumerable<string> paths)
         {
             var index = this.PlaylistBrowser.GetInsertIndex(playlist);
+            return this.AddArchivesToPlaylist(playlist, index, paths);
+        }
+
+        public async Task AddArchivesToPlaylist(Playlist playlist, int index, IEnumerable<string> paths)
+        {
             using (var task = new AddArchivesToPlaylistTask(playlist, index, paths, false))
             {
                 task.InitializeComponent(this.Core);

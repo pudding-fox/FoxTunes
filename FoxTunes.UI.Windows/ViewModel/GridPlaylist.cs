@@ -1,5 +1,4 @@
-﻿#define FILE_ACTION_MANAGER_DROP_ACTION
-using FoxDb;
+﻿using FoxDb;
 using FoxTunes.Integration;
 using FoxTunes.Interfaces;
 using System;
@@ -374,7 +373,7 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    return this.FileActionHandlerManager.RunPaths(paths, FileActionType.Playlist);
+                    return this.AddToPlaylist(paths);
                 }
                 if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
                 {
@@ -391,7 +390,7 @@ namespace FoxTunes.ViewModel
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
                     var paths = ShellIDListHelper.GetData(e.Data);
-                    return this.FileActionHandlerManager.RunPaths(paths, FileActionType.Playlist);
+                    return this.AddToPlaylist(paths);
                 }
             }
             catch (Exception exception)
@@ -403,6 +402,19 @@ namespace FoxTunes.ViewModel
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        private Task AddToPlaylist(IEnumerable<string> paths)
+        {
+            var sequence = default(int);
+            if (this.TryGetInsertSequence(out sequence))
+            {
+                return this.FileActionHandlerManager.RunPaths(paths, sequence, FileActionType.Playlist);
+            }
+            else
+            {
+                return this.FileActionHandlerManager.RunPaths(paths, FileActionType.Playlist);
+            }
         }
 
         private async Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)

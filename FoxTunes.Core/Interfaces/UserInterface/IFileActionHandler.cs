@@ -8,6 +8,8 @@ namespace FoxTunes.Interfaces
         bool CanHandle(string path, FileActionType type);
 
         Task Handle(IEnumerable<string> paths, FileActionType type);
+
+        Task Handle(IEnumerable<string> paths, int index, FileActionType type);
     }
 
     public enum FileActionType : byte

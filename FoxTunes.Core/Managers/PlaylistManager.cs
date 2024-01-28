@@ -708,6 +708,20 @@ namespace FoxTunes
 #endif
         }
 
+        public Task Handle(IEnumerable<string> paths, int index, FileActionType type)
+        {
+            switch (type)
+            {
+                case FileActionType.Playlist:
+                    return this.Insert(this.SelectedPlaylist, index, paths, false);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
         public string Checksum
         {
             get

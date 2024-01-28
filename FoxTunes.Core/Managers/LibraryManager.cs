@@ -359,6 +359,11 @@ namespace FoxTunes
 #endif
         }
 
+        public Task Handle(IEnumerable<string> paths, int index, FileActionType type)
+        {
+            throw new NotImplementedException();
+        }
+
         public class LibraryManagerReport : BaseComponent, IReport
         {
             public LibraryManagerReport(IDictionary<LibraryItem, IList<string>> warnings)
