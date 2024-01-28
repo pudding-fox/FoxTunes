@@ -29,7 +29,7 @@
             <GroupStyle>
                 <GroupStyle.HeaderTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name, Converter={StaticResource EnumConverter}}" Foreground="{DynamicResource TextBrush}" Margin="4,0,0,0" TextDecorations="Underline"></TextBlock>
+                        <TextBlock Text="{Binding Name, Converter={StaticResource EnumConverter}}" Foreground="{DynamicResource TextBrush}" Margin="4,0,0,2" TextDecorations="Underline"></TextBlock>
                     </DataTemplate>
                 </GroupStyle.HeaderTemplate>
             </GroupStyle>
