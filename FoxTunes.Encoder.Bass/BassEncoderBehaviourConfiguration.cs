@@ -9,6 +9,8 @@ namespace FoxTunes
     {
         public const string SECTION = "D1D2586A-8FE3-4F1E-A5A2-58C57A99FB11";
 
+        public const string ENABLED_ELEMENT = "AAAA1152-CA98-4FE5-B63B-B6DD90E11B88";
+
         public const string FORMAT_ELEMENT = "AAAA29F6-02C7-4694-A689-C2DC9EDEE419";
 
         public const string DESTINATION_ELEMENT = "BBBBBF10-E515-4A99-B49B-4C5821A22945";
@@ -28,6 +30,8 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "Converter")
+                .WithElement(
+                    new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
                 .WithElement(
                     new SelectionConfigurationElement(FORMAT_ELEMENT, "Format").WithOptions(GetFormatOptions()))
                 .WithElement(

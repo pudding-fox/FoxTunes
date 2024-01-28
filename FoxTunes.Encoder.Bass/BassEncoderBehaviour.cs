@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public BooleanConfigurationElement Enabled { get; private set; }
+
         public BooleanConfigurationElement CopyTags { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -23,6 +25,10 @@ namespace FoxTunes
             this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
             this.Configuration = core.Components.Configuration;
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassEncoderBehaviourConfiguration.SECTION,
+                BassEncoderBehaviourConfiguration.ENABLED_ELEMENT
+            );
             this.CopyTags = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.COPY_TAGS
@@ -34,9 +40,12 @@ namespace FoxTunes
         {
             get
             {
-                if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                if (this.Enabled.Value)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, "Convert");
+                    if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, ENCODE, "Convert");
+                    }
                 }
             }
         }
