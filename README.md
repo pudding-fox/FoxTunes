@@ -66,3 +66,7 @@ Various optional plugins are available;
 * TagLib - Use TagLib for meta data functions.
 * WASAPI - Windows Audio Session API output.
 * Windows - Global key bindings (Multi media keys), system tray icon, system media transport controls, taskbar controls.
+
+I'm saving up for a signing certificate and associated costs but it is very expensive;
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BW5JUK6ZUQK7S&currency_code=GBP&source=url)
