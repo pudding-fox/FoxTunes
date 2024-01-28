@@ -19,15 +19,22 @@ namespace FoxTunes
             this.Query = set;
         }
 
+        public WrappedDbQuery(DbContext dbContext, DbSet<T> set, IQueryable<T> query)
+        {
+            this.DbContext = dbContext;
+            this.Set = set;
+            this.Query = query;
+        }
+
         public DbContext DbContext { get; private set; }
 
         public DbSet<T> Set { get; private set; }
 
-        public DbQuery<T> Query { get; private set; }
+        public IQueryable<T> Query { get; private set; }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            return ((IEnumerable<T>)this.Query).GetEnumerator();
+            return this.Query.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -39,7 +46,7 @@ namespace FoxTunes
         {
             get
             {
-                return ((IQueryable)this.Query).ElementType;
+                return this.Query.ElementType;
             }
         }
 
@@ -47,7 +54,7 @@ namespace FoxTunes
         {
             get
             {
-                return ((IQueryable)this.Query).Expression;
+                return this.Query.Expression;
             }
         }
 
@@ -55,7 +62,7 @@ namespace FoxTunes
         {
             get
             {
-                return ((IQueryable)this.Query).Provider;
+                return this.Query.Provider;
             }
         }
 

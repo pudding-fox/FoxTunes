@@ -4,6 +4,9 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Threading;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 
 namespace FoxTunes
 {
@@ -12,6 +15,14 @@ namespace FoxTunes
         public readonly object SyncRoot = new object();
 
         protected DbContext DbContext { get; private set; }
+
+        protected ObjectContext ObjectContext
+        {
+            get
+            {
+                return (this.DbContext as IObjectContextAdapter).ObjectContext;
+            }
+        }
 
         protected virtual DbModelBuilder CreateModelBuilder()
         {
@@ -167,6 +178,26 @@ namespace FoxTunes
                 this.DbContext = this.CreateDbContext();
             }
             return new WrappedDbQuery<T>(this.DbContext, this.DbContext.Set<T>());
+        }
+
+        public override IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, TMember>> member)
+        {
+            var entry = this.DbContext.Entry(item);
+            return new WrappedDbQuery<TMember>(
+                this.DbContext,
+                this.DbContext.Set<TMember>(),
+                entry.Reference(member).Query()
+            );
+        }
+
+        public override IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, ICollection<TMember>>> member)
+        {
+            var entry = this.DbContext.Entry(item);
+            return new WrappedDbQuery<TMember>(
+                this.DbContext,
+                this.DbContext.Set<TMember>(),
+                entry.Collection(member).Query()
+            );
         }
 
         public override void Interlocked(Action action)

@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq.Expressions;
 
 namespace FoxTunes
 {
@@ -11,6 +13,14 @@ namespace FoxTunes
         public abstract IDatabaseSet<T> GetSet<T>() where T : class;
 
         public abstract IDatabaseQuery<T> GetQuery<T>() where T : class;
+
+        public abstract IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, TMember>> member)
+            where T : class
+            where TMember : class;
+
+        public abstract IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, ICollection<TMember>>> member)
+            where T : class
+            where TMember : class;
 
         public abstract void Interlocked(Action action);
 
