@@ -153,7 +153,7 @@ namespace FoxTunes.ViewModel
                 this.Sections.Clear();
                 foreach (var section in this.Configuration.Sections.OrderBy(section => section.Id))
                 {
-                    if (!string.IsNullOrEmpty(this.Filter) && !section.Name.Contains(this.Filter, true) && !section.Elements.Any(element => (!string.IsNullOrEmpty(element.Name) && element.Name.Contains(this.Filter, true)) || (!string.IsNullOrEmpty(element.Path) && element.Path.Contains(this.Filter, true))))
+                    if (!this.MatchesFilter(section, true))
                     {
                         continue;
                     }
@@ -161,6 +161,47 @@ namespace FoxTunes.ViewModel
                 }
                 this.SelectedSection = this.Sections.FirstOrDefault();
             });
+        }
+
+        public virtual bool MatchesFilter(global::FoxTunes.ConfigurationSection section, bool elements)
+        {
+            if (string.IsNullOrEmpty(this.Filter))
+            {
+                return true;
+            }
+            var values = new[] { section.Name, section.Description };
+            foreach (var value in values)
+            {
+                if (!string.IsNullOrEmpty(value) && value.Contains(this.Filter, true))
+                {
+                    return true;
+                }
+            }
+            if (elements)
+            {
+                return section.Elements.Any(element => this.MatchesFilter(element));
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public virtual bool MatchesFilter(global::FoxTunes.ConfigurationElement element)
+        {
+            if (string.IsNullOrEmpty(this.Filter))
+            {
+                return true;
+            }
+            var values = new[] { element.Name, element.Description, element.Path };
+            foreach (var value in values)
+            {
+                if (!string.IsNullOrEmpty(value) && value.Contains(this.Filter, true))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         protected override Freezable CreateInstanceCore()
@@ -187,6 +228,10 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var element in this.Section.Elements.OrderBy(element => element.Id))
                 {
+                    if (!componentSettings.MatchesFilter(this.Section, false) && !componentSettings.MatchesFilter(element))
+                    {
+                        continue;
+                    }
                     this.AddElement(element);
                 }
             }
@@ -266,12 +311,16 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler IsSelectedChanged;
 
+        public bool HasElements
+        {
+            get
+            {
+                return this.Elements.Any();
+            }
+        }
+
         protected virtual void AddElement(ConfigurationElement element)
         {
-            if (!string.IsNullOrEmpty(this.ComponentSettings.Filter) && !(!string.IsNullOrEmpty(element.Name) && element.Name.Contains(this.ComponentSettings.Filter, true)) && (!string.IsNullOrEmpty(element.Path) && !element.Path.Contains(this.ComponentSettings.Filter, true)))
-            {
-                return;
-            }
             if (string.IsNullOrEmpty(element.Path))
             {
                 this.Elements.Add(element);

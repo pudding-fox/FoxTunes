@@ -46,47 +46,61 @@
                 </TreeView>
                 <Windows:SearchBox Grid.Row="1" SearchText="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}" Interval="0"></Windows:SearchBox>
                 <ScrollViewer Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto" Margin="4,0,0,0" Padding="4" Background="{DynamicResource NormalBrush}">
-                    <ItemsControl ItemsSource="{Binding SelectedSection.Elements, Source={StaticResource ViewModel}}">
-                        <ItemsControl.ItemContainerStyle>
-                            <Style TargetType="{x:Type ContentPresenter}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsHidden}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,0,0,5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
-                                    <ContentControl Grid.Column="1" Content="{Binding}">
-                                        <ContentControl.Resources>
-                                            <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
-                                                <Config:SelectionConfigurationElement></Config:SelectionConfigurationElement>
-                                            </DataTemplate>
-                                            <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
-                                                <Config:BooleanConfigurationElement></Config:BooleanConfigurationElement>
-                                            </DataTemplate>
-                                            <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
-                                                <Config:TextConfigurationElement></Config:TextConfigurationElement>
-                                            </DataTemplate>
-                                            <DataTemplate DataType="{x:Type Core:IntegerConfigurationElement}">
-                                                <Config:IntegerConfigurationElement></Config:IntegerConfigurationElement>
-                                            </DataTemplate>
-                                            <DataTemplate DataType="{x:Type Core:DoubleConfigurationElement}">
-                                                <Config:DoubleConfigurationElement></Config:DoubleConfigurationElement>
-                                            </DataTemplate>
-                                        </ContentControl.Resources>
-                                    </ContentControl>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <Grid>
+                        <ItemsControl ItemsSource="{Binding SelectedSection.Elements, Source={StaticResource ViewModel}}">
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="{x:Type ContentPresenter}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
+                                        <ContentControl Grid.Column="1" Content="{Binding}">
+                                            <ContentControl.Resources>
+                                                <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
+                                                    <Config:SelectionConfigurationElement></Config:SelectionConfigurationElement>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
+                                                    <Config:BooleanConfigurationElement></Config:BooleanConfigurationElement>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
+                                                    <Config:TextConfigurationElement></Config:TextConfigurationElement>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="{x:Type Core:IntegerConfigurationElement}">
+                                                    <Config:IntegerConfigurationElement></Config:IntegerConfigurationElement>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="{x:Type Core:DoubleConfigurationElement}">
+                                                    <Config:DoubleConfigurationElement></Config:DoubleConfigurationElement>
+                                                </DataTemplate>
+                                            </ContentControl.Resources>
+                                        </ContentControl>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Please select a sub page." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedSection.HasElements, Mode=OneWay, Source={StaticResource ViewModel}}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                 </ScrollViewer>
             </Grid>
         </GroupBox>
