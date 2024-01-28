@@ -3,10 +3,16 @@ using V8.Net;
 
 namespace FoxTunes
 {
-    [Component("8D4693E0-6416-4B33-9DE7-89116D15F5EA", ComponentSlots.ScriptingRuntime)]
+    [Component(ID, ComponentSlots.ScriptingRuntime)]
     [PlatformDependency(Major = 6, Minor = 1)]
     public class JSScriptingRuntime : ScriptingRuntime
     {
+        const string ID = "D3A862B1-4770-489E-9C2A-A3DEB8A47D73";
+
+        public JSScriptingRuntime() : base(ID, Strings.JSScriptingRuntime_Name, string.Format(Strings.JSScriptingRuntime_Description, V8Engine.Version))
+        {
+        }
+
         public ICore Core { get; private set; }
 
         public override ICoreScripts CoreScripts

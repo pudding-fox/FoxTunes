@@ -24,19 +24,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Update="Resources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<CustomToolNamespace>FoxTunes</CustomToolNamespace>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-		<Compile Update="Resources.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
 	</ItemGroup>
 

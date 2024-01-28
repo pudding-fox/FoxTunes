@@ -37,11 +37,14 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler DescriptionChanged;
 
+        public IScriptingRuntime ScriptingRuntime { get; private set; }
+
         public IOutput Output { get; private set; }
 
         protected override void InitializeComponent(ICore core)
         {
             PlaybackStateNotifier.Notify += this.OnNotify;
+            this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.Output = core.Components.Output;
             base.InitializeComponent(core);
         }
@@ -62,6 +65,18 @@ namespace FoxTunes.ViewModel
         {
             var builder = new StringBuilder();
             builder.AppendLine(string.Format("{0} {1}", Publication.Product, Publication.Version));
+            if (this.ScriptingRuntime != null)
+            {
+                if (!string.IsNullOrEmpty(this.ScriptingRuntime.Description))
+                {
+                    builder.AppendLine(this.ScriptingRuntime.Description);
+                }
+                else if (!string.IsNullOrEmpty(this.ScriptingRuntime.Name))
+                {
+                    builder.Append("JS: ");
+                    builder.AppendLine(this.ScriptingRuntime.Name);
+                }
+            }
             if (this.Output != null)
             {
                 builder.Append(this.Output.Description);
