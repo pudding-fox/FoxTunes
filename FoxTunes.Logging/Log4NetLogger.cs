@@ -1,7 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using log4net.Appender;
 using log4net.Config;
+using log4net.Layout;
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace FoxTunes
 {
@@ -108,6 +111,27 @@ namespace FoxTunes
                     }
                     break;
             }
+        }
+
+        public static void EnableFileAppender()
+        {
+            BasicConfigurator.Configure(GetFileAppender());
+        }
+
+        private static IAppender GetFileAppender()
+        {
+            var layout = new PatternLayout();
+            layout.ConversionPattern = "%d [%2%t] %-5p [%-10c] %m%n";
+            layout.ActivateOptions();
+            var appender = new FileAppender()
+            {
+                AppendToFile = false,
+                LockingModel = new FileAppender.MinimalLock(),
+                Layout = layout,
+                File = Path.Combine(ComponentScanner.Instance.Location, "Log.txt")
+            };
+            appender.ActivateOptions();
+            return appender;
         }
     }
 }

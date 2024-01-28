@@ -3,6 +3,7 @@ using FoxTunes.Theme;
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -33,9 +34,15 @@ namespace FoxTunes
         public override void Show()
         {
             this.Application = new Application();
+            this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
             this.Application.Exit += this.OnApplicationExit;
             this.ThemeLoader.Application = this.Application;
             this.Application.Run(new MainWindow() { DataContext = this.Core });
+        }
+
+        protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            Logger.Write(this, LogLevel.Fatal, e.Exception.Message, e);
         }
 
         protected virtual void OnApplicationExit(object sender, ExitEventArgs e)

@@ -12,6 +12,7 @@ namespace FoxTunes.Launcher
         [STAThread]
         public static void Main(string[] args)
         {
+            Log4NetLogger.EnableFileAppender();
             using (var core = new Core())
             {
                 core.Load();
