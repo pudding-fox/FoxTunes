@@ -64,7 +64,16 @@
                                             <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
+                                        <ContentControl Grid.Column="0" Content="{Binding}">
+                                            <ContentControl.Resources>
+                                                <DataTemplate DataType="{x:Type Core:ConfigurationElement}">
+                                                    <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="{x:Type Core:CommandConfigurationElement}">
+                                                    <!-- The name is in the button content.-->
+                                                </DataTemplate>
+                                            </ContentControl.Resources>
+                                        </ContentControl>
                                         <ContentControl Grid.Column="1" Content="{Binding}">
                                             <ContentControl.Resources>
                                                 <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
@@ -81,6 +90,9 @@
                                                 </DataTemplate>
                                                 <DataTemplate DataType="{x:Type Core:DoubleConfigurationElement}">
                                                     <Config:DoubleConfigurationElement></Config:DoubleConfigurationElement>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="{x:Type Core:CommandConfigurationElement}">
+                                                    <Config:CommandConfigurationElement></Config:CommandConfigurationElement>
                                                 </DataTemplate>
                                             </ContentControl.Resources>
                                         </ContentControl>
