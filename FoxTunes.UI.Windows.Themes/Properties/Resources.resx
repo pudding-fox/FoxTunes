@@ -121,6 +121,12 @@
   <data name="Blue" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\blue.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="RetroVibes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\retrovibes.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="TrafficLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\trafficlight.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="Transparent_Blue" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\transparent_blue.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

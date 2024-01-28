@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 
@@ -11,7 +10,7 @@ namespace FoxTunes
     {
         public const string ID = "B337A1E3-CA33-4769-BB13-E9F8DC70FE9D";
 
-        public RoyaleTheme() : base(ID, Strings.RoyaleTheme_Name, Strings.RoyaleTheme_Description, GetColorPalettes())
+        public RoyaleTheme() : base(ID, Strings.RoyaleTheme_Name, Strings.RoyaleTheme_Description, global::FoxTunes.ColorPalettes.Light)
         {
 
         }
@@ -41,27 +40,6 @@ namespace FoxTunes
         public override Stream GetArtworkPlaceholder()
         {
             return typeof(RoyaleTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.System_Artwork.png");
-        }
-
-        public static IEnumerable<IColorPalette> GetColorPalettes()
-        {
-            return new[]
-            {
-                new ColorPalette(
-                    ID + "_AAAA",
-                    ColorPaletteRole.Visualization,
-                    Strings.RoyaleTheme_ColorPalette_Default_Name,
-                    Strings.RoyaleTheme_ColorPalette_Default_Description,
-                    Resources.Blue
-                ),
-                new ColorPalette(
-                    ID + "_BBBB",
-                    ColorPaletteRole.Visualization,
-                    Strings.RoyaleTheme_ColorPalette_Gradient1_Name,
-                    Strings.RoyaleTheme_ColorPalette_Gradient1_Description,
-                    Resources.Transparent_Blue
-                ),
-            };
         }
     }
 }

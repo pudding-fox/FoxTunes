@@ -70,6 +70,37 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to //BACKGROUND
+        ///#01172F
+        ///#54129E
+        ///#F30B88
+        ///#F2AE29
+        ///1000:#FFDFF5
+        /////VALUE
+        ///#FDFBF6
+        ///#F402F1
+        ///#1601CF
+        ///1000:#0A0220.
+        /// </summary>
+        internal static string RetroVibes {
+            get {
+                return ResourceManager.GetString("RetroVibes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DARKRED
+        ///RED
+        ///YELLOW
+        ///1000:GREEN.
+        /// </summary>
+        internal static string TrafficLight {
+            get {
+                return ResourceManager.GetString("TrafficLight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to #FF9BDDFB
         ///700:#FF9BDDFB
         ///1000:#009BDDFB.

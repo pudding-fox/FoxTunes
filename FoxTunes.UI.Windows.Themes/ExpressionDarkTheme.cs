@@ -12,7 +12,7 @@ namespace FoxTunes
         public const string ID = "3E9EFE8C-5245-4F8B-97D1-EB47CC70E373";
 
         public ExpressionDarkTheme()
-            : base(ID, Strings.ExpressionDarkTheme_Name, Strings.ExpressionDarkTheme_Description, GetColorPalettes())
+            : base(ID, Strings.ExpressionDarkTheme_Name, Strings.ExpressionDarkTheme_Description, global::FoxTunes.ColorPalettes.Dark)
         {
 
         }
@@ -36,27 +36,6 @@ namespace FoxTunes
         public override Stream GetArtworkPlaceholder()
         {
             return typeof(ExpressionDarkTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.ExpressionDark_Artwork.png");
-        }
-
-        public static IEnumerable<IColorPalette> GetColorPalettes()
-        {
-            return new[]
-            {
-                new ColorPalette(
-                    ID + "_AAAA",
-                    ColorPaletteRole.Visualization,
-                    Strings.ExpressionDarkTheme_ColorPalette_Default_Name,
-                    Strings.ExpressionDarkTheme_ColorPalette_Default_Description,
-                    Resources.White
-                ),
-                new ColorPalette(
-                    ID + "_BBBB",
-                    ColorPaletteRole.Visualization,
-                    Strings.ExpressionDarkTheme_ColorPalette_Gradient1_Name,
-                    Strings.ExpressionDarkTheme_ColorPalette_Gradient1_Description,
-                    Resources.Transparent_White
-                ),
-            };
         }
     }
 }

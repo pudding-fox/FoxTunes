@@ -63,42 +63,6 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string AdamantineTheme_ColorPalette_Default_Description {
-            get {
-                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Default.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        internal static string AdamantineTheme_ColorPalette_Default_Name {
-            get {
-                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Default.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string AdamantineTheme_ColorPalette_Gradient1_Description {
-            get {
-                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Gradient1.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default (Gradient).
-        /// </summary>
-        internal static string AdamantineTheme_ColorPalette_Gradient1_Name {
-            get {
-                return ResourceManager.GetString("AdamantineTheme.ColorPalette.Gradient1.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
         internal static string AdamantineTheme_Description {
             get {
                 return ResourceManager.GetString("AdamantineTheme.Description", resourceCulture);
@@ -111,51 +75,6 @@ namespace FoxTunes {
         internal static string AdamantineTheme_Name {
             get {
                 return ResourceManager.GetString("AdamantineTheme.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to List Row Shading.
-        /// </summary>
-        internal static string AdamantineThemeConfiguration_ListRowShading {
-            get {
-                return ResourceManager.GetString("AdamantineThemeConfiguration.ListRowShading", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string Aero2Theme_ColorPalette_Default_Description {
-            get {
-                return ResourceManager.GetString("Aero2Theme.ColorPalette.Default.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        internal static string Aero2Theme_ColorPalette_Default_Name {
-            get {
-                return ResourceManager.GetString("Aero2Theme.ColorPalette.Default.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string Aero2Theme_ColorPalette_Gradient1_Description {
-            get {
-                return ResourceManager.GetString("Aero2Theme.ColorPalette.Gradient1.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default (Gradient).
-        /// </summary>
-        internal static string Aero2Theme_ColorPalette_Gradient1_Name {
-            get {
-                return ResourceManager.GetString("Aero2Theme.ColorPalette.Gradient1.Name", resourceCulture);
             }
         }
         
@@ -180,42 +99,6 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string AeroTheme_ColorPalette_Default_Description {
-            get {
-                return ResourceManager.GetString("AeroTheme.ColorPalette.Default.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        internal static string AeroTheme_ColorPalette_Default_Name {
-            get {
-                return ResourceManager.GetString("AeroTheme.ColorPalette.Default.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string AeroTheme_ColorPalette_Gradient1_Description {
-            get {
-                return ResourceManager.GetString("AeroTheme.ColorPalette.Gradient1.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default (Gradient).
-        /// </summary>
-        internal static string AeroTheme_ColorPalette_Gradient1_Name {
-            get {
-                return ResourceManager.GetString("AeroTheme.ColorPalette.Gradient1.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
         internal static string AeroTheme_Description {
             get {
                 return ResourceManager.GetString("AeroTheme.Description", resourceCulture);
@@ -228,42 +111,6 @@ namespace FoxTunes {
         internal static string AeroTheme_Name {
             get {
                 return ResourceManager.GetString("AeroTheme.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string ClassicTheme_ColorPalette_Default_Description {
-            get {
-                return ResourceManager.GetString("ClassicTheme.ColorPalette.Default.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        internal static string ClassicTheme_ColorPalette_Default_Name {
-            get {
-                return ResourceManager.GetString("ClassicTheme.ColorPalette.Default.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string ClassicTheme_ColorPalette_Gradient1_Description {
-            get {
-                return ResourceManager.GetString("ClassicTheme.ColorPalette.Gradient1.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default (Gradient).
-        /// </summary>
-        internal static string ClassicTheme_ColorPalette_Gradient1_Name {
-            get {
-                return ResourceManager.GetString("ClassicTheme.ColorPalette.Gradient1.Name", resourceCulture);
             }
         }
         
@@ -286,38 +133,38 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string ExpressionDarkTheme_ColorPalette_Default_Description {
-            get {
-                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Default.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Default.
         /// </summary>
-        internal static string ExpressionDarkTheme_ColorPalette_Default_Name {
+        internal static string ColorPalette_Default {
             get {
-                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Default.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string ExpressionDarkTheme_ColorPalette_Gradient1_Description {
-            get {
-                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Gradient1.Description", resourceCulture);
+                return ResourceManager.GetString("ColorPalette.Default", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Default (Gradient).
         /// </summary>
-        internal static string ExpressionDarkTheme_ColorPalette_Gradient1_Name {
+        internal static string ColorPalette_Gradient {
             get {
-                return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Gradient1.Name", resourceCulture);
+                return ResourceManager.GetString("ColorPalette.Gradient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retro Vibes.
+        /// </summary>
+        internal static string ColorPalette_RetroVibes {
+            get {
+                return ResourceManager.GetString("ColorPalette.RetroVibes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Traffic Light.
+        /// </summary>
+        internal static string ColorPalette_TrafficLight {
+            get {
+                return ResourceManager.GetString("ColorPalette.TrafficLight", resourceCulture);
             }
         }
         
@@ -340,56 +187,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to List Row Shading.
-        /// </summary>
-        internal static string ExpressionDarkThemeConfiguration_ListRowShading {
-            get {
-                return ResourceManager.GetString("ExpressionDarkThemeConfiguration.ListRowShading", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
             get {
                 return ResourceManager.GetString("General.Advanced", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string RoyaleTheme_ColorPalette_Default_Description {
-            get {
-                return ResourceManager.GetString("RoyaleTheme.ColorPalette.Default.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        internal static string RoyaleTheme_ColorPalette_Default_Name {
-            get {
-                return ResourceManager.GetString("RoyaleTheme.ColorPalette.Default.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string RoyaleTheme_ColorPalette_Gradient1_Description {
-            get {
-                return ResourceManager.GetString("RoyaleTheme.ColorPalette.Gradient1.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default (Gradient).
-        /// </summary>
-        internal static string RoyaleTheme_ColorPalette_Gradient1_Name {
-            get {
-                return ResourceManager.GetString("RoyaleTheme.ColorPalette.Gradient1.Name", resourceCulture);
             }
         }
         
