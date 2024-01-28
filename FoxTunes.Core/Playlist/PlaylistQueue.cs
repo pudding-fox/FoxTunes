@@ -1,15 +1,20 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
-using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class PlaylistQueue : StandardComponent
+    public class PlaylistQueue : StandardComponent, IPlaylistQueue
     {
+        public const string QUEUE_LAST = "BBBB";
+
+        public const string QUEUE_NEXT = "BBBC";
+
+        public const string QUEUE_RESET = "BBBD";
+
         public PlaylistQueue()
         {
             this.Queue = new ConcurrentDictionary<Playlist, List<PlaylistItem>>();
@@ -17,12 +22,15 @@ namespace FoxTunes
 
         public ConcurrentDictionary<Playlist, List<PlaylistItem>> Queue { get; private set; }
 
+        public IPlaylistManager PlaylistManager { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
@@ -45,6 +53,40 @@ namespace FoxTunes
                     {
                         this.Refresh();
                     }
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        public IEnumerable<IInvocationComponent> Invocations
+        {
+            get
+            {
+                if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_LAST, "Add", path: "Queue", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_NEXT, "Add (Next)", path: "Queue");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_RESET, "Reset", path: "Queue");
+                }
+            }
+        }
+
+        public Task InvokeAsync(IInvocationComponent component)
+        {
+            switch (component.Id)
+            {
+                case QUEUE_LAST:
+                    this.Enqueue(PlaylistQueueFlags.None);
+                    break;
+                case QUEUE_NEXT:
+                    this.Enqueue(PlaylistQueueFlags.Next);
+                    break;
+                case QUEUE_RESET:
+                    this.Enqueue(PlaylistQueueFlags.Reset);
                     break;
             }
 #if NET40
@@ -84,7 +126,25 @@ namespace FoxTunes
             }
         }
 
-        public Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
+        public void Enqueue(PlaylistQueueFlags flags)
+        {
+            var playlistItems = this.PlaylistManager.SelectedItems as IEnumerable<PlaylistItem>;
+            if (flags == PlaylistQueueFlags.Next)
+            {
+                playlistItems = playlistItems.Reverse();
+            }
+            foreach (var playlistItem in playlistItems)
+            {
+                var playlist = this.PlaylistBrowser.GetPlaylist(playlistItem);
+                if (playlist == null)
+                {
+                    continue;
+                }
+                this.Enqueue(playlist, playlistItem, flags);
+            }
+        }
+
+        public void Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
         {
             var queue = this.Queue.GetOrAdd(playlist, key => new List<PlaylistItem>());
             queue.Remove(playlistItem);
@@ -97,14 +157,9 @@ namespace FoxTunes
                     queue.Insert(0, playlistItem);
                     break;
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
-        public Task<PlaylistItem> Dequeue(Playlist playlist)
+        public PlaylistItem Dequeue(Playlist playlist)
         {
             var queue = default(List<PlaylistItem>);
             var playlistItem = default(PlaylistItem);
@@ -120,26 +175,22 @@ namespace FoxTunes
                     }
                 }
             }
-#if NET40
-            return TaskEx.FromResult(playlistItem);
-#else
-            return Task.FromResult(playlistItem);
-#endif
+            return playlistItem;
         }
 
-        public Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem)
+        public int GetQueuePosition(PlaylistItem playlistItem)
         {
             var position = -1;
-            var queue = default(List<PlaylistItem>);
-            if (this.Queue.TryGetValue(playlist, out queue))
+            var playlist = this.PlaylistBrowser.GetPlaylist(playlistItem);
+            if (playlist != null)
             {
-                position = queue.IndexOf(playlistItem);
+                var queue = default(List<PlaylistItem>);
+                if (this.Queue.TryGetValue(playlist, out queue))
+                {
+                    position = queue.IndexOf(playlistItem);
+                }
             }
-#if NET40
-            return TaskEx.FromResult(position);
-#else
-            return Task.FromResult(position);
-#endif
+            return position;
         }
     }
 }

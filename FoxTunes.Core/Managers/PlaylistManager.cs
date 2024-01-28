@@ -12,12 +12,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class PlaylistManager : StandardManager, IPlaylistManager
     {
-        public const string QUEUE = "YAAA";
-
-        public const string QUEUE_NEXT = "YBBB";
-
-        public const string QUEUE_RESET = "YCCC";
-
         public const string CLEAR_PLAYLIST = "ZZZZ";
 
         public PlaylistManager()
@@ -637,24 +631,6 @@ namespace FoxTunes
 
         public event EventHandler SelectedItemsChanged;
 
-        public async Task Enqueue(Playlist playlist, IEnumerable<PlaylistItem> playlistItems, PlaylistQueueFlags flags)
-        {
-            foreach (var playlistItem in playlistItems)
-            {
-                await this.PlaylistBrowser.Enqueue(playlist, playlistItem, flags).ConfigureAwait(false);
-            }
-        }
-
-        public Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
-        {
-            return this.PlaylistBrowser.Enqueue(playlist, playlistItem, flags);
-        }
-
-        public Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem)
-        {
-            return this.PlaylistBrowser.GetQueuePosition(playlist, playlistItem);
-        }
-
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)
@@ -678,12 +654,6 @@ namespace FoxTunes
             {
                 if (this.SelectedPlaylist != null)
                 {
-                    if (this.SelectedItems != null && this.SelectedItems.Any())
-                    {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE, "Add", path: "Queue");
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_NEXT, "Add (Next)", path: "Queue");
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, QUEUE_NEXT, "Reset", path: "Queue");
-                    }
                     if (this.SelectedPlaylist.Type == PlaylistType.None)
                     {
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR_PLAYLIST, "Clear", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
@@ -700,12 +670,6 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case QUEUE:
-                    return this.Enqueue(this.SelectedPlaylist, this.SelectedItems, PlaylistQueueFlags.None);
-                case QUEUE_NEXT:
-                    return this.Enqueue(this.SelectedPlaylist, this.SelectedItems, PlaylistQueueFlags.Next);
-                case QUEUE_RESET:
-                    return this.Enqueue(this.SelectedPlaylist, this.SelectedItems, PlaylistQueueFlags.Reset);
                 case CLEAR_PLAYLIST:
                     return this.Clear(this.SelectedPlaylist);
             }
