@@ -39,17 +39,34 @@ namespace FoxTunes
             return this.CreateStream(playlistItem, flags);
         }
 
-        public override Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
-        {
-            if (this.Output != null && this.Output.PlayFromMemory)
-            {
-                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
-            }
 #if NET40
-            return TaskEx.FromResult(BassDts.CreateStream(playlistItem.FileName, 0, 0, flags));
+        public override Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
 #else
-            return Task.FromResult(BassDts.CreateStream(playlistItem.FileName, 0, 0, flags));
+        public override async Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
 #endif
+        {
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+#endif
+            try
+            {
+                if (this.Output != null && this.Output.PlayFromMemory)
+                {
+                    Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
+                }
+                var channelHandle = BassDts.CreateStream(playlistItem.FileName, 0, 0, flags);
+#if NET40
+                return TaskEx.FromResult(channelHandle);
+#else
+                return channelHandle;
+#endif
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
         }
     }
 }
