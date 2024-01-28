@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -127,10 +128,17 @@ namespace FoxTunes
         public static void BringToFront(this Window window)
         {
             window.Activate();
-            if (!window.Topmost)
+            if (!window.HasBinding(Window.TopmostProperty))
             {
-                window.Topmost = true;
-                window.Topmost = false;
+                if (!window.Topmost)
+                {
+                    window.Topmost = true;
+                    window.Topmost = false;
+                }
+            }
+            else
+            {
+                //TODO: Can't use topmost hack to bring window to front, property is data bound.
             }
             window.Focus();
         }
@@ -185,6 +193,11 @@ namespace FoxTunes
                 }
             }
             return false;
+        }
+
+        public static bool HasBinding(this DependencyObject element, DependencyProperty property)
+        {
+            return BindingOperations.GetBindingExpression(element, property) != null;
         }
     }
 }

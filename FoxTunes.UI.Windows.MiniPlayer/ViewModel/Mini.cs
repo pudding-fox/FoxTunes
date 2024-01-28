@@ -16,6 +16,32 @@ namespace FoxTunes.ViewModel
 
         public IConfiguration Configuration { get; private set; }
 
+        private BooleanConfigurationElement _Topmost { get; set; }
+
+        public BooleanConfigurationElement Topmost
+        {
+            get
+            {
+                return this._Topmost;
+            }
+            set
+            {
+                this._Topmost = value;
+                this.OnTopmostChanged();
+            }
+        }
+
+        protected virtual void OnTopmostChanged()
+        {
+            if (this.TopmostChanged != null)
+            {
+                this.TopmostChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Topmost");
+        }
+
+        public event EventHandler TopmostChanged;
+
         private BooleanConfigurationElement _ShowArtwork { get; set; }
 
         public BooleanConfigurationElement ShowArtwork
@@ -93,32 +119,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler DropCommitChanged;
-
-        private DoubleConfigurationElement _ScalingFactor { get; set; }
-
-        public DoubleConfigurationElement ScalingFactor
-        {
-            get
-            {
-                return this._ScalingFactor;
-            }
-            set
-            {
-                this._ScalingFactor = value;
-                this.OnScalingFactorChanged();
-            }
-        }
-
-        protected virtual void OnScalingFactorChanged()
-        {
-            if (this.ScalingFactorChanged != null)
-            {
-                this.ScalingFactorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ScalingFactor");
-        }
-
-        public event EventHandler ScalingFactorChanged;
 
         private BooleanConfigurationElement _ExtendGlass { get; set; }
 
@@ -275,6 +275,10 @@ namespace FoxTunes.ViewModel
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaylistManager = core.Managers.Playlist;
             this.Configuration = core.Components.Configuration;
+            this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
+              MiniPlayerBehaviourConfiguration.SECTION,
+              MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
+            );
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
               MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.SHOW_ARTWORK_ELEMENT
@@ -286,10 +290,6 @@ namespace FoxTunes.ViewModel
             this.DropCommit = this.Configuration.GetElement<SelectionConfigurationElement>(
               MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.DROP_COMMIT_ELEMENT
-            );
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
             this.ExtendGlass = this.Configuration.GetElement<BooleanConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
