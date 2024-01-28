@@ -48,6 +48,14 @@ namespace FoxTunes
             }
         }
 
+        public bool IsMaximized
+        {
+            get
+            {
+                return this.Window.WindowState == global::System.Windows.WindowState.Maximized;
+            }
+        }
+
         public bool IsVisible
         {
             get
