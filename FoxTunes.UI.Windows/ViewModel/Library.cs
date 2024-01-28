@@ -16,7 +16,7 @@ namespace FoxTunes.ViewModel
         public Library()
         {
             this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>>();
-            this._SelectedItem = LibraryHierarchyNode.Empty;
+            this._SelectedItem = new Dictionary<LibraryHierarchy, LibraryHierarchyNode>();
         }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
@@ -124,32 +124,36 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged = delegate { };
 
-        private LibraryHierarchyNode _SelectedItem { get; set; }
+        private Dictionary<LibraryHierarchy, LibraryHierarchyNode> _SelectedItem { get; set; }
 
         public LibraryHierarchyNode SelectedItem
         {
             get
             {
-                return this._SelectedItem;
+                if (this.SelectedHierarchy == null)
+                {
+                    return null;
+                }
+                if (!this._SelectedItem.ContainsKey(this.SelectedHierarchy))
+                {
+                    this._SelectedItem[this.SelectedHierarchy] = LibraryHierarchyNode.Empty;
+                }
+                return this._SelectedItem[this.SelectedHierarchy];
             }
             set
             {
-                if (object.ReferenceEquals(this._SelectedItem, value))
+                if (this.SelectedHierarchy == null || object.ReferenceEquals(this.SelectedItem, value))
                 {
                     return;
                 }
                 this.OnSelectedItemChanging();
-                this._SelectedItem = value;
+                this._SelectedItem[this.SelectedHierarchy] = value;
                 this.OnSelectedItemChanged();
             }
         }
 
         protected virtual void OnSelectedItemChanging()
         {
-            if (this.SelectedItem != null)
-            {
-                this.SelectedItem.IsSelected = false;
-            }
             if (this.SelectedItemChanging != null)
             {
                 this.SelectedItemChanging(this, EventArgs.Empty);
@@ -161,10 +165,6 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnSelectedItemChanged()
         {
-            if (this.SelectedItem != null)
-            {
-                this.SelectedItem.IsSelected = true;
-            }
             if (this.SelectedItemChanged != null)
             {
                 this.SelectedItemChanged(this, EventArgs.Empty);
@@ -177,6 +177,7 @@ namespace FoxTunes.ViewModel
         public virtual void Refresh()
         {
             this.OnItemsChanged();
+            this.OnSelectedItemChanged();
         }
 
         public virtual Task Reload()
