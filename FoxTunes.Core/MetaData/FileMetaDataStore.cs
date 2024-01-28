@@ -14,6 +14,8 @@ namespace FoxTunes
             "DataStore"
         );
 
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
+
         public static readonly object SyncRoot = new object();
 
         public static bool Contains(string fileName)
@@ -88,15 +90,6 @@ namespace FoxTunes
             return fileName;
         }
 
-
-        public static string Write(string prefix, string id, string fileName)
-        {
-            using (var stream = File.OpenRead(fileName))
-            {
-                return Write(prefix, id, stream);
-            }
-        }
-
         public static async Task<string> WriteAsync(string prefix, string id, Stream stream)
         {
             var fileName = GetFileName(prefix, id);
@@ -116,7 +109,15 @@ namespace FoxTunes
             return fileName;
         }
 
-        public static async Task<string> WriteAsync(string prefix, string id, string fileName)
+        public static string Copy(string prefix, string id, string fileName)
+        {
+            using (var stream = File.OpenRead(fileName))
+            {
+                return Write(prefix, id, stream);
+            }
+        }
+
+        public static async Task<string> CopyAsync(string prefix, string id, string fileName)
         {
             using (var stream = File.OpenRead(fileName))
             {
@@ -152,6 +153,40 @@ namespace FoxTunes
         public static string GetFileName(string prefix, string id)
         {
             return Path.Combine(DataStoreDirectoryName, prefix, string.Concat(Path.Combine(GetSegments(id).ToArray()), ".bin"));
+        }
+
+        public static string IfNotExists(string prefix, string id, Func<string, string> factory, bool always = false)
+        {
+            var result = default(string);
+            if (!always && Exists(prefix, id, out result))
+            {
+                return result;
+            }
+            using (KeyLock.Lock(GetFileName(prefix, id)))
+            {
+                if (!always && Exists(prefix, id, out result))
+                {
+                    return result;
+                }
+                return factory(result);
+            }
+        }
+
+        public static async Task<string> IfNotExistsAsync(string prefix, string id, Func<string, Task<string>> factory, bool always = false)
+        {
+            var result = default(string);
+            if (!always && Exists(prefix, id, out result))
+            {
+                return result;
+            }
+            using (await KeyLock.LockAsync(GetFileName(prefix, id)).ConfigureAwait(false))
+            {
+                if (!always && Exists(prefix, id, out result))
+                {
+                    return result;
+                }
+                return await factory(result).ConfigureAwait(false);
+            }
         }
     }
 }

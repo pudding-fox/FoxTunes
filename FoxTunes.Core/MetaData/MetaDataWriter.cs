@@ -53,15 +53,13 @@ namespace FoxTunes
             {
                 return;
             }
-            var metaDataItemId = default(int);
-            if (!this.Store.TryGetValue(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, out metaDataItemId))
+            var metaDataItemId = this.Store.GetOrAdd(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, () =>
             {
                 this.AddCommand.Parameters["name"] = metaDataItem.Name;
                 this.AddCommand.Parameters["type"] = metaDataItem.Type;
                 this.AddCommand.Parameters["value"] = metaDataItem.Value;
-                metaDataItemId = Convert.ToInt32(await this.AddCommand.ExecuteScalarAsync().ConfigureAwait(false));
-                this.Store.Add(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, metaDataItemId);
-            }
+                return Convert.ToInt32(this.AddCommand.ExecuteScalar());
+            });
             this.UpdateCommand.Parameters["itemId"] = itemId;
             this.UpdateCommand.Parameters["metaDataItemId"] = metaDataItemId;
             await this.UpdateCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -118,25 +116,14 @@ namespace FoxTunes
 
             public CappedDictionary<Key, int> Store { get; private set; }
 
-            public void Add(string name, MetaDataItemType type, string value, int metaDataItemId)
+            public int GetOrAdd(string name, MetaDataItemType type, string value, Func<int> factory)
             {
                 if (!NAMES.Contains(name))
                 {
-                    return;
+                    return default(int);
                 }
                 var key = new Key(name, type, value);
-                this.Store.Add(key, metaDataItemId);
-            }
-
-            public bool TryGetValue(string name, MetaDataItemType type, string value, out int metaDataItemId)
-            {
-                if (!NAMES.Contains(name))
-                {
-                    metaDataItemId = default(int);
-                    return false;
-                }
-                var key = new Key(name, type, value);
-                return this.Store.TryGetValue(key, out metaDataItemId);
+                return this.Store.GetOrAdd(key, factory);
             }
 
             public class Key : IEquatable<Key>
