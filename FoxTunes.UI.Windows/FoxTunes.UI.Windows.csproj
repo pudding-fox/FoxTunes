@@ -86,6 +86,7 @@
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
+    <Compile Include="ViewModel\AsyncCommand.cs" />
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryHierarchies.cs" />
     <Compile Include="ViewModel\RenderableLibraryHierarchyItem.cs" />

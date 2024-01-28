@@ -42,12 +42,16 @@ namespace FoxTunes.ViewModel
                     {
                         sequence = Enumerable.Empty<LibraryHierarchyItem>();
                     }
-                    else
+                    else if (this.Database.CanQuery(this.LibraryHierarchyItem))
                     {
                         var query = this.Database
                             .GetMemberQuery<LibraryHierarchyItem, LibraryHierarchyItem>(this.LibraryHierarchyItem, _ => _.Children)
                             .ToArray(); //We have to switch to object query as the following projection is not supported.
                         sequence = query.Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database));
+                    }
+                    else
+                    {
+                        sequence = Enumerable.Empty<LibraryHierarchyItem>();
                     }
                     this._Children = new ObservableCollection<LibraryHierarchyItem>(sequence);
                 }
@@ -61,7 +65,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this._Items == null)
+                if (this._Items == null && this.Database.CanQuery(this.LibraryHierarchyItem))
                 {
                     var query = this.Database.GetMemberQuery<LibraryHierarchyItem, LibraryItem>(this.LibraryHierarchyItem, _ => _.Items);
                     query.Include("MetaDatas");

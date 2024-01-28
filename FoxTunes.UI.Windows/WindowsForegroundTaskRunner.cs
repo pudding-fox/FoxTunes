@@ -19,5 +19,17 @@ namespace FoxTunes
             }
             return Task.CompletedTask;
         }
+
+        public void RunAsync(Action action)
+        {
+            if (Application.Current != null)
+            {
+                Application.Current.Dispatcher.BeginInvoke(action);
+            }
+            else
+            {
+                action();
+            }
+        }
     }
 }

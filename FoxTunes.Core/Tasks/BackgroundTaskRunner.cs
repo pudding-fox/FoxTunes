@@ -10,5 +10,14 @@ namespace FoxTunes
         {
             return Task.Factory.StartNew(action);
         }
+
+        public Task Run(Task task)
+        {
+            if (task.Status == TaskStatus.Created)
+            {
+                return this.Run(() => task.Start());
+            }
+            return task;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using CSCore.SoundOut;
 using CSCore.Streams;
 using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -101,7 +102,7 @@ namespace FoxTunes
 
         protected virtual void NotificationSource_BlockRead(object sender, BlockReadEventArgs<float> e)
         {
-            this.ForegroundTaskRunner.Run(() => this.OnPositionChanged());
+            this.ForegroundTaskRunner.RunAsync(() => this.OnPositionChanged());
         }
 
         protected virtual void SoundOut_Stopped(object sender, PlaybackStoppedEventArgs e)
@@ -134,11 +135,12 @@ namespace FoxTunes
             this.OnResumed();
         }
 
-        public override void Stop()
+        public override Task Stop()
         {
             this.StopRequested = true;
             this.SoundOut.Stop();
             this.EmitState();
+            return Task.CompletedTask;
         }
 
         private void EmitState()

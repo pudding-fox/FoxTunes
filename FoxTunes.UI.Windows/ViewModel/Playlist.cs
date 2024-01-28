@@ -72,10 +72,12 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() =>
+                return new AsyncCommand(() =>
                 {
                     var item = this.SelectedItems[0] as PlaylistItem;
-                    this.PlaybackManager.Load(item.FileName, () => this.PlaybackManager.CurrentStream.Play());
+                    return this.PlaybackManager
+                        .Load(item.FileName)
+                        .ContinueWith(_ => this.PlaybackManager.CurrentStream.Play());
                 },
                 () => this.PlaybackManager != null && this.SelectedItems.Count > 0);
             }
@@ -98,7 +100,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() => this.Core.Managers.Playlist.Clear());
+                return new AsyncCommand(() => this.Core.Managers.Playlist.Clear());
             }
         }
 

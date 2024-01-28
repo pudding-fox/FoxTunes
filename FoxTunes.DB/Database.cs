@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -14,6 +15,8 @@ namespace FoxTunes
 
         public abstract IDatabaseQuery<T> GetQuery<T>() where T : class;
 
+        public abstract bool CanQuery<T>(T item) where T : class;
+
         public abstract IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, TMember>> member)
             where T : class
             where TMember : class;
@@ -22,17 +25,13 @@ namespace FoxTunes
             where T : class
             where TMember : class;
 
-        public abstract void Interlocked(Action action);
-
-        public abstract T Interlocked<T>(Func<T> func);
-
-        public abstract void Interlocked(Action action, TimeSpan timeout);
-
-        public abstract T Interlocked<T>(Func<T> func, TimeSpan timeout);
-
         public abstract void WithAutoDetectChanges(Action action);
 
+        public abstract T WithAutoDetectChanges<T>(Func<T> func);
+
         public abstract int SaveChanges();
+
+        public abstract Task<int> SaveChangesAsync();
 
         public override void InitializeComponent(ICore core)
         {

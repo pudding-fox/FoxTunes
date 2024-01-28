@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -6,12 +7,14 @@ namespace FoxTunes.Interfaces
     {
         bool IsSupported(string fileName);
 
-        IOutputStream CurrentStream { get; set; }
+        IOutputStream CurrentStream { get; }
 
         event EventHandler CurrentStreamChanged;
 
-        void Load(string fileName, Action callBack = null);
+        Task Load(string fileName);
 
-        void Unload(Action callBack = null);
+        Task Unload();
+
+        Task Stop();
     }
 }

@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
     public interface IPlaylistManager : IStandardManager, IBackgroundTaskSource
     {
-        void Add(IEnumerable<string> paths);
+        Task Add(IEnumerable<string> paths);
 
-        void Add(IEnumerable<LibraryItem> libraryItems);
+        Task Add(IEnumerable<LibraryItem> libraryItems);
 
         event EventHandler Updated;
 
-        void Next();
+        Task Next();
 
-        void Previous();
+        Task Previous();
 
-        void Clear();
+        Task Clear();
 
         PlaylistItem CurrentItem { get; }
 

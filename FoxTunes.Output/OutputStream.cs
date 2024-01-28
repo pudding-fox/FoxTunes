@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -107,7 +108,7 @@ namespace FoxTunes
 
         public event EventHandler Resumed = delegate { };
 
-        public abstract void Stop();
+        public abstract Task Stop();
 
         protected virtual void OnStopped(bool manual)
         {

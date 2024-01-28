@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -6,8 +7,8 @@ namespace FoxTunes
     {
         public abstract bool IsSupported(string fileName);
 
-        public abstract IOutputStream Load(string fileName);
+        public abstract Task<IOutputStream> Load(string fileName);
 
-        public abstract void Unload(IOutputStream stream);
+        public abstract Task Unload(IOutputStream stream);
     }
 }

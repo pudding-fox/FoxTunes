@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Output.cs" />
     <Compile Include="OutputStream.cs" />
+    <Compile Include="OutputStreamQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

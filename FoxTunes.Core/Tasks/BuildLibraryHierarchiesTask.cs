@@ -3,6 +3,7 @@ using FoxTunes.Interfaces;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -31,7 +32,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override void OnRun()
+        protected override Task OnRun()
         {
             this.Position = 0;
             this.Count = this.Library.LibraryItemQuery.Count() * this.Library.LibraryHierarchyQuery.Count();
@@ -46,7 +47,7 @@ namespace FoxTunes
                 }
             }
             this.Position = this.Count;
-            this.SaveChanges();
+            return this.SaveChanges();
         }
 
         private void ClearHierarchy(LibraryHierarchy libraryHierarchy)
@@ -92,11 +93,11 @@ namespace FoxTunes
             return libraryHierarchyItems;
         }
 
-        private void SaveChanges()
+        private Task SaveChanges()
         {
             this.Name = "Saving changes";
             this.Position = this.Count;
-            this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(() => this.Database.SaveChanges()));
+            return this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(() => this.Database.SaveChangesAsync()));
         }
 
         private string ExecuteScript(LibraryItem libraryItem, string script)

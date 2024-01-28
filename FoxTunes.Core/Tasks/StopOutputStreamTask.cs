@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -20,9 +21,9 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override void OnRun()
+        protected override Task OnRun()
         {
-            this.PlaybackManager.CurrentStream.Stop();
+            return this.PlaybackManager.CurrentStream.Stop();
         }
     }
 }

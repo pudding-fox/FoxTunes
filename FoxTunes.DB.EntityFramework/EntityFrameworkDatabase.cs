@@ -7,13 +7,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Objects;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public abstract class EntityFrameworkDatabase : Database
     {
-        public readonly object SyncRoot = new object();
-
         protected DbContext DbContext { get; private set; }
 
         protected ObjectContext ObjectContext
@@ -180,9 +179,19 @@ namespace FoxTunes
             return new WrappedDbQuery<T>(this.DbContext, this.DbContext.Set<T>());
         }
 
+        public override bool CanQuery<T>(T item)
+        {
+            var entry = this.DbContext.Entry(item);
+            return entry.State != EntityState.Detached;
+        }
+
         public override IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, TMember>> member)
         {
             var entry = this.DbContext.Entry(item);
+            if (entry.State == EntityState.Detached)
+            {
+                throw new InvalidOperationException("Item is untracked, cannot query.");
+            }
             return new WrappedDbQuery<TMember>(
                 this.DbContext,
                 this.DbContext.Set<TMember>(),
@@ -193,61 +202,36 @@ namespace FoxTunes
         public override IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, ICollection<TMember>>> member)
         {
             var entry = this.DbContext.Entry(item);
+            if (entry.State == EntityState.Detached)
+            {
+                throw new InvalidOperationException("Item is untracked, cannot query.");
+            }
             return new WrappedDbQuery<TMember>(
                 this.DbContext,
                 this.DbContext.Set<TMember>(),
                 entry.Collection(member).Query()
             );
         }
-
-        public override void Interlocked(Action action)
-        {
-            this.Interlocked(action, Timeout.InfiniteTimeSpan);
-        }
-
-        public override T Interlocked<T>(Func<T> func)
-        {
-            return this.Interlocked(func, Timeout.InfiniteTimeSpan);
-        }
-
-        public override void Interlocked(Action action, TimeSpan timeout)
-        {
-            if (!Monitor.TryEnter(this.SyncRoot, timeout))
-            {
-                throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));
-            }
-            try
-            {
-                action();
-            }
-            finally
-            {
-                Monitor.Exit(this.SyncRoot);
-            }
-        }
-
-        public override T Interlocked<T>(Func<T> func, TimeSpan timeout)
-        {
-            if (!Monitor.TryEnter(this.SyncRoot, timeout))
-            {
-                throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));
-            }
-            try
-            {
-                return func();
-            }
-            finally
-            {
-                Monitor.Exit(this.SyncRoot);
-            }
-        }
-
+        
         public override void WithAutoDetectChanges(Action action)
         {
             this.DbContext.Configuration.AutoDetectChangesEnabled = true;
             try
             {
                 action();
+            }
+            finally
+            {
+                this.DbContext.Configuration.AutoDetectChangesEnabled = false;
+            }
+        }
+
+        public override T WithAutoDetectChanges<T>(Func<T> func)
+        {
+            this.DbContext.Configuration.AutoDetectChangesEnabled = true;
+            try
+            {
+                return func();
             }
             finally
             {
@@ -262,6 +246,16 @@ namespace FoxTunes
                 return 0;
             }
             return this.DbContext.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync()
+        {
+            //if (this.DbContext == null)
+            //{
+            //    return Task.FromResult(0);
+            //}
+            //return this.DbContext.SaveChangesAsync();
+            return Task.FromResult(this.SaveChanges());
         }
     }
 }
