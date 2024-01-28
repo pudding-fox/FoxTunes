@@ -49,25 +49,25 @@ namespace FoxTunes
 
         protected virtual async Task AddPaths(IEnumerable<string> paths)
         {
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
-            {
-                await this.AddItems(paths);
-                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
-                if (this.MetaDataSourceFactory.Enabled)
-                {
-                    await this.AddOrUpdateMetaData(cancellationToken);
-                    await this.UpdateVariousArtists();
-                    await this.SequenceItems();
-                }
-                await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
-            }))
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+             {
+                 await this.AddPlaylistItems(paths, cancellationToken);
+                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+                 if (this.MetaDataSourceFactory.Enabled)
+                 {
+                     await this.AddOrUpdateMetaData(cancellationToken);
+                     await this.UpdateVariousArtists();
+                     await this.SequenceItems();
+                 }
+                 await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+             }))
             {
                 await task.Run();
             }
         }
 
-        protected virtual async Task AddItems(IEnumerable<string> paths)
+        protected virtual async Task AddPlaylistItems(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
@@ -75,7 +75,7 @@ namespace FoxTunes
                 {
                     playlistPopulator.InitializeComponent(this.Core);
                     await this.WithPopulator(playlistPopulator,
-                        async () => await playlistPopulator.Populate(paths)
+                        async () => await playlistPopulator.Populate(paths, cancellationToken)
                     );
                     this.Offset = playlistPopulator.Offset;
                 }
@@ -103,7 +103,7 @@ namespace FoxTunes
 
         protected virtual async Task MoveItems(IEnumerable<PlaylistItem> playlistItems)
         {
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
@@ -136,7 +136,7 @@ namespace FoxTunes
 
         protected virtual async Task RemoveItems(IEnumerable<PlaylistItem> playlistItems)
         {
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
@@ -162,7 +162,7 @@ namespace FoxTunes
         {
             await this.SetIsIndeterminate(true);
             Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {

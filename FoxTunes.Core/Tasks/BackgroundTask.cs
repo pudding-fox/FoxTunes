@@ -66,7 +66,18 @@ namespace FoxTunes
             }
         }
 
-        protected bool IsCancellationRequested { get; set; }
+        public bool IsCancellationRequested { get; private set; }
+
+        protected virtual void OnCancellationRequested()
+        {
+            if (this.CancellationRequested == null)
+            {
+                return;
+            }
+            this.CancellationRequested(this, EventArgs.Empty);
+        }
+
+        public event EventHandler CancellationRequested;
 
         public virtual int Concurrency
         {
@@ -378,6 +389,7 @@ namespace FoxTunes
                 throw new NotImplementedException();
             }
             this.IsCancellationRequested = true;
+            this.OnCancellationRequested();
         }
 
         protected virtual async Task WithPopulator(PopulatorBase populator, Func<Task> func)
@@ -446,5 +458,60 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             this.Dispose(true);
         }
+
+        public static async Task<bool> Shutdown(TimeSpan interval, TimeSpan timeout)
+        {
+            OnShutdownStarted();
+            do
+            {
+                var instances = Active.ToArray();
+                if (instances.Length == 0)
+                {
+                    break;
+                }
+                foreach (var instance in instances)
+                {
+                    if (!instance.Cancellable || instance.IsCancellationRequested)
+                    {
+                        continue;
+                    }
+                    instance.Cancel();
+                }
+#if NET40
+                await TaskEx.Delay(interval);
+#else
+                await Task.Delay(interval);
+#endif
+                timeout -= interval;
+                if (timeout <= TimeSpan.Zero)
+                {
+                    return false;
+                }
+            } while (true);
+            OnShutdownCompleted();
+            return true;
+        }
+
+        private static void OnShutdownStarted()
+        {
+            if (ShutdownStarted == null)
+            {
+                return;
+            }
+            ShutdownStarted(null, EventArgs.Empty);
+        }
+
+        public static event EventHandler ShutdownStarted;
+
+        private static void OnShutdownCompleted()
+        {
+            if (ShutdownCompleted == null)
+            {
+                return;
+            }
+            ShutdownCompleted(null, EventArgs.Empty);
+        }
+
+        public static event EventHandler ShutdownCompleted;
     }
 }

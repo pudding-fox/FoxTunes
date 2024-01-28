@@ -39,19 +39,19 @@ namespace FoxTunes
 
         protected virtual async Task AddPaths(IEnumerable<string> paths, bool buildHierarchies)
         {
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
-            {
-                await this.AddLibraryItems(paths, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    await this.SetName("Waiting..");
-                    await this.SetDescription(string.Empty);
-                }
-            }))
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+             {
+                 await this.AddLibraryItems(paths, cancellationToken);
+                 if (cancellationToken.IsCancellationRequested)
+                 {
+                     await this.SetName("Waiting..");
+                     await this.SetDescription(string.Empty);
+                 }
+             }))
             {
                 await task.Run();
             }
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
                 await this.AddOrUpdateMetaData(cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
@@ -68,7 +68,10 @@ namespace FoxTunes
             {
                 await this.BuildHierarchies(LibraryItemStatus.Import);
             }
-            await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None);
+            if (!this.IsCancellationRequested)
+            {
+                await SetLibraryItemsStatus(this.Database, LibraryItemStatus.None);
+            }
         }
 
         protected virtual async Task AddLibraryItems(IEnumerable<string> paths, CancellationToken cancellationToken)
@@ -102,7 +105,7 @@ namespace FoxTunes
 
         protected virtual async Task BuildHierarchies(LibraryItemStatus? status)
         {
-            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {

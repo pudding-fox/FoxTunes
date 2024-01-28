@@ -20,6 +20,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool Cancellable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public IEnumerable<string> Paths { get; private set; }
 
         protected override async Task OnStarted()

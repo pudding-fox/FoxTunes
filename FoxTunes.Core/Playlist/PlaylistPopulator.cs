@@ -28,7 +28,7 @@ namespace FoxTunes
 
         public ITransactionSource Transaction { get; private set; }
 
-        public async Task Populate(IEnumerable<string> paths)
+        public async Task Populate(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
             var interval = 10;
             var position = 0;
@@ -36,10 +36,18 @@ namespace FoxTunes
             {
                 foreach (var path in paths)
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     if (Directory.Exists(path))
                     {
                         foreach (var fileName in FileSystemHelper.EnumerateFiles(path, "*.*"))
                         {
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                return;
+                            }
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                             await this.AddPlaylistItem(writer, fileName);
                             if (this.ReportProgress)

@@ -5,6 +5,10 @@ namespace FoxTunes.Launcher
 {
     public static class Program
     {
+        public static readonly TimeSpan SHUTDOWN_INTERVAL = TimeSpan.FromSeconds(1);
+
+        public static readonly TimeSpan SHUTDOWN_TIMEOUT = TimeSpan.FromSeconds(10);
+
         static Program()
         {
             AssemblyResolver.Instance.Enable();
@@ -69,6 +73,11 @@ namespace FoxTunes.Launcher
                     try
                     {
                         core.Components.UserInterface.Show();
+                        //TODO: Bad .Result
+                        if (!BackgroundTask.Shutdown(SHUTDOWN_INTERVAL, SHUTDOWN_TIMEOUT).Result)
+                        {
+                            //TODO: Warn.
+                        }
                     }
                     catch (Exception e)
                     {
