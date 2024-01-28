@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Media;
@@ -120,13 +121,21 @@ namespace FoxTunes
                 {
                     if (bitmap.TryLock(LockTimeout))
                     {
-                        var info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, data.Colors));
-                        lock (history)
+                        try
                         {
-                            Restore(info, data, history);
+                            var color = data.Colors.FirstOrDefault();
+                            var info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, data.Colors));
+                            BitmapHelper.Clear(ref info, color);
+                            lock (history)
+                            {
+                                Restore(info, data, history);
+                            }
+                            bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                         }
-                        bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                        bitmap.Unlock();
+                        finally
+                        {
+                            bitmap.Unlock();
+                        }
                     }
                 }
                 catch (Exception e)
@@ -134,7 +143,39 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Error, "Failed to restore spectrogram from history: {0}", e.Message);
                 }
             }
+            else
+            {
+                this.ClearBitmap(bitmap);
+            }
             return bitmap;
+        }
+
+        protected override void ClearBitmap(WriteableBitmap bitmap)
+        {
+            if (!bitmap.TryLock(LockTimeout))
+            {
+                return;
+            }
+            try
+            {
+                var color = default(Color);
+                var data = this.RendererData;
+                if (data != null)
+                {
+                    color = data.Colors.FirstOrDefault();
+                }
+                else
+                {
+                    color = SpectrogramConfiguration.GetColorPalette(this.ColorPalette.Value).FirstOrDefault();
+                }
+                var info = BitmapHelper.CreateRenderInfo(bitmap, IntPtr.Zero);
+                BitmapHelper.Clear(ref info, color);
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            }
+            finally
+            {
+                bitmap.Unlock();
+            }
         }
 
         protected virtual async Task Render(SpectrogramRendererData data)

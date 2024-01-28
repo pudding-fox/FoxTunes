@@ -289,10 +289,16 @@ namespace FoxTunes
             {
                 return;
             }
-            var info = BitmapHelper.CreateRenderInfo(bitmap, IntPtr.Zero);
-            BitmapHelper.Clear(ref info);
-            bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-            bitmap.Unlock();
+            try
+            {
+                var info = BitmapHelper.CreateRenderInfo(bitmap, IntPtr.Zero);
+                BitmapHelper.Clear(ref info);
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            }
+            finally
+            {
+                bitmap.Unlock();
+            }
         }
 
         protected virtual Task CreateData()
