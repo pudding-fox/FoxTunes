@@ -102,79 +102,12 @@ namespace FoxTunes
 
                     try
                     {
-                        lock (playlistItem.MetaDatas)
-                        {
-                            foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
-                            {
-                                if (!string.IsNullOrEmpty(metaDataItem.Value))
-                                {
-                                    continue;
-                                }
-                                playlistItem.MetaDatas.Remove(metaDataItem);
-                            }
-                        }
-
-                        if (!playlistItem.LibraryItem_Id.HasValue)
-                        {
-                            await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
-                            await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
-                        }
-
-                        if (!this.WriteToFiles)
-                        {
-                            //Task was configured not to write to files.
-                            position++;
-                            continue;
-                        }
-
-                        if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)
-                        {
-                            Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", playlistItem.FileName);
-                            position++;
-                            continue;
-                        }
-
-                        if (!FileSystemHelper.IsLocalFile(playlistItem.FileName))
-                        {
-                            Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName);
-                            this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName)));
-                            position++;
-                            continue;
-                        }
-
-                        if (!File.Exists(playlistItem.FileName))
-                        {
-                            Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
-                            this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName)));
-                            position++;
-                            continue;
-                        }
-
-                        await metaDataSource.SetMetaData(
-                            playlistItem.FileName,
-                            playlistItem.MetaDatas,
-                            metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
-                        ).ConfigureAwait(false);
-
-                        //Update the import date otherwise the file might be re-scanned and changes lost.
-                        if (playlistItem.LibraryItem_Id.HasValue)
-                        {
-                            var libraryItem = new LibraryItem()
-                            {
-                                Id = playlistItem.LibraryItem_Id.Value
-                            };
-                            await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow).ConfigureAwait(false);
-                        }
+                        await this.UpdateFile(metaDataSource, playlistItem);
+                        await this.UpdateDatabase(metaDataSource, playlistItem);
                     }
                     catch (Exception e)
                     {
                         this.Errors.Add(playlistItem, e);
-                        position++;
-                        continue;
                     }
 
                     position++;
@@ -182,6 +115,75 @@ namespace FoxTunes
             }))
             {
                 await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        protected virtual async Task UpdateDatabase(IMetaDataSource metaDataSource, PlaylistItem playlistItem)
+        {
+            lock (playlistItem.MetaDatas)
+            {
+                foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
+                {
+                    if (!string.IsNullOrEmpty(metaDataItem.Value))
+                    {
+                        continue;
+                    }
+                    playlistItem.MetaDatas.Remove(metaDataItem);
+                }
+            }
+
+            if (!playlistItem.LibraryItem_Id.HasValue)
+            {
+                await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
+            }
+            else
+            {
+                await this.WriteLibraryMetaData(playlistItem).ConfigureAwait(false);
+                await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
+            }
+        }
+
+        protected virtual async Task UpdateFile(IMetaDataSource metaDataSource, PlaylistItem playlistItem)
+        {
+            if (!this.WriteToFiles)
+            {
+                return;
+            }
+
+            if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)
+            {
+                Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", playlistItem.FileName);
+                return;
+            }
+
+            if (!FileSystemHelper.IsLocalFile(playlistItem.FileName))
+            {
+                Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName);
+                this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName)));
+                return;
+            }
+
+            if (!File.Exists(playlistItem.FileName))
+            {
+                Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
+                this.Errors.Add(playlistItem, new FileNotFoundException(string.Format("File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName)));
+                return;
+            }
+
+            await metaDataSource.SetMetaData(
+                playlistItem.FileName,
+                playlistItem.MetaDatas,
+                metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
+            ).ConfigureAwait(false);
+
+            //Update the import date otherwise the file might be re-scanned and changes lost.
+            if (playlistItem.LibraryItem_Id.HasValue)
+            {
+                var libraryItem = new LibraryItem()
+                {
+                    Id = playlistItem.LibraryItem_Id.Value
+                };
+                await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow).ConfigureAwait(false);
             }
         }
 
