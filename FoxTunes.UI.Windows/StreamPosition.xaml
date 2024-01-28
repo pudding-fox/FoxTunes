@@ -33,9 +33,9 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Text="{Binding CurrentStream.PositionDescription, Source={StaticResource  ViewModel}}" Margin="0,0,4,0">
-
-        </TextBlock>
+        <!-- Ensure the entire control responds to input. -->
+        <Rectangle Grid.Column="0" Grid.ColumnSpan="3" Fill="Transparent"/>
+        <TextBlock Grid.Column="0" Text="{Binding CurrentStream.PositionDescription, Source={StaticResource  ViewModel}}" Margin="0,0,4,0"/>
         <Slider Grid.Column="1" VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="PreviewMouseDown">
@@ -46,9 +46,6 @@
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
         </Slider>
-        <TextBlock Grid.Column="2" Text="{Binding CurrentStream.RemainingDescription, Source={StaticResource  ViewModel}}" Margin="4,0,0,0">
-
-        </TextBlock>
-        <Rectangle Grid.ColumnSpan="3" Fill="Transparent"></Rectangle>
+        <TextBlock Grid.Column="2" Text="{Binding CurrentStream.RemainingDescription, Source={StaticResource  ViewModel}}" Margin="4,0,0,0"/>
     </Grid>
 </Windows:UIComponentBase>

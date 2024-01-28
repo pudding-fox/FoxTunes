@@ -23,6 +23,10 @@ basswma.dll
 basswv.dll
 "
 
+ADDON_DTS="
+bass_dts.dll
+"
+
 ADDON_MOD="
 basszxtune.dll
 "
@@ -114,7 +118,6 @@ bass_inmemory_handler_dsd.dll
 DTS="
 FoxTunes.Output.Bass.Dts.dll
 ManagedBass.Dts.dll
-bass_dts.dll
 "
 
 SOX="
@@ -331,6 +334,7 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/cue"
 		mkdir -p "./release/$platform/$target/Plugins/dsd"
 		mkdir -p "./release/$platform/$target/Plugins/dts"
+		mkdir -p "./release/$platform/$target/Plugins/dts/addon"
 		mkdir -p "./release/$platform/$target/Plugins/encoder"
 		mkdir -p "./release/$platform/$target/Plugins/encoder/encoders"
 		mkdir -p "./release/$platform/$target/Plugins/eq"
@@ -404,6 +408,14 @@ do
 		do
 			echo $file
 			cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/dts"
+		done
+		echo
+
+		echo "Installing addons (dts)"
+		for file in $ADDON_DTS
+		do
+			echo "$file"
+			cp "./distribution/$platform/$target/Addon/$file" "./release/$platform/$target/Plugins/dts/addon"
 		done
 		echo
 
