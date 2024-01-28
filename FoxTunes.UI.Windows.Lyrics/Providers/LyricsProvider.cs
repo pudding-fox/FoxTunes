@@ -23,10 +23,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Behaviour = ComponentRegistry.Instance.GetComponent<LyricsBehaviour>();
-            if (this.Behaviour != null)
-            {
-                this.Behaviour.Register(this);
-            }
             base.InitializeComponent(core);
         }
 
