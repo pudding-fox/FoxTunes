@@ -94,15 +94,6 @@ namespace FoxTunes
                    config.MapRightKey("LibraryHierarchyLevel_Id");
                    config.ToTable("LibraryHierarchy_LibraryHierarchyLevel");
                });
-            builder.Entity<LibraryHierarchy>()
-                .HasMany(item => item.Items)
-                .WithMany()
-                .Map(config =>
-                {
-                    config.MapLeftKey("LibraryHierarchy_Id");
-                    config.MapRightKey("LibraryHierarchyItem_Id");
-                    config.ToTable("LibraryHierarchy_LibraryHierarchyItem");
-                });
         }
 
         protected virtual void MapLibraryHierarchyLevel(DbModelBuilder builder)

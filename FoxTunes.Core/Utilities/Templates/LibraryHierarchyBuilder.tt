@@ -18,12 +18,12 @@ CREATE UNIQUE INDEX "IDX_LibraryHierarchyLevelLeaf" ON "LibraryHierarchyLevelLea
 DROP TABLE IF EXISTS "LibraryHierarchyLevelParent";
 CREATE TEMPORARY TABLE "LibraryHierarchyLevelParent"
 AS
-	SELECT "LibraryHierarchy_LibraryHierarchyLevel"."Id" AS "Id", MAX("LibraryHierarchy_LibraryHierarchyLevel_Copy"."Id") AS "Parent_Id"
+	SELECT "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id" AS "Id", MAX("LibraryHierarchy_LibraryHierarchyLevel_Copy"."LibraryHierarchyLevel_Id") AS "Parent_Id"
 	FROM "LibraryHierarchy_LibraryHierarchyLevel"
 	JOIN "LibraryHierarchy_LibraryHierarchyLevel" AS "LibraryHierarchy_LibraryHierarchyLevel_Copy"
 		ON "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id"  = "LibraryHierarchy_LibraryHierarchyLevel_Copy"."LibraryHierarchy_Id"
-			AND "LibraryHierarchy_LibraryHierarchyLevel_Copy"."Id" < "LibraryHierarchy_LibraryHierarchyLevel"."Id"
-	GROUP BY "LibraryHierarchy_LibraryHierarchyLevel"."Id";
+			AND "LibraryHierarchy_LibraryHierarchyLevel_Copy"."LibraryHierarchyLevel_Id" < "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id"
+	GROUP BY "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id";
 CREATE UNIQUE INDEX "IDX_LibraryHierarchyLevelParent" ON "LibraryHierarchyLevelParent"
 (
 	"Id"

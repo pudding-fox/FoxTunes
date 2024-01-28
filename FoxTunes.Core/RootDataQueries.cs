@@ -14,7 +14,6 @@ namespace FoxTunes
             this.LibraryItem.Include("MetaDatas");
             this.LibraryHierarchy = this.DatabaseContext.GetQuery<LibraryHierarchy>();
             this.LibraryHierarchy.Include("Levels");
-            this.LibraryHierarchy.Include("Items");
         }
 
         public IDatabaseContext DatabaseContext { get; private set; }

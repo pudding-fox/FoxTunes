@@ -8,7 +8,6 @@ namespace FoxTunes
         public LibraryHierarchy()
         {
             this.Levels = new ObservableCollection<LibraryHierarchyLevel>();
-            this.Items = new ObservableCollection<LibraryHierarchyItem>();
         }
 
         private string _Name { get; set; }
@@ -38,8 +37,6 @@ namespace FoxTunes
         public event EventHandler NameChanged = delegate { };
 
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
-
-        public ObservableCollection<LibraryHierarchyItem> Items { get; set; }
 
         public bool Equals(LibraryHierarchy other)
         {
