@@ -32,9 +32,15 @@ namespace FoxTunes
                 //If there is more than one root then we will create a node for each root.
                 if (roots.Length > 1)
                 {
-                    roots = roots.Select(
-                        root => Path.GetDirectoryName(root)
-                    ).ToArray();
+                    roots = roots.Select(root =>
+                    {
+                        var parent = Path.GetDirectoryName(root);
+                        if (!string.IsNullOrEmpty(parent))
+                        {
+                            return parent;
+                        }
+                        return root;
+                    }).Distinct().ToArray();
                 }
                 return roots;
             });
