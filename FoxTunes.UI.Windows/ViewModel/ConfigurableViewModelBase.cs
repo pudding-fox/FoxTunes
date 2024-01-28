@@ -5,6 +5,11 @@ namespace FoxTunes.ViewModel
 {
     public abstract class ConfigurableViewModelBase : ViewModelBase, IConfigurationTarget
     {
+        protected ConfigurableViewModelBase(bool initialize = true) : base(initialize)
+        {
+
+        }
+
         private IConfiguration _Configuration { get; set; }
 
         public IConfiguration Configuration

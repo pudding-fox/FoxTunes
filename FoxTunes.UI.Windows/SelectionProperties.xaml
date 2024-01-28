@@ -1,0 +1,91 @@
+﻿<Windows:ConfigurableUIComponentBase x:Class="FoxTunes.SelectionProperties"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Windows="clr-namespace:FoxTunes"
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ViewModel:SelectionProperties x:Key="ViewModel"></ViewModel:SelectionProperties>
+        <ViewModel:MetaDataNameConverter x:Key="MetaDataNameConverter"></ViewModel:MetaDataNameConverter>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Grid.IsSharedSizeScope="True">
+            <StackPanel Visibility="{Binding ShowTags, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Tags}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    <Line Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Fill="{DynamicResource TextBrush}"></Line>
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Tags, Source={StaticResource ViewModel}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="{Binding Name, Converter={StaticResource MetaDataNameConverter}, Mode=OneWay}" ContentStringFormat="{}{0}:"></Label>
+                                <TextBox Grid.Column="1" Text="{Binding Value, Mode=OneWay}" IsReadOnly="True"></TextBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+            <StackPanel Visibility="{Binding ShowProperties, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Properties}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    <Line Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Fill="{DynamicResource TextBrush}"></Line>
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Properties, Source={StaticResource ViewModel}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="{Binding Name, Converter={StaticResource MetaDataNameConverter}, Mode=OneWay}" ContentStringFormat="{}{0}:"></Label>
+                                <TextBox Grid.Column="1" Text="{Binding Value, Mode=OneWay}" IsReadOnly="True"></TextBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+            <StackPanel Visibility="{Binding ShowImages, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Images}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    <Line Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Fill="{DynamicResource TextBrush}"></Line>
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Images, Source={StaticResource ViewModel}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="{Binding Name, Converter={StaticResource MetaDataNameConverter}, Mode=OneWay}" ContentStringFormat="{}{0}:"></Label>
+                                <TextBox Grid.Column="1" Text="{Binding Value, Mode=OneWay}" IsReadOnly="True"></TextBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Windows:ConfigurableUIComponentBase>

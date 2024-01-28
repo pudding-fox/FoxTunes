@@ -1087,6 +1087,87 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Images.
+        /// </summary>
+        internal static string SelectionProperties_Images {
+            get {
+                return ResourceManager.GetString("SelectionProperties.Images", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection Properties.
+        /// </summary>
+        internal static string SelectionProperties_Name {
+            get {
+                return ResourceManager.GetString("SelectionProperties.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;No Value&gt;.
+        /// </summary>
+        internal static string SelectionProperties_NoValue {
+            get {
+                return ResourceManager.GetString("SelectionProperties.NoValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Properties.
+        /// </summary>
+        internal static string SelectionProperties_Properties {
+            get {
+                return ResourceManager.GetString("SelectionProperties.Properties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tags.
+        /// </summary>
+        internal static string SelectionProperties_Tags {
+            get {
+                return ResourceManager.GetString("SelectionProperties.Tags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection Properties.
+        /// </summary>
+        internal static string SelectionPropertiesConfiguration_Section {
+            get {
+                return ResourceManager.GetString("SelectionPropertiesConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Images.
+        /// </summary>
+        internal static string SelectionPropertiesConfiguration_ShowImages {
+            get {
+                return ResourceManager.GetString("SelectionPropertiesConfiguration.ShowImages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Properties.
+        /// </summary>
+        internal static string SelectionPropertiesConfiguration_ShowProperties {
+            get {
+                return ResourceManager.GetString("SelectionPropertiesConfiguration.ShowProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tags.
+        /// </summary>
+        internal static string SelectionPropertiesConfiguration_ShowTags {
+            get {
+                return ResourceManager.GetString("SelectionPropertiesConfiguration.ShowTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings Launcher.
         /// </summary>
         internal static string Settings_Name {
