@@ -175,6 +175,10 @@ namespace FoxTunes
 
             protected override void OnDisposing()
             {
+                if (this.Debouncer != null)
+                {
+                    this.Debouncer.Dispose();
+                }
                 if (this.ListView != null && this.ListView.ItemContainerGenerator != null)
                 {
                     this.ListView.ItemContainerGenerator.StatusChanged -= this.OnStatusChanged;
