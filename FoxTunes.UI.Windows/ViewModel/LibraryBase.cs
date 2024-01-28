@@ -22,6 +22,8 @@ namespace FoxTunes.ViewModel
 
         public ILibraryManager LibraryManager { get; private set; }
 
+        public IHierarchyManager HierarchyManager { get; private set; }
+
         private IConfiguration Configuration { get; set; }
 
         public IEnumerable<LibraryHierarchy> Hierarchies
@@ -228,25 +230,25 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var isUpdating = global::FoxTunes.BackgroundTask.Active
-                    .OfType<LibraryTaskBase>()
-                    .Any();
-                if (isUpdating)
+                if (this.HierarchyManager != null)
                 {
-                    return "Updating...";
-                }
-                if (this.LibraryHierarchyBrowser != null)
-                {
-                    switch (this.LibraryHierarchyBrowser.State)
+                    if (!this.HierarchyManager.CanNavigate)
                     {
-                        case LibraryHierarchyBrowserState.Loading:
-                            return "Loading...";
-                    }
-                }
-                if (this.LibraryManager != null)
-                {
-                    if (!this.LibraryManager.CanNavigate)
-                    {
+                        var isUpdating = global::FoxTunes.BackgroundTask.Active
+                            .OfType<LibraryTaskBase>()
+                            .Any();
+                        if (isUpdating)
+                        {
+                            return "Updating...";
+                        }
+                        if (this.LibraryHierarchyBrowser != null)
+                        {
+                            switch (this.LibraryHierarchyBrowser.State)
+                            {
+                                case LibraryHierarchyBrowserState.Loading:
+                                    return "Loading...";
+                            }
+                        }
                         return "Add to collection by dropping files here.";
                     }
                 }
@@ -269,24 +271,9 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var isUpdating = global::FoxTunes.BackgroundTask.Active
-                    .OfType<LibraryTaskBase>()
-                    .Any();
-                if (isUpdating)
+                if (this.HierarchyManager != null)
                 {
-                    return true;
-                }
-                if (this.LibraryHierarchyBrowser != null)
-                {
-                    switch (this.LibraryHierarchyBrowser.State)
-                    {
-                        case LibraryHierarchyBrowserState.Loading:
-                            return true;
-                    }
-                }
-                if (this.LibraryManager != null)
-                {
-                    if (!this.LibraryManager.CanNavigate)
+                    if (!this.HierarchyManager.CanNavigate)
                     {
                         return true;
                     }
@@ -348,6 +335,7 @@ namespace FoxTunes.ViewModel
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
+            this.LibraryHierarchyBrowser.StateChanged += this.OnStateChanged;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
@@ -355,7 +343,8 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
-            this.LibraryManager.CanNavigateChanged += this.OnCanNavigateChanged;
+            this.HierarchyManager = this.Core.Managers.Hierarchy;
+            this.HierarchyManager.CanNavigateChanged += this.OnCanNavigateChanged;
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 SearchBehaviourConfiguration.SECTION,
@@ -380,11 +369,6 @@ namespace FoxTunes.ViewModel
             var task = this.RefreshStatus();
         }
 
-        protected virtual void OnStateChanged(object sender, EventArgs e)
-        {
-            var task = this.RefreshStatus();
-        }
-
         protected virtual void OnFilterChanged(object sender, EventArgs e)
         {
             var task = this.Refresh();
@@ -392,6 +376,11 @@ namespace FoxTunes.ViewModel
             {
                 this.OnSearchCompleted();
             }
+        }
+
+        protected virtual void OnStateChanged(object sender, EventArgs e)
+        {
+            var task = this.RefreshStatus();
         }
 
         protected virtual void OnSearchCompleted()

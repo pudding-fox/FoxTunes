@@ -35,7 +35,7 @@ namespace FoxTunes.Interfaces
 
         bool CanNavigate { get; }
 
-        event AsyncEventHandler CanNavigateChanged;
+        event EventHandler CanNavigateChanged;
 
         Task Next();
 
