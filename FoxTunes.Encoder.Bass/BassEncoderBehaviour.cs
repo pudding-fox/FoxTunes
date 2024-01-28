@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassEncoderBehaviour : StandardBehaviour, IBackgroundTaskSource, IInvocableComponent, IConfigurableComponent
+    public class BassEncoderBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
     {
         public const string ENCODE = "GGGG";
 
@@ -96,6 +96,7 @@ namespace FoxTunes
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
                 await task.Run().ConfigureAwait(false);
+                this.OnReport(task.EncoderItems);
             }
         }
 
@@ -109,6 +110,24 @@ namespace FoxTunes
         }
 
         public event BackgroundTaskEventHandler BackgroundTask;
+
+        protected virtual void OnReport(EncoderItem[] encoderItems)
+        {
+            var report = new BassEncoderReport(encoderItems);
+            report.InitializeComponent(this.Core);
+            this.OnReport(report);
+        }
+
+        protected virtual void OnReport(IReport report)
+        {
+            if (this.Report == null)
+            {
+                return;
+            }
+            this.Report(this, new ReportSourceEventArgs(report));
+        }
+
+        public event ReportSourceEventHandler Report;
 
         private class EncodePlaylistItemsTask : BackgroundTask
         {
@@ -175,13 +194,14 @@ namespace FoxTunes
                         try
                         {
                             await this.WithSubTask(monitor,
-                                async () => await monitor.Encode()
-.ConfigureAwait(false)).ConfigureAwait(false);
+                                async () => await monitor.Encode().ConfigureAwait(false)
+                            ).ConfigureAwait(false);
                         }
                         finally
                         {
                             monitor.StatusChanged -= this.OnStatusChanged;
                         }
+                        this.EncoderItems = monitor.EncoderItems.Values.ToArray();
                     }
                 }
                 Logger.Write(this, LogLevel.Debug, "Encoder completed successfully.");

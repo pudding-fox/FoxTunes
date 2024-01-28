@@ -211,7 +211,7 @@ namespace FoxTunes
             if (playlistItem != null)
             {
                 var fileName = this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
-                if (!string.IsNullOrEmpty(fileName) != null && File.Exists(fileName))
+                if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
                 {
                     var stream = await this.GetThumbnail(fileName).ConfigureAwait(false);
                     updater.Thumbnail = RandomAccessStreamReference.CreateFromStream(stream);

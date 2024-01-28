@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxTunes.Integration;
+using FoxTunes.Interfaces;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,11 @@ namespace FoxTunes
 {
     public class WindowsFileSystemBrowser : StandardComponent, IFileSystemBrowser
     {
+        public void Select(string fileName)
+        {
+            Explorer.Select(fileName);
+        }
+
         public BrowseResult Browse(BrowseOptions options)
         {
             if (options.Flags.HasFlag(BrowseFlags.File))

@@ -5,6 +5,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IFileSystemBrowser : IStandardComponent
     {
+        void Select(string fileName);
+
         BrowseResult Browse(BrowseOptions options);
     }
 

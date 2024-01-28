@@ -14,12 +14,12 @@ namespace FoxTunes
 
         public BassEncoderMonitor(IBassEncoder encoder, bool reportProgress, CancellationToken cancellationToken) : base(reportProgress)
         {
-            this.EncoderItems = new Dictionary<EncoderItem, EncoderItemStatus>();
+            this.EncoderItems = new Dictionary<Guid, EncoderItem>();
             this.Encoder = encoder;
             this.CancellationToken = cancellationToken;
         }
 
-        public IDictionary<EncoderItem, EncoderItemStatus> EncoderItems { get; private set; }
+        public Dictionary<Guid, EncoderItem> EncoderItems { get; private set; }
 
         public IBassEncoder Encoder { get; private set; }
 
@@ -98,42 +98,17 @@ namespace FoxTunes
                 await Task.Delay(INTERVAL).ConfigureAwait(false);
 #endif
             }
-            var exceptions = new List<Exception>();
-            foreach (var encoderItem in this.Encoder.EncoderItems)
-            {
-                this.UpdateStatus(encoderItem);
-                if (encoderItem.Status != EncoderItemStatus.Failed)
-                {
-                    continue;
-                }
-                foreach (var error in encoderItem.Errors)
-                {
-                    exceptions.Add(new Exception(error));
-                }
-            }
-            if (exceptions.Any())
-            {
-                if (exceptions.Count == 1)
-                {
-                    throw exceptions.First();
-                }
-                throw new AggregateException(exceptions);
-            }
         }
 
         protected virtual void UpdateStatus(EncoderItem encoderItem)
         {
-            var status = default(EncoderItemStatus);
-            if (!this.EncoderItems.TryGetValue(encoderItem, out status))
-            {
-                this.EncoderItems.Add(encoderItem, EncoderItemStatus.None);
-            }
-            else if (encoderItem.Status != status)
+            var currentEncoderItem = default(EncoderItem);
+            if (this.EncoderItems.TryGetValue(encoderItem.Id, out currentEncoderItem) && currentEncoderItem.Status != encoderItem.Status)
             {
                 Logger.Write(this, LogLevel.Debug, "Encoder status changed for file \"{0}\": {1}", encoderItem.InputFileName, Enum.GetName(typeof(EncoderItemStatus), encoderItem.Status));
-                this.EncoderItems[encoderItem] = encoderItem.Status;
                 this.OnStatusChanged(encoderItem);
             }
+            this.EncoderItems[encoderItem.Id] = encoderItem;
         }
 
         protected virtual void OnStatusChanged(EncoderItem encoderItem)

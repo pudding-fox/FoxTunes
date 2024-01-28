@@ -5,18 +5,21 @@ using System.Linq;
 namespace FoxTunes
 {
     [Serializable]
-    public class EncoderItem : IEquatable<EncoderItem>
+    public class EncoderItem
     {
         const int ERROR_CAPACITY = 10;
 
         private EncoderItem()
         {
+            this.Id = Guid.NewGuid();
             this._Errors = new List<string>(ERROR_CAPACITY);
         }
 
         public const int PROGRESS_NONE = 0;
 
         public const int PROGRESS_COMPLETE = 100;
+
+        public Guid Id { get; private set; }
 
         public string InputFileName { get; private set; }
 
@@ -53,41 +56,6 @@ namespace FoxTunes
             }
         }
 
-        public virtual bool Equals(EncoderItem other)
-        {
-            if (other == null)
-            {
-                return false;
-            }
-            if (object.ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            if (!string.Equals(this.InputFileName, other.InputFileName, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return this.Equals(obj as EncoderItem);
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = default(int);
-            unchecked
-            {
-                if (!string.IsNullOrEmpty(this.InputFileName))
-                {
-                    hashCode += this.InputFileName.ToLower().GetHashCode();
-                }
-            }
-            return hashCode;
-        }
-
         public static EncoderItem FromPlaylistItem(PlaylistItem playlistItem)
         {
             var encoderItem = new EncoderItem()
@@ -104,31 +72,9 @@ namespace FoxTunes
             }
             return encoderItem;
         }
-
-        public static bool operator ==(EncoderItem a, EncoderItem b)
-        {
-            if ((object)a == null && (object)b == null)
-            {
-                return true;
-            }
-            if ((object)a == null || (object)b == null)
-            {
-                return false;
-            }
-            if (object.ReferenceEquals((object)a, (object)b))
-            {
-                return true;
-            }
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(EncoderItem a, EncoderItem b)
-        {
-            return !(a == b);
-        }
     }
 
-    public enum EncoderItemStatus
+    public enum EncoderItemStatus : byte
     {
         None,
         Processing,
