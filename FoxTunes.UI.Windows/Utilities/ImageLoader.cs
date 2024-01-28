@@ -13,25 +13,27 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ImageLoader : StandardComponent, IConfigurableComponent
     {
-        const int CACHE_SIZE = 128;
-
         const int TIMEOUT = 1000;
 
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
 
-        private static readonly Cache Store = new Cache(CACHE_SIZE);
-
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement HighQualityResizer { get; private set; }
+        public bool HighQualityResizer { get; private set; }
+
+        public Cache Store { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.HighQualityResizer = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Configuration.GetElement<BooleanConfigurationElement>(
                 ImageLoaderConfiguration.SECTION,
                 ImageLoaderConfiguration.HIGH_QUALITY_RESIZER
-            );
+            ).ConnectValue(value => this.HighQualityResizer = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                ImageLoaderConfiguration.SECTION,
+                ImageLoaderConfiguration.CACHE_SIZE
+            ).ConnectValue(value => this.Store = new Cache(value));
             base.InitializeComponent(core);
         }
 
@@ -62,7 +64,7 @@ namespace FoxTunes
             try
             {
                 var decode = false;
-                if (width != 0 && height != 0 && this.HighQualityResizer.Value)
+                if (width != 0 && height != 0 && this.HighQualityResizer)
                 {
                     fileName = this.Resize(prefix, id, fileName, width, height);
                 }
@@ -112,7 +114,7 @@ namespace FoxTunes
             {
                 var decode = false;
                 var dispose = false;
-                if (width != 0 && height != 0 && this.HighQualityResizer.Value)
+                if (width != 0 && height != 0 && this.HighQualityResizer)
                 {
                     stream = this.Resize(prefix, id, stream, width, height);
                     dispose = true;
