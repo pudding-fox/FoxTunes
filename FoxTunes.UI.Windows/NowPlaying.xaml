@@ -11,5 +11,16 @@
     <UserControl.Resources>
         <ViewModel:NowPlaying x:Key="ViewModel" Core="{Binding}"></ViewModel:NowPlaying>
     </UserControl.Resources>
-    <Windows:Marquee Text="{Binding DisplayValue, Source={StaticResource ViewModel}}"></Windows:Marquee>
+    <Windows:Marquee>
+        <Windows:Marquee.Style>
+            <Style TargetType="{x:Type Windows:Marquee}">
+                <Setter Property="Text" Value="{Binding DisplayValue, Source={StaticResource ViewModel}}"></Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsBuffering, Source={StaticResource ViewModel}}" Value="True">
+                        <Setter Property="Text" Value="Buffering.."></Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Windows:Marquee.Style>
+    </Windows:Marquee>
 </UserControl>

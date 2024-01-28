@@ -95,8 +95,35 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler DisplayValueChanged = delegate { };
 
+        private object _IsBuffering { get; set; }
+
+        public object IsBuffering
+        {
+            get
+            {
+                return this._IsBuffering;
+            }
+            set
+            {
+                this._IsBuffering = value;
+                this.OnIsBufferingChanged();
+            }
+        }
+
+        protected virtual void OnIsBufferingChanged()
+        {
+            if (this.IsBufferingChanged != null)
+            {
+                this.IsBufferingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsBuffering");
+        }
+
+        public event EventHandler IsBufferingChanged = delegate { };
+
         public override void InitializeComponent(ICore core)
         {
+            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask += this.OnBackgroundTask);
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
@@ -108,6 +135,35 @@ namespace FoxTunes.ViewModel
             ).ConnectValue<string>(async value => await this.SetDisplayScript(value));
             var task = this.Refresh();
             base.InitializeComponent(core);
+        }
+
+        protected virtual async void OnBackgroundTask(object sender, BackgroundTaskEventArgs e)
+        {
+            if (e.BackgroundTask is LoadOutputStreamTask && e.BackgroundTask.Visible)
+            {
+                using (e.Defer())
+                {
+                    await Windows.Invoke(() => this.IsBuffering = true);
+                }
+                e.BackgroundTask.Completed += this.OnCompleted;
+                e.BackgroundTask.Faulted += this.OnFaulted;
+            }
+        }
+
+        protected virtual async void OnCompleted(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await Windows.Invoke(() => this.IsBuffering = false);
+            }
+        }
+
+        protected virtual async void OnFaulted(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await Windows.Invoke(() => this.IsBuffering = false);
+            }
         }
 
         protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
@@ -137,6 +193,7 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask -= this.OnBackgroundTask);
             if (this.PlaylistManager != null)
             {
                 this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;

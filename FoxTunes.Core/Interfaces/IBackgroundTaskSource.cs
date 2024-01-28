@@ -9,7 +9,7 @@ namespace FoxTunes.Interfaces
 
     public delegate void BackgroundTaskEventHandler(object sender, BackgroundTaskEventArgs e);
 
-    public class BackgroundTaskEventArgs : EventArgs
+    public class BackgroundTaskEventArgs : AsyncEventArgs
     {
         public BackgroundTaskEventArgs(IBackgroundTask backgroundTask)
         {
