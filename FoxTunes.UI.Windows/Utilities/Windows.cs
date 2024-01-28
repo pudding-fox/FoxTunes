@@ -249,6 +249,60 @@ namespace FoxTunes
 
         public static event EventHandler EqualizerWindowClosed;
 
+        private static Lazy<Window> _PlaylistManagerWindow { get; set; }
+
+        public static bool IsPlaylistManagerWindowCreated
+        {
+            get
+            {
+                return _PlaylistManagerWindow.IsValueCreated;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public static Window PlaylistManagerWindow
+        {
+            get
+            {
+                var raiseEvent = !IsPlaylistManagerWindowCreated;
+                try
+                {
+                    return _PlaylistManagerWindow.Value;
+                }
+                finally
+                {
+                    if (IsPlaylistManagerWindowCreated && raiseEvent)
+                    {
+                        OnPlaylistManagerWindowCreated();
+                    }
+                }
+            }
+        }
+
+        private static void OnPlaylistManagerWindowCreated()
+        {
+            PlaylistManagerWindow.Closed += OnPlaylistManagerWindowClosed;
+            if (PlaylistManagerWindowCreated == null)
+            {
+                return;
+            }
+            PlaylistManagerWindowCreated(PlaylistManagerWindow, EventArgs.Empty);
+        }
+
+        public static event EventHandler PlaylistManagerWindowCreated;
+
+        private static void OnPlaylistManagerWindowClosed(object sender, EventArgs e)
+        {
+            _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
+            if (PlaylistManagerWindowClosed == null)
+            {
+                return;
+            }
+            PlaylistManagerWindowClosed(typeof(PlaylistManagerWindow), EventArgs.Empty);
+        }
+
+        public static event EventHandler PlaylistManagerWindowClosed;
+
         private static Window _ActiveWindow { get; set; }
 
         public static Window ActiveWindow
@@ -333,6 +387,10 @@ namespace FoxTunes
                         {
                             EqualizerWindow.Close();
                         }
+                        if (IsPlaylistManagerWindowCreated)
+                        {
+                            PlaylistManagerWindow.Close();
+                        }
                         Reset();
                     })
                 );
@@ -345,6 +403,7 @@ namespace FoxTunes
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
             _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
             _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
+            _PlaylistManagerWindow = new Lazy<Window>(() => new PlaylistManagerWindow() { Owner = ActiveWindow });
         }
 
         public static Task Invoke(Action action)

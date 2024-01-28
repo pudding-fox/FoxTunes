@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public const string REMOVE_PLAYLIST = "RRRR";
 
+        public const string MANAGE_PLAYLISTS = "SSSS";
+
         public const string CREATE_PLAYLIST = "AAAD";
 
         public PlaylistsActionsBehaviour()
@@ -44,6 +46,8 @@ namespace FoxTunes
 
         public event EventHandler EnabledChanged;
 
+        public ICore Core { get; private set; }
+
         public ILibraryManager LibraryManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -53,6 +57,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             LayoutManager.Instance.ActiveComponentsChanged += this.OnEnabledChanged;
+            this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
@@ -72,6 +77,7 @@ namespace FoxTunes
                 {
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, ADD_PLAYLIST, "Add Playlist");
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, REMOVE_PLAYLIST, "Remove Playlist");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, MANAGE_PLAYLISTS, "Playlist Manager", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                     if (this.LibraryManager.SelectedItem != null)
                     {
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, CREATE_PLAYLIST, "Create Playlist");
@@ -88,6 +94,8 @@ namespace FoxTunes
                     return this.AddPlaylist();
                 case REMOVE_PLAYLIST:
                     return this.RemovePlaylist();
+                case MANAGE_PLAYLISTS:
+                    return this.ManagePlaylists();
                 case CREATE_PLAYLIST:
                     return this.AddPlaylist(this.LibraryManager.SelectedItem);
             }
@@ -155,38 +163,24 @@ namespace FoxTunes
             }
         }
 
+        public Task ManagePlaylists()
+        {
+            return Windows.Invoke(() =>
+            {
+                if (!Windows.IsPlaylistManagerWindowCreated)
+                {
+                    Windows.PlaylistManagerWindow.DataContext = this.Core;
+                    Windows.PlaylistManagerWindow.Show();
+                }
+            });
+        }
+
         protected virtual Playlist CreatePlaylist()
         {
-            var name = default(string);
             var playlists = this.PlaylistBrowser.GetPlaylists();
-            if (playlists.Length == 0)
-            {
-                name = "Default";
-            }
-            else
-            {
-                name = "New Playlist";
-                for (var a = 1; a < 100; a++)
-                {
-                    var success = true;
-                    foreach (var playlist in playlists)
-                    {
-                        if (string.Equals(playlist.Name, name, StringComparison.OrdinalIgnoreCase))
-                        {
-                            name = string.Format("New Playlist ({0})", a);
-                            success = false;
-                            break;
-                        }
-                    }
-                    if (success)
-                    {
-                        break;
-                    }
-                }
-            }
             return new Playlist()
             {
-                Name = name,
+                Name = Playlist.GetName(playlists),
                 Enabled = true
             };
         }
