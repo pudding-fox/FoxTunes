@@ -8,12 +8,31 @@ using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 
 namespace FoxTunes
 {
     public static partial class Extensions
     {
+        public static DependencyObject GetParent(this DependencyObject visual)
+        {
+            var parent = default(DependencyObject);
+            {
+                parent = VisualTreeHelper.GetParent(visual);
+                if (parent != null)
+                {
+                    return parent;
+                }
+            }
+            {
+                parent = LogicalTreeHelper.GetParent(visual);
+                if (parent != null)
+                {
+                    return parent;
+                }
+            }
+            return default(DependencyObject);
+        }
+
         public static T FindChild<T>(this DependencyObject visual) where T : DependencyObject
         {
             return visual.FindChildren<T>().FirstOrDefault();
@@ -32,7 +51,37 @@ namespace FoxTunes
                 }
                 for (int a = 0, b = VisualTreeHelper.GetChildrenCount(visual); a < b; a++)
                 {
-                    var child = VisualTreeHelper.GetChild(visual, a) as DependencyObject;
+                    var child = VisualTreeHelper.GetChild(visual, a);
+                    if (child != null)
+                    {
+                        stack.Push(child);
+                    }
+                }
+            }
+        }
+
+        public static T FindChild<T>(this DependencyObject visual, string name) where T : FrameworkElement
+        {
+            return visual.FindChildren<T>(name).FirstOrDefault();
+        }
+
+        public static IEnumerable<T> FindChildren<T>(this DependencyObject visual, string name) where T : FrameworkElement
+        {
+            var stack = new Stack<DependencyObject>();
+            stack.Push(visual);
+            while (stack.Count > 0)
+            {
+                visual = stack.Pop();
+                if (visual is T element)
+                {
+                    if (string.Equals(element.Name, name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        yield return element;
+                    }
+                }
+                for (int a = 0, b = VisualTreeHelper.GetChildrenCount(visual); a < b; a++)
+                {
+                    var child = VisualTreeHelper.GetChild(visual, a);
                     if (child != null)
                     {
                         stack.Push(child);
@@ -49,7 +98,7 @@ namespace FoxTunes
                 {
                     return visual as T;
                 }
-                visual = VisualTreeHelper.GetParent(visual);
+                visual = visual.GetParent();
             } while (visual != null);
             return default(T);
         }
@@ -62,7 +111,7 @@ namespace FoxTunes
                 {
                     return visual;
                 }
-                visual = VisualTreeHelper.GetParent(visual);
+                visual = visual.GetParent();
             } while (visual != null);
             return default(DependencyObject);
         }
@@ -75,14 +124,14 @@ namespace FoxTunes
                 {
                     return dataContext;
                 }
-                element = VisualTreeHelper.GetParent(element) as FrameworkElement;
+                element = element.GetParent() as FrameworkElement;
             } while (element != null);
             return default(T);
         }
 
         public static bool Disconnect(this FrameworkElement element)
         {
-            var parent = VisualTreeHelper.GetParent(element);
+            var parent = element.GetParent();
             if (parent == null)
             {
                 return false;
