@@ -4,7 +4,6 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -199,46 +198,15 @@ namespace FoxTunes
                                 {
                                     parameters["favorite"] = true;
                                 }
+                                parameters["loadMetaData"] = loadMetaData;
+                                parameters["metaDataType"] = META_DATA_TYPE;
                                 break;
                         }
                     }, transaction);
                     foreach (var item in items)
                     {
-                        //TODO: This is awful. We should hydrate the meta data using the same query.
-                        if (loadMetaData)
-                        {
-                            item.MetaDatas = new ObservableCollection<MetaDataItem>(
-                                this.GetMetaDatas(item)
-                            );
-                        }
                         item.InitializeComponent(this.Core);
                         yield return item;
-                    }
-                }
-            }
-        }
-
-        protected virtual IEnumerable<MetaDataItem> GetMetaDatas(LibraryItem libraryItem)
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    using (var reader = MetaDataInfo.GetMetaData(database, libraryItem, META_DATA_TYPE, transaction))
-                    {
-                        var metaDatas = new List<MetaDataItem>();
-                        foreach (var record in reader)
-                        {
-                            metaDatas.Add(new MetaDataItem()
-                            {
-                                Id = record.Get<int>("Id"),
-                                Name = record.Get<string>("Name"),
-                                //TODO: Make IDatabaseReaderRecord.Get<Enum> work properly.
-                                Type = (MetaDataItemType)record.Get<byte>("Type"),
-                                Value = record.Get<string>("Value")
-                            });
-                        }
-                        return metaDatas;
                     }
                 }
             }

@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public class WriteLibraryMetaDataTask : BackgroundTask
     {
+        const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Image;
+
         public const string ID = "3EDED881-5AFD-46B2-AD53-78290E535F2E";
 
         public WriteLibraryMetaDataTask(IEnumerable<LibraryItem> libraryItems) : base(ID)
@@ -99,6 +101,7 @@ namespace FoxTunes
                     {
                         case DatabaseParameterPhase.Fetch:
                             parameters["itemId"] = libraryItem.Id;
+                            parameters["type"] = META_DATA_TYPE;
                             break;
                     }
                 }, transaction);
