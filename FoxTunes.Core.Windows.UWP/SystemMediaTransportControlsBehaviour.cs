@@ -59,6 +59,10 @@ namespace FoxTunes
                     }
                 });
             }
+            else
+            {
+                Logger.Write(this, LogLevel.Warn, "Platform is not supported.");
+            }
             base.InitializeComponent(core);
         }
 
