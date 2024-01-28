@@ -38,7 +38,7 @@ namespace FoxTunes
                 {
                     if (Directory.Exists(path))
                     {
-                        foreach (var fileName in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
+                        foreach (var fileName in FileSystemHelper.EnumerateFiles(path, "*.*"))
                         {
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                             await this.AddPlaylistItem(writer, fileName);
