@@ -9,13 +9,18 @@ namespace FoxTunes
 {
     public class ComponentScanner : BaseComponent, IComponentScanner
     {
+        const FileSystemHelper.SearchOption SEARCH_OPTIONS =
+            FileSystemHelper.SearchOption.Recursive |
+            FileSystemHelper.SearchOption.UseSystemCache |
+            FileSystemHelper.SearchOption.UseSystemExclusions;
+
         private ComponentScanner()
         {
             this._FileNames = new Lazy<IEnumerable<string>>(() =>
             {
                 return Enumerable.Concat(
-                    Directory.EnumerateFiles(this.Location, "FoxTunes*.dll", SearchOption.AllDirectories),
-                    Directory.EnumerateFiles(this.Location, "FoxTunes*.exe", SearchOption.AllDirectories)
+                    FileSystemHelper.EnumerateFiles(this.Location, "FoxTunes*.dll", SEARCH_OPTIONS),
+                    FileSystemHelper.EnumerateFiles(this.Location, "FoxTunes*.exe", SEARCH_OPTIONS)
                 ).ToArray();
             });
         }
