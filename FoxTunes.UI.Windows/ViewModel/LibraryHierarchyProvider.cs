@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Linq.Expressions;
 
 namespace FoxTunes.ViewModel
 {
@@ -60,6 +61,44 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HierarchyChanged = delegate { };
 
+        private string _Filter { get; set; }
+
+        public string Filter
+        {
+            get
+            {
+                return this._Filter;
+            }
+            set
+            {
+                this._Filter = value;
+                this.OnFilterChanged();
+            }
+        }
+
+        protected virtual void OnFilterChanged()
+        {
+            if (this.FilterChanged != null)
+            {
+                this.FilterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Filter");
+            //TODO: This is a hack in order to make the view refresh when the filter is changed.
+            this.OnLibraryNodesChanged();
+        }
+
+        public event EventHandler FilterChanged = delegate { };
+
+        private Expression<Func<LibraryItem, bool>> GetFilterExpression(string filter)
+        {
+            return libraryItem =>
+                libraryItem.FileName.Contains(filter) ||
+                libraryItem.MetaDatas.Any(
+                    metaDataItem => metaDataItem.TextValue != null &&
+                        metaDataItem.TextValue.Contains(filter)
+                );
+        }
+
         public ObservableCollection<LibraryNode> LibraryNodes
         {
             get
@@ -68,8 +107,17 @@ namespace FoxTunes.ViewModel
                 {
                     return new ObservableCollection<LibraryNode>();
                 }
-                return new ObservableCollection<LibraryNode>(this.BuildHierarchy(this.Library.Query, 0));
+                return new ObservableCollection<LibraryNode>(this.BuildHierarchy(this.GetLibraryItems(), 0));
             }
+        }
+
+        private IEnumerable<LibraryItem> GetLibraryItems()
+        {
+            if (string.IsNullOrEmpty(this.Filter))
+            {
+                return this.Library.Query;
+            }
+            return this.Library.Query.Where(this.GetFilterExpression(this.Filter));
         }
 
         protected virtual void OnLibraryNodesChanged()
