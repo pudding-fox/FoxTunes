@@ -33,10 +33,10 @@
 
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Substream" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.Substream.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.Substream.dll</HintPath>
     </Reference>
   </ItemGroup>
 

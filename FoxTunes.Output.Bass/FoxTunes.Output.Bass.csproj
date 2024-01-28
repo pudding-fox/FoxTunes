@@ -24,13 +24,13 @@
 
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.Fx.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.Fx.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.Mix.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.Mix.dll</HintPath>
     </Reference>
   </ItemGroup>
 

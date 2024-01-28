@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.dll</HintPath>
+      <HintPath>..\lib\net462\ManagedBass.dll</HintPath>
     </Reference>
   </ItemGroup>
 
