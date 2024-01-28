@@ -13,7 +13,8 @@ namespace FoxTunes.ViewModel
 
         }
 
-        public RenderableLibraryHierarchyItem(LibraryHierarchyItem libraryHierarchyItem, IDatabase database) : this()
+        public RenderableLibraryHierarchyItem(LibraryHierarchyItem libraryHierarchyItem, IDatabase database)
+            : this()
         {
             this.LibraryHierarchyItem = libraryHierarchyItem;
             this.Database = database;
