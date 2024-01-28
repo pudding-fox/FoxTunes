@@ -51,7 +51,7 @@ namespace FoxTunes
         private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(Resources.AddLibraryHierarchyNodeToPlaylist, new[] { "libraryHierarchyItemId", "sequence", "status" }, out parameters))
+            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.AddLibraryHierarchyNodeToPlaylist, new[] { "libraryHierarchyItemId", "sequence", "status" }, out parameters))
             {
                 command.Transaction = transaction;
                 parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
@@ -64,7 +64,7 @@ namespace FoxTunes
         private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(Resources.CopyMetaDataItems, new[] { "status" }, out parameters))
+            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.CopyMetaDataItems, new[] { "status" }, out parameters))
             {
                 command.Transaction = transaction;
                 parameters["status"] = PlaylistItemStatus.Import;

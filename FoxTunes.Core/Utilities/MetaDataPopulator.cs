@@ -18,12 +18,15 @@ namespace FoxTunes
             this.Command = new ThreadLocal<MetaDataPopulatorCommand>(true);
         }
 
-        public MetaDataPopulator(IDatabaseContext databaseContext, IDbTransaction transaction, string prefix) : this()
+        public MetaDataPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, string prefix) : this()
         {
+            this.Database = database;
             this.DatabaseContext = databaseContext;
             this.Transaction = transaction;
             this.Prefix = prefix;
         }
+
+        public IDatabase Database { get; private set; }
 
         public IDatabaseContext DatabaseContext { get; private set; }
 
@@ -90,7 +93,7 @@ namespace FoxTunes
             {
                 return this.Command.Value;
             }
-            return this.Command.Value = new MetaDataPopulatorCommand(this.DatabaseContext, this.Transaction, this.Prefix);
+            return this.Command.Value = new MetaDataPopulatorCommand(this.Database, this.DatabaseContext, this.Transaction, this.Prefix);
         }
 
         protected override void OnDisposing()
@@ -105,14 +108,14 @@ namespace FoxTunes
 
         private class MetaDataPopulatorCommand : BaseComponent
         {
-            public MetaDataPopulatorCommand(IDatabaseContext databaseContext, IDbTransaction transaction, string prefix)
+            public MetaDataPopulatorCommand(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, string prefix)
             {
                 Logger.Write(this, LogLevel.Debug, "Creating meta data populator command set.");
 
                 var metaDataParameters = default(IDbParameterCollection);
 
                 this.Command = databaseContext.Connection.CreateCommand(
-                    string.Format(Resources.AddMetaDataItems, prefix),
+                    string.Format(database.CoreSQL.AddMetaDataItems, prefix),
                     new[] { "itemId", "name", "type", "numericValue", "textValue", "fileValue" },
                     out metaDataParameters
                 );

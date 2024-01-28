@@ -19,7 +19,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
             using (var context = this.DataManager.CreateWriteContext())
             {
-                using (var command = context.Connection.CreateCommand(Resources.ClearPlaylist))
+                using (var command = context.Connection.CreateCommand(this.Database.CoreSQL.ClearPlaylist))
                 {
                     command.ExecuteNonQuery();
                 }

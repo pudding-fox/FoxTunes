@@ -118,13 +118,61 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="AddImageItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addimageitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="AddLibraryHierarchyNodeToPlaylist" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addlibraryhierarchynodetoplaylist.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="AddLibraryHierarchyRecord" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addlibraryhierarchyrecord.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="AddLibraryItem" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addlibraryitem.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="AddMetaDataItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addmetadataitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="AddPlaylistItem" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addplaylistitem.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="AddPropertyItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addpropertyitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ClearPlaylist" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\clearplaylist.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CopyMetaDataItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\copymetadataitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="Database" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>database.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>resources\database.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="GetLibraryHierarchyMetaDataItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\getlibraryhierarchymetadataitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="GetLibraryHierarchyNodes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\getlibraryhierarchynodes.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="GetLibraryHierarchyNodesWithFilter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\getlibraryhierarchynodeswithfilter.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="SetLibraryItemStatus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\setlibraryitemstatus.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="SetPlaylistItemStatus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\setplaylistitemstatus.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ShiftPlaylistItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\shiftplaylistitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="SQLite_Interop_x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\packages\system.data.sqlite.core.1.0.105.2\build\net46\x64\sqlite.interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="SQLite_Interop_x86" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\packages\system.data.sqlite.core.1.0.105.2\build\net46\x86\sqlite.interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="VariousArtists" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\variousartists.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

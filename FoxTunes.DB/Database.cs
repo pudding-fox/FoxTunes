@@ -7,6 +7,8 @@ namespace FoxTunes
     {
         public abstract DbConnection CreateConnection();
 
+        public abstract ICoreSQL CoreSQL { get; }
+
         public abstract IDatabaseContext CreateContext();
     }
 }
