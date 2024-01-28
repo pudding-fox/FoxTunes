@@ -8,6 +8,8 @@
 
         IOutput Output { get; }
 
+        IOutputEffects OutputEffects { get; }
+
         IOutputStreamQueue OutputStreamQueue { get; }
 
         IScriptingRuntime ScriptingRuntime { get; }

@@ -19,6 +19,8 @@ namespace FoxTunes.Interfaces
 
         long BufferLength { get; }
 
+        bool IsActive { get; }
+
         void Connect(IBassStreamComponent previous);
 
         void ClearBuffer();

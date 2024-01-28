@@ -53,6 +53,10 @@ namespace FoxTunes
                         builder.AppendLine(string.Format("Input = {0}", pipeline.Input.Description));
                         foreach (var component in pipeline.Components)
                         {
+                            if (!component.IsActive)
+                            {
+                                continue;
+                            }
                             builder.AppendLine(string.Format("Component = {0}", component.Description));
                         }
                         builder.Append(string.Format("Output = {0}", pipeline.Output.Description));
@@ -314,14 +318,6 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.BUFFER_LENGTH_ELEMENT
             ).ConnectValue(value => this.BufferLength = value);
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                BassOutputConfiguration.VOLUME_ENABLED_ELEMENT
-            ).ConnectValue(value => this.CanControlVolume = value);
-            this.Configuration.GetElement<DoubleConfigurationElement>(
-                BassOutputConfiguration.SECTION,
-                BassOutputConfiguration.VOLUME_ELEMENT
-            ).ConnectValue(value => this.Volume = Convert.ToSingle(value));
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             this.PipelineManager.Error += this.OnPipelineManagerError;
@@ -454,59 +450,6 @@ namespace FoxTunes
                 }
             });
             return result;
-        }
-
-        private bool _CanControlVolume { get; set; }
-
-        public override bool CanControlVolume
-        {
-            get
-            {
-                return this._CanControlVolume;
-            }
-            protected set
-            {
-                this._CanControlVolume = value;
-                this.OnCanControlVolumeChanged();
-            }
-        }
-
-        protected override void OnCanControlVolumeChanged()
-        {
-            Logger.Write(this, LogLevel.Debug, "CanControlVolume = {0}", this.CanControlVolume);
-            //TODO: Bad .Wait().
-            this.Shutdown().Wait();
-            base.OnCanControlVolumeChanged();
-        }
-
-        private float _Volume { get; set; }
-
-        public override float Volume
-        {
-            get
-            {
-                return this._Volume;
-            }
-            set
-            {
-                this._Volume = value;
-                this.OnVolumeChanged();
-            }
-        }
-
-        protected override void OnVolumeChanged()
-        {
-            if (this.PipelineManager != null && this.CanControlVolume)
-            {
-                this.PipelineManager.WithPipeline(pipeline =>
-                {
-                    if (pipeline != null && pipeline.Output.CanControlVolume)
-                    {
-                        pipeline.Output.Volume = this.Volume;
-                    }
-                });
-            }
-            base.OnVolumeChanged();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

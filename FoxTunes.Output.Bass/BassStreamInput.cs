@@ -29,6 +29,14 @@ namespace FoxTunes
             }
         }
 
+        public virtual bool IsActive
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public abstract void Connect(IBassStreamComponent previous);
 
         public virtual void ClearBuffer()

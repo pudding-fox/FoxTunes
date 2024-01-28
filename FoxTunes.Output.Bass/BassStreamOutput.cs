@@ -32,25 +32,49 @@ namespace FoxTunes
             }
         }
 
-
-        public virtual bool CanControlVolume
+        public virtual bool IsActive
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
-        public virtual float Volume
+        public IOutputVolume Volume { get; private set; }
+
+        public override void InitializeComponent(ICore core)
         {
-            get
+            this.Volume = core.Components.OutputEffects.Volume;
+            if (this.Volume != null)
             {
-                throw new NotImplementedException();
+                this.Volume.EnabledChanged += this.OnVolumeEnabledChanged;
+                this.Volume.ValueChanged += this.OnVolumeValueChanged;
             }
-            set
+            base.InitializeComponent(core);
+        }
+
+        protected virtual void OnVolumeEnabledChanged(object sender, EventArgs e)
+        {
+            this.UpdateVolume();
+        }
+
+        protected virtual void OnVolumeValueChanged(object sender, EventArgs e)
+        {
+            this.UpdateVolume();
+        }
+
+        protected virtual void UpdateVolume()
+        {
+            var volume = default(float);
+            if (this.Volume != null && this.Volume.Available && this.Volume.Enabled)
             {
-                throw new NotImplementedException();
+                volume = this.Volume.Value;
             }
+            else
+            {
+                volume = 1;
+            }
+            this.SetVolume(volume);
         }
 
         public abstract bool CheckFormat(int rate, int channels);
@@ -90,6 +114,10 @@ namespace FoxTunes
         public abstract void Stop();
 
         public abstract int GetData(float[] buffer);
+
+        protected abstract float GetVolume();
+
+        protected abstract void SetVolume(float volume);
 
         public bool IsDisposed { get; private set; }
 

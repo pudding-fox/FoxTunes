@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using System;
 using System.Collections.Generic;
 
@@ -16,6 +17,8 @@ namespace FoxTunes
 
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
+        new public bool IsInitialized { get; private set; }
+
         private bool _Enabled { get; set; }
 
         public bool Enabled
@@ -28,8 +31,6 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                //TODO: Bad .Wait().
-                this.Output.Shutdown().Wait();
             }
         }
 
@@ -37,6 +38,8 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
+            this.Output.Init += this.OnInit;
+            this.Output.Free += this.OnFree;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -50,12 +53,23 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
+        protected virtual void OnInit(object sender, EventArgs e)
         {
-            if (!this.Enabled)
+            this.IsInitialized = true;
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.FloatDSP, true));
+        }
+
+        protected virtual void OnFree(object sender, EventArgs e)
+        {
+            if (!this.IsInitialized)
             {
                 return;
             }
+            this.IsInitialized = false;
+        }
+
+        protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
+        {
             if (BassUtils.GetChannelDsdRaw(e.Stream.ChannelHandle))
             {
                 return;
@@ -90,6 +104,11 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
             if (this.BassStreamPipelineFactory != null)
             {
                 this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;

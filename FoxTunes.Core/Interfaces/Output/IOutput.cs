@@ -37,19 +37,11 @@ namespace FoxTunes.Interfaces
         Task Shutdown();
 
         int GetData(float[] buffer);
-
-        bool CanControlVolume { get; }
-
-        event EventHandler CanControlVolumeChanged;
-
-        float Volume { get; set; }
-
-        event EventHandler VolumeChanged;
     }
 
     public delegate void OutputStreamEventHandler(object sender, OutputStreamEventArgs e);
 
-    public class OutputStreamEventArgs
+    public class OutputStreamEventArgs : EventArgs
     {
         public OutputStreamEventArgs(IOutputStream stream)
         {

@@ -9,6 +9,8 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDirectSoundStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public ICore Core { get; private set; }
+
         public IBassOutput Output { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -53,6 +55,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
@@ -141,7 +144,9 @@ namespace FoxTunes
             {
                 return;
             }
-            e.Output = new BassDirectSoundStreamOutput(this, e.Stream);
+            var output = new BassDirectSoundStreamOutput(this, e.Stream);
+            output.InitializeComponent(this.Core);
+            e.Output = output;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

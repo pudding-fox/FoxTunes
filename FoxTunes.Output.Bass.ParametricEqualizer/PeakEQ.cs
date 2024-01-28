@@ -1,55 +1,33 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public class PeakEQ : BaseComponent, IDisposable
     {
-        public const int MIN_BANDWIDTH = 1;
+        public const float MIN_BANDWIDTH = 0.5f;
 
-        public const int MAX_BANDWIDTH = 36;
+        public const float MAX_BANDWIDTH = 5.0f;
 
-        public PeakEQ()
+        public const float MIN_GAIN = -15;
+
+        public const float MAX_GAIN = 15;
+
+        public PeakEQ(int channelHandle)
         {
-            this.Effects = new Dictionary<float, PeakEQEffect>();
+            this.Effect = new PeakEQEffect(channelHandle);
         }
 
-        public PeakEQ(int channelHandle) : this()
+        public PeakEQEffect Effect { get; private set; }
+
+        public void UpdateBand(int band, float bandwidth, float center, float gain)
         {
-            this.ChannelHandle = channelHandle;
-        }
-
-        public IDictionary<float, PeakEQEffect> Effects { get; private set; }
-
-        public int ChannelHandle { get; private set; }
-
-        public PeakEQEffect AddOrUpdateBand(float bandwidth, float center, float gain)
-        {
-            var effect = default(PeakEQEffect);
-            if (!this.Effects.TryGetValue(center, out effect))
-            {
-                effect = new PeakEQEffect(this.ChannelHandle);
-                effect.Band = this.Effects.Count;
-                effect.Center = center;
-                effect.Channel = -1;
-                this.Effects.Add(center, effect);
-            }
-            effect.Bandwidth = bandwidth;
-            effect.Gain = gain;
-            effect.Activate();
-            return effect;
-        }
-
-        public void RemoveBand(float center)
-        {
-            var effect = default(PeakEQEffect);
-            if (!this.Effects.TryGetValue(center, out effect))
-            {
-                return;
-            }
-            effect.Dispose();
-            this.Effects.Remove(center);
+            this.Effect.Band = band;
+            this.Effect.Center = center;
+            this.Effect.Channel = -1;
+            this.Effect.Bandwidth = bandwidth;
+            this.Effect.Gain = gain;
+            this.Effect.Activate();
         }
 
         public bool IsDisposed { get; private set; }
@@ -72,12 +50,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            foreach (var key in this.Effects.Keys)
+            if (this.Effect != null)
             {
-                var effect = this.Effects[key];
-                effect.Dispose();
+                this.Effect.Dispose();
             }
-            this.Effects.Clear();
         }
 
         ~PeakEQ()

@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="FoxTunes.EqualizerDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core"
+             xmlns:Windows="clr-namespace:FoxTunes" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <ViewModel:Equalizer x:Key="ViewModel" Core="{Binding}"></ViewModel:Equalizer>
+    </UserControl.Resources>
+    <Grid IsEnabled="{Binding Available, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ItemsControl Grid.ColumnSpan="2" ItemsSource="{Binding Bands, Source={StaticResource ViewModel}}" Margin="0,0,0,3" IsEnabled="{Binding Enabled, Source={StaticResource ViewModel}}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel IsItemsHost="True" Orientation="Horizontal"></StackPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type ViewModel:EqualizerBand}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Slider Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Stretch" Height="100" IsMoveToPointEnabled="True" Minimum="{Binding MinValue, Mode=OneWay}" Maximum="{Binding MaxValue, Mode=OneWay}" Value="{Binding Value}"></Slider>
+                        <TextBlock Grid.Row="1" Width="40" Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <StackPanel Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal">
+            <CheckBox HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Enabled, Source={StaticResource ViewModel}}" Margin="0,0,3,0">Enabled</CheckBox>
+        </StackPanel>
+        <ComboBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" ItemsSource="{Binding Presets, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPreset, Source={StaticResource ViewModel}}" IsEnabled="{Binding Enabled, Source={StaticResource ViewModel}}">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="SelectionChanged">
+                    <Interactivity:InvokeCommandAction Command="{Binding LoadPresetCommand, Source={StaticResource ViewModel}}"></Interactivity:InvokeCommandAction>
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
+        </ComboBox>
+    </Grid>
+</UserControl>

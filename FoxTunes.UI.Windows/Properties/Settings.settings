@@ -18,7 +18,10 @@
       <Value Profile="(Default)">0.35*</Value>
     </Setting>
     <Setting Name="ColumnHeight_6F3FDC8521DA" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0.5*</Value>
+      <Value Profile="(Default)">1*</Value>
+    </Setting>
+    <Setting Name="EqualizerWindowBounds" Type="System.Windows.Rect" Scope="User">
+      <Value Profile="(Default)">0,0,0,0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

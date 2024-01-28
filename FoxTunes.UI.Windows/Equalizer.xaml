@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="FoxTunes.Equalizer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+    <UserControl.Resources>
+        <ViewModel:Equalizer x:Key="ViewModel" Core="{Binding}"></ViewModel:Equalizer>
+    </UserControl.Resources>
+    <UserControl.IsEnabled>
+        <Binding Mode="OneWay" Path="Available" Source="{StaticResource ViewModel}"/>
+    </UserControl.IsEnabled>
+    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding EqualizerVisible, Source={StaticResource ViewModel}}" ToolTipService.ShowDuration="60000">
+        <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
+            <Viewbox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="-1" ScaleX="1"/>
+                    <SkewTransform AngleY="0" AngleX="0"/>
+                    <RotateTransform Angle="0"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Viewbox.RenderTransform>
+            <Canvas Width="500" Height="500">
+                <Path Fill="{DynamicResource TextBrush}">
+                    <Path.Data>
+                        <PathGeometry Figures="M341 320h86v-235h-86v235zM85 85v171h86v-171h-86zM213 85v342h86v-342h-86z" FillRule="NonZero"/>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </Viewbox>
+    </ToggleButton>
+</UserControl>

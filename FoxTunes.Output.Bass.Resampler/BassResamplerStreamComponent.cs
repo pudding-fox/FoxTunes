@@ -74,6 +74,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool IsActive
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public IConfiguration Configuration { get; private set; }
 
         private SoxChannelQuality _Quality { get; set; }

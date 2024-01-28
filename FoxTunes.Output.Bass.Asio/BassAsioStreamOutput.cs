@@ -5,7 +5,6 @@ using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace FoxTunes
 {
@@ -63,26 +62,6 @@ namespace FoxTunes
         public override int ChannelHandle { get; protected set; }
 
         public HashSet<int> MixerChannelHandles { get; protected set; }
-
-        public override bool CanControlVolume
-        {
-            get
-            {
-                return BassAsioDevice.CanControlVolume;
-            }
-        }
-
-        public override float Volume
-        {
-            get
-            {
-                return BassAsioDevice.Volume;
-            }
-            set
-            {
-                BassAsioDevice.Volume = value;
-            }
-        }
 
         public override bool CheckFormat(int rate, int channels)
         {
@@ -340,6 +319,32 @@ namespace FoxTunes
                 return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
             }
             return 0;
+        }
+
+        protected override float GetVolume()
+        {
+            if (this.ChannelHandle == 0)
+            {
+                return 0;
+            }
+            if (!BassAsioDevice.CanControlVolume)
+            {
+                return 1;
+            }
+            return BassAsioDevice.Volume;
+        }
+
+        protected override void SetVolume(float volume)
+        {
+            if (this.ChannelHandle == 0)
+            {
+                return;
+            }
+            if (!BassAsioDevice.CanControlVolume)
+            {
+                return;
+            }
+            BassAsioDevice.Volume = volume;
         }
 
         protected override void OnDisposing()
