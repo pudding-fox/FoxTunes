@@ -39,6 +39,10 @@ namespace FoxTunes
             var viewModel = this.FindResource<global::FoxTunes.ViewModel.LibraryBrowser>("ViewModel");
             if (viewModel != null)
             {
+                if (LibraryHierarchyNode.Empty.Equals(viewModel.SelectedItem))
+                {
+                    return;
+                }
                 if (!viewModel.SelectedItem.IsMetaDatasLoaded)
                 {
                     viewModel.SelectedItem.LoadMetaDatas();

@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -9,6 +10,13 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowser : LibraryBase
     {
+        public LibraryBrowser()
+        {
+            this.Frames = new ObservableCollection<LibraryBrowserFrame>();
+        }
+
+        public ObservableCollection<LibraryBrowserFrame> Frames { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         private IntegerConfigurationElement _TileSize { get; set; }
@@ -56,20 +64,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler IsSlaveChanged;
 
-        private LibraryHierarchyNode ItemsSource { get; set; }
-
-        public override IEnumerable<LibraryHierarchyNode> Items
-        {
-            get
-            {
-                if (this.ItemsSource != null && !LibraryHierarchyNode.Empty.Equals(this.ItemsSource))
-                {
-                    return new[] { LibraryHierarchyNode.Empty }.Concat(this.LibraryHierarchyBrowser.GetNodes(this.ItemsSource));
-                }
-                return base.Items;
-            }
-        }
-
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -80,6 +74,7 @@ namespace FoxTunes.ViewModel
             LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
+            this.Frames.Add(new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items));
         }
 
         protected virtual void OnActiveComponentsChanged(object sender, EventArgs e)
@@ -128,41 +123,70 @@ namespace FoxTunes.ViewModel
 
         private void Up()
         {
-            var itemsSource = this.ItemsSource;
-            if (itemsSource != null)
+            var frame = this.Frames.LastOrDefault();
+            if (frame == null)
             {
-                this.ItemsSource = itemsSource.Parent;
+                return;
             }
-            this.OnItemsChanged();
-            this.SelectedItem = itemsSource;
+            this.Frames.Remove(frame);
+            this.SelectedItem = frame.ItemsSource;
         }
 
         private void Down()
         {
-            this.ItemsSource = this.SelectedItem;
-            this.OnItemsChanged();
-            this.SelectedItem = LibraryHierarchyNode.Empty;
+            this.Down(this.SelectedItem);
+        }
+
+        private void Down(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            this.Frames.Add(
+                new LibraryBrowserFrame(
+                    libraryHierarchyNode,
+                    new[] { LibraryHierarchyNode.Empty }.Concat(this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode))
+                )
+            );
         }
 
         private void Synchronize()
         {
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
-                if (this.ItemsSource == null)
-                {
-                    return;
-                }
-                this.ItemsSource = null;
+                return;
             }
-            else
+            var stack = new Stack<LibraryHierarchyNode>();
+            var libraryHierarchyNode = this.SelectedItem;
+            while (libraryHierarchyNode.Parent != null)
             {
-                if (this.ItemsSource == this.SelectedItem.Parent)
-                {
-                    return;
-                }
-                this.ItemsSource = this.SelectedItem.Parent;
+                libraryHierarchyNode = libraryHierarchyNode.Parent;
+                stack.Push(libraryHierarchyNode);
             }
-            this.OnItemsChanged();
+            stack.Push(LibraryHierarchyNode.Empty);
+            var position = 0;
+            while (stack.Count > 0)
+            {
+                libraryHierarchyNode = stack.Pop();
+                if (position >= this.Frames.Count)
+                {
+                    this.Down(libraryHierarchyNode);
+                }
+                else
+                {
+                    var frame = this.Frames[position];
+                    if (!frame.ItemsSource.Equals(libraryHierarchyNode))
+                    {
+                        for (; position < this.Frames.Count; position++)
+                        {
+                            this.Frames.RemoveAt(this.Frames.Count - 1);
+                        }
+                        this.Down(libraryHierarchyNode);
+                    }
+                }
+                position++;
+            }
+            for (; position < this.Frames.Count; position++)
+            {
+                this.Frames.RemoveAt(this.Frames.Count - 1);
+            }
         }
 
         protected override void OnDisposing()
