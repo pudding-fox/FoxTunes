@@ -9,7 +9,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class OutputStreamQueue : StandardComponent, IOutputStreamQueue
     {
-        const int QUEUE_CAPACITY = 3;
+        public static readonly object SyncRoot = new object();
 
         public OutputStreamQueue()
         {
@@ -17,6 +17,10 @@ namespace FoxTunes
         }
 
         private ConcurrentDictionary<PlaylistItem, OutputStreamQueueValue> Queue { get; set; }
+
+        public IConfiguration Configuration { get; private set; }
+
+        public IntegerConfigurationElement Count { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -31,74 +35,108 @@ namespace FoxTunes
                     }
                 };
             }
+            this.Configuration = core.Components.Configuration;
+            this.Count = this.Configuration.GetElement<IntegerConfigurationElement>(
+                PlaybackBehaviourConfiguration.SECTION,
+                EnqueueNextItemBehaviourConfiguration.COUNT
+            );
             base.InitializeComponent(core);
         }
 
         public bool IsQueued(PlaylistItem playlistItem)
         {
-            return this.Queue.ContainsKey(playlistItem);
+            lock (SyncRoot)
+            {
+                return this.Queue.ContainsKey(playlistItem);
+            }
+        }
+
+        public bool Requeue(PlaylistItem playlistItem)
+        {
+            lock (SyncRoot)
+            {
+                var value = default(OutputStreamQueueValue);
+                if (!this.Queue.TryGetValue(playlistItem, out value))
+                {
+                    return false;
+                }
+                value.CreatedAt = DateTime.UtcNow;
+                return true;
+            }
         }
 
         public IOutputStream Peek(PlaylistItem playlistItem)
         {
-            var value = default(OutputStreamQueueValue);
-            if (!this.Queue.TryGetValue(playlistItem, out value))
+            lock (SyncRoot)
             {
-                return default(IOutputStream);
+                var value = default(OutputStreamQueueValue);
+                if (!this.Queue.TryGetValue(playlistItem, out value))
+                {
+                    return default(IOutputStream);
+                }
+                return value.OutputStream;
             }
-            return value.OutputStream;
         }
 
         public Task Enqueue(IOutputStream outputStream, bool dequeue)
         {
-            if (!this.Queue.TryAdd(outputStream.PlaylistItem, new OutputStreamQueueValue(outputStream)))
+            lock (SyncRoot)
             {
-                throw new InvalidOperationException("Failed to add the specified output stream to the queue.");
-            }
-            this.EnsureCapacity(outputStream.PlaylistItem);
-            if (!dequeue)
-            {
+                if (!this.Queue.TryAdd(outputStream.PlaylistItem, new OutputStreamQueueValue(outputStream)))
+                {
+                    throw new InvalidOperationException("Failed to add the specified output stream to the queue.");
+                }
+                this.EnsureCapacity(outputStream.PlaylistItem);
+                if (!dequeue)
+                {
 #if NET40
-                return TaskEx.FromResult(false);
+                    return TaskEx.FromResult(false);
 #else
-                return Task.CompletedTask;
+                    return Task.CompletedTask;
 #endif
+                }
+                return this.Dequeue(outputStream.PlaylistItem);
             }
-            return this.Dequeue(outputStream.PlaylistItem);
         }
 
         private void EnsureCapacity(PlaylistItem playlistItem)
         {
-            //We remove the oldest items in the queue to enforce the capacity.
-            //Hopefully they are not needed.
-            var query =
-                from key in this.Queue.Keys
-                where key != playlistItem
-                orderby this.Queue[key].CreatedAt
-                select key;
-            while (this.Queue.Count > QUEUE_CAPACITY)
+            lock (SyncRoot)
             {
-                var key = query.FirstOrDefault();
-                if (key == null)
+                //We remove the oldest items in the queue to enforce the capacity.
+                //Hopefully they are not needed.
+                var query =
+                    from pair in this.Queue
+                    where pair.Key != playlistItem
+                    orderby pair.Value.CreatedAt descending
+                    select pair.Key;
+                while (this.Queue.Count > this.Count.Value)
                 {
-                    return;
+                    var key = query.FirstOrDefault();
+                    if (key == null)
+                    {
+                        return;
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Evicting output stream from the queue due to exceeded capacity: {0} => {1}", key.Id, key.FileName);
+                    var value = default(OutputStreamQueueValue);
+                    if (!this.Queue.TryRemove(key, out value))
+                    {
+                        continue;
+                    }
+                    value.OutputStream.Dispose();
                 }
-                Logger.Write(this, LogLevel.Debug, "Evicting output stream from the queue due to exceeded capacity: {0} => {1}", key.Id, key.FileName);
-                var value = default(OutputStreamQueueValue);
-                if (!this.Queue.TryRemove(key, out value))
-                {
-                    continue;
-                }
-                value.OutputStream.Dispose();
             }
         }
 
         public Task Dequeue(PlaylistItem playlistItem)
         {
             var value = default(OutputStreamQueueValue);
-            if (!this.Queue.TryRemove(playlistItem, out value))
+            lock (SyncRoot)
             {
-                throw new InvalidOperationException("Failed to locate the specified playlist item in the queue.");
+                if (!this.Queue.TryRemove(playlistItem, out value))
+                {
+                    throw new InvalidOperationException("Failed to locate the specified playlist item in the queue.");
+                }
             }
             return this.OnDequeued(value.OutputStream);
         }
@@ -122,14 +160,17 @@ namespace FoxTunes
 
         public void Clear()
         {
-            foreach (var key in this.Queue.Keys)
+            lock (SyncRoot)
             {
-                var outputStream = this.Queue[key].OutputStream;
-                Logger.Write(this, LogLevel.Debug, "Disposing queued output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-                outputStream.Dispose();
+                foreach (var pair in this.Queue)
+                {
+                    var outputStream = pair.Value.OutputStream;
+                    Logger.Write(this, LogLevel.Debug, "Disposing queued output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
+                    outputStream.Dispose();
+                }
+                Logger.Write(this, LogLevel.Debug, "Clearing output stream queue.");
+                this.Queue.Clear();
             }
-            Logger.Write(this, LogLevel.Debug, "Clearing output stream queue.");
-            this.Queue.Clear();
         }
 
         public bool IsDisposed { get; private set; }
@@ -183,7 +224,7 @@ namespace FoxTunes
 
             public IOutputStream OutputStream { get; private set; }
 
-            public DateTime CreatedAt { get; private set; }
+            public DateTime CreatedAt { get; set; }
         }
     }
 }

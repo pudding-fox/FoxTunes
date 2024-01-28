@@ -7,6 +7,8 @@ namespace FoxTunes.Interfaces
     {
         bool IsQueued(PlaylistItem playlistItem);
 
+        bool Requeue(PlaylistItem playlistItem);
+
         IOutputStream Peek(PlaylistItem playlistItem);
 
         Task Enqueue(IOutputStream outputStream, bool dequeue);

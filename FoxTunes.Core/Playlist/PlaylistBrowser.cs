@@ -131,9 +131,19 @@ namespace FoxTunes
             return this.NavigationStrategy.GetNext(navigate);
         }
 
+        public Task<PlaylistItem> GetNext(PlaylistItem playlistItem)
+        {
+            return this.NavigationStrategy.GetNext(playlistItem);
+        }
+
         public Task<PlaylistItem> GetPrevious(bool navigate)
         {
             return this.NavigationStrategy.GetPrevious(navigate);
+        }
+
+        public Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem)
+        {
+            return this.NavigationStrategy.GetPrevious(playlistItem);
         }
 
         public virtual async Task<PlaylistItem> Get(string fileName)

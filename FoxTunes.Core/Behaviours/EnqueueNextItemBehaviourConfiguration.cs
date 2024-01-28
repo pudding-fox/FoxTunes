@@ -1,18 +1,17 @@
-﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public static class PlaybackStatisticsBehaviourConfiguration
+    public static class EnqueueNextItemBehaviourConfiguration
     {
-        public const string ENABLED = "2B879758-2672-4513-A348-FDD08E1E8500";
+        public static string COUNT = "82DF8CB4-D447-419F-A891-9AC6170B48A1";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(PlaybackBehaviourConfiguration.SECTION, "Playback")
                 .WithElement(
-                    new BooleanConfigurationElement(ENABLED, "Update Play Counters").WithValue(releaseType == ReleaseType.Default)
+                    new IntegerConfigurationElement(COUNT, "Queue Size").WithValue(1).WithValidationRule(new IntegerValidationRule(1, 16))
             );
         }
     }

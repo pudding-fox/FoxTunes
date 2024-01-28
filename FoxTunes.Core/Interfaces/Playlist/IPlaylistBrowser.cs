@@ -17,7 +17,11 @@ namespace FoxTunes.Interfaces
 
         Task<PlaylistItem> GetNext(bool navigate);
 
+        Task<PlaylistItem> GetNext(PlaylistItem playlistItem);
+
         Task<PlaylistItem> GetPrevious(bool navigate);
+
+        Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem);
 
         Task<int> GetInsertIndex();
     }

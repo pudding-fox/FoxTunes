@@ -356,6 +356,10 @@ namespace FoxTunes
             {
                 await this.Start().ConfigureAwait(false);
             }
+            if (BassOutputStreams.Contains(playlistItem.FileName))
+            {
+                Logger.Write(this, LogLevel.Warn, "The stream is already loaded: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+            }
             Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             var stream = await this.StreamFactory.CreateStream(playlistItem, immidiate).ConfigureAwait(false);
             if (stream.IsEmpty)

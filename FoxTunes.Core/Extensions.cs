@@ -317,6 +317,21 @@ namespace FoxTunes
             }
         }
 
+        public static void Shuffle<TKey, TValue>(this IDictionary<TKey, TValue> sequence)
+        {
+            var random = new Random(unchecked((int)DateTime.Now.Ticks));
+            var keys = sequence.Keys.ToArray();
+            for (var a = 0; a < keys.Length; a++)
+            {
+                var key1 = keys[a];
+                var key2 = keys[random.Next(sequence.Count)];
+                var value1 = sequence[key1];
+                var value2 = sequence[key2];
+                sequence[key1] = value2;
+                sequence[key2] = value1;
+            }
+        }
+
         public static string Replace(this string value, IEnumerable<string> oldValues, string newValue, bool ignoreCase, bool once)
         {
             foreach (var oldValue in oldValues)

@@ -36,7 +36,7 @@ namespace FoxTunes
             );
             this.MetaDataEnabled.ValueChanged += this.OnValueChanged;
             this.PlaybackStatisticsEnabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                PlaybackStatisticsBehaviourConfiguration.SECTION,
+                PlaybackBehaviourConfiguration.SECTION,
                 PlaybackStatisticsBehaviourConfiguration.ENABLED
             );
             this.PlaybackStatisticsEnabled.ValueChanged += this.OnValueChanged;
