@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -20,13 +22,11 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Bands { get; private set; }
 
-        public BooleanConfigurationElement ShowPeaks { get; private set; }
+        public BooleanConfigurationElement ShowPeak { get; private set; }
 
         public BooleanConfigurationElement ShowRms { get; private set; }
 
         public BooleanConfigurationElement ShowCrestFactor { get; private set; }
-
-        public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
@@ -40,14 +40,10 @@ namespace FoxTunes
                    EnhancedSpectrumConfiguration.SECTION,
                    EnhancedSpectrumConfiguration.BANDS_ELEMENT
                );
-                this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                this.ShowPeak = this.Configuration.GetElement<BooleanConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
-                    EnhancedSpectrumConfiguration.PEAKS_ELEMENT
+                    EnhancedSpectrumConfiguration.PEAK_ELEMENT
                  );
-                this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                   EnhancedSpectrumConfiguration.SECTION,
-                   EnhancedSpectrumConfiguration.HOLD_ELEMENT
-                );
                 this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
                     EnhancedSpectrumConfiguration.RMS_ELEMENT
@@ -65,7 +61,7 @@ namespace FoxTunes
                    VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
                 );
                 this.Bands.ValueChanged += this.OnValueChanged;
-                this.ShowPeaks.ValueChanged += this.OnValueChanged;
+                this.ShowPeak.ValueChanged += this.OnValueChanged;
                 this.ShowRms.ValueChanged += this.OnValueChanged;
                 this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
@@ -99,23 +95,89 @@ namespace FoxTunes
                 height,
                 EnhancedSpectrumConfiguration.GetBands(this.Bands.Value),
                 EnhancedSpectrumConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value),
-                this.ShowPeaks.Value,
+                this.ShowPeak.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
-                this.ShowRms.Value ? this.Colors : EnhancedSpectrumConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors)
+                this.GetColorPalettes(this.ColorPalette.Value, this.ShowPeak.Value, this.ShowRms.Value, this.ShowCrestFactor.Value, this.Colors)
             );
             return true;
         }
 
+        protected virtual IDictionary<string, Color[]> GetColorPalettes(string value, bool showPeak, bool showRms, bool showCrest, Color[] colors)
+        {
+            var palettes = EnhancedSpectrumConfiguration.GetColorPalette(value, colors);
+            if (showPeak)
+            {
+                palettes.GetOrAdd(
+                    EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK,
+                    () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK, showPeak, showRms, colors)
+                );
+            }
+            if (showRms)
+            {
+                palettes.GetOrAdd(
+                    EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS,
+                    () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS, showPeak, showRms, colors)
+                );
+            }
+            palettes.GetOrAdd(
+                EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE,
+                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE, showPeak, showRms, colors)
+            );
+            if (showCrest)
+            {
+                palettes.GetOrAdd(
+                    EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST,
+                    () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST, showPeak, showRms, colors)
+                );
+            }
+            palettes.GetOrAdd(
+                EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, showPeak, showRms, colors)
+            );
+            return palettes;
+        }
+
+        protected override WriteableBitmap CreateBitmap(int width, int height)
+        {
+            var bitmap = base.CreateBitmap(width, height);
+            this.ClearBitmap(bitmap);
+            return bitmap;
+        }
+
+        protected override void ClearBitmap(WriteableBitmap bitmap)
+        {
+            if (!bitmap.TryLock(LockTimeout))
+            {
+                return;
+            }
+            var info = default(BitmapHelper.RenderInfo);
+            var data = this.RendererData;
+            if (data != null)
+            {
+                info = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND);
+            }
+            else
+            {
+                var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, false, false, this.Colors);
+                var flags = 0;
+                var colors = palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND];
+                if (colors.Length > 1)
+                {
+                    flags |= BitmapHelper.COLOR_FROM_Y;
+                }
+                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, colors));
+            }
+            BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
+            bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            bitmap.Unlock();
+        }
+
         protected virtual async Task Render(SpectrumRendererData data)
         {
-            const byte SHADE = 30;
-
             var bitmap = default(WriteableBitmap);
             var success = default(bool);
-            var valueRenderInfo = default(BitmapHelper.RenderInfo);
-            var rmsRenderInfo = default(BitmapHelper.RenderInfo);
-            var crestRenderInfo = default(BitmapHelper.RenderInfo);
+            var info = default(SpectrumRenderInfo);
 
             await Windows.Invoke(() =>
             {
@@ -130,20 +192,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (data.RmsElements != null)
-                {
-                    var colors = data.Colors[0].ToPair(SHADE);
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
-                    rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[1]));
-                    if (data.CrestPoints != null)
-                    {
-                        crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, global::System.Windows.Media.Colors.Red));
-                    }
-                }
-                else
-                {
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(BitmapHelper.COLOR_FROM_Y, data.Colors));
-                }
+                info = GetRenderInfo(bitmap, data);
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)
@@ -155,7 +204,7 @@ namespace FoxTunes
 
             try
             {
-                Render(valueRenderInfo, rmsRenderInfo, crestRenderInfo, data);
+                Render(ref info, data);
             }
             catch (Exception e)
             {
@@ -206,10 +255,6 @@ namespace FoxTunes
                     {
                         UpdateElementsFast(data);
                     }
-                    if (data.PeakElements != null)
-                    {
-                        UpdatePeaks(data, this.UpdateInterval, this.HoldInterval.Value);
-                    }
                     data.LastUpdated = DateTime.UtcNow;
                 }
 
@@ -238,9 +283,9 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.ShowPeaks != null)
+            if (this.ShowPeak != null)
             {
-                this.ShowPeaks.ValueChanged -= this.OnValueChanged;
+                this.ShowPeak.ValueChanged -= this.OnValueChanged;
             }
             if (this.ShowRms != null)
             {
@@ -261,14 +306,103 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, BitmapHelper.RenderInfo crestRenderInfo, SpectrumRendererData data)
+        private static SpectrumRenderInfo GetRenderInfo(WriteableBitmap bitmap, SpectrumRendererData data)
         {
-            var valueElements = data.ValueElements;
-            var rmsElements = data.RmsElements;
-            var crestPoints = data.CrestPoints;
-            var peakElements = data.PeakElements;
+            var info = new SpectrumRenderInfo()
+            {
+                Background = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND)
+            };
+            if (data.PeakElements != null)
+            {
+                info.Peak = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK);
+            }
+            if (data.RmsElements != null)
+            {
+                info.Rms = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS);
+            }
+            if (data.ValueElements != null)
+            {
+                info.Value = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE);
+            }
+            if (data.CrestPoints != null)
+            {
+                info.Crest = GetRenderInfo(bitmap, data, EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST);
+            }
+            return info;
+        }
 
-            BitmapHelper.Clear(ref valueRenderInfo);
+        private static BitmapHelper.RenderInfo GetRenderInfo(WriteableBitmap bitmap, SpectrumRendererData data, string name)
+        {
+            var flags = 0;
+            var colors = data.Colors[name];
+            if (colors.Length > 1)
+            {
+                flags |= BitmapHelper.COLOR_FROM_Y;
+            }
+            if (data.PeakElements != null || data.RmsElements != null)
+            {
+                if (!string.Equals(name, EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
+                {
+                    flags |= BitmapHelper.ALPHA_BLENDING;
+                }
+            }
+            return BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, colors));
+        }
+
+        private static Color[] GetDefaultColors(string name, bool showPeak, bool showRms, Color[] colors)
+        {
+            switch (name)
+            {
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK:
+                    if (showRms)
+                    {
+                        return colors.WithAlpha(-200);
+                    }
+                    else
+                    {
+                        return colors.WithAlpha(-100);
+                    }
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS:
+                    if (showPeak)
+                    {
+                        return colors.WithAlpha(-100);
+                    }
+                    else
+                    {
+                        return colors.WithAlpha(-50);
+                    }
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE:
+                    if (showPeak || showRms)
+                    {
+                        return colors.WithAlpha(-25);
+                    }
+                    else
+                    {
+                        return colors;
+                    }
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.Red
+                    };
+                case EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.Black
+                    };
+            }
+            throw new NotImplementedException();
+        }
+
+        private static void Render(ref SpectrumRenderInfo info, SpectrumRendererData data)
+        {
+            if (info.Background.Width != data.Width || info.Background.Height != data.Height)
+            {
+                //Bitmap does not match data.
+                return;
+            }
+
+            BitmapHelper.DrawRectangle(ref info.Background, 0, 0, data.Width, data.Height);
 
             if (data.SampleCount == 0)
             {
@@ -276,49 +410,28 @@ namespace FoxTunes
                 return;
             }
 
-            if (valueRenderInfo.Width != data.Width || valueRenderInfo.Height != data.Height)
+            if (data.PeakElements != null)
             {
-                //Bitmap does not match data.
-                return;
+                BitmapHelper.DrawRectangles(ref info.Peak, data.PeakElements, data.PeakElements.Length);
+            }
+            if (data.RmsElements != null)
+            {
+                BitmapHelper.DrawRectangles(ref info.Rms, data.RmsElements, data.RmsElements.Length);
+            }
+            if (data.ValueElements != null)
+            {
+                BitmapHelper.DrawRectangles(ref info.Value, data.ValueElements, data.ValueElements.Length);
             }
 
-            BitmapHelper.DrawRectangles(ref valueRenderInfo, valueElements, valueElements.Length);
-            if (rmsElements != null)
+            if (data.CrestPoints != null)
             {
-                BitmapHelper.DrawRectangles(ref rmsRenderInfo, rmsElements, rmsElements.Length);
-            }
-
-            if (peakElements != null)
-            {
-                for (var a = 0; a < valueElements.Length; a++)
+                //TODO: Switch to BitmapHelper.DrawLines.
+                for (var a = 0; a < data.CrestPoints.Length - 1; a++)
                 {
-                    var max = valueElements[a].Y;
-                    if (rmsElements != null)
-                    {
-                        max = Math.Max(max, rmsElements[a].Y);
-                    }
-                    if (peakElements[a].Y >= max)
-                    {
-                        continue;
-                    }
-                    BitmapHelper.DrawRectangle(
-                        ref valueRenderInfo,
-                        peakElements[a].X,
-                        peakElements[a].Y,
-                        peakElements[a].Width,
-                        peakElements[a].Height
-                    );
-                }
-            }
-
-            if (crestPoints != null)
-            {
-                for (var a = 0; a < crestPoints.Length - 1; a++)
-                {
-                    var point1 = crestPoints[a];
-                    var point2 = crestPoints[a + 1];
+                    var point1 = data.CrestPoints[a];
+                    var point2 = data.CrestPoints[a + 1];
                     BitmapHelper.DrawLine(
-                        ref crestRenderInfo,
+                        ref info.Crest,
                         point1.X,
                         point1.Y,
                         point2.X,
@@ -355,18 +468,25 @@ namespace FoxTunes
 
         private static void UpdateValue(SpectrumRendererData data, int band, int start, int end)
         {
+            var values = data.Data;
             var peakValues = data.History.Peak;
             var rmsValues = data.History.Rms;
             var value = default(float);
+            var peak = default(float);
             var rms = default(float);
-            var doRms = data.Rms != null;
+            var doPeaks = data.PeakValues != null;
+            var doRms = data.RmsValues != null;
             var count = end - start;
 
             if (count > 0)
             {
                 for (var a = start; a < end; a++)
                 {
-                    value = Math.Max(peakValues[0, a], value);
+                    value = Math.Max(values[0, a], value);
+                    if (doPeaks)
+                    {
+                        peak = Math.Max(peakValues[0, a], peak);
+                    }
                     if (doRms)
                     {
                         rms = Math.Max(rmsValues[0, a], rms);
@@ -392,13 +512,21 @@ namespace FoxTunes
                 }
                 for (var a = start; a < end; a++)
                 {
-                    value += peakValues[0, a];
+                    value += values[0, a];
+                    if (doPeaks)
+                    {
+                        peak += peakValues[0, a];
+                    }
                     if (doRms)
                     {
                         rms += rmsValues[0, a];
                     }
                 }
                 value /= count;
+                if (doPeaks)
+                {
+                    peak /= count;
+                }
                 if (doRms)
                 {
                     rms /= count;
@@ -406,49 +534,31 @@ namespace FoxTunes
             }
 
             data.Values[band] = ToDecibelFixed(value);
-
+            if (doPeaks)
+            {
+                data.PeakValues[band] = ToDecibelFixed(peak);
+            }
             if (doRms)
             {
-                data.Rms[band] = ToDecibelFixed(rms);
+                data.RmsValues[band] = ToDecibelFixed(rms);
             }
         }
 
         private static void UpdateElementsFast(SpectrumRendererData data)
         {
             UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
-            if (data.Rms != null && data.RmsElements != null)
+            if (data.PeakValues != null && data.PeakElements != null)
             {
-                UpdateElementsFast(data.Rms, data.RmsElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
+                UpdateElementsFast(data.PeakValues, data.PeakElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
             }
-            if (data.Rms != null && data.CrestPoints != null)
+            if (data.RmsValues != null && data.RmsElements != null)
             {
-                UpdateCrestPointsFast(data.Values, data.Rms, data.CrestPoints, data.Width, data.Height);
+                UpdateElementsFast(data.RmsValues, data.RmsElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
             }
-        }
-
-        private static void UpdatePeaks(SpectrumRendererData data, int updateInterval, int holdInterval)
-        {
-            if (data.RmsElements != null)
+            if (data.PeakValues != null && data.RmsValues != null && data.CrestPoints != null)
             {
-                for (var a = 0; a < data.Peaks.Length; a++)
-                {
-                    data.Peaks[a] = Math.Min(data.ValueElements[a].Y, data.RmsElements[a].Y);
-                }
+                UpdateCrestPointsFast(data.PeakValues, data.RmsValues, data.CrestPoints, data.Width, data.Height);
             }
-            else
-            {
-                for (var a = 0; a < data.Peaks.Length; a++)
-                {
-                    data.Peaks[a] = data.ValueElements[a].Y;
-                }
-            }
-            var duration = Convert.ToInt32(
-                Math.Min(
-                    (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
-                    updateInterval * 100
-                )
-            );
-            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, data.Margin, holdInterval, duration, Orientation.Vertical);
         }
 
         private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, int width, int height)
@@ -460,10 +570,10 @@ namespace FoxTunes
             height = height - 1;
             var step = width / values.Length;
             var offset = default(float);
-            for (var a = 0; a < values.Length; a++)
-            {
-                offset = Math.Max(offset, values[a] - rms[a]);
-            }
+            //for (var a = 0; a < values.Length; a++)
+            //{
+            //    offset = Math.Max(offset, values[a] - rms[a]);
+            //}
             for (var a = 0; a < values.Length; a++)
             {
                 var x = (a * step) + (step / 2);
@@ -484,13 +594,17 @@ namespace FoxTunes
         private static void UpdateElementsSmooth(SpectrumRendererData data)
         {
             UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
-            if (data.Rms != null && data.RmsElements != null)
+            if (data.PeakValues != null && data.PeakElements != null)
             {
-                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
+                UpdateElementsSmooth(data.PeakValues, data.PeakElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
             }
-            if (data.Rms != null && data.CrestPoints != null)
+            if (data.RmsValues != null && data.RmsElements != null)
             {
-                UpdateCrestPointsSmooth(data.Values, data.Rms, data.CrestPoints, data.Width, data.Height);
+                UpdateElementsSmooth(data.RmsValues, data.RmsElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
+            }
+            if (data.PeakValues != null && data.RmsValues != null && data.CrestPoints != null)
+            {
+                UpdateCrestPointsSmooth(data.PeakValues, data.RmsValues, data.CrestPoints, data.Width, data.Height);
             }
         }
 
@@ -505,10 +619,10 @@ namespace FoxTunes
             var offset = default(float);
             var minChange = 1;
             var maxChange = Convert.ToInt32(height * 0.05f);
-            for (var a = 0; a < values.Length; a++)
-            {
-                offset = Math.Max(offset, values[a] - rms[a]);
-            }
+            //for (var a = 0; a < values.Length; a++)
+            //{
+            //    offset = Math.Max(offset, values[a] - rms[a]);
+            //}
             for (var a = 0; a < values.Length; a++)
             {
                 var x = (a * step) + (step / 2);
@@ -526,7 +640,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest, Color[] colors)
+        public static SpectrumRendererData Create(int width, int height, int[] bands, int fftSize, bool showPeak, bool showRms, bool showCrest, IDictionary<string, Color[]> colors)
         {
             var margin = width > (bands.Length * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
@@ -542,32 +656,21 @@ namespace FoxTunes
                 Colors = colors,
                 ValueElements = new Int32Rect[bands.Length]
             };
+            if (showPeak)
+            {
+                data.PeakValues = new float[bands.Length];
+                data.PeakElements = new Int32Rect[bands.Length];
+            }
             if (showRms)
             {
-                data.Rms = new float[bands.Length];
+                data.RmsValues = new float[bands.Length];
                 data.RmsElements = new Int32Rect[bands.Length];
-                if (showCrest)
-                {
-                    data.CrestPoints = new Int32Point[bands.Length];
-                }
             }
-            if (showPeaks)
+            if (showPeak && showRms && showCrest)
             {
-                data.Peaks = new int[bands.Length];
-                data.Holds = new int[bands.Length];
-                data.PeakElements = CreatePeaks(bands.Length);
+                data.CrestPoints = new Int32Point[bands.Length];
             }
             return data;
-        }
-
-        private static Int32Rect[] CreatePeaks(int count)
-        {
-            var peaks = new Int32Rect[count];
-            for (var a = 0; a < count; a++)
-            {
-                peaks[a].Y = int.MaxValue;
-            }
-            return peaks;
         }
 
         public class SpectrumRendererData : FFTVisualizationData
@@ -585,7 +688,9 @@ namespace FoxTunes
 
             public float[] Values;
 
-            public float[] Rms;
+            public float[] PeakValues;
+
+            public float[] RmsValues;
 
             public int Width;
 
@@ -593,32 +698,46 @@ namespace FoxTunes
 
             public int Margin;
 
-            public Color[] Colors;
+            public IDictionary<string, Color[]> Colors;
 
             public Int32Rect[] ValueElements;
+
+            public Int32Rect[] PeakElements;
 
             public Int32Rect[] RmsElements;
 
             public Int32Point[] CrestPoints;
 
-            public Int32Rect[] PeakElements;
-
-            public int[] Peaks;
-
-            public int[] Holds;
-
             public DateTime LastUpdated;
 
             public override void OnAllocated()
             {
-                this.History.Capacity = 4;
-                this.History.Flags = VisualizationDataHistoryFlags.Peak;
-                if (this.Rms != null)
+                this.History.Capacity = 32;
+                this.History.Flags = VisualizationDataHistoryFlags.None;
+                if (this.PeakValues != null)
+                {
+                    this.History.Flags |= VisualizationDataHistoryFlags.Peak;
+                }
+                if (this.RmsValues != null)
                 {
                     this.History.Flags |= VisualizationDataHistoryFlags.Rms;
                 }
                 base.OnAllocated();
             }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SpectrumRenderInfo
+        {
+            public BitmapHelper.RenderInfo Peak;
+
+            public BitmapHelper.RenderInfo Rms;
+
+            public BitmapHelper.RenderInfo Value;
+
+            public BitmapHelper.RenderInfo Crest;
+
+            public BitmapHelper.RenderInfo Background;
         }
     }
 }

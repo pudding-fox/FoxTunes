@@ -97,15 +97,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hold Duration.
-        /// </summary>
-        internal static string EnhancedSpectrumConfiguration_Hold {
-            get {
-                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Hold", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string EnhancedSpectrumConfiguration_Path {
@@ -115,11 +106,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show Peaks.
+        ///   Looks up a localized string similar to Show Peak.
         /// </summary>
-        internal static string EnhancedSpectrumConfiguration_Peaks {
+        internal static string EnhancedSpectrumConfiguration_Peak {
             get {
-                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Peaks", resourceCulture);
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Peak", resourceCulture);
             }
         }
         

@@ -17,6 +17,7 @@ namespace FoxTunes
 
         public const int COLOR_FROM_X = 1;
         public const int COLOR_FROM_Y = 2;
+        public const int ALPHA_BLENDING = 4;
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport("bitmap_utilities.dll", EntryPoint = "create_palette")]
@@ -58,9 +59,24 @@ namespace FoxTunes
         [DllImport("bitmap_utilities.dll", EntryPoint = "shift_left")]
         public static extern bool ShiftLeft([In] ref RenderInfo info, int count);
 
+        public static bool Clear(ref RenderInfo info, Color color)
+        {
+            var temp = new Int32Color(color);
+            return Clear(ref info, ref temp);
+        }
+
         [SuppressUnmanagedCodeSecurity]
         [DllImport("bitmap_utilities.dll", EntryPoint = "clear")]
-        public static extern bool Clear([In] ref RenderInfo info);
+        public static extern bool Clear([In] ref RenderInfo info, [In] ref Int32Color color);
+
+        public static bool Clear(ref RenderInfo info)
+        {
+            return Clear(ref info, IntPtr.Zero);
+        }
+
+        [SuppressUnmanagedCodeSecurity]
+        [DllImport("bitmap_utilities.dll", EntryPoint = "clear")]
+        private static extern bool Clear([In] ref RenderInfo info, [In] IntPtr color);
 
         public static RenderInfo CreateRenderInfo(WriteableBitmap bitmap, IntPtr palette)
         {

@@ -129,14 +129,11 @@
   <data name="EnhancedSpectrumConfiguration.Crest" xml:space="preserve">
     <value>Show Crest Factor</value>
   </data>
-  <data name="EnhancedSpectrumConfiguration.Hold" xml:space="preserve">
-    <value>Hold Duration</value>
-  </data>
   <data name="EnhancedSpectrumConfiguration.Path" xml:space="preserve">
     <value>Spectrum</value>
   </data>
-  <data name="EnhancedSpectrumConfiguration.Peaks" xml:space="preserve">
-    <value>Show Peaks</value>
+  <data name="EnhancedSpectrumConfiguration.Peak" xml:space="preserve">
+    <value>Show Peak</value>
   </data>
   <data name="EnhancedSpectrumConfiguration.Rms" xml:space="preserve">
     <value>Show RMS</value>

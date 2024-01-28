@@ -13,6 +13,7 @@ typedef struct Int32Color
 
 #define COLOR_FROM_X 1
 #define COLOR_FROM_Y 2
+#define ALPHA_BLENDING 4
 
 typedef struct ColorPalette
 {
@@ -83,4 +84,4 @@ BOOL WINAPI  draw_pixel(RenderInfo* info, INT32 color, INT32 x, INT32 y);
 
 BOOL WINAPI shift_left(RenderInfo* info, INT32 count);
 
-BOOL WINAPI clear(RenderInfo* info);
+BOOL WINAPI clear(RenderInfo* info, Int32Color* color);

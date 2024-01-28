@@ -283,6 +283,18 @@ namespace FoxTunes
             });
         }
 
+        protected virtual void ClearBitmap(WriteableBitmap bitmap)
+        {
+            if (!bitmap.TryLock(LockTimeout))
+            {
+                return;
+            }
+            var info = BitmapHelper.CreateRenderInfo(bitmap, IntPtr.Zero);
+            BitmapHelper.Clear(ref info);
+            bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            bitmap.Unlock();
+        }
+
         protected virtual Task CreateData()
         {
             return Windows.Invoke(() =>
@@ -344,14 +356,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (!bitmap.TryLock(LockTimeout))
-                {
-                    return;
-                }
-                var info = BitmapHelper.CreateRenderInfo(bitmap, IntPtr.Zero);
-                BitmapHelper.Clear(ref info);
-                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                bitmap.Unlock();
+                this.ClearBitmap(bitmap);
             });
         }
 
@@ -720,7 +725,7 @@ namespace FoxTunes
     {
         public static bool IsLighter(this Color color)
         {
-            return color.A > byte.MaxValue / 2 && color.R > byte.MaxValue / 2 && color.G > byte.MaxValue / 2 && color.B > byte.MaxValue / 2;
+            return color.R > byte.MaxValue / 2 && color.G > byte.MaxValue / 2 && color.B > byte.MaxValue / 2;
         }
 
         public static Color Shade(this Color color1, Color color2)
@@ -764,12 +769,82 @@ namespace FoxTunes
             };
         }
 
+        public static Color[] ToTriplet(this Color color, byte shade)
+        {
+            var contrast1 = new Color()
+            {
+                R = shade,
+                G = shade,
+                B = shade
+            };
+            var contrast2 = new Color()
+            {
+                R = Convert.ToByte(shade * 2),
+                G = Convert.ToByte(shade * 2),
+                B = Convert.ToByte(shade * 2)
+            };
+            return new[]
+            {
+                color.Shade(contrast1),
+                color,
+                color.Shade(contrast2)
+            };
+        }
+
+        public static Color[] WithAlpha(this Color[] colors, int alpha)
+        {
+            return colors.Select(color => color.WithAlpha(alpha)).ToArray();
+        }
+
+        public static Color WithAlpha(this Color color, int alpha)
+        {
+            if (alpha > 0)
+            {
+                color.A += Convert.ToByte(alpha);
+            }
+            else if (alpha < 0)
+            {
+                color.A -= Convert.ToByte(Math.Abs(alpha));
+            }
+            return color;
+        }
+
+        public static IDictionary<string, ColorStop[]> ToNamedColorStops(this string value)
+        {
+            const string PREFIX = "//";
+            var groups = new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
+            var lines = value
+                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Trim())
+                .ToArray();
+            var group = string.Empty;
+            foreach (var line in lines)
+            {
+                if (line.StartsWith(PREFIX))
+                {
+                    group = line.Substring(PREFIX.Length).Trim();
+                    continue;
+                }
+                groups.GetOrAdd(group, () => new List<string>()).Add(line);
+            }
+            return groups.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.ToColorStops(),
+                StringComparer.OrdinalIgnoreCase
+            );
+        }
+
         public static ColorStop[] ToColorStops(this string value)
         {
             var lines = value
                 .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => line.Trim())
                 .ToArray();
+            return lines.ToColorStops();
+        }
+
+        public static ColorStop[] ToColorStops(this IEnumerable<string> lines)
+        {
             var colors = new List<ColorStop>();
             foreach (var line in lines)
             {

@@ -369,7 +369,7 @@ namespace FoxTunes
             {
                 for (var channel = 0; channel < channels; channel++)
                 {
-                    var value = samples[channel, position];
+                    var value = Math.Abs(samples[channel, position]);
                     values[channel] = Math.Max(value, values[channel]);
                     if (doRms)
                     {
