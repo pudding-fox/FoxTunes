@@ -354,7 +354,7 @@ namespace FoxTunes.ViewModel
                 {
                     effects = DragDropEffects.Copy;
                 }
-                if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
+                if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>())
                 {
                     effects = DragDropEffects.Copy;
                 }
@@ -396,10 +396,10 @@ namespace FoxTunes.ViewModel
                     var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
                     return this.AddToPlaylist(libraryHierarchyNode);
                 }
-                if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>(true))
+                if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>())
                 {
                     var playlistItems = e.Data
-                        .GetData<IEnumerable<PlaylistItem>>(true)
+                        .GetData<IEnumerable<PlaylistItem>>()
                         .OrderBy(playlistItem => playlistItem.Sequence);
                     return this.AddToPlaylist(playlistItems);
                 }

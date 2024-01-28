@@ -80,6 +80,8 @@ namespace FoxTunes
 
             public Point DragStartPosition { get; private set; }
 
+            public object DragData { get; private set; }
+
             public bool DragInitialized { get; private set; }
 
             public ListBox ListBox { get; private set; }
@@ -108,7 +110,7 @@ namespace FoxTunes
                 {
                     DragDrop.DoDragDrop(
                         this.ListBox,
-                        this.ListBox.SelectedValue,
+                        this.DragData,
                         DragDropEffects.Copy
                     );
                 }
@@ -125,11 +127,13 @@ namespace FoxTunes
                     return;
                 }
                 this.DragStartPosition = e.GetPosition(this.ListBox);
+                this.DragData = this.GetDataContext(e);
             }
 
             protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
             {
                 this.DragStartPosition = default(Point);
+                this.DragData = null;
             }
 
             protected virtual void OnMouseMove(object sender, MouseEventArgs e)
@@ -141,6 +145,7 @@ namespace FoxTunes
                 var position = e.GetPosition(this.ListBox);
                 if (this.ShouldInitializeDrag(e.OriginalSource, position))
                 {
+                    this.ListBox.SelectedItem = this.DragData;
                     this.DragStartPosition = default(Point);
                     this.DoDragDrop();
                 }
@@ -148,28 +153,44 @@ namespace FoxTunes
 
             protected virtual void OnDragOver(object sender, DragEventArgs e)
             {
-                var effects = DragDropEffects.None;
                 if (!this.DragInitialized)
                 {
                     return;
                 }
-                var position = e.GetPosition(this.ListBox);
-                var result = VisualTreeHelper.HitTest(this.ListBox, position);
-                if (result != null && result.VisualHit is FrameworkElement)
+                var data = e.Data.GetData<object>();
+                var value = this.GetDataContext(e);
+                if (value != null && !object.ReferenceEquals(data, value))
                 {
-                    var value = (result.VisualHit as FrameworkElement).DataContext;
-                    if (value != null && !object.ReferenceEquals(this.ListBox.SelectedValue, value))
+                    var command = GetDragDropReorderCommand(this.ListBox);
+                    var parameter = new[] { data, value };
+                    if (command != null && command.CanExecute(parameter))
                     {
-                        var command = GetDragDropReorderCommand(this.ListBox);
-                        var parameter = new[] { this.ListBox.SelectedValue, value };
-                        if (command != null && command.CanExecute(parameter))
-                        {
-                            command.Execute(parameter);
-                        }
-                        effects |= DragDropEffects.Move;
+                        command.Execute(parameter);
                     }
                 }
-                e.Effects = effects;
+                e.Effects = DragDropEffects.Move;
+            }
+
+            protected virtual object GetDataContext(MouseEventArgs e)
+            {
+                var position = e.GetPosition(this.ListBox);
+                return this.GetDataContext(position);
+            }
+
+            protected virtual object GetDataContext(DragEventArgs e)
+            {
+                var position = e.GetPosition(this.ListBox);
+                return this.GetDataContext(position);
+            }
+
+            protected virtual object GetDataContext(Point position)
+            {
+                var result = VisualTreeHelper.HitTest(this.ListBox, position);
+                if (result != null && result.VisualHit is FrameworkElement element)
+                {
+                    return element.DataContext;
+                }
+                return null;
             }
         }
     }

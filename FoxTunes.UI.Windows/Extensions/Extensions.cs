@@ -41,7 +41,7 @@ namespace FoxTunes
             return element.FindResource(resourceKey) as T;
         }
 
-        public static bool GetDataPresent<T>(this IDataObject dataObject, bool inferType)
+        public static bool GetDataPresent<T>(this IDataObject dataObject)
         {
             foreach (var format in dataObject.GetFormats())
             {
@@ -62,7 +62,7 @@ namespace FoxTunes
             return false;
         }
 
-        public static T GetData<T>(this IDataObject dataObject, bool inferType)
+        public static T GetData<T>(this IDataObject dataObject)
         {
             foreach (var format in dataObject.GetFormats())
             {
